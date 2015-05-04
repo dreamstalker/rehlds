@@ -1,0 +1,20 @@
+#ifndef __APPVERSION_H__
+\#define __APPVERSION_H__
+
+//
+// This file is generated automatically.
+// Don't edit it.
+//
+
+// Version defines
+\#define VERSION_MAJOR ${verInfo.majorVersion}
+\#define VERSION_MINOR ${verInfo.minorVersion}
+
+\#define APP_VERSION_D ${verInfo.format('.', '-', true)}
+\#define APP_VERSION_STRD "${verInfo.format('.', '-', true)}"
+
+#set ( $commitYMD = $_DateTimeFormat.forPattern('yyyy-MM-dd').print($verInfo.lastCommitDate) )
+
+\#define APP_VERSION_YMD_STR "${commitYMD}"
+
+#endif //__APPVERSION_H__

@@ -1,0 +1,1041 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+      <ParseFiles>false</ParseFiles>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="hookers">
+      <UniqueIdentifier>{7be88557-a49b-4c62-8df3-d7134a578201}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="engine">
+      <UniqueIdentifier>{eeaac718-712b-453f-9d34-4cefc9e0fe59}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="version">
+      <UniqueIdentifier>{bcd7bb13-9910-4e5d-bb7a-b13b6b813fe8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="engine\common">
+      <UniqueIdentifier>{66f51dad-107e-440d-9d17-f940a5f097b6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="engine\server">
+      <UniqueIdentifier>{572aedd9-6d8e-4099-86dc-aae0d6dce836}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="engine\client">
+      <UniqueIdentifier>{be634138-1bc8-4547-b84f-8885675922d6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common">
+      <UniqueIdentifier>{fe7a8e81-b7d4-4540-ab5b-457ed93672ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="linux">
+      <UniqueIdentifier>{9de0de20-070f-4fae-a9df-3dca942e65a7}</UniqueIdentifier>
+      <ParseFiles>false</ParseFiles>
+    </Filter>
+    <Filter Include="public">
+      <UniqueIdentifier>{d74cb79e-afd5-4215-af0e-029e38925be0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="public\steam">
+      <UniqueIdentifier>{e39a67b3-80ba-4cf5-b400-47b81b798984}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="testsuite">
+      <UniqueIdentifier>{f1a6df08-3b16-4524-b67e-21f6f4e16fa1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="rehlds">
+      <UniqueIdentifier>{a54a9aa9-f95b-4199-bdf0-9640fdb5590b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="unittests">
+      <UniqueIdentifier>{10ba586f-5f90-4a4b-940c-287810a7e9bc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="public\tier0">
+      <UniqueIdentifier>{a49f0aeb-4e6b-4939-a396-1599d2a7d971}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="public\rehlds">
+      <UniqueIdentifier>{b9870aee-d852-4d90-98d7-317ec1283872}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="dlls">
+      <UniqueIdentifier>{c91850f0-8e81-47e5-9a5f-53215766e960}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\hookers\memory.cpp">
+      <Filter>hookers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\hookers\hooker.cpp">
+      <Filter>hookers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\hookers\6132_hooker.cpp">
+      <Filter>hookers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\engine\common.cpp">
+      <Filter>engine\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\engine\sys_dll.cpp">
+      <Filter>engine\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\engine\delta.cpp">
+      <Filter>engine\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\engine\sv_main.cpp">
+      <Filter>engine\server</Filter>
+    </ClCompile>
+    <ClCompile Include="..\engine\zone.cpp">
+      <Filter>engine\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\engine\mem.cpp">
+      <Filter>engine\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\engine\cmd.cpp">
+      <Filter>engine\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\engine\filesystem_internal.cpp">
+      <Filter>engine\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\engine\host.cpp">
+      <Filter>engine\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\engine\module.cpp">
+      <Filter>engine\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\engine\unicode_strtools.cpp">
+      <Filter>engine\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\engine\cvar.cpp">
+      <Filter>engine\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\hookers\main.cpp">
+      <Filter>hookers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\public\interface.cpp">
+      <Filter>public</Filter>
+    </ClCompile>
+    <ClCompile Include="..\engine\filesystem.cpp">
+      <Filter>engine\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\engine\info.cpp">
+      <Filter>engine\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\public\registry.cpp">
+      <Filter>public</Filter>
+    </ClCompile>
+    <ClCompile Include="..\engine\sys_dll2.cpp">
+      <Filter>engine\server</Filter>
+    </ClCompile>
+    <ClCompile Include="..\engine\cmodel.cpp">
+      <Filter>engine\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\engine\model.cpp">
+      <Filter>engine\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\engine\cl_null.cpp">
+      <Filter>engine\server</Filter>
+    </ClCompile>
+    <ClCompile Include="..\engine\sv_log.cpp">
+      <Filter>engine\server</Filter>
+    </ClCompile>
+    <ClCompile Include="..\engine\sv_steam3.cpp">
+      <Filter>engine\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\engine\host_cmd.cpp">
+      <Filter>engine\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\engine\sv_user.cpp">
+      <Filter>engine\server</Filter>
+    </ClCompile>
+    <ClCompile Include="..\engine\pmove.cpp">
+      <Filter>engine\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\engine\pr_edict.cpp">
+      <Filter>engine\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\engine\pmovetst.cpp">
+      <Filter>engine\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\engine\mathlib.cpp">
+      <Filter>engine\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\engine\world.cpp">
+      <Filter>engine\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\engine\pr_cmds.cpp">
+      <Filter>engine\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\engine\sv_phys.cpp">
+      <Filter>engine\server</Filter>
+    </ClCompile>
+    <ClCompile Include="..\engine\sv_move.cpp">
+      <Filter>engine\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\testsuite\testsuite.cpp">
+      <Filter>testsuite</Filter>
+    </ClCompile>
+    <ClCompile Include="..\testsuite\recorder.cpp">
+      <Filter>testsuite</Filter>
+    </ClCompile>
+    <ClCompile Include="..\testsuite\funccalls.cpp">
+      <Filter>testsuite</Filter>
+    </ClCompile>
+    <ClCompile Include="..\testsuite\player.cpp">
+      <Filter>testsuite</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rehlds\RehldsRuntimeConfig.cpp">
+      <Filter>rehlds</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rehlds\platform.cpp">
+      <Filter>rehlds</Filter>
+    </ClCompile>
+    <ClCompile Include="..\engine\r_studio.cpp">
+      <Filter>engine\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\unittests\common_tests.cpp">
+      <Filter>unittests</Filter>
+    </ClCompile>
+    <ClCompile Include="..\engine\net_ws.cpp">
+      <Filter>engine\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\engine\net_chan.cpp">
+      <Filter>engine\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\engine\hashpak.cpp">
+      <Filter>engine\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\hookers\rehlds_debug.cpp">
+      <Filter>hookers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\unittests\TestRunner.cpp">
+      <Filter>unittests</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rehlds\precompiled.cpp">
+      <Filter>rehlds</Filter>
+    </ClCompile>
+    <ClCompile Include="..\engine\tmessage.cpp">
+      <Filter>engine\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\engine\wad.cpp">
+      <Filter>engine\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\engine\textures.cpp">
+      <Filter>engine\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\engine\vid_null.cpp">
+      <Filter>engine\server</Filter>
+    </ClCompile>
+    <ClCompile Include="..\engine\l_studio.cpp">
+      <Filter>engine\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\engine\crc.cpp">
+      <Filter>engine\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\engine\sv_pmove.cpp">
+      <Filter>engine\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\public\utlbuffer.cpp">
+      <Filter>public</Filter>
+    </ClCompile>
+    <ClCompile Include="..\public\tier0\platform_win32.cpp">
+      <Filter>public\tier0</Filter>
+    </ClCompile>
+    <ClCompile Include="..\public\tier0\platform_linux.cpp">
+      <Filter>public\tier0</Filter>
+    </ClCompile>
+    <ClCompile Include="..\engine\sv_remoteaccess.cpp">
+      <Filter>engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\public\tier0\dbg.cpp">
+      <Filter>public\tier0</Filter>
+    </ClCompile>
+    <ClCompile Include="..\engine\buildnum.cpp">
+      <Filter>engine\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rehlds\structSizeCheck.cpp">
+      <Filter>rehlds</Filter>
+    </ClCompile>
+    <ClCompile Include="..\unittests\struct_offsets_tests.cpp">
+      <Filter>unittests</Filter>
+    </ClCompile>
+    <ClCompile Include="..\engine\com_custom.cpp">
+      <Filter>engine\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\unittests\tmessage_tests.cpp">
+      <Filter>unittests</Filter>
+    </ClCompile>
+    <ClCompile Include="..\public\steamid.cpp">
+      <Filter>public</Filter>
+    </ClCompile>
+    <ClCompile Include="..\engine\sv_upld.cpp">
+      <Filter>engine\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\engine\ipratelimit.cpp">
+      <Filter>engine\server</Filter>
+    </ClCompile>
+    <ClCompile Include="..\engine\ipratelimitWrapper.cpp">
+      <Filter>engine\server</Filter>
+    </ClCompile>
+    <ClCompile Include="..\engine\decals.cpp">
+      <Filter>engine\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\engine\sys_engine.cpp">
+      <Filter>engine\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\engine\sys_linuxwind.cpp">
+      <Filter>engine\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\engine\snd_null.cpp">
+      <Filter>engine\server</Filter>
+    </ClCompile>
+    <ClCompile Include="..\engine\traceinit.cpp">
+      <Filter>engine\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\hookers\main_swds.cpp">
+      <Filter>hookers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rehlds\hookchains_impl.cpp">
+      <Filter>rehlds</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rehlds\rehlds_interfaces_impl.cpp">
+      <Filter>rehlds</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rehlds\rehlds_api_impl.cpp">
+      <Filter>rehlds</Filter>
+    </ClCompile>
+    <ClCompile Include="..\testsuite\anonymizer.cpp">
+      <Filter>testsuite</Filter>
+    </ClCompile>
+    <ClCompile Include="..\public\rehlds\sys_shared.cpp">
+      <Filter>public\rehlds</Filter>
+    </ClCompile>
+    <ClCompile Include="..\public\rehlds\crc32.cpp">
+      <Filter>public\rehlds</Filter>
+    </ClCompile>
+    <ClCompile Include="..\engine\ed_strpool.cpp">
+      <Filter>engine\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rehlds\FlightRecorderImpl.cpp">
+      <Filter>rehlds</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rehlds\flight_recorder.cpp">
+      <Filter>rehlds</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\hookers\memory.h">
+      <Filter>hookers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\version\version.h">
+      <Filter>version</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\common.h">
+      <Filter>engine\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hookers\engine.h">
+      <Filter>hookers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\sys_dll.h">
+      <Filter>engine\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\delta.h">
+      <Filter>engine\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\server.h">
+      <Filter>engine\server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\consistency.h">
+      <Filter>engine\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\event.h">
+      <Filter>engine\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\zone.h">
+      <Filter>engine\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\client.h">
+      <Filter>engine\client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\quakedef.h">
+      <Filter>engine\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\sound.h">
+      <Filter>engine\client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\delta_packet.h">
+      <Filter>engine\client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\net.h">
+      <Filter>engine\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\beamdef.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\cl_entity.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\com_model.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\con_nprint.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\const.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\crc.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\cvardef.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\demo_api.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\director_cmds.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\dlight.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\dll_state.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\entity_state.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\entity_types.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\enums.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\event_api.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\event_args.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\event_flags.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\hltv.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\in_buttons.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\ivoicetweak.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\mathlib.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\net_api.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\netadr.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\nowin.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\parsemsg.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\particledef.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\pmtrace.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\port.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\qfont.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\r_efx.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\r_studioint.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\ref_params.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\screenfade.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\Sequence.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\studio_event.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\triangleapi.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\usercmd.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\weaponinfo.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\winsani_in.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\winsani_out.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\userid.h">
+      <Filter>engine\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\inst_baseline.h">
+      <Filter>engine\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\mem.h">
+      <Filter>engine\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\cmd.h">
+      <Filter>engine\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\filesystem_internal.h">
+      <Filter>engine\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\host.h">
+      <Filter>engine\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\vmodes.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\cdll_int.h">
+      <Filter>engine\client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\APIProxy.h">
+      <Filter>engine\client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\kbutton.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\unicode_strtools.h">
+      <Filter>engine\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\cvar.h">
+      <Filter>engine\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\archtypes.h">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\FileSystem.h">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\interface.h">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\steam\steamtypes.h">
+      <Filter>public\steam</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\filesystem_.h">
+      <Filter>engine\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\modinfo.h">
+      <Filter>engine\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\info.h">
+      <Filter>engine\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\iregistry.h">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\filter.h">
+      <Filter>engine\server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\pr_dlls.h">
+      <Filter>engine\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\sys_dll2.h">
+      <Filter>engine\server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\engine_hlds_api.h">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\engine_launcher_api.h">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\cmodel.h">
+      <Filter>engine\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\server_static.h">
+      <Filter>engine\server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\sv_log.h">
+      <Filter>engine\server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\sv_steam3.h">
+      <Filter>engine\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\steam\isteamapps.h">
+      <Filter>public\steam</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\steam\isteambilling.h">
+      <Filter>public\steam</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\steam\isteamclient.h">
+      <Filter>public\steam</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\steam\isteamcontroller.h">
+      <Filter>public\steam</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\steam\isteamfriends.h">
+      <Filter>public\steam</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\steam\isteamgameserver.h">
+      <Filter>public\steam</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\steam\isteamgameserverstats.h">
+      <Filter>public\steam</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\steam\isteamhttp.h">
+      <Filter>public\steam</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\steam\isteammatchmaking.h">
+      <Filter>public\steam</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\steam\isteamnetworking.h">
+      <Filter>public\steam</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\steam\isteamremotestorage.h">
+      <Filter>public\steam</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\steam\isteamscreenshots.h">
+      <Filter>public\steam</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\steam\isteamunifiedmessages.h">
+      <Filter>public\steam</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\steam\isteamuser.h">
+      <Filter>public\steam</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\steam\isteamuserstats.h">
+      <Filter>public\steam</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\steam\isteamutils.h">
+      <Filter>public\steam</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\steam\matchmakingtypes.h">
+      <Filter>public\steam</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\steam\steam_api.h">
+      <Filter>public\steam</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\steam\steam_gameserver.h">
+      <Filter>public\steam</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\steam\steamclientpublic.h">
+      <Filter>public\steam</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\steam\steamhttpenums.h">
+      <Filter>public\steam</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\SteamCommon.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\host_cmd.h">
+      <Filter>engine\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\usermsg.h">
+      <Filter>engine\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\sv_user.h">
+      <Filter>engine\server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\decal.h">
+      <Filter>engine\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\pmove.h">
+      <Filter>engine\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\pr_edict.h">
+      <Filter>engine\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\pmovetst.h">
+      <Filter>engine\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\mathlib_e.h">
+      <Filter>engine\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\world.h">
+      <Filter>engine\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\pr_cmds.h">
+      <Filter>engine\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\sv_phys.h">
+      <Filter>engine\server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\sv_move.h">
+      <Filter>engine\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\testsuite\testsuite.h">
+      <Filter>testsuite</Filter>
+    </ClInclude>
+    <ClInclude Include="..\testsuite\funccalls.h">
+      <Filter>testsuite</Filter>
+    </ClInclude>
+    <ClInclude Include="..\testsuite\recorder.h">
+      <Filter>testsuite</Filter>
+    </ClInclude>
+    <ClInclude Include="..\testsuite\player.h">
+      <Filter>testsuite</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rehlds\RehldsRuntimeConfig.h">
+      <Filter>rehlds</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rehlds\platform.h">
+      <Filter>rehlds</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\net_ws.h">
+      <Filter>engine\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\net_chan.h">
+      <Filter>engine\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\hashpak.h">
+      <Filter>engine\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hookers\rehlds_debug.h">
+      <Filter>hookers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rehlds\precompiled.h">
+      <Filter>rehlds</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hookers\hooker.h">
+      <Filter>hookers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\tmessage.h">
+      <Filter>engine\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\wad.h">
+      <Filter>engine\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\textures.h">
+      <Filter>engine\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\vid_null.h">
+      <Filter>engine\server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\l_studio.h">
+      <Filter>engine\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\sv_pmove.h">
+      <Filter>engine\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\keys.h">
+      <Filter>engine\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\utlmemory.h">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\tier0\platform.h">
+      <Filter>public\tier0</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\tier0\fasttimer.h">
+      <Filter>public\tier0</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\tier0\dbg.h">
+      <Filter>public\tier0</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\basetypes.h">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\protected_things.h">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\commonmacros.h">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\utlbuffer.h">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\string_t.h">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\tier0\memalloc.h">
+      <Filter>public\tier0</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\tier0\mem.h">
+      <Filter>public\tier0</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\tier0\memdbgon.h">
+      <Filter>public\tier0</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\tier0\memdbgoff.h">
+      <Filter>public\tier0</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\utllinkedlist.h">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\IGameServerData.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\sv_remoteaccess.h">
+      <Filter>engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\com_custom.h">
+      <Filter>engine\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\sv_upld.h">
+      <Filter>engine\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\utlrbtree.h">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\ipratelimit.h">
+      <Filter>engine\server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\ipratelimitWrapper.h">
+      <Filter>engine\server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\savegame_version.h">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\iengine.h">
+      <Filter>engine\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\sys_engine.h">
+      <Filter>engine\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\igame.h">
+      <Filter>engine\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\sys_linuxwnd.h">
+      <Filter>engine\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\traceinit.h">
+      <Filter>engine\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\utlvector.h">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\idedicatedexports.h">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\rehlds\common_rehlds.h">
+      <Filter>public\rehlds</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\rehlds\maintypes.h">
+      <Filter>public\rehlds</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\rehlds\osconfig.h">
+      <Filter>public\rehlds</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\rehlds\hookchains.h">
+      <Filter>public\rehlds</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\rehlds\rehlds_interfaces.h">
+      <Filter>public\rehlds</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\rehlds\userid_rehlds.h">
+      <Filter>public\rehlds</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\rehlds\rehlds_api.h">
+      <Filter>public\rehlds</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rehlds\hookchains_impl.h">
+      <Filter>rehlds</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rehlds\rehlds_interfaces_impl.h">
+      <Filter>rehlds</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rehlds\rehlds_api_impl.h">
+      <Filter>rehlds</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\rehlds\archtypes.h">
+      <Filter>public\rehlds</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\rehlds\eiface.h">
+      <Filter>public\rehlds</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\rehlds\edict.h">
+      <Filter>public\rehlds</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\rehlds\progdefs.h">
+      <Filter>public\rehlds</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\custom_int.h">
+      <Filter>engine\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\rehlds\custom.h">
+      <Filter>public\rehlds</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\activity.h">
+      <Filter>dlls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\activitymap.h">
+      <Filter>dlls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\animation.h">
+      <Filter>dlls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\basemonster.h">
+      <Filter>dlls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\cbase.h">
+      <Filter>dlls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\cdll_dll.h">
+      <Filter>dlls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\client.h">
+      <Filter>dlls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\decals.h">
+      <Filter>dlls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\doors.h">
+      <Filter>dlls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\effects.h">
+      <Filter>dlls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\enginecallback.h">
+      <Filter>dlls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\explode.h">
+      <Filter>dlls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\extdll.h">
+      <Filter>dlls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\func_break.h">
+      <Filter>dlls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\game.h">
+      <Filter>dlls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\gamerules.h">
+      <Filter>dlls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\hornet.h">
+      <Filter>dlls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\items.h">
+      <Filter>dlls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\maprules.h">
+      <Filter>dlls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\monsterevent.h">
+      <Filter>dlls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\monsters.h">
+      <Filter>dlls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\nodes.h">
+      <Filter>dlls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\plane.h">
+      <Filter>dlls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\player.h">
+      <Filter>dlls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\saverestore.h">
+      <Filter>dlls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\schedule.h">
+      <Filter>dlls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\scriptevent.h">
+      <Filter>dlls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\skill.h">
+      <Filter>dlls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\soundent.h">
+      <Filter>dlls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\spectator.h">
+      <Filter>dlls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\talkmonster.h">
+      <Filter>dlls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\teamplay_gamerules.h">
+      <Filter>dlls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\trains.h">
+      <Filter>dlls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\util.h">
+      <Filter>dlls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\vector.h">
+      <Filter>dlls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\weapons.h">
+      <Filter>dlls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\testsuite\anonymizer.h">
+      <Filter>testsuite</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\rehlds\sys_shared.h">
+      <Filter>public\rehlds</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\rehlds\crc32.h">
+      <Filter>public\rehlds</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\rehlds\static_map.h">
+      <Filter>public\rehlds</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\ed_strpool.h">
+      <Filter>engine\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\rehlds\FlightRecorder.h">
+      <Filter>public\rehlds</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rehlds\FlightRecorderImpl.h">
+      <Filter>rehlds</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rehlds\flight_recorder.h">
+      <Filter>rehlds</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\rehlds\cmd_rehlds.h">
+      <Filter>public\rehlds</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\rehlds\customentity.h">
+      <Filter>public\rehlds</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\rehlds\d_local.h">
+      <Filter>public\rehlds</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\rehlds\keydefs.h">
+      <Filter>public\rehlds</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\rehlds\progs.h">
+      <Filter>public\rehlds</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\rehlds\Sequence.h">
+      <Filter>public\rehlds</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\rehlds\shake.h">
+      <Filter>public\rehlds</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\studio_rehlds.h">
+      <Filter>engine\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\model_rehlds.h">
+      <Filter>engine\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\rehlds\bspfile.h">
+      <Filter>public\rehlds</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\linux\appversion.sh">
+      <Filter>linux</Filter>
+    </None>
+    <None Include="..\linux\Makefile">
+      <Filter>linux</Filter>
+    </None>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,16 @@
+**/build
+**/.gradle
+.idea
+*.iml
+**/msvc/Debug*
+**/msvc/Release*
+**/msvc/*.sdf
+**/msvc/*.opensdf
+**/msvc/*.user
+**/msvc/*.suo
+**/msvc/ipch
+
+rehlds/version/appversion.h
+rehlds/msvc/PublishPath*.txt
+rehlds/_rehldsTestImg
+publish

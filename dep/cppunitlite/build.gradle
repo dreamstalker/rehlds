@@ -1,0 +1,60 @@
+import org.doomedsociety.gradlecpp.cfg.ToolchainConfigUtils
+import org.doomedsociety.gradlecpp.msvc.MsvcToolchainConfig
+import org.doomedsociety.gradlecpp.toolchain.icc.Icc
+import org.doomedsociety.gradlecpp.toolchain.icc.IccCompilerPlugin
+import org.gradle.nativeplatform.NativeBinarySpec
+import org.gradle.nativeplatform.NativeLibrarySpec
+
+apply plugin: 'cpp'
+apply plugin: IccCompilerPlugin
+
+void setupToolchain(NativeBinarySpec b) {
+    def cfg = rootProject.createToolchainConfig(b)
+
+    ToolchainConfigUtils.apply(project, cfg, b)
+}
+
+model {
+    buildTypes {
+        debug
+        release
+    }
+
+    platforms {
+        x86 {
+            architecture "x86"
+        }
+    }
+
+    toolChains {
+        visualCpp(VisualCpp) {
+        }
+        icc(Icc) {
+        }
+    }
+
+    components {
+		cppunitlite(NativeLibrarySpec) {
+			targetPlatform 'x86'
+			
+			sources {
+				cppul_main(CppSourceSet) {
+					source {
+						srcDir "src"
+						include "**/*.cpp"
+					}
+					
+					exportedHeaders {
+						srcDir "include"
+					}					
+				}
+			}
+			
+
+            binaries.all { NativeBinarySpec b ->
+                project.setupToolchain(b)
+            }			
+		}
+	}
+}
+

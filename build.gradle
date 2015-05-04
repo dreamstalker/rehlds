@@ -1,0 +1,44 @@
+import versioning.GitVersioner
+import versioning.RehldsVersionInfo
+
+apply plugin: 'maven-publish'
+apply from: 'shared.gradle'
+group = 'rehlds'
+
+def gitInfo = GitVersioner.versionForDir(project.rootDir)
+if (!gitInfo) {
+    throw new RuntimeException('Running outside git repository')
+}
+
+
+
+RehldsVersionInfo versionInfo
+if (gitInfo.tag && gitInfo.tag[0] == 'v') {
+    def m = gitInfo.tag =~ /^v(\d+)\.(\d+)(\.(\d+))?$/
+    if (!m.find()) {
+        throw new RuntimeException("Invalid git version tag name ${gitInfo.tag}")
+    }
+
+    versionInfo = new RehldsVersionInfo(
+            majorVersion: m.group(1) as int,
+            minorVersion: m.group(2) as int,
+            maintenanceVersion: m.group(4) ? (m.group(4) as int) : null,
+            lastCommitDate: gitInfo.lastCommitDate
+    )
+} else {
+    versionInfo = new RehldsVersionInfo(
+            majorVersion: project.majorVersion as int,
+            minorVersion: project.minorVersion as int,
+            suffix: 'SNAPSHOT',
+            lastCommitDate: gitInfo.lastCommitDate
+    )
+}
+
+project.ext.rehldsVersionInfo = versionInfo
+project.version = versionInfo.asMavenVersion()
+
+apply from: 'publish.gradle'
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.4-rc-2'
+}

@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="include">
+      <UniqueIdentifier>{f9e9a344-81ba-4669-a9a5-a9abe81561f8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{93df47a7-64d0-4a1a-8fcc-4f5dfa6d9086}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\include\cppunitlite\Assertions.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\cppunitlite\Failure.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\cppunitlite\Test.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\cppunitlite\TestHarness.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\cppunitlite\TestRegistry.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\cppunitlite\TestResult.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\cppunitlite\GradleAdapter.h">
+      <Filter>include</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\Assertions.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Test.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\TestRegistry.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\TestResult.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\GradleAdapter.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

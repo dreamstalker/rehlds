@@ -1,0 +1,88 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30501.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ReHLDS", "..\rehlds\msvc\ReHLDS.vcxproj", "{70A2B904-B7DB-4C48-8DE0-AF567360D572}"
+	ProjectSection(ProjectDependencies) = postProject
+		{792DF067-9904-4579-99B9-46C17277ADE3} = {792DF067-9904-4579-99B9-46C17277ADE3}
+		{CEB94F7C-E459-4673-AABB-36E2074396C0} = {CEB94F7C-E459-4673-AABB-36E2074396C0}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cppunitlite", "..\dep\cppunitlite\msvc\cppunitlite.vcxproj", "{CEB94F7C-E459-4673-AABB-36E2074396C0}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bzip2", "..\dep\bzip2\msvc\bzip2.vcxproj", "{792DF067-9904-4579-99B9-46C17277ADE3}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "gradle", "gradle", "{FFC337A9-D58C-4D62-B8BB-A54DD4E4DF41}"
+	ProjectSection(SolutionItems) = preProject
+		..\build.gradle = ..\build.gradle
+		..\gradle.properties = ..\gradle.properties
+		..\settings.gradle = ..\settings.gradle
+		..\shared.gradle = ..\shared.gradle
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug Play|Win32 = Debug Play|Win32
+		Debug Record|Win32 = Debug Record|Win32
+		Debug Swds Play|Win32 = Debug Swds Play|Win32
+		Debug Swds|Win32 = Debug Swds|Win32
+		Debug|Win32 = Debug|Win32
+		Release Play|Win32 = Release Play|Win32
+		Release|Win32 = Release|Win32
+		Tests|Win32 = Tests|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{70A2B904-B7DB-4C48-8DE0-AF567360D572}.Debug Play|Win32.ActiveCfg = Debug Play|Win32
+		{70A2B904-B7DB-4C48-8DE0-AF567360D572}.Debug Play|Win32.Build.0 = Debug Play|Win32
+		{70A2B904-B7DB-4C48-8DE0-AF567360D572}.Debug Record|Win32.ActiveCfg = Debug Record|Win32
+		{70A2B904-B7DB-4C48-8DE0-AF567360D572}.Debug Record|Win32.Build.0 = Debug Record|Win32
+		{70A2B904-B7DB-4C48-8DE0-AF567360D572}.Debug Swds Play|Win32.ActiveCfg = Debug Swds Play|Win32
+		{70A2B904-B7DB-4C48-8DE0-AF567360D572}.Debug Swds Play|Win32.Build.0 = Debug Swds Play|Win32
+		{70A2B904-B7DB-4C48-8DE0-AF567360D572}.Debug Swds|Win32.ActiveCfg = Debug Swds|Win32
+		{70A2B904-B7DB-4C48-8DE0-AF567360D572}.Debug Swds|Win32.Build.0 = Debug Swds|Win32
+		{70A2B904-B7DB-4C48-8DE0-AF567360D572}.Debug|Win32.ActiveCfg = Debug|Win32
+		{70A2B904-B7DB-4C48-8DE0-AF567360D572}.Debug|Win32.Build.0 = Debug|Win32
+		{70A2B904-B7DB-4C48-8DE0-AF567360D572}.Release Play|Win32.ActiveCfg = Release Play|Win32
+		{70A2B904-B7DB-4C48-8DE0-AF567360D572}.Release Play|Win32.Build.0 = Release Play|Win32
+		{70A2B904-B7DB-4C48-8DE0-AF567360D572}.Release|Win32.ActiveCfg = Release|Win32
+		{70A2B904-B7DB-4C48-8DE0-AF567360D572}.Release|Win32.Build.0 = Release|Win32
+		{70A2B904-B7DB-4C48-8DE0-AF567360D572}.Tests|Win32.ActiveCfg = Tests|Win32
+		{70A2B904-B7DB-4C48-8DE0-AF567360D572}.Tests|Win32.Build.0 = Tests|Win32
+		{CEB94F7C-E459-4673-AABB-36E2074396C0}.Debug Play|Win32.ActiveCfg = Debug|Win32
+		{CEB94F7C-E459-4673-AABB-36E2074396C0}.Debug Play|Win32.Build.0 = Debug|Win32
+		{CEB94F7C-E459-4673-AABB-36E2074396C0}.Debug Record|Win32.ActiveCfg = Debug|Win32
+		{CEB94F7C-E459-4673-AABB-36E2074396C0}.Debug Record|Win32.Build.0 = Debug|Win32
+		{CEB94F7C-E459-4673-AABB-36E2074396C0}.Debug Swds Play|Win32.ActiveCfg = Debug|Win32
+		{CEB94F7C-E459-4673-AABB-36E2074396C0}.Debug Swds Play|Win32.Build.0 = Debug|Win32
+		{CEB94F7C-E459-4673-AABB-36E2074396C0}.Debug Swds|Win32.ActiveCfg = Debug|Win32
+		{CEB94F7C-E459-4673-AABB-36E2074396C0}.Debug Swds|Win32.Build.0 = Debug|Win32
+		{CEB94F7C-E459-4673-AABB-36E2074396C0}.Debug|Win32.ActiveCfg = Debug|Win32
+		{CEB94F7C-E459-4673-AABB-36E2074396C0}.Debug|Win32.Build.0 = Debug|Win32
+		{CEB94F7C-E459-4673-AABB-36E2074396C0}.Release Play|Win32.ActiveCfg = Release|Win32
+		{CEB94F7C-E459-4673-AABB-36E2074396C0}.Release Play|Win32.Build.0 = Release|Win32
+		{CEB94F7C-E459-4673-AABB-36E2074396C0}.Release|Win32.ActiveCfg = Release|Win32
+		{CEB94F7C-E459-4673-AABB-36E2074396C0}.Release|Win32.Build.0 = Release|Win32
+		{CEB94F7C-E459-4673-AABB-36E2074396C0}.Tests|Win32.ActiveCfg = Debug|Win32
+		{CEB94F7C-E459-4673-AABB-36E2074396C0}.Tests|Win32.Build.0 = Debug|Win32
+		{792DF067-9904-4579-99B9-46C17277ADE3}.Debug Play|Win32.ActiveCfg = Debug|Win32
+		{792DF067-9904-4579-99B9-46C17277ADE3}.Debug Play|Win32.Build.0 = Debug|Win32
+		{792DF067-9904-4579-99B9-46C17277ADE3}.Debug Record|Win32.ActiveCfg = Debug|Win32
+		{792DF067-9904-4579-99B9-46C17277ADE3}.Debug Record|Win32.Build.0 = Debug|Win32
+		{792DF067-9904-4579-99B9-46C17277ADE3}.Debug Swds Play|Win32.ActiveCfg = Debug|Win32
+		{792DF067-9904-4579-99B9-46C17277ADE3}.Debug Swds Play|Win32.Build.0 = Debug|Win32
+		{792DF067-9904-4579-99B9-46C17277ADE3}.Debug Swds|Win32.ActiveCfg = Debug|Win32
+		{792DF067-9904-4579-99B9-46C17277ADE3}.Debug Swds|Win32.Build.0 = Debug|Win32
+		{792DF067-9904-4579-99B9-46C17277ADE3}.Debug|Win32.ActiveCfg = Debug|Win32
+		{792DF067-9904-4579-99B9-46C17277ADE3}.Debug|Win32.Build.0 = Debug|Win32
+		{792DF067-9904-4579-99B9-46C17277ADE3}.Release Play|Win32.ActiveCfg = Release|Win32
+		{792DF067-9904-4579-99B9-46C17277ADE3}.Release Play|Win32.Build.0 = Release|Win32
+		{792DF067-9904-4579-99B9-46C17277ADE3}.Release|Win32.ActiveCfg = Release|Win32
+		{792DF067-9904-4579-99B9-46C17277ADE3}.Release|Win32.Build.0 = Release|Win32
+		{792DF067-9904-4579-99B9-46C17277ADE3}.Tests|Win32.ActiveCfg = Debug|Win32
+		{792DF067-9904-4579-99B9-46C17277ADE3}.Tests|Win32.Build.0 = Debug|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
