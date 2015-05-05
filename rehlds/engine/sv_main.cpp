@@ -2198,7 +2198,11 @@ void SV_ConnectClient_internal(void)
 	client_t *client;
 	netadr_t adr;
 	int nClientSlot;
+#ifdef REHLDS_FIXES
+	char userinfo[MAX_INFO_STRING];
+#else
 	char userinfo[1024];
+#endif
 	char protinfo[1024];
 	char cdkey[64];
 	const char *s;
@@ -2246,7 +2250,12 @@ void SV_ConnectClient_internal(void)
 	}
 
 	s = Cmd_Argv(4);
+#ifdef REHLDS_FIXES
+	// truncate to 255 before sanity checks
+	if (Q_strlen(s) > MAX_INFO_STRING - 1 || !Info_IsValid(s))
+#else
 	if (Q_strlen(s) > 256 || !Info_IsValid(s))
+#endif
 	{
 		SV_RejectConnection(&adr, "Invalid userinfo in connect command\n");
 		return;
@@ -4442,7 +4451,14 @@ qboolean SV_SendClientDatagram(client_t *client)
 	}
 	else
 	{
+#ifdef REHLDS_FIXES
+		if (msg.cursize + client->datagram.cursize > msg.maxsize)
+			Con_DPrintf("Warning: Ignoring unreliable datagram for %s, would overflow on msg\n", client->name);
+		else
+			SZ_Write(&msg, client->datagram.data, client->datagram.cursize);
+#else
 		SZ_Write(&msg, client->datagram.data, client->datagram.cursize);
+#endif
 	}
 
 	SZ_Clear(&client->datagram);
