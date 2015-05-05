@@ -12,10 +12,6 @@ repositories {
 
 }
 
-configurations {
-	rehlds_it_image
-}
-
 dependencies {
 	compile gradleApi()
     compile localGroovy()
@@ -28,10 +24,4 @@ dependencies {
     compile 'org.eclipse.jgit:org.eclipse.jgit:3.7.0.201502260915-r'
 
     compile 'org.apache.velocity:velocity:1.7'
-}
-
-buildscript {
-	configurations {
-		rehlds_it_image
-	}
 }

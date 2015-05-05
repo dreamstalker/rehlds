@@ -355,7 +355,7 @@ task prepareDevEnv {
     dependsOn prepareDevEnvEngine, prepareDevEnvTests
 }
 
-task clean << {
+tasks.clean.doLast {
     project.file('version/appversion.h').delete()
 }
 
