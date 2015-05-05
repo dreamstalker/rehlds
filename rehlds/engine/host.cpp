@@ -505,9 +505,9 @@ void SV_DropClient(client_t *cl, qboolean crash, const char *fmt, ...)
 
 #ifdef REHLDS_FIXES
 	// prevent message reading after disconnect
-	if (cl == host_client )
+	if (cl == host_client)
 		msg_readcount = net_message.cursize;
-#endif // REHLDS_CHECKS
+#endif // REHLDS_FIXES
 
 	Netchan_Clear(&cl->netchan);
 
