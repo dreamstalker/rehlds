@@ -272,11 +272,12 @@ qboolean Info_IsKeyImportant(const char *key)
 		return true;
 	if (!Q_strcmp(key, "cl_lc"))
 		return true;
+#ifndef REHLDS_FIXES
 	if (!Q_strcmp(key, "*hltv"))
 		return true;
 	if (!Q_strcmp(key, "*sid"))
 		return true;
-
+#endif
 	return false;
 }
 
