@@ -34,10 +34,12 @@
 
 #include "maintypes.h"
 
-#define MAX_CLIENTS			32
-#define MAX_EDICTS			900
-#define MAX_NAME			32
+// TODO: I think this defines must be in /common/
+#define MAX_CLIENTS				32
+#define MAX_EDICTS				900
+#define MAX_NAME				32
 #define MAX_LIGHTSTYLES			64
+#define MAX_PACKET_ENTITIES		256
 
 #include "custom_int.h"
 #include "crc.h"
@@ -86,6 +88,8 @@
 #define HL_SOUND_HASHLOOKUP_SIZE (HL_SOUND_MAX * 2 - 1)
 
 #define HL_MODEL_MAX 512
+#define HL_GENERIC_MAX 512
+#define HL_EVENT_MAX 256
 
 // Authentication types
 #define AUTH_IDTYPE_UNKNOWN	0
@@ -131,15 +135,15 @@ typedef struct server_s
 	int num_resources;
 	consistency_t consistency_list[512];
 	int num_consistency;
-	char *model_precache[512];
-	struct model_s *models[512];
-	unsigned char model_precache_flags[512];
-	struct event_s event_precache[256];
-	char *sound_precache[512];
+	char *model_precache[HL_MODEL_MAX];
+	struct model_s *models[HL_MODEL_MAX];
+	unsigned char model_precache_flags[HL_MODEL_MAX];
+	struct event_s event_precache[HL_EVENT_MAX];
+	char *sound_precache[HL_SOUND_MAX];
 	short int sound_precache_hashedlookup[HL_SOUND_HASHLOOKUP_SIZE];
 	qboolean sound_precache_hashedlookup_built;
-	char *generic_precache[512];
-	char generic_precache_names[512][64];
+	char *generic_precache[HL_GENERIC_MAX];
+	char generic_precache_names[HL_GENERIC_MAX][64];
 	int num_generic_names;
 	char *lightstyles[MAX_LIGHTSTYLES];
 	int num_edicts;

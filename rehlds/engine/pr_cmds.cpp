@@ -134,7 +134,7 @@ void PF_setmodel_I(edict_t *e, const char *m)
 	int i = 0;
 
 #ifdef REHLDS_CHECKS
-	for (; *check && i < 512; i++, check++)
+	for (; *check && i < HL_MODEL_MAX; i++, check++)
 #else
 	for (; *check; i++, check++)
 #endif
@@ -273,7 +273,6 @@ void PF_particle_I(const float *org, const float *dir, float color, float count)
 /* <786e7> ../engine/pr_cmds.c:390 */
 void PF_ambientsound_I(edict_t *entity, float *pos, const char *samp, float vol, float attenuation, int fFlags, int pitch)
 {
-	char **check;
 	int i;
 	int soundnum;
 	int ent;
@@ -291,19 +290,20 @@ void PF_ambientsound_I(edict_t *entity, float *pos, const char *samp, float vol,
 	}
 	else
 	{
-		i = 0;
-		check = g_psv.sound_precache;
-		while (*check && Q_stricmp(*check, samp)) {
-			i++;
-			check++;
+		for (i = 0; i < HL_SOUND_MAX; i++)
+		{
+			if (g_psv.sound_precache[i] && !Q_stricmp(g_psv.sound_precache[i], samp))
+			{
+				soundnum = i;
+				break;
+			}
 		}
-		if (!check[0])
+
+		if (i == HL_SOUND_MAX)
 		{
 			Con_Printf("no precache: %s\n", samp);
 			return;
 		}
-
-		soundnum = i;
 	}
 
 	ent = NUM_FOR_EDICT(entity);
@@ -1059,41 +1059,37 @@ int PF_precache_sound_I(char *s)
 	if (g_psv.state == ss_loading)
 	{
 		g_psv.sound_precache_hashedlookup_built = 0;
-		i = 0;
-		while (1)
+
+		for (i = 0; i < HL_SOUND_MAX; i++)
 		{
 			if (!g_psv.sound_precache[i])
-				break;
+			{
+				g_psv.sound_precache[i] = s;
+				return i;
+			}
 
 			if (!Q_stricmp(g_psv.sound_precache[i], s))
 				return i;
-
-			++i;
-			if (i >= 512)
-				Host_Error(
-				"PF_precache_sound_I: Sound '%s' failed to precache because the item count is over the %d limit.\nReduce the number of brush models and/or regular models in the map to correct this.",
-				s,
-				512);
 		}
-		g_psv.sound_precache[i] = s;
+
+		Host_Error(
+			"PF_precache_sound_I: Sound '%s' failed to precache because the item count is over the %d limit.\nReduce the number of brush models and/or regular models in the map to correct this.",
+			s,
+			HL_SOUND_MAX);
 	}
 	else
 	{
-		i = 0;
-		while (1)
+		// precaching not enabled. check if already exists.
+		for (i = 0; i < HL_SOUND_MAX; i++)
 		{
-			if (g_psv.sound_precache[i])
-			{
-				if (!Q_stricmp(g_psv.sound_precache[i], s))
-					break;
-			}
-			++i;
-			if (i >= 512)
-				Host_Error("PF_precache_sound_I: '%s' Precache can only be done in spawn functions", s);
+			if (g_psv.sound_precache[i] && !Q_stricmp(g_psv.sound_precache[i], s))
+					return i;
 		}
+
+		Host_Error("PF_precache_sound_I: '%s' Precache can only be done in spawn functions", s);
 	}
 
-	return i;
+	return -1; // unreach
 }
 
 /* <79609> ../engine/pr_cmds.c:1455 */
@@ -1107,7 +1103,7 @@ short unsigned int EV_Precache(int type, const char *psz)
 
 	if (g_psv.state == ss_loading)
 	{
-		for (int i = 1; i < 256; i++)
+		for (int i = 1; i < HL_EVENT_MAX; i++)
 		{
 			struct event_s* ev = &g_psv.event_precache[i];
 			if (!ev->filename)
@@ -1115,8 +1111,8 @@ short unsigned int EV_Precache(int type, const char *psz)
 				if (type != 1)
 					Host_Error("EV_Precache:  only file type 1 supported currently\n");
 
-				char szpath[260];
-				_snprintf(szpath, 0x104u, "%s", psz);
+				char szpath[MAX_PATH];
+				_snprintf(szpath, sizeof(szpath), "%s", psz);
 				COM_FixSlashes(szpath);
 
 				int scriptSize = 0;
@@ -1139,7 +1135,7 @@ short unsigned int EV_Precache(int type, const char *psz)
 	}
 	else
 	{
-		for (int i = 1; i < 256; i++)
+		for (int i = 1; i < HL_EVENT_MAX; i++)
 		{
 			struct event_s* ev = &g_psv.event_precache[i];
 			if (!Q_stricmp(ev->filename, psz))
@@ -1235,7 +1231,7 @@ void EV_Playback(int flags, const edict_t *pInvoker, short unsigned int eventind
 	eargs.bparam1 = bparam1;
 	eargs.bparam2 = bparam2;
 
-	if (eventindex < 1u || eventindex >= 0x100u)
+	if (eventindex < 1u || eventindex >= HL_EVENT_MAX)
 	{
 		Con_DPrintf("EV_Playback:  index out of range %i\n", eventindex);
 		return;
@@ -1400,7 +1396,7 @@ int PF_precache_model_I(char *s)
 
 	if (g_psv.state == ss_loading)
 	{
-		for (int i = 0; i < 512; i++)
+		for (int i = 0; i < HL_MODEL_MAX; i++)
 		{
 			if (!g_psv.model_precache[i])
 			{
@@ -1421,7 +1417,7 @@ int PF_precache_model_I(char *s)
 	}
 	else
 	{
-		for (int i = 0; i < 512; i++)
+		for (int i = 0; i < HL_MODEL_MAX; i++)
 		{
 			if (!Q_stricmp(g_psv.model_precache[i], s))
 				return i;
@@ -1442,7 +1438,7 @@ int PF_precache_generic_I(char *s)
 
 	if (g_psv.state == ss_loading)
 	{
-		for (int i = 0; i < 512; i++)
+		for (int i = 0; i < HL_GENERIC_MAX; i++)
 		{
 			if (!g_psv.generic_precache[i])
 			{
@@ -1456,11 +1452,11 @@ int PF_precache_generic_I(char *s)
 		Host_Error(
 			"PF_precache_generic_I: Generic item '%s' failed to precache because the item count is over the %d limit.\nReduce the number of brush models and/or regular models in the map to correct this.",
 			s,
-			512);
+			HL_GENERIC_MAX);
 	}
 	else
 	{
-		for (int i = 0; i < 512; i++)
+		for (int i = 0; i < HL_GENERIC_MAX; i++)
 		{
 			if (!Q_stricmp(g_psv.generic_precache[i], s))
 				return i;

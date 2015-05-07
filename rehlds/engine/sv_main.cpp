@@ -32,7 +32,7 @@
 typedef struct full_packet_entities_s
 {
 	int num_entities;
-	entity_state_t entities[256];
+	entity_state_t entities[MAX_PACKET_ENTITIES];
 } full_packet_entities_t;
 
 /* <a59b9> ../engine/sv_main.c:102 */
@@ -493,6 +493,13 @@ void SV_AllocPacketEntities(client_frame_t *frame, int numents)
 {
 	if (frame)
 	{
+#ifdef REHLDS_FIXES
+		frame->entities.num_entities = numents;
+
+		// only alloc for max possible numents
+		if (!frame->entities.entities)
+			frame->entities.entities = (entity_state_t *)Mem_ZeroMalloc(sizeof(entity_state_t) * MAX_PACKET_ENTITIES);
+#else // REHLDS_FIXES
 		if (frame->entities.entities)
 			SV_ClearPacketEntities(frame);
 
@@ -502,6 +509,7 @@ void SV_AllocPacketEntities(client_frame_t *frame, int numents)
 
 		frame->entities.num_entities = numents;
 		frame->entities.entities = (entity_state_t *)Mem_ZeroMalloc(sizeof(entity_state_t) * allocatedslots);
+#endif // REHLDS_FIXES
 	}
 }
 
@@ -853,14 +861,10 @@ int SV_LookupSoundIndex(const char *sample)
 	{
 		if (g_psv.state == ss_loading)
 		{
-			index = 1;
-			while (g_psv.sound_precache[index])
+			for (index = 1; index < HL_SOUND_MAX && g_psv.sound_precache[index]; index++) // TODO: why from 1?
 			{
 				if (!Q_stricmp(sample, g_psv.sound_precache[index]))
 					return index;
-				index++;
-				if (index >= HL_SOUND_MAX)
-					return 0;
 			}
 			return 0;
 		}
@@ -1401,6 +1405,12 @@ void SV_WriteSpawn(sizebuf_t *msg)
 	int i = 0;
 	client_t *client = g_psvs.clients;
 
+#ifdef REHLDS_FIXES
+	// do it before PutInServer to allow mods send messages from forward
+	SZ_Clear( &host_client->netchan.message );
+	SZ_Clear( &host_client->datagram );
+#endif // REHLDS_FIXES
+
 	if (g_psv.loadgame)
 	{
 		if (host_client->proxy)
@@ -1429,8 +1439,10 @@ void SV_WriteSpawn(sizebuf_t *msg)
 		g_psv.state = ss_active;
 	}
 
+#ifndef REHLDS_FIXES
 	SZ_Clear(&host_client->netchan.message);
 	SZ_Clear(&host_client->datagram);
+#endif // REHLDS_FIXES
 
 	MSG_WriteByte(msg, svc_time);
 	MSG_WriteFloat(msg, g_psv.time);
@@ -1443,7 +1455,7 @@ void SV_WriteSpawn(sizebuf_t *msg)
 			SV_FullClientUpdate(client, msg);
 	}
 
-	for (i = 0; i < 64; i++)
+	for (i = 0; i < ARRAYSIZE( g_psv.lightstyles ); i++)
 	{
 		MSG_WriteByte(msg, svc_lightstyle);
 		MSG_WriteByte(msg, i);
@@ -1714,6 +1726,7 @@ int SV_GetFragmentSize(void *state)
 		const char *val = Info_ValueForKey(cl->userinfo, "cl_dlmax");
 		if (val[0] != 0)
 		{
+			size = Q_atoi( val );
 			size = clamp(size, 256, 1024);
 		}
 	}
@@ -1736,7 +1749,7 @@ qboolean SV_FilterUser(USERID_t *userid)
 		else
 		{
 			if (i + 1 < j)
-				memcpy(filter, &filter[1], sizeof(userfilter_t) * (j - i + 1));
+				memmove(filter, &filter[1], sizeof(userfilter_t) * (j - i + 1));
 
 			numuserfilters = --j;
 		}
@@ -4375,7 +4388,10 @@ void SV_WriteEntitiesToClient(client_t *client, sizebuf_t *msg)
 	gEntityInterface.pfnSetupVisibility((edict_t*)client->pViewEntity, client->edict, &pvs, &pas);
 	unsigned char *pSet = pvs;
 
+#ifndef REHLDS_FIXES
+	// don't reallocate entity states
 	SV_ClearPacketEntities(frame);
+#endif // REHLDS_FIXES
 	packet_entities_t *pack = &frame->entities;
 	fullpack.num_entities = 0;
 
@@ -4383,6 +4399,33 @@ void SV_WriteEntitiesToClient(client_t *client, sizebuf_t *msg)
 	
 	int flags = client->lw != 0;
 
+#ifdef REHLDS_FIXES
+	int e;
+
+	for (e = 1; e <= g_psvs.maxclients; e++)
+	{
+		client_t *cl = &g_psvs.clients[e - 1];
+		if( ( !cl->active && !cl->spawned ) || cl->proxy )
+			continue;
+
+		qboolean add = gEntityInterface.pfnAddToFullPack(&fullpack.entities[fullpack.num_entities], e, &g_psv.edicts[e], host_client->edict, flags, TRUE, pSet);
+		if (add)
+			++fullpack.num_entities;
+	}
+
+	for (; e < g_psv.num_edicts; e++)
+	{
+		if (fullpack.num_entities >= MAX_PACKET_ENTITIES)
+		{
+			Con_DPrintf("Too many entities in visible packet list.\n");
+			break;
+		}
+
+		qboolean add = gEntityInterface.pfnAddToFullPack(&fullpack.entities[fullpack.num_entities], e, &g_psv.edicts[e], host_client->edict, flags, FALSE, pSet);
+		if (add)
+			++fullpack.num_entities;
+	}
+#else // REHLDS_FIXES
 	for (int e = 1; e < g_psv.num_edicts; e++)
 	{
 		edict_t *ent = &g_psv.edicts[e];
@@ -4396,7 +4439,7 @@ void SV_WriteEntitiesToClient(client_t *client, sizebuf_t *msg)
 			player = 1;
 		}
 
-		if (fullpack.num_entities >= 256)
+		if (fullpack.num_entities >= MAX_PACKET_ENTITIES)
 		{
 			Con_DPrintf("Too many entities in visible packet list.\n");
 			break;
@@ -4406,6 +4449,7 @@ void SV_WriteEntitiesToClient(client_t *client, sizebuf_t *msg)
 		if (add)
 			++fullpack.num_entities;
 	}
+#endif // REHLDS_FIXES
 
 	SV_AllocPacketEntities(frame, fullpack.num_entities);
 	if (pack->num_entities)
@@ -4490,7 +4534,12 @@ void SV_UpdateToReliableMessages(void)
 
 		host_client = client;
 
+#ifdef REHLDS_FIXES
+		// skip update in this frame if would overflow
+		if (client->sendinfo && client->sendinfo_time <= realtime && ( 1 + 1 + 4 + ( int )strlen( client->userinfo ) + 1 + 16 + g_psv.reliable_datagram.cursize <= g_psv.reliable_datagram.maxsize ) )
+#else // REHLDS_FIXES
 		if (client->sendinfo && client->sendinfo_time <= realtime)
+#endif // REHLDS_FIXES
 		{
 			client->sendinfo = FALSE;
 			client->sendinfo_time = realtime + 1.0;
@@ -4800,7 +4849,7 @@ int SV_ModelIndex(const char *name)
 	if (!name || !name[0])
 		return 0;
 
-	for (int i = 0; i < 512; i++)
+	for (int i = 0; i < HL_MODEL_MAX; i++)
 	{
 		if (!g_psv.model_precache[i])
 			break;
@@ -4896,7 +4945,11 @@ void SV_CreateResourceList(void)
 	event_t *ep;
 
 	g_psv.num_resources = 0;
+#ifdef REHLDS_CHECKS
+	for (i = 1, s = &g_psv.generic_precache[1]; i < HL_GENERIC_MAX && *s != NULL; i++, s++)
+#else // REHLDS_CHECKS
 	for (i = 1, s = &g_psv.generic_precache[1]; *s != NULL; i++, s++)
+#endif // REHLDS_CHECKS
 	{
 		if (g_psvs.maxclients > 1)
 			nSize = FS_FileSize(*s);
@@ -4905,7 +4958,11 @@ void SV_CreateResourceList(void)
 
 		SV_AddResource(t_generic, *s, nSize, 1, i);
 	}
+#ifdef REHLDS_CHECKS
+	for (i = 1, s = &g_psv.sound_precache[1]; i < HL_SOUND_MAX && *s != NULL; i++, s++)
+#else // REHLDS_CHECKS
 	for (i = 1, s = &g_psv.sound_precache[1]; *s != NULL; i++, s++)
+#endif // REHLDS_CHECKS
 	{
 		if (**s == '!')
 		{
@@ -4923,7 +4980,11 @@ void SV_CreateResourceList(void)
 			SV_AddResource(t_sound, *s, nSize, 0, i);
 		}
 	}
+#ifdef REHLDS_CHECKS
+	for (i = 1, s = &g_psv.model_precache[1]; i < HL_MODEL_MAX && *s != NULL; i++, s++)
+#else // REHLDS_CHECKS
 	for (i = 1, s = &g_psv.model_precache[1]; *s != NULL; i++, s++)
+#endif // REHLDS_CHECKS
 	{
 		if (g_psvs.maxclients > 1 && **s != '*')
 			nSize = FS_FileSize(*s);
@@ -4935,7 +4996,7 @@ void SV_CreateResourceList(void)
 	for (i = 0; i < sv_decalnamecount; i++)
 		SV_AddResource(t_decal, sv_decalnames[i].name, Draw_DecalSize(i), 0, i);
 
-	for (i = 1; i < 255; i++)
+	for (i = 1; i < HL_EVENT_MAX; i++)
 	{
 		ep = &g_psv.event_precache[i];
 		if (!ep->filename)
@@ -4950,7 +5011,7 @@ void SV_ClearCaches(void)
 {
 	int i;
 	event_t *ep;
-	for (i = 1; i < 255; i++)
+	for (i = 1; i < HL_EVENT_MAX; i++)
 	{
 		ep = &g_psv.event_precache[i];
 		if (ep->filename == NULL)

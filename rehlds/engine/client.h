@@ -232,10 +232,10 @@ typedef struct client_state_s
 	local_state_t predicted_frames[64];
 	int delta_sequence;
 	int playernum;
-	event_t event_precache[256];
-	model_t *model_precache[512];
+	event_t event_precache[HL_EVENT_MAX];
+	model_t *model_precache[HL_MODEL_MAX];
 	int model_precache_count;
-	sfx_s *sound_precache[512];
+	sfx_s *sound_precache[HL_SOUND_MAX];
 	consistency_t consistency_list[512];
 	int num_consistency;
 	int highentity;
