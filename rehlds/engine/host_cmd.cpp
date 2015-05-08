@@ -2550,7 +2550,12 @@ void Host_Say(qboolean teamonly)
 		p[Q_strlen(p) - 1] = 0;
 	}
 
+#ifdef REHLDS_FIXES
+	// I think '\x01' don't need in TextMsg
+	Q_snprintf(text, sizeof(text), "<%s> ", Cvar_VariableString("hostname"));
+#else // REHLDS_FIXES
 	Q_snprintf(text, sizeof(text), "%c<%s> ", 1, Cvar_VariableString("hostname"));
+#endif // REHLDS_FIXES
 
 	if (Q_strlen(p) > 63)
 		p[63] = 0;
@@ -2569,10 +2574,19 @@ void Host_Say(qboolean teamonly)
 
 		host_client = client;
 
+#ifdef REHLDS_FIXES
+		// Text can be unsafe (format %, localize #) therefore need to send text as argument. TextMsg is used here instead of SayText, because SayText in Half-Life doesn't support arguments.
+		PF_MessageBegin_I(MSG_ONE, RegUserMsg("TextMsg", -1), NULL, &g_psv.edicts[j + 1]);
+		PF_WriteByte_I(HUD_PRINTTALK);
+		PF_WriteString_I("%s");
+		PF_WriteString_I(text);
+		PF_MessageEnd_I();
+#else // REHLDS_FIXES
 		PF_MessageBegin_I(MSG_ONE, RegUserMsg("SayText", -1), NULL, &g_psv.edicts[j + 1]);
 		PF_WriteByte_I(0);
 		PF_WriteString_I(text);
 		PF_MessageEnd_I();
+#endif // REHLDS_FIXES
 	}
 
 	host_client = save;
