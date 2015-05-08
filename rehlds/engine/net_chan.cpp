@@ -1558,9 +1558,17 @@ qboolean Netchan_CopyFileFragments(netchan_t *chan)
 			COM_FixSlashes(filedir);
 			pszFileName = strrchr(filedir, '\\');
 			if (pszFileName)
+			{
 				*pszFileName = 0;
 
+#ifdef REHLDS_FIXES
+				FS_CreateDirHierarchy(filedir, "GAMEDOWNLOAD");
+#endif
+			}
+
+#ifndef REHLDS_FIXES
 			FS_CreateDirHierarchy(filedir, "GAMEDOWNLOAD");
+#endif
 			handle = FS_OpenPathID(filename, "wb", "GAMEDOWNLOAD");
 			if (!handle)
 			{
