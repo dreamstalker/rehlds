@@ -49,3 +49,5 @@
 #include "rehlds_api_impl.h"
 #include "FlightRecorderImpl.h"
 #include "flight_recorder.h"
+
+#include "dlls/cdll_dll.h"
