@@ -80,9 +80,6 @@ void Cbuf_AddText(char *text)
 // commands.
 void Cbuf_InsertText(char *text)
 {
-#ifndef REHLDS_FIXES
-	char *temp = NULL;
-#endif // REHLDS_FIXES
 
 	int addLen = Q_strlen(text);
 	int currLen = cmd_text.cursize;
@@ -93,20 +90,25 @@ void Cbuf_InsertText(char *text)
 		return;
 	}
 
+#ifdef REHLDS_FIXES
+	if (currLen)
+		memmove(cmd_text.data + addLen, cmd_text.data, currLen);
+
+	Q_memcpy(cmd_text.data, text, addLen);
+	cmd_text.cursize += addLen;
+
+#else
+	char *temp = NULL;
 	if (currLen)
 	{
-#ifdef REHLDS_FIXES
-		memmove(cmd_text.data + addLen, cmd_text.data, currLen);
-#else // REHLDS_FIXES
+		
 		temp = (char *)Z_Malloc(currLen);	// TODO: Optimize: better use memmove without need for a temp buffer
 		Q_memcpy(temp, cmd_text.data, currLen);
 		SZ_Clear(&cmd_text);
-#endif // REHLDS_FIXES
 	}
 
 	Cbuf_AddText(text);
 
-#ifndef REHLDS_FIXES
 	if (currLen)
 	{
 		SZ_Write(&cmd_text, temp, currLen);
@@ -118,10 +120,6 @@ void Cbuf_InsertText(char *text)
 /* <4f05> ../engine/cmd.c:148 */
 void Cbuf_InsertTextLines(char *text)
 {
-#ifndef REHLDS_FIXES
-	char *temp = NULL;
-#endif // REHLDS_FIXES
-
 	int addLen = Q_strlen(text);
 	int currLen = cmd_text.cursize;
 
@@ -131,22 +129,31 @@ void Cbuf_InsertTextLines(char *text)
 		return;
 	}
 
+#ifdef REHLDS_FIXES
+	if (currLen)
+		memmove(cmd_text.data + addLen + 1, cmd_text.data, currLen);
+	
+	cmd_text.data[0] = '\n'; // TODO: Why we need leading \n, if there is no commands in the start?
+	Q_memcpy(&cmd_text.data[1], text, addLen);
+	cmd_text.data[addLen + 1] = '\n';
+
+	cmd_text.cursize += addLen + 2;
+
+#else
+
+	char *temp = NULL;
 	if (currLen)
 	{
-#ifdef REHLDS_FIXES
-		memmove(cmd_text.data + addLen, cmd_text.data, currLen);
-#else // REHLDS_FIXES
+		
 		temp = (char *)Z_Malloc(currLen);
 		Q_memcpy(temp, cmd_text.data, currLen);
 		SZ_Clear(&cmd_text);
-#endif // REHLDS_FIXES
 	}
 
 	Cbuf_AddText("\n");	// TODO: Why we need leading \n, if there is no commands in the start?
 	Cbuf_AddText(text);
 	Cbuf_AddText("\n");
 
-#ifndef REHLDS_FIXES
 	if (currLen)
 	{
 		SZ_Write(&cmd_text, temp, currLen);
