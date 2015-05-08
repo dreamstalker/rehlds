@@ -11,3 +11,5 @@ public:
 
 	virtual int ReadDataResponse(void *data, int len) = 0;
 };
+
+#define GAMESERVERDATA_INTERFACE_VERSION "GameServerData001"
