@@ -80,7 +80,9 @@ void Cbuf_AddText(char *text)
 // commands.
 void Cbuf_InsertText(char *text)
 {
+#ifndef REHLDS_FIXES
 	char *temp = NULL;
+#endif // REHLDS_FIXES
 
 	int addLen = Q_strlen(text);
 	int currLen = cmd_text.cursize;
@@ -93,24 +95,32 @@ void Cbuf_InsertText(char *text)
 
 	if (currLen)
 	{
+#ifdef REHLDS_FIXES
+		memmove(cmd_text.data + addLen, cmd_text.data, currLen);
+#else // REHLDS_FIXES
 		temp = (char *)Z_Malloc(currLen);	// TODO: Optimize: better use memmove without need for a temp buffer
 		Q_memcpy(temp, cmd_text.data, currLen);
 		SZ_Clear(&cmd_text);
+#endif // REHLDS_FIXES
 	}
 
 	Cbuf_AddText(text);
 
+#ifndef REHLDS_FIXES
 	if (currLen)
 	{
 		SZ_Write(&cmd_text, temp, currLen);
 		Z_Free(temp);
 	}
+#endif // REHLDS_FIXES
 }
 
 /* <4f05> ../engine/cmd.c:148 */
 void Cbuf_InsertTextLines(char *text)
 {
+#ifndef REHLDS_FIXES
 	char *temp = NULL;
+#endif // REHLDS_FIXES
 
 	int addLen = Q_strlen(text);
 	int currLen = cmd_text.cursize;
@@ -123,20 +133,26 @@ void Cbuf_InsertTextLines(char *text)
 
 	if (currLen)
 	{
+#ifdef REHLDS_FIXES
+		memmove(cmd_text.data + addLen, cmd_text.data, currLen);
+#else // REHLDS_FIXES
 		temp = (char *)Z_Malloc(currLen);
 		Q_memcpy(temp, cmd_text.data, currLen);
 		SZ_Clear(&cmd_text);
+#endif // REHLDS_FIXES
 	}
 
 	Cbuf_AddText("\n");	// TODO: Why we need leading \n, if there is no commands in the start?
 	Cbuf_AddText(text);
 	Cbuf_AddText("\n");
 
+#ifndef REHLDS_FIXES
 	if (currLen)
 	{
 		SZ_Write(&cmd_text, temp, currLen);
 		Z_Free(temp);
 	}
+#endif // REHLDS_FIXES
 }
 
 /* <5d96> ../engine/cmd.c:193 */
@@ -167,6 +183,18 @@ void Cbuf_Execute(void)
 				break;
 		}
 
+#ifdef REHLDS_FIXES
+		// save `i` if we truncate command
+		int len;
+
+		if (i > MAX_CMD_LINE - 1)
+			len = MAX_CMD_LINE - 1;
+		else
+			len = i;
+
+		Q_memcpy(line, text, len);
+		line[len] = 0;
+#else // REHLDS_FIXES
 		if (i > MAX_CMD_LINE - 1)
 		{
 			i = MAX_CMD_LINE - 1;
@@ -174,6 +202,7 @@ void Cbuf_Execute(void)
 
 		Q_memcpy(line, text, i);
 		line[i] = 0;
+#endif // REHLDS_FIXES
 
 		// delete the text from the command buffer and move remaining commands down
 		// this is necessary because commands (exec, alias) can insert data at the
@@ -187,7 +216,12 @@ void Cbuf_Execute(void)
 		{
 			i++;
 			cmd_text.cursize -= i;
+#ifdef REHLDS_FIXES
+			// dst overlaps src
+			memmove(text, text + i, cmd_text.cursize);
+#else // REHLDS_FIXES
 			Q_memcpy(text, text + i, cmd_text.cursize);
+#endif // REHLDS_FIXES
 		}
 
 		// execute the command line

@@ -215,12 +215,26 @@ void SV_ParseConsistencyResponse(client_t *pSenderClient)
 	if (c > 0)
 	{
 		char dropmessage[256];
+#ifdef REHLDS_FIXES
+		dropmessage[0] = '\0';
+
+		if (gEntityInterface.pfnInconsistentFile(host_client->edict, g_psv.resourcelist[c - 1].szFileName, dropmessage))
+		{
+			if (dropmessage[0])
+				SV_ClientPrintf("%s", dropmessage);
+
+			SV_DropClient(host_client, 0, "Bad file %s", g_psv.resourcelist[c - 1].szFileName); // only filename. reason was printed in console if exists.
+		}
+#else // REHLDS_FIXES
 		if (gEntityInterface.pfnInconsistentFile(host_client->edict, g_psv.resourcelist[c - 1].szFileName, dropmessage))
 		{
 			if (Q_strlen(dropmessage) > 0)
 				SV_ClientPrintf("%s", dropmessage);
+
 			SV_DropClient(host_client, 0, "Bad file %s", dropmessage);
 		}
+#endif // REHLDS_FIXES
+
 		return;
 	}
 
@@ -230,7 +244,7 @@ void SV_ParseConsistencyResponse(client_t *pSenderClient)
 /* <bf937> ../engine/sv_user.c:267 */
 qboolean SV_FileInConsistencyList(const char *filename, consistency_t **ppconsist)
 {
-	for (int i = 0; i < 512; i++)
+	for (int i = 0; i < ARRAYSIZE(g_psv.consistency_list); i++)
 	{
 		if (!g_psv.consistency_list[i].filename)
 			return 0;
@@ -277,10 +291,6 @@ int SV_TransferConsistencyInfo(void)
 
 		if (r->type == t_model)
 		{
-			if (pc->check_type <= 0 || pc->check_type > 3)
-			{
-
-			}
 			if (pc->check_type == force_model_samebounds)
 			{
 				vec3_t mins;
@@ -1784,8 +1794,16 @@ void SV_FullUpdate_f(void)
 			return;
 		}
 		s_LastFullUpdate[entIndex] = g_psv.time;
+
+#ifdef REHLDS_FIXES
+		// it's not need until not active
+		SV_ForceFullClientsUpdate();
+		gEntityInterface.pfnClientCommand( sv_player );
+#endif // REHLDS_FIXES
 	}
 
+#ifndef REHLDS_FIXES
 	SV_ForceFullClientsUpdate();
 	gEntityInterface.pfnClientCommand(sv_player);
+#endif // REHLDS_FIXES
 }
