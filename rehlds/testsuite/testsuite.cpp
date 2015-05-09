@@ -4,12 +4,12 @@
 /* ============================================================================
                                 external function hooks
  ============================================================================*/
-uint32_t __cdecl time_hooked(uint32_t* pTime)
+uint32 __cdecl time_hooked(uint32* pTime)
 {
 	return CRehldsPlatformHolder::get()->time(pTime);
 }
 
-struct tm* __cdecl localtime_hooked(uint32_t* pTime)
+struct tm* __cdecl localtime_hooked(uint32* pTime)
 {
 	if (pTime == NULL)
 		rehlds_syserror("%s: pTime is NULL", __FUNCTION__);
@@ -17,7 +17,7 @@ struct tm* __cdecl localtime_hooked(uint32_t* pTime)
 	return CRehldsPlatformHolder::get()->localtime(*pTime);
 }
 
-void __cdecl srand_hooked(uint32_t seed)
+void __cdecl srand_hooked(uint32 seed)
 {
 	CRehldsPlatformHolder::get()->srand(seed);
 }

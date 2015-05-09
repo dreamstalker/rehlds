@@ -86,34 +86,6 @@
 #include <iomanip>
 
 #ifdef _WIN32 // WINDOWS
-#ifndef _STDINT
-	typedef unsigned __int64 uint64_t;
-	typedef unsigned __int32 uint32_t;
-	typedef unsigned __int16 uint16_t;
-	typedef unsigned __int8 uint8_t;
-
-	typedef __int64 int64_t;
-	typedef __int32 int32_t;
-	typedef __int16 int16_t;
-	typedef __int8 int8_t;
-#endif
-#else // _WIN32
-	typedef unsigned long long uint64_t;
-	typedef unsigned int uint32_t;
-	typedef unsigned short uint16_t;
-	typedef unsigned char uint8_t;
-
-	#ifndef __int8_t_defined
-		typedef long long int64_t;
-		typedef int int32_t;
-		typedef short int16_t;
-		typedef char int8_t;
-	#endif
-
-	typedef unsigned char byte;
-#endif // _WIN32
-
-#ifdef _WIN32 // WINDOWS
 	#define _CRT_SECURE_NO_WARNINGS
 	#define WIN32_LEAN_AND_MEAN
 

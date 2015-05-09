@@ -184,6 +184,7 @@ class RehldsSrc {
                 include "**/*.cpp"
                 exclude "precompiled.cpp"
                 exclude GradleCppUtils.windows ? "tier0/platform_linux.cpp" : "tier0/platform_win32.cpp"
+				exclude "interface.cpp", "rehlds/crc32.cpp", "rehlds/sys_shared.cpp"
             }
 
             source {

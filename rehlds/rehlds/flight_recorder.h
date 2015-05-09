@@ -21,9 +21,9 @@
 
 extern CRehldsFlightRecorder* g_FlightRecorder;
 
-extern uint16_t g_FRMsg_Frame;
-extern uint16_t g_FRMsg_FreeEntPrivateData;
-extern uint16_t g_FRMsg_AllocEntPrivateData;
+extern uint16 g_FRMsg_Frame;
+extern uint16 g_FRMsg_FreeEntPrivateData;
+extern uint16 g_FRMsg_AllocEntPrivateData;
 
 extern void FR_Init();
 

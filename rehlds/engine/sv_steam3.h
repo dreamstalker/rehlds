@@ -116,7 +116,7 @@ public:
 	}
 
 	/* <ee390> ../engine/sv_steam3.cpp:128 */
-	uint64_t GetSteamID(void); /* linkage=_ZN13CSteam3Server10GetSteamIDEv */
+	uint64 GetSteamID(void); /* linkage=_ZN13CSteam3Server10GetSteamIDEv */
 
 	/* <ee4f8> ../engine/sv_steam3.cpp:190 */
 	void OnGSClientDenyHelper(client_t *cl, EDenyReason eDenyReason, const char *pchOptionalText); /* linkage=_ZN13CSteam3Server20OnGSClientDenyHelperEP8client_s11EDenyReasonPKc */
@@ -134,7 +134,7 @@ public:
 	virtual void Shutdown(void); /* linkage=_ZN13CSteam3Server8ShutdownEv */
 
 	/* <ee2d5> ../engine/sv_steam3.cpp:537 */
-	bool NotifyClientConnect(client_t *client, const void *pvSteam2Key, uint32_t ucbSteam2Key); /* linkage=_ZN13CSteam3Server19NotifyClientConnectEP8client_sPKvj */
+	bool NotifyClientConnect(client_t *client, const void *pvSteam2Key, uint32 ucbSteam2Key); /* linkage=_ZN13CSteam3Server19NotifyClientConnectEP8client_sPKvj */
 
 	/* <ee327> ../engine/sv_steam3.cpp:578 */
 	bool NotifyBotConnect(client_t *client); /* linkage=_ZN13CSteam3Server16NotifyBotConnectEP8client_s */
@@ -194,12 +194,12 @@ extern CSteam3Server *s_Steam3Server;
 extern CSteam3Client s_Steam3Client;
 
 
-extern bool (CSteam3Server::*pNotifyClientConnect)(client_t *client, const void *pvSteam2Key, uint32_t ucbSteam2Key);
+extern bool (CSteam3Server::*pNotifyClientConnect)(client_t *client, const void *pvSteam2Key, uint32 ucbSteam2Key);
 
 
-uint64_t ISteamGameServer_CreateUnauthenticatedUserConnection(void);
-bool ISteamGameServer_BUpdateUserData(uint64_t steamid, const char *netname, uint32_t score);
-bool ISteamApps_BIsSubscribedApp(uint32_t appid);
+uint64 ISteamGameServer_CreateUnauthenticatedUserConnection(void);
+bool ISteamGameServer_BUpdateUserData(uint64 steamid, const char *netname, uint32 score);
+bool ISteamApps_BIsSubscribedApp(uint32 appid);
 const char *Steam_GetCommunityName(void);
 qboolean Steam_NotifyClientConnect(client_t *cl, const void *pvSteam2Key, unsigned int ucbSteam2Key);
 qboolean Steam_NotifyClientConnect_internal(client_t *cl, const void *pvSteam2Key, unsigned int ucbSteam2Key);
@@ -215,19 +215,19 @@ void Steam_RunFrame(void);
 void Steam_SetCVar(const char *pchKey, const char *pchValue);
 void Steam_ClientRunFrame(void);
 void Steam_InitClient(void);
-int Steam_GSInitiateGameConnection(void *pData, int cbMaxData, uint64_t steamID, uint32_t unIPServer, uint16_t usPortServer, qboolean bSecure);
-void Steam_GSTerminateGameConnection(uint32_t unIPServer, uint16_t usPortServer);
+int Steam_GSInitiateGameConnection(void *pData, int cbMaxData, uint64 steamID, uint32 unIPServer, uint16 usPortServer, qboolean bSecure);
+void Steam_GSTerminateGameConnection(uint32 unIPServer, uint16 usPortServer);
 void Steam_ShutdownClient(void);
-uint64_t Steam_GSGetSteamID(void);
+uint64 Steam_GSGetSteamID(void);
 qboolean Steam_GSBSecure(void);
 qboolean Steam_GSBLoggedOn(void);
 qboolean Steam_GSBSecurePreference(void);
-TSteamGlobalUserID Steam_Steam3IDtoSteam2(uint64_t unSteamID);
-uint64_t Steam_StringToSteamID(const char *pStr);
+TSteamGlobalUserID Steam_Steam3IDtoSteam2(uint64 unSteamID);
+uint64 Steam_StringToSteamID(const char *pStr);
 const char *Steam_GetGSUniverse(void);
 CSteam3Server *Steam3Server(void);
 CSteam3Client *Steam3Client(void);
 void Master_SetMaster_f(void);
-void Steam_HandleIncomingPacket(byte *data, int len, int fromip, uint16_t port);
+void Steam_HandleIncomingPacket(byte *data, int len, int fromip, uint16 port);
 
 #endif // SV_STEAM3_H

@@ -864,7 +864,7 @@ void Cmd_RemoveWrapperCmds(void)
 }
 
 /* <5af2> ../engine/cmd.c:1035 */
-qboolean Cmd_Exists(char *cmd_name)
+qboolean Cmd_Exists(const char *cmd_name)
 {
 	cmd_function_t *cmd = cmd_functions;
 

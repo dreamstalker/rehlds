@@ -27,7 +27,7 @@
 */
 #pragma once
 
-#include "maintypes.h"
+#include "archtypes.h"
 
 /* <8f1> ../engine/cmd.h:65 */
 typedef void(*xcommand_t)(void);

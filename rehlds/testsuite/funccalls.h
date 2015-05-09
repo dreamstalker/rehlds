@@ -186,7 +186,7 @@ public:
 
 class CQueryPerfFreqCall : public IEngExtCall {
 public:
-	int64_t m_Freq;
+	int64 m_Freq;
 	BOOL m_Res;
 
 public:
@@ -202,7 +202,7 @@ public:
 
 class CQueryPerfCounterCall : public IEngExtCall {
 public:
-	int64_t m_Counter;
+	int64 m_Counter;
 	BOOL m_Res;
 
 public:
@@ -860,11 +860,11 @@ public:
 
 class CSteamApiSetBreakpadAppIdCall : public IEngExtCall {
 public:
-	uint32_t m_AppId;
+	uint32 m_AppId;
 
 public:
 	CSteamApiSetBreakpadAppIdCall() { m_AppId = 0; }
-	CSteamApiSetBreakpadAppIdCall(uint32_t appId);
+	CSteamApiSetBreakpadAppIdCall(uint32 appId);
 
 	virtual bool compareInputArgs(IEngExtCall* other, bool strict);
 	virtual std::string toString();
@@ -933,7 +933,7 @@ public:
 
 class CGameServerGetSteamIdCall : public IEngExtCall {
 public:
-	uint64_t m_SteamId;
+	uint64 m_SteamId;
 
 public:
 	CGameServerGetSteamIdCall() { m_SteamId = 0; }
@@ -965,8 +965,8 @@ class CGameServerHandleIncomingPacketCall : public IEngExtCall {
 public:
 	char m_Data[8192];
 	int m_Len;
-	uint32_t m_Ip;
-	uint16_t m_Port;
+	uint32 m_Ip;
+	uint16 m_Port;
 	bool m_Res;
 
 public:
@@ -987,9 +987,9 @@ class CGameServerSendUserConnectAndAuthenticateCall : public IEngExtCall {
 public:
 	char m_AuthBlob[4096];
 	int m_AuthBlobLen;
-	uint32_t m_IP;
+	uint32 m_IP;
 
-	uint64_t m_OutSteamId;
+	uint64 m_OutSteamId;
 	bool m_Res;
 
 public:
@@ -1008,7 +1008,7 @@ public:
 
 class CGameServerSendUserDisconnectCall : public IEngExtCall {
 public:
-	uint64_t m_SteamId;
+	uint64 m_SteamId;
 
 public:
 	CGameServerSendUserDisconnectCall() { m_SteamId = 0; }
@@ -1023,10 +1023,10 @@ public:
 
 class CGameServerBUpdateUserDataCall : public IEngExtCall {
 public:
-	uint64_t m_SteamId;
+	uint64 m_SteamId;
 	char m_PlayerName[64];
 	int m_PlayerNameLen;
-	uint32_t m_Score;
+	uint32 m_Score;
 
 	bool m_Res;
 
@@ -1046,7 +1046,7 @@ public:
 
 class CGameServerCreateUnauthUserConnectionCall : public IEngExtCall {
 public:
-	uint64_t m_SteamId;
+	uint64 m_SteamId;
 
 public:
 	CGameServerCreateUnauthUserConnectionCall() { m_SteamId = 0; }
@@ -1146,13 +1146,13 @@ class CStdTimeCall : public IEngExtCall {
 public:
 	bool m_InTimeNull;
 
-	uint32_t m_Res;
+	uint32 m_Res;
 
 public:
-	CStdTimeCall(uint32_t* inTime);
+	CStdTimeCall(uint32* inTime);
 	CStdTimeCall() { m_InTimeNull = false; m_Res = 0; }
 
-	void setResult(uint32_t res);
+	void setResult(uint32 res);
 	virtual bool compareInputArgs(IEngExtCall* other, bool strict);
 	virtual std::string toString();
 	virtual ExtCallFuncs getOpcode() { return ECF_CSTD_TIME; }
@@ -1164,12 +1164,12 @@ public:
 
 class CStdLocalTimeCall : public IEngExtCall {
 public:
-	uint32_t m_Time;
+	uint32 m_Time;
 
 	struct tm m_Res;
 
 public:
-	CStdLocalTimeCall(uint32_t inTime);
+	CStdLocalTimeCall(uint32 inTime);
 	CStdLocalTimeCall() { m_Time = 0; memset(&m_Res, 0, sizeof(m_Res)); }
 
 	void setResult(struct tm *res);
@@ -1184,11 +1184,11 @@ public:
 
 class CStdSrandCall : public IEngExtCall {
 public:
-	uint32_t m_Seed;
+	uint32 m_Seed;
 
 public:
 	CStdSrandCall() { m_Seed = 0; }
-	CStdSrandCall(uint32_t seed) { m_Seed = seed;  }
+	CStdSrandCall(uint32 seed) { m_Seed = seed;  }
 
 	virtual bool compareInputArgs(IEngExtCall* other, bool strict);
 	virtual std::string toString();

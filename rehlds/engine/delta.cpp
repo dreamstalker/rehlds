@@ -434,18 +434,18 @@ int DELTA_TestDelta(unsigned char *from, unsigned char *to, delta_t *pFields)
 			different = from[pTest->fieldOffset] != to[pTest->fieldOffset];
 			break;
 		case DT_SHORT:
-			different = *(uint16_t *)&from[pTest->fieldOffset] != *(uint16_t *)&to[pTest->fieldOffset];
+			different = *(uint16 *)&from[pTest->fieldOffset] != *(uint16 *)&to[pTest->fieldOffset];
 			break;
 		case DT_FLOAT:
 		case DT_INTEGER:
 		case DT_ANGLE:
-			different = *(uint32_t *)&from[pTest->fieldOffset] != *(uint32_t *)&to[pTest->fieldOffset];
+			different = *(uint32 *)&from[pTest->fieldOffset] != *(uint32 *)&to[pTest->fieldOffset];
 			break;
 		case DT_TIMEWINDOW_8:
-			different = (int32_t)(*(float *)&from[pTest->fieldOffset] * 100.0) != (int32_t)(*(float *)&to[pTest->fieldOffset] * 100.0);
+			different = (int32)(*(float *)&from[pTest->fieldOffset] * 100.0) != (int32)(*(float *)&to[pTest->fieldOffset] * 100.0);
 			break;
 		case DT_TIMEWINDOW_BIG:
-			different = (int32_t)(*(float *)&from[pTest->fieldOffset] * 1000.0) != (int32_t)(*(float *)&to[pTest->fieldOffset] * 1000.0);
+			different = (int32)(*(float *)&from[pTest->fieldOffset] * 1000.0) != (int32)(*(float *)&to[pTest->fieldOffset] * 1000.0);
 			break;
 		case DT_STRING:
 			st1 = (char*)&from[pTest->fieldOffset];
@@ -511,21 +511,21 @@ void DELTA_MarkSendFields(unsigned char *from, unsigned char *to, delta_t *pFiel
 				pTest->flags |= FDT_MARK;
 			break;
 		case DT_SHORT:
-			if (*(uint16_t *)&from[pTest->fieldOffset] != *(uint16_t *)&to[pTest->fieldOffset])
+			if (*(uint16 *)&from[pTest->fieldOffset] != *(uint16 *)&to[pTest->fieldOffset])
 				pTest->flags |= FDT_MARK;
 			break;
 		case DT_FLOAT:
 		case DT_INTEGER:
 		case DT_ANGLE:
-			if (*(uint32_t *)&from[pTest->fieldOffset] != *(uint32_t *)&to[pTest->fieldOffset])
+			if (*(uint32 *)&from[pTest->fieldOffset] != *(uint32 *)&to[pTest->fieldOffset])
 				pTest->flags |= FDT_MARK;
 			break;
 		case DT_TIMEWINDOW_8:
-			if ((int32_t)(*(float *)&from[pTest->fieldOffset] * 100.0) != (int32_t)(*(float *)&to[pTest->fieldOffset] * 100.0))
+			if ((int32)(*(float *)&from[pTest->fieldOffset] * 100.0) != (int32)(*(float *)&to[pTest->fieldOffset] * 100.0))
 				pTest->flags |= FDT_MARK;
 			break;
 		case DT_TIMEWINDOW_BIG:
-			if ((int32_t)(*(float *)&from[pTest->fieldOffset] * 1000.0) != (int32_t)(*(float *)&to[pTest->fieldOffset] * 1000.0))
+			if ((int32)(*(float *)&from[pTest->fieldOffset] * 1000.0) != (int32)(*(float *)&to[pTest->fieldOffset] * 1000.0))
 				pTest->flags |= FDT_MARK;
 			break;
 		case DT_STRING:
@@ -592,28 +592,28 @@ void DELTA_WriteMarkedFields(unsigned char *from, unsigned char *to, delta_t *pF
 		case DT_BYTE:
 			if (fieldSign)
 			{
-				int8_t si8 = *(int8_t *)&to[pTest->fieldOffset];
-				si8 = (int8_t)((double)si8 * pTest->premultiply);
+				int8 si8 = *(int8 *)&to[pTest->fieldOffset];
+				si8 = (int8)((double)si8 * pTest->premultiply);
 				MSG_WriteSBits(si8, pTest->significant_bits);
 			}
 			else
 			{
-				uint8_t i8 = *(uint8_t *)&to[pTest->fieldOffset];
-				i8 = (uint8_t)((double)i8 * pTest->premultiply);
+				uint8 i8 = *(uint8 *)&to[pTest->fieldOffset];
+				i8 = (uint8)((double)i8 * pTest->premultiply);
 				MSG_WriteBits(i8, pTest->significant_bits);
 			}
 			break;
 		case DT_SHORT:
 			if (fieldSign)
 			{
-				int16_t si16 = *(int16_t *)&to[pTest->fieldOffset];
-				si16 = (int16_t)((double)si16 * pTest->premultiply);
+				int16 si16 = *(int16 *)&to[pTest->fieldOffset];
+				si16 = (int16)((double)si16 * pTest->premultiply);
 				MSG_WriteSBits(si16, pTest->significant_bits);
 			}
 			else
 			{
-				uint16_t i16 = *(uint16_t *)&to[pTest->fieldOffset];
-				i16 = (uint16_t)((double)i16 * pTest->premultiply);
+				uint16 i16 = *(uint16 *)&to[pTest->fieldOffset];
+				i16 = (uint16)((double)i16 * pTest->premultiply);
 				MSG_WriteBits(i16, pTest->significant_bits);
 			}
 			break;
@@ -622,11 +622,11 @@ void DELTA_WriteMarkedFields(unsigned char *from, unsigned char *to, delta_t *pF
 			double val = (double)(*(float *)&to[pTest->fieldOffset]) * pTest->premultiply;
 			if (fieldSign)
 			{
-				MSG_WriteSBits((int32_t)val, pTest->significant_bits);
+				MSG_WriteSBits((int32)val, pTest->significant_bits);
 			}
 			else
 			{
-				MSG_WriteBits((uint32_t)val, pTest->significant_bits);
+				MSG_WriteBits((uint32)val, pTest->significant_bits);
 			}
 			break;
 		}
@@ -634,19 +634,19 @@ void DELTA_WriteMarkedFields(unsigned char *from, unsigned char *to, delta_t *pF
 		{
 			if (fieldSign)
 			{
-				int32_t signedInt = *(int32_t *)&to[pTest->fieldOffset];
+				int32 signedInt = *(int32 *)&to[pTest->fieldOffset];
 				if (pTest->premultiply < 0.9999 || pTest->premultiply > 1.0001)
 				{
-					signedInt = (int32_t)((double)signedInt * pTest->premultiply);
+					signedInt = (int32)((double)signedInt * pTest->premultiply);
 				}
 				MSG_WriteSBits(signedInt, pTest->significant_bits);
 			}
 			else
 			{
-				uint32_t unsignedInt = *(uint32_t *)&to[pTest->fieldOffset];
+				uint32 unsignedInt = *(uint32 *)&to[pTest->fieldOffset];
 				if (pTest->premultiply < 0.9999 || pTest->premultiply > 1.0001)
 				{
-					unsignedInt = (uint32_t)((double)unsignedInt * pTest->premultiply);
+					unsignedInt = (uint32)((double)unsignedInt * pTest->premultiply);
 				}
 				MSG_WriteBits(unsignedInt, pTest->significant_bits);
 			}
@@ -659,15 +659,15 @@ void DELTA_WriteMarkedFields(unsigned char *from, unsigned char *to, delta_t *pF
 		case DT_TIMEWINDOW_8:
 		{
 			f2 = *(float *)&to[pTest->fieldOffset];
-			int32_t twVal = (int)(g_psv.time * 100.0) - (int)(f2 * 100.0);
+			int32 twVal = (int)(g_psv.time * 100.0) - (int)(f2 * 100.0);
 			MSG_WriteSBits(twVal, 8);
 			break;
 		}
 		case DT_TIMEWINDOW_BIG:
 		{
 			f2 = *(float *)&to[pTest->fieldOffset];
-			int32_t twVal = (int)(g_psv.time * pTest->premultiply) - (int)(f2 * pTest->premultiply);
-			MSG_WriteSBits((int32_t)twVal, pTest->significant_bits);
+			int32 twVal = (int)(g_psv.time * pTest->premultiply) - (int)(f2 * pTest->premultiply);
+			MSG_WriteSBits((int32)twVal, pTest->significant_bits);
 			break;
 		}
 		case DT_STRING:
@@ -769,14 +769,14 @@ int DELTA_ParseDelta(unsigned char *from, unsigned char *to, delta_t *pFields)
 				to[pTest->fieldOffset] = from[pTest->fieldOffset];
 				break;
 			case DT_SHORT:
-				*(uint16_t *)&to[pTest->fieldOffset] = *(uint16_t *)&from[pTest->fieldOffset];
+				*(uint16 *)&to[pTest->fieldOffset] = *(uint16 *)&from[pTest->fieldOffset];
 				break;
 			case DT_FLOAT:
 			case DT_INTEGER:
 			case DT_ANGLE:
 			case DT_TIMEWINDOW_8:
 			case DT_TIMEWINDOW_BIG:
-				*(uint32_t *)&to[pTest->fieldOffset] = *(uint32_t *)&from[pTest->fieldOffset];
+				*(uint32 *)&to[pTest->fieldOffset] = *(uint32 *)&from[pTest->fieldOffset];
 				break;
 			case DT_STRING:
 				Q_strcpy((char *)&to[pTest->fieldOffset], (char *)&from[pTest->fieldOffset]);
@@ -804,7 +804,7 @@ int DELTA_ParseDelta(unsigned char *from, unsigned char *to, delta_t *pFields)
 				{
 					d2 = d2 * pTest->postmultiply;
 				}
-				*(int8_t *)&to[pTest->fieldOffset] = (int8_t)d2;
+				*(int8 *)&to[pTest->fieldOffset] = (int8)d2;
 			}
 			else
 			{
@@ -817,7 +817,7 @@ int DELTA_ParseDelta(unsigned char *from, unsigned char *to, delta_t *pFields)
 				{
 					d2 = d2 * pTest->postmultiply;
 				}
-				*(uint8_t *)&to[pTest->fieldOffset] = (uint8_t)d2;
+				*(uint8 *)&to[pTest->fieldOffset] = (uint8)d2;
 			}
 			break;
 		case DT_SHORT:
@@ -832,7 +832,7 @@ int DELTA_ParseDelta(unsigned char *from, unsigned char *to, delta_t *pFields)
 				{
 					d2 = d2 * pTest->postmultiply;
 				}
-				*(int16_t *)&to[pTest->fieldOffset] = (int16_t)d2;
+				*(int16 *)&to[pTest->fieldOffset] = (int16)d2;
 			}
 			else
 			{
@@ -845,7 +845,7 @@ int DELTA_ParseDelta(unsigned char *from, unsigned char *to, delta_t *pFields)
 				{
 					d2 = d2 * pTest->postmultiply;
 				}
-				*(uint16_t *)&to[pTest->fieldOffset] = (uint16_t)d2;
+				*(uint16 *)&to[pTest->fieldOffset] = (uint16)d2;
 			}
 			break;
 		case DT_FLOAT:
@@ -879,7 +879,7 @@ int DELTA_ParseDelta(unsigned char *from, unsigned char *to, delta_t *pFields)
 				{
 					d2 = d2 * pTest->postmultiply;
 				}
-				*(int32_t *)&to[pTest->fieldOffset] = (int32_t)d2;
+				*(int32 *)&to[pTest->fieldOffset] = (int32)d2;
 			}
 			else
 			{
@@ -892,7 +892,7 @@ int DELTA_ParseDelta(unsigned char *from, unsigned char *to, delta_t *pFields)
 				{
 					d2 = d2 * pTest->postmultiply;
 				}
-				*(uint32_t *)&to[pTest->fieldOffset] = (uint32_t)d2;
+				*(uint32 *)&to[pTest->fieldOffset] = (uint32)d2;
 			}
 			break;
 		case DT_ANGLE:

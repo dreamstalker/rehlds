@@ -30,7 +30,7 @@
 class INetChan;
 class IGameClient;
 
-#include "maintypes.h"
+#include "archtypes.h"
 #include "const.h"
 #include "netadr.h"
 
@@ -100,6 +100,6 @@ public:
 
 	virtual const char* GetModelName() = 0;
 	virtual const char* GetName() = 0;
-	virtual uint32_t GetWorldmapCrc() = 0;
-	virtual uint8_t* GetClientDllMd5() = 0;
+	virtual uint32 GetWorldmapCrc() = 0;
+	virtual uint8* GetClientDllMd5() = 0;
 };

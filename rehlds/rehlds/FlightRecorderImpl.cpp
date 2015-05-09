@@ -18,8 +18,8 @@
 #include "precompiled.h"
 
 CRehldsFlightRecorder::CRehldsFlightRecorder() {
-	m_MetaRegionPtr = (uint8_t*) sys_allocmem(META_REGION_SIZE);
-	m_DataRegionPtr = (uint8_t*) sys_allocmem(DATA_REGION_SIZE);
+	m_MetaRegionPtr = (uint8*) sys_allocmem(META_REGION_SIZE);
+	m_DataRegionPtr = (uint8*) sys_allocmem(DATA_REGION_SIZE);
 
 	if (!m_MetaRegionPtr || !m_DataRegionPtr) {
 		rehlds_syserror("%s: direct allocation failed", __FUNCTION__);
@@ -82,7 +82,7 @@ void CRehldsFlightRecorder::MoveToStart() {
 	}
 }
 
-void CRehldsFlightRecorder::StartMessage(uint16_t msg, bool entrance) {
+void CRehldsFlightRecorder::StartMessage(uint16 msg, bool entrance) {
 	if (msg == 0 || msg > m_pMetaHeader->numMessages) {
 		rehlds_syserror("%s: Invalid message id %u", __FUNCTION__, msg);
 	}
@@ -104,11 +104,11 @@ void CRehldsFlightRecorder::StartMessage(uint16_t msg, bool entrance) {
 
 	m_pRecorderState->curMessage = msg;
 	m_pRecorderState->lastMsgBeginPos = m_pRecorderState->wpos;
-	*(uint16_t*)(m_DataRegionPtr + m_pRecorderState->wpos) = msg;
+	*(uint16*)(m_DataRegionPtr + m_pRecorderState->wpos) = msg;
 	m_pRecorderState->wpos += 2;
 }
 
-void CRehldsFlightRecorder::EndMessage(uint16_t msg, bool entrance) {
+void CRehldsFlightRecorder::EndMessage(uint16 msg, bool entrance) {
 	if (entrance) {
 		msg = msg | 0x8000;
 	}
@@ -126,7 +126,7 @@ void CRehldsFlightRecorder::EndMessage(uint16_t msg, bool entrance) {
 	if (msgSize > MSG_MAX_SIZE) {
 		rehlds_syserror("%s: too big message %u; size%u", __FUNCTION__, msg, msgSize);
 	}
-	*(uint16_t*)(m_DataRegionPtr + m_pRecorderState->wpos) = msgSize;
+	*(uint16*)(m_DataRegionPtr + m_pRecorderState->wpos) = msgSize;
 	m_pRecorderState->wpos += 2;
 
 	m_pRecorderState->curMessage = 0;
@@ -158,36 +158,36 @@ void CRehldsFlightRecorder::WriteString(const char* s) {
 	WriteBuffer(s, strlen(s) + 1);
 }
 
-void CRehldsFlightRecorder::WriteInt8(int8_t v) {
-	WritePrimitive<int8_t>(v);
+void CRehldsFlightRecorder::WriteInt8(int8 v) {
+	WritePrimitive<int8>(v);
 }
 
-void CRehldsFlightRecorder::WriteUInt8(uint8_t v) {
-	WritePrimitive<uint8_t>(v);
+void CRehldsFlightRecorder::WriteUInt8(uint8 v) {
+	WritePrimitive<uint8>(v);
 }
 
-void CRehldsFlightRecorder::WriteInt16(int16_t v) {
-	WritePrimitive<int16_t>(v);
+void CRehldsFlightRecorder::WriteInt16(int16 v) {
+	WritePrimitive<int16>(v);
 }
 
-void CRehldsFlightRecorder::WriteUInt16(uint16_t v) {
-	WritePrimitive<uint16_t>(v);
+void CRehldsFlightRecorder::WriteUInt16(uint16 v) {
+	WritePrimitive<uint16>(v);
 }
 
-void CRehldsFlightRecorder::WriteInt32(int32_t v) {
-	WritePrimitive<int32_t>(v);
+void CRehldsFlightRecorder::WriteInt32(int32 v) {
+	WritePrimitive<int32>(v);
 }
 
-void CRehldsFlightRecorder::WriteUInt32(uint32_t v) {
-	WritePrimitive<uint32_t>(v);
+void CRehldsFlightRecorder::WriteUInt32(uint32 v) {
+	WritePrimitive<uint32>(v);
 }
 
-void CRehldsFlightRecorder::WriteInt64(int64_t v) {
-	WritePrimitive<int64_t>(v);
+void CRehldsFlightRecorder::WriteInt64(int64 v) {
+	WritePrimitive<int64>(v);
 }
 
-void CRehldsFlightRecorder::WriteUInt64(uint64_t v) {
-	WritePrimitive<uint64_t>(v);
+void CRehldsFlightRecorder::WriteUInt64(uint64 v) {
+	WritePrimitive<uint64>(v);
 }
 
 void CRehldsFlightRecorder::WriteFloat(float v) {
@@ -198,12 +198,12 @@ void CRehldsFlightRecorder::WriteDouble(double v) {
 	WritePrimitive<double>(v);
 }
 
-uint16_t CRehldsFlightRecorder::RegisterMessage(const char* module, const char *message, unsigned int version, bool inOut) {
+uint16 CRehldsFlightRecorder::RegisterMessage(const char* module, const char *message, unsigned int version, bool inOut) {
 	if (m_pMetaHeader->numMessages >= MSG_MAX_ID) {
 		rehlds_syserror("%s: can't register message; limit exceeded", __FUNCTION__);
 	}
 
-	uint16_t msgId = ++m_pMetaHeader->numMessages;
+	uint16 msgId = ++m_pMetaHeader->numMessages;
 
 	sizebuf_t sb;
 	sb.buffername = "FlightRecorded Meta";

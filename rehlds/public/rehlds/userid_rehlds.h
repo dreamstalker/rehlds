@@ -27,13 +27,13 @@
 */
 #pragma once
 
-#include "maintypes.h"
+#include "archtypes.h"
 
 
 /* <2e915> ../engine/userid.h:22 */
 typedef struct USERID_s
 {
 	int idtype;
-	uint64_t m_SteamID;
+	uint64 m_SteamID;
 	unsigned int clientip;
 } USERID_t;

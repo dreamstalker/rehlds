@@ -4,6 +4,9 @@
 
 #include "osconfig.h"
 
+#include "archtypes.h"
+#include "mathlib.h"
+
 #include "sys_shared.h"
 #include "crc32.h"
 #include "static_map.h"

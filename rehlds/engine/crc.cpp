@@ -29,7 +29,7 @@
 #include "precompiled.h"
 
 
-static const uint32_t pulCRCTable[256] =
+static const uint32 pulCRCTable[256] =
 {
 	0x00000000, 0x77073096, 0xee0e612c, 0x990951ba,
 	0x076dc419, 0x706af48f, 0xe963a535, 0x9e6495a3,
@@ -122,7 +122,7 @@ void CRC32_ProcessByte(CRC32_t *pulCRC, unsigned char ch)
 void CRC32_ProcessBuffer(CRC32_t *pulCRC, void *pBuffer, int nBuffer)
 {
 	CRC32_t ulCrc = *pulCRC;
-	uint8_t* pb = (uint8_t*)pBuffer;
+	uint8* pb = (uint8*)pBuffer;
 
 	for (int i = 0; i < nBuffer; i++)
 	{
@@ -299,25 +299,25 @@ static unsigned char PADDING[64] =
 /* Rotation is separate from addition to prevent recomputation */
 #define FF(a, b, c, d, x, s, ac) \
 	{ \
-		(a) += F ((b), (c), (d)) + (x) + (uint32_t)(ac); \
+		(a) += F ((b), (c), (d)) + (x) + (uint32)(ac); \
 		(a) = ROTATE_LEFT ((a), (s)); \
 		(a) += (b); \
 	}
 #define GG(a, b, c, d, x, s, ac) \
 	{ \
-		(a) += G ((b), (c), (d)) + (x) + (uint32_t)(ac); \
+		(a) += G ((b), (c), (d)) + (x) + (uint32)(ac); \
 		(a) = ROTATE_LEFT ((a), (s)); \
 		(a) += (b); \
 	}
 #define HH(a, b, c, d, x, s, ac) \
 	{ \
-		(a) += H ((b), (c), (d)) + (x) + (uint32_t)(ac); \
+		(a) += H ((b), (c), (d)) + (x) + (uint32)(ac); \
 		(a) = ROTATE_LEFT ((a), (s)); \
 		(a) += (b); \
 	}
 #define II(a, b, c, d, x, s, ac) \
 	{ \
-		(a) += I ((b), (c), (d)) + (x) + (uint32_t)(ac); \
+		(a) += I ((b), (c), (d)) + (x) + (uint32)(ac); \
 		(a) = ROTATE_LEFT ((a), (s)); \
 		(a) += (b); \
 	}
@@ -338,7 +338,7 @@ void MD5Init(MD5Context_t *ctx)
 /* <19841> ../engine/crc.c:473 */
 void MD5Update(MD5Context_t *ctx, const unsigned char *buf, unsigned int len)
 {
-	uint32_t in[16];
+	uint32 in[16];
 	int mdi;
 	unsigned int i, ii;
 
@@ -346,13 +346,13 @@ void MD5Update(MD5Context_t *ctx, const unsigned char *buf, unsigned int len)
 	mdi = (int)((ctx->bits[0] >> 3) & 0x3F);
 
 	// Update number of bits
-	if ((ctx->bits[0] + ((uint32_t)len << 3)) < ctx->bits[0])
+	if ((ctx->bits[0] + ((uint32)len << 3)) < ctx->bits[0])
 	{
 		ctx->bits[1]++;
 	}
 
-	ctx->bits[0] += ((uint32_t)len << 3);
-	ctx->bits[1] += ((uint32_t)len >> 29);
+	ctx->bits[0] += ((uint32)len << 3);
+	ctx->bits[1] += ((uint32)len >> 29);
 
 	while (len--)
 	{
@@ -363,10 +363,10 @@ void MD5Update(MD5Context_t *ctx, const unsigned char *buf, unsigned int len)
 		if (mdi == 0x40)
 		{
 			for (i = 0, ii = 0; i < 16; i++, ii += 4)
-				in[i] = (((uint32_t)ctx->in[ii + 3]) << 24) |
-						(((uint32_t)ctx->in[ii + 2]) << 16) |
-						(((uint32_t)ctx->in[ii + 1]) << 8) |
-						((uint32_t)ctx->in[ii]);
+				in[i] = (((uint32)ctx->in[ii + 3]) << 24) |
+						(((uint32)ctx->in[ii + 2]) << 16) |
+						(((uint32)ctx->in[ii + 1]) << 8) |
+						((uint32)ctx->in[ii]);
 			MD5Transform(ctx->buf, in);
 			mdi = 0;
 		}
@@ -376,7 +376,7 @@ void MD5Update(MD5Context_t *ctx, const unsigned char *buf, unsigned int len)
 /* <197ea> ../engine/crc.c:528 */
 void MD5Final(unsigned char digest[16], MD5Context_t *ctx)
 {
-	uint32_t in[16];
+	uint32 in[16];
 	int mdi;
 	unsigned int i, ii;
 	unsigned int padLen;
@@ -394,10 +394,10 @@ void MD5Final(unsigned char digest[16], MD5Context_t *ctx)
 
 	// Append length in bits and transform
 	for (i = 0, ii = 0; i < 14; i++, ii += 4)
-		in[i] = (((uint32_t)ctx->in[ii + 3]) << 24) |
-				(((uint32_t)ctx->in[ii + 2]) << 16) |
-				(((uint32_t)ctx->in[ii + 1]) << 8) |
-				((uint32_t)ctx->in[ii]);
+		in[i] = (((uint32)ctx->in[ii + 3]) << 24) |
+				(((uint32)ctx->in[ii + 2]) << 16) |
+				(((uint32)ctx->in[ii + 1]) << 8) |
+				((uint32)ctx->in[ii]);
 	MD5Transform(ctx->buf, in);
 
 	// Store buffer in digest
@@ -413,7 +413,7 @@ void MD5Final(unsigned char digest[16], MD5Context_t *ctx)
 /* <19769> ../engine/crc.c:592 */
 void MD5Transform(unsigned int buf[4], const unsigned int in[16])
 {
-	uint32_t a = buf[0], b = buf[1], c = buf[2], d = buf[3];
+	uint32 a = buf[0], b = buf[1], c = buf[2], d = buf[3];
 
 	// Round 1
 #define S11 7

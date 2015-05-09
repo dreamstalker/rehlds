@@ -319,6 +319,9 @@
     <ClCompile Include="..\rehlds\flight_recorder.cpp">
       <Filter>rehlds</Filter>
     </ClCompile>
+    <ClCompile Include="..\engine\public_amalgamation.cpp">
+      <Filter>engine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\hookers\memory.h">
@@ -521,9 +524,6 @@
     </ClInclude>
     <ClInclude Include="..\engine\cvar.h">
       <Filter>engine\common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\public\archtypes.h">
-      <Filter>public</Filter>
     </ClInclude>
     <ClInclude Include="..\public\FileSystem.h">
       <Filter>public</Filter>

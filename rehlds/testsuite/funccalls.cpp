@@ -2046,7 +2046,7 @@ void CGameServerSetKeyValueCall::readPrologue(std::istream &stream) {
 /* ============================================================================
                      CSteamApiSetBreakpadAppIdCall
 ============================================================================ */
-CSteamApiSetBreakpadAppIdCall::CSteamApiSetBreakpadAppIdCall(uint32_t appId)
+CSteamApiSetBreakpadAppIdCall::CSteamApiSetBreakpadAppIdCall(uint32 appId)
 {
 	m_AppId = appId;
 }
@@ -2879,7 +2879,7 @@ void CGetSystemTimeAsFileTimeCall::readEpilogue(std::istream &stream) {
 /* ============================================================================
                             CStdTimeCall
 ============================================================================ */
-CStdTimeCall::CStdTimeCall(uint32_t* inTime)
+CStdTimeCall::CStdTimeCall(uint32* inTime)
 {
 	m_InTimeNull = (inTime == NULL);
 }
@@ -2904,7 +2904,7 @@ bool CStdTimeCall::compareInputArgs(IEngExtCall* other, bool strict)
 	return true;
 }
 
-void CStdTimeCall::setResult(uint32_t res)
+void CStdTimeCall::setResult(uint32 res)
 {
 	m_Res = res;
 }
@@ -2933,7 +2933,7 @@ void CStdTimeCall::readEpilogue(std::istream &stream) {
 /* ============================================================================
                           CStdLocalTimeCall
 ============================================================================ */
-CStdLocalTimeCall::CStdLocalTimeCall(uint32_t inTime)
+CStdLocalTimeCall::CStdLocalTimeCall(uint32 inTime)
 {
 	m_Time = inTime;
 }

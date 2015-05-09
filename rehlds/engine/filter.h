@@ -40,8 +40,8 @@ typedef struct ipfilter_s
 {
 	unsigned int mask;
 	union {
-		uint32_t u32;
-		uint8_t octets[4];
+		uint32 u32;
+		uint8 octets[4];
 	} compare;
 	float banEndTime;
 	float banTime;

@@ -23,21 +23,21 @@ CSimplePlatform::CSimplePlatform() {
 #endif
 }
 
-uint32_t CSimplePlatform::time(uint32_t* pTime)
+uint32 CSimplePlatform::time(uint32* pTime)
 {
 	time_t res = ::time((time_t*)NULL);
-	if (pTime != NULL) *pTime = (uint32_t)res;
+	if (pTime != NULL) *pTime = (uint32)res;
 
-	return (uint32_t) res;
+	return (uint32) res;
 }
 
-struct tm* CSimplePlatform::localtime(uint32_t time)
+struct tm* CSimplePlatform::localtime(uint32 time)
 {
 	time_t theTime = (time_t)time;
 	return ::localtime(&theTime);
 }
 
-void CSimplePlatform::srand(uint32_t seed)
+void CSimplePlatform::srand(uint32 seed)
 {
 	return ::srand(seed);
 }

@@ -92,8 +92,8 @@ class CRehldsServerData : public IRehldsServerData {
 public:
 	virtual const char* GetModelName();
 	virtual const char* GetName();
-	virtual uint32_t GetWorldmapCrc();
-	virtual uint8_t* GetClientDllMd5();
+	virtual uint32 GetWorldmapCrc();
+	virtual uint8* GetClientDllMd5();
 };
 
 extern CGameClient** g_GameClients;

@@ -53,7 +53,7 @@ NOXREF cvar_t *Cvar_FindPrevVar(const char *var_name);
 float Cvar_VariableValue(const char *var_name);
 NOXREF int Cvar_VariableInt(const char *var_name);
 char *Cvar_VariableString(const char *var_name);
-NOXREF char *Cvar_CompleteVariable(const char *search, int forward);
+NOXREF const char *Cvar_CompleteVariable(const char *search, int forward);
 void Cvar_DirectSet(struct cvar_s *var, const char *value);
 void Cvar_Set(const char *var_name, const char *value);
 void Cvar_SetValue(const char *var_name, float value);

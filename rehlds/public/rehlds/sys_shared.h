@@ -26,6 +26,5 @@
 *
 */
 #pragma once
-#include "maintypes.h"
 
 extern bool g_HasSSE42;

@@ -25,7 +25,7 @@
 *    version.
 *
 */
-#include "precompiled.h"
+#include "sys_shared.h"
 
 bool Sys_ChechSSE42Support();
 

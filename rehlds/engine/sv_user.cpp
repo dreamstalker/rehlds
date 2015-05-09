@@ -142,7 +142,7 @@ void SV_ParseConsistencyResponse(client_t *pSenderClient)
 		Q_memcpy(resbuffer, r->rguc_reserved, sizeof(resbuffer));
 		if (!Q_memcmp(resbuffer, nullbuffer, sizeof(resbuffer)))
 		{
-			if (MSG_ReadBits(32) != *(uint32_t *)&r->rgucMD5_hash[0])
+			if (MSG_ReadBits(32) != *(uint32 *)&r->rgucMD5_hash[0])
 				c = idx + 1;
 		}
 		else
@@ -1660,7 +1660,7 @@ void SV_ParseCvarValue2(client_t *cl)
 	Con_DPrintf("Cvar query response: name:%s, request ID %d, cvar:%s, value:%s\n", cl->name, requestID, cvarName, value);
 }
 
-void SV_HandleClientMessage_api(IGameClient* client, int8_t opcode) {
+void SV_HandleClientMessage_api(IGameClient* client, int8 opcode) {
 	client_t* cl = client->GetClient();
 	if (opcode < clc_bad || opcode > clc_cvarvalue2)
 	{

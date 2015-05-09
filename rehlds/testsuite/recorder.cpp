@@ -516,8 +516,8 @@ CRecordingEngExtInterceptor::CRecordingEngExtInterceptor(const char* fname, IReH
 	m_RootFunc = m_LastFunc = NULL;
 	m_BasePlatform = basePlatform;
 
-	uint16_t versionMajor = TESTSUITE_PROTOCOL_VERSION_MAJOR;
-	uint16_t versionMinor = TESTSUITE_PROTOCOL_VERSION_MINOR;
+	uint16 versionMajor = TESTSUITE_PROTOCOL_VERSION_MAJOR;
+	uint16 versionMinor = TESTSUITE_PROTOCOL_VERSION_MINOR;
 	m_OutStream.write((char*)&versionMinor, 2).write((char*)&versionMajor, 2);
 
 	const char* cmdLine = GetCommandLineA();
@@ -529,7 +529,7 @@ CRecordingEngExtInterceptor::CRecordingEngExtInterceptor(const char* fname, IReH
 
 void CRecordingEngExtInterceptor::writeCall(bool start, bool end, IEngExtCall* fcall)
 {
-	uint16_t opc = fcall->getOpcode();
+	uint16 opc = fcall->getOpcode();
 	if (start)
 		opc |= (1 << 15);
 
@@ -587,18 +587,18 @@ void CRecordingEngExtInterceptor::PopFunc(CRecorderFuncCall* func)
 	}
 }
 
-uint32_t CRecordingEngExtInterceptor::time(uint32_t* pTime)
+uint32 CRecordingEngExtInterceptor::time(uint32* pTime)
 {
 	CStdTimeCall fcall(pTime); CRecorderFuncCall frec(&fcall);
 	PushFunc(&frec);
-	uint32_t res = m_BasePlatform->time(pTime);
+	uint32 res = m_BasePlatform->time(pTime);
 	fcall.setResult(res);
 	PopFunc(&frec);
 
 	return res;
 }
 
-struct tm* CRecordingEngExtInterceptor::localtime(uint32_t time)
+struct tm* CRecordingEngExtInterceptor::localtime(uint32 time)
 {
 	CStdLocalTimeCall fcall; CRecorderFuncCall frec(&fcall);
 	PushFunc(&frec);
@@ -609,7 +609,7 @@ struct tm* CRecordingEngExtInterceptor::localtime(uint32_t time)
 	return res;
 }
 
-void CRecordingEngExtInterceptor::srand(uint32_t seed)
+void CRecordingEngExtInterceptor::srand(uint32 seed)
 {
 	CStdSrandCall fcall(seed); CRecorderFuncCall frec(&fcall);
 	PushFunc(&frec);

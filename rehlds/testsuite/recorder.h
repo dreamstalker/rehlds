@@ -158,9 +158,9 @@ public:
 	void PushFunc(CRecorderFuncCall* func);
 	void PopFunc(CRecorderFuncCall* func);
 
-	virtual uint32_t time(uint32_t* pTime);
-	virtual struct tm* localtime(uint32_t time);
-	virtual void srand(uint32_t seed);
+	virtual uint32 time(uint32* pTime);
+	virtual struct tm* localtime(uint32 time);
+	virtual void srand(uint32 seed);
 	virtual int rand();
 
 	virtual void Sleep(DWORD msec);

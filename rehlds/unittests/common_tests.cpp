@@ -10,8 +10,8 @@ TEST(BitsWritingReading, MSG, 5000)
 
 	sizebuf_t *buf = &net_message;
 
-	uint32_t ff1 = ((uint32_t)1 << 31) - 1;
-	uint32_t ff2 = ((uint32_t)1 << 9) - 1;
+	uint32 ff1 = ((uint32)1 << 31) - 1;
+	uint32 ff2 = ((uint32)1 << 9) - 1;
 
 	SZ_Clear(buf);
 
@@ -23,8 +23,8 @@ TEST(BitsWritingReading, MSG, 5000)
 	MSG_BeginReading();
 
 	MSG_StartBitReading(buf);
-	uint32_t t1 = MSG_ReadBits(31);
-	uint32_t t2 = MSG_ReadBits(9);
+	uint32 t1 = MSG_ReadBits(31);
+	uint32 t2 = MSG_ReadBits(9);
 	MSG_EndBitReading(buf);
 
 	UINT32_EQUALS("31/9 Read failed (31)", ff1, t1);
@@ -49,9 +49,9 @@ TEST(BitsWritingReading, MSG, 5000)
 	UINT32_EQUALS("9/31 Read failed (31)", ff2, t2);
 
 
-	uint32_t a2, a1 = 5;
-	uint32_t b2, b1 = 0xEFEF;
-	uint32_t c2, c1 = 0x7AAEAEAE;
+	uint32 a2, a1 = 5;
+	uint32 b2, b1 = 0xEFEF;
+	uint32 c2, c1 = 0x7AAEAEAE;
 
 	SZ_Clear(buf);
 

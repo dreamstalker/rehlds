@@ -29,10 +29,10 @@
 #include "precompiled.h"
 
 #define FILETIME_TO_QWORD(ft) \
-		((((uint64_t)ft.dwHighDateTime) << 32) + ft.dwLowDateTime)
+		((((uint64)ft.dwHighDateTime) << 32) + ft.dwLowDateTime)
 
 #define FILETIME_TO_PAIR(f,h)\
-		(((uint64_t)f << 32) | h)
+		(((uint64)f << 32) | h)
 
 /* <3d3ff> ../engine/host_cmd.c:4378 */
 typedef int(*SV_BLENDING_INTERFACE_FUNC)(int, struct sv_blending_interface_s **, struct server_studio_api_s *, float *, float *);
@@ -328,14 +328,14 @@ int Host_GetStartTime(void)
 /* <3e39a> ../engine/host_cmd.c:405 */
 void Host_UpdateStats(void)
 {
-	uint32_t runticks = 0;
-	uint32_t cputicks = 0;
+	uint32 runticks = 0;
+	uint32 cputicks = 0;
 
 	static float last = 0.0f;
 	static float lastAvg = 0.0f;
 
-	static uint64_t lastcputicks = 0;
-	static uint64_t lastrunticks = 0;
+	static uint64 lastcputicks = 0;
+	static uint64 lastrunticks = 0;
 
 #ifdef _WIN32
 
@@ -365,8 +365,8 @@ void Host_UpdateStats(void)
 		}
 		else
 		{
-			cputicks = (uint32_t)(lastcputicks & 0xFFFFFFFF);
-			runticks = (uint32_t)(lastcputicks >> 32);
+			cputicks = (uint32)(lastcputicks & 0xFFFFFFFF);
+			runticks = (uint32)(lastcputicks >> 32);
 		}
 
 		cpuPercent = 

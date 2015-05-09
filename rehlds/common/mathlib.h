@@ -20,7 +20,10 @@
 typedef float vec_t;
 
 /* <42b91> ../common/mathlib.h:6 */
+#ifndef DID_VEC3_T_DEFINE
+#define DID_VEC3_T_DEFINE
 typedef vec_t vec3_t[3];
+#endif
 
 /* <80013> ../common/mathlib.h:8 */
 typedef vec_t vec4_t[4];

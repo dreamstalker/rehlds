@@ -27,29 +27,29 @@
 */
 #pragma once
 
-#include "osconfig.h"
+#include "archtypes.h"
 
 class IRehldsFlightRecorder
 {
 public:
 	virtual ~IRehldsFlightRecorder() { }
 
-	virtual uint16_t RegisterMessage(const char* module, const char *message, unsigned int version, bool inOut) = 0;
+	virtual uint16 RegisterMessage(const char* module, const char *message, unsigned int version, bool inOut) = 0;
 	
-	virtual void StartMessage(uint16_t msg, bool entrance) = 0;
-	virtual void EndMessage(uint16_t msg, bool entrance) = 0;
+	virtual void StartMessage(uint16 msg, bool entrance) = 0;
+	virtual void EndMessage(uint16 msg, bool entrance) = 0;
 	
-	virtual void WriteInt8(int8_t v) = 0;
-	virtual void WriteUInt8(uint8_t v) = 0;
+	virtual void WriteInt8(int8 v) = 0;
+	virtual void WriteUInt8(uint8 v) = 0;
 	
-	virtual void WriteInt16(int16_t v) = 0;
-	virtual void WriteUInt16(uint16_t v) = 0;
+	virtual void WriteInt16(int16 v) = 0;
+	virtual void WriteUInt16(uint16 v) = 0;
 
-	virtual void WriteInt32(int32_t v) = 0;
-	virtual void WriteUInt32(uint32_t v) = 0;
+	virtual void WriteInt32(int32 v) = 0;
+	virtual void WriteUInt32(uint32 v) = 0;
 
-	virtual void WriteInt64(int64_t v) = 0;
-	virtual void WriteUInt64(uint64_t v) = 0;
+	virtual void WriteInt64(int64 v) = 0;
+	virtual void WriteUInt64(uint64 v) = 0;
 
 	virtual void WriteFloat(float v) = 0;
 	virtual void WriteDouble(double v) = 0;

@@ -51,7 +51,7 @@ int NUM_FOR_EDICT(const edict_t *e);
 bool SuckOutClassname(char *szInputStream, edict_t *pEdict);
 void ReleaseEntityDLLFields(edict_t *pEdict);
 void InitEntityDLLFields(edict_t *pEdict);
-void *PvAllocEntPrivateData(edict_t *pEdict, int32_t cb);
+void *PvAllocEntPrivateData(edict_t *pEdict, int32 cb);
 void *PvEntPrivateData(edict_t *pEdict);
 void FreeEntPrivateData(edict_t *pEdict);
 void FreeAllEntPrivateData(void);

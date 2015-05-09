@@ -39,7 +39,7 @@
 /* <8a763> ../engine/pr_dlls.h:42 */
 typedef struct functiontable_s
 {
-	uint32_t pFunction;
+	uint32 pFunction;
 	char *pFunctionName;
 } functiontable_t;
 

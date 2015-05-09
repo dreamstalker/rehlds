@@ -27,28 +27,7 @@
 // need this for memset
 #include <string.h>
 
-// for when we care about how many bits we use
-typedef signed char      int8;
-typedef signed short     int16;
-
-#ifdef _WIN32
-#ifdef _MSC_VER
-typedef signed __int64   int64;
-#endif
-#elif defined __linux__
-typedef long long	int64;
-#endif
-
-typedef unsigned char      uint8;
-typedef unsigned short     uint16;
-#ifdef _WIN32
-#ifdef _MSC_VER
-typedef unsigned __int64   uint64;
-#endif
-#elif defined __linux__
-typedef unsigned long long uint64;
-#endif
-
+#include "archtypes.h"
 
 typedef float  float32;
 typedef double float64;

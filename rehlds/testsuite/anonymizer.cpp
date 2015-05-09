@@ -1,10 +1,10 @@
 #include "precompiled.h"
 
-uint64_t NET_AdrToLong(const netadr_t &a) {
+uint64 NET_AdrToLong(const netadr_t &a) {
 	if (a.type != NA_IP)
 		return -1;
 
-	return a.ip[0] | (a.ip[1] << 8) | (a.ip[2] << 16) | (a.ip[3] << 24) | (uint64_t)a.port << 32;
+	return a.ip[0] | (a.ip[1] << 8) | (a.ip[2] << 16) | (a.ip[3] << 24) | (uint64)a.port << 32;
 }
 
 CSteamCallbackAnonymizingWrapper::CSteamCallbackAnonymizingWrapper(CAnonymizingEngExtInterceptor* anonymizer, CCallbackBase* cb, int id)
@@ -345,7 +345,7 @@ void CSteamGameServerAnonymizingWrapper::SetRegion(const char *pszRegion)
 
 bool CSteamGameServerAnonymizingWrapper::SendUserConnectAndAuthenticate(uint32 unIPClient, const void *pvAuthBlob, uint32 cubAuthBlobSize, CSteamID *pSteamIDUser)
 {
-	uint32_t realIp = m_Anonymizer->Fake2RealIp(ntohl(unIPClient), __FUNCTION__);
+	uint32 realIp = m_Anonymizer->Fake2RealIp(ntohl(unIPClient), __FUNCTION__);
 	bool res = m_Wrapped->SendUserConnectAndAuthenticate(htonl(realIp), pvAuthBlob, cubAuthBlobSize, pSteamIDUser);
 	if (res) {
 		*pSteamIDUser = m_Anonymizer->Real2FakeSteamId(*pSteamIDUser, __FUNCTION__);
@@ -427,7 +427,7 @@ uint32 CSteamGameServerAnonymizingWrapper::GetPublicIP()
 
 bool CSteamGameServerAnonymizingWrapper::HandleIncomingPacket(const void *pData, int cbData, uint32 srcIP, uint16 srcPort)
 {
-	uint32_t realIp = m_Anonymizer->Fake2RealIp(htonl(srcIP), __FUNCTION__);
+	uint32 realIp = m_Anonymizer->Fake2RealIp(htonl(srcIP), __FUNCTION__);
 	
 	bool res;
 	if (m_Anonymizer->m_OriginalConnectPacketLen) {
@@ -445,17 +445,17 @@ int CSteamGameServerAnonymizingWrapper::GetNextOutgoingPacket(void *pOut, int cb
 {
 	int res = m_Wrapped->GetNextOutgoingPacket(pOut, cbMaxOut, pNetAdr, pPort);
 	if (res > 0) {
-		uint32_t fakeIp = m_Anonymizer->Real2FakeIp(ntohl(*pNetAdr), __FUNCTION__);
+		uint32 fakeIp = m_Anonymizer->Real2FakeIp(ntohl(*pNetAdr), __FUNCTION__);
 		*pNetAdr = htonl(fakeIp);
 
 		//Clear players list
-		if (res > 6 && *(uint32_t*)pOut == 0xFFFFFFFF && ((uint8_t*)pOut)[4] == 0x44) {
-			memset((uint8_t*)pOut + 6, 0, res - 6);
+		if (res > 6 && *(uint32*)pOut == 0xFFFFFFFF && ((uint8*)pOut)[4] == 0x44) {
+			memset((uint8*)pOut + 6, 0, res - 6);
 		}
 
 		//Clear serverinfo
-		if (res > 6 && *(uint32_t*)pOut == 0xFFFFFFFF && ((uint8_t*)pOut)[4] == 0x49) {
-			memset((uint8_t*)pOut + 6, 0, res - 6);
+		if (res > 6 && *(uint32*)pOut == 0xFFFFFFFF && ((uint8*)pOut)[4] == 0x49) {
+			memset((uint8*)pOut + 6, 0, res - 6);
 		}
 	}
 	return res;
@@ -505,19 +505,19 @@ CAnonymizingEngExtInterceptor::CAnonymizingEngExtInterceptor(IReHLDSPlatform* ba
 	m_OriginalConnectPacketLen = 0;
 }
 
-uint32_t CAnonymizingEngExtInterceptor::time(uint32_t* pTime)
+uint32 CAnonymizingEngExtInterceptor::time(uint32* pTime)
 {
-	uint32_t res = m_BasePlatform->time(pTime);
+	uint32 res = m_BasePlatform->time(pTime);
 	return res;
 }
 
-struct tm* CAnonymizingEngExtInterceptor::localtime(uint32_t time)
+struct tm* CAnonymizingEngExtInterceptor::localtime(uint32 time)
 {
 	struct tm* res = m_BasePlatform->localtime(time);
 	return res;
 }
 
-void CAnonymizingEngExtInterceptor::srand(uint32_t seed)
+void CAnonymizingEngExtInterceptor::srand(uint32 seed)
 {
 	m_BasePlatform->srand(seed);
 }
@@ -606,9 +606,9 @@ int CAnonymizingEngExtInterceptor::recvfrom(SOCKET s, char* buf, int len, int fl
 	int res = m_BasePlatform->recvfrom(s, buf, len, flags, from, fromlen);
 	if (res > 0) {
 		Real2FakeSockaddr(from, __FUNCTION__);
-		if (res > 4 && (*(uint32_t*)buf) == 0xFFFFFFFF) {
+		if (res > 4 && (*(uint32*)buf) == 0xFFFFFFFF) {
 			unsigned int localLen = res;
-			ProcessConnectionlessPacket((uint8_t*)buf, &localLen);
+			ProcessConnectionlessPacket((uint8*)buf, &localLen);
 			res = localLen;
 		}
 	}
@@ -800,14 +800,14 @@ void CAnonymizingEngExtInterceptor::AnonymizeAddr(const char* real, const char* 
 }
 
 void CAnonymizingEngExtInterceptor::AnonymizeAddr(const netadr_t& real, const netadr_t& fake) {
-	uint32_t realIp = *(uint32_t*)(&real.ip[0]);
-	uint32_t fakeIp = *(uint32_t*)(&fake.ip[0]);
+	uint32 realIp = *(uint32*)(&real.ip[0]);
+	uint32 fakeIp = *(uint32*)(&fake.ip[0]);
 
 	m_Fake2RealIpMap[fakeIp] = realIp;
 	m_Real2FakeIpMap[realIp] = fakeIp;
 }
 
-uint32_t CAnonymizingEngExtInterceptor::Fake2RealIp(uint32_t fakeIp, const char* callsite) {
+uint32 CAnonymizingEngExtInterceptor::Fake2RealIp(uint32 fakeIp, const char* callsite) {
 	auto itr = m_Fake2RealIpMap.find(fakeIp);
 	if (itr == m_Fake2RealIpMap.end()) {
 		rehlds_syserror("%s: Unmapped fake addr %s", callsite, IpToString(fakeIp));
@@ -816,7 +816,7 @@ uint32_t CAnonymizingEngExtInterceptor::Fake2RealIp(uint32_t fakeIp, const char*
 	return itr->second;
 }
 
-uint32_t CAnonymizingEngExtInterceptor::Real2FakeIp(uint32_t realIp, const char* callsite) {
+uint32 CAnonymizingEngExtInterceptor::Real2FakeIp(uint32 realIp, const char* callsite) {
 	auto itr = m_Real2FakeIpMap.find(realIp);
 	if (itr == m_Real2FakeIpMap.end()) {
 		Con_Printf("%s: Unmapped real addr %s\n", callsite, IpToString(realIp));
@@ -830,21 +830,21 @@ uint32_t CAnonymizingEngExtInterceptor::Real2FakeIp(uint32_t realIp, const char*
 
 void CAnonymizingEngExtInterceptor::Real2FakeSockaddr(sockaddr* saddr, const char* callsite) {
 	sockaddr_in* inaddr = (sockaddr_in*)saddr;
-	uint32_t realIp = *(uint32_t*)(&inaddr->sin_addr);
-	uint32_t fakeIp = Real2FakeIp(realIp, callsite);
+	uint32 realIp = *(uint32*)(&inaddr->sin_addr);
+	uint32 fakeIp = Real2FakeIp(realIp, callsite);
 
-	*(uint32_t*)(&inaddr->sin_addr) = fakeIp;
+	*(uint32*)(&inaddr->sin_addr) = fakeIp;
 }
 
 void CAnonymizingEngExtInterceptor::Fake2RealSockaddr(sockaddr* saddr, const char* callsite) {
 	sockaddr_in* inaddr = (sockaddr_in*)saddr;
-	uint32_t fakeIp = *(uint32_t*)(&inaddr->sin_addr);
-	uint32_t realIp = Fake2RealIp(fakeIp, callsite);
+	uint32 fakeIp = *(uint32*)(&inaddr->sin_addr);
+	uint32 realIp = Fake2RealIp(fakeIp, callsite);
 
-	*(uint32_t*)(&inaddr->sin_addr) = realIp;
+	*(uint32*)(&inaddr->sin_addr) = realIp;
 }
 
-char* CAnonymizingEngExtInterceptor::IpToString(uint32_t ip) {
+char* CAnonymizingEngExtInterceptor::IpToString(uint32 ip) {
 	static char buf[64];
 	sprintf(buf, "%u.%u.%u.%u", ip & 0xFF, (ip >> 8) & 0xFF, (ip >> 16) & 0xFF, (ip >> 24) & 0xFF);
 	return buf;
@@ -891,7 +891,7 @@ void CAnonymizingEngExtInterceptor::AnonymizeSteamId(const char* real, const cha
 	AnonymizeSteamId(realId, fakeId);
 }
 
-void CAnonymizingEngExtInterceptor::ProcessConnectionlessPacket(uint8_t* data, unsigned int *len) {
+void CAnonymizingEngExtInterceptor::ProcessConnectionlessPacket(uint8* data, unsigned int *len) {
 	memcpy(net_message.data, data, *len);
 	net_message.cursize = *len;
 	MSG_BeginReading();
@@ -933,7 +933,7 @@ void CopyInfoKey(char* from, char* to, const char* key) {
 	}
 }
 
-void CAnonymizingEngExtInterceptor::ProcessConnectPacket(uint8_t* data, unsigned int *len) {
+void CAnonymizingEngExtInterceptor::ProcessConnectPacket(uint8* data, unsigned int *len) {
 	char origuserinfo[1024];
 	char userinfo[1024];
 	char protinfo[1024];
@@ -987,7 +987,7 @@ void CAnonymizingEngExtInterceptor::ProcessConnectPacket(uint8_t* data, unsigned
 	}
 
 
-	uint8_t ticket[1024];
+	uint8 ticket[1024];
 	unsigned int ticketLen = *len - msg_readcount;
 
 	if (ticketLen > 0) {
