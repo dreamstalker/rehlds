@@ -527,7 +527,7 @@ void CPlayingEngExtInterceptor::setCurrentHostent(hostent_data_t* data) {
 }
 
 void CPlayingEngExtInterceptor::setCurrentTm(struct tm* t) {
-	memcpy(&m_CurrentTm, 0, sizeof(m_CurrentTm));
+	memcpy(&m_CurrentTm, t, sizeof(m_CurrentTm));
 }
 
 void CPlayingEngExtInterceptor::SteamAPI_SetBreakpadAppID(uint32 unAppID) {
