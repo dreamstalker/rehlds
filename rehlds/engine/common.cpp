@@ -333,7 +333,7 @@ int msg_badread;
 int msg_readcount;
 
 // Some bit tables...
-const uint32_t BITTABLE[] =
+const uint32 BITTABLE[] =
 {
 	0x00000001, 0x00000002, 0x00000004, 0x00000008,
 	0x00000010, 0x00000020, 0x00000040, 0x00000080,
@@ -346,7 +346,7 @@ const uint32_t BITTABLE[] =
 	0x00000000,
 };
 
-const uint32_t ROWBITTABLE[] = 
+const uint32 ROWBITTABLE[] = 
 {
 	0x00000000, 0x00000001, 0x00000003, 0x00000007,
 	0x0000000F, 0x0000001F, 0x0000003F, 0x0000007F,
@@ -359,7 +359,7 @@ const uint32_t ROWBITTABLE[] =
 	0xFFFFFFFF,
 };
 
-const uint32_t INVBITTABLE[] =
+const uint32 INVBITTABLE[] =
 {
 	0xFFFFFFFE, 0xFFFFFFFD, 0xFFFFFFFB, 0xFFFFFFF7,
 	0xFFFFFFEF, 0xFFFFFFDF, 0xFFFFFFBF, 0xFFFFFF7F,
@@ -388,19 +388,19 @@ void MSG_WriteByte(sizebuf_t *sb, int c)
 void MSG_WriteShort(sizebuf_t *sb, int c)
 {
 	unsigned char *buf = (unsigned char *)SZ_GetSpace(sb, 2);
-	*(int16_t *)buf = (int16_t)c;
+	*(int16 *)buf = (int16)c;
 }
 
 void MSG_WriteWord(sizebuf_t *sb, int c)
 {
 	unsigned char *buf = (unsigned char *)SZ_GetSpace(sb, 2);
-	*(uint16_t *)buf = (uint16_t)c;
+	*(uint16 *)buf = (uint16)c;
 }
 
 void MSG_WriteLong(sizebuf_t *sb, int c)
 {
 	unsigned char *buf = (unsigned char *)SZ_GetSpace(sb, 4);
-	*(uint32_t *)buf = (uint32_t)c;
+	*(uint32 *)buf = (uint32)c;
 }
 
 void MSG_WriteFloat(sizebuf_t *sb, float f)
@@ -431,12 +431,12 @@ void MSG_WriteBuf(sizebuf_t *sb, int iSize, void *buf)
 
 void MSG_WriteAngle(sizebuf_t *sb, float f)
 {
-	MSG_WriteByte(sb, (int64_t)(fmod((double)f, 360.0) * 256.0 / 360.0) & 0xFF);
+	MSG_WriteByte(sb, (int64)(fmod((double)f, 360.0) * 256.0 / 360.0) & 0xFF);
 }
 
 void MSG_WriteHiresAngle(sizebuf_t *sb, float f)
 {
-	MSG_WriteShort(sb, (int64_t)(fmod((double)f, 360.0) * 65536.0 / 360.0) & 0xFFFF);
+	MSG_WriteShort(sb, (int64)(fmod((double)f, 360.0) * 65536.0 / 360.0) & 0xFFFF);
 }
 
 void MSG_WriteUsercmd(sizebuf_t *buf, usercmd_t *to, usercmd_t *from)
@@ -528,16 +528,16 @@ void MSG_EndBitWriting(sizebuf_t *buf)
 	}
 }
 
-void MSG_WriteBits(uint32_t data, int numbits)
+void MSG_WriteBits(uint32 data, int numbits)
 {
 	if (numbits < 32)
 	{
-		if (data >= (uint32_t)(1 << numbits))
+		if (data >= (uint32)(1 << numbits))
 			data = ROWBITTABLE[numbits];
 	}
 
 	int surplusBytes = 0;
-	if ((uint32_t)bfwrite.nCurOutputBit >= 8)
+	if ((uint32)bfwrite.nCurOutputBit >= 8)
 	{
 		surplusBytes = 1;
 		bfwrite.nCurOutputBit = 0;
@@ -554,7 +554,7 @@ void MSG_WriteBits(uint32_t data, int numbits)
 		SZ_GetSpace(bfwrite.pbuf, surplusBytes + bytesToWrite);
 		if (!(bfwrite.pbuf->flags & SIZEBUF_OVERFLOWED))
 		{
-			*(uint32_t *)bfwrite.pOutByte = (data << bfwrite.nCurOutputBit) | *(uint32_t *)bfwrite.pOutByte & ROWBITTABLE[bfwrite.nCurOutputBit];
+			*(uint32 *)bfwrite.pOutByte = (data << bfwrite.nCurOutputBit) | *(uint32 *)bfwrite.pOutByte & ROWBITTABLE[bfwrite.nCurOutputBit];
 			bfwrite.nCurOutputBit = 8;
 			if (bitsLeft)
 				bfwrite.nCurOutputBit = bitsLeft;
@@ -566,11 +566,11 @@ void MSG_WriteBits(uint32_t data, int numbits)
 		SZ_GetSpace(bfwrite.pbuf, surplusBytes + 4);
 		if (!(bfwrite.pbuf->flags & SIZEBUF_OVERFLOWED))
 		{
-			*(uint32_t *)bfwrite.pOutByte = (data << bfwrite.nCurOutputBit) | *(uint32_t *)bfwrite.pOutByte & ROWBITTABLE[bfwrite.nCurOutputBit];
+			*(uint32 *)bfwrite.pOutByte = (data << bfwrite.nCurOutputBit) | *(uint32 *)bfwrite.pOutByte & ROWBITTABLE[bfwrite.nCurOutputBit];
 			int leftBits = 32 - bfwrite.nCurOutputBit;
 			bfwrite.nCurOutputBit = bits & 7;
 			bfwrite.pOutByte += 4;
-			*(uint32_t *)bfwrite.pOutByte = data >> leftBits;
+			*(uint32 *)bfwrite.pOutByte = data >> leftBits;
 		}
 	}
 }
@@ -626,8 +626,8 @@ void MSG_WriteBitAngle(float fAngle, int numbits)
 		Sys_Error(__FUNCTION__ ": Can't write bit angle with 32 bits precision\n");
 	}
 
-	uint32_t shift = (1 << numbits);
-	uint32_t mask = shift - 1;
+	uint32 shift = (1 << numbits);
+	uint32 mask = shift - 1;
 
 	int d = (int)(shift * fmod((double)fAngle, 360.0)) / 360;
 	d &= mask;
@@ -725,9 +725,9 @@ int MSG_ReadOneBit(void)
 	return nValue;
 }
 
-uint32_t MSG_ReadBits(int numbits)
+uint32 MSG_ReadBits(int numbits)
 {
-	uint32_t result;
+	uint32 result;
 
 	if (msg_badread)
 	{
@@ -744,13 +744,13 @@ uint32_t MSG_ReadBits(int numbits)
 			bfread.nCurInputBit = 0;
 		}
 
-		uint32_t bits = (bfread.nCurInputBit + numbits) & 7;
+		uint32 bits = (bfread.nCurInputBit + numbits) & 7;
 
 		if ((unsigned int)(bfread.nCurInputBit + numbits) <= 32)
 		{
 			result = (*(unsigned int *)bfread.pInByte >> bfread.nCurInputBit) & ROWBITTABLE[numbits];
 
-			uint32_t bytes = (bfread.nCurInputBit + numbits) >> 3;
+			uint32 bytes = (bfread.nCurInputBit + numbits) >> 3;
 
 			if (bits)
 			{
@@ -785,12 +785,12 @@ uint32_t MSG_ReadBits(int numbits)
 	return result;
 }
 
-NOXREF uint32_t MSG_PeekBits(int numbits)
+NOXREF uint32 MSG_PeekBits(int numbits)
 {
 	NOXREFCHECK;
 
 	bf_read_t savebf = bfread;
-	uint32_t r = MSG_ReadBits(numbits);
+	uint32 r = MSG_ReadBits(numbits);
 	bfread = savebf;
 
 	return r;
@@ -889,8 +889,8 @@ NOXREF float MSG_ReadBitCoord(void)
 void MSG_WriteBitCoord(const float f)
 {
 	int signbit = f <= -0.125;
-	int intval = abs((int32_t)f);
-	int fractval = abs((int32_t)f * 8) & 7;
+	int intval = abs((int32)f);
+	int fractval = abs((int32)f * 8) & 7;
 
 	MSG_WriteOneBit(intval);
 	MSG_WriteOneBit(fractval);
@@ -1024,7 +1024,7 @@ int MSG_ReadShort(void)
 
 	if (msg_readcount + 2 <= net_message.cursize )
 	{
-		c = *(int16_t *)&net_message.data[msg_readcount];
+		c = *(int16 *)&net_message.data[msg_readcount];
 		msg_readcount += 2;
 	}
 	else
@@ -1044,7 +1044,7 @@ NOXREF int MSG_ReadWord(void)
 
 	if (msg_readcount + 2 <= net_message.cursize)
 	{
-		c = *(uint16_t *)&net_message.data[msg_readcount];
+		c = *(uint16 *)&net_message.data[msg_readcount];
 		msg_readcount += 2;
 	}
 	else
@@ -1062,7 +1062,7 @@ int MSG_ReadLong(void)
 
 	if (msg_readcount + 4 <= net_message.cursize)
 	{
-		c = *(uint32_t *)&net_message.data[msg_readcount];
+		c = *(uint32 *)&net_message.data[msg_readcount];
 		msg_readcount += 4;
 	}
 	else

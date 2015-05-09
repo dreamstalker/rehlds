@@ -19,9 +19,9 @@
 
 CRehldsFlightRecorder* g_FlightRecorder;
 
-uint16_t g_FRMsg_Frame;
-uint16_t g_FRMsg_FreeEntPrivateData;
-uint16_t g_FRMsg_AllocEntPrivateData;
+uint16 g_FRMsg_Frame;
+uint16 g_FRMsg_FreeEntPrivateData;
+uint16 g_FRMsg_AllocEntPrivateData;
 
 
 void FR_Init() {

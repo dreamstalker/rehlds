@@ -289,8 +289,8 @@ size_t HIDDEN FindSymbol(Module *module, const char* symbolName, int index)
 	Elf32_Shdr *sections, *shstrtab_hdr, *symtab_hdr, *strtab_hdr;
 	Elf32_Sym *symtab;
 	const char *shstrtab, *strtab;
-	uint16_t section_count;
-	uint32_t symbol_count;
+	uint16 section_count;
+	uint32 symbol_count;
 	size_t address;
 
 	// If index > 0 then we shouldn't use dlsym, cos it will give wrong result
@@ -334,7 +334,7 @@ size_t HIDDEN FindSymbol(Module *module, const char* symbolName, int index)
 	shstrtab = (const char *)(map_base + shstrtab_hdr->sh_offset);
 
 	// Iterate sections while looking for ELF symbol table and string table
-	for (uint16_t i = 0; i < section_count; i++)
+	for (uint16 i = 0; i < section_count; i++)
 	{
 		Elf32_Shdr &hdr = sections[i];
 		const char *section_name = shstrtab + hdr.sh_name;
@@ -368,7 +368,7 @@ size_t HIDDEN FindSymbol(Module *module, const char* symbolName, int index)
 
 	// Iterate symbol table
 	int match = 1;
-	for (uint32_t i = 0; i < symbol_count; i++)
+	for (uint32 i = 0; i < symbol_count; i++)
 	{
 		Elf32_Sym &sym = symtab[i];
 		unsigned char sym_type = ELF32_ST_TYPE(sym.st_info);
@@ -444,7 +444,7 @@ void ProcessModuleData(Module *module)
 		return;
 	}
 
-	module->codeSection.start = (uint32_t)module->base + CodeSection->VirtualAddress;
+	module->codeSection.start = (uint32)module->base + CodeSection->VirtualAddress;
 	module->codeSection.size = CodeSection->Misc.VirtualSize;
 	module->codeSection.end = module->codeSection.start + module->codeSection.size;
 	module->codeSection.next = NULL;
@@ -499,7 +499,7 @@ size_t HIDDEN ConvertHexString(const char *srcHexString, unsigned char *outBuffe
 	unsigned char *out = outBuffer;
 	unsigned char *end = outBuffer + bufferSize;
 	bool low = false;
-	uint8_t byte = 0;
+	uint8 byte = 0;
 	while (*in && out < end)
 	{
 		if (*in >= '0' && *in <= '9') { byte |= *in - '0'; }
@@ -628,7 +628,7 @@ size_t HIDDEN MemoryFindBackward(size_t start, size_t end, const unsigned char *
 
 	return NULL;
 }
-size_t HIDDEN MemoryFindRefForwardPrefix8(size_t start, size_t end, size_t refAddress, uint8_t prefixValue, bool relative)
+size_t HIDDEN MemoryFindRefForwardPrefix8(size_t start, size_t end, size_t refAddress, uint8 prefixValue, bool relative)
 {
 	// Ensure start is lower than the end
 	if (start > end)
@@ -664,20 +664,20 @@ size_t HIDDEN MemoryFindRefForwardPrefix8(size_t start, size_t end, size_t refAd
 }
 
 // Replaces double word on specified address with a new dword, returns old dword
-uint32_t HIDDEN HookDWord(size_t addr, uint32_t newDWord)
+uint32 HIDDEN HookDWord(size_t addr, uint32 newDWord)
 {
-	uint32_t origDWord = *(size_t *)addr;
-	EnablePageWrite(addr, sizeof(uint32_t));
+	uint32 origDWord = *(size_t *)addr;
+	EnablePageWrite(addr, sizeof(uint32));
 	*(size_t *)addr = newDWord;
-	RestorePageProtection(addr, sizeof(uint32_t));
+	RestorePageProtection(addr, sizeof(uint32));
 	return origDWord;
 }
 // Exchanges bytes between memory address and bytes array
-void HIDDEN ExchangeMemoryBytes(size_t origAddr, size_t dataAddr, uint32_t size)
+void HIDDEN ExchangeMemoryBytes(size_t origAddr, size_t dataAddr, uint32 size)
 {
 	EnablePageWrite(origAddr, size);
 	unsigned char data[MAX_PATTERN];
-	int32_t iSize = size;
+	int32 iSize = size;
 	while (iSize > 0)
 	{
 		size_t s = iSize <= MAX_PATTERN ? iSize : MAX_PATTERN;
@@ -753,9 +753,9 @@ bool HIDDEN FindDataRef(Module *module, AddressRef *ref)
 }
 
 #ifdef _WIN32
-void FindAllCalls(Section* section, CFuncAddr** calls, uint32_t findRefsTo)
+void FindAllCalls(Section* section, CFuncAddr** calls, uint32 findRefsTo)
 {
-	uint32_t coderef_addr = section->start;
+	uint32 coderef_addr = section->start;
 	coderef_addr = MemoryFindRefForwardPrefix8(coderef_addr, section->end, findRefsTo, 0xE8, true);
 	while (coderef_addr) {
 		CFuncAddr* cfa = new CFuncAddr(coderef_addr);

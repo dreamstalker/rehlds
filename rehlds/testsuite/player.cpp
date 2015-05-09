@@ -24,11 +24,11 @@ CPlayingEngExtInterceptor::CPlayingEngExtInterceptor(const char* fname, bool str
 	m_GameServerWrapper = NULL;
 	m_SteamBreakpadContext = NULL;
 
-	uint32_t cmdlineLen = 0;
+	uint32 cmdlineLen = 0;
 	char cmdLine[2048];
 
-	uint16_t versionMajor = 0;
-	uint16_t versionMinor = 0;
+	uint16 versionMajor = 0;
+	uint16 versionMinor = 0;
 
 	m_InStream.read((char*)&versionMinor, 2).read((char*)&versionMajor, 2);
 
@@ -235,13 +235,13 @@ int CPlayingEngExtInterceptor::getOrRegisterSteamCallback(CCallbackBase* cb) {
 	return id;
 }
 
-uint32_t CPlayingEngExtInterceptor::time(uint32_t* pTime)
+uint32 CPlayingEngExtInterceptor::time(uint32* pTime)
 {
 	CStdTimeCall* playCall = dynamic_cast<CStdTimeCall*>(getNextCall(false, false, ECF_CSTD_TIME, true, __FUNCTION__));
 	CStdTimeCall(pTime).ensureArgsAreEqual(playCall, m_bStrictChecks, __FUNCTION__);
 	CStdTimeCall* playEndCall = dynamic_cast<CStdTimeCall*>(getNextCall(false, true, ECF_CSTD_TIME, false, __FUNCTION__));
 
-	uint32_t res = playEndCall->m_Res;
+	uint32 res = playEndCall->m_Res;
 	if (pTime != NULL) *pTime = res;
 
 	freeFuncCall(playCall); freeFuncCall(playEndCall);
@@ -249,7 +249,7 @@ uint32_t CPlayingEngExtInterceptor::time(uint32_t* pTime)
 	return res;
 }
 
-struct tm* CPlayingEngExtInterceptor::localtime(uint32_t time)
+struct tm* CPlayingEngExtInterceptor::localtime(uint32 time)
 {
 	CStdLocalTimeCall* playCall = dynamic_cast<CStdLocalTimeCall*>(getNextCall(false, false, ECF_CSTD_LOCALTIME, true, __FUNCTION__));
 	CStdLocalTimeCall(time).ensureArgsAreEqual(playCall, m_bStrictChecks, __FUNCTION__);
@@ -262,7 +262,7 @@ struct tm* CPlayingEngExtInterceptor::localtime(uint32_t time)
 	return &m_CurrentTm;
 }
 
-void CPlayingEngExtInterceptor::srand(uint32_t seed)
+void CPlayingEngExtInterceptor::srand(uint32 seed)
 {
 	CStdSrandCall* playCall = dynamic_cast<CStdSrandCall*>(getNextCall(false, false, ECF_CSTD_SRAND_CALL, true, __FUNCTION__));
 	CStdSrandCall(seed).ensureArgsAreEqual(playCall, m_bStrictChecks, __FUNCTION__);

@@ -49,7 +49,7 @@ int gMsgDest;
 int gMsgType;
 qboolean gMsgStarted;
 vec3_t gMsgOrigin;
-int32_t idum;
+int32 idum;
 int g_groupop;
 int g_groupmask;
 unsigned char checkpvs[1024];
@@ -130,7 +130,7 @@ void PF_setsize_I(edict_t *e, const float *rgflMin, const float *rgflMax)
 /* <78451> ../engine/pr_cmds.c:184 */
 void PF_setmodel_I(edict_t *e, const char *m)
 {
-	char** check = &g_psv.model_precache[0];
+	const char** check = &g_psv.model_precache[0];
 	int i = 0;
 
 #ifdef REHLDS_CHECKS
@@ -1043,7 +1043,7 @@ qboolean PR_IsEmptyString(const char *s)
 }
 
 /* <795b5> ../engine/pr_cmds.c:1397 */
-int PF_precache_sound_I(char *s)
+int PF_precache_sound_I(const char *s)
 {
 	int i;
 
@@ -1379,7 +1379,7 @@ void EV_SV_Playback(int flags, int clientindex, short unsigned int eventindex, f
 }
 
 /* <799da> ../engine/pr_cmds.c:1849 */
-int PF_precache_model_I(char *s)
+int PF_precache_model_I(const char *s)
 {
 	int iOptional = 0;
 	if (!s)
@@ -1525,13 +1525,13 @@ char *PF_GetInfoKeyBuffer_I(edict_t *e)
 }
 
 /* <79b55> ../engine/pr_cmds.c:2012 */
-char *PF_InfoKeyValue_I(char *infobuffer, char *key)
+char *PF_InfoKeyValue_I(char *infobuffer, const char *key)
 {
 	return (char *)Info_ValueForKey(infobuffer, key);
 }
 
 /* <79b91> ../engine/pr_cmds.c:2022 */
-void PF_SetKeyValue_I(char *infobuffer, char *key, char *value)
+void PF_SetKeyValue_I(char *infobuffer, const char *key, const char *value)
 {
 	if (infobuffer == localinfo)
 	{
@@ -1558,7 +1558,7 @@ void PF_RemoveKey_I(char *s, const char *key)
 }
 
 /* <79c0f> ../engine/pr_cmds.c:2047 */
-void PF_SetClientKeyValue_I(int clientIndex, char *infobuffer, char *key, char *value)
+void PF_SetClientKeyValue_I(int clientIndex, char *infobuffer, const char *key, const char *value)
 {
 	client_t *pClient;
 
@@ -2273,7 +2273,7 @@ void PF_setspawnparms_I(edict_t *ent)
 }
 
 /* <7a539> ../engine/pr_cmds.c:2956 */
-void PF_changelevel_I(char *s1, char *s2)
+void PF_changelevel_I(const char *s1, const char *s2)
 {
 	static int last_spawncount;
 
@@ -2310,7 +2310,7 @@ void SeedRandomNumberGenerator(void)
 #define NDIV (1+(IM-1)/NTAB)
 
 /* <7a598> ../engine/pr_cmds.c:3003 */
-int32_t ran1(void)
+int32 ran1(void)
 {
 	int j;
 	long k;
@@ -2364,7 +2364,7 @@ float RandomFloat(float flLow, float flHigh)
 }
 
 /* <7a6b2> ../engine/pr_cmds.c:3056 */
-int32_t RandomLong(int32_t lLow, int32_t lHigh)
+int32 RandomLong(int32 lLow, int32 lHigh)
 {
 #ifndef SWDS
 	g_engdstAddrs.pfnRandomLong(&lLow, &lHigh);
@@ -2410,10 +2410,10 @@ void PF_FadeVolume(const edict_t *clientent, int fadePercent, int fadeOutSeconds
 		return;
 
 	MSG_WriteChar(&client->netchan.message, svc_soundfade);
-	MSG_WriteByte(&client->netchan.message, (uint8_t)fadePercent);
-	MSG_WriteByte(&client->netchan.message, (uint8_t)holdTime);
-	MSG_WriteByte(&client->netchan.message, (uint8_t)fadeOutSeconds);
-	MSG_WriteByte(&client->netchan.message, (uint8_t)fadeInSeconds);
+	MSG_WriteByte(&client->netchan.message, (uint8)fadePercent);
+	MSG_WriteByte(&client->netchan.message, (uint8)holdTime);
+	MSG_WriteByte(&client->netchan.message, (uint8)fadeOutSeconds);
+	MSG_WriteByte(&client->netchan.message, (uint8)fadeInSeconds);
 }
 
 /* <7a7a1> ../engine/pr_cmds.c:3124 */
@@ -2589,7 +2589,7 @@ int PF_CreateInstancedBaseline(int classname, struct entity_state_s *baseline)
 }
 
 /* <7abdb> ../engine/pr_cmds.c:3332 */
-void PF_Cvar_DirectSet(struct cvar_s *var, char *value)
+void PF_Cvar_DirectSet(struct cvar_s *var, const char *value)
 {
 	Cvar_DirectSet(var, value);
 }

@@ -1,12 +1,12 @@
 #pragma once
 
-#include "osconfig.h"
+#include "archtypes.h"
 #include "crc32.h"
 
 template<typename T_KEY, typename T_VAL, unsigned int ASSOC_2N, unsigned int MAX_VALS>
 class CStaticMap {
 protected:
-	virtual uint32_t hash(const T_KEY& val) {
+	virtual uint32 hash(const T_KEY& val) {
 		return crc32((const unsigned char*)&val, sizeof(T_KEY));
 	}
 

@@ -826,7 +826,7 @@ qboolean SV_BuildSoundMsg(edict_t *entity, int channel, const char *sample, int 
 	if (field_mask & SND_FL_VOLUME)
 		MSG_WriteBits(volume, 8);
 	if (field_mask & SND_FL_ATTENUATION)
-		MSG_WriteBits((uint32_t)(attenuation * 64.0f), 8);
+		MSG_WriteBits((uint32)(attenuation * 64.0f), 8);
 	MSG_WriteBits(channel, 3);
 	MSG_WriteBits(ent, 11);
 	MSG_WriteBits(sound_num, (field_mask & SND_FL_LARGE_INDEX) ? 16 : 8);
@@ -2323,11 +2323,11 @@ void SV_ConnectClient_internal(void)
 			return;
 		}
 		memcpy(szSteamAuthBuf, &net_message.data[msg_readcount], len);
-		client->network_userid.clientip = *(uint32_t *)&adr.ip[0];
+		client->network_userid.clientip = *(uint32 *)&adr.ip[0];
 		if (adr.type == NA_LOOPBACK)
 		{
 			if (sv_lan.value <= 0.0f)
-				client->network_userid.clientip = *(uint32_t *)&adr.ip[0];
+				client->network_userid.clientip = *(uint32 *)&adr.ip[0];
 			else
 				client->network_userid.clientip = 0x7F000001; //127.0.0.1
 		}
@@ -2365,7 +2365,7 @@ void SV_ConnectClient_internal(void)
 		}
 		host_client->network_userid.idtype = AUTH_IDTYPE_LOCAL;
 		host_client->network_userid.m_SteamID = 0;
-		host_client->network_userid.clientip = *(uint32_t *)&adr.ip[0];
+		host_client->network_userid.clientip = *(uint32 *)&adr.ip[0];
 		Steam_NotifyBotConnect(client);
 	}
 
@@ -3067,7 +3067,7 @@ int SVC_GameDllQuery(const char *s)
 	valid = gEntityInterface.pfnConnectionlessPacket(&net_from, s, (char *) &data[4], &len);
 	if (len && len <= 2044)
 	{
-		*(uint32_t *)data = 0xFFFFFFFF; //connectionless packet
+		*(uint32 *)data = 0xFFFFFFFF; //connectionless packet
 		NET_SendPacket(NS_SERVER, len + 4, data, net_from);
 	}
 	return valid;
@@ -3508,7 +3508,7 @@ qboolean SV_FilterPacket(void)
 		ipfilter_t* curFilter = &ipfilters[i];
 		if (curFilter->compare.u32 == 0xFFFFFFFF || curFilter->banEndTime == 0.0f || curFilter->banEndTime > realtime)
 		{
-			if ((*(uint32_t*)net_from.ip & curFilter->mask) == curFilter->compare.u32)
+			if ((*(uint32*)net_from.ip & curFilter->mask) == curFilter->compare.u32)
 				return (int)sv_filterban.value;
 		}
 		else
@@ -3549,7 +3549,7 @@ void SV_ReadPackets(void)
 			continue;
 		}
 
-		if (*(uint32_t *)net_message.data == 0xFFFFFFFF)
+		if (*(uint32 *)net_message.data == 0xFFFFFFFF)
 		{
 			// Connectionless packet
 			if (CheckIP(net_from))
@@ -4862,7 +4862,7 @@ int SV_ModelIndex(const char *name)
 }
 
 /* <a9992> ../engine/sv_main.c:6529 */
-void SV_AddResource(resourcetype_t type, char *name, int size, unsigned char flags, int index)
+void SV_AddResource(resourcetype_t type, const char *name, int size, unsigned char flags, int index)
 {
 	resource_t *r;
 	if (g_psv.num_resources >= 1280)
@@ -4938,7 +4938,7 @@ void SV_CreateGenericResources(void)
 /* <a9a24> ../engine/sv_main.c:6675 */
 void SV_CreateResourceList(void)
 {
-	char ** s;
+	char const ** s;
 	int ffirstsent = 0;
 	int i;
 	int nSize;
@@ -5690,8 +5690,8 @@ qboolean StringToFilter(const char *s, ipfilter_t *f)
 			if (i < 4)
 				continue;
 		}
-		f->mask = *(uint32_t *)m;
-		f->compare.u32 = *(uint32_t *)b;
+		f->mask = *(uint32 *)m;
+		f->compare.u32 = *(uint32 *)b;
 		return TRUE;
 	}
 	Con_Printf("Bad filter address: %s\n", cc);
@@ -6266,7 +6266,7 @@ void SV_ListIP_f(void)
 	Con_Printf("IP filter list:\n");
 	for (int i = 0; i < numipfilters; i++)
 	{
-		uint8_t* b = ipfilters[i].compare.octets;
+		uint8* b = ipfilters[i].compare.octets;
 		if (ipfilters[i].banTime == 0.0f) 
 			Con_Printf("%3i.%3i.%3i.%3i : permanent\n", b[0], b[1], b[2], b[3]);
 		else
@@ -6293,7 +6293,7 @@ void SV_WriteIP_f(void)
 		if (ipfilters[i].banTime != 0.0f)
 			continue;
 
-		uint8_t *b = ipfilters[i].compare.octets;
+		uint8 *b = ipfilters[i].compare.octets;
 		FS_FPrintf(f, "addip 0.0 %i.%i.%i.%i\n", b[0], b[1], b[2], b[3]);
 	}
 	FS_Close(f);
@@ -6689,7 +6689,7 @@ void SV_CheckForRcon(void)
 		}
 		else
 		{
-			if (*(uint32_t *)net_message.data == 0xFFFFFFFF)
+			if (*(uint32 *)net_message.data == 0xFFFFFFFF)
 				SV_HandleRconPacket();
 		}
 	}

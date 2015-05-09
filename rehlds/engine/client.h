@@ -87,15 +87,15 @@ typedef struct frame_s
 	clientdata_t clientdata;
 	weapon_data_t weapondata[64];
 	packet_entities_t packet_entities;
-	uint16_t clientbytes;
-	uint16_t playerinfobytes;
-	uint16_t packetentitybytes;
-	uint16_t tentitybytes;
-	uint16_t soundbytes;
-	uint16_t eventbytes;
-	uint16_t usrbytes;
-	uint16_t voicebytes;
-	uint16_t msgbytes;
+	uint16 clientbytes;
+	uint16 playerinfobytes;
+	uint16 packetentitybytes;
+	uint16 tentitybytes;
+	uint16 soundbytes;
+	uint16 eventbytes;
+	uint16 usrbytes;
+	uint16 voicebytes;
+	uint16 msgbytes;
 } frame_t;
 
 /* <153e9> ../engine/client.h:127 */
@@ -117,7 +117,7 @@ typedef struct player_info_s
 	vec3_t prevgaitorigin;
 	customization_t customdata;
 	char hashedcdkey[16];
-	uint64_t m_nSteamID;
+	uint64 m_nSteamID;
 } player_info_t;
 
 /* <277f5> ../engine/client.h:208 */
@@ -183,7 +183,7 @@ typedef struct client_static_s
 	qboolean director;
 	qboolean fSecureClient;
 	qboolean isVAC2Secure;
-	uint64_t GameServerSteamID;
+	uint64 GameServerSteamID;
 	int build_num;
 } client_static_t;
 

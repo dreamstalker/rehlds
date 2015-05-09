@@ -765,7 +765,7 @@ void HPAK_List_f(void)
 void HPAK_CreatePak(char *pakname, struct resource_s *pResource, void *pData, FileHandle_t fpSource)
 {
 	char name[MAX_PATH];
-	int32_t curpos;
+	int32 curpos;
 	FileHandle_t fp;
 	hash_pack_entry_t *pCurrentEntry;
 

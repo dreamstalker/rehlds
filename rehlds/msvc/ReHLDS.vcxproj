@@ -65,6 +65,7 @@
     <ClCompile Include="..\engine\pmovetst.cpp" />
     <ClCompile Include="..\engine\pr_cmds.cpp" />
     <ClCompile Include="..\engine\pr_edict.cpp" />
+    <ClCompile Include="..\engine\public_amalgamation.cpp" />
     <ClCompile Include="..\engine\r_studio.cpp" />
     <ClCompile Include="..\engine\snd_null.cpp" />
     <ClCompile Include="..\engine\sv_log.cpp" />
@@ -115,10 +116,37 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Swds Play|Win32'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\hookers\rehlds_debug.cpp" />
-    <ClCompile Include="..\public\interface.cpp" />
+    <ClCompile Include="..\public\interface.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Swds|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Play|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Swds Play|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Record|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Play|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Tests|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\public\registry.cpp" />
-    <ClCompile Include="..\public\rehlds\crc32.cpp" />
-    <ClCompile Include="..\public\rehlds\sys_shared.cpp" />
+    <ClCompile Include="..\public\rehlds\crc32.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Swds|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Play|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Swds Play|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Record|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Play|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Tests|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\public\rehlds\sys_shared.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Swds|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Play|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Swds Play|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Record|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Play|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Tests|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\public\steamid.cpp" />
     <ClCompile Include="..\public\tier0\dbg.cpp" />
     <ClCompile Include="..\public\tier0\platform_linux.cpp">
@@ -349,7 +377,6 @@
     <ClInclude Include="..\hookers\hooker.h" />
     <ClInclude Include="..\hookers\memory.h" />
     <ClInclude Include="..\hookers\rehlds_debug.h" />
-    <ClInclude Include="..\public\archtypes.h" />
     <ClInclude Include="..\public\basetypes.h" />
     <ClInclude Include="..\public\commonmacros.h" />
     <ClInclude Include="..\public\engine_hlds_api.h" />

@@ -127,7 +127,7 @@ char *Cvar_VariableString(const char *var_name)
 }
 
 /* <1872a> ../engine/cvar.c:126 */
-NOXREF char *Cvar_CompleteVariable(const char *search, int forward)
+NOXREF const char *Cvar_CompleteVariable(const char *search, int forward)
 {
 	NOXREFCHECK;
 

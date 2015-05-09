@@ -336,7 +336,7 @@ model_t *Mod_LoadModel(model_t *mod, qboolean crash, qboolean trackCRC)
 	loadmodel = mod;
 	mod->needload = NL_PRESENT;
 
-	switch (LittleLong(*(uint32_t *)buf))
+	switch (LittleLong(*(uint32 *)buf))
 	{
 	case 'OPDI':
 		Sys_Error(__FUNCTION__ "Alias models are not supported");
@@ -427,8 +427,8 @@ void Mod_LoadTextures(lump_t *l)
 	miptex_t *mt;
 	int palette;
 	int pixels;
-	uint8_t *mippal;
-	uint16_t *texpal;
+	uint8 *mippal;
+	uint16 *texpal;
 	int max;
 	texture_t *tx2;
 	int num;
@@ -487,7 +487,7 @@ void Mod_LoadTextures(lump_t *l)
 			Sys_Error("Texture %s is not 16 aligned", mt);
 
 		pixels = 85 * mt->height * mt->width / 64;
-		palette = *(uint16_t*)((char*)mt + sizeof(miptex_t) + pixels);
+		palette = *(uint16*)((char*)mt + sizeof(miptex_t) + pixels);
 
 		tx = (texture_t *)Hunk_AllocName(2 + 8 * palette + pixels + sizeof(texture_t), loadname);
 		loadmodel->textures[i] = tx;
@@ -510,8 +510,8 @@ void Mod_LoadTextures(lump_t *l)
 			//R_InitSky();
 		}
 
-		mippal = (uint8_t *)&mt[1] + pixels + 2;
-		texpal = (uint16_t *)((char*)&tx[1] + pixels + 2);
+		mippal = (uint8 *)&mt[1] + pixels + 2;
+		texpal = (uint16 *)((char*)&tx[1] + pixels + 2);
 		for (int j = 0; j < palette; j++, mippal += 3, texpal += 4)
 		{
 			texpal[0] = texgammatable[mippal[2]];
@@ -1772,7 +1772,7 @@ void Mod_LoadSpriteModel(model_t *mod, void *buffer)
 		"(%i should be %i)", mod->name, version, SPRITE_VERSION);
 
 	numframes = LittleLong(pin->numframes);
-	int palsize = *(uint16_t*)&pin[1];
+	int palsize = *(uint16*)&pin[1];
 	size = sizeof(msprite_t) + (numframes - 1) * sizeof(psprite->frames) + 2 + 8 * palsize;
 
 	psprite = (msprite_t*) Hunk_AllocName(size, loadname);
@@ -1792,7 +1792,7 @@ void Mod_LoadSpriteModel(model_t *mod, void *buffer)
 	mod->maxs[2] = float(psprite->maxheight / 2);
 
 	unsigned char *palsrc = (unsigned char*)(&pin[1]) + 2; //header + palette size
-	uint16_t* paldest = (uint16_t*)((char*)(psprite + 1) + sizeof(psprite->frames) * (numframes - 1)); //sprite + [frames-1]
+	uint16* paldest = (uint16*)((char*)(psprite + 1) + sizeof(psprite->frames) * (numframes - 1)); //sprite + [frames-1]
 	*(paldest++) = palsize; //write palette size
 	for (i = 0; i < palsize; i++, paldest += 4, palsrc += 3)
 	{

@@ -106,7 +106,7 @@ qboolean COM_CreateCustomization(customization_t *pListHead, resource_t *pResour
 
 	if (flags & 1)
 	{
-		if (!HPAK_GetDataPointer("custom.hpk", pResource, (uint8_t**)&pCust->pBuffer, 0))
+		if (!HPAK_GetDataPointer("custom.hpk", pResource, (uint8**)&pCust->pBuffer, 0))
 		{
 			bError = 1;
 			goto CustomizationError;

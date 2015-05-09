@@ -1,4 +1,4 @@
-#include "precompiled.h"
+#include "interface.h"
 
 
 #if !defined ( _WIN32 )

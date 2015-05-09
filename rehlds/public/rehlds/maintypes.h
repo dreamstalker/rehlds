@@ -49,10 +49,4 @@
 
 typedef unsigned int string_t;		// from engine's pr_comp.h;
 
-#ifndef __cplusplus
-	typedef enum { false, true }	qboolean;
-#else 
-	typedef int qboolean;
-#endif
-
 #endif // MAINTYPES_H

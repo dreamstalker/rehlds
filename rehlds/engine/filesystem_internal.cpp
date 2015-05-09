@@ -122,13 +122,13 @@ unsigned int FS_FileSize(const char *pFileName)
 }
 
 /* <262fe> ../engine/filesystem_internal.cpp:101 */
-int32_t FS_GetFileTime(const char *pFileName)
+int32 FS_GetFileTime(const char *pFileName)
 {
 	return g_pFileSystem->GetFileTime(pFileName);
 }
 
 /* <26329> ../engine/filesystem_internal.cpp:107 */
-NOXREF void FS_FileTimeToString(char *pStrip, int maxCharsIncludingTerminator, int32_t fileTime)
+NOXREF void FS_FileTimeToString(char *pStrip, int maxCharsIncludingTerminator, int32 fileTime)
 {
 	NOXREFCHECK;
 
@@ -283,7 +283,7 @@ NOXREF unsigned char FS_GetCharacter(FileHandle_t f)
 {
 	NOXREFCHECK;
 
-	uint8_t retval;
+	uint8 retval;
 	g_pFileSystem->Read(&retval, 1, f);
 	return retval;
 }
