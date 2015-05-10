@@ -1007,7 +1007,7 @@ void Netchan_CreateFragments_(qboolean server, netchan_t *chan, sizebuf_t *msg)
 	}
 
 	// Compress if not done already
-	if (msg->data[0] != 'B' || msg->data[1] != 'Z' || msg->data[2] != '2' || msg->data[3] != 0)
+	if (*(uint32 *)msg->data != MAKEID('B', 'Z', '2', '\0'))
 	{
 		unsigned char compressed[65536];
 		char hdr[4] = "BZ2";
@@ -1383,7 +1383,7 @@ qboolean Netchan_CopyNormalFragments(netchan_t *chan)
 		p = n;
 	}
 
-	if (net_message.data[0] == 'B' && net_message.data[1] == 'Z' && net_message.data[2] == '2' && net_message.data[3] == 0)
+	if (*(uint32 *)net_message.data == MAKEID('B', 'Z', '2', '\0'))
 	{
 		char uncompressed[65536];
 		unsigned int uncompressedSize = 65536;
