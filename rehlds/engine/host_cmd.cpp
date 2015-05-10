@@ -428,7 +428,7 @@ void Host_UpdateStats(void)
 			lastcputicks = cputicks;
 
 		if (lastrunticks)
-			cpuPercent = (cputicks - lastcputicks) / (runticks - lastrunticks);
+			cpuPercent = (double)(cputicks - lastcputicks) / (double)(runticks - lastrunticks);
 		else
 			lastrunticks = runticks;
 
@@ -440,7 +440,7 @@ void Host_UpdateStats(void)
 		}
 		if (cpuPercent > 0.999)
 			cpuPercent = 0.999;
-		if (cpuPercent < 0.1)
+		else if (cpuPercent < 0.0)
 			cpuPercent = 0.0;
 		last = Sys_FloatTime();
 	}
