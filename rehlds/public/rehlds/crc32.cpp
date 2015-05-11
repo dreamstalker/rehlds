@@ -110,7 +110,7 @@ uint32 crc32_t_nosse(uint32 iCRC, const uint8 *s, unsigned int len) {
 }
 
 uint32 crc32_t(uint32 iCRC, const uint8 *s, unsigned int len) {
-	if (!g_HasSSE42) {
+	if (!cpuinfo.sse4_2) {
 		return crc32_t_nosse(iCRC, s, len);
 	}
 

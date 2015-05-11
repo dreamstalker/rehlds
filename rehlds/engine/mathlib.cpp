@@ -28,7 +28,8 @@
 
 #include "precompiled.h"
 
-
+#include <smmintrin.h>
+#include <xmmintrin.h>
 
 vec3_t vec3_origin;
 //int nanmask;
@@ -125,16 +126,34 @@ NOBODY int InvertMatrix(const float *m, float *out);
 //	float *r3;                                                   //   161
 //}
 
+#ifdef REHLDS_FIXES
+void SinCos(float radians, float *sine, float *cosine)
+{
+	__asm
+	{
+		fld dword ptr [radians];
+		fsincos;
+		fstp dword ptr [cosine];
+		fstp dword ptr [sine];
+	}
+}
+#endif // REHLDS_FIXES
+
 /* <47067> ../engine/mathlib.c:267 */
 void AngleVectors(const vec_t *angles, vec_t *forward, vec_t *right, vec_t *up)
 {
-	float		angle;
 	float		sr, sp, sy, cr, cp, cy;
 
 #ifndef SWDS
 	g_engdstAddrs.pfnAngleVectors(&angles, &forward, &right, &up);
 #endif // SWDS
 
+#ifdef REHLDS_FIXES
+	SinCos(DEG2RAD(angles[YAW]), &sy, &cy);
+	SinCos(DEG2RAD(angles[PITCH]), &sp, &cp);
+	SinCos(DEG2RAD(angles[ROLL]), &sr, &cr);
+#else
+	float angle;
 	angle = (float)(angles[YAW] * (M_PI * 2 / 360));
 	sy = sin(angle);
 	cy = cos(angle);
@@ -144,6 +163,7 @@ void AngleVectors(const vec_t *angles, vec_t *forward, vec_t *right, vec_t *up)
 	angle = (float)(angles[ROLL] * (M_PI * 2 / 360));
 	sr = sin(angle);
 	cr = cos(angle);
+#endif
 
 	if (forward)
 	{
@@ -168,9 +188,14 @@ void AngleVectors(const vec_t *angles, vec_t *forward, vec_t *right, vec_t *up)
 /* <4712e> ../engine/mathlib.c:304 */
 void AngleVectorsTranspose(const vec_t *angles, vec_t *forward, vec_t *right, vec_t *up)
 {
-	float		angle;
 	float		sr, sp, sy, cr, cp, cy;
 
+#ifdef REHLDS_FIXES
+	SinCos(DEG2RAD(angles[YAW]), &sy, &cy);
+	SinCos(DEG2RAD(angles[PITCH]), &sp, &cp);
+	SinCos(DEG2RAD(angles[ROLL]), &sr, &cr);
+#else
+	float angle;
 	angle = (float)(angles[YAW] * (M_PI * 2 / 360));
 	sy = sin(angle);
 	cy = cos(angle);
@@ -180,6 +205,7 @@ void AngleVectorsTranspose(const vec_t *angles, vec_t *forward, vec_t *right, ve
 	angle = (float)(angles[ROLL] * (M_PI * 2 / 360));
 	sr = sin(angle);
 	cr = cos(angle);
+#endif
 
 	if (forward)
 	{
@@ -204,18 +230,24 @@ void AngleVectorsTranspose(const vec_t *angles, vec_t *forward, vec_t *right, ve
 /* <471e9> ../engine/mathlib.c:340 */
 void AngleMatrix(const vec_t *angles, float(*matrix)[4])
 {
-	float		angle;
 	float		sr, sp, sy, cr, cp, cy;
 
-	angle = (float)(angles[2] * (M_PI * 2 / 360));
+#ifdef REHLDS_FIXES
+	SinCos(DEG2RAD(angles[ROLL]), &sy, &cy);
+	SinCos(DEG2RAD(angles[YAW]), &sp, &cp);
+	SinCos(DEG2RAD(angles[PITCH]), &sr, &cr);
+#else
+	float angle;
+	angle = (float)(angles[ROLL] * (M_PI * 2 / 360));
 	sy = sin(angle);
 	cy = cos(angle);
-	angle = (float)(angles[1] * (M_PI * 2 / 360));
+	angle = (float)(angles[YAW] * (M_PI * 2 / 360));
 	sp = sin(angle);
 	cp = cos(angle);
-	angle = (float)(angles[0] * (M_PI * 2 / 360));
+	angle = (float)(angles[PITCH] * (M_PI * 2 / 360));
 	sr = sin(angle);
 	cr = cos(angle);
+#endif
 
 	float tmp1, tmp2;
 
@@ -296,11 +328,28 @@ void VectorMA(const vec_t *veca, float scale, const vec_t *vecb, vec_t *vecc)
 	vecc[2] = scale * vecb[2] + veca[2];
 }
 
+#ifndef REHLDS_FIXES
 /* <4757a> ../engine/mathlib.c:484 */
-float _DotProduct(vec_t *v1, vec_t *v2)
+long double _DotProduct(const vec_t *v1, const vec_t *v2)
 {
 	return v1[0] * v2[0] + v1[1] * v2[1] + v1[2] * v2[2];
 }
+#else // REHLDS_FIXES
+float _DotProduct(const vec_t *v1, const vec_t *v2)
+{
+#ifdef REHLDS_FIXES
+	// _mm_loadu_ps - load xmm from unaligned address
+	// _mm_cvtss_f32 - return low float value of xmm
+	// _mm_dp_ps - dot product
+	// 0x71 = 0b01110001 - mask for multiplying operands and result
+	// dpps isn't binary compatible with separate sse2 instructions (max difference is about 0.0002f, but usually < 0.00001f)
+	if (cpuinfo.sse4_1)
+		return _mm_cvtss_f32(_mm_dp_ps(_mm_loadu_ps(v1), _mm_loadu_ps(v2), 0x71));
+#endif // REHLDS_FIXES
+
+	return v1[0] * v2[0] + v1[1] * v2[1] + v1[2] * v2[2];
+}
+#endif // REHLDS_FIXES
 
 /* <475b4> ../engine/mathlib.c:489 */
 NOBODY void _VectorSubtract(vec_t *veca, vec_t *vecb, vec_t *out);
@@ -331,6 +380,14 @@ void CrossProduct(const vec_t *v1, const vec_t *v2, vec_t *cross)
 /* <476d8> ../engine/mathlib.c:519 */
 float Length(const vec_t *v)
 {
+#ifdef REHLDS_FIXES
+	// based on dot product
+	if (cpuinfo.sse4_1)
+	{
+		return _mm_cvtss_f32(_mm_sqrt_ps(_mm_dp_ps(_mm_loadu_ps(v), _mm_loadu_ps(v), 0x71)));
+	}
+#endif // REHLDS_FIXES
+
 	float length;
 
 	length = 0.0f;
@@ -346,8 +403,12 @@ float VectorNormalize(vec3_t v)
 {
 	float	length, ilength;
 
+#ifdef REHLDS_FIXES
+	length = Length(v);
+#else // REHLDS_FIXES
 	length = v[0] * v[0] + v[1] * v[1] + v[2] * v[2];
 	length = sqrt(length);		// FIXME
+#endif // REHLDS_FIXES
 
 	if (length)
 	{

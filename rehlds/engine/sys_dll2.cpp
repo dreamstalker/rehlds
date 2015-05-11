@@ -514,6 +514,8 @@ int Sys_InitGame(char *lpOrgCmdLine, char *pBaseDir, void *pwnd, int bIsDedicate
 	Sys_InitHardwareTimer();
 #endif // _WIN32
 
+	Sys_CheckCpuInstructionsSupport();
+
 #ifndef SWDS
 	Sys_InitFloatTime();
 #endif // SWDS

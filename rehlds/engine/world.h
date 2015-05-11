@@ -124,4 +124,8 @@ void SV_MoveBounds(const vec_t *start, const vec_t *mins, const vec_t *maxs, con
 trace_t SV_MoveNoEnts(const vec_t *start, vec_t *mins, vec_t *maxs, const vec_t *end, int type, edict_t *passedict);
 trace_t SV_Move(const vec_t *start, const vec_t *mins, const vec_t *maxs, const vec_t *end, int type, edict_t *passedict, qboolean monsterClipBrush);
 
+#ifdef REHLDS_OPT_PEDANTIC
+trace_t SV_Move_Point(const vec_t *start, const vec_t *end, int type, edict_t *passedict);
+#endif // REHLDS_OPT_PEDANTIC
+
 #endif // WORLD_H

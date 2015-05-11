@@ -341,7 +341,12 @@ void PF_sound_I(edict_t *entity, int channel, const char *sample, float volume, 
 /* <78cdd> ../engine/pr_cmds.c:491 */
 void PF_traceline_Shared(const float *v1, const float *v2, int nomonsters, edict_t *ent)
 {
+#ifdef REHLDS_OPT_PEDANTIC
+	trace_t trace = SV_Move_Point(v1, v2, nomonsters, ent);
+#else // REHLDS_OPT_PEDANTIC
 	trace_t trace = SV_Move(v1, vec3_origin, vec3_origin, v2, nomonsters, ent, 0);
+#endif // REHLDS_OPT_PEDANTIC
+
 	gGlobalVariables.trace_flags = 0;
 	SV_SetGlobalTrace(&trace);
 } 
