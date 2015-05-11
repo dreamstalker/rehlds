@@ -1069,7 +1069,11 @@ int PF_precache_sound_I(const char *s)
 		{
 			if (!g_psv.sound_precache[i])
 			{
+#ifdef REHLDS_FIXES
+				g_psv.sound_precache[i] = ED_NewString(s);
+#else
 				g_psv.sound_precache[i] = s;
+#endif // REHLDS_FIXES
 				return i;
 			}
 
@@ -1124,8 +1128,11 @@ short unsigned int EV_Precache(int type, const char *psz)
 				char* evScript = (char*) COM_LoadFile(szpath, 5, &scriptSize);
 				if (!evScript)
 					Host_Error("EV_Precache:  file %s missing from server\n", psz);
-
+#ifdef REHLDS_FIXES
+				g_psv.event_precache[i].filename = ED_NewString(psz);
+#else
 				g_psv.event_precache[i].filename = psz;
+#endif // REHLDS_FIXES
 				g_psv.event_precache[i].filesize = scriptSize;
 				g_psv.event_precache[i].pszScript = evScript;
 				g_psv.event_precache[i].index = i;
@@ -1405,7 +1412,11 @@ int PF_precache_model_I(const char *s)
 		{
 			if (!g_psv.model_precache[i])
 			{
+#ifdef REHLDS_FIXES
+				g_psv.model_precache[i] = ED_NewString(s);
+#else
 				g_psv.model_precache[i] = s;
+#endif // REHLDS_FIXES
 				g_psv.models[i] = Mod_ForName(s, 1, 1);
 				if (!iOptional)
 					g_psv.model_precache_flags[i] |= 1u;
@@ -1447,7 +1458,11 @@ int PF_precache_generic_I(char *s)
 		{
 			if (!g_psv.generic_precache[i])
 			{
+#ifdef REHLDS_FIXES
+				g_psv.generic_precache[i] = ED_NewString(s);
+#else
 				g_psv.generic_precache[i] = s;
+#endif // REHLDS_FIXES
 				return i;
 			}
 
