@@ -122,7 +122,7 @@ void setupToolchain(NativeBinarySpec b) {
     }
     b.lib LazyNativeDepSet.create(dep_bzip2, 'bzip2', b.buildType.name, true)
 
-    cfg.singleDefines 'USE_BREAKPAD_HANDLER', 'DEDICATED', 'SWDS', 'REHLDS_SELF'
+    cfg.singleDefines 'USE_BREAKPAD_HANDLER', 'DEDICATED', 'SWDS', 'REHLDS_SELF', 'REHLDS_OPT_PEDANTIC'
 
     if (cfg instanceof MsvcToolchainConfig) {
         cfg.compilerOptions.pchConfig = new MsvcToolchainConfig.PrecompiledHeadersConfig(
