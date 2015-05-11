@@ -645,7 +645,6 @@ struct pmtrace_s *PM_TraceLineEx(float *start, float *end, int flags, int usehul
 /* <6ef4a> ../engine/pmovetst.c:844 */
 qboolean PM_RecursiveHullCheck(hull_t *hull, int num, float p1f, float p2f, const vec_t *p1, const vec_t *p2, pmtrace_t *trace)
 {
-	qboolean retval;
 	dclipnode_t *node;
 	mplane_t *plane;
 	vec3_t mid;
@@ -687,8 +686,8 @@ qboolean PM_RecursiveHullCheck(hull_t *hull, int num, float p1f, float p2f, cons
 	plane = &hull->planes[node->planenum];
 	if (plane->type >= 3u)
 	{
-		t1 = p1[2] * plane->normal[2] + p1[1] * plane->normal[1] + p1[0] * plane->normal[0] - plane->dist;
-		t2 = p2[2] * plane->normal[2] + p2[1] * plane->normal[1] + p2[0] * plane->normal[0] - plane->dist;
+		t1 = _DotProduct(p1, plane->normal) - plane->dist;
+		t2 = _DotProduct(p2, plane->normal) - plane->dist;
 	}
 	else
 	{
@@ -700,14 +699,14 @@ qboolean PM_RecursiveHullCheck(hull_t *hull, int num, float p1f, float p2f, cons
 
 	if (t1 >= 0.0)
 	{
-		midf = t1 - 0.03125f;
+		midf = t1 - DIST_EPSILON;
 	}
 	else
 	{
 		if (t2 < 0.0)
 			return PM_RecursiveHullCheck(hull, node->children[1], p1f, p2f, p1, p2, trace);
 
-		midf = t1 + 0.03125f;
+		midf = t1 + DIST_EPSILON;
 	}
 	midf = midf / (t1 - t2);
 	if (midf >= 0.0)
@@ -837,8 +836,8 @@ qboolean PM_RecursiveHullCheck(hull_t *hull, int num, float p1f, float p2f, cons
 		plane = &hull->planes[node->planenum];
 		if (plane->type >= 3u)
 		{
-			t1 = p1[1] * plane->normal[1] + p1[2] * plane->normal[2] + p1[0] * plane->normal[0] - plane->dist;
-			t2 = p2[1] * plane->normal[1] + p2[2] * plane->normal[2] + plane->normal[0] * p2[0] - plane->dist;
+			t1 = _DotProduct(p1, plane->normal) - plane->dist;
+			t2 = _DotProduct(p2, plane->normal) - plane->dist;
 		}
 		else
 		{
