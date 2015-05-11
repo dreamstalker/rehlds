@@ -28,6 +28,9 @@
 
 #include "precompiled.h"
 
+// 1/32 epsilon to keep floating point happy
+#define	DIST_EPSILON	(0.03125f)
+
 int g_contentsresult;
 hull_t box_hull_0;
 box_clipnodes_t box_clipnodes_0;
@@ -638,8 +641,9 @@ struct pmtrace_s *PM_TraceLineEx(float *start, float *end, int flags, int usehul
 	return &tr;
 }
 
+#ifndef REHLDS_OPT_PEDANTIC
 /* <6ef4a> ../engine/pmovetst.c:844 */
-qboolean PM_RecursiveHullCheck(hull_t *hull, int num, float p1f, float p2f, vec_t *p1, vec_t *p2, pmtrace_t *trace)
+qboolean PM_RecursiveHullCheck(hull_t *hull, int num, float p1f, float p2f, const vec_t *p1, const vec_t *p2, pmtrace_t *trace)
 {
 	qboolean retval;
 	dclipnode_t *node;
@@ -653,33 +657,30 @@ qboolean PM_RecursiveHullCheck(hull_t *hull, int num, float p1f, float p2f, vec_
 
 	if (num < 0)
 	{
-		if (num == -2)
+		if (num == CONTENTS_SOLID)
 		{
-			trace->startsolid = 1;
-			retval = 1;
+			trace->startsolid = TRUE;
 		}
 		else
 		{
-			trace->allsolid = 0;
-			if (num == -1)
+			trace->allsolid = FALSE;
+			if (num == CONTENTS_EMPTY)
 			{
-				trace->inopen = 1;
-				retval = 1;
+				trace->inopen = TRUE;
 			}
 			else
 			{
-				trace->inwater = 1;
-				retval = 1;
+				trace->inwater = TRUE;
 			}
 		}
-		return retval;
+		return TRUE;
 	}
 
 	if (hull->firstclipnode >= hull->lastclipnode)
 	{
-		trace->allsolid = 0;
-		trace->inopen = 1;
-		return 1;
+		trace->allsolid = FALSE;
+		trace->inopen = TRUE;
+		return TRUE;
 	}
 
 	node = &hull->clipnodes[num];
@@ -787,3 +788,171 @@ qboolean PM_RecursiveHullCheck(hull_t *hull, int num, float p1f, float p2f, vec_
 	Con_DPrintf("Trace backed up past 0.0.\n");
 	return 0;
 }
+#else // REHLDS_OPT_PEDANTIC
+// version with unrolled tail recursion
+qboolean PM_RecursiveHullCheck(hull_t *hull, int num, float p1f, float p2f, const vec_t *p1, const vec_t *p2, pmtrace_t *trace)
+{
+	dclipnode_t *node;
+	mplane_t *plane;
+	vec3_t mid;
+	float pdif;
+	float frac;
+	float t1;
+	float t2;
+	float midf;
+	vec3_t custom_p1; // for holding custom p1 value
+
+	while (1)
+	{
+		if (num < 0)
+		{
+			if (num == CONTENTS_SOLID)
+			{
+				trace->startsolid = TRUE;
+			}
+			else
+			{
+				trace->allsolid = FALSE;
+				if (num == CONTENTS_EMPTY)
+				{
+					trace->inopen = TRUE;
+				}
+				else
+				{
+					trace->inwater = TRUE;
+				}
+			}
+			return TRUE;
+		}
+
+		if (hull->firstclipnode >= hull->lastclipnode)
+		{
+			trace->allsolid = FALSE;
+			trace->inopen = TRUE;
+			return TRUE;
+		}
+
+		// find the point distances
+		node = &hull->clipnodes[num];
+		plane = &hull->planes[node->planenum];
+		if (plane->type >= 3u)
+		{
+			t1 = p1[1] * plane->normal[1] + p1[2] * plane->normal[2] + p1[0] * plane->normal[0] - plane->dist;
+			t2 = p2[1] * plane->normal[1] + p2[2] * plane->normal[2] + plane->normal[0] * p2[0] - plane->dist;
+		}
+		else
+		{
+			t1 = p1[plane->type] - plane->dist;
+			t2 = p2[plane->type] - plane->dist;
+		}
+		if (t1 >= 0.0 && t2 >= 0.0)
+		{
+			num = node->children[0]; // only 1 arg changed
+			continue;
+		}
+
+		if (t1 >= 0.0)
+		{
+			midf = t1 - DIST_EPSILON;
+		}
+		else
+		{
+			if (t2 < 0.0)
+			{
+				num = node->children[1];
+				continue;
+			}
+
+			midf = t1 + DIST_EPSILON;
+		}
+		midf = midf / (t1 - t2);
+		if (midf >= 0.0)
+		{
+			if (midf > 1.0)
+				midf = 1.0;
+		}
+		else
+		{
+			midf = 0.0;
+		}
+
+		pdif = p2f - p1f;
+		frac = pdif * midf + p1f;
+		mid[0] = (p2[0] - p1[0]) * midf + p1[0];
+		mid[1] = (p2[1] - p1[1]) * midf + p1[1];
+		mid[2] = (p2[2] - p1[2]) * midf + p1[2];
+
+		int side = (t1 >= 0.0) ? 0 : 1;
+
+		if (!PM_RecursiveHullCheck(hull, node->children[side], p1f, frac, p1, mid, trace))
+			return 0;
+
+		if (PM_HullPointContents(hull, node->children[side ^ 1], mid) != -2)
+		{
+			num = node->children[side ^ 1];
+			p1f = frac;
+			p1 = custom_p1;
+			custom_p1[0] = mid[0];
+			custom_p1[1] = mid[1];
+			custom_p1[2] = mid[2];
+			continue;
+		}
+
+		if (trace->allsolid)
+			return 0;
+
+		if (side)
+		{
+			trace->plane.normal[0] = vec3_origin[0] - plane->normal[0];
+			trace->plane.normal[1] = vec3_origin[1] - plane->normal[1];
+			trace->plane.normal[2] = vec3_origin[2] - plane->normal[2];
+			trace->plane.dist = -plane->dist;
+		}
+		else
+		{
+			trace->plane.normal[0] = plane->normal[0];
+			trace->plane.normal[1] = plane->normal[1];
+			trace->plane.normal[2] = plane->normal[2];
+			trace->plane.dist = plane->dist;
+		}
+
+		if (PM_HullPointContents(hull, hull->firstclipnode, mid) != -2)
+		{
+			trace->fraction = frac;
+			trace->endpos[0] = mid[0];
+			trace->endpos[1] = mid[1];
+			trace->endpos[2] = mid[2];
+			return 0;
+		}
+
+		while (1)
+		{
+			midf = (float)(midf - 0.05);
+			if (midf < 0.0)
+				break;
+
+			frac = pdif * midf + p1f;
+			mid[0] = (p2[0] - p1[0]) * midf + p1[0];
+			mid[1] = (p2[1] - p1[1]) * midf + p1[1];
+			mid[2] = (p2[2] - p1[2]) * midf + p1[2];
+			if (PM_HullPointContents(hull, hull->firstclipnode, mid) != -2)
+			{
+				trace->fraction = frac;
+				trace->endpos[0] = mid[0];
+				trace->endpos[1] = mid[1];
+				trace->endpos[2] = mid[2];
+				return 0;
+			}
+		}
+
+		trace->fraction = frac;
+		trace->endpos[0] = mid[0];
+		trace->endpos[1] = mid[1];
+		trace->endpos[2] = mid[2];
+		Con_DPrintf("Trace backed up past 0.0.\n");
+		return 0;
+	}
+
+	return 0;
+}
+#endif // REHLDS_OPT_PEDANTIC

@@ -28,6 +28,7 @@
 
 #include "precompiled.h"
 
+#define DIST_EPSILON (0.03125f)
 
 hull_t box_hull;
 hull_t beam_hull;
@@ -641,6 +642,7 @@ edict_t *SV_TestEntityPosition(edict_t *ent)
 	return NULL;
 }
 
+#ifndef REHLDS_OPT_PEDANTIC
 /* <cacbc> ../engine/world.c:804 */
 qboolean SV_RecursiveHullCheck(hull_t *hull, int num, float p1f, float p2f, vec_t *p1, vec_t *p2, trace_t *trace)
 {
@@ -775,6 +777,159 @@ qboolean SV_RecursiveHullCheck(hull_t *hull, int num, float p1f, float p2f, vec_
 	}
 	return TRUE;
 }
+#else // REHLDS_OPT_PEDANTIC
+// version with unrolled tail recursion
+qboolean SV_RecursiveHullCheck(hull_t *hull, int num, float p1f, float p2f, const vec_t *p1, const vec_t *p2, trace_t *trace)
+{
+	dclipnode_t *node;
+	mplane_t *plane;
+	float t2;
+	vec3_t mid;
+	float frac;
+	float t1;
+	signed int side;
+	float midf;
+	float pdif;
+	vec3_t custom_p1; // for holding custom p1 value
+
+	while (num >= 0)
+	{
+		pdif = p2f - p1f;
+
+		if (num < hull->firstclipnode || num > hull->lastclipnode || !hull->planes)
+			Sys_Error(__FUNCTION__ ": bad node number");
+
+		node = &hull->clipnodes[num];
+		plane = &hull->planes[hull->clipnodes[num].planenum];
+		if (plane->type >= 3)
+		{
+			t1 = p1[1] * plane->normal[1] + p1[2] * plane->normal[2] + p1[0] * plane->normal[0] - plane->dist;
+			t2 = p2[1] * plane->normal[1] + p2[2] * plane->normal[2] + plane->normal[0] * p2[0] - plane->dist;
+		}
+		else
+		{
+			t1 = p1[plane->type] - plane->dist;
+			t2 = p2[plane->type] - plane->dist;
+		}
+		if (t1 >= 0.0f && t2 >= 0.0f)
+		{
+			num = node->children[0];
+			continue;
+		}
+
+		if (t1 >= 0.0f)
+		{
+			midf = t1 - DIST_EPSILON;
+		}
+		else
+		{
+			if (t2 < 0.0f)
+			{
+				num = node->children[1];
+				continue;
+			}
+
+			midf = t1 + DIST_EPSILON;
+		}
+
+		midf = midf / (t1 - t2);
+		if (midf >= 0.0f)
+		{
+			if (midf > 1.0f)
+				midf = 1.0f;
+		}
+		else
+		{
+			midf = 0.0f;
+		}
+		if (!IS_NAN(midf)) // not a number
+		{
+			frac = pdif * midf + p1f;
+			mid[0] = (p2[0] - p1[0]) * midf + p1[0];
+			mid[1] = (p2[1] - p1[1]) * midf + p1[1];
+			mid[2] = (p2[2] - p1[2]) * midf + p1[2];
+			side = (t1 < 0.0f) ? 1 : 0;
+			if (SV_RecursiveHullCheck(hull, node->children[side], p1f, frac, p1, mid, trace))
+			{
+				if (SV_HullPointContents(hull, node->children[side ^ 1], mid) != CONTENTS_SOLID)
+				{
+					num = node->children[side ^ 1];
+					p1f = frac;
+					p1 = custom_p1;
+					custom_p1[0] = mid[0];
+					custom_p1[1] = mid[1];
+					custom_p1[2] = mid[2];
+					continue;
+				}
+
+				if (!trace->allsolid)
+				{
+					if (side)
+					{
+						trace->plane.normal[0] = vec3_origin[0] - plane->normal[0];
+						trace->plane.normal[1] = vec3_origin[1] - plane->normal[1];
+						trace->plane.normal[2] = vec3_origin[2] - plane->normal[2];
+						trace->plane.dist = -plane->dist;
+					}
+					else
+					{
+						trace->plane.normal[0] = plane->normal[0];
+						trace->plane.normal[1] = plane->normal[1];
+						trace->plane.normal[2] = plane->normal[2];
+						trace->plane.dist = plane->dist;
+					}
+
+					while (1)
+					{
+						if (SV_HullPointContents(hull, hull->firstclipnode, mid) != CONTENTS_SOLID)
+						{
+							trace->fraction = frac;
+							trace->endpos[0] = mid[0];
+							trace->endpos[1] = mid[1];
+							trace->endpos[2] = mid[2];
+							return FALSE;
+						}
+						midf -= 0.1f;
+						if (midf < 0.0f)
+							break;
+						frac = pdif * midf + p1f;
+						mid[0] = (p2[0] - p1[1]) * midf + p1[0];
+						mid[1] = (p2[1] - p1[1]) * midf + p1[1];
+						mid[2] = (p2[2] - p1[2]) * midf + p1[2];
+					}
+					trace->fraction = frac;
+					trace->endpos[0] = mid[0];
+					trace->endpos[1] = mid[1];
+					trace->endpos[2] = mid[2];
+					Con_DPrintf("backup past 0\n");
+					return FALSE;
+				}
+			}
+		}
+		return FALSE;
+	}
+
+	if (num == CONTENTS_SOLID)
+	{
+		trace->startsolid = TRUE;
+	}
+	else
+	{
+		trace->allsolid = FALSE;
+		if (num == CONTENTS_EMPTY)
+		{
+			trace->inopen = TRUE;
+			return TRUE;
+		}
+		if (num != CONTENTS_TRANSLUCENT)
+		{
+			trace->inwater = TRUE;
+			return TRUE;
+		}
+	}
+	return TRUE;
+}
+#endif // REHLDS_OPT_PEDANTIC
 
 /* <cadd3> ../engine/world.c:948 */
 void SV_SingleClipMoveToEntity(edict_t *ent, const vec_t *start, const vec_t *mins, const vec_t *maxs, const vec_t *end, trace_t *trace)
