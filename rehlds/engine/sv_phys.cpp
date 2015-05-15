@@ -193,7 +193,7 @@ int ClipVelocity(vec_t *in, vec_t *normal, vec_t *out, float overbounce)
 	if (normal[2] == 0.0)
 		blocked |= 2u;
 
-	float backoff = (in[0] * normal[0] + in[1] * normal[1] + normal[2] * in[2]) * overbounce;
+	float backoff = _DotProduct(in, normal) * overbounce;
 	for (int i = 0; i < 3; i++)
 	{
 		float tmp = normal[i] * backoff;
@@ -231,7 +231,7 @@ int SV_FlyMove(edict_t *ent, float time, trace_t *steptrace)
 
 		vec3_t end;
 		for (int i = 0; i < 3; i++)
-			end[i] = time * ent->v.velocity[i] + ent->v.origin[i];
+			VectorMA(ent->v.origin, time, ent->v.velocity, end);
 
 		trace_t trace = SV_Move(ent->v.origin, ent->v.mins, ent->v.maxs, end, 0, ent, monsterClip);
 		if (trace.allsolid)
@@ -314,7 +314,7 @@ int SV_FlyMove(edict_t *ent, float time, trace_t *steptrace)
 					if (j == i)
 						continue;
 
-					if (new_velocity[2] * planes[j][2] + new_velocity[0] * planes[j][0] + new_velocity[1] * planes[j][1] < 0.0f)
+					if (_DotProduct(new_velocity, planes[j]) < 0.0f)
 						break;
 				}
 				if (j == numplanes)
@@ -326,8 +326,8 @@ int SV_FlyMove(edict_t *ent, float time, trace_t *steptrace)
 					return blocked;
 
 				vec3_t dir;
-				CrossProduct((const vec_t *)planes, planes[1], dir);
-				float vscale = dir[2] * ent->v.velocity[2] + dir[0] * ent->v.velocity[0] + dir[1] * ent->v.velocity[1];
+				CrossProduct(planes[0], planes[1], dir);
+				float vscale = _DotProduct(dir, ent->v.velocity);
 				VectorScale(dir, vscale, ent->v.velocity);
 			}
 			else
@@ -337,9 +337,7 @@ int SV_FlyMove(edict_t *ent, float time, trace_t *steptrace)
 				ent->v.velocity[0] = new_velocity[0];
 			}
 
-			if (original_velocity[2] * ent->v.velocity[2]
-				+ original_velocity[0] * ent->v.velocity[0]
-				+ original_velocity[1] * ent->v.velocity[1] <= 0.0f)
+			if (_DotProduct(original_velocity, ent->v.velocity) <= 0.0f)
 			{
 				ent->v.velocity[0] = vec3_origin[0];
 				ent->v.velocity[1] = vec3_origin[1];
@@ -417,7 +415,7 @@ trace_t SV_PushEntity(edict_t *ent, vec_t *push)
 	vec3_t end;                                                   //   518
 	int moveType;   
 	
-	end[0] = ent->v.origin[0] + push[0];
+	end[0] = push[0] + ent->v.origin[0];
 	end[1] = push[1] + ent->v.origin[1];
 	end[2] = push[2] + ent->v.origin[2];
 
@@ -637,7 +635,7 @@ int SV_PushRotate(edict_t *pusher, float movetime)
 				Sys_Error("Out of edicts in simulator!\n");
 
 			vec3_t start, end, push, move;
-			float start_off2;
+
 			if (check->v.movetype == MOVETYPE_PUSHSTEP)
 			{
 				vec3_t org;
@@ -646,24 +644,23 @@ int SV_PushRotate(edict_t *pusher, float movetime)
 				org[2] = (check->v.absmax[2] + check->v.absmin[2]) * 0.5f;
 				start[0] = org[0] - pusher->v.origin[0];
 				start[1] = org[1] - pusher->v.origin[1];
-				start_off2 = org[2];
+				start[2] = org[2] - pusher->v.origin[2];
 			}
 			else
 			{
 				start[0] = check->v.origin[0] - pusher->v.origin[0];
 				start[1] = check->v.origin[1] - pusher->v.origin[1];
-				start_off2 = check->v.origin[2];
+				start[2] = check->v.origin[2] - pusher->v.origin[2];
 			}
 
-			start[2] = start_off2 - pusher->v.origin[2];
 			pusher->v.solid = SOLID_NOT;
 
-			move[0] = forward[2] * start[2] + forward[1] * start[1] + forward[0] * start[0];
-			move[1] = -(right[2] * start[2] + right[1] * start[1] + right[0] * start[0]);
-			move[2] = up[2] * start[2] + up[1] * start[1] + up[0] * start[0];
-			end[0] = forwardNow[2] * move[2] + forwardNow[1] * move[1] + forwardNow[0] * move[0];
-			end[1] = rightNow[2] * move[2] + rightNow[1] * move[1] + rightNow[0] * move[0];
-			end[2] = upNow[2] * move[2] + upNow[1] * move[1] + upNow[0] * move[0];
+			move[0] = _DotProduct(forward, start);
+			move[1] = -_DotProduct(right, start);
+			move[2] = _DotProduct(up, start);
+			end[0] = _DotProduct(forwardNow, move);
+			end[1] = _DotProduct(rightNow, move);
+			end[2] = _DotProduct(upNow, move);
 			push[0] = end[0] - start[0];
 			push[1] = end[1] - start[1];
 			push[2] = end[2] - start[2];
@@ -1113,12 +1110,13 @@ void SV_Physics_Toss(edict_t *ent)
 		ent->v.groundentity = trace.ent;
 	}
 
-	if (move[2] * move[2] + move[1] * move[1] + move[0] * move[0] >= 900.0f)
+	if (_DotProduct(move, move) >= 900.0f)
 	{
 		if (ent->v.movetype == MOVETYPE_BOUNCE || ent->v.movetype == MOVETYPE_BOUNCEMISSILE)
 		{
-			VectorScale(ent->v.velocity, (float)((1.0 - trace.fraction) * host_frametime * 0.9f), move);
-			VectorMA(move, (float)((1.0 - trace.fraction) * host_frametime * 0.9f), ent->v.basevelocity, move);
+			float scale = (1.0 - trace.fraction) * host_frametime * 0.9f;
+			VectorScale(ent->v.velocity, scale, move);
+			VectorMA(move, scale, ent->v.basevelocity, move);
 			SV_PushEntity(ent, move);
 			SV_CheckWaterTransition(ent);
 			return;
@@ -1154,10 +1152,10 @@ void PF_WaterMove(edict_t *pSelf)
 	if (pSelf->v.health < 0.0)
 		return;
 
-	drownlevel = (pSelf->v.deadflag) ? 1.0f : 3.0f;
-	flags = pSelf->v.flags;
+	drownlevel = pSelf->v.deadflag ? 1.0f : 3.0f;
 	waterlevel = pSelf->v.waterlevel;
 	watertype = pSelf->v.watertype;
+	flags = pSelf->v.flags;
 	if (!(flags & (FL_IMMUNE_WATER | FL_GODMODE)))
 	{
 		if (flags & FL_SWIM && (waterlevel < drownlevel)
