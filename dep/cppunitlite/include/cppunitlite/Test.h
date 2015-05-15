@@ -70,12 +70,8 @@ protected:
 { Assertions::CharEquals(msg,expected, actual, __FILE__, __LINE__); }
 
 
-#define DOUBLES_EQUAL(expected,actual,threshold)\
-{ double actualTemp = actual; \
-  double expectedTemp = expected; \
-  if (fabs ((expectedTemp)-(actualTemp)) > threshold) \
-{ result_.addFailure (Failure (name_, __FILE__, __LINE__, \
-StringFrom((double)expectedTemp), StringFrom((double)actualTemp))); return; } }
+#define DOUBLES_EQUAL(msg, expected,actual,threshold)\
+{ Assertions::DoubleEquals(msg,expected, actual, threshold, __FILE__, __LINE__); }
 
 
 

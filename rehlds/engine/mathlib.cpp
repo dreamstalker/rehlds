@@ -398,15 +398,15 @@ void CrossProduct(const vec_t *v1, const vec_t *v2, vec_t *cross)
 {
 #ifdef REHLDS_FIXES
 	__m128 a = _mm_loadu_ps(v1), b = _mm_loadu_ps(v2);
-	__m128 m = _mm_sub_ps(	_mm_mul_ps(b, _mm_shuffle_ps(a, a, _MM_SHUFFLE(3, 0, 2, 1))),
-							_mm_mul_ps(a, _mm_shuffle_ps(b, b, _MM_SHUFFLE(3, 0, 2, 1)))
-					);
+	__m128 tmp1 = _mm_mul_ps(a, _mm_shuffle_ps(b, b, _MM_SHUFFLE(3, 0, 2, 1)));
+	__m128 tmp2 = _mm_mul_ps(b, _mm_shuffle_ps(a, a, _MM_SHUFFLE(3, 0, 2, 1)));
+	__m128 m = _mm_sub_ps(tmp1, tmp2);
 
 	xmm2vec(cross, _mm_shuffle_ps(m, m, _MM_SHUFFLE(3, 0, 2, 1)));
 #else // REHLDS_FIXES
-	cross[0] = v2[2] * v1[1] - v1[2] * v2[1];
+	cross[0] = v1[1] * v2[2] - v1[2] * v2[1];
 	cross[1] = v1[2] * v2[0] - v1[0] * v2[2];
-	cross[2] = v1[0] * v2[1] - v2[0] * v1[1];
+	cross[2] = v1[0] * v2[1] - v1[1] * v2[0];
 #endif // REHLDS_FIXES
 }
 

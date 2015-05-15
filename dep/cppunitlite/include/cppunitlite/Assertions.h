@@ -15,4 +15,6 @@ public:
 	static void UInt32Equals(std::string message, unsigned int expected, unsigned int actual, const char* fileName, long lineNumber);
 
 	static void CharEquals(std::string message, char expected, char actual, const char* fileName, long lineNumber);
+
+	static void DoubleEquals(std::string message, double expected, double actual, double epsilon, const char* fileName, long lineNumber);
 };
