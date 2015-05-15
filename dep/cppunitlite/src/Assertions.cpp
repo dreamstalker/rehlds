@@ -1,6 +1,7 @@
 #include "cppunitlite/Assertions.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <sstream>
 
@@ -49,6 +50,14 @@ void Assertions::UInt32Equals(std::string message, unsigned int expected, unsign
 
 void Assertions::CharEquals(std::string message, char expected, char actual, const char* fileName, long lineNumber) {
 	if (expected != actual) {
+		std::stringstream ss;
+		ss << message << " (expected '" << expected << "', got '" << actual << "')";
+		throw TestFailException(ss.str(), std::string(fileName), lineNumber);
+	}
+}
+
+void Assertions::DoubleEquals(std::string message, double expected, double actual, double epsilon, const char* fileName, long lineNumber) {
+	if (abs(expected - actual) > epsilon) {
 		std::stringstream ss;
 		ss << message << " (expected '" << expected << "', got '" << actual << "')";
 		throw TestFailException(ss.str(), std::string(fileName), lineNumber);
