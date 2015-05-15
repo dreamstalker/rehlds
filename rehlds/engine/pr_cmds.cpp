@@ -459,8 +459,8 @@ msurface_t *SurfaceAtPoint(model_t *pModel, mnode_t *node, vec_t *start, vec_t *
 		return 0;
 
 	plane = node->plane;
-	front = start[2] * plane->normal[2] + plane->normal[0] * start[0] + start[1] * plane->normal[1] - plane->dist;
-	back = plane->normal[0] * end[0] + plane->normal[2] * end[2] + plane->normal[1] * end[1] - plane->dist;
+	front = _DotProduct(start, plane->normal) - plane->dist;
+	back = _DotProduct(end, plane->normal) - plane->dist;
 	s = (front < 0.0f) ? 1 : 0;
 	t = (back < 0.0f) ? 1 : 0;
 	if (t == s)
@@ -481,8 +481,8 @@ msurface_t *SurfaceAtPoint(model_t *pModel, mnode_t *node, vec_t *start, vec_t *
 	{
 		surf = &pModel->surfaces[node->firstsurface + i];
 		tex = surf->texinfo;
-		ds = (int)(mid[2] * tex->vecs[0][2] + mid[1] * tex->vecs[0][1] + mid[0] * tex->vecs[0][0] + tex->vecs[0][3]);
-		dt = (int)(mid[2] * tex->vecs[1][2] + mid[1] * tex->vecs[1][1] + mid[0] * tex->vecs[1][0] + tex->vecs[1][3]);
+		ds = (int)_DotProduct(mid, tex->vecs[0]);
+		dt = (int)_DotProduct(mid, tex->vecs[1]);
 		if (ds >= surf->texturemins[0])
 		{
 			if (dt >= surf->texturemins[1])
@@ -532,14 +532,14 @@ const char *TraceTexture(edict_t *pTextureEntity, const float *v1, const float *
 			AngleVectors(pTextureEntity->v.angles, forward, right, up);
 
 			temp[0] = start[0];	temp[1] = start[1]; temp[2] = start[2];
-			start[0] = forward[2] * start[2] + forward[1] * start[1] + forward[0] * start[0];
-			start[1] = -(right[0] * temp[0] + right[2] * start[2] + right[1] * start[1]);
-			start[2] = up[1] * temp[1] + up[0] * temp[0] + up[2] * start[2];
+			start[0] = _DotProduct(forward, temp);
+			start[1] = -_DotProduct(right, temp);
+			start[2] = _DotProduct(up, temp);
 			
 			temp[0] = end[0]; temp[1] = end[1]; temp[2] = end[2];
-			end[0] = forward[2] * end[2] + forward[1] * end[1] + forward[0] * end[0];
-			end[1] = -(right[0] * temp[0] + right[2] * end[2] + right[1] * end[1]);
-			end[2] = up[1] * temp[1] + up[0] * temp[0] + up[2] * end[2];
+			end[0] = _DotProduct(forward, temp);
+			end[1] = -_DotProduct(right, temp);
+			end[2] = _DotProduct(up, temp);
 		}
 	}
 	else
@@ -1933,10 +1933,10 @@ edict_t *PF_CreateFakeClient_I(const char *netname)
 	ent->v.pContainingEntity = ent;
 	ent->v.flags = FL_FAKECLIENT | FL_CLIENT;
 
-	Info_SetValueForKey(fakeclient->userinfo, "name", netname, 256);
-	Info_SetValueForKey(fakeclient->userinfo, "model", "gordon", 256);
-	Info_SetValueForKey(fakeclient->userinfo, "topcolor", "1", 256);
-	Info_SetValueForKey(fakeclient->userinfo, "bottomcolor", "1", 256);
+	Info_SetValueForKey(fakeclient->userinfo, "name", netname, MAX_INFO_STRING);
+	Info_SetValueForKey(fakeclient->userinfo, "model", "gordon", MAX_INFO_STRING);
+	Info_SetValueForKey(fakeclient->userinfo, "topcolor", "1", MAX_INFO_STRING);
+	Info_SetValueForKey(fakeclient->userinfo, "bottomcolor", "1", MAX_INFO_STRING);
 	fakeclient->sendinfo = 1;
 	SV_ExtractFromUserinfo(fakeclient);
 

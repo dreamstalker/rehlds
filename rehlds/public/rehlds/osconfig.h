@@ -95,6 +95,7 @@
 	#define STDCALL __stdcall
 	#define HIDDEN
 	#define NOINLINE __declspec(noinline)
+	#define ALIGN16 __declspec(align(16))
 
 	//inline bool SOCKET_FIONBIO(SOCKET s, int m) { return (ioctlsocket(s, FIONBIO, (u_long*)&m) == 0); }
 	//inline int SOCKET_MSGLEN(SOCKET s, u_long& r) { return ioctlsocket(s, FIONREAD, (u_long*)&r); }
@@ -129,6 +130,7 @@
 	#define STDCALL __attribute__ ((stdcall))
 	#define HIDDEN __attribute__((visibility("hidden")))
 	#define NOINLINE __attribute__((noinline))
+	#define ALIGN16 __attribute__((aligned(16)))
 
 	//inline bool SOCKET_FIONBIO(SOCKET s, int m) { return (ioctl(s, FIONBIO, (int*)&m) == 0); }
 	//inline int SOCKET_MSGLEN(SOCKET s, u_long& r) { return ioctl(s, FIONREAD, (int*)&r); }
