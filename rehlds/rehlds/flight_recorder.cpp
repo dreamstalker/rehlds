@@ -19,13 +19,34 @@
 
 CRehldsFlightRecorder* g_FlightRecorder;
 
+void FR_Init() {
+	g_FlightRecorder = new CRehldsFlightRecorder();
+}
+
+#ifdef REHLDS_FLIGHT_REC
+
 uint16 g_FRMsg_Frame;
 uint16 g_FRMsg_FreeEntPrivateData;
 uint16 g_FRMsg_AllocEntPrivateData;
 
+cvar_t rehlds_flrec_frame = { "rehlds_flrec_frame", "1", 0, 1.0f, NULL };
+cvar_t rehlds_flrec_pvdata = { "rehlds_flrec_privdata", "1", 0, 1.0f, NULL };
 
-void FR_Init() {
-	g_FlightRecorder = new CRehldsFlightRecorder();
+void FR_Dump_f() {
+	const char* fname = "rehlds_flightrec.bin";
+	if (Cmd_Argc() == 1) {
+		fname = Cmd_Argv(0);
+	} else if (Cmd_Argc() > 1) {
+		Con_Printf("usage:  rehlds_flrec_dump < filename >\n");
+	}
+
+	g_FlightRecorder->dump(fname);
+}
+
+void FR_Rehlds_Init() {
+	Cvar_RegisterVariable(&rehlds_flrec_frame);
+	Cvar_RegisterVariable(&rehlds_flrec_pvdata);
+	Cmd_AddCommand("rehlds_flrec_dump", &FR_Dump_f);
 
 	g_FRMsg_Frame = g_FlightRecorder->RegisterMessage("rehlds", "Frame", 1, true);
 	g_FRMsg_FreeEntPrivateData = g_FlightRecorder->RegisterMessage("rehlds", "FreeEntPrivateData", 1, false);
@@ -54,3 +75,5 @@ void FR_FreeEntPrivateData(void* data) {
 	g_FlightRecorder->WriteUInt32((size_t)data);
 	g_FlightRecorder->EndMessage(g_FRMsg_FreeEntPrivateData, true);
 }
+
+#endif //REHLDS_FLIGHT_REC

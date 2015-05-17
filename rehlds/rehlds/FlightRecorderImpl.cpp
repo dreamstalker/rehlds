@@ -18,15 +18,15 @@
 #include "precompiled.h"
 
 CRehldsFlightRecorder::CRehldsFlightRecorder() {
-	m_MetaRegionPtr = (uint8*) sys_allocmem(META_REGION_SIZE);
-	m_DataRegionPtr = (uint8*) sys_allocmem(DATA_REGION_SIZE);
+	m_MetaRegion = (uint8*) sys_allocmem(META_REGION_SIZE);
+	m_DataRegion = (uint8*) sys_allocmem(DATA_REGION_SIZE);
 
-	if (!m_MetaRegionPtr || !m_DataRegionPtr) {
+	if (!m_MetaRegion || !m_DataRegion) {
 		rehlds_syserror("%s: direct allocation failed", __FUNCTION__);
 	}
 
 	//initialize meta region header
-	char* metaPos = (char*)m_MetaRegionPtr;
+	char* metaPos = (char*)m_MetaRegion;
 	const char* metaSignature = "REHLDS_FLIGHTREC_META";
 	metaPos += sprintf(metaPos, "%s%s%s:", metaSignature, metaSignature, metaSignature);
 
@@ -35,12 +35,12 @@ CRehldsFlightRecorder::CRehldsFlightRecorder() {
 	m_pRecorderState = (recorder_state*)metaPos;
 	metaPos += sizeof(recorder_state);
 
-	if ((metaPos - (char*)m_MetaRegionPtr) > META_REGION_HEADER) {
+	if ((metaPos - (char*)m_MetaRegion) > META_REGION_HEADER) {
 		rehlds_syserror("%s: Meta header overflow", __FUNCTION__);
 	}
 
 	//initialize data region header
-	char* dataPos = (char*)m_DataRegionPtr;
+	char* dataPos = (char*)m_DataRegion;
 	const char* dataSignature = "REHLDS_FLIGHTREC_DATA";
 	dataPos += sprintf(dataPos, "%s%s%s:", dataSignature, dataSignature, dataSignature);
 
@@ -53,8 +53,8 @@ CRehldsFlightRecorder::CRehldsFlightRecorder() {
 
 	InitHeadersContent();
 
-	m_MetaRegionPtr += META_REGION_HEADER;
-	m_DataRegionPtr += DATA_REGION_HEADER;
+	m_MetaRegionPtr = m_MetaRegion + META_REGION_HEADER;
+	m_DataRegionPtr = m_DataRegion + DATA_REGION_HEADER;
 }
 
 void CRehldsFlightRecorder::InitHeadersContent() {
@@ -99,8 +99,6 @@ void CRehldsFlightRecorder::StartMessage(uint16 msg, bool entrance) {
 	if (sz < 6) {
 		MoveToStart();
 	}
-
-
 
 	m_pRecorderState->curMessage = msg;
 	m_pRecorderState->lastMsgBeginPos = m_pRecorderState->wpos;
@@ -221,4 +219,18 @@ uint16 CRehldsFlightRecorder::RegisterMessage(const char* module, const char *me
 	m_pMetaHeader->metaRegionPos = sb.cursize;
 
 	return msgId;
+}
+
+void CRehldsFlightRecorder::dump(const char* fname) {
+	FILE* fl = fopen(fname, "wb");
+	if (fl == NULL) {
+		Con_Printf("Failed to write Flight Recorder dump: could not open '%s' for writing\n", fname);
+		return;
+	}
+
+	fwrite(m_MetaRegion, META_REGION_SIZE, 1, fl);
+	fwrite(m_DataRegion, DATA_REGION_SIZE, 1, fl);
+	fclose(fl);
+
+	Con_Printf("Written flightrecorder dump to '%s'\n", fname);
 }
