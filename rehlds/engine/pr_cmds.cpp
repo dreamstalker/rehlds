@@ -1069,7 +1069,12 @@ int PF_precache_sound_I(const char *s)
 		{
 			if (!g_psv.sound_precache[i])
 			{
+#ifdef REHLDS_FIXES
+				// For more information, see EV_Precache
+				g_psv.sound_precache[i] = ED_NewString(s);
+#else
 				g_psv.sound_precache[i] = s;
+#endif // REHLDS_FIXES
 				return i;
 			}
 
@@ -1124,8 +1129,15 @@ short unsigned int EV_Precache(int type, const char *psz)
 				char* evScript = (char*) COM_LoadFile(szpath, 5, &scriptSize);
 				if (!evScript)
 					Host_Error("EV_Precache:  file %s missing from server\n", psz);
-
+#ifdef REHLDS_FIXES
+				// Many modders don't know that the resource names passed to precache functions must be a static strings.
+				// Also some metamod modules can be unloaded during the server running.
+				// Thereafter the pointers to resource names, precached by this modules becomes invalid and access to them will cause segfault error.
+				// Reallocating strings in the rehlds temporary hunk memory helps to avoid these problems.
+				g_psv.event_precache[i].filename = ED_NewString(psz);
+#else
 				g_psv.event_precache[i].filename = psz;
+#endif // REHLDS_FIXES
 				g_psv.event_precache[i].filesize = scriptSize;
 				g_psv.event_precache[i].pszScript = evScript;
 				g_psv.event_precache[i].index = i;
@@ -1405,7 +1417,12 @@ int PF_precache_model_I(const char *s)
 		{
 			if (!g_psv.model_precache[i])
 			{
+#ifdef REHLDS_FIXES
+				// For more information, see EV_Precache
+				g_psv.model_precache[i] = ED_NewString(s);
+#else
 				g_psv.model_precache[i] = s;
+#endif // REHLDS_FIXES
 				g_psv.models[i] = Mod_ForName(s, 1, 1);
 				if (!iOptional)
 					g_psv.model_precache_flags[i] |= 1u;
@@ -1447,7 +1464,12 @@ int PF_precache_generic_I(char *s)
 		{
 			if (!g_psv.generic_precache[i])
 			{
+#ifdef REHLDS_FIXES
+				// For more information, see EV_Precache
+				g_psv.generic_precache[i] = ED_NewString(s);
+#else
 				g_psv.generic_precache[i] = s;
+#endif // REHLDS_FIXES
 				return i;
 			}
 
