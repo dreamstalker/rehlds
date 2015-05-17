@@ -321,9 +321,10 @@ model {
 
 task buildRelease {
     dependsOn binaries.withType(SharedLibraryBinarySpec).matching { SharedLibraryBinarySpec blib ->
-        blib.buildable && blib.buildType.name == 'release'
+		blib.buildable && blib.buildType.name == 'release' && !blib.name.contains('Rehlds_hooker_engine')
     }
 }
+
 
 task prepareDevEnvTests {
     def rehldsTests = new File(project.projectDir, '_dev/testDemos')
