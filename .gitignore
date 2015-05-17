@@ -4,6 +4,8 @@
 *.iml
 **/msvc/Debug*
 **/msvc/Release*
+**/msvc/Tests
+**/msvc/Test Fixes
 **/msvc/*.sdf
 **/msvc/*.opensdf
 **/msvc/*.user

@@ -322,6 +322,9 @@
     <ClCompile Include="..\engine\public_amalgamation.cpp">
       <Filter>engine</Filter>
     </ClCompile>
+    <ClCompile Include="..\unittests\mathlib_tests.cpp">
+      <Filter>unittests</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\hookers\memory.h">

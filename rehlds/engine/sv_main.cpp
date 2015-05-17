@@ -3828,6 +3828,10 @@ void SV_EmitEvents(client_t *cl, packet_entities_t *pack, sizebuf_t *msg)
 					MSG_WriteBits(1, 1);
 					DELTA_WriteDelta((byte *)&nullargs, (byte *)&info->args, TRUE, g_peventdelta, NULL);
 				}
+				else
+				{
+					MSG_WriteBits(0, 1);
+				}
 			}
 			else
 			{

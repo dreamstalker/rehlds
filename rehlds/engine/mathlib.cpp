@@ -37,6 +37,24 @@ vec3_t vec3_origin;
 //short int old_cw;
 //DLONG dlong;
 
+// aligned vec4_t
+typedef ALIGN16 vec4_t avec4_t;
+
+// conversion multiplier
+const avec4_t deg2rad =
+{
+	M_PI / 180.f,
+	M_PI / 180.f,
+	M_PI / 180.f,
+	M_PI / 180.f
+};
+
+// save 4d xmm to 3d vector. we can't optimize many simple vector3 functions because saving back to 3d is slow.
+void xmm2vec(vec_t *v, const __m128 m)
+{
+	_mm_store_ss(v, m);
+	_mm_storel_pi((__m64*)(v + 1), _mm_shuffle_ps(m, m, _MM_SHUFFLE(3, 2, 2, 1)));
+}
 
 /* <46ebf> ../engine/mathlib.c:14 */
 float anglemod(float a)
@@ -126,19 +144,6 @@ NOBODY int InvertMatrix(const float *m, float *out);
 //	float *r3;                                                   //   161
 //}
 
-#ifdef REHLDS_FIXES
-void SinCos(float radians, float *sine, float *cosine)
-{
-	__asm
-	{
-		fld dword ptr [radians];
-		fsincos;
-		fstp dword ptr [cosine];
-		fstp dword ptr [sine];
-	}
-}
-#endif // REHLDS_FIXES
-
 /* <47067> ../engine/mathlib.c:267 */
 void AngleVectors(const vec_t *angles, vec_t *forward, vec_t *right, vec_t *up)
 {
@@ -149,9 +154,16 @@ void AngleVectors(const vec_t *angles, vec_t *forward, vec_t *right, vec_t *up)
 #endif // SWDS
 
 #ifdef REHLDS_FIXES
-	SinCos(DEG2RAD(angles[YAW]), &sy, &cy);
-	SinCos(DEG2RAD(angles[PITCH]), &sp, &cp);
-	SinCos(DEG2RAD(angles[ROLL]), &sr, &cr);
+	// convert to radians
+	avec4_t rad_angles;
+	_mm_store_ps(rad_angles, _mm_mul_ps(_mm_loadu_ps(angles), _mm_load_ps(deg2rad)));
+
+	sy = sin(rad_angles[YAW]);
+	cy = cos(rad_angles[YAW]);
+	sp = sin(rad_angles[PITCH]);
+	cp = cos(rad_angles[PITCH]);
+	sr = sin(rad_angles[ROLL]);
+	cr = cos(rad_angles[ROLL]);
 #else
 	float angle;
 	angle = (float)(angles[YAW] * (M_PI * 2 / 360));
@@ -191,9 +203,16 @@ void AngleVectorsTranspose(const vec_t *angles, vec_t *forward, vec_t *right, ve
 	float		sr, sp, sy, cr, cp, cy;
 
 #ifdef REHLDS_FIXES
-	SinCos(DEG2RAD(angles[YAW]), &sy, &cy);
-	SinCos(DEG2RAD(angles[PITCH]), &sp, &cp);
-	SinCos(DEG2RAD(angles[ROLL]), &sr, &cr);
+	// convert to radians
+	avec4_t rad_angles;
+	_mm_store_ps(rad_angles, _mm_mul_ps(_mm_loadu_ps(angles), _mm_load_ps(deg2rad)));
+
+	sy = sin(rad_angles[YAW]);
+	cy = cos(rad_angles[YAW]);
+	sp = sin(rad_angles[PITCH]);
+	cp = cos(rad_angles[PITCH]);
+	sr = sin(rad_angles[ROLL]);
+	cr = cos(rad_angles[ROLL]);
 #else
 	float angle;
 	angle = (float)(angles[YAW] * (M_PI * 2 / 360));
@@ -233,9 +252,16 @@ void AngleMatrix(const vec_t *angles, float(*matrix)[4])
 	float		sr, sp, sy, cr, cp, cy;
 
 #ifdef REHLDS_FIXES
-	SinCos(DEG2RAD(angles[ROLL]), &sy, &cy);
-	SinCos(DEG2RAD(angles[YAW]), &sp, &cp);
-	SinCos(DEG2RAD(angles[PITCH]), &sr, &cr);
+	// convert to radians
+	avec4_t rad_angles;
+	_mm_store_ps(rad_angles, _mm_mul_ps(_mm_loadu_ps(angles), _mm_load_ps(deg2rad)));
+
+	sy = sin(rad_angles[ROLL]);
+	cy = cos(rad_angles[ROLL]);
+	sp = sin(rad_angles[YAW]);
+	cp = cos(rad_angles[YAW]);
+	sr = sin(rad_angles[PITCH]);
+	cr = cos(rad_angles[PITCH]);
 #else
 	float angle;
 	angle = (float)(angles[ROLL] * (M_PI * 2 / 360));
@@ -321,11 +347,11 @@ int VectorCompare(const vec_t *v1, const vec_t *v2)
 }
 
 /* <47524> ../engine/mathlib.c:476 */
-void VectorMA(const vec_t *veca, float scale, const vec_t *vecb, vec_t *vecc)
+void VectorMA(const vec_t *veca, float scale, const vec_t *vecm, vec_t *out)
 {
-	vecc[0] = scale * vecb[0] + veca[0];
-	vecc[1] = scale * vecb[1] + veca[1];
-	vecc[2] = scale * vecb[2] + veca[2];
+	out[0] = scale * vecm[0] + veca[0];
+	out[1] = scale * vecm[1] + veca[1];
+	out[2] = scale * vecm[2] + veca[2];
 }
 
 #ifndef REHLDS_FIXES
@@ -337,7 +363,6 @@ long double _DotProduct(const vec_t *v1, const vec_t *v2)
 #else // REHLDS_FIXES
 float _DotProduct(const vec_t *v1, const vec_t *v2)
 {
-#ifdef REHLDS_FIXES
 	// _mm_loadu_ps - load xmm from unaligned address
 	// _mm_cvtss_f32 - return low float value of xmm
 	// _mm_dp_ps - dot product
@@ -345,7 +370,6 @@ float _DotProduct(const vec_t *v1, const vec_t *v2)
 	// dpps isn't binary compatible with separate sse2 instructions (max difference is about 0.0002f, but usually < 0.00001f)
 	if (cpuinfo.sse4_1)
 		return _mm_cvtss_f32(_mm_dp_ps(_mm_loadu_ps(v1), _mm_loadu_ps(v2), 0x71));
-#endif // REHLDS_FIXES
 
 	return v1[0] * v2[0] + v1[1] * v2[1] + v1[2] * v2[2];
 }
@@ -372,9 +396,18 @@ NOBODY void _VectorCopy(vec_t *in, vec_t *out);
 /* <47679> ../engine/mathlib.c:510 */
 void CrossProduct(const vec_t *v1, const vec_t *v2, vec_t *cross)
 {
-	cross[0] = v2[2] * v1[1] - v1[2] * v2[1];
+#ifdef REHLDS_FIXES
+	__m128 a = _mm_loadu_ps(v1), b = _mm_loadu_ps(v2);
+	__m128 tmp1 = _mm_mul_ps(a, _mm_shuffle_ps(b, b, _MM_SHUFFLE(3, 0, 2, 1)));
+	__m128 tmp2 = _mm_mul_ps(b, _mm_shuffle_ps(a, a, _MM_SHUFFLE(3, 0, 2, 1)));
+	__m128 m = _mm_sub_ps(tmp1, tmp2);
+
+	xmm2vec(cross, _mm_shuffle_ps(m, m, _MM_SHUFFLE(3, 0, 2, 1)));
+#else // REHLDS_FIXES
+	cross[0] = v1[1] * v2[2] - v1[2] * v2[1];
 	cross[1] = v1[2] * v2[0] - v1[0] * v2[2];
-	cross[2] = v1[0] * v2[1] - v2[0] * v1[1];
+	cross[2] = v1[0] * v2[1] - v1[1] * v2[0];
+#endif // REHLDS_FIXES
 }
 
 /* <476d8> ../engine/mathlib.c:519 */
@@ -383,9 +416,7 @@ float Length(const vec_t *v)
 #ifdef REHLDS_FIXES
 	// based on dot product
 	if (cpuinfo.sse4_1)
-	{
-		return _mm_cvtss_f32(_mm_sqrt_ps(_mm_dp_ps(_mm_loadu_ps(v), _mm_loadu_ps(v), 0x71)));
-	}
+		return _mm_cvtss_f32(_mm_sqrt_ss(_mm_dp_ps(_mm_loadu_ps(v), _mm_loadu_ps(v), 0x71)));
 #endif // REHLDS_FIXES
 
 	float length;
@@ -396,6 +427,17 @@ float Length(const vec_t *v)
 		length = v[i] * v[i] + length;
 	}
 	return sqrt(length);
+}
+
+float Length2D(const vec_t *v)
+{
+#ifdef REHLDS_FIXES
+	// based on dot product
+	if (cpuinfo.sse4_1)
+		return _mm_cvtss_f32(_mm_sqrt_ss(_mm_dp_ps(_mm_loadu_ps(v), _mm_loadu_ps(v), 0x31))); // 0b00110001
+#endif // REHLDS_FIXES
+
+	return sqrt(v[0] * v[0] + v[1] * v[1]);
 }
 
 /* <47722> ../engine/mathlib.c:532 */
@@ -457,7 +499,7 @@ NOBODY void VectorMatrix(vec_t *forward, vec_t *right, vec_t *up);
 /* <4794e> ../engine/mathlib.c:597 */
 void VectorAngles(const vec_t *forward, vec_t *angles)
 {
-	float	tmp, yaw, pitch;
+	float	length, yaw, pitch;
 
 	if (forward[1] == 0 && forward[0] == 0)
 	{
@@ -473,8 +515,13 @@ void VectorAngles(const vec_t *forward, vec_t *angles)
 		if (yaw < 0)
 			yaw += 360;
 
-		tmp = sqrt((double)(forward[0] * forward[0] + forward[1] * forward[1]));
-		pitch = (atan2((double)forward[2], (double)tmp) * 180.0 / M_PI);
+#ifdef REHLDS_FIXES
+		length = Length2D(forward);
+#else // REHLDS_FIXES
+		length = sqrt((double)(forward[0] * forward[0] + forward[1] * forward[1]));
+#endif // REHLDS_FIXES
+
+		pitch = atan2((double)forward[2], (double)length) * 180.0 / M_PI;
 		if (pitch < 0)
 			pitch += 360;
 	}

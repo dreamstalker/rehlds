@@ -99,7 +99,7 @@ mleaf_t *Mod_PointInLeaf(vec_t *p, model_t *model)
 	{
 		plane = node->plane;
 		if (plane->type >= 3u)
-			d = plane->normal[2] * p[2] + plane->normal[1] * p[1] + plane->normal[0] * p[0] - plane->dist;
+			d = _DotProduct(plane->normal, p) - plane->dist;
 		else
 			d = p[plane->type] - plane->dist;
 
@@ -258,7 +258,7 @@ qboolean IsCZPlayerModel(uint32 crc, const char  * filename)
 model_t *Mod_LoadModel(model_t *mod, qboolean crash, qboolean trackCRC)
 {
 	unsigned char *buf;
-	char tmpName[260];
+	char tmpName[MAX_PATH];
 	int length;
 	CRC32_t currentCRC;
 
@@ -282,11 +282,11 @@ model_t *Mod_LoadModel(model_t *mod, qboolean crash, qboolean trackCRC)
 		while (*(p++) == '/')
 			;
 
-		strncpy(tmpName, p, 259);
-		tmpName[259] = 0;
+		strncpy(tmpName, p, sizeof(tmpName) - 1);
+		tmpName[sizeof(tmpName) - 1] = '\0';
 
-		strncpy(mod->name, tmpName, 63);
-		mod->name[63] = 0;
+		strncpy(mod->name, tmpName, sizeof(mod->name) - 1);
+		mod->name[sizeof(mod->name) - 1] = '\0';
 	}
 
 	buf = COM_LoadFileForMe(mod->name, &length);
@@ -383,7 +383,7 @@ void Mod_AdInit(void)
 {
 	int i;
 	char *s;
-	static char filename[260];
+	static char filename[MAX_PATH];
 
 	tested = 1;
 	i = COM_CheckParm("-ad");
@@ -392,7 +392,7 @@ void Mod_AdInit(void)
 		s = com_argv[i + 1];
 		if (s && *s)
 		{
-			_snprintf(filename, 0x104u, "%s", s);
+			_snprintf(filename, MAX_PATH, "%s", s);
 			if (FS_FileSize(filename) > 0)
 			{
 				Sys_Error("Mod_Init(): reverse me");

@@ -263,14 +263,15 @@ float (*LittleFloat)(float l);
 
 int LongSwap(int l)
 {
-	byte b1, b2, b3, b4;
+	/*byte b1, b2, b3, b4;
 
 	b1 = l & 0xFF;
 	b2 = (l >> 8) & 0xFF;
 	b3 = (l >> 16) & 0xFF;
 	b4 = (l >> 24) & 0xFF;
 
-	return ((int)b1 << 24) + ((int)b2 << 16) + ((int)b3 << 8) + b4;
+	return ((int)b1 << 24) + ((int)b2 << 16) + ((int)b3 << 8) + b4;*/
+	return _byteswap_ulong(l);
 }
 
 int LongNoSwap(int l)
@@ -280,12 +281,16 @@ int LongNoSwap(int l)
 
 short ShortSwap(short l)
 {
+#ifdef _WIN32
+	return _byteswap_ushort(l); // xchg
+#else
 	byte b1, b2;
 
 	b1 = l & 0xFF;
 	b2 = (l >> 8) & 0xFF;
 
 	return (b1 << 8) + b2;
+#endif
 }
 
 short ShortNoSwap(short l)
@@ -295,7 +300,7 @@ short ShortNoSwap(short l)
 
 float FloatSwap(float f)
 {
-	union
+	/*union
 	{
 		float f;
 		byte b[4];
@@ -307,7 +312,9 @@ float FloatSwap(float f)
 	dat2.b[2] = dat1.b[1];
 	dat2.b[3] = dat1.b[0];
 
-	return dat2.f;
+	return dat2.f;*/
+	unsigned long u = _byteswap_ulong(*(unsigned long *)&f);
+	return *(float *)&u;
 }
 
 float FloatNoSwap(float f)
@@ -443,7 +450,7 @@ void MSG_WriteUsercmd(sizebuf_t *buf, usercmd_t *to, usercmd_t *from)
 {
 	delta_t **ppdesc;
 
-	ppdesc = (delta_t **)DELTA_LookupRegistration("usercmd_t");
+	ppdesc = DELTA_LookupRegistration("usercmd_t");
 	MSG_StartBitWriting(buf);
 	DELTA_WriteDelta((byte *)from, (byte *)to, 1, *ppdesc, 0);
 	MSG_EndBitWriting(buf);
