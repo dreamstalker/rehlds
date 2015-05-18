@@ -92,25 +92,25 @@ TEST(AngleMatrixTest, MathLib, 1000) {
 	};
 
 	for (int sse = 0; sse <= 1; sse++) {
-		float rotationmatrix[3][4];
+		float rotation_matrix[3][4];
 
 		for (int i = 0; i < ARRAYSIZE(testdata); i++) {
-			AngleMatrix(testdata[i].angles, rotationmatrix);
+			AngleMatrix(testdata[i].angles, rotation_matrix);
 
-			DOUBLES_EQUAL("rotationmatrix[0][0] mismatch", testdata[i].matrix0[0], rotationmatrix[0][0], 0.00001);
-			DOUBLES_EQUAL("rotationmatrix[0][1] mismatch", testdata[i].matrix0[1], rotationmatrix[0][1], 0.00001);
-			DOUBLES_EQUAL("rotationmatrix[0][2] mismatch", testdata[i].matrix0[2], rotationmatrix[0][2], 0.00001);
-			DOUBLES_EQUAL("rotationmatrix[0][3] mismatch", testdata[i].matrix0[3], rotationmatrix[0][3], 0.00001);
+			DOUBLES_EQUAL("rotationmatrix[0][0] mismatch", testdata[i].matrix0[0], rotation_matrix[0][0], 0.00001);
+			DOUBLES_EQUAL("rotationmatrix[0][1] mismatch", testdata[i].matrix0[1], rotation_matrix[0][1], 0.00001);
+			DOUBLES_EQUAL("rotationmatrix[0][2] mismatch", testdata[i].matrix0[2], rotation_matrix[0][2], 0.00001);
+			DOUBLES_EQUAL("rotationmatrix[0][3] mismatch", testdata[i].matrix0[3], rotation_matrix[0][3], 0.00001);
 
-			DOUBLES_EQUAL("rotationmatrix[1][0] mismatch", testdata[i].matrix1[0], rotationmatrix[1][0], 0.00001);
-			DOUBLES_EQUAL("rotationmatrix[1][1] mismatch", testdata[i].matrix1[1], rotationmatrix[1][1], 0.00001);
-			DOUBLES_EQUAL("rotationmatrix[1][2] mismatch", testdata[i].matrix1[2], rotationmatrix[1][2], 0.00001);
-			DOUBLES_EQUAL("rotationmatrix[1][3] mismatch", testdata[i].matrix1[3], rotationmatrix[1][3], 0.00001);
+			DOUBLES_EQUAL("rotationmatrix[1][0] mismatch", testdata[i].matrix1[0], rotation_matrix[1][0], 0.00001);
+			DOUBLES_EQUAL("rotationmatrix[1][1] mismatch", testdata[i].matrix1[1], rotation_matrix[1][1], 0.00001);
+			DOUBLES_EQUAL("rotationmatrix[1][2] mismatch", testdata[i].matrix1[2], rotation_matrix[1][2], 0.00001);
+			DOUBLES_EQUAL("rotationmatrix[1][3] mismatch", testdata[i].matrix1[3], rotation_matrix[1][3], 0.00001);
 
-			DOUBLES_EQUAL("rotationmatrix[2][0] mismatch", testdata[i].matrix2[0], rotationmatrix[2][0], 0.00001);
-			DOUBLES_EQUAL("rotationmatrix[2][1] mismatch", testdata[i].matrix2[1], rotationmatrix[2][1], 0.00001);
-			DOUBLES_EQUAL("rotationmatrix[2][2] mismatch", testdata[i].matrix2[2], rotationmatrix[2][2], 0.00001);
-			DOUBLES_EQUAL("rotationmatrix[2][3] mismatch", testdata[i].matrix2[3], rotationmatrix[2][3], 0.00001);
+			DOUBLES_EQUAL("rotationmatrix[2][0] mismatch", testdata[i].matrix2[0], rotation_matrix[2][0], 0.00001);
+			DOUBLES_EQUAL("rotationmatrix[2][1] mismatch", testdata[i].matrix2[1], rotation_matrix[2][1], 0.00001);
+			DOUBLES_EQUAL("rotationmatrix[2][2] mismatch", testdata[i].matrix2[2], rotation_matrix[2][2], 0.00001);
+			DOUBLES_EQUAL("rotationmatrix[2][3] mismatch", testdata[i].matrix2[3], rotation_matrix[2][3], 0.00001);
 		}
 
 		cpuinfo.sse4_1 = 0;
@@ -128,15 +128,15 @@ TEST(DotProductTest, MathLib, 1000) {
 	};
 
 	testdata_t testdata[2] = {
-			{ { 41.5f, 7.32f, -9.22f }, { 13.3f, -0.5f, 8.09f }, 473.70023f },
-			{ { -16.1f, -0.09f, 1.2f }, { 8.2f, 1.2f, -6.66f }, -140.12001f },
+			{ { 41.5f, 7.32f, -9.22f }, { 13.3f, -0.5f, 8.09f }, 473.70020f },
+			{ { -16.1f, -0.09f, 1.2f }, { 8.2f, 1.2f, -6.66f }, -140.12000f },
 	};
 
 	for (int sse = 0; sse <= 1; sse++) {
 
 		for (int i = 0; i < ARRAYSIZE(testdata); i++) {
 			double res = _DotProduct(testdata[i].v1, testdata[i].v2);
-			DOUBLES_EQUAL("_DotProduct mismatch", testdata[i].res, res, 0.00001);
+			DOUBLES_EQUAL("_DotProduct mismatch", testdata[i].res, res, 0.0001);
 		}
 
 		cpuinfo.sse4_1 = 0;

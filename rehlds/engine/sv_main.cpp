@@ -35,16 +35,6 @@ typedef struct full_packet_entities_s
 	entity_state_t entities[MAX_PACKET_ENTITIES];
 } full_packet_entities_t;
 
-/* <a59b9> ../engine/sv_main.c:102 */
-typedef struct delta_info_s
-{
-	delta_info_s *next;
-	char *name;
-	char *loadfile;
-	delta_t *delta;
-} delta_info_t;
-
-
 int sv_lastnum;
 
 extra_baselines_t g_sv_instance_baselines;
@@ -65,6 +55,8 @@ float g_LastScreenUpdateTime;
 globalvars_t gGlobalVariables;
 server_static_t g_psvs;
 server_t g_psv;
+
+rehlds_server_t g_rehlds_sv;
 
 decalname_t sv_decalnames[512];
 int sv_decalnamecount;
@@ -695,8 +687,15 @@ void SV_FindModelNumbers(void)
 	{
 		if (!g_psv.model_precache[i])
 			break;
+
+		//use case-sensitive names to increase performance
+#ifdef REHLDS_FIXES
 		if (!Q_stricmp(g_psv.model_precache[i], "models/player.mdl"))
 			sv_playermodel = i;
+#else
+		if (!Q_stricmp(g_psv.model_precache[i], "models/player.mdl"))
+			sv_playermodel = i;
+#endif
 	}
 }
 
@@ -4853,6 +4852,12 @@ int SV_ModelIndex(const char *name)
 	if (!name || !name[0])
 		return 0;
 
+#ifdef REHLDS_OPT_PEDANTIC
+	auto node = g_rehlds_sv.modelsMap.get(name);
+	if (node) {
+		return node->val;
+	}
+#else
 	for (int i = 0; i < HL_MODEL_MAX; i++)
 	{
 		if (!g_psv.model_precache[i])
@@ -4861,6 +4866,7 @@ int SV_ModelIndex(const char *name)
 		if (!Q_stricmp(g_psv.model_precache[i], name))
 			return i;
 	};
+#endif
 
 	Sys_Error("SV_ModelIndex: model %s not precached", name);
 }
@@ -5465,6 +5471,11 @@ int SV_SpawnServer(qboolean bIsDemo, char *server, char *startspot)
 
 	SV_AllocClientFrames();
 	Q_memset(&g_psv, 0, sizeof(server_t));
+
+#ifdef REHLDS_OPT_PEDANTIC
+	g_rehlds_sv.modelsMap.clear();
+#endif
+
 	Q_strncpy(g_psv.oldname, oldname, sizeof(oldname) - 1);
 	g_psv.oldname[sizeof(oldname) - 1] = 0;
 	Q_strncpy(g_psv.name, server, sizeof(g_psv.name) - 1);
@@ -5577,6 +5588,13 @@ int SV_SpawnServer(qboolean bIsDemo, char *server, char *startspot)
 	g_psv.model_precache_flags[1] |= RES_FATALIFMISSING;
 	g_psv.model_precache[1] = g_psv.modelname;
 
+#ifdef REHLDS_OPT_PEDANTIC
+	{
+		int __itmp = 1;
+		g_rehlds_sv.modelsMap.put(ED_NewString(g_psv.modelname), __itmp);
+	}
+#endif
+
 	g_psv.sound_precache[0] = pr_strings;
 	g_psv.model_precache[0] = pr_strings;
 	g_psv.generic_precache[0] = pr_strings;
@@ -5586,6 +5604,13 @@ int SV_SpawnServer(qboolean bIsDemo, char *server, char *startspot)
 		g_psv.model_precache[i + 1] = localmodels[i];
 		g_psv.models[i + 1] = Mod_ForName(localmodels[i], FALSE, FALSE);
 		g_psv.model_precache_flags[i + 1] |= RES_FATALIFMISSING;
+
+#ifdef REHLDS_OPT_PEDANTIC
+		{
+			int __itmp = i + 1;
+			g_rehlds_sv.modelsMap.put(g_psv.model_precache[i + 1], __itmp);
+		}
+#endif
 	}
 
 	Q_memset(&g_psv.edicts->v, 0, sizeof(entvars_t));
@@ -6789,6 +6814,10 @@ void SV_RegisterDelta(char *name, char *loadfile)
 	p->delta = pdesc;
 	p->next = g_sv_delta;
 	g_sv_delta = p;
+
+#if defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)
+	g_DeltaJitRegistry.CreateAndRegisterDeltaJIT(pdesc);
+#endif
 }
 
 /* <aa966> ../engine/sv_main.c:9284 */
@@ -6826,6 +6855,10 @@ void SV_InitDeltas(void)
 	g_peventdelta = SV_LookupDelta("event_t");
 	if (!g_peventdelta)
 		Sys_Error("No event_t encoder on server!\n");
+
+#if defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)
+	g_DeltaJitRegistry.CreateAndRegisterDeltaJIT(&g_MetaDelta[0]);
+#endif
 }
 
 /* <aac49> ../engine/sv_main.c:9339 */
@@ -7012,6 +7045,7 @@ void SV_Init(void)
 /* <aad4b> ../engine/sv_main.c:9558 */
 void SV_Shutdown(void)
 {
+	g_DeltaJitRegistry.Cleanup();
 	delta_info_t *p = g_sv_delta;
 	while (p)
 	{

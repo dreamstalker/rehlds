@@ -25,14 +25,21 @@
 *    version.
 *
 */
-
-#ifndef DELTA_H
-#define DELTA_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #include "maintypes.h"
+
+#define DT_BYTE				BIT(0)		// A byte
+#define DT_SHORT			BIT(1)		// 2 byte field
+#define DT_FLOAT			BIT(2)		// A floating point field
+#define DT_INTEGER			BIT(3)		// 4 byte integer
+#define DT_ANGLE			BIT(4)		// A floating point angle
+#define DT_TIMEWINDOW_8		BIT(5)		// A floating point timestamp relative to server time
+#define DT_TIMEWINDOW_BIG	BIT(6)		// A floating point timestamp relative to server time (with more precision and custom multiplier)
+#define DT_STRING			BIT(7)		// A null terminated string, sent as 8 byte chars
+#define DT_SIGNED			BIT(31)		// sign modificator
+
+#define FDT_MARK			BIT(0)		// Delta mark for sending
 
 
 typedef struct delta_s delta_t;
@@ -61,6 +68,8 @@ typedef struct delta_description_s
 	delta_stats_t stats;
 } delta_description_t;
 
+class CDeltaJit;
+
 /* <bfa0> ../engine/delta.h:78 */
 typedef struct delta_s
 {
@@ -69,6 +78,10 @@ typedef struct delta_s
 	char conditionalencodename[32];
 	encoder_t conditionalencode;
 	delta_description_t *pdd;
+
+#ifdef REHLDS_FIXES
+	CDeltaJit* jit;
+#endif
 } delta_t;
 
 /* <23b2a> ../engine/delta.h:104 */
@@ -88,6 +101,14 @@ typedef struct delta_definition_list_s delta_definition_list_t;
 typedef struct delta_registry_s delta_registry_t;
 typedef struct delta_info_s delta_info_t;
 
+/* <a59b9> ../engine/sv_main.c:102 */
+typedef struct delta_info_s
+{
+	delta_info_s *next;
+	char *name;
+	char *loadfile;
+	delta_t *delta;
+} delta_info_t;
 
 #ifdef HOOK_ENGINE
 #define g_defs (*pg_defs)
@@ -145,5 +166,3 @@ void DELTA_PrintStats(const char *name, delta_t *p);
 void DELTA_DumpStats_f(void);
 void DELTA_Init(void);
 void DELTA_Shutdown(void);
-
-#endif // DELTA_H

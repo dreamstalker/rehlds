@@ -31,19 +31,6 @@
 
 #ifndef Defines_and_Variables_region
 
-#define DT_BYTE				BIT(0)		// A byte
-#define DT_SHORT			BIT(1)		// 2 byte field
-#define DT_FLOAT			BIT(2)		// A floating point field
-#define DT_INTEGER			BIT(3)		// 4 byte integer
-#define DT_ANGLE			BIT(4)		// A floating point angle
-#define DT_TIMEWINDOW_8		BIT(5)		// A floating point timestamp relative to server time
-#define DT_TIMEWINDOW_BIG	BIT(6)		// A floating point timestamp relative to server time (with more precision and custom multiplier)
-#define DT_STRING			BIT(7)		// A null terminated string, sent as 8 byte chars
-#define DT_SIGNED			BIT(31)		// sign modificator
-
-#define FDT_MARK			BIT(0)		// Delta mark for sending
-
-
 /* <23bb1> ../engine/delta.c:47 */
 typedef struct delta_link_s
 {
@@ -520,6 +507,15 @@ void DELTA_MarkSendFields(unsigned char *from, unsigned char *to, delta_t *pFiel
 			if (*(uint32 *)&from[pTest->fieldOffset] != *(uint32 *)&to[pTest->fieldOffset])
 				pTest->flags |= FDT_MARK;
 			break;
+
+// don't use multiplier when checking, to increase performance
+#ifdef REHLDS_FIXES
+		case DT_TIMEWINDOW_8:
+		case DT_TIMEWINDOW_BIG:
+			if (*(uint32 *)&from[pTest->fieldOffset] != *(uint32 *)&to[pTest->fieldOffset])
+				pTest->flags |= FDT_MARK;
+			break;
+#else
 		case DT_TIMEWINDOW_8:
 			if ((int32)(*(float *)&from[pTest->fieldOffset] * 100.0) != (int32)(*(float *)&to[pTest->fieldOffset] * 100.0))
 				pTest->flags |= FDT_MARK;
@@ -528,6 +524,7 @@ void DELTA_MarkSendFields(unsigned char *from, unsigned char *to, delta_t *pFiel
 			if ((int32)(*(float *)&from[pTest->fieldOffset] * 1000.0) != (int32)(*(float *)&to[pTest->fieldOffset] * 1000.0))
 				pTest->flags |= FDT_MARK;
 			break;
+#endif
 		case DT_STRING:
 			st1 = (char*)&from[pTest->fieldOffset];
 			st2 = (char*)&to[pTest->fieldOffset];
@@ -691,12 +688,19 @@ int DELTA_CheckDelta(unsigned char *from, unsigned char *to, delta_t *pFields)
 }
 
 /* <247f5> ../engine/delta.c:949 */
-int DELTA_WriteDelta(unsigned char *from, unsigned char *to, qboolean force, delta_t *pFields, void(*callback)(void))
+NOINLINE int DELTA_WriteDelta(unsigned char *from, unsigned char *to, qboolean force, delta_t *pFields, void(*callback)(void))
 {
 	int sendfields;
+
+#if defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)
+	DELTAJit_ClearAndMarkSendFields(from, to, pFields);
+#else
 	DELTA_ClearFlags(pFields);
 	DELTA_MarkSendFields(from, to, pFields);
+#endif
+
 	sendfields = DELTA_CountSendFields(pFields);
+	
 	_DELTA_WriteDelta(from, to, force, pFields, callback, sendfields);
 	return sendfields;
 }

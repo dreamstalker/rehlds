@@ -43,6 +43,7 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 			return (FALSE);
 
 		TestSuite_Init(NULL, &hlds_exe, NULL);
+		Rehlds_Debug_Init(NULL);
 #endif
 
 	}

@@ -325,6 +325,12 @@
     <ClCompile Include="..\unittests\mathlib_tests.cpp">
       <Filter>unittests</Filter>
     </ClCompile>
+    <ClCompile Include="..\engine\delta_jit.cpp">
+      <Filter>engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\unittests\delta_tests.cpp">
+      <Filter>unittests</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\hookers\memory.h">
@@ -1031,6 +1037,9 @@
     </ClInclude>
     <ClInclude Include="..\public\rehlds\bspfile.h">
       <Filter>public\rehlds</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\delta_jit.h">
+      <Filter>engine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

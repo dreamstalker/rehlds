@@ -28,9 +28,6 @@
 
 #include "precompiled.h"
 
-// 1/32 epsilon to keep floating point happy
-#define	DIST_EPSILON	(0.03125f)
-
 int g_contentsresult;
 hull_t box_hull_0;
 box_clipnodes_t box_clipnodes_0;
@@ -645,6 +642,8 @@ qboolean PM_RecursiveHullCheck(hull_t *hull, int num, float p1f, float p2f, cons
 	float t2;
 	float midf;
 
+	float DIST_EPSILON = 0.03125f;
+
 	if (num < 0)
 	{
 		if (num == CONTENTS_SOLID)
@@ -791,6 +790,8 @@ qboolean PM_RecursiveHullCheck(hull_t *hull, int num, float p1f, float p2f, cons
 	float t2;
 	float midf;
 	vec3_t custom_p1; // for holding custom p1 value
+
+	float DIST_EPSILON = 0.03125f;
 
 	while (1)
 	{

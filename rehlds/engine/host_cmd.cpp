@@ -28,12 +28,6 @@
 
 #include "precompiled.h"
 
-#define FILETIME_TO_QWORD(ft) \
-		((((uint64)ft.dwHighDateTime) << 32) + ft.dwLowDateTime)
-
-#define FILETIME_TO_PAIR(f,h)\
-		(((uint64)f << 32) | h)
-
 /* <3d3ff> ../engine/host_cmd.c:4378 */
 typedef int(*SV_BLENDING_INTERFACE_FUNC)(int, struct sv_blending_interface_s **, struct server_studio_api_s *, float *, float *);
 

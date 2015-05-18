@@ -202,3 +202,56 @@ public:
 		return Iterator(this);
 	}
 };
+
+template<typename T_VAL, unsigned int ASSOC_2N, unsigned int MAX_VALS>
+class CStringKeyStaticMap : public CStaticMap<const char*, T_VAL, ASSOC_2N, MAX_VALS> {
+protected:
+	virtual uint32 hash(const char* const &val) {
+		return crc32((const unsigned char*)val, strlen(val));
+	}
+
+	virtual bool equals(const char* const &val1, const char* const &val2) {
+		return !strcmp(val1, val2);
+	}
+
+public:
+	CStringKeyStaticMap() {
+	}
+
+};
+
+template<typename T_VAL, unsigned int ASSOC_2N, unsigned int MAX_VALS>
+class CICaseStringKeyStaticMap : public CStaticMap<const char*, T_VAL, ASSOC_2N, MAX_VALS> {
+protected:
+	virtual uint32 hash(const char* const &val) {
+		uint32 cksum = 0;
+		const char* pcc = val;
+		if (cpuinfo.sse4_2) {
+			while (*pcc) {
+				char cc = *(pcc++);
+				if (cc >= 'A' || cc <= 'Z') {
+					cc |= 0x20;
+				}
+				cksum = crc32_t8_sse(cksum, cc);
+			}
+		} else {
+			while (*pcc) {
+				char cc = *(pcc++);
+				if (cc >= 'A' || cc <= 'Z') {
+					cc |= 0x20;
+				}
+				cksum = crc32_t8_nosse(cksum, cc);
+			}
+		}
+		return cksum;
+	}
+
+	virtual bool equals(const char* const &val1, const char* const &val2) {
+		return !_stricmp(val1, val2);
+	}
+
+public:
+	CICaseStringKeyStaticMap() {
+	}
+
+};

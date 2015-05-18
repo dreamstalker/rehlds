@@ -18,4 +18,6 @@
 
 uint32 crc32(const uint8 *buf, unsigned int len);
 uint32 crc32_t(uint32 iCRC, const uint8 *s, unsigned int len);
+uint32 crc32_t8_sse(uint32 iCRC, uint8 data);
+uint32 crc32_t8_nosse(uint32 iCRC, uint8 data);
 

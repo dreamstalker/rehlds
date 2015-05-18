@@ -28,10 +28,6 @@
 
 #include "precompiled.h"
 
-// Create general message queues
-#define NUM_MSG_QUEUES 40
-#define MSG_QUEUE_SIZE 1536
-
 #ifdef _WIN32
 CRITICAL_SECTION net_cs;
 #endif // _WIN32

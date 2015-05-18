@@ -131,3 +131,11 @@ uint32 crc32_t(uint32 iCRC, const uint8 *s, unsigned int len) {
 uint32 crc32(const uint8 *buf, unsigned int len) {
 	return crc32_t(0, buf, len);
 }
+
+uint32 crc32_t8_sse(uint32 iCRC, uint8 data) {
+	return _mm_crc32_u8(iCRC, data);
+}
+
+uint32 crc32_t8_nosse(uint32 iCRC, uint8 data) {
+	return crc32_tab[(iCRC ^ data) & 0xff] ^ (iCRC >> 8);
+}

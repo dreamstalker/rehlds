@@ -42,6 +42,12 @@
 
 #define MAX_NETMESSAGE		4
 
+#define MSGFILE_NAME	0
+#define MSGFILE_TEXT	1
+
+#define NAME_HEAP_SIZE	16384
+#define MAX_MESSAGES	1000
+
 #ifdef HOOK_ENGINE
 
 #define gMessageTable (*pgMessageTable)

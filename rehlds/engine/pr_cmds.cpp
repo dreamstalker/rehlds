@@ -139,7 +139,14 @@ void PF_setmodel_I(edict_t *e, const char *m)
 	for (; *check; i++, check++)
 #endif
 	{
+
+		//use case-sensitive names to increase performance
+#ifdef REHLDS_FIXES
+		if (!Q_strcmp(*check, m))
+#else
 		if (!Q_stricmp(*check, m))
+#endif
+		
 		{
 			e->v.modelindex = i;
 			model_t *mod = g_psv.models[i];
@@ -1423,14 +1430,25 @@ int PF_precache_model_I(const char *s)
 #else
 				g_psv.model_precache[i] = s;
 #endif // REHLDS_FIXES
+
+#ifdef REHLDS_OPT_PEDANTIC
+				g_rehlds_sv.modelsMap.put(g_psv.model_precache[i], i);
+#endif //REHLDS_OPT_PEDANTIC
+
 				g_psv.models[i] = Mod_ForName(s, 1, 1);
 				if (!iOptional)
 					g_psv.model_precache_flags[i] |= 1u;
 				return i;
 			}
 
+			//use case-sensitive names to increase performance
+#ifdef REHLDS_FIXES
+			if (!Q_strcmp(g_psv.model_precache[i], s))
+				return i;
+#else
 			if (!Q_stricmp(g_psv.model_precache[i], s))
 				return i;
+#endif
 		}
 		Host_Error(
 			"PF_precache_model_I: Model '%s' failed to precache because the item count is over the %d limit.\nReduce the number of brush models and/or regular models in the map to correct this.",
@@ -1441,8 +1459,14 @@ int PF_precache_model_I(const char *s)
 	{
 		for (int i = 0; i < HL_MODEL_MAX; i++)
 		{
+			//use case-sensitive names to increase performance
+#ifdef REHLDS_FIXES
+			if (!Q_strcmp(g_psv.model_precache[i], s))
+				return i;
+#else
 			if (!Q_stricmp(g_psv.model_precache[i], s))
 				return i;
+#endif
 		}
 		Host_Error("PF_precache_model_I: '%s' Precache can only be done in spawn functions", s);
 	}

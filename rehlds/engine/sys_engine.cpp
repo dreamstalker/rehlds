@@ -28,10 +28,6 @@
 
 #include "precompiled.h"
 
-// sleep time when not focus
-#define NOT_FOCUS_SLEEP	50
-#define MINIMIZED_SLEEP 20
-
 /*
 * Globals initialization
 */
