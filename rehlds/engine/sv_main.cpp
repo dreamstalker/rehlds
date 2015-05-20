@@ -652,14 +652,16 @@ void SV_Users_f(void)
 /* <a651b> ../engine/sv_main.c:762 */
 void SV_CountPlayers(int *clients)
 {
-	*clients = 0;
+	int count = 0;
+	
 	client_s *cl = g_psvs.clients;
-
 	for (int i = 0; i < g_psvs.maxclients; i++, cl++)
 	{
-		if (cl->active || cl->spawned || cl->connected)
-			(*clients)++;
+		if (cl->active | cl->spawned | cl->connected)
+			count++;
 	}
+
+	*clients = count;
 }
 
 /* <a68a4> ../engine/sv_main.c:786 */

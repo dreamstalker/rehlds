@@ -681,9 +681,15 @@ void DELTA_WriteMarkedFields(unsigned char *from, unsigned char *to, delta_t *pF
 int DELTA_CheckDelta(unsigned char *from, unsigned char *to, delta_t *pFields)
 {
 	int sendfields;
+
+#if defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)
+	sendfields = DELTAJit_Feilds_Clear_Mark_Check(from, to, pFields);
+#else
 	DELTA_ClearFlags(pFields);
 	DELTA_MarkSendFields(from, to, pFields);
+#endif
 	sendfields = DELTA_CountSendFields(pFields);
+	
 	return sendfields;
 }
 
@@ -693,14 +699,14 @@ NOINLINE int DELTA_WriteDelta(unsigned char *from, unsigned char *to, qboolean f
 	int sendfields;
 
 #if defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)
-	DELTAJit_ClearAndMarkSendFields(from, to, pFields);
+	sendfields = DELTAJit_Feilds_Clear_Mark_Check(from, to, pFields);
 #else
 	DELTA_ClearFlags(pFields);
 	DELTA_MarkSendFields(from, to, pFields);
+	sendfields = DELTA_CountSendFields(pFields);
 #endif
 
-	sendfields = DELTA_CountSendFields(pFields);
-	
+	//sendfields = DELTA_CountSendFields(pFields);
 	_DELTA_WriteDelta(from, to, force, pFields, callback, sendfields);
 	return sendfields;
 }
