@@ -3,7 +3,7 @@
 #include "maintypes.h"
 
 #define DELTAJIT_MAX_BLOCKS 32
-#define DELTAJIT_MAX_FIELDS 96
+#define DELTAJIT_MAX_FIELDS 56
 
 struct deltajit_field {
 	unsigned int id;
@@ -57,5 +57,5 @@ public:
 
 extern CDeltaJitRegistry g_DeltaJitRegistry;
 
-extern void DELTAJit_ClearAndMarkSendFields(unsigned char *from, unsigned char *to, delta_t *pFields);
+extern void DELTAJit_ClearAndMarkSendFields(unsigned char *from, unsigned char *to, delta_t *pFields, int* bits, int* bytecount, int force);
 extern int DELTAJit_Feilds_Clear_Mark_Check(unsigned char *from, unsigned char *to, delta_t *pFields);
