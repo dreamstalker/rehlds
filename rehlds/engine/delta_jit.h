@@ -33,6 +33,12 @@ struct deltajitdata_t {
 	deltajit_field fields[DELTAJIT_MAX_FIELDS];
 };
 
+enum deltajit_marked_count_type_t {
+	DJ_M_DONT_COUNT,
+	DJ_M_CHECK,
+	//DJ_M_COUNT, //not implemented yet
+};
+
 class CDeltaJit;
 
 class CDeltaJitRegistry {
@@ -52,3 +58,4 @@ public:
 extern CDeltaJitRegistry g_DeltaJitRegistry;
 
 extern void DELTAJit_ClearAndMarkSendFields(unsigned char *from, unsigned char *to, delta_t *pFields);
+extern int DELTAJit_Feilds_Clear_Mark_Check(unsigned char *from, unsigned char *to, delta_t *pFields);

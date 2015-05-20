@@ -107,17 +107,21 @@ void DELTAJIT_CreateDescription(delta_t* delta, deltajitdata_t &jitdesc) {
 
 }
 
-class CDeltaClearMarkFieldsJIT : public jitasm::function<void, CDeltaClearMarkFieldsJIT, void*, void*, void*> {
+class CDeltaClearMarkFieldsJIT : public jitasm::function<int, CDeltaClearMarkFieldsJIT, void*, void*, void*> {
 public:
 	deltajitdata_t *jitdesc;
+	deltajit_marked_count_type_t countType;
 
 
-	CDeltaClearMarkFieldsJIT(deltajitdata_t *_jitdesc) : jitdesc(_jitdesc) {
+	CDeltaClearMarkFieldsJIT(deltajitdata_t *_jitdesc, deltajit_marked_count_type_t _countType)
+		: jitdesc(_jitdesc), countType(_countType) {
 	}
 
 	void checkFieldMask(jitasm::Frontend::Reg32& mask, deltajit_memblock_field* jitField);
-	void main(Addr src, Addr dst, Addr fields);
-	void processStrings(Addr src, Addr dst, Addr fields);
+	Result main(Addr src, Addr dst, Addr delta);
+	void processStrings(Addr src, Addr dst, Addr delta);
+	void callConditionalEncoder(Addr src, Addr dst, Addr delta);
+	void countMarkedFields();
 };
 
 void CDeltaClearMarkFieldsJIT::checkFieldMask(jitasm::Frontend::Reg32& mask, deltajit_memblock_field* jitField) {
@@ -126,7 +130,60 @@ void CDeltaClearMarkFieldsJIT::checkFieldMask(jitasm::Frontend::Reg32& mask, del
 	movzx(dx, al);
 }
 
-void CDeltaClearMarkFieldsJIT::main(Addr src, Addr dst, Addr fields)
+void CDeltaClearMarkFieldsJIT::callConditionalEncoder(Addr src, Addr dst, Addr delta) {
+	//This generator expects that following registers are already initialized:
+	// esi = src
+	// edi = dst
+
+	int condEncoderOffset = (offsetof(delta_t, conditionalencode));
+	mov(eax, ptr[delta]);
+	mov(ecx, dword_ptr[eax + condEncoderOffset]);
+	If(ecx != 0);
+		push(edi);
+		push(esi);
+		push(eax);
+		
+		call(ecx);
+		add(esp, 12);
+	EndIf();
+}
+
+void CDeltaClearMarkFieldsJIT::countMarkedFields() {
+	//This generator expects that following registers are already initialized:
+	// ebx = delta->pdd
+	//
+	//Returns value: 'changed flag' or count in eax
+
+	xor_(eax, eax);
+
+	if (countType == DJ_M_DONT_COUNT) {	
+		return;
+	}
+
+	for (unsigned int i = 0; i < jitdesc->numFields; i++) {
+		int fieldId = jitdesc->fields[i].id;
+		int flagsOffset = (fieldId * sizeof(delta_description_t) + offsetof(delta_description_t, flags));
+
+		if (i & 1) { //rotate between cx and dx to decrease instruction result dependencies
+			mov(cx, word_ptr[ebx + flagsOffset]);
+			and_(cx, 1);
+			or_(ax, cx);
+		} else {
+			mov(dx, word_ptr[ebx + flagsOffset]);
+			and_(dx, 1);
+			or_(ax, dx);
+		}
+
+		//insert 'is changed' check every 8 fields
+		if ((i & 7) == 0) {
+			jnz("countMarkedFields_finish");
+		}
+	}
+
+	L("countMarkedFields_finish");
+}
+
+CDeltaClearMarkFieldsJIT::Result CDeltaClearMarkFieldsJIT::main(Addr src, Addr dst, Addr delta)
 {
 
 #ifndef REHLDS_FIXES
@@ -135,14 +192,16 @@ void CDeltaClearMarkFieldsJIT::main(Addr src, Addr dst, Addr fields)
 
 	mov(esi, ptr[src]);
 	mov(edi, ptr[dst]);
-	mov(ecx, ptr[fields]);
+	mov(ebx, ptr[delta]);
+	int fieldsOffset = (offsetof(delta_t, pdd));
+	mov(ebx, dword_ptr[ebx + fieldsOffset]);
 	movdqu(xmm3, xmmword_ptr[esi]);
 	movdqu(xmm4, xmmword_ptr[edi]);
 
 	auto zero_xmm = xmm2;
 	pxor(zero_xmm, zero_xmm);
 
-	auto mask = ebx;
+	auto mask = ecx;
 	xor_(mask, mask);
 	for (unsigned int i = 0; i < jitdesc->numblocks; i++) {
 		movdqa(xmm0, xmm3);
@@ -150,8 +209,6 @@ void CDeltaClearMarkFieldsJIT::main(Addr src, Addr dst, Addr fields)
 
 		//prefetch next blocks
 		if (i < jitdesc->numblocks) {
-			mov(esi, ptr[src]);
-			mov(edi, ptr[dst]);
 			movdqu(xmm3, xmmword_ptr[esi + ((i + 1) * 16)]);
 			movdqu(xmm4, xmmword_ptr[edi + ((i + 1) * 16)]);
 		}
@@ -202,35 +259,46 @@ void CDeltaClearMarkFieldsJIT::main(Addr src, Addr dst, Addr fields)
 
 			int flagsOffset = (jitField->field->id * sizeof(delta_description_t) + offsetof(delta_description_t, flags));
 			if (jitField->first) {
-				mov(word_ptr[ecx + flagsOffset], dx);
+				mov(word_ptr[ebx + flagsOffset], dx);
 			}
 			else {
-				or_(word_ptr[ecx + flagsOffset], dx);
+				or_(word_ptr[ebx + flagsOffset], dx);
 			}
 		}
 	}
 
-	processStrings(src, dst, fields);
+	processStrings(src, dst, delta);
+
+	callConditionalEncoder(src, dst, delta);
+
+	countMarkedFields();
 
 #ifndef REHLDS_FIXES
 	add(esp, 12); //some local storage is required for precise DT_TIMEWINDOW marking
 #endif
+
+	return eax;
 }
 
-void CDeltaClearMarkFieldsJIT::processStrings(Addr src, Addr dst, Addr fields) {
+void CDeltaClearMarkFieldsJIT::processStrings(Addr src, Addr dst, Addr delta) {
+	//This generator expects that following registers are already initialized:
+	// ebx = delta->pdd
+	// esi = src
+	// edi = dst
+
 	//strings
 	for (unsigned int i = 0; i < jitdesc->numFields; i++) {
 		auto jitField = &jitdesc->fields[i];
 		if (jitField->type != DT_STRING)
 			continue;
 
-		mov(esi, ptr[src]);
-		mov(edi, ptr[dst]);
-		add(esi, jitField->offset);
-		add(edi, jitField->offset);
+		mov(eax, esi);
+		mov(edx, edi);
+		add(eax, jitField->offset);
+		add(edx, jitField->offset);
 
-		push(esi);
-		push(edi);
+		push(eax);
+		push(edx);
 		mov(ecx, (size_t)&Q_stricmp);
 		call(ecx);
 		add(esp, 8);
@@ -238,9 +306,9 @@ void CDeltaClearMarkFieldsJIT::processStrings(Addr src, Addr dst, Addr fields) {
 		setnz(cl);
 		movzx(cx, cl);
 
-		mov(edx, ptr[fields]);
+
 		int flagsOffset = (jitField->id * sizeof(delta_description_t) + offsetof(delta_description_t, flags));
-		mov(word_ptr[edx + flagsOffset], cx);
+		mov(word_ptr[ebx + flagsOffset], cx);
 	}
 }
 
@@ -289,7 +357,7 @@ void CDeltaJitRegistry::CreateAndRegisterDeltaJIT(delta_t* delta) {
 	deltajitdata_t data;
 	DELTAJIT_CreateDescription(delta, data);
 
-	CDeltaClearMarkFieldsJIT* cleanMarkCheckFunc = new CDeltaClearMarkFieldsJIT(&data);
+	CDeltaClearMarkFieldsJIT* cleanMarkCheckFunc = new CDeltaClearMarkFieldsJIT(&data, DJ_M_CHECK);
 	cleanMarkCheckFunc->Assemble();
 	cleanMarkCheckFunc->jitdesc = NULL;
 
@@ -305,11 +373,18 @@ NOINLINE void DELTAJit_ClearAndMarkSendFields(unsigned char *from, unsigned char
 	}
 
 	CDeltaClearMarkFieldsJIT &func = *deltaJit->cleanMarkCheckFunc;
-	func(from, to, pFields->pdd);
+	func(from, to, pFields);
+}
 
-	if (pFields->conditionalencode)
-		pFields->conditionalencode(pFields, from, to);
+NOINLINE int DELTAJit_Feilds_Clear_Mark_Check(unsigned char *from, unsigned char *to, delta_t *pFields) {
+	CDeltaJit* deltaJit = g_DeltaJitRegistry.GetJITByDelta(pFields);
+	if (!deltaJit) {
+		rehlds_syserror("%s: JITted delta encoder not found for delta %p", __FUNCTION__, pFields);
+		return 0;
+	}
 
+	CDeltaClearMarkFieldsJIT &func = *deltaJit->cleanMarkCheckFunc;
+	return func(from, to, pFields);
 }
 
 void CDeltaJitRegistry::Cleanup() {
