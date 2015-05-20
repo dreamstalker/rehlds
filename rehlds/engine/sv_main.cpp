@@ -4385,7 +4385,7 @@ void SV_EmitPings(client_t *client, sizebuf_t *msg)
 /* <a947b> ../engine/sv_main.c:5878 */
 void SV_WriteEntitiesToClient(client_t *client, sizebuf_t *msg)
 {
-	full_packet_entities_t fullpack;
+	
 	client_frame_t *frame = &client->frames[SV_UPDATE_MASK & client->netchan.outgoing_sequence];
 
 	unsigned char *pvs = NULL;
@@ -4393,72 +4393,68 @@ void SV_WriteEntitiesToClient(client_t *client, sizebuf_t *msg)
 	gEntityInterface.pfnSetupVisibility((edict_t*)client->pViewEntity, client->edict, &pvs, &pas);
 	unsigned char *pSet = pvs;
 
-#ifndef REHLDS_FIXES
-	// don't reallocate entity states
-	SV_ClearPacketEntities(frame);
-#endif // REHLDS_FIXES
 	packet_entities_t *pack = &frame->entities;
-	fullpack.num_entities = 0;
 
-	qboolean sendping = SV_ShouldUpdatePing(client);
+	// for REHLDS_FIXES: Allocate the MAX_PACKET_ENTITIES ents in the frame's storage 
+	// This allows us to avoid intermediate 'fullpack' storage
+#ifdef REHLDS_FIXES
+	SV_AllocPacketEntities(frame, MAX_PACKET_ENTITIES);
+	packet_entities_t *curPack = &frame->entities;
+	curPack->num_entities = 0;
+#else
+	SV_ClearPacketEntities(frame);
+	full_packet_entities_t fullpack;
+	fullpack.num_entities = 0;
+	full_packet_entities_t* curPack = &fullpack;
+#endif // REHLDS_FIXES
 	
+	qboolean sendping = SV_ShouldUpdatePing(client);
 	int flags = client->lw != 0;
 
-#ifdef REHLDS_FIXES
 	int e;
-
 	for (e = 1; e <= g_psvs.maxclients; e++)
 	{
 		client_t *cl = &g_psvs.clients[e - 1];
 		if( ( !cl->active && !cl->spawned ) || cl->proxy )
 			continue;
 
-		qboolean add = gEntityInterface.pfnAddToFullPack(&fullpack.entities[fullpack.num_entities], e, &g_psv.edicts[e], host_client->edict, flags, TRUE, pSet);
+		qboolean add = gEntityInterface.pfnAddToFullPack(&curPack->entities[curPack->num_entities], e, &g_psv.edicts[e], host_client->edict, flags, TRUE, pSet);
 		if (add)
-			++fullpack.num_entities;
+			++curPack->num_entities;
 	}
 
 	for (; e < g_psv.num_edicts; e++)
 	{
-		if (fullpack.num_entities >= MAX_PACKET_ENTITIES)
+		if (curPack->num_entities >= MAX_PACKET_ENTITIES)
 		{
 			Con_DPrintf("Too many entities in visible packet list.\n");
 			break;
 		}
 
+		edict_t* ent = &g_psv.edicts[e];
+
+#ifdef REHLDS_FIXES
+		//Part of gamedll's code is moved here to decrease amount of calls to AddToFullPack()
+		//We don't even try to transmit entities without model as well as invisible entities
+		if (ent->v.modelindex && !(ent->v.effects & EF_NODRAW)) {
+			qboolean add = gEntityInterface.pfnAddToFullPack(&curPack->entities[curPack->num_entities], e, &g_psv.edicts[e], host_client->edict, flags, FALSE, pSet);
+			if (add)
+				++curPack->num_entities;
+		}
+#else
 		qboolean add = gEntityInterface.pfnAddToFullPack(&fullpack.entities[fullpack.num_entities], e, &g_psv.edicts[e], host_client->edict, flags, FALSE, pSet);
 		if (add)
 			++fullpack.num_entities;
+#endif
+
 	}
-#else // REHLDS_FIXES
-	for (int e = 1; e < g_psv.num_edicts; e++)
-	{
-		edict_t *ent = &g_psv.edicts[e];
-		int player = 0;
-		if (e >= 1 && e <= g_psvs.maxclients)
-		{
-			client_t *cl = &g_psvs.clients[e - 1];
-			if ((!cl->active && !cl->spawned) || cl->proxy)
-				continue;
 
-			player = 1;
-		}
-
-		if (fullpack.num_entities >= MAX_PACKET_ENTITIES)
-		{
-			Con_DPrintf("Too many entities in visible packet list.\n");
-			break;
-		}
-
-		qboolean add = gEntityInterface.pfnAddToFullPack(&fullpack.entities[fullpack.num_entities], e, ent, host_client->edict, flags, player, pSet);
-		if (add)
-			++fullpack.num_entities;
-	}
-#endif // REHLDS_FIXES
-
+	//for REHLDS_FIXES: Entities are already in the frame's storage, no need to copy them
+#ifndef REHLDS_FIXES
 	SV_AllocPacketEntities(frame, fullpack.num_entities);
 	if (pack->num_entities)
 		Q_memcpy(pack->entities, fullpack.entities, sizeof(entity_state_t) * pack->num_entities);
+#endif
 
 	SV_EmitPacketEntities(client, pack, msg);
 	SV_EmitEvents(client, pack, msg);
