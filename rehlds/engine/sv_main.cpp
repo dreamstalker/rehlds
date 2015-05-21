@@ -485,13 +485,13 @@ void SV_AllocPacketEntities(client_frame_t *frame, int numents)
 {
 	if (frame)
 	{
-#ifdef REHLDS_FIXES
+#ifdef REHLDS_OPT_PEDANTIC
 		frame->entities.num_entities = numents;
 
 		// only alloc for max possible numents
 		if (!frame->entities.entities)
 			frame->entities.entities = (entity_state_t *)Mem_ZeroMalloc(sizeof(entity_state_t) * MAX_PACKET_ENTITIES);
-#else // REHLDS_FIXES
+#else // REHLDS_OPT_PEDANTIC
 		if (frame->entities.entities)
 			SV_ClearPacketEntities(frame);
 
@@ -501,7 +501,7 @@ void SV_AllocPacketEntities(client_frame_t *frame, int numents)
 
 		frame->entities.num_entities = numents;
 		frame->entities.entities = (entity_state_t *)Mem_ZeroMalloc(sizeof(entity_state_t) * allocatedslots);
-#endif // REHLDS_FIXES
+#endif // REHLDS_OPT_PEDANTIC
 	}
 }
 
@@ -4395,9 +4395,9 @@ void SV_WriteEntitiesToClient(client_t *client, sizebuf_t *msg)
 
 	packet_entities_t *pack = &frame->entities;
 
-	// for REHLDS_FIXES: Allocate the MAX_PACKET_ENTITIES ents in the frame's storage 
+	// for REHLDS_OPT_PEDANTIC: Allocate the MAX_PACKET_ENTITIES ents in the frame's storage 
 	// This allows us to avoid intermediate 'fullpack' storage
-#ifdef REHLDS_FIXES
+#ifdef REHLDS_OPT_PEDANTIC
 	SV_AllocPacketEntities(frame, MAX_PACKET_ENTITIES);
 	packet_entities_t *curPack = &frame->entities;
 	curPack->num_entities = 0;
@@ -4406,7 +4406,7 @@ void SV_WriteEntitiesToClient(client_t *client, sizebuf_t *msg)
 	full_packet_entities_t fullpack;
 	fullpack.num_entities = 0;
 	full_packet_entities_t* curPack = &fullpack;
-#endif // REHLDS_FIXES
+#endif // REHLDS_OPT_PEDANTIC
 	
 	qboolean sendping = SV_ShouldUpdatePing(client);
 	int flags = client->lw != 0;
@@ -4433,7 +4433,7 @@ void SV_WriteEntitiesToClient(client_t *client, sizebuf_t *msg)
 
 		edict_t* ent = &g_psv.edicts[e];
 
-#ifdef REHLDS_FIXES
+#ifdef REHLDS_OPT_PEDANTIC
 		//Part of gamedll's code is moved here to decrease amount of calls to AddToFullPack()
 		//We don't even try to transmit entities without model as well as invisible entities
 		if (ent->v.modelindex && !(ent->v.effects & EF_NODRAW)) {
@@ -4442,15 +4442,15 @@ void SV_WriteEntitiesToClient(client_t *client, sizebuf_t *msg)
 				++curPack->num_entities;
 		}
 #else
-		qboolean add = gEntityInterface.pfnAddToFullPack(&fullpack.entities[fullpack.num_entities], e, &g_psv.edicts[e], host_client->edict, flags, FALSE, pSet);
+		qboolean add = gEntityInterface.pfnAddToFullPack(&curPack->entities[curPack->num_entities], e, &g_psv.edicts[e], host_client->edict, flags, FALSE, pSet);
 		if (add)
-			++fullpack.num_entities;
-#endif
+			++curPack->num_entities;
+#endif //REHLDS_OPT_PEDANTIC
 
 	}
 
 	//for REHLDS_FIXES: Entities are already in the frame's storage, no need to copy them
-#ifndef REHLDS_FIXES
+#ifndef REHLDS_OPT_PEDANTIC
 	SV_AllocPacketEntities(frame, fullpack.num_entities);
 	if (pack->num_entities)
 		Q_memcpy(pack->entities, fullpack.entities, sizeof(entity_state_t) * pack->num_entities);

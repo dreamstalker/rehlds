@@ -50,6 +50,8 @@ CPlayingEngExtInterceptor::CPlayingEngExtInterceptor(const char* fname, bool str
 
 	m_InStream.read(cmdLine, cmdlineLen);
 	printf("Playing testsuite\nrecorders's cmdline: %s\n", cmdLine);
+
+	m_StartTick = ::GetTickCount();
 }
 
 void* CPlayingEngExtInterceptor::allocFuncCall()
@@ -145,6 +147,12 @@ IEngExtCall* CPlayingEngExtInterceptor::getNextCall(bool peek, bool processCallb
 	}
 
 	if (cmd->getOpcode() == ECF_NONE) {
+		DWORD endTick = ::GetTickCount();
+		FILE* fl = fopen("rehlds_demo_stats.log", "w");
+		if (fl) {
+			fprintf(fl, "Finished playing demo; duration=%umsec", (endTick - m_StartTick));
+			fclose(fl);
+		}
 		TerminateProcess(GetCurrentProcess(), 777);
 	}
 

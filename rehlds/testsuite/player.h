@@ -135,6 +135,8 @@ private:
 	int m_HeartBeatInterval;
 	int m_PrevHeartBeat;
 
+	DWORD m_StartTick;
+
 	hostent_data_t m_CurrentHostentData;
 	struct hostent m_CurrentHostent;
 	void setCurrentHostent(hostent_data_t* data);
