@@ -187,15 +187,12 @@ void CDeltaClearMarkFieldsJIT::calculateBytecount(Addr bits, Addr bytecount) {
 		mov(eax, ptr[bits + 4]);
 
 		// 32-39
-		if (jitdesc->numFields > 7)
-		{
-			inc(ecx);
-			test(eax, 0xFF);
-			cmovnz(edi, ecx);
-		}
+		inc(ecx);
+		test(eax, 0xFF);
+		cmovnz(edi, ecx);
 
 		// 40-47
-		if (jitdesc->numFields > 15)
+		if (jitdesc->numFields > 39)
 		{
 			inc(ecx);
 			test(eax, 0xFF00);
@@ -203,7 +200,7 @@ void CDeltaClearMarkFieldsJIT::calculateBytecount(Addr bits, Addr bytecount) {
 		}
 
 		// 48-55
-		if (jitdesc->numFields > 15)
+		if (jitdesc->numFields > 47)
 		{
 			inc(ecx);
 			test(eax, 0xFF0000);
@@ -309,18 +306,20 @@ CDeltaClearMarkFieldsJIT::Result CDeltaClearMarkFieldsJIT::main(Addr src, Addr d
 
 	processStrings(src, dst, delta);
 
-	mov(ebx, ptr[delta]);
 	size_t markbits_offset = offsetof(delta_t, markbits);
-	movdqu(xmmword_ptr[ebx + markbits_offset], mark);
-	pcmpeqq(mark, zero_xmm);
-	cvttss2si(ecx, mark);
-	or_(ecx, ptr[force]); // if(sendfields || force)
 
-	If(ecx != 0);
+	mov(eax, ptr[delta]);
+	movdqu(xmmword_ptr[eax + markbits_offset], mark);
+	pcmpeqq(mark, zero_xmm); // SSE 4.1 instruction
+	cvttss2si(eax, mark);
+	or_(eax, ptr[force]); // if(sendfields || force)
+
+	If(eax != 0);
 		callConditionalEncoder(src, dst, delta);
 	EndIf();
 
-	movdqu(mark, xmmword_ptr[ebx + markbits_offset]);
+	mov(eax, ptr[delta]);
+	movdqu(mark, xmmword_ptr[eax + markbits_offset]);
 	pcmpeqq(mark, zero_xmm);
 	cvttss2si(eax, mark);
 
@@ -433,6 +432,7 @@ NOINLINE void DELTAJit_ClearAndMarkSendFields(unsigned char *from, unsigned char
 	}
 
 	CDeltaClearMarkFieldsJIT &func = *deltaJit->cleanMarkCheckFunc;
+
 	func(from, to, pFields, bits, bytecount, force);
 }
 

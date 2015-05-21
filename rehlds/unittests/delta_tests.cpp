@@ -90,7 +90,7 @@ NOINLINE void _EnsureFieldsChanged(const char* callsite, const char* action, boo
 
 		if (markmask) {
 			int index = field - delta->pdd;
-			if (DELTA_IsFieldMarked(delta, index) ^ changed) {
+			if ((DELTA_IsFieldMarked(delta, index)?1:0) ^ changed) {
 				rehlds_syserror("%s: %s: Field '%s' is expected to be marked", callsite, action, fieldName);
 			}
 		}
@@ -112,7 +112,7 @@ NOINLINE void _EnsureFieldsChanged(const char* callsite, const char* action, boo
 
 		if (markmask) {
 			int index = field - delta->pdd;
-			if (DELTA_IsFieldMarked(delta, index) ^ !changed) {
+			if ((DELTA_IsFieldMarked(delta, index)?1:0) ^ !changed) {
 				rehlds_syserror("%s: %s: Field '%s' is expected to be marked", callsite, action, fieldName);
 			}
 		}

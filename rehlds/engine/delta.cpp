@@ -417,17 +417,12 @@ void DELTA_UnsetFieldByIndex(struct delta_s *pFields, int fieldNumber)
 /* <23cc4> ../engine/delta.c:453 */
 void DELTA_ClearFlags(delta_t *pFields)
 {
-#if defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)
-	pFields->markbits[0] = 0;
-	pFields->markbits[1] = 0;
-#else // REHLDS_OPT_PEDANTIC || REHLDS_FIXES
 	int i;
 	delta_description_t *pitem;
 	for (i = 0, pitem = pFields->pdd; i < pFields->fieldCount; i++, pitem++)
 	{
 		pitem->flags = 0;
 	}
-#endif // REHLDS_OPT_PEDANTIC || REHLDS_FIXES
 }
 
 /* <241d2> ../engine/delta.c:473 */
