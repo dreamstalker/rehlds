@@ -107,10 +107,29 @@ void DELTAJIT_CreateDescription(delta_t* delta, deltajitdata_t &jitdesc) {
 
 }
 
-class CDeltaClearMarkFieldsJIT : public jitasm::function<int, CDeltaClearMarkFieldsJIT, void*, void*, void*, void*, void*, int> {
+class CDeltaClearMarkFieldsJIT;
+
+class CDeltaJit {
+public:
+	CDeltaClearMarkFieldsJIT* cleanMarkCheckFunc;
+	delta_t* delta;
+
+	int markedFieldsMaskSize;
+
+	int marked_fields_mask[2];
+	int sse_highbits[2]; //High 64 bits for manipulating marked_fields_mask via SSE registers 
+
+	CDeltaJit(delta_t* _delta, CDeltaClearMarkFieldsJIT* _cleanMarkCheckFunc);
+
+	virtual ~CDeltaJit();
+};
+
+class CDeltaClearMarkFieldsJIT : public jitasm::function<int, CDeltaClearMarkFieldsJIT, void*, void*, void*> {
 public:
 	deltajitdata_t *jitdesc;
 	deltajit_marked_count_type_t countType;
+
+	XmmReg marked_fields_mask = xmm5;
 
 
 	CDeltaClearMarkFieldsJIT(deltajitdata_t *_jitdesc, deltajit_marked_count_type_t _countType)
@@ -118,10 +137,10 @@ public:
 	}
 
 	void checkFieldMask(jitasm::Frontend::Reg32& mask, deltajit_memblock_field* jitField);
-	Result main(Addr src, Addr dst, Addr delta, Addr bits, Addr bytecount, Addr force);
-	void processStrings(Addr src, Addr dst, Addr delta);
-	void callConditionalEncoder(Addr src, Addr dst, Addr delta);
-	void calculateBytecount(Addr bits, Addr bytecount);
+	Result main(Addr src, Addr dst, Addr deltaJit);
+	void processStrings(Addr src, Addr dst);
+	void callConditionalEncoder(Addr src, Addr dst, Addr deltaJit);
+	void calculateBytecount();
 };
 
 void CDeltaClearMarkFieldsJIT::checkFieldMask(jitasm::Frontend::Reg32& mask, deltajit_memblock_field* jitField) {
@@ -130,14 +149,16 @@ void CDeltaClearMarkFieldsJIT::checkFieldMask(jitasm::Frontend::Reg32& mask, del
 	movzx(edx, al);
 }
 
-void CDeltaClearMarkFieldsJIT::callConditionalEncoder(Addr src, Addr dst, Addr delta) {
+void CDeltaClearMarkFieldsJIT::callConditionalEncoder(Addr src, Addr dst, Addr deltaJit) {
 	//This generator expects that following registers are already initialized:
 	// esi = src
 	// edi = dst
 
+	int deltaOffset = (offsetof(CDeltaJit, delta));
 	int condEncoderOffset = (offsetof(delta_t, conditionalencode));
-	mov(eax, ptr[delta]);
-	or_(ecx, dword_ptr[eax + condEncoderOffset]);
+	mov(eax, ptr[deltaJit]);
+	mov(eax, ptr[eax + deltaOffset]);
+	mov(ecx, dword_ptr[eax + condEncoderOffset]);
 	If(ecx != 0);
 		push(edi);
 		push(esi);
@@ -148,72 +169,81 @@ void CDeltaClearMarkFieldsJIT::callConditionalEncoder(Addr src, Addr dst, Addr d
 	EndIf();
 }
 
-void CDeltaClearMarkFieldsJIT::calculateBytecount(Addr bits, Addr bytecount) {
-	mov(eax, ptr[bits]);
-	xor_(ecx, ecx);
-	xor_(edi, edi);
+void CDeltaClearMarkFieldsJIT::calculateBytecount() {
+	//This generator expects that following registers are already initialized:
+	//ebx = delta
+
+	size_t delta_markbits_offset = offsetof(CDeltaJit, marked_fields_mask);
+	mov(eax, dword_ptr[ebx + delta_markbits_offset]);
+	xor_(edx, edx);
 
 	// 0-7
-	inc(ecx);
+	mov(ecx, 1);
 	test(eax, 0xFF);
-	cmovnz(edi, ecx);
+	cmovnz(edx, ecx);
 
 	// 8-15
 	if (jitdesc->numFields > 7)
 	{
-		inc(ecx);
+		mov(ecx, 2);
 		test(eax, 0xFF00);
-		cmovnz(edi, ecx);
+		cmovnz(edx, ecx);
 	}
 
 	// 16-23
 	if (jitdesc->numFields > 15)
 	{
-		inc(ecx);
+		mov(ecx, 3);
 		test(eax, 0xFF0000);
-		cmovnz(edi, ecx);
+		cmovnz(edx, ecx);
 	}
 
 	// 24-31
 	if (jitdesc->numFields > 23)
 	{
-		inc(ecx);
+		mov(ecx, 4);
 		test(eax, 0xFF000000);
-		cmovnz(edi, ecx);
+		cmovnz(edx, ecx);
 	}
 
 	if (jitdesc->numFields > 31)
 	{
-		mov(eax, ptr[bits + 4]);
+		mov(eax, dword_ptr[ebx + delta_markbits_offset + 4]);
 
 		// 32-39
-		inc(ecx);
+		mov(ecx, 5);
 		test(eax, 0xFF);
-		cmovnz(edi, ecx);
+		cmovnz(edx, ecx);
 
 		// 40-47
 		if (jitdesc->numFields > 39)
 		{
-			inc(ecx);
+			mov(ecx, 6);
 			test(eax, 0xFF00);
-			cmovnz(edi, ecx);
+			cmovnz(edx, ecx);
 		}
 
 		// 48-55
 		if (jitdesc->numFields > 47)
 		{
-			inc(ecx);
+			mov(ecx, 7);
 			test(eax, 0xFF0000);
-			cmovnz(edi, ecx);
+			cmovnz(edx, ecx);
+		}
+
+		if (jitdesc->numFields > 55)
+		{
+			mov(ecx, 8);
+			test(eax, 0xFF000000);
+			cmovnz(edx, ecx);
 		}
 	}
 
-	mov(eax, ptr[bytecount]);
-	mov(ptr[eax], edi);
-	mov(eax, edi);
+	size_t delta_masksize_offset = offsetof(CDeltaJit, markedFieldsMaskSize);
+	mov(dword_ptr[ebx + delta_masksize_offset], edx);
 }
 
-CDeltaClearMarkFieldsJIT::Result CDeltaClearMarkFieldsJIT::main(Addr src, Addr dst, Addr delta, Addr bits, Addr bytecount, Addr force)
+CDeltaClearMarkFieldsJIT::Result CDeltaClearMarkFieldsJIT::main(Addr src, Addr dst, Addr deltaJit)
 {
 #ifndef REHLDS_FIXES
 	sub(esp, 12); //some local storage is required for precise DT_TIMEWINDOW marking
@@ -227,14 +257,11 @@ CDeltaClearMarkFieldsJIT::Result CDeltaClearMarkFieldsJIT::main(Addr src, Addr d
 	movdqu(xmm3, xmmword_ptr[esi]);
 	movdqu(xmm4, xmmword_ptr[edi]);
 
-	auto zero_xmm = xmm2;
-	pxor(zero_xmm, zero_xmm);
-
 	auto mask = ecx;
 	xor_(mask, mask);
 
-	auto mark = xmm5;
-	pxor(mark, mark);
+	
+	pxor(marked_fields_mask, marked_fields_mask);
 
 	for (unsigned int i = 0; i < jitdesc->numblocks; i++) {
 		movdqa(xmm0, xmm3);
@@ -246,8 +273,7 @@ CDeltaClearMarkFieldsJIT::Result CDeltaClearMarkFieldsJIT::main(Addr src, Addr d
 			movdqu(xmm4, xmmword_ptr[edi + ((i + 1) * 16)]);
 		}
 
-		pxor(xmm0, xmm1);
-		pcmpeqb(xmm0, zero_xmm);
+		pcmpeqb(xmm0, xmm1);
 		pmovmskb(mask, xmm0);
 		not_(mask);
 
@@ -285,58 +311,51 @@ CDeltaClearMarkFieldsJIT::Result CDeltaClearMarkFieldsJIT::main(Addr src, Addr d
 			} else {
 				checkFieldMask(mask, jitField);
 			}
-
-			/*int flagsOffset = ( jitField->field->id * sizeof(delta_description_t) + offsetof(delta_description_t, flags) );
-			if (jitField->first) {
-				mov(word_ptr[ebx + flagsOffset], dx);
-			}
-			else {
-				or_(word_ptr[ebx + flagsOffset], dx);
-			}*/
 #else
 			checkFieldMask(mask, jitField);
 #endif
 
 			// set bit in send mask
 			movd(xmm0, edx);
-			pslldq(xmm0, j);
-			por(mark, xmm0);
+			psllq(xmm0, jitField->field->id);
+			por(marked_fields_mask, xmm0);
 		}
 	}
 
-	processStrings(src, dst, delta);
+	processStrings(src, dst);
 
-	size_t markbits_offset = offsetof(delta_t, markbits);
+	size_t delta_markbits_offset = offsetof(CDeltaJit, marked_fields_mask);
 
-	mov(eax, ptr[delta]);
-	movdqu(xmmword_ptr[eax + markbits_offset], mark);
-	pcmpeqq(mark, zero_xmm); // SSE 4.1 instruction
-	cvttss2si(eax, mark);
-	or_(eax, ptr[force]); // if(sendfields || force)
+	//Before calling the condition encoder we have to save 'marked fields' mask 
+	//from SSE register into the CDeltaJit::marked_fields_mask, because conditional encoder can modify the mask
+	mov(ebx, ptr[deltaJit]);
+	movdqu(xmmword_ptr[ebx + delta_markbits_offset], marked_fields_mask);
 
-	If(eax != 0);
-		callConditionalEncoder(src, dst, delta);
-	EndIf();
+	//emit conditional encoder call
+	callConditionalEncoder(src, dst, deltaJit);
+	
+	// check if mask is empty
+	mov(edi, dword_ptr[ebx + delta_markbits_offset]);
+	mov(edx, dword_ptr[ebx + delta_markbits_offset + 4]);
+	or_(edi, edx);
 
-	mov(eax, ptr[delta]);
-	movdqu(mark, xmmword_ptr[eax + markbits_offset]);
-	pcmpeqq(mark, zero_xmm);
-	cvttss2si(eax, mark);
-
-	If(eax != 0);
-		calculateBytecount(bits, bytecount);
+	If(edi != 0);
+		calculateBytecount();
+	Else();
+		//set maskSize to 0 if there are no marked fields
+		size_t delta_masksize_offset = offsetof(CDeltaJit, markedFieldsMaskSize);
+		mov(dword_ptr[ebx + delta_masksize_offset], 0);
 	EndIf();
 
 #ifndef REHLDS_FIXES
 	add(esp, 12); //some local storage is required for precise DT_TIMEWINDOW marking
 #endif // REHLDS_FIXES
 
-	return eax;
+	return edi;
 }
 
-void CDeltaClearMarkFieldsJIT::processStrings(Addr src, Addr dst, Addr delta) {
+void CDeltaClearMarkFieldsJIT::processStrings(Addr src, Addr dst) {
 	//This generator expects that following registers are already initialized:
-	// ebx = delta->pdd
 	// esi = src
 	// edi = dst
 
@@ -360,34 +379,23 @@ void CDeltaClearMarkFieldsJIT::processStrings(Addr src, Addr dst, Addr delta) {
 		setnz(cl);
 		movzx(ecx, cl);
 
-#ifndef REHLDS_FIXES
-		int flagsOffset = (jitField->id * sizeof(delta_description_t) + offsetof(delta_description_t, flags));
-		mov(word_ptr[ebx + flagsOffset], cx);
-#else // REHLDS_FIXES
 		movd(xmm0, ecx);
-		pslldq(xmm0, i);
+		psllq(xmm0, jitField->id);
 		por(xmm5, xmm0);
-#endif // REHLDS_FIXES
 	}
 }
 
-class CDeltaJit {
-public:
-	CDeltaClearMarkFieldsJIT* cleanMarkCheckFunc;
-	delta_t* delta;
+CDeltaJit::CDeltaJit(delta_t* _delta, CDeltaClearMarkFieldsJIT* _cleanMarkCheckFunc) {
+	delta = _delta;
+	cleanMarkCheckFunc = _cleanMarkCheckFunc;
+}
 
-	CDeltaJit(delta_t* _delta, CDeltaClearMarkFieldsJIT* _cleanMarkCheckFunc) {
-		delta = _delta;
-		cleanMarkCheckFunc = _cleanMarkCheckFunc;
+CDeltaJit::~CDeltaJit() {
+	if (cleanMarkCheckFunc) {
+		delete cleanMarkCheckFunc;
+		cleanMarkCheckFunc = NULL;
 	}
-
-	virtual ~CDeltaJit() {
-		if (cleanMarkCheckFunc) {
-			delete cleanMarkCheckFunc;
-			cleanMarkCheckFunc = NULL;
-		}
-	}
-};
+}
 
 CDeltaJitRegistry::CDeltaJitRegistry() {
 	
@@ -424,28 +432,56 @@ void CDeltaJitRegistry::CreateAndRegisterDeltaJIT(delta_t* delta) {
 	RegisterDeltaJit(delta, deltaJit);
 }
 
-NOINLINE void DELTAJit_ClearAndMarkSendFields(unsigned char *from, unsigned char *to, delta_t *pFields, int* bits, int* bytecount, int force) {
+CDeltaJit* DELTAJit_LookupDeltaJit(const char* callsite, delta_t *pFields) {
 	CDeltaJit* deltaJit = g_DeltaJitRegistry.GetJITByDelta(pFields);
 	if (!deltaJit) {
-		rehlds_syserror("%s: JITted delta encoder not found for delta %p", __FUNCTION__, pFields);
-		return;
+		rehlds_syserror("%s: JITted delta encoder not found for delta %p", callsite, pFields);
+		return NULL;
 	}
 
-	CDeltaClearMarkFieldsJIT &func = *deltaJit->cleanMarkCheckFunc;
-
-	func(from, to, pFields, bits, bytecount, force);
+	return deltaJit;
 }
 
 NOINLINE int DELTAJit_Feilds_Clear_Mark_Check(unsigned char *from, unsigned char *to, delta_t *pFields) {
-	CDeltaJit* deltaJit = g_DeltaJitRegistry.GetJITByDelta(pFields);
-	if (!deltaJit) {
-		rehlds_syserror("%s: JITted delta encoder not found for delta %p", __FUNCTION__, pFields);
-		return 0;
-	}
-
-	int bits[2], bytecount;
+	CDeltaJit* deltaJit = DELTAJit_LookupDeltaJit(__FUNCTION__, pFields);
 	CDeltaClearMarkFieldsJIT &func = *deltaJit->cleanMarkCheckFunc;
-	return func(from, to, pFields, bits, &bytecount, false);
+	return func(from, to, deltaJit);
+}
+
+void DELTAJit_SetSendFlagBits(delta_t *pFields, int *bits, int *bytecount) {
+	CDeltaJit* deltaJit = DELTAJit_LookupDeltaJit(__FUNCTION__, pFields);
+
+	bits[0] = deltaJit->marked_fields_mask[0];
+	bits[1] = deltaJit->marked_fields_mask[1];
+	*bytecount = deltaJit->markedFieldsMaskSize;
+}
+
+void DELTAJit_SetFieldByIndex(struct delta_s *pFields, int fieldNumber) {
+	CDeltaJit* deltaJit = DELTAJit_LookupDeltaJit(__FUNCTION__, pFields);
+
+	if (fieldNumber > 31)
+		deltaJit->marked_fields_mask[1] |= (1 << (fieldNumber & 0x1F));
+	else
+		deltaJit->marked_fields_mask[0] |= (1 << fieldNumber);
+
+}
+
+void DELTAJit_UnsetFieldByIndex(struct delta_s *pFields, int fieldNumber) {
+	CDeltaJit* deltaJit = DELTAJit_LookupDeltaJit(__FUNCTION__, pFields);
+
+	if (fieldNumber > 31)
+		deltaJit->marked_fields_mask[1] &= ~(1 << (fieldNumber & 0x1F));
+	else
+		deltaJit->marked_fields_mask[0] &= ~(1 << fieldNumber);
+}
+
+qboolean DELTAJit_IsFieldMarked(delta_t* pFields, int fieldNumber) {
+	CDeltaJit* deltaJit = DELTAJit_LookupDeltaJit(__FUNCTION__, pFields);
+
+	if (fieldNumber > 31)
+		return deltaJit->marked_fields_mask[1] & (1 << (fieldNumber & 0x1F));
+
+	return deltaJit->marked_fields_mask[0] & (1 << fieldNumber);
 }
 
 void CDeltaJitRegistry::Cleanup() {

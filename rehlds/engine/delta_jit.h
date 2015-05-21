@@ -57,5 +57,8 @@ public:
 
 extern CDeltaJitRegistry g_DeltaJitRegistry;
 
-extern void DELTAJit_ClearAndMarkSendFields(unsigned char *from, unsigned char *to, delta_t *pFields, int* bits, int* bytecount, int force);
 extern int DELTAJit_Feilds_Clear_Mark_Check(unsigned char *from, unsigned char *to, delta_t *pFields);
+extern void DELTAJit_SetSendFlagBits(delta_t *pFields, int *bits, int *bytecount);
+extern void DELTAJit_SetFieldByIndex(struct delta_s *pFields, int fieldNumber);
+extern void DELTAJit_UnsetFieldByIndex(struct delta_s *pFields, int fieldNumber);
+extern qboolean DELTAJit_IsFieldMarked(delta_t* pFields, int fieldNumber);

@@ -81,8 +81,6 @@ typedef struct delta_s
 
 #ifdef REHLDS_FIXES
 	CDeltaJit* jit;
-	int markbits[2];
-	int sse_highbits[2];
 #endif
 } delta_t;
 
@@ -140,11 +138,7 @@ qboolean DELTA_IsFieldMarked(delta_t* pFields, int fieldNumber);
 void DELTA_WriteMarkedFields(unsigned char *from, unsigned char *to, delta_t *pFields);
 qboolean DELTA_CheckDelta(unsigned char *from, unsigned char *to, delta_t *pFields);
 qboolean DELTA_WriteDelta(unsigned char *from, unsigned char *to, qboolean force, delta_t *pFields, void(*callback)( void ));
-#if defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)
-qboolean _DELTA_WriteDelta(unsigned char *from, unsigned char *to, delta_t *pFields, int* bits, int bytecount);
-#else // REHLDS_OPT_PEDANTIC || REHLDS_FIXES
 qboolean _DELTA_WriteDelta(unsigned char *from, unsigned char *to, qboolean force, delta_t *pFields, void(*callback)(void), int sendfields);
-#endif // REHLDS_OPT_PEDANTIC || REHLDS_FIXES
 int DELTA_ParseDelta(unsigned char *from, unsigned char *to, delta_t *pFields);
 void DELTA_AddEncoder(char *name, void(*conditionalencode)(struct delta_s *, const unsigned char *, const unsigned char *));
 void DELTA_ClearEncoders(void);
