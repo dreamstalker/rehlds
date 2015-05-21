@@ -457,7 +457,7 @@ typedef struct bf_write_s
 {
 
 	//For enhanced and safe bits writing functions
-#if defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)
+#if defined(REHLDS_FIXES)
 
 #pragma pack(push, 1)
 	union {
@@ -471,13 +471,13 @@ typedef struct bf_write_s
 	int nCurOutputBit;
 	sizebuf_t *pbuf;
 
-#else //defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)
+#else //defined(REHLDS_FIXES)
 
 	int nCurOutputBit;
 	unsigned char *pOutByte;
 	sizebuf_t *pbuf;
 
-#endif //defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)
+#endif //defined(REHLDS_FIXES)
 } bf_write_t;
 
 typedef struct bf_read_s
@@ -502,7 +502,7 @@ void COM_BitOpsInit(void)
 }
 
 //Enhanced and safe bits writing functions
-#if defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)
+#if defined(REHLDS_FIXES)
 
 void MSG_WBits_MaybeFlush() {
 	if (bfwrite.nCurOutputBit < 32)
@@ -561,7 +561,7 @@ void MSG_EndBitWriting(sizebuf_t *buf)
 
 }
 
-#else //defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)
+#else // defined(REHLDS_FIXES)
 
 void MSG_WriteOneBit(int nValue)
 {
@@ -592,13 +592,6 @@ void MSG_StartBitWriting(sizebuf_t *buf)
 	bfwrite.nCurOutputBit = 0;
 	bfwrite.pbuf = buf;
 	bfwrite.pOutByte = &buf->data[buf->cursize];
-}
-
-NOXREF qboolean MSG_IsBitWriting(void)
-{
-	NOXREFCHECK;
-
-	return bfwrite.pbuf != 0;
 }
 
 void MSG_EndBitWriting(sizebuf_t *buf)
@@ -660,7 +653,14 @@ void MSG_WriteBits(uint32 data, int numbits)
 	}
 }
 
-#endif //defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)
+#endif //defined(REHLDS_FIXES)
+
+NOXREF qboolean MSG_IsBitWriting(void)
+{
+	NOXREFCHECK;
+
+	return bfwrite.pbuf != 0;
+}
 
 void MSG_WriteSBits(int data, int numbits)
 {
@@ -1290,6 +1290,7 @@ void *SZ_GetSpace(sizebuf_t *buf, int length)
 {
 	void *data;
 	const char *buffername = buf->buffername ? buf->buffername : "???";
+
 
 	if (length < 0)
 	{

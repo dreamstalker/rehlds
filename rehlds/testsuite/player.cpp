@@ -24,6 +24,9 @@ CPlayingEngExtInterceptor::CPlayingEngExtInterceptor(const char* fname, bool str
 	m_GameServerWrapper = NULL;
 	m_SteamBreakpadContext = NULL;
 
+	m_HeartBeatInterval = 10000000;
+	m_PrevHeartBeat = 0;
+
 	uint32 cmdlineLen = 0;
 	char cmdLine[2048];
 
@@ -134,6 +137,8 @@ IEngExtCall* CPlayingEngExtInterceptor::getNextCallInternal(bool peek) {
 
 IEngExtCall* CPlayingEngExtInterceptor::getNextCall(bool peek, bool processCallbacks, ExtCallFuncs expectedOpcode, bool needStart, const char* callSource) {
 	int size = (int)m_InStream.tellg();
+	int sizeLeft = m_inStreamSize - size;
+	maybeHeartBeat(size);
 	IEngExtCall* cmd = getNextCallInternal(peek);
 	if (peek) {
 		return cmd;
@@ -158,7 +163,7 @@ IEngExtCall* CPlayingEngExtInterceptor::getNextCall(bool peek, bool processCallb
 	}
 
 	if (cmd->getOpcode() != expectedOpcode) {
-		rehlds_syserror("%s: bad opcode; expected %d got %d; size left: %d", __FUNCTION__, expectedOpcode, cmd->getOpcode(), m_inStreamSize - size);
+		rehlds_syserror("%s: bad opcode; expected %d got %d; size left: %d", __FUNCTION__, expectedOpcode, cmd->getOpcode(), sizeLeft);
 	}
 	if (needStart) {
 		if (!cmd->m_Start) rehlds_syserror("%s: bad fcall %d; expected start flag", __FUNCTION__, cmd->getOpcode());
@@ -233,6 +238,13 @@ int CPlayingEngExtInterceptor::getOrRegisterSteamCallback(CCallbackBase* cb) {
 	m_SteamCallbacks[id] = cb;
 
 	return id;
+}
+
+void CPlayingEngExtInterceptor::maybeHeartBeat(int readPos) {
+	if (m_PrevHeartBeat + m_HeartBeatInterval <= readPos) {
+		m_PrevHeartBeat = readPos;
+		Con_Printf("%s: readPos=%u\n", __FUNCTION__, readPos);
+	}
 }
 
 uint32 CPlayingEngExtInterceptor::time(uint32* pTime)

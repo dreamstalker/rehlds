@@ -570,6 +570,11 @@ void Rehlds_Debug_LogDeltaFlags(delta_t* delta, int counter, bool verbose) {
 	g_RehldsDebugLog.flush();
 }
 
+void Rehlds_Debug_LogSzAlloc(int counter, int cursize, int maxsize, int flags) {
+	g_RehldsDebugLog << "SZAlloc(c=" << counter << " sz=" << cursize << " maxsz= " << maxsize << " f=" << flags << ")\n";
+	g_RehldsDebugLog.flush();
+}
+
 
 void Rehlds_Debug_Init(Module* engine)
 {

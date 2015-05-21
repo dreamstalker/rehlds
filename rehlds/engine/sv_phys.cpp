@@ -1097,8 +1097,11 @@ void SV_Physics_Toss(edict_t *ent)
 	}
 	ClipVelocity(ent->v.velocity, trace.plane.normal, ent->v.velocity, backoff);
 
-	if (trace.plane.normal[2] <= 0.7f)
+	if (trace.plane.normal[2] <= 0.7)
+	{
+		SV_CheckWaterTransition(ent);
 		return;
+	}
 
 	move[0] = ent->v.basevelocity[0] + ent->v.velocity[0];
 	move[1] = ent->v.basevelocity[1] + ent->v.velocity[1];
@@ -1131,6 +1134,7 @@ void SV_Physics_Toss(edict_t *ent)
 	ent->v.avelocity[0] = vec3_origin[0];
 	ent->v.avelocity[1] = vec3_origin[1];
 	ent->v.avelocity[2] = vec3_origin[2];
+	SV_CheckWaterTransition(ent);
 } /* size: 3408000 */
 
 /* <b655d> ../engine/sv_phys.c:1668 */

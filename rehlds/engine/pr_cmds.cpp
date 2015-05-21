@@ -488,8 +488,8 @@ msurface_t *SurfaceAtPoint(model_t *pModel, mnode_t *node, vec_t *start, vec_t *
 	{
 		surf = &pModel->surfaces[node->firstsurface + i];
 		tex = surf->texinfo;
-		ds = (int)_DotProduct(mid, tex->vecs[0]);
-		dt = (int)_DotProduct(mid, tex->vecs[1]);
+		ds = (int)(_DotProduct(mid, tex->vecs[0]) + tex->vecs[0][3]);
+		dt = (int)(_DotProduct(mid, tex->vecs[1]) + tex->vecs[1][3]);
 		if (ds >= surf->texturemins[0])
 		{
 			if (dt >= surf->texturemins[1])

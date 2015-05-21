@@ -132,6 +132,8 @@ private:
 	CSteamGameServerPlayingWrapper* m_GameServerWrapper;
 
 	void* m_SteamBreakpadContext;
+	int m_HeartBeatInterval;
+	int m_PrevHeartBeat;
 
 	hostent_data_t m_CurrentHostentData;
 	struct hostent m_CurrentHostent;
@@ -149,6 +151,8 @@ private:
 	void playSteamCallback2(CSteamCallbackCall2* cb);
 
 	int getOrRegisterSteamCallback(CCallbackBase* cb);
+
+	void maybeHeartBeat(int readPos);
 
 public:
 	void* allocFuncCall();
