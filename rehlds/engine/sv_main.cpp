@@ -1387,11 +1387,17 @@ void SV_WriteClientdataToMessage(client_t *client, sizebuf_t *msg)
 			else
 				fdata = &host_client->frames[bits].weapondata[i];
 
-			if (DELTA_CheckDelta((byte *)fdata, (byte *)tdata, (delta_t *)g_pweapondelta))
+			if (DELTA_CheckDelta((byte *)fdata, (byte *)tdata, g_pweapondelta))
 			{
 				MSG_WriteBits(1, 1);
 				MSG_WriteBits(i, 6);
-				DELTA_WriteDelta((byte *)fdata, (byte *)tdata, TRUE, (delta_t *)g_pweapondelta, NULL);
+
+#if defined (REHLDS_OPT_PEDANTIC) || defined (REHLDS_FIXES)
+				// all calculations are already done
+				_DELTA_WriteDelta((byte *)fdata, (byte *)tdata, TRUE, g_pweapondelta, NULL, TRUE);
+#else
+				DELTA_WriteDelta((byte *)fdata, (byte *)tdata, TRUE, g_pweapondelta, NULL);
+#endif
 			}
 		}
 	}

@@ -23,6 +23,7 @@ struct deltajit_memblock_field {
 struct deltajit_memblock {
 	unsigned int numFields;
 	deltajit_memblock_field fields[24];
+	bool isEmpty() const;
 };
 
 struct deltajitdata_t {
@@ -57,7 +58,7 @@ public:
 
 extern CDeltaJitRegistry g_DeltaJitRegistry;
 
-extern int DELTAJit_Feilds_Clear_Mark_Check(unsigned char *from, unsigned char *to, delta_t *pFields);
+extern int DELTAJit_Fields_Clear_Mark_Check(unsigned char *from, unsigned char *to, delta_t *pFields);
 extern void DELTAJit_SetSendFlagBits(delta_t *pFields, int *bits, int *bytecount);
 extern void DELTAJit_SetFieldByIndex(struct delta_s *pFields, int fieldNumber);
 extern void DELTAJit_UnsetFieldByIndex(struct delta_s *pFields, int fieldNumber);
