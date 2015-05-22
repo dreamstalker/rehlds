@@ -29,6 +29,8 @@
 
 #include "maintypes.h"
 
+#define DELTA_MAX_FIELDS	56			// 7*8
+
 #define DT_BYTE				BIT(0)		// A byte
 #define DT_SHORT			BIT(1)		// 2 byte field
 #define DT_FLOAT			BIT(2)		// A floating point field
@@ -134,10 +136,11 @@ int DELTA_TestDelta(unsigned char *from, unsigned char *to, delta_t *pFields);
 int DELTA_CountSendFields(delta_t *pFields);
 void DELTA_MarkSendFields(unsigned char *from, unsigned char *to, delta_t *pFields);
 void DELTA_SetSendFlagBits(delta_t *pFields, int *bits, int *bytecount);
+qboolean DELTA_IsFieldMarked(delta_t* pFields, int fieldNumber);
 void DELTA_WriteMarkedFields(unsigned char *from, unsigned char *to, delta_t *pFields);
-int DELTA_CheckDelta(unsigned char *from, unsigned char *to, delta_t *pFields);
-int DELTA_WriteDelta(unsigned char *from, unsigned char *to, qboolean force, delta_t *pFields, void(*callback)(void));
-int _DELTA_WriteDelta(unsigned char *from, unsigned char *to, qboolean force, delta_t *pFields, void(*callback)(void), int sendfields);
+qboolean DELTA_CheckDelta(unsigned char *from, unsigned char *to, delta_t *pFields);
+qboolean DELTA_WriteDelta(unsigned char *from, unsigned char *to, qboolean force, delta_t *pFields, void(*callback)(void));
+qboolean _DELTA_WriteDelta(unsigned char *from, unsigned char *to, qboolean force, delta_t *pFields, void(*callback)(void), qboolean sendfields);
 int DELTA_ParseDelta(unsigned char *from, unsigned char *to, delta_t *pFields);
 void DELTA_AddEncoder(char *name, void(*conditionalencode)(struct delta_s *, const unsigned char *, const unsigned char *));
 void DELTA_ClearEncoders(void);

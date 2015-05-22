@@ -349,41 +349,63 @@ int DELTA_FindFieldIndex(struct delta_s *pFields, const char *fieldname)
 	}
 
 	Con_Printf(__FUNCTION__ ":  Warning, couldn't find %s\n", fieldname);
-	return NULL;
+	return -1;
 }
 
 /* <24032> ../engine/delta.c:393 */
 void DELTA_SetField(struct delta_s *pFields, const char *fieldname)
 {
+#if defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)
+	int index = DELTA_FindFieldIndex(pFields, fieldname);
+
+	if (index != -1)
+		DELTA_SetFieldByIndex(pFields, index);
+#else
 	delta_description_t *pTest = DELTA_FindField(pFields, fieldname);
-	
+
 	if (pTest)
 	{
 		pTest->flags |= FDT_MARK;
 	}
+#endif
 }
 
 /* <240b2> ../engine/delta.c:411 */
 void DELTA_UnsetField(struct delta_s *pFields, const char *fieldname)
 {
+#if defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)
+	int index = DELTA_FindFieldIndex(pFields, fieldname);
+
+	if (index != -1)
+		DELTA_UnsetFieldByIndex(pFields, index);
+#else
 	delta_description_t *pTest = DELTA_FindField(pFields, fieldname);
-	
+
 	if (pTest)
 	{
 		pTest->flags &= ~FDT_MARK;
 	}
+#endif
 }
 
 /* <24132> ../engine/delta.c:429 */
 void DELTA_SetFieldByIndex(struct delta_s *pFields, int fieldNumber)
 {
+#if defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)
+	DELTAJit_SetFieldByIndex(pFields, fieldNumber);
+#else
 	pFields->pdd[fieldNumber].flags |= FDT_MARK;
+#endif
 }
 
 /* <2416a> ../engine/delta.c:441 */
 void DELTA_UnsetFieldByIndex(struct delta_s *pFields, int fieldNumber)
 {
+#if defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)
+	DELTAJit_UnsetFieldByIndex(pFields, fieldNumber);
+#else
 	pFields->pdd[fieldNumber].flags &= ~FDT_MARK;
+#endif
 }
 
 /* <23cc4> ../engine/delta.c:453 */
@@ -428,17 +450,28 @@ int DELTA_TestDelta(unsigned char *from, unsigned char *to, delta_t *pFields)
 		case DT_ANGLE:
 			different = *(uint32 *)&from[pTest->fieldOffset] != *(uint32 *)&to[pTest->fieldOffset];
 			break;
+#ifdef REHLDS_FIXES
+		// don't use multiplier when checking, to increase performance
+		case DT_TIMEWINDOW_8:
+		case DT_TIMEWINDOW_BIG:
+			different = (int32)(*(float *)&from[pTest->fieldOffset]) != (int32)(*(float *)&to[pTest->fieldOffset]);
+			break;
+#else
 		case DT_TIMEWINDOW_8:
 			different = (int32)(*(float *)&from[pTest->fieldOffset] * 100.0) != (int32)(*(float *)&to[pTest->fieldOffset] * 100.0);
 			break;
 		case DT_TIMEWINDOW_BIG:
 			different = (int32)(*(float *)&from[pTest->fieldOffset] * 1000.0) != (int32)(*(float *)&to[pTest->fieldOffset] * 1000.0);
 			break;
+#endif
 		case DT_STRING:
 			st1 = (char*)&from[pTest->fieldOffset];
 			st2 = (char*)&to[pTest->fieldOffset];
 			if (!(!*st1 && !*st2 || *st1 && *st2 && !Q_stricmp(st1, st2)))	// Not sure why it is case insensitive, but it looks so
 			{
+#ifdef REHLDS_FIXES
+				different = TRUE;
+#endif // REHLDS_FIXES
 				length = Q_strlen(st2);
 			}
 			break;
@@ -546,24 +579,38 @@ void DELTA_SetSendFlagBits(delta_t *pFields, int *bits, int *bytecount)
 	delta_description_t *pTest;
 	int i;
 	int lastbit = -1;
-	int bitnumber;
 	int fieldCount = pFields->fieldCount;
 
 	Q_memset(bits, 0, 8);
 
-	lastbit = -1;
-	bitnumber = -1;
 	for (i = fieldCount - 1, pTest = &pFields->pdd[i]; i >= 0; i--, pTest--)
 	{
 		if (pTest->flags & FDT_MARK)
 		{
 			if (lastbit == -1)
-				bitnumber = i;
+				lastbit = i;
 			bits[i > 31 ? 1 : 0] |= 1 << (i & 0x1F);
-			lastbit = bitnumber;
 		}
 	}
+
+#ifdef REHLDS_FIXES
+	// fix for bad bytecount when no fields are marked
+	if (lastbit == -1) {
+		*bytecount = 0;
+		return;
+	}
+#endif
+
 	*bytecount = (lastbit >> 3) + 1;
+}
+
+qboolean DELTA_IsFieldMarked(delta_t* pFields, int fieldNumber)
+{
+#if defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)
+	return DELTAJit_IsFieldMarked(pFields, fieldNumber);
+#else 
+	return pFields->pdd[fieldNumber].flags & FDT_MARK;
+#endif
 }
 
 /* <2456d> ../engine/delta.c:782 */
@@ -579,8 +626,13 @@ void DELTA_WriteMarkedFields(unsigned char *from, unsigned char *to, delta_t *pF
 
 	for (i = 0, pTest = pFields->pdd; i < fieldCount; i++, pTest++)
 	{
+#if defined (REHLDS_OPT_PEDANTIC) || defined (REHLDS_FIXES)
+		if (!DELTA_IsFieldMarked(pFields, i))
+			continue;
+#else
 		if (!(pTest->flags & FDT_MARK))
 			continue;
+#endif
 
 		fieldSign = pTest->fieldType & DT_SIGNED;
 		fieldType = pTest->fieldType & ~DT_SIGNED;
@@ -678,49 +730,52 @@ void DELTA_WriteMarkedFields(unsigned char *from, unsigned char *to, delta_t *pF
 }
 
 /* <2467e> ../engine/delta.c:924 */
-int DELTA_CheckDelta(unsigned char *from, unsigned char *to, delta_t *pFields)
+qboolean DELTA_CheckDelta(unsigned char *from, unsigned char *to, delta_t *pFields)
 {
-	int sendfields;
+	qboolean sendfields;
 
 #if defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)
-	sendfields = DELTAJit_Feilds_Clear_Mark_Check(from, to, pFields);
+	sendfields = DELTAJit_Fields_Clear_Mark_Check(from, to, pFields);
 #else
 	DELTA_ClearFlags(pFields);
 	DELTA_MarkSendFields(from, to, pFields);
-#endif
 	sendfields = DELTA_CountSendFields(pFields);
+#endif
 	
 	return sendfields;
 }
 
 /* <247f5> ../engine/delta.c:949 */
-NOINLINE int DELTA_WriteDelta(unsigned char *from, unsigned char *to, qboolean force, delta_t *pFields, void(*callback)(void))
+NOINLINE qboolean DELTA_WriteDelta(unsigned char *from, unsigned char *to, qboolean force, delta_t *pFields, void(*callback)(void))
 {
-	int sendfields;
+	qboolean sendfields;
+	int bytecount;
 
 #if defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)
-	sendfields = DELTAJit_Feilds_Clear_Mark_Check(from, to, pFields);
-#else
+	sendfields = DELTAJit_Fields_Clear_Mark_Check(from, to, pFields);
+#else // REHLDS_OPT_PEDANTIC || REHLDS_FIXES
 	DELTA_ClearFlags(pFields);
 	DELTA_MarkSendFields(from, to, pFields);
 	sendfields = DELTA_CountSendFields(pFields);
-#endif
+#endif // REHLDS_OPT_PEDANTIC || REHLDS_FIXES
 
-	//sendfields = DELTA_CountSendFields(pFields);
 	_DELTA_WriteDelta(from, to, force, pFields, callback, sendfields);
 	return sendfields;
 }
 
-/* <24760> ../engine/delta.c:963 */
-int _DELTA_WriteDelta(unsigned char *from, unsigned char *to, qboolean force, delta_t *pFields, void(*callback)(void), int sendfields)
+qboolean _DELTA_WriteDelta(unsigned char *from, unsigned char *to, qboolean force, delta_t *pFields, void(*callback)( void ), qboolean sendfields)
 {
 	int i;
 	int bytecount;
-	int bits[2];	// this is a limit with 64 fields max in delta
+	int bits[2];
 
 	if (sendfields || force)
 	{
+#if defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)
+		DELTAJit_SetSendFlagBits(pFields, bits, &bytecount);
+#else
 		DELTA_SetSendFlagBits(pFields, bits, &bytecount);
+#endif
 
 		if (callback)
 			callback();
@@ -728,7 +783,7 @@ int _DELTA_WriteDelta(unsigned char *from, unsigned char *to, qboolean force, de
 		MSG_WriteBits(bytecount, 3);
 		for (i = 0; i < bytecount; i++)
 		{
-			MSG_WriteBits(((byte*)bits)[i], 8);
+			MSG_WriteBits(( (byte*)bits )[i], 8);
 		}
 
 		DELTA_WriteMarkedFields(from, to, pFields);
@@ -736,6 +791,7 @@ int _DELTA_WriteDelta(unsigned char *from, unsigned char *to, qboolean force, de
 
 	return 1;
 }
+
 
 /* <24aa0> ../engine/delta.c:1010 */
 int DELTA_ParseDelta(unsigned char *from, unsigned char *to, delta_t *pFields)
@@ -1038,6 +1094,12 @@ delta_t *DELTA_BuildFromLinks(delta_link_t **pplinks)
 	DELTA_ReverseLinks(pplinks);
 
 	count = DELTA_CountLinks(*pplinks);
+
+#ifdef REHLDS_FIXES
+	if (count > DELTA_MAX_FIELDS)
+		Sys_Error(__FUNCTION__ ": Too many fields in delta description %i (MAX %i)\n", count, DELTA_MAX_FIELDS);
+#endif
+
 	pdesc = (delta_description_t *)Mem_ZeroMalloc(sizeof(delta_description_t) * count);
 
 	for (p = *pplinks, pcur = pdesc; p != NULL; p = p->next, pcur++)
