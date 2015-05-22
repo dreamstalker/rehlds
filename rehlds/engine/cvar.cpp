@@ -526,7 +526,10 @@ void Cmd_CvarListPrintCvar(cvar_t *var, FileHandle_t f)
 {
 	char szOutstr[256];
 
-	// TODO: Do correct output of string valued cvars
+#ifdef REHLDS_FIXES
+	// Do correct output of string valued cvars
+	Q_snprintf(szOutstr, ARRAYSIZE(szOutstr) - 1, "%-28s : %16s", var->name, var->string);
+#else // REHLDS_FIXES
 	if (var->value == (float)(int)var->value)
 	{
 		Q_snprintf(szOutstr, ARRAYSIZE(szOutstr) - 1, "%-15s : %8i", var->name, (int)var->value);
@@ -535,6 +538,7 @@ void Cmd_CvarListPrintCvar(cvar_t *var, FileHandle_t f)
 	{
 		Q_snprintf(szOutstr, ARRAYSIZE(szOutstr) - 1, "%-15s : %8.3f", var->name, var->value);
 	}
+#endif // REHLDS_FIXES
 	szOutstr[ARRAYSIZE(szOutstr) - 1] = 0;
 
 	if (var->flags & FCVAR_ARCHIVE)
