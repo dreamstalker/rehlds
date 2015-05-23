@@ -4156,6 +4156,8 @@ int SV_CreatePacketEntities(sv_delta_t type, client_t *client, packet_entities_t
 	{
 		client_frame_t *fromframe = &client->frames[SV_UPDATE_MASK & client->delta_sequence];
 		from = &fromframe->entities;
+		_mm_prefetch((const char*)&from->entities[0], _MM_HINT_T0);
+		_mm_prefetch(((const char*)&from->entities[0]) + 64, _MM_HINT_T0);
 		oldmax = from->num_entities;
 		MSG_WriteByte(msg, svc_deltapacketentities);
 		MSG_WriteShort(msg, to->num_entities);
@@ -4169,8 +4171,8 @@ int SV_CreatePacketEntities(sv_delta_t type, client_t *client, packet_entities_t
 		MSG_WriteShort(msg, to->num_entities);
 	}
 
-	newnum = 0;
-	oldnum = 0;
+	newnum = 0; //index in to->entities
+	oldnum = 0; //index in from->entities
 	MSG_StartBitWriting(msg);
 	while (1)
 	{
@@ -4201,6 +4203,8 @@ int SV_CreatePacketEntities(sv_delta_t type, client_t *client, packet_entities_t
 			SV_SetCallback(newindex, FALSE, custom, &numbase, FALSE, 0);
 			DELTA_WriteDelta((uint8 *)&from->entities[oldnum], (uint8 *)baseline_, FALSE, custom ? g_pcustomentitydelta : (SV_IsPlayerIndex(newindex) ? g_pplayerdelta : g_pentitydelta), &SV_InvokeCallback);
 			++oldnum;
+			_mm_prefetch((const char*)&from->entities[oldnum], _MM_HINT_T0);
+			_mm_prefetch(((const char*)&from->entities[oldnum]) + 64, _MM_HINT_T0);
 			++newnum;
 			continue;
 		}
@@ -4211,6 +4215,8 @@ int SV_CreatePacketEntities(sv_delta_t type, client_t *client, packet_entities_t
 			{
 				SV_WriteDeltaHeader(oldindex, TRUE, FALSE, &numbase, FALSE, 0, FALSE, 0);
 				++oldnum;
+				_mm_prefetch((const char*)&from->entities[oldnum], _MM_HINT_T0);
+				_mm_prefetch(((const char*)&from->entities[oldnum]) + 64, _MM_HINT_T0);
 			}
 			continue;
 		}
@@ -4243,6 +4249,8 @@ int SV_CreatePacketEntities(sv_delta_t type, client_t *client, packet_entities_t
 			if (!from)
 			{
 				int offset = SV_FindBestBaseline(newnum, &baseline_, to->entities, newindex, custom);
+				_mm_prefetch((const char*)baseline_, _MM_HINT_T0);
+				_mm_prefetch(((const char*)baseline_) + 64, _MM_HINT_T0);
 				if (offset)
 					SV_SetCallback(newindex, 0, custom, &numbase, 1, offset);
 			}

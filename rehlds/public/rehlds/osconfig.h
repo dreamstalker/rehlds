@@ -45,6 +45,7 @@
 
 #include <algorithm>
 #include <deque>
+#include <functional>
 
 #ifdef _WIN32 // WINDOWS
 	#include <windows.h>

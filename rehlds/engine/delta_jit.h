@@ -23,7 +23,12 @@ struct deltajit_memblock_field {
 struct deltajit_memblock {
 	unsigned int numFields;
 	deltajit_memblock_field fields[24];
-	bool isEmpty() const;
+};
+
+struct deltajit_memblock_itr_t {
+	int memblockId;
+	deltajit_memblock* memblock;
+	int prefetchBlockId;
 };
 
 struct deltajitdata_t {
@@ -32,6 +37,9 @@ struct deltajitdata_t {
 
 	unsigned int numFields;
 	deltajit_field fields[DELTAJIT_MAX_FIELDS];
+
+	unsigned int numItrBlocks;
+	deltajit_memblock_itr_t itrBlocks[DELTAJIT_MAX_BLOCKS];
 };
 
 enum deltajit_marked_count_type_t {
@@ -55,6 +63,13 @@ public:
 	void CreateAndRegisterDeltaJIT(delta_t* delta);
 	void Cleanup();
 };
+
+union delta_marked_mask_t {
+	uint8 u8[8];
+	uint32 u32[2];
+	uint64 u64;
+};
+
 
 extern CDeltaJitRegistry g_DeltaJitRegistry;
 
