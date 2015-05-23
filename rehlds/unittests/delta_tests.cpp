@@ -26,6 +26,7 @@ struct delta_test_struct_t {
 	uint8 b_61; //20
 };
 #pragma pack(pop)
+typedef delta_test_struct_t dts_t;
 
 struct delta_res_t
 {
@@ -73,57 +74,88 @@ NOINLINE qboolean _DoMarkFields(void* src, void* dst, delta_t* delta, bool useJi
 	return sendfields;
 }
 
-NOINLINE bool _CheckFieldMarked(delta_t* delta, int fieldIdx, int usejit) {
-	if (usejit) {
-		return DELTAJit_IsFieldMarked(delta, fieldIdx) != 0;
-	} else {
-		return delta->pdd[fieldIdx].flags & FDT_MARK;
-	}
-}
 
-NOINLINE void _EnsureFieldsChanged(const char* callsite, const char* action, int usejit, bool changed, delta_t* delta, ...) {
-	va_list vargs;
-	va_start(vargs, delta);
-	const char* fieldName = va_arg(vargs, const char*);
-	while (fieldName) {
-		delta_description_t* field = NULL;
-		int idx = 0;
-		for (; idx < delta->fieldCount; idx++) {
-			if (!strcmp(fieldName, delta->pdd[idx].fieldName)) {
-				field = &delta->pdd[idx];
-				break;
+NOINLINE void _MarkAndEnsureCorrectResults(const char* action, delta_t* delta, void* src, void* dst, int useJit, bool changed, const char* szFields) {
+	delta_description_t* fields[DELTA_MAX_FIELDS];
+	int numFields = 0;
+
+	char localFieldsStr[512];
+	strcpy(localFieldsStr, szFields);
+
+	//parse fields
+	int prevEnd = -1;
+	for (char* pcc = localFieldsStr; *pcc; pcc++) {
+		if (*pcc == ' ') {
+			*pcc = 0;
+			int fIdx = DELTA_FindFieldIndex(delta, &localFieldsStr[prevEnd + 1]);
+			if (fIdx == -1) {
+				rehlds_syserror("%s: Coult not find field '%s'", &localFieldsStr[prevEnd + 1]);
 			}
+			fields[numFields++] = &delta->pdd[fIdx];
+			prevEnd = pcc - localFieldsStr;
 		}
-
-		if (field == NULL) {
-			rehlds_syserror("%s: %s: Could not find delta field '%s'", callsite, action, fieldName);
-		}
-
-		if (field->flags & 0x80) {
-			rehlds_syserror("%s: %s: Field '%s' is marked as processed", callsite, action, fieldName);
-		}
-
-
-		if (_CheckFieldMarked(delta, idx, usejit) ^ changed) {
-			rehlds_syserror("%s: %s: Field '%s' is expected to be marked", callsite, action, fieldName);
-		}
-
-		field->flags |= 0x80;
-
-		fieldName = va_arg(vargs, const char*);
 	}
 
-	for (int i = 0; i < delta->fieldCount; i++) {
-		delta_description_t* field = &delta->pdd[i];
-		if (field->flags & 0x80)
-			continue;
-
-		if (_CheckFieldMarked(delta, i, usejit) ^ !changed) {
-			rehlds_syserror("%s: %s: Field '%s' is expected to be unmarked", callsite, action, field->fieldName);
+	if (localFieldsStr[0] != 0) {
+		int fIdx = DELTA_FindFieldIndex(delta, &localFieldsStr[prevEnd + 1]);
+		if (fIdx == -1) {
+			rehlds_syserror("%s: Coult not find field '%s'", &localFieldsStr[prevEnd + 1]);
 		}
-
+		fields[numFields++] = &delta->pdd[fIdx];
 	}
+
+	//build expected mask
+	delta_marked_mask_t expectedMask; expectedMask.u64 = 0;
+	for (int i = 0; i < numFields; i++) {
+		delta_description_t* f = fields[i];
+		int fieldId = f - delta->pdd;
+		expectedMask.u8[fieldId >> 3] |= (1 << (fieldId & 0x7));
+	}
+
+	if (!changed) {
+		//invert mask
+		uint64 existingFieldsMask = 0xFFFFFFFFFFFFFFFF;
+		existingFieldsMask = existingFieldsMask >> (64 - delta->fieldCount);
+
+		expectedMask.u64 = ~expectedMask.u64;
+		expectedMask.u64 &= existingFieldsMask;
+	}
+
+	//calculate expected bytecount
+	int expectedBytecount = 0;
+	for (int i = 0; i < ARRAYSIZE(expectedMask.u8); i++) {
+		if (expectedMask.u8[i]) {
+			expectedBytecount = i + 1;
+		}
+	}
+
+	//do marking
+	qboolean markResult = _DoMarkFields(src, dst, delta, useJit != 0);
+
+	//check marking result
+	if ((markResult != 0) != (expectedMask.u64 != 0)) {
+		rehlds_syserror("%s: DoMarkFields returned invalid value %d, expected %s", action, markResult, (expectedMask.u64 == 0) ? "0" : "!0");
+	}
+
+	delta_marked_mask_t returnedMask;
+	int returnedBytecount;
+	if (useJit) {
+		DELTAJit_SetSendFlagBits(delta, (int*)returnedMask.u32, &returnedBytecount);
+	} else {
+		DELTA_SetSendFlagBits(delta, (int*)returnedMask.u32, &returnedBytecount);
+	}
+
+	//check per-field marks
+	if (returnedMask.u64 != expectedMask.u64) {
+		rehlds_syserror("%s: DoMarkFields returned invalid mask %llX, expected %llX", action, returnedMask.u64, expectedMask.u64);
+	}
+
+	//check bytecount
+	if (returnedBytecount != expectedBytecount) {
+		rehlds_syserror("%s: DoMarkFields returned invalid bytecount %d, expected %d", action, returnedBytecount, expectedBytecount);
+	}	
 }
+
 
 NOINLINE void _GetBitmaskAndBytecount(delta_t* delta, int* bits, int* bytecount, int usejit) {
 	if (usejit) {
@@ -149,7 +181,7 @@ NOINLINE void _CompareDeltaResults(const char* callsite, delta_res_t* def, delta
 
 NOINLINE delta_t* _CreateTestDeltaDesc() {
 	static delta_description_t _fields[32];
-	delta_test_struct_t d; d; // "use" d variable
+	delta_test_struct_t d; // "use" d variable
 
 	_InitDeltaField(&_fields[0], 0x00, DT_BYTE, "b_00", offsetof(delta_test_struct_t, b_00), 1, 8, 1.0f, 1.0f);
 	_InitDeltaField(&_fields[1], 0x01, DT_BYTE, "b_01", offsetof(delta_test_struct_t, b_01), 1, 8, 1.0f, 1.0f);
@@ -194,266 +226,108 @@ NOINLINE delta_t* _CreateTestDeltaDesc() {
 	return delta;
 };
 
-TEST(MarkFieldsTest_Simple_Primitives, Delta, 1000) {
+struct delta_simpletest_data_t {
+	const char* action;
+	int fill1, fill2;
+	bool changed;
+	const char* fields;
+	std::function<void(void)> act;
+};
 
+delta_test_struct_t dst1, dst2;
+
+void _DeltaSimpleTest(delta_simpletest_data_t* t, delta_t* delta, int jit) {
+	_FillTestDelta(&dst1, t->fill1); _FillTestDelta(&dst2, t->fill2);
+	t->act();
+	_MarkAndEnsureCorrectResults(t->action, delta, &dst1, &dst2, jit, t->changed, t->fields);
+}
+
+void _DeltaSimpleTests(delta_t* delta, delta_simpletest_data_t* tests, int testsCount) {
+	for (int usejit = 0; usejit <= 1; usejit++) {
+		for (int i = 0; i < testsCount; i++) {
+			_DeltaSimpleTest(tests + i, delta, usejit);
+		}
+	}
+}
+
+
+TEST(MarkFieldsTest_Simple_Primitives, Delta, 1000) {
 	delta_t* delta = _CreateTestDeltaDesc();
 
-	delta_test_struct_t d1;
-	delta_test_struct_t d2;
-	delta_res_t res[2][10];
+	delta_simpletest_data_t testdata[] = {
+			{ "SimpleUnchangedAll1", 0x71, 0x71, true, "", [](){} },
+			{ "SimpleUnchangedAll2", 0x71, 0x72, false, "", [](){} },
+			{ "Byte_0BlockCheck", 0x71, 0x71, true, "b_01", []() { dst2.b_01 = 0; } },
+			{ "Byte_1BlockCheck", 0x71, 0x71, true, "b_11", []() { dst2.b_11 = 0; } },
+			{ "Short_0BlockCheck", 0x71, 0x71, true, "s_02", []() { dst2.s_02 = 0; } },
+			{ "Short_1BlockCheck", 0x71, 0x71, true, "s_12", []() { dst2.s_12 = 0; } },
+			{ "Int_0BlockCheck", 0x71, 0x71, true, "i_04", []() { dst2.i_04 = 0; } },
+			{ "Int_1BlockCheck", 0x71, 0x71, true, "i_14", []() { dst2.i_14 = 0; } },
+			{ "Float_0BlockCheck", 0x71, 0x71, true, "f_08", []() { dst2.f_08 = 0; } },
+			{ "Float_1BlockCheck", 0x71, 0x71, true, "f_18", []() { dst2.f_18 = 0; } },
+	};
+	_DeltaSimpleTests(delta, testdata, ARRAYSIZE(testdata));
 
-	memset(res[0], 0xCC, sizeof(res) / 2);
-	memset(res[1], 0xDD, sizeof(res) / 2);
-
-	for (int usejit = 0; usejit <= 1; usejit++) {
-
-		_FillTestDelta(&d1, 0x71); _FillTestDelta(&d2, 0x71);
-		res[usejit][0].sendfields = _DoMarkFields(&d1, &d2, delta, usejit != 0);
-		_GetBitmaskAndBytecount(delta, res[usejit][0].bits, &res[usejit][0].bytecount, usejit);
-		_EnsureFieldsChanged(__FUNCTION__, "SimpleUnchangedAll", usejit, true, delta, NULL);
-
-		_FillTestDelta(&d1, 0x71); _FillTestDelta(&d2, 0x72);
-		res[usejit][1].sendfields = _DoMarkFields(&d1, &d2, delta, usejit != 0);
-		_GetBitmaskAndBytecount(delta, res[usejit][1].bits, &res[usejit][1].bytecount, usejit);
-		_EnsureFieldsChanged(__FUNCTION__, "SimpleUnchangedAll", usejit, false, delta, NULL);
-
-		_FillTestDelta(&d1, 0x71); _FillTestDelta(&d2, 0x71);
-		d2.b_01 = 0;
-		res[usejit][2].sendfields = _DoMarkFields(&d1, &d2, delta, usejit != 0);
-		_GetBitmaskAndBytecount(delta, res[usejit][2].bits, &res[usejit][2].bytecount, usejit);
-		_EnsureFieldsChanged(__FUNCTION__, "Byte_0BlockCheck", usejit, true, delta, "b_01", NULL);
-
-		_FillTestDelta(&d1, 0x71); _FillTestDelta(&d2, 0x71);
-		d2.b_11 = 0;
-		res[usejit][3].sendfields = _DoMarkFields(&d1, &d2, delta, usejit != 0);
-		_GetBitmaskAndBytecount(delta, res[usejit][3].bits, &res[usejit][3].bytecount, usejit);
-		_EnsureFieldsChanged(__FUNCTION__, "Byte_1BlockCheck", usejit, true, delta, "b_11", NULL);
-
-		_FillTestDelta(&d1, 0x71); _FillTestDelta(&d2, 0x71);
-		d2.s_02 = 0;
-		res[usejit][4].sendfields = _DoMarkFields(&d1, &d2, delta, usejit != 0);
-		_GetBitmaskAndBytecount(delta, res[usejit][4].bits, &res[usejit][4].bytecount, usejit);
-		_EnsureFieldsChanged(__FUNCTION__, "Short_0BlockCheck", usejit, true, delta, "s_02", NULL);
-
-		_FillTestDelta(&d1, 0x71); _FillTestDelta(&d2, 0x71);
-		d2.s_12 = 0;
-		res[usejit][5].sendfields = _DoMarkFields(&d1, &d2, delta, usejit != 0);
-		_GetBitmaskAndBytecount(delta, res[usejit][5].bits, &res[usejit][5].bytecount, usejit);
-		_EnsureFieldsChanged(__FUNCTION__, "Short_1BlockCheck", usejit, true, delta, "s_12", NULL);
-
-		_FillTestDelta(&d1, 0x71); _FillTestDelta(&d2, 0x71);
-		d2.i_04 = 0;
-		res[usejit][6].sendfields = _DoMarkFields(&d1, &d2, delta, usejit != 0);
-		_GetBitmaskAndBytecount(delta, res[usejit][6].bits, &res[usejit][6].bytecount, usejit);
-		_EnsureFieldsChanged(__FUNCTION__, "Int_0BlockCheck", usejit, true, delta, "i_04", NULL);
-
-		_FillTestDelta(&d1, 0x71); _FillTestDelta(&d2, 0x71);
-		d2.i_14 = 0;
-		res[usejit][7].sendfields = _DoMarkFields(&d1, &d2, delta, usejit != 0);
-		_GetBitmaskAndBytecount(delta, res[usejit][7].bits, &res[usejit][7].bytecount, usejit);
-		_EnsureFieldsChanged(__FUNCTION__, "Int_1BlockCheck", usejit, true, delta, "i_14", NULL);
-
-		_FillTestDelta(&d1, 0x71); _FillTestDelta(&d2, 0x71);
-		d2.f_08 = 0;
-		res[usejit][8].sendfields = _DoMarkFields(&d1, &d2, delta, usejit != 0);
-		_GetBitmaskAndBytecount(delta, res[usejit][8].bits, &res[usejit][8].bytecount, usejit);
-		_EnsureFieldsChanged(__FUNCTION__, "Float_0BlockCheck", usejit, true, delta, "f_08", NULL);
-
-		_FillTestDelta(&d1, 0x71); _FillTestDelta(&d2, 0x71);
-		d2.f_18 = 0;
-		res[usejit][9].sendfields = _DoMarkFields(&d1, &d2, delta, usejit != 0);
-		_GetBitmaskAndBytecount(delta, res[usejit][9].bits, &res[usejit][9].bytecount, usejit);
-		_EnsureFieldsChanged(__FUNCTION__, "Float_0BlockCheck", usejit, true, delta, "f_18", NULL);
-	}
-
-	_CompareDeltaResults(__FUNCTION__, res[0], res[1], 10);
 	SV_Shutdown();
 }
 
 TEST(MarkFieldsTest_InterBlock, Delta, 1000) {
-
 	delta_t* delta = _CreateTestDeltaDesc();
 
-	delta_test_struct_t d1;
-	delta_test_struct_t d2;
-	delta_res_t res[2][14];
+	delta_simpletest_data_t testdata[] = {
+			{ "Interblock1_guards", 0x71, 0x71, true, "b_4D b_52", []() { dst2.b_4D = dst2.b_52 = 0; } },
+			{ "Interblock1_guards_and_val", 0x71, 0x71, true, "b_4D b_52 i_4E", []() { dst2.b_4D = dst2.b_52 = 0; dst2.i_4E = 0; } },
+			{ "Interblock1_val", 0x71, 0x71, true, "i_4E", []() { dst2.i_4E = 0; } },
+			{ "Interblock1_val_0b", 0x71, 0x71, true, "i_4E", []() { dst2.i_4E &= 0xFFFFFF00; } },
+			{ "Interblock1_val_1b", 0x71, 0x71, true, "i_4E", []() { dst2.i_4E &= 0xFFFF00FF; } },
+			{ "Interblock1_val_2b", 0x71, 0x71, true, "i_4E", []() { dst2.i_4E &= 0xFF00FFFF; } },
+			{ "Interblock1_val_3b", 0x71, 0x71, true, "i_4E", []() { dst2.i_4E &= 0x00FFFFFF; } },
 
-	memset(res[0], 0xCC, sizeof(res) / 2);
-	memset(res[1], 0xDD, sizeof(res) / 2);
+			{ "Interblock2_guards", 0x71, 0x71, true, "b_5C b_61", []() { dst2.b_5C = dst2.b_61 = 0; } },
+			{ "Interblock2_guards_and_val", 0x71, 0x71, true, "b_5C b_61 i_5D", []() { dst2.b_5C = dst2.b_61 = 0; dst2.i_5D = 0; } },
+			{ "Interblock2_val", 0x71, 0x71, true, "i_5D", []() { dst2.i_5D = 0; } },
+			{ "Interblock2_val_0b", 0x71, 0x71, true, "i_5D", []() { dst2.i_5D &= 0xFFFFFF00; } },
+			{ "Interblock2_val_1b", 0x71, 0x71, true, "i_5D", []() { dst2.i_5D &= 0xFFFF00FF; } },
+			{ "Interblock2_val_2b", 0x71, 0x71, true, "i_5D", []() { dst2.i_5D &= 0xFF00FFFF; } },
+			{ "Interblock2_val_3b", 0x71, 0x71, true, "i_5D", []() { dst2.i_5D &= 0x00FFFFFF; } },
+	};
+	_DeltaSimpleTests(delta, testdata, ARRAYSIZE(testdata));
 
-	for (int usejit = 0; usejit <= 1; usejit++) {
-		_FillTestDelta(&d1, 0x71); _FillTestDelta(&d2, 0x71);
-		d2.b_4D = d2.b_52 = 0;
-		res[usejit][0].sendfields = _DoMarkFields(&d1, &d2, delta, usejit != 0);
-		_GetBitmaskAndBytecount(delta, res[usejit][0].bits, &res[usejit][0].bytecount, usejit);
-		_EnsureFieldsChanged(__FUNCTION__, "Interblock1_guards", usejit, true, delta, "b_4D", "b_52", NULL);
-
-		_FillTestDelta(&d1, 0x71); _FillTestDelta(&d2, 0x71);
-		d2.b_4D = d2.b_52 = 0;
-		d2.i_4E = 0;
-		res[usejit][1].sendfields = _DoMarkFields(&d1, &d2, delta, usejit != 0);
-		_GetBitmaskAndBytecount(delta, res[usejit][1].bits, &res[usejit][1].bytecount, usejit);
-		_EnsureFieldsChanged(__FUNCTION__, "Interblock1_guards_and_val", usejit, true, delta, "b_4D", "b_52", "i_4E", NULL);
-
-		_FillTestDelta(&d1, 0x71); _FillTestDelta(&d2, 0x71);
-		d2.i_4E = 0;
-		res[usejit][2].sendfields = _DoMarkFields(&d1, &d2, delta, usejit != 0);
-		_GetBitmaskAndBytecount(delta, res[usejit][2].bits, &res[usejit][2].bytecount, usejit);
-		_EnsureFieldsChanged(__FUNCTION__, "Interblock1_val", usejit, true, delta, "i_4E", NULL);
-
-		_FillTestDelta(&d1, 0x71); _FillTestDelta(&d2, 0x71);
-		d2.i_4E &= 0xFFFFFF00;
-		res[usejit][3].sendfields = _DoMarkFields(&d1, &d2, delta, usejit != 0);
-		_GetBitmaskAndBytecount(delta, res[usejit][3].bits, &res[usejit][3].bytecount, usejit);
-		_EnsureFieldsChanged(__FUNCTION__, "Interblock1_val_0b", usejit, true, delta, "i_4E", NULL);
-
-		_FillTestDelta(&d1, 0x71); _FillTestDelta(&d2, 0x71);
-		d2.i_4E &= 0xFFFF00FF;
-		res[usejit][4].sendfields = _DoMarkFields(&d1, &d2, delta, usejit != 0);
-		_GetBitmaskAndBytecount(delta, res[usejit][4].bits, &res[usejit][4].bytecount, usejit);
-		_EnsureFieldsChanged(__FUNCTION__, "Interblock1_val_1b", usejit, true, delta, "i_4E", NULL);
-
-		_FillTestDelta(&d1, 0x71); _FillTestDelta(&d2, 0x71);
-		d2.i_4E &= 0xFF00FFFF;
-		res[usejit][5].sendfields = _DoMarkFields(&d1, &d2, delta, usejit != 0);
-		_GetBitmaskAndBytecount(delta, res[usejit][5].bits, &res[usejit][5].bytecount, usejit);
-		_EnsureFieldsChanged(__FUNCTION__, "Interblock1_val_2b", usejit, true, delta, "i_4E", NULL);
-
-		_FillTestDelta(&d1, 0x71); _FillTestDelta(&d2, 0x71);
-		d2.i_4E &= 0x00FFFFFF;
-		res[usejit][6].sendfields = _DoMarkFields(&d1, &d2, delta, usejit != 0);
-		_GetBitmaskAndBytecount(delta, res[usejit][6].bits, &res[usejit][6].bytecount, usejit);
-		_EnsureFieldsChanged(__FUNCTION__, "Interblock1_val_3b", usejit, true, delta, "i_4E", NULL);
-
-
-		_FillTestDelta(&d1, 0x71); _FillTestDelta(&d2, 0x71);
-		d2.b_5C = d2.b_61 = 0;
-		res[usejit][7].sendfields = _DoMarkFields(&d1, &d2, delta, usejit != 0);
-		_GetBitmaskAndBytecount(delta, res[usejit][7].bits, &res[usejit][7].bytecount, usejit);
-		_EnsureFieldsChanged(__FUNCTION__, "Interblock2_guards", usejit, true, delta, "b_5C", "b_61", NULL);
-
-		_FillTestDelta(&d1, 0x71); _FillTestDelta(&d2, 0x71);
-		d2.b_5C = d2.b_61 = 0;
-		d2.i_5D = 0;
-		res[usejit][8].sendfields = _DoMarkFields(&d1, &d2, delta, usejit != 0);
-		_GetBitmaskAndBytecount(delta, res[usejit][8].bits, &res[usejit][8].bytecount, usejit);
-		_EnsureFieldsChanged(__FUNCTION__, "Interblock2_guards_and_val", usejit, true, delta, "b_5C", "b_61", "i_5D", NULL);
-
-		_FillTestDelta(&d1, 0x71); _FillTestDelta(&d2, 0x71);
-		d2.i_5D = 0;
-		res[usejit][9].sendfields = _DoMarkFields(&d1, &d2, delta, usejit != 0);
-		_GetBitmaskAndBytecount(delta, res[usejit][9].bits, &res[usejit][9].bytecount, usejit);
-		_EnsureFieldsChanged(__FUNCTION__, "Interblock2_val", usejit, true, delta, "i_5D", NULL);
-
-		_FillTestDelta(&d1, 0x71); _FillTestDelta(&d2, 0x71);
-		d2.i_5D &= 0xFFFFFF00;
-		res[usejit][10].sendfields = _DoMarkFields(&d1, &d2, delta, usejit != 0);
-		_GetBitmaskAndBytecount(delta, res[usejit][10].bits, &res[usejit][10].bytecount, usejit);
-		_EnsureFieldsChanged(__FUNCTION__, "Interblock2_val_0b", usejit, true, delta, "i_5D", NULL);
-
-		_FillTestDelta(&d1, 0x71); _FillTestDelta(&d2, 0x71);
-		d2.i_5D &= 0xFFFF00FF;
-		res[usejit][11].sendfields = _DoMarkFields(&d1, &d2, delta, usejit != 0);
-		_GetBitmaskAndBytecount(delta, res[usejit][11].bits, &res[usejit][11].bytecount, usejit);
-		_EnsureFieldsChanged(__FUNCTION__, "Interblock2_val_1b", usejit, true, delta, "i_5D", NULL);
-
-		_FillTestDelta(&d1, 0x71); _FillTestDelta(&d2, 0x71);
-		d2.i_5D &= 0xFF00FFFF;
-		res[usejit][12].sendfields = _DoMarkFields(&d1, &d2, delta, usejit != 0);
-		_GetBitmaskAndBytecount(delta, res[usejit][12].bits, &res[usejit][12].bytecount, usejit);
-		_EnsureFieldsChanged(__FUNCTION__, "Interblock2_val_2b", usejit, true, delta, "i_5D", NULL);
-
-		_FillTestDelta(&d1, 0x71); _FillTestDelta(&d2, 0x71);
-		d2.i_5D &= 0x00FFFFFF;
-		res[usejit][13].sendfields = _DoMarkFields(&d1, &d2, delta, usejit != 0);
-		_GetBitmaskAndBytecount(delta, res[usejit][13].bits, &res[usejit][13].bytecount, usejit);
-		_EnsureFieldsChanged(__FUNCTION__, "Interblock2_val_3b", usejit, true, delta, "i_5D", NULL);
-	}
-
-	_CompareDeltaResults(__FUNCTION__, res[0], res[1], 14);
 	SV_Shutdown();
 }
 
 TEST(MarkFieldsTest_Strings, Delta, 1000) {
-
 	delta_t* delta = _CreateTestDeltaDesc();
 
-	delta_test_struct_t d1;
-	delta_test_struct_t d2;
-	delta_res_t res[2][4];
+	delta_simpletest_data_t testdata[] = {
+			{ "Str_empty", 'c', 'c', true, "s_24", []() { dst2.s_24[0] = 0; } },
+			{ "Str_empty2", 'c', 'c', true, "s_24", []() { dst1.s_24[0] = 0; } },
+			{ "Str_both_empty_with_garbage", 'c', 'c', true, "", []() {
+				dst1.s_24[0] = 0;   dst2.s_24[0] = 0;
+				dst1.s_24[1] = 'd'; dst2.s_24[1] = 'e';
+			}},
+			{ "Str_case_check", 'c', 'c', true, "", []() { dst1.s_24[0] = 'C'; } },
+	};
+	_DeltaSimpleTests(delta, testdata, ARRAYSIZE(testdata));
 
-	memset(res[0], 0xCC, sizeof(res) / 2);
-	memset(res[1], 0xDD, sizeof(res) / 2);
-
-	for (int usejit = 0; usejit <= 1; usejit++) {
-
-		_FillTestDelta(&d1, 'c'); _FillTestDelta(&d2, 'c');
-		d2.s_24[0] = 0;
-		res[usejit][0].sendfields = _DoMarkFields(&d1, &d2, delta, usejit != 0);
-		_GetBitmaskAndBytecount(delta, res[usejit][0].bits, &res[usejit][0].bytecount, usejit);
-		_EnsureFieldsChanged(__FUNCTION__, "Str_empty", usejit, true, delta, "s_24", NULL);
-
-		_FillTestDelta(&d1, 'c'); _FillTestDelta(&d2, 'c');
-		d1.s_24[0] = 0;
-		res[usejit][1].sendfields = _DoMarkFields(&d1, &d2, delta, usejit != 0);
-		_GetBitmaskAndBytecount(delta, res[usejit][1].bits, &res[usejit][1].bytecount, usejit);
-		_EnsureFieldsChanged(__FUNCTION__, "Str_empty2", usejit, true, delta, "s_24", NULL);
-
-		_FillTestDelta(&d1, 'c'); _FillTestDelta(&d2, 'c');
-		d1.s_24[0] = d2.s_24[0] = 0;
-		d1.s_24[1] = 'd'; d2.s_24[1] = 'e';
-		res[usejit][2].sendfields = _DoMarkFields(&d1, &d2, delta, usejit != 0);
-		_GetBitmaskAndBytecount(delta, res[usejit][2].bits, &res[usejit][2].bytecount, usejit);
-		_EnsureFieldsChanged(__FUNCTION__, "Str_both_empty_with_garbage", usejit, true, delta, NULL);
-
-		_FillTestDelta(&d1, 'c'); _FillTestDelta(&d2, 'c');
-		d1.s_24[1] = 'C';
-		res[usejit][3].sendfields = _DoMarkFields(&d1, &d2, delta, usejit != 0);
-		_GetBitmaskAndBytecount(delta, res[usejit][3].bits, &res[usejit][3].bytecount, usejit);
-		_EnsureFieldsChanged(__FUNCTION__, "Str_case_check", usejit, true, delta, NULL);
-	}
-
-	_CompareDeltaResults(__FUNCTION__, res[0], res[1], 4);
 	SV_Shutdown();
 }
 
 TEST(MarkFieldsTest_TimeWindow, Delta, 1000) {
 #ifdef REHLDS_FIXES
-	bool rehds_fixes = true;
+	bool rehlds_fixes = true;
 #else
-	bool rehds_fixes = false;
+	bool rehlds_fixes = false;
 #endif
 
 	delta_t* delta = _CreateTestDeltaDesc();
 
-	delta_test_struct_t d1;
-	delta_test_struct_t d2;
-	delta_res_t res[2][3];
+	delta_simpletest_data_t testdata[] = {
+			{ "TimeWindow_Below_Precision", 'c', 'c', true, (rehlds_fixes ? "w8_1C" : ""), []() { dst2.w8_1C = 0.001f; dst1.w8_1C = 0.0011f; } },
+			{ "TimeWindow_Above_Precision1", 'c', 'c', true, (rehlds_fixes ? "w8_1C" : ""), []() { dst2.w8_1C = 0.1f; dst1.w8_1C = 0.11f; } }, //precision check, 0.11f is actually 0.10999
+			{ "TimeWindow_Above_Precision2", 'c', 'c', true, "w8_1C", []() { dst2.w8_1C = 0.1f; dst1.w8_1C = 0.12f; } },
+	};
+	_DeltaSimpleTests(delta, testdata, ARRAYSIZE(testdata));
 
-	memset(res[0], 0xCC, sizeof(res) / 2);
-	memset(res[1], 0xDD, sizeof(res) / 2);
-
-	for (int usejit = 0; usejit <= 1; usejit++) {
-
-		_FillTestDelta(&d1, 'c'); _FillTestDelta(&d2, 'c');
-		d2.w8_1C = 0.001f; d1.w8_1C = 0.0011f;
-		res[usejit][0].sendfields = _DoMarkFields(&d1, &d2, delta, usejit != 0);
-		_GetBitmaskAndBytecount(delta, res[usejit][0].bits, &res[usejit][0].bytecount, usejit);
-		_EnsureFieldsChanged(__FUNCTION__, "TimeWindow_Below_Precision", usejit, true, delta, rehds_fixes ? "w8_1C" : NULL, NULL);
-
-		_FillTestDelta(&d1, 'c'); _FillTestDelta(&d2, 'c');
-		d2.w8_1C = 0.1f; d1.w8_1C = 0.11f; //precision check, 0.11f is actually 0.10999
-		res[usejit][1].sendfields = _DoMarkFields(&d1, &d2, delta, usejit != 0);
-		_GetBitmaskAndBytecount(delta, res[usejit][1].bits, &res[usejit][1].bytecount, usejit);
-		_EnsureFieldsChanged(__FUNCTION__, "TimeWindow_Above_Precision1", usejit, true, delta, rehds_fixes ? "w8_1C" : NULL, NULL);
-
-		_FillTestDelta(&d1, 'c'); _FillTestDelta(&d2, 'c');
-		d2.w8_1C = 0.1f; d1.w8_1C = 0.12f;
-		res[usejit][2].sendfields = _DoMarkFields(&d1, &d2, delta, usejit != 0);
-		_GetBitmaskAndBytecount(delta, res[usejit][2].bits, &res[usejit][2].bytecount, usejit);
-		_EnsureFieldsChanged(__FUNCTION__, "TimeWindow_Above_Precision2", usejit, true, delta, "w8_1C", NULL);
-	}
-
-	_CompareDeltaResults(__FUNCTION__, res[0], res[1], 3);
 	SV_Shutdown();
 }
