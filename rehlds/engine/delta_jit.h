@@ -73,8 +73,13 @@ union delta_marked_mask_t {
 
 extern CDeltaJitRegistry g_DeltaJitRegistry;
 
-extern int DELTAJit_Fields_Clear_Mark_Check(unsigned char *from, unsigned char *to, delta_t *pFields);
+extern int DELTAJit_Fields_Clear_Mark_Check(unsigned char *from, unsigned char *to, delta_t *pFields, void* pForceMarkMask);
 extern void DELTAJit_SetSendFlagBits(delta_t *pFields, int *bits, int *bytecount);
 extern void DELTAJit_SetFieldByIndex(struct delta_s *pFields, int fieldNumber);
 extern void DELTAJit_UnsetFieldByIndex(struct delta_s *pFields, int fieldNumber);
 extern qboolean DELTAJit_IsFieldMarked(delta_t* pFields, int fieldNumber);
+
+/* Returns original mask, before it was changed by the conditional encoder */
+extern uint64 DELTAJit_GetOriginalMask(delta_t* pFields);
+
+extern uint64 DELTAJit_GetMaskU64(delta_t* pFields);

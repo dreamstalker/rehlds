@@ -735,7 +735,7 @@ qboolean DELTA_CheckDelta(unsigned char *from, unsigned char *to, delta_t *pFiel
 	qboolean sendfields;
 
 #if defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)
-	sendfields = DELTAJit_Fields_Clear_Mark_Check(from, to, pFields);
+	sendfields = DELTAJit_Fields_Clear_Mark_Check(from, to, pFields, NULL);
 #else
 	DELTA_ClearFlags(pFields);
 	DELTA_MarkSendFields(from, to, pFields);
@@ -752,7 +752,7 @@ NOINLINE qboolean DELTA_WriteDelta(unsigned char *from, unsigned char *to, qbool
 	int bytecount;
 
 #if defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)
-	sendfields = DELTAJit_Fields_Clear_Mark_Check(from, to, pFields);
+	sendfields = DELTAJit_Fields_Clear_Mark_Check(from, to, pFields, NULL);
 #else // REHLDS_OPT_PEDANTIC || REHLDS_FIXES
 	DELTA_ClearFlags(pFields);
 	DELTA_MarkSendFields(from, to, pFields);
@@ -762,6 +762,15 @@ NOINLINE qboolean DELTA_WriteDelta(unsigned char *from, unsigned char *to, qbool
 	_DELTA_WriteDelta(from, to, force, pFields, callback, sendfields);
 	return sendfields;
 }
+
+#ifdef REHLDS_FIXES //Fix for https://github.com/dreamstalker/rehlds/issues/24
+qboolean DELTA_WriteDeltaForceMask(unsigned char *from, unsigned char *to, qboolean force, delta_t *pFields, void(*callback)(void), void* pForceMask) {
+	qboolean sendfields = DELTAJit_Fields_Clear_Mark_Check(from, to, pFields, pForceMask);
+	_DELTA_WriteDelta(from, to, force, pFields, callback, sendfields);
+	return sendfields;
+}
+#endif
+
 
 qboolean _DELTA_WriteDelta(unsigned char *from, unsigned char *to, qboolean force, delta_t *pFields, void(*callback)( void ), qboolean sendfields)
 {
