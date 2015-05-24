@@ -136,14 +136,17 @@ public:
 	int markedFieldsMaskSize;
 
 	delta_marked_mask_t marked_fields_mask;
-	int sse_highbits[2]; //High 64 bits for manipulating marked_fields_mask via SSE registers 
+	int mfm_sse_highbits[2]; //High 64 bits for manipulating marked_fields_mask via SSE registers 
+
+	delta_marked_mask_t originalMarkedFieldsMask; //mask based on data, before calling the conditional encoder
+	int omfm_sse_highbits[2]; //High 64 bits for manipulating marked_fields_mask via SSE registers 
 
 	CDeltaJit(delta_t* _delta, CDeltaClearMarkFieldsJIT* _cleanMarkCheckFunc);
 
 	virtual ~CDeltaJit();
 };
 
-class CDeltaClearMarkFieldsJIT : public jitasm::function<int, CDeltaClearMarkFieldsJIT, void*, void*, void*> {
+class CDeltaClearMarkFieldsJIT : public jitasm::function<int, CDeltaClearMarkFieldsJIT, void*, void*, void*, void*> {
 public:
 	deltajitdata_t *jitdesc;
 	deltajit_marked_count_type_t countType;
@@ -156,7 +159,7 @@ public:
 	}
 
 	void checkFieldMask(jitasm::Frontend::Reg32& mask, deltajit_memblock_field* jitField);
-	Result main(Addr src, Addr dst, Addr deltaJit);
+	Result main(Addr src, Addr dst, Addr deltaJit, Addr pForceMarkMask);
 	void processStrings(Addr src, Addr dst);
 	void callConditionalEncoder(Addr src, Addr dst, Addr deltaJit);
 	void calculateBytecount();
@@ -257,7 +260,7 @@ void CDeltaClearMarkFieldsJIT::calculateBytecount() {
 	mov(dword_ptr[ebx + delta_masksize_offset], edx);
 }
 
-CDeltaClearMarkFieldsJIT::Result CDeltaClearMarkFieldsJIT::main(Addr src, Addr dst, Addr deltaJit)
+CDeltaClearMarkFieldsJIT::Result CDeltaClearMarkFieldsJIT::main(Addr src, Addr dst, Addr deltaJit, Addr pForceMarkMask)
 {
 #ifndef REHLDS_FIXES
 	sub(esp, 12); //some local storage is required for precise DT_TIMEWINDOW marking
@@ -369,12 +372,28 @@ CDeltaClearMarkFieldsJIT::Result CDeltaClearMarkFieldsJIT::main(Addr src, Addr d
 		}
 	}
 
+	//apply 'force mark' mask if it's present
+	mov(eax, ptr[pForceMarkMask]);
+	If(eax != 0);
+		//mask for cleaning garbage in high 64 bits
+		mov(edx, -1);
+		movd(xmm0, edx);
+		movd(xmm1, edx);
+		psllq(xmm0, 32);
+		por(xmm0, xmm1);
+		
+		movdqu(xmm_tmp, xmmword_ptr[eax]);
+		pand(xmm_tmp, xmm0); //clean high 64 bits
+
+		por(marked_fields_mask, xmm_tmp); //apply the 'force' mask
+	EndIf();
+
 	size_t delta_markbits_offset = offsetof(CDeltaJit, marked_fields_mask);
 
-	//Before calling the condition encoder we have to save 'marked fields' mask 
-	//from SSE register into the CDeltaJit::marked_fields_mask, because conditional encoder can modify the mask
+	//Save mask from SSE register to CDeltaJit::marked_fields_mask and CDeltaJit::originalMarkedFieldsMask
 	mov(ebx, ptr[deltaJit]);
 	movdqu(xmmword_ptr[ebx + delta_markbits_offset], marked_fields_mask);
+	movdqu(xmmword_ptr[ebx + offsetof(CDeltaJit, originalMarkedFieldsMask)], marked_fields_mask);
 
 	processStrings(src, dst);
 
@@ -490,10 +509,10 @@ CDeltaJit* DELTAJit_LookupDeltaJit(const char* callsite, delta_t *pFields) {
 	return deltaJit;
 }
 
-NOINLINE int DELTAJit_Fields_Clear_Mark_Check(unsigned char *from, unsigned char *to, delta_t *pFields) {
+NOINLINE int DELTAJit_Fields_Clear_Mark_Check(unsigned char *from, unsigned char *to, delta_t *pFields, void* pForceMarkMask) {
 	CDeltaJit* deltaJit = DELTAJit_LookupDeltaJit(__FUNCTION__, pFields);
 	CDeltaClearMarkFieldsJIT &func = *deltaJit->cleanMarkCheckFunc;
-	return func(from, to, deltaJit);
+	return func(from, to, deltaJit, pForceMarkMask);
 }
 
 void DELTAJit_SetSendFlagBits(delta_t *pFields, int *bits, int *bytecount) {
@@ -530,6 +549,16 @@ qboolean DELTAJit_IsFieldMarked(delta_t* pFields, int fieldNumber) {
 		return deltaJit->marked_fields_mask.u32[1] & (1 << (fieldNumber & 0x1F));
 
 	return deltaJit->marked_fields_mask.u32[0] & (1 << fieldNumber);
+}
+
+uint64 DELTAJit_GetOriginalMask(delta_t* pFields) {
+	CDeltaJit* deltaJit = DELTAJit_LookupDeltaJit(__FUNCTION__, pFields);
+	return deltaJit->originalMarkedFieldsMask.u64;
+}
+
+uint64 DELTAJit_GetMaskU64(delta_t* pFields) {
+	CDeltaJit* deltaJit = DELTAJit_LookupDeltaJit(__FUNCTION__, pFields);
+	return deltaJit->marked_fields_mask.u64;
 }
 
 void CDeltaJitRegistry::Cleanup() {

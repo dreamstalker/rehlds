@@ -4151,6 +4151,12 @@ int SV_CreatePacketEntities(sv_delta_t type, client_t *client, packet_entities_t
 	int oldmax;
 	int numbase;
 
+	// fix for https://github.com/dreamstalker/rehlds/issues/24
+#ifdef REHLDS_FIXES
+	int baselineToIdx = -1; //index of the baseline in to->entities[]
+	uint64 toBaselinesForceMask[MAX_PACKET_ENTITIES];
+#endif
+
 	numbase = 0;
 	if (type == sv_packet_delta)
 	{
@@ -4253,17 +4259,50 @@ int SV_CreatePacketEntities(sv_delta_t type, client_t *client, packet_entities_t
 				_mm_prefetch(((const char*)baseline_) + 64, _MM_HINT_T0);
 				if (offset)
 					SV_SetCallback(newindex, 0, custom, &numbase, 1, offset);
+
+				// fix for https://github.com/dreamstalker/rehlds/issues/24
+#ifdef REHLDS_FIXES
+				if (offset) 
+					baselineToIdx = newnum - offset;
+#endif
 			}
 		}
 
+
+		delta_t* delta = custom ? g_pcustomentitydelta : (SV_IsPlayerIndex(newindex) ? g_pplayerdelta : g_pentitydelta);
+
+		// fix for https://github.com/dreamstalker/rehlds/issues/24
+#ifdef REHLDS_FIXES
+		DELTA_WriteDeltaForceMask(
+			(uint8 *)baseline_,
+			(uint8 *)&to->entities[newnum],
+			TRUE,
+			delta,
+			&SV_InvokeCallback,
+			baselineToIdx != -1 ? &toBaselinesForceMask[baselineToIdx] : NULL
+		);
+		baselineToIdx = -1;
+
+		uint64 origMask = DELTAJit_GetOriginalMask(delta);
+		uint64 usedMask = DELTAJit_GetMaskU64(delta);
+		uint64 diffMask = origMask ^ usedMask;
+
+		//Remember changed fields that was marked in original mask, but unmarked by the conditional encoder
+		toBaselinesForceMask[newnum] = diffMask & origMask;
+		
+		
+#else //REHLDS_FIXES
 		DELTA_WriteDelta(
 			(uint8 *)baseline_,
 			(uint8 *)&to->entities[newnum],
 			TRUE,
-			custom ? g_pcustomentitydelta : (SV_IsPlayerIndex(newindex) ? g_pplayerdelta : g_pentitydelta),
+			delta,
 			&SV_InvokeCallback
 			);
+#endif //REHLDS_FIXES
+
 		++newnum;
+		
 	}
 
 	MSG_WriteBits(0, 16);

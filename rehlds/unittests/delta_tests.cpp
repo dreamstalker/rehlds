@@ -64,7 +64,7 @@ NOINLINE qboolean _DoMarkFields(void* src, void* dst, delta_t* delta, bool useJi
 	qboolean sendfields;
 	if (useJit) {
 		DELTA_ClearFlags(delta);
-		return DELTAJit_Fields_Clear_Mark_Check((unsigned char*)src, (unsigned char*)dst, delta);
+		return DELTAJit_Fields_Clear_Mark_Check((unsigned char*)src, (unsigned char*)dst, delta, NULL);
 	} else {
 		DELTA_ClearFlags(delta);
 		DELTA_MarkSendFields((unsigned char*)src, (unsigned char*)dst, delta);

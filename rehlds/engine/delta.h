@@ -139,6 +139,11 @@ void DELTA_SetSendFlagBits(delta_t *pFields, int *bits, int *bytecount);
 qboolean DELTA_IsFieldMarked(delta_t* pFields, int fieldNumber);
 void DELTA_WriteMarkedFields(unsigned char *from, unsigned char *to, delta_t *pFields);
 qboolean DELTA_CheckDelta(unsigned char *from, unsigned char *to, delta_t *pFields);
+
+#ifdef REHLDS_FIXES //Fix for https://github.com/dreamstalker/rehlds/issues/24
+qboolean DELTA_WriteDeltaForceMask(unsigned char *from, unsigned char *to, qboolean force, delta_t *pFields, void(*callback)(void), void* pForceMask);
+#endif
+
 qboolean DELTA_WriteDelta(unsigned char *from, unsigned char *to, qboolean force, delta_t *pFields, void(*callback)(void));
 qboolean _DELTA_WriteDelta(unsigned char *from, unsigned char *to, qboolean force, delta_t *pFields, void(*callback)(void), qboolean sendfields);
 int DELTA_ParseDelta(unsigned char *from, unsigned char *to, delta_t *pFields);
