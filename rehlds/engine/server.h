@@ -164,6 +164,19 @@ typedef struct server_s
 	unsigned char signon_data[32768];
 } server_t;
 
+
+struct rehlds_server_t {
+
+	//map for sv.model_precache (for faster resolving of model index by its name)
+#if defined(REHLDS_FIXES)
+	CStringKeyStaticMap<int, 7, HL_MODEL_MAX * 2> modelsMap; //case-sensitive keys for better performance
+#elif defined(REHLDS_OPT_PEDANTIC)
+	CICaseStringKeyStaticMap<int, 7, HL_MODEL_MAX * 2> modelsMap; //use case-insensitive keys to conform original engine's behavior
+#endif
+
+};
+
+
 /* <3b30a> ../engine/server.h:163 */
 typedef struct client_frame_s
 {
@@ -429,6 +442,8 @@ extern int SV_UPDATE_MASK;
 extern globalvars_t gGlobalVariables;
 extern server_static_t g_psvs;
 extern server_t g_psv;
+
+extern rehlds_server_t g_rehlds_sv;
 
 extern cvar_t sv_lan;
 extern cvar_t sv_lan_rate;

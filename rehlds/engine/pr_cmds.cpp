@@ -139,7 +139,14 @@ void PF_setmodel_I(edict_t *e, const char *m)
 	for (; *check; i++, check++)
 #endif
 	{
+
+		//use case-sensitive names to increase performance
+#ifdef REHLDS_FIXES
+		if (!Q_strcmp(*check, m))
+#else
 		if (!Q_stricmp(*check, m))
+#endif
+		
 		{
 			e->v.modelindex = i;
 			model_t *mod = g_psv.models[i];
@@ -481,8 +488,8 @@ msurface_t *SurfaceAtPoint(model_t *pModel, mnode_t *node, vec_t *start, vec_t *
 	{
 		surf = &pModel->surfaces[node->firstsurface + i];
 		tex = surf->texinfo;
-		ds = (int)_DotProduct(mid, tex->vecs[0]);
-		dt = (int)_DotProduct(mid, tex->vecs[1]);
+		ds = (int)(_DotProduct(mid, tex->vecs[0]) + tex->vecs[0][3]);
+		dt = (int)(_DotProduct(mid, tex->vecs[1]) + tex->vecs[1][3]);
 		if (ds >= surf->texturemins[0])
 		{
 			if (dt >= surf->texturemins[1])
@@ -1069,7 +1076,12 @@ int PF_precache_sound_I(const char *s)
 		{
 			if (!g_psv.sound_precache[i])
 			{
+#ifdef REHLDS_FIXES
+				// For more information, see EV_Precache
+				g_psv.sound_precache[i] = ED_NewString(s);
+#else
 				g_psv.sound_precache[i] = s;
+#endif // REHLDS_FIXES
 				return i;
 			}
 
@@ -1124,8 +1136,15 @@ short unsigned int EV_Precache(int type, const char *psz)
 				char* evScript = (char*) COM_LoadFile(szpath, 5, &scriptSize);
 				if (!evScript)
 					Host_Error("EV_Precache:  file %s missing from server\n", psz);
-
+#ifdef REHLDS_FIXES
+				// Many modders don't know that the resource names passed to precache functions must be a static strings.
+				// Also some metamod modules can be unloaded during the server running.
+				// Thereafter the pointers to resource names, precached by this modules becomes invalid and access to them will cause segfault error.
+				// Reallocating strings in the rehlds temporary hunk memory helps to avoid these problems.
+				g_psv.event_precache[i].filename = ED_NewString(psz);
+#else
 				g_psv.event_precache[i].filename = psz;
+#endif // REHLDS_FIXES
 				g_psv.event_precache[i].filesize = scriptSize;
 				g_psv.event_precache[i].pszScript = evScript;
 				g_psv.event_precache[i].index = i;
@@ -1405,15 +1424,31 @@ int PF_precache_model_I(const char *s)
 		{
 			if (!g_psv.model_precache[i])
 			{
+#ifdef REHLDS_FIXES
+				// For more information, see EV_Precache
+				g_psv.model_precache[i] = ED_NewString(s);
+#else
 				g_psv.model_precache[i] = s;
+#endif // REHLDS_FIXES
+
+#ifdef REHLDS_OPT_PEDANTIC
+				g_rehlds_sv.modelsMap.put(g_psv.model_precache[i], i);
+#endif //REHLDS_OPT_PEDANTIC
+
 				g_psv.models[i] = Mod_ForName(s, 1, 1);
 				if (!iOptional)
 					g_psv.model_precache_flags[i] |= 1u;
 				return i;
 			}
 
+			//use case-sensitive names to increase performance
+#ifdef REHLDS_FIXES
+			if (!Q_strcmp(g_psv.model_precache[i], s))
+				return i;
+#else
 			if (!Q_stricmp(g_psv.model_precache[i], s))
 				return i;
+#endif
 		}
 		Host_Error(
 			"PF_precache_model_I: Model '%s' failed to precache because the item count is over the %d limit.\nReduce the number of brush models and/or regular models in the map to correct this.",
@@ -1424,8 +1459,14 @@ int PF_precache_model_I(const char *s)
 	{
 		for (int i = 0; i < HL_MODEL_MAX; i++)
 		{
+			//use case-sensitive names to increase performance
+#ifdef REHLDS_FIXES
+			if (!Q_strcmp(g_psv.model_precache[i], s))
+				return i;
+#else
 			if (!Q_stricmp(g_psv.model_precache[i], s))
 				return i;
+#endif
 		}
 		Host_Error("PF_precache_model_I: '%s' Precache can only be done in spawn functions", s);
 	}
@@ -1447,7 +1488,12 @@ int PF_precache_generic_I(char *s)
 		{
 			if (!g_psv.generic_precache[i])
 			{
+#ifdef REHLDS_FIXES
+				// For more information, see EV_Precache
+				g_psv.generic_precache[i] = ED_NewString(s);
+#else
 				g_psv.generic_precache[i] = s;
+#endif // REHLDS_FIXES
 				return i;
 			}
 

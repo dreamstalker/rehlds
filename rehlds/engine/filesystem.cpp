@@ -28,12 +28,6 @@
 
 #include "precompiled.h"
 
-#ifdef _WIN32
-	#define FILESYSTEM_DLL_NAME "filesystem_stdio.dll"
-#else
-	#define FILESYSTEM_DLL_NAME "filesystem_stdio.so"
-#endif
-
 CUtlVector<char *> g_fallbackLocalizationFiles;
 char s_pBaseDir[512];
 bool bLowViolenceBuild;

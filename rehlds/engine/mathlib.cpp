@@ -28,9 +28,6 @@
 
 #include "precompiled.h"
 
-#include <smmintrin.h>
-#include <xmmintrin.h>
-
 vec3_t vec3_origin;
 //int nanmask;
 //short int new_cw;

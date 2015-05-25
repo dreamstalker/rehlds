@@ -35,16 +35,6 @@ typedef struct full_packet_entities_s
 	entity_state_t entities[MAX_PACKET_ENTITIES];
 } full_packet_entities_t;
 
-/* <a59b9> ../engine/sv_main.c:102 */
-typedef struct delta_info_s
-{
-	delta_info_s *next;
-	char *name;
-	char *loadfile;
-	delta_t *delta;
-} delta_info_t;
-
-
 int sv_lastnum;
 
 extra_baselines_t g_sv_instance_baselines;
@@ -65,6 +55,8 @@ float g_LastScreenUpdateTime;
 globalvars_t gGlobalVariables;
 server_static_t g_psvs;
 server_t g_psv;
+
+rehlds_server_t g_rehlds_sv;
 
 decalname_t sv_decalnames[512];
 int sv_decalnamecount;
@@ -493,13 +485,13 @@ void SV_AllocPacketEntities(client_frame_t *frame, int numents)
 {
 	if (frame)
 	{
-#ifdef REHLDS_FIXES
+#ifdef REHLDS_OPT_PEDANTIC
 		frame->entities.num_entities = numents;
 
 		// only alloc for max possible numents
 		if (!frame->entities.entities)
 			frame->entities.entities = (entity_state_t *)Mem_ZeroMalloc(sizeof(entity_state_t) * MAX_PACKET_ENTITIES);
-#else // REHLDS_FIXES
+#else // REHLDS_OPT_PEDANTIC
 		if (frame->entities.entities)
 			SV_ClearPacketEntities(frame);
 
@@ -509,7 +501,7 @@ void SV_AllocPacketEntities(client_frame_t *frame, int numents)
 
 		frame->entities.num_entities = numents;
 		frame->entities.entities = (entity_state_t *)Mem_ZeroMalloc(sizeof(entity_state_t) * allocatedslots);
-#endif // REHLDS_FIXES
+#endif // REHLDS_OPT_PEDANTIC
 	}
 }
 
@@ -660,14 +652,16 @@ void SV_Users_f(void)
 /* <a651b> ../engine/sv_main.c:762 */
 void SV_CountPlayers(int *clients)
 {
-	*clients = 0;
+	int count = 0;
+	
 	client_s *cl = g_psvs.clients;
-
 	for (int i = 0; i < g_psvs.maxclients; i++, cl++)
 	{
-		if (cl->active || cl->spawned || cl->connected)
-			(*clients)++;
+		if (cl->active | cl->spawned | cl->connected)
+			count++;
 	}
+
+	*clients = count;
 }
 
 /* <a68a4> ../engine/sv_main.c:786 */
@@ -695,8 +689,15 @@ void SV_FindModelNumbers(void)
 	{
 		if (!g_psv.model_precache[i])
 			break;
+
+		//use case-sensitive names to increase performance
+#ifdef REHLDS_FIXES
 		if (!Q_stricmp(g_psv.model_precache[i], "models/player.mdl"))
 			sv_playermodel = i;
+#else
+		if (!Q_stricmp(g_psv.model_precache[i], "models/player.mdl"))
+			sv_playermodel = i;
+#endif
 	}
 }
 
@@ -1386,11 +1387,17 @@ void SV_WriteClientdataToMessage(client_t *client, sizebuf_t *msg)
 			else
 				fdata = &host_client->frames[bits].weapondata[i];
 
-			if (DELTA_CheckDelta((byte *)fdata, (byte *)tdata, (delta_t *)g_pweapondelta))
+			if (DELTA_CheckDelta((byte *)fdata, (byte *)tdata, g_pweapondelta))
 			{
 				MSG_WriteBits(1, 1);
 				MSG_WriteBits(i, 6);
-				DELTA_WriteDelta((byte *)fdata, (byte *)tdata, TRUE, (delta_t *)g_pweapondelta, NULL);
+
+#if defined (REHLDS_OPT_PEDANTIC) || defined (REHLDS_FIXES)
+				// all calculations are already done
+				_DELTA_WriteDelta((byte *)fdata, (byte *)tdata, TRUE, g_pweapondelta, NULL, TRUE);
+#else
+				DELTA_WriteDelta((byte *)fdata, (byte *)tdata, TRUE, g_pweapondelta, NULL);
+#endif
 			}
 		}
 	}
@@ -3828,6 +3835,10 @@ void SV_EmitEvents(client_t *cl, packet_entities_t *pack, sizebuf_t *msg)
 					MSG_WriteBits(1, 1);
 					DELTA_WriteDelta((byte *)&nullargs, (byte *)&info->args, TRUE, g_peventdelta, NULL);
 				}
+				else
+				{
+					MSG_WriteBits(0, 1);
+				}
 			}
 			else
 			{
@@ -4140,11 +4151,19 @@ int SV_CreatePacketEntities(sv_delta_t type, client_t *client, packet_entities_t
 	int oldmax;
 	int numbase;
 
+	// fix for https://github.com/dreamstalker/rehlds/issues/24
+#ifdef REHLDS_FIXES
+	int baselineToIdx = -1; //index of the baseline in to->entities[]
+	uint64 toBaselinesForceMask[MAX_PACKET_ENTITIES];
+#endif
+
 	numbase = 0;
 	if (type == sv_packet_delta)
 	{
 		client_frame_t *fromframe = &client->frames[SV_UPDATE_MASK & client->delta_sequence];
 		from = &fromframe->entities;
+		_mm_prefetch((const char*)&from->entities[0], _MM_HINT_T0);
+		_mm_prefetch(((const char*)&from->entities[0]) + 64, _MM_HINT_T0);
 		oldmax = from->num_entities;
 		MSG_WriteByte(msg, svc_deltapacketentities);
 		MSG_WriteShort(msg, to->num_entities);
@@ -4158,8 +4177,8 @@ int SV_CreatePacketEntities(sv_delta_t type, client_t *client, packet_entities_t
 		MSG_WriteShort(msg, to->num_entities);
 	}
 
-	newnum = 0;
-	oldnum = 0;
+	newnum = 0; //index in to->entities
+	oldnum = 0; //index in from->entities
 	MSG_StartBitWriting(msg);
 	while (1)
 	{
@@ -4190,6 +4209,8 @@ int SV_CreatePacketEntities(sv_delta_t type, client_t *client, packet_entities_t
 			SV_SetCallback(newindex, FALSE, custom, &numbase, FALSE, 0);
 			DELTA_WriteDelta((uint8 *)&from->entities[oldnum], (uint8 *)baseline_, FALSE, custom ? g_pcustomentitydelta : (SV_IsPlayerIndex(newindex) ? g_pplayerdelta : g_pentitydelta), &SV_InvokeCallback);
 			++oldnum;
+			_mm_prefetch((const char*)&from->entities[oldnum], _MM_HINT_T0);
+			_mm_prefetch(((const char*)&from->entities[oldnum]) + 64, _MM_HINT_T0);
 			++newnum;
 			continue;
 		}
@@ -4200,6 +4221,8 @@ int SV_CreatePacketEntities(sv_delta_t type, client_t *client, packet_entities_t
 			{
 				SV_WriteDeltaHeader(oldindex, TRUE, FALSE, &numbase, FALSE, 0, FALSE, 0);
 				++oldnum;
+				_mm_prefetch((const char*)&from->entities[oldnum], _MM_HINT_T0);
+				_mm_prefetch(((const char*)&from->entities[oldnum]) + 64, _MM_HINT_T0);
 			}
 			continue;
 		}
@@ -4232,19 +4255,54 @@ int SV_CreatePacketEntities(sv_delta_t type, client_t *client, packet_entities_t
 			if (!from)
 			{
 				int offset = SV_FindBestBaseline(newnum, &baseline_, to->entities, newindex, custom);
+				_mm_prefetch((const char*)baseline_, _MM_HINT_T0);
+				_mm_prefetch(((const char*)baseline_) + 64, _MM_HINT_T0);
 				if (offset)
 					SV_SetCallback(newindex, 0, custom, &numbase, 1, offset);
+
+				// fix for https://github.com/dreamstalker/rehlds/issues/24
+#ifdef REHLDS_FIXES
+				if (offset) 
+					baselineToIdx = newnum - offset;
+#endif
 			}
 		}
 
+
+		delta_t* delta = custom ? g_pcustomentitydelta : (SV_IsPlayerIndex(newindex) ? g_pplayerdelta : g_pentitydelta);
+
+		// fix for https://github.com/dreamstalker/rehlds/issues/24
+#ifdef REHLDS_FIXES
+		DELTA_WriteDeltaForceMask(
+			(uint8 *)baseline_,
+			(uint8 *)&to->entities[newnum],
+			TRUE,
+			delta,
+			&SV_InvokeCallback,
+			baselineToIdx != -1 ? &toBaselinesForceMask[baselineToIdx] : NULL
+		);
+		baselineToIdx = -1;
+
+		uint64 origMask = DELTAJit_GetOriginalMask(delta);
+		uint64 usedMask = DELTAJit_GetMaskU64(delta);
+		uint64 diffMask = origMask ^ usedMask;
+
+		//Remember changed fields that was marked in original mask, but unmarked by the conditional encoder
+		toBaselinesForceMask[newnum] = diffMask & origMask;
+		
+		
+#else //REHLDS_FIXES
 		DELTA_WriteDelta(
 			(uint8 *)baseline_,
 			(uint8 *)&to->entities[newnum],
 			TRUE,
-			custom ? g_pcustomentitydelta : (SV_IsPlayerIndex(newindex) ? g_pplayerdelta : g_pentitydelta),
+			delta,
 			&SV_InvokeCallback
 			);
+#endif //REHLDS_FIXES
+
 		++newnum;
+		
 	}
 
 	MSG_WriteBits(0, 16);
@@ -4380,7 +4438,7 @@ void SV_EmitPings(client_t *client, sizebuf_t *msg)
 /* <a947b> ../engine/sv_main.c:5878 */
 void SV_WriteEntitiesToClient(client_t *client, sizebuf_t *msg)
 {
-	full_packet_entities_t fullpack;
+	
 	client_frame_t *frame = &client->frames[SV_UPDATE_MASK & client->netchan.outgoing_sequence];
 
 	unsigned char *pvs = NULL;
@@ -4388,72 +4446,68 @@ void SV_WriteEntitiesToClient(client_t *client, sizebuf_t *msg)
 	gEntityInterface.pfnSetupVisibility((edict_t*)client->pViewEntity, client->edict, &pvs, &pas);
 	unsigned char *pSet = pvs;
 
-#ifndef REHLDS_FIXES
-	// don't reallocate entity states
-	SV_ClearPacketEntities(frame);
-#endif // REHLDS_FIXES
 	packet_entities_t *pack = &frame->entities;
-	fullpack.num_entities = 0;
 
-	qboolean sendping = SV_ShouldUpdatePing(client);
+	// for REHLDS_OPT_PEDANTIC: Allocate the MAX_PACKET_ENTITIES ents in the frame's storage 
+	// This allows us to avoid intermediate 'fullpack' storage
+#ifdef REHLDS_OPT_PEDANTIC
+	SV_AllocPacketEntities(frame, MAX_PACKET_ENTITIES);
+	packet_entities_t *curPack = &frame->entities;
+	curPack->num_entities = 0;
+#else
+	SV_ClearPacketEntities(frame);
+	full_packet_entities_t fullpack;
+	fullpack.num_entities = 0;
+	full_packet_entities_t* curPack = &fullpack;
+#endif // REHLDS_OPT_PEDANTIC
 	
+	qboolean sendping = SV_ShouldUpdatePing(client);
 	int flags = client->lw != 0;
 
-#ifdef REHLDS_FIXES
 	int e;
-
 	for (e = 1; e <= g_psvs.maxclients; e++)
 	{
 		client_t *cl = &g_psvs.clients[e - 1];
 		if( ( !cl->active && !cl->spawned ) || cl->proxy )
 			continue;
 
-		qboolean add = gEntityInterface.pfnAddToFullPack(&fullpack.entities[fullpack.num_entities], e, &g_psv.edicts[e], host_client->edict, flags, TRUE, pSet);
+		qboolean add = gEntityInterface.pfnAddToFullPack(&curPack->entities[curPack->num_entities], e, &g_psv.edicts[e], host_client->edict, flags, TRUE, pSet);
 		if (add)
-			++fullpack.num_entities;
+			++curPack->num_entities;
 	}
 
 	for (; e < g_psv.num_edicts; e++)
 	{
-		if (fullpack.num_entities >= MAX_PACKET_ENTITIES)
+		if (curPack->num_entities >= MAX_PACKET_ENTITIES)
 		{
 			Con_DPrintf("Too many entities in visible packet list.\n");
 			break;
 		}
 
-		qboolean add = gEntityInterface.pfnAddToFullPack(&fullpack.entities[fullpack.num_entities], e, &g_psv.edicts[e], host_client->edict, flags, FALSE, pSet);
-		if (add)
-			++fullpack.num_entities;
-	}
-#else // REHLDS_FIXES
-	for (int e = 1; e < g_psv.num_edicts; e++)
-	{
-		edict_t *ent = &g_psv.edicts[e];
-		int player = 0;
-		if (e >= 1 && e <= g_psvs.maxclients)
-		{
-			client_t *cl = &g_psvs.clients[e - 1];
-			if ((!cl->active && !cl->spawned) || cl->proxy)
-				continue;
+		edict_t* ent = &g_psv.edicts[e];
 
-			player = 1;
+#ifdef REHLDS_OPT_PEDANTIC
+		//Part of gamedll's code is moved here to decrease amount of calls to AddToFullPack()
+		//We don't even try to transmit entities without model as well as invisible entities
+		if (ent->v.modelindex && !(ent->v.effects & EF_NODRAW)) {
+			qboolean add = gEntityInterface.pfnAddToFullPack(&curPack->entities[curPack->num_entities], e, &g_psv.edicts[e], host_client->edict, flags, FALSE, pSet);
+			if (add)
+				++curPack->num_entities;
 		}
-
-		if (fullpack.num_entities >= MAX_PACKET_ENTITIES)
-		{
-			Con_DPrintf("Too many entities in visible packet list.\n");
-			break;
-		}
-
-		qboolean add = gEntityInterface.pfnAddToFullPack(&fullpack.entities[fullpack.num_entities], e, ent, host_client->edict, flags, player, pSet);
+#else
+		qboolean add = gEntityInterface.pfnAddToFullPack(&curPack->entities[curPack->num_entities], e, &g_psv.edicts[e], host_client->edict, flags, FALSE, pSet);
 		if (add)
-			++fullpack.num_entities;
-	}
-#endif // REHLDS_FIXES
+			++curPack->num_entities;
+#endif //REHLDS_OPT_PEDANTIC
 
+	}
+
+	//for REHLDS_FIXES: Entities are already in the frame's storage, no need to copy them
+#ifndef REHLDS_OPT_PEDANTIC
 	SV_AllocPacketEntities(frame, fullpack.num_entities);
 	if (pack->num_entities)
 		Q_memcpy(pack->entities, fullpack.entities, sizeof(entity_state_t) * pack->num_entities);
+#endif
 
 	SV_EmitPacketEntities(client, pack, msg);
 	SV_EmitEvents(client, pack, msg);
@@ -4849,6 +4903,12 @@ int SV_ModelIndex(const char *name)
 	if (!name || !name[0])
 		return 0;
 
+#ifdef REHLDS_OPT_PEDANTIC
+	auto node = g_rehlds_sv.modelsMap.get(name);
+	if (node) {
+		return node->val;
+	}
+#else
 	for (int i = 0; i < HL_MODEL_MAX; i++)
 	{
 		if (!g_psv.model_precache[i])
@@ -4857,6 +4917,7 @@ int SV_ModelIndex(const char *name)
 		if (!Q_stricmp(g_psv.model_precache[i], name))
 			return i;
 	};
+#endif
 
 	Sys_Error("SV_ModelIndex: model %s not precached", name);
 }
@@ -5461,6 +5522,11 @@ int SV_SpawnServer(qboolean bIsDemo, char *server, char *startspot)
 
 	SV_AllocClientFrames();
 	Q_memset(&g_psv, 0, sizeof(server_t));
+
+#ifdef REHLDS_OPT_PEDANTIC
+	g_rehlds_sv.modelsMap.clear();
+#endif
+
 	Q_strncpy(g_psv.oldname, oldname, sizeof(oldname) - 1);
 	g_psv.oldname[sizeof(oldname) - 1] = 0;
 	Q_strncpy(g_psv.name, server, sizeof(g_psv.name) - 1);
@@ -5573,6 +5639,13 @@ int SV_SpawnServer(qboolean bIsDemo, char *server, char *startspot)
 	g_psv.model_precache_flags[1] |= RES_FATALIFMISSING;
 	g_psv.model_precache[1] = g_psv.modelname;
 
+#ifdef REHLDS_OPT_PEDANTIC
+	{
+		int __itmp = 1;
+		g_rehlds_sv.modelsMap.put(ED_NewString(g_psv.modelname), __itmp);
+	}
+#endif
+
 	g_psv.sound_precache[0] = pr_strings;
 	g_psv.model_precache[0] = pr_strings;
 	g_psv.generic_precache[0] = pr_strings;
@@ -5582,6 +5655,13 @@ int SV_SpawnServer(qboolean bIsDemo, char *server, char *startspot)
 		g_psv.model_precache[i + 1] = localmodels[i];
 		g_psv.models[i + 1] = Mod_ForName(localmodels[i], FALSE, FALSE);
 		g_psv.model_precache_flags[i + 1] |= RES_FATALIFMISSING;
+
+#ifdef REHLDS_OPT_PEDANTIC
+		{
+			int __itmp = i + 1;
+			g_rehlds_sv.modelsMap.put(g_psv.model_precache[i + 1], __itmp);
+		}
+#endif
 	}
 
 	Q_memset(&g_psv.edicts->v, 0, sizeof(entvars_t));
@@ -6785,6 +6865,10 @@ void SV_RegisterDelta(char *name, char *loadfile)
 	p->delta = pdesc;
 	p->next = g_sv_delta;
 	g_sv_delta = p;
+
+#if defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)
+	g_DeltaJitRegistry.CreateAndRegisterDeltaJIT(pdesc);
+#endif
 }
 
 /* <aa966> ../engine/sv_main.c:9284 */
@@ -6822,6 +6906,10 @@ void SV_InitDeltas(void)
 	g_peventdelta = SV_LookupDelta("event_t");
 	if (!g_peventdelta)
 		Sys_Error("No event_t encoder on server!\n");
+
+#if defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)
+	g_DeltaJitRegistry.CreateAndRegisterDeltaJIT(&g_MetaDelta[0]);
+#endif
 }
 
 /* <aac49> ../engine/sv_main.c:9339 */
@@ -7008,6 +7096,7 @@ void SV_Init(void)
 /* <aad4b> ../engine/sv_main.c:9558 */
 void SV_Shutdown(void)
 {
+	g_DeltaJitRegistry.Cleanup();
 	delta_info_t *p = g_sv_delta;
 	while (p)
 	{

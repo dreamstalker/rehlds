@@ -307,9 +307,6 @@
     <ClCompile Include="..\public\rehlds\sys_shared.cpp">
       <Filter>public\rehlds</Filter>
     </ClCompile>
-    <ClCompile Include="..\public\rehlds\crc32.cpp">
-      <Filter>public\rehlds</Filter>
-    </ClCompile>
     <ClCompile Include="..\engine\ed_strpool.cpp">
       <Filter>engine\common</Filter>
     </ClCompile>
@@ -323,6 +320,18 @@
       <Filter>engine</Filter>
     </ClCompile>
     <ClCompile Include="..\unittests\mathlib_tests.cpp">
+      <Filter>unittests</Filter>
+    </ClCompile>
+    <ClCompile Include="..\engine\delta_jit.cpp">
+      <Filter>engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\unittests\delta_tests.cpp">
+      <Filter>unittests</Filter>
+    </ClCompile>
+    <ClCompile Include="..\public\rehlds\crc32c.cpp">
+      <Filter>public\rehlds</Filter>
+    </ClCompile>
+    <ClCompile Include="..\unittests\crc32c_tests.cpp">
       <Filter>unittests</Filter>
     </ClCompile>
   </ItemGroup>
@@ -984,9 +993,6 @@
     <ClInclude Include="..\public\rehlds\sys_shared.h">
       <Filter>public\rehlds</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\rehlds\crc32.h">
-      <Filter>public\rehlds</Filter>
-    </ClInclude>
     <ClInclude Include="..\public\rehlds\static_map.h">
       <Filter>public\rehlds</Filter>
     </ClInclude>
@@ -1030,6 +1036,12 @@
       <Filter>engine\common</Filter>
     </ClInclude>
     <ClInclude Include="..\public\rehlds\bspfile.h">
+      <Filter>public\rehlds</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\delta_jit.h">
+      <Filter>engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\rehlds\crc32c.h">
       <Filter>public\rehlds</Filter>
     </ClInclude>
   </ItemGroup>

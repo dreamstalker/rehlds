@@ -56,7 +56,9 @@
 //1400 - 9 = 1391
 #define SPLIT_SIZE				(MAX_ROUTEABLE_PACKET - sizeof(SPLITPACKET))
 
-
+// Create general message queues
+#define NUM_MSG_QUEUES 40
+#define MSG_QUEUE_SIZE 1536
 
 /* <d297f> ../engine/net_ws.c:137 */
 typedef struct loopmsg_s

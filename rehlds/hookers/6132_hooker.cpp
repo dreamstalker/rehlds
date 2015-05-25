@@ -42,56 +42,76 @@ extern const size_t g_BaseOffset = 0x01D00000;
 extern const size_t g_BaseOffset = NULL;
 #endif
 
+/*
+	Requred hooks for runing hooker with rehlds API enabled:
+	Whole regions: 
+		Common_MSG_region
+		Common_SZ_region
+		Sv_Steam3_region
+
+	SysDll_region: 
+		Sys_FloatTime, Sys_InitHardwareTimer
+
+	Pr_Cmds_region:
+		SeedRandomNumberGenerator, ran1, fran1, RandomFloat, RandomLong, PF_GetPlayerAuthId
+	
+	Sv_Main_region:
+		SV_RejectConnection, SV_FilterUser, SV_CheckChallenge, SV_CheckIPRestrictions, SV_CheckIPConnectionReuse, SV_FinishCertificateCheck, SV_CheckKeyInfo
+		SV_CheckForDuplicateSteamID, SV_CheckForDuplicateNames, SV_CheckUserInfo, SV_ConnectClient, SVC_GetChallenge, SVC_ServiceChallenge,
+		SV_SetMaxclients, SV_CompareUserID, SV_GetIDString, SV_GetClientIDString
+*/
 
 //#define Common_MSG_region
 //#define Common_SZ_region
-//#define Common_COM_region
-//#define Delta_region
-//#define Main_region
-//#define Zone_region
-//#define FileSystem_Internal_region
-//#define FileSystem_region
-//#define Unicode_StrTools_region
-//#define Cmd_region
-//#define Cvar_region
-//#define Info_region
+#define Common_COM_region
+#define Delta_region
+#define Main_region
+#define Zone_region
+#define FileSystem_Internal_region
+#define FileSystem_region
+#define Unicode_StrTools_region
+#define Cmd_region
+#define Cvar_region
+#define Info_region
 //#define SysDll_region
-//#define Sys_Dll2_region
-//#define CModel_region
-//#define Model_region
-//#define Sv_Log_region
-//#define Cl_Null_region
-//#define Snd_Null_region
+#define Sys_Dll2_region
+#define CModel_region
+#define Model_region
+#define Sv_Log_region
+#define Cl_Null_region
+#define Snd_Null_region
 //#define Sv_Steam3_region
-//#define Host_region
-//#define Host_Cmd_region
-//#define Pmove_region
-//#define Pmovetst_region
-//#define Pr_Edict_region
+#define Host_region
+#define Host_Cmd_region
+#define Pmove_region
+#define Pmovetst_region
+#define Pr_Edict_region
 //#define Pr_Cmds_region
-//#define Mathlib_region
-//#define World_region
-//#define Sv_Phys_region
-//#define Sv_Move_region
-//#define Sv_pmove_region
-//#define R_Studio_region
-//#define Net_ws_region
-//#define Net_chan_region
-//#define Hashpak_region
-//#define Sv_user_region
-//#define Wad_region
-//#define Textures_region
-//#define Tmessage_region
-//#define Vid_null_region
-//#define L_studio_region
-//#define Crc_region
-//#define Sv_RemoteAccess_region
-//#define Com_custom
-//#define Sv_upld
-//#define Decals
-//#define IpratelimitWrapper_region
-//#define Sys_engine
-//#define Sys_linuxwind
+#define Mathlib_region
+#define World_region
+#define Sv_Phys_region
+#define Sv_Move_region
+#define Sv_pmove_region
+//#define Sv_Main_region
+#define R_Studio_region
+#define TraceInit_Region
+#define Net_ws_region
+#define Net_chan_region
+#define Hashpak_region
+#define Sv_user_region
+#define Wad_region
+#define Textures_region
+#define Tmessage_region
+#define Vid_null_region
+#define L_studio_region
+#define Crc_region
+#define Sv_RemoteAccess_region
+#define Com_custom
+#define Sv_upld
+#define Decals
+#define IpratelimitWrapper_region
+#define Sys_engine
+#define Sys_linuxwind
 
 //#define Function_References_region
 //#define Data_References_region
@@ -355,50 +375,50 @@ FunctionHook g_FunctionHooks[] =
 
 #ifndef Sv_Main_region
 
-	{ 0x01D87E40, "SV_LookupDelta", (size_t)&SV_LookupDelta },
-	{ 0x01D87E90, "SV_DownloadingModules", (size_t)&SV_DownloadingModules }, 	// NOXREF
-	{ 0x01D87F70, "SV_GatherStatistics", (size_t)&SV_GatherStatistics },
-	{ 0x01D88190, "SV_DeallocateDynamicData", (size_t)&SV_DeallocateDynamicData },
-	{ 0x01D881D0, "SV_ReallocateDynamicData", (size_t)&SV_ReallocateDynamicData },
-	{ 0x01D88250, "SV_AllocClientFrames", (size_t)&SV_AllocClientFrames },
-	{ 0x01D882B0, "SV_IsPlayerIndex", (size_t)&SV_IsPlayerIndex_wrapped },
-	{ 0x01D882D0, "SV_ClearPacketEntities", (size_t)&SV_ClearPacketEntities },
-	{ 0x01D88310, "SV_AllocPacketEntities", (size_t)&SV_AllocPacketEntities },
-	{ 0x01D88370, "SV_ClearFrames", (size_t)&SV_ClearFrames },
-	{ 0x01D883E0, "SV_Serverinfo_f", (size_t)&SV_Serverinfo_f },
-	{ 0x01D884C0, "SV_Localinfo_f", (size_t)&SV_Localinfo_f },
-	{ 0x01D88550, "SV_User_f", (size_t)&SV_User_f },
-	{ 0x01D88640, "SV_Users_f", (size_t)&SV_Users_f },
-	{ 0x01D88700, "SV_CountPlayers", (size_t)&SV_CountPlayers },
-	{ 0x01D88740, "SV_CountProxies", (size_t)&SV_CountProxies },
-	{ 0x01D88790, "SV_FindModelNumbers", (size_t)&SV_FindModelNumbers },
-	{ 0x01D887D0, "SV_StartParticle", (size_t)&SV_StartParticle },
-	{ 0x01D88880, "SV_StartSound", (size_t)&SV_StartSound },
-	{ 0x01D88960, "SV_BuildSoundMsg", (size_t)&SV_BuildSoundMsg },
-	{ 0x01D88BD0, "SV_HashString", (size_t)&SV_HashString },
-	{ 0x01D88C10, "SV_LookupSoundIndex", (size_t)&SV_LookupSoundIndex },
-	{ 0x01D88CD0, "SV_BuildHashedSoundLookupTable", (size_t)&SV_BuildHashedSoundLookupTable },
-	{ 0x01D88D20, "SV_AddSampleToHashedLookupTable", (size_t)&SV_AddSampleToHashedLookupTable },
-	{ 0x01D88DA0, "SV_ValidClientMulticast", (size_t)&SV_ValidClientMulticast },
-	{ 0x01D88E40, "SV_Multicast", (size_t)&SV_Multicast },
-	{ 0x01D88FA0, "SV_WriteMovevarsToClient", (size_t)&SV_WriteMovevarsToClient },
-	{ 0x01D89110, "SV_WriteDeltaDescriptionsToClient", (size_t)&SV_WriteDeltaDescriptionsToClient },
-	{ 0x01D891B0, "SV_SetMoveVars", (size_t)&SV_SetMoveVars },
-	{ 0x01D892F0, "SV_QueryMovevarsChanged", (size_t)&SV_QueryMovevarsChanged },
-	{ 0x01D89590, "SV_SendServerinfo", (size_t)&SV_SendServerinfo },
-	{ 0x01D897C0, "SV_SendResources", (size_t)&SV_SendResources },
-	{ 0x01D89920, "SV_WriteClientdataToMessage", (size_t)&SV_WriteClientdataToMessage },
-	{ 0x01D89BF0, "SV_WriteSpawn", (size_t)&SV_WriteSpawn },
-	{ 0x01D89F10, "SV_SendUserReg", (size_t)&SV_SendUserReg },
-	{ 0x01D89F80, "SV_New_f", (size_t)&SV_New_f },
-	{ 0x01D8A210, "SV_SendRes_f", (size_t)&SV_SendRes_f },
-	{ 0x01D8A2C0, "SV_Spawn_f", (size_t)&SV_Spawn_f },
-	{ 0x01D8A3F0, "SV_CheckUpdateRate", (size_t)&SV_CheckUpdateRate },
+//	{ 0x01D87E40, "SV_LookupDelta", (size_t)&SV_LookupDelta },
+//	{ 0x01D87E90, "SV_DownloadingModules", (size_t)&SV_DownloadingModules }, 	// NOXREF
+//	{ 0x01D87F70, "SV_GatherStatistics", (size_t)&SV_GatherStatistics },
+//	{ 0x01D88190, "SV_DeallocateDynamicData", (size_t)&SV_DeallocateDynamicData },
+//	{ 0x01D881D0, "SV_ReallocateDynamicData", (size_t)&SV_ReallocateDynamicData },
+//	{ 0x01D88250, "SV_AllocClientFrames", (size_t)&SV_AllocClientFrames },
+//	{ 0x01D882B0, "SV_IsPlayerIndex", (size_t)&SV_IsPlayerIndex_wrapped },
+//	{ 0x01D882D0, "SV_ClearPacketEntities", (size_t)&SV_ClearPacketEntities },
+//	{ 0x01D88310, "SV_AllocPacketEntities", (size_t)&SV_AllocPacketEntities },
+//	{ 0x01D88370, "SV_ClearFrames", (size_t)&SV_ClearFrames },
+//	{ 0x01D883E0, "SV_Serverinfo_f", (size_t)&SV_Serverinfo_f },
+//	{ 0x01D884C0, "SV_Localinfo_f", (size_t)&SV_Localinfo_f },
+//	{ 0x01D88550, "SV_User_f", (size_t)&SV_User_f },
+//	{ 0x01D88640, "SV_Users_f", (size_t)&SV_Users_f },
+//	{ 0x01D88700, "SV_CountPlayers", (size_t)&SV_CountPlayers },
+//	{ 0x01D88740, "SV_CountProxies", (size_t)&SV_CountProxies },
+//	{ 0x01D88790, "SV_FindModelNumbers", (size_t)&SV_FindModelNumbers },
+//	{ 0x01D887D0, "SV_StartParticle", (size_t)&SV_StartParticle },
+//	{ 0x01D88880, "SV_StartSound", (size_t)&SV_StartSound },
+//	{ 0x01D88960, "SV_BuildSoundMsg", (size_t)&SV_BuildSoundMsg },
+//	{ 0x01D88BD0, "SV_HashString", (size_t)&SV_HashString },
+//	{ 0x01D88C10, "SV_LookupSoundIndex", (size_t)&SV_LookupSoundIndex },
+//	{ 0x01D88CD0, "SV_BuildHashedSoundLookupTable", (size_t)&SV_BuildHashedSoundLookupTable },
+//	{ 0x01D88D20, "SV_AddSampleToHashedLookupTable", (size_t)&SV_AddSampleToHashedLookupTable },
+//	{ 0x01D88DA0, "SV_ValidClientMulticast", (size_t)&SV_ValidClientMulticast },
+//	{ 0x01D88E40, "SV_Multicast", (size_t)&SV_Multicast },
+//	{ 0x01D88FA0, "SV_WriteMovevarsToClient", (size_t)&SV_WriteMovevarsToClient },
+//	{ 0x01D89110, "SV_WriteDeltaDescriptionsToClient", (size_t)&SV_WriteDeltaDescriptionsToClient },
+//	{ 0x01D891B0, "SV_SetMoveVars", (size_t)&SV_SetMoveVars },
+//	{ 0x01D892F0, "SV_QueryMovevarsChanged", (size_t)&SV_QueryMovevarsChanged },
+//	{ 0x01D89590, "SV_SendServerinfo", (size_t)&SV_SendServerinfo },
+//	{ 0x01D897C0, "SV_SendResources", (size_t)&SV_SendResources },
+//	{ 0x01D89920, "SV_WriteClientdataToMessage", (size_t)&SV_WriteClientdataToMessage },
+//	{ 0x01D89BF0, "SV_WriteSpawn", (size_t)&SV_WriteSpawn },
+//	{ 0x01D89F10, "SV_SendUserReg", (size_t)&SV_SendUserReg },
+//	{ 0x01D89F80, "SV_New_f", (size_t)&SV_New_f },
+//	{ 0x01D8A210, "SV_SendRes_f", (size_t)&SV_SendRes_f },
+//	{ 0x01D8A2C0, "SV_Spawn_f", (size_t)&SV_Spawn_f },
+//	{ 0x01D8A3F0, "SV_CheckUpdateRate", (size_t)&SV_CheckUpdateRate },
 	{ 0x01D8A510, "SV_RejectConnection", (size_t)&SV_RejectConnection },
-	{ 0x01D8A5A0, "SV_RejectConnectionForPassword", (size_t)&SV_RejectConnectionForPassword },
-	{ 0x01D8A610, "SV_GetFragmentSize", (size_t)&SV_GetFragmentSize },
+//	{ 0x01D8A5A0, "SV_RejectConnectionForPassword", (size_t)&SV_RejectConnectionForPassword },
+//	{ 0x01D8A610, "SV_GetFragmentSize", (size_t)&SV_GetFragmentSize },
 	{ 0x01D8A680, "SV_FilterUser", (size_t)&SV_FilterUser },
-	{ 0x01D8A760, "SV_CheckProtocol", (size_t)&SV_CheckProtocol },
+//	{ 0x01D8A760, "SV_CheckProtocol", (size_t)&SV_CheckProtocol },
 	{ 0x01D8A7E0, "SV_CheckChallenge", (size_t)&SV_CheckChallenge },
 	{ 0x01D8A8D0, "SV_CheckIPRestrictions", (size_t)&SV_CheckIPRestrictions },
 	{ 0x01D8A980, "SV_CheckIPConnectionReuse", (size_t)&SV_CheckIPConnectionReuse },
@@ -407,12 +427,12 @@ FunctionHook g_FunctionHooks[] =
 	{ 0x01D8AC30, "SV_CheckForDuplicateSteamID", (size_t)&SV_CheckForDuplicateSteamID },
 	{ 0x01D8ACE0, "SV_CheckForDuplicateNames", (size_t)&SV_CheckForDuplicateNames },
 	{ 0x01D8AE10, "SV_CheckUserInfo", (size_t)&SV_CheckUserInfo },
-	{ 0x01D8B080, "SV_FindEmptySlot", (size_t)&SV_FindEmptySlot },
+//	{ 0x01D8B080, "SV_FindEmptySlot", (size_t)&SV_FindEmptySlot },
 	{ 0x01D8B100, "SV_ConnectClient", (size_t)&SV_ConnectClient },
-	{ 0x01D8B8E0, "SVC_Ping", (size_t)&SVC_Ping },
+//	{ 0x01D8B8E0, "SVC_Ping", (size_t)&SVC_Ping },
 	{ 0x01D8B930, "SVC_GetChallenge", (size_t)&SVC_GetChallenge },
 	{ 0x01D8BB20, "SVC_ServiceChallenge", (size_t)&SVC_ServiceChallenge },
-	{ 0x01D8BCB0, "SV_ResetModInfo", (size_t)&SV_ResetModInfo },
+//	{ 0x01D8BCB0, "SV_ResetModInfo", (size_t)&SV_ResetModInfo },
 	//{ 0x01D8BE40, "SV_GetFakeClientCount", (size_t)&SV_GetFakeClientCount },//NOXREF
 	//{ 0x01D8BE70, "SV_GetModInfo", (size_t)&SV_GetModInfo }, //NOXREF
 	//{ 0x01D8BF40, "RequireValidChallenge", (size_t)&RequireValidChallenge }, //NOXREF
@@ -425,106 +445,106 @@ FunctionHook g_FunctionHooks[] =
 	//{ 0x01D8C720, "SVC_Info", (size_t)&SVC_Info }, //NOXREF
 	//{ 0x01D8CA40, "SVC_PlayerInfo", (size_t)&SVC_PlayerInfo }, //NOXREF
 	//{ 0x01D8CBA0, "SVC_RuleInfo", (size_t)&SVC_RuleInfo }, //NOXREF
-	{ 0x01D8CCC0, "SVC_GameDllQuery", (size_t)&SVC_GameDllQuery },
-	{ 0x01D8CD70, "SV_FlushRedirect", (size_t)&SV_FlushRedirect },
-	{ 0x01D8CE70, "SV_BeginRedirect", (size_t)&SV_BeginRedirect },
-	{ 0x01D8CEA0, "SV_EndRedirect", (size_t)&SV_EndRedirect },
-	{ 0x01D8CEB0, "SV_ResetRcon_f", (size_t)&SV_ResetRcon_f },
-	{ 0x01D8CED0, "SV_AddFailedRcon", (size_t)&SV_AddFailedRcon },
-	{ 0x01D8D1F0, "SV_CheckRconFailure", (size_t)&SV_CheckRconFailure },
-	{ 0x01D8D250, "SV_Rcon_Validate", (size_t)&SV_Rcon_Validate },
-	{ 0x01D8D370, "SV_Rcon", (size_t)&SV_Rcon },
-	{ 0x01D8D560, "SV_ConnectionlessPacket", (size_t)&SV_ConnectionlessPacket },
-	{ 0x01D8D750, "SV_CheckRate", (size_t)&SV_CheckRate },
-	{ 0x01D8D810, "SV_ProcessFile", (size_t)&SV_ProcessFile },
-	{ 0x01D8D960, "SV_FilterPacket", (size_t)&SV_FilterPacket },
-	{ 0x01D8DA30, "SV_SendBan", (size_t)&SV_SendBan },
-	{ 0x01D8DAB0, "SV_ReadPackets", (size_t)&SV_ReadPackets },
+//	{ 0x01D8CCC0, "SVC_GameDllQuery", (size_t)&SVC_GameDllQuery },
+//	{ 0x01D8CD70, "SV_FlushRedirect", (size_t)&SV_FlushRedirect },
+//	{ 0x01D8CE70, "SV_BeginRedirect", (size_t)&SV_BeginRedirect },
+//	{ 0x01D8CEA0, "SV_EndRedirect", (size_t)&SV_EndRedirect },
+//	{ 0x01D8CEB0, "SV_ResetRcon_f", (size_t)&SV_ResetRcon_f },
+//	{ 0x01D8CED0, "SV_AddFailedRcon", (size_t)&SV_AddFailedRcon },
+//	{ 0x01D8D1F0, "SV_CheckRconFailure", (size_t)&SV_CheckRconFailure },
+//	{ 0x01D8D250, "SV_Rcon_Validate", (size_t)&SV_Rcon_Validate },
+//	{ 0x01D8D370, "SV_Rcon", (size_t)&SV_Rcon },
+//	{ 0x01D8D560, "SV_ConnectionlessPacket", (size_t)&SV_ConnectionlessPacket },
+//	{ 0x01D8D750, "SV_CheckRate", (size_t)&SV_CheckRate },
+//	{ 0x01D8D810, "SV_ProcessFile", (size_t)&SV_ProcessFile },
+//	{ 0x01D8D960, "SV_FilterPacket", (size_t)&SV_FilterPacket },
+//	{ 0x01D8DA30, "SV_SendBan", (size_t)&SV_SendBan },
+//	{ 0x01D8DAB0, "SV_ReadPackets", (size_t)&SV_ReadPackets },
 	//{ 0x, "ntohl", (size_t)&ntohl },
 	//{ 0x, "htons", (size_t)&htons },
-	{ 0x01D8DCC0, "SV_CheckTimeouts", (size_t)&SV_CheckTimeouts },
-	{ 0x01D8DD50, "SV_CalcPing", (size_t)&SV_CalcPing },
-	{ 0x01D8DE20, "SV_FullClientUpdate", (size_t)&SV_FullClientUpdate },
-	{ 0x01D8DEF0, "SV_EmitEvents", (size_t)&SV_EmitEvents },
-	{ 0x01D8E0F0, "SV_AddToFatPVS", (size_t)&SV_AddToFatPVS },
-	{ 0x01D8E1B0, "SV_FatPVS", (size_t)&SV_FatPVS },
-	{ 0x01D8E200, "SV_AddToFatPAS", (size_t)&SV_AddToFatPAS },
-	{ 0x01D8E2D0, "SV_FatPAS", (size_t)&SV_FatPAS },
-	{ 0x01D8E320, "SV_PointLeafnum", (size_t)&SV_PointLeafnum },
+//	{ 0x01D8DCC0, "SV_CheckTimeouts", (size_t)&SV_CheckTimeouts },
+//	{ 0x01D8DD50, "SV_CalcPing", (size_t)&SV_CalcPing },
+//	{ 0x01D8DE20, "SV_FullClientUpdate", (size_t)&SV_FullClientUpdate },
+//	{ 0x01D8DEF0, "SV_EmitEvents", (size_t)&SV_EmitEvents },
+//	{ 0x01D8E0F0, "SV_AddToFatPVS", (size_t)&SV_AddToFatPVS },
+//	{ 0x01D8E1B0, "SV_FatPVS", (size_t)&SV_FatPVS },
+//	{ 0x01D8E200, "SV_AddToFatPAS", (size_t)&SV_AddToFatPAS },
+//	{ 0x01D8E2D0, "SV_FatPAS", (size_t)&SV_FatPAS },
+//	{ 0x01D8E320, "SV_PointLeafnum", (size_t)&SV_PointLeafnum },
 	//{ 0x, "TRACE_DELTA", (size_t)&TRACE_DELTA }, //NOXREF
-	{ 0x01D8E370, "SV_SetCallback", (size_t)&SV_SetCallback },
-	{ 0x01D8E3C0, "SV_SetNewInfo", (size_t)&SV_SetNewInfo },
-	{ 0x01D8E3E0, "SV_WriteDeltaHeader", (size_t)&SV_WriteDeltaHeader },
-	{ 0x01D8E4E0, "SV_InvokeCallback", (size_t)&SV_InvokeCallback },
-	{ 0x01D8E520, "SV_FindBestBaseline", (size_t)&SV_FindBestBaseline },
-	{ 0x01D8E650, "SV_CreatePacketEntities", (size_t)&SV_CreatePacketEntities },
-	{ 0x01D8E9A0, "SV_EmitPacketEntities", (size_t)&SV_EmitPacketEntities },
-	{ 0x01D8E9E0, "SV_ShouldUpdatePing", (size_t)&SV_ShouldUpdatePing },
+//	{ 0x01D8E370, "SV_SetCallback", (size_t)&SV_SetCallback },
+//	{ 0x01D8E3C0, "SV_SetNewInfo", (size_t)&SV_SetNewInfo },
+//	{ 0x01D8E3E0, "SV_WriteDeltaHeader", (size_t)&SV_WriteDeltaHeader },
+//	{ 0x01D8E4E0, "SV_InvokeCallback", (size_t)&SV_InvokeCallback },
+//	{ 0x01D8E520, "SV_FindBestBaseline", (size_t)&SV_FindBestBaseline },
+//	{ 0x01D8E650, "SV_CreatePacketEntities", (size_t)&SV_CreatePacketEntities },
+//	{ 0x01D8E9A0, "SV_EmitPacketEntities", (size_t)&SV_EmitPacketEntities },
+//	{ 0x01D8E9E0, "SV_ShouldUpdatePing", (size_t)&SV_ShouldUpdatePing },
 	//{ 0x01D8EA40, "SV_HasEventsInQueue", (size_t)&SV_HasEventsInQueue }, //NOXREF
-	{ 0x01D8EA70, "SV_GetNetInfo", (size_t)&SV_GetNetInfo },
-	{ 0x01D8EB00, "SV_CheckVisibility", (size_t)&SV_CheckVisibility },
-	{ 0x01D8EBF0, "SV_EmitPings", (size_t)&SV_EmitPings },
-	{ 0x01D8EC90, "SV_WriteEntitiesToClient", (size_t)&SV_WriteEntitiesToClient },
-	{ 0x01D8EE90, "SV_CleanupEnts", (size_t)&SV_CleanupEnts },
-	{ 0x01D8EEC0, "SV_SendClientDatagram", (size_t)&SV_SendClientDatagram },
-	{ 0x01D8EFC0, "SV_UpdateToReliableMessages", (size_t)&SV_UpdateToReliableMessages },
-	{ 0x01D8F230, "SV_SkipUpdates", (size_t)&SV_SkipUpdates },
-	{ 0x01D8F280, "SV_SendClientMessages", (size_t)&SV_SendClientMessages },
-	{ 0x01D8F470, "SV_ExtractFromUserinfo", (size_t)&SV_ExtractFromUserinfo },
-	{ 0x01D8F870, "SV_ModelIndex", (size_t)&SV_ModelIndex },
-	{ 0x01D8F8E0, "SV_AddResource", (size_t)&SV_AddResource },
-	{ 0x01D8F950, "SV_CreateGenericResources", (size_t)&SV_CreateGenericResources },
-	{ 0x01D8FC30, "SV_CreateResourceList", (size_t)&SV_CreateResourceList },
-	{ 0x01D8FDC0, "SV_ClearCaches", (size_t)&SV_ClearCaches },
-	{ 0x01D8FE00, "SV_PropagateCustomizations", (size_t)&SV_PropagateCustomizations },
-	{ 0x01D8FF00, "SV_WriteVoiceCodec", (size_t)&SV_WriteVoiceCodec },
-	{ 0x01D8FF30, "SV_CreateBaseline", (size_t)&SV_CreateBaseline },
-	{ 0x01D90170, "SV_BroadcastCommand", (size_t)&SV_BroadcastCommand },
-	{ 0x01D90260, "SV_BuildReconnect", (size_t)&SV_BuildReconnect },
+//	{ 0x01D8EA70, "SV_GetNetInfo", (size_t)&SV_GetNetInfo },
+//	{ 0x01D8EB00, "SV_CheckVisibility", (size_t)&SV_CheckVisibility },
+//	{ 0x01D8EBF0, "SV_EmitPings", (size_t)&SV_EmitPings },
+//	{ 0x01D8EC90, "SV_WriteEntitiesToClient", (size_t)&SV_WriteEntitiesToClient },
+//	{ 0x01D8EE90, "SV_CleanupEnts", (size_t)&SV_CleanupEnts },
+//	{ 0x01D8EEC0, "SV_SendClientDatagram", (size_t)&SV_SendClientDatagram },
+//	{ 0x01D8EFC0, "SV_UpdateToReliableMessages", (size_t)&SV_UpdateToReliableMessages },
+//	{ 0x01D8F230, "SV_SkipUpdates", (size_t)&SV_SkipUpdates },
+//	{ 0x01D8F280, "SV_SendClientMessages", (size_t)&SV_SendClientMessages },
+//	{ 0x01D8F470, "SV_ExtractFromUserinfo", (size_t)&SV_ExtractFromUserinfo },
+//	{ 0x01D8F870, "SV_ModelIndex", (size_t)&SV_ModelIndex },
+//	{ 0x01D8F8E0, "SV_AddResource", (size_t)&SV_AddResource },
+//	{ 0x01D8F950, "SV_CreateGenericResources", (size_t)&SV_CreateGenericResources },
+//	{ 0x01D8FC30, "SV_CreateResourceList", (size_t)&SV_CreateResourceList },
+//	{ 0x01D8FDC0, "SV_ClearCaches", (size_t)&SV_ClearCaches },
+//	{ 0x01D8FE00, "SV_PropagateCustomizations", (size_t)&SV_PropagateCustomizations },
+//	{ 0x01D8FF00, "SV_WriteVoiceCodec", (size_t)&SV_WriteVoiceCodec },
+//	{ 0x01D8FF30, "SV_CreateBaseline", (size_t)&SV_CreateBaseline },
+//	{ 0x01D90170, "SV_BroadcastCommand", (size_t)&SV_BroadcastCommand },
+//	{ 0x01D90260, "SV_BuildReconnect", (size_t)&SV_BuildReconnect },
 	//{ 0x01D90280, "SV_ReconnectAllClients", (size_t)&SV_ReconnectAllClients }, //NOXREF
-	{ 0x01D903D0, "SetCStrikeFlags", (size_t)&SetCStrikeFlags },
-	{ 0x01D904E0, "SV_ActivateServer", (size_t)&SV_ActivateServer },
-	{ 0x01D90790, "SV_ServerShutdown", (size_t)&SV_ServerShutdown },
-	{ 0x01D907C0, "SV_SpawnServer", (size_t)&SV_SpawnServer },
-	{ 0x01D90E70, "SV_LoadEntities", (size_t)&SV_LoadEntities },
-	{ 0x01D90E90, "SV_ClearEntities", (size_t)&SV_ClearEntities },
-	{ 0x01D90ED0, "RegUserMsg", (size_t)&RegUserMsg },
-	{ 0x01D90F80, "StringToFilter", (size_t)&StringToFilter },
-	{ 0x01D91020, "SV_StringToUserID", (size_t)&SV_StringToUserID },
-	{ 0x01D910C0, "SV_BanId_f", (size_t)&SV_BanId_f },
-	{ 0x01D915C0, "Host_Kick_f", (size_t)&Host_Kick_f },
-	{ 0x01D91990, "SV_RemoveId_f", (size_t)&SV_RemoveId_f },
-	{ 0x01D91B90, "SV_WriteId_f", (size_t)&SV_WriteId_f },
-	{ 0x01D91C60, "SV_ListId_f", (size_t)&SV_ListId_f },
-	{ 0x01D91D00, "SV_AddIP_f", (size_t)&SV_AddIP_f },
-	{ 0x01D91F00, "SV_RemoveIP_f", (size_t)&SV_RemoveIP_f },
-	{ 0x01D91FD0, "SV_ListIP_f", (size_t)&SV_ListIP_f },
-	{ 0x01D920B0, "SV_WriteIP_f", (size_t)&SV_WriteIP_f },
-	{ 0x01D92190, "SV_KickPlayer", (size_t)&SV_KickPlayer },
-	{ 0x01D92300, "SV_InactivateClients", (size_t)&SV_InactivateClients },
-	{ 0x01D923A0, "SV_FailDownload", (size_t)&SV_FailDownload },
-	{ 0x01D923E0, "Q_stristr", (size_t)&Q_stristr },
-	{ 0x01D92480, "IsSafeFileToDownload", (size_t)&IsSafeFileToDownload },
-	{ 0x01D92710, "SV_BeginFileDownload_f", (size_t)&SV_BeginFileDownload_f },
+//	{ 0x01D903D0, "SetCStrikeFlags", (size_t)&SetCStrikeFlags },
+//	{ 0x01D904E0, "SV_ActivateServer", (size_t)&SV_ActivateServer },
+//	{ 0x01D90790, "SV_ServerShutdown", (size_t)&SV_ServerShutdown },
+//	{ 0x01D907C0, "SV_SpawnServer", (size_t)&SV_SpawnServer },
+//	{ 0x01D90E70, "SV_LoadEntities", (size_t)&SV_LoadEntities },
+//	{ 0x01D90E90, "SV_ClearEntities", (size_t)&SV_ClearEntities },
+//	{ 0x01D90ED0, "RegUserMsg", (size_t)&RegUserMsg },
+//	{ 0x01D90F80, "StringToFilter", (size_t)&StringToFilter },
+//	{ 0x01D91020, "SV_StringToUserID", (size_t)&SV_StringToUserID },
+//	{ 0x01D910C0, "SV_BanId_f", (size_t)&SV_BanId_f },
+//	{ 0x01D915C0, "Host_Kick_f", (size_t)&Host_Kick_f },
+//	{ 0x01D91990, "SV_RemoveId_f", (size_t)&SV_RemoveId_f },
+//	{ 0x01D91B90, "SV_WriteId_f", (size_t)&SV_WriteId_f },
+//	{ 0x01D91C60, "SV_ListId_f", (size_t)&SV_ListId_f },
+//	{ 0x01D91D00, "SV_AddIP_f", (size_t)&SV_AddIP_f },
+//	{ 0x01D91F00, "SV_RemoveIP_f", (size_t)&SV_RemoveIP_f },
+//	{ 0x01D91FD0, "SV_ListIP_f", (size_t)&SV_ListIP_f },
+//	{ 0x01D920B0, "SV_WriteIP_f", (size_t)&SV_WriteIP_f },
+//	{ 0x01D92190, "SV_KickPlayer", (size_t)&SV_KickPlayer },
+//	{ 0x01D92300, "SV_InactivateClients", (size_t)&SV_InactivateClients },
+//	{ 0x01D923A0, "SV_FailDownload", (size_t)&SV_FailDownload },
+//	{ 0x01D923E0, "Q_stristr", (size_t)&Q_stristr },
+//	{ 0x01D92480, "IsSafeFileToDownload", (size_t)&IsSafeFileToDownload },
+//	{ 0x01D92710, "SV_BeginFileDownload_f", (size_t)&SV_BeginFileDownload_f },
 	{ 0x01D92940, "SV_SetMaxclients", (size_t)&SV_SetMaxclients },
-	{ 0x01D92B00, "SV_HandleRconPacket", (size_t)&SV_HandleRconPacket },
-	{ 0x01D92B70, "SV_CheckCmdTimes", (size_t)&SV_CheckCmdTimes },
-	{ 0x01D92C60, "SV_CheckForRcon", (size_t)&SV_CheckForRcon },
-	{ 0x01D92CC0, "SV_IsSimulating", (size_t)&SV_IsSimulating },
-	{ 0x01D92D00, "SV_CheckMapDifferences", (size_t)&SV_CheckMapDifferences },
-	{ 0x01D92D80, "SV_Frame", (size_t)&SV_Frame },
-	{ 0x01D92E00, "SV_Drop_f", (size_t)&SV_Drop_f },
-	{ 0x01D92E40, "SV_RegisterDelta", (size_t)&SV_RegisterDelta },
-	{ 0x01D92EC0, "SV_InitDeltas", (size_t)&SV_InitDeltas },
-	{ 0x01D93010, "SV_InitEncoders", (size_t)&SV_InitEncoders },
-	{ 0x01D93050, "SV_Init", (size_t)&SV_Init },
-	{ 0x01D93600, "SV_Shutdown", (size_t)&SV_Shutdown },
+//	{ 0x01D92B00, "SV_HandleRconPacket", (size_t)&SV_HandleRconPacket },
+//	{ 0x01D92B70, "SV_CheckCmdTimes", (size_t)&SV_CheckCmdTimes },
+//	{ 0x01D92C60, "SV_CheckForRcon", (size_t)&SV_CheckForRcon },
+//	{ 0x01D92CC0, "SV_IsSimulating", (size_t)&SV_IsSimulating },
+//	{ 0x01D92D00, "SV_CheckMapDifferences", (size_t)&SV_CheckMapDifferences },
+//	{ 0x01D92D80, "SV_Frame", (size_t)&SV_Frame },
+//	{ 0x01D92E00, "SV_Drop_f", (size_t)&SV_Drop_f },
+//	{ 0x01D92E40, "SV_RegisterDelta", (size_t)&SV_RegisterDelta },
+//	{ 0x01D92EC0, "SV_InitDeltas", (size_t)&SV_InitDeltas },
+//	{ 0x01D93010, "SV_InitEncoders", (size_t)&SV_InitEncoders },
+//	{ 0x01D93050, "SV_Init", (size_t)&SV_Init },
+//	{ 0x01D93600, "SV_Shutdown", (size_t)&SV_Shutdown },
 	{ 0x01D93650, "SV_CompareUserID", (size_t)&SV_CompareUserID },
 	{ 0x01D936D0, "SV_GetIDString", (size_t)&SV_GetIDString },
 	{ 0x01D938E0, "SV_GetClientIDString", (size_t)&SV_GetClientIDString },
-	{ 0x01D93950, "GetGameAppID", (size_t)&GetGameAppID },
-	{ 0x01D939C0, "IsGameSubscribed", (size_t)&IsGameSubscribed },
-	{ 0x01D93A10, "BIsValveGame", (size_t)&BIsValveGame }, //NOXREF
+//	{ 0x01D93950, "GetGameAppID", (size_t)&GetGameAppID },
+//	{ 0x01D939C0, "IsGameSubscribed", (size_t)&IsGameSubscribed },
+//	{ 0x01D93A10, "BIsValveGame", (size_t)&BIsValveGame }, //NOXREF
 
 #endif // Sv_Main_region
 
@@ -741,10 +761,10 @@ FunctionHook g_FunctionHooks[] =
 #ifndef SysDll_region
 
 	//{ 0x, "Sys_PageIn", (size_t)&Sys_PageIn },
-	{ 0x01D9ECF0, "Sys_FindFirst", (size_t)&Sys_FindFirst },
-	{ 0x01D9ED50, "Sys_FindFirstPathID", (size_t)&Sys_FindFirstPathID },
-	{ 0x01D9ED90, "Sys_FindNext", (size_t)&Sys_FindNext },
-	{ 0x01D9EDC0, "Sys_FindClose", (size_t)&Sys_FindClose },
+//	{ 0x01D9ECF0, "Sys_FindFirst", (size_t)&Sys_FindFirst },
+//	{ 0x01D9ED50, "Sys_FindFirstPathID", (size_t)&Sys_FindFirstPathID },
+//	{ 0x01D9ED90, "Sys_FindNext", (size_t)&Sys_FindNext },
+//	{ 0x01D9EDC0, "Sys_FindClose", (size_t)&Sys_FindClose },
 	//{ 0x01D9EDE0, "glob_match_after_star", (size_t)&glob_match_after_star },
 	//{ 0x01D9EF50, "glob_match", (size_t)&glob_match },
 	//{ 0x01D9EFD0, "Sys_MakeCodeWriteable", (size_t)&Sys_MakeCodeWriteable },
@@ -757,36 +777,36 @@ FunctionHook g_FunctionHooks[] =
 	//{ 0x, "Sys_DebugOutStraight", (size_t)&Sys_DebugOutStraight },
 	//{ 0x01D9F0E0, "Sys_Error", (size_t)&Sys_Error },
 	//{ 0x01D9F1F0, "Sys_Warning", (size_t)&Sys_Warning },
-	{ 0x01D9F230, "Sys_Printf", (size_t)&Sys_Printf },
-	{ 0x01D9F4A0, "Sys_Quit", (size_t)&Sys_Quit },
+//	{ 0x01D9F230, "Sys_Printf", (size_t)&Sys_Printf },
+//	{ 0x01D9F4A0, "Sys_Quit", (size_t)&Sys_Quit },
 	{ 0x01D9F2A0, "Sys_FloatTime", (size_t)&Sys_FloatTime },
-	{ 0x01D9F460, "Dispatch_Substate", (size_t)&Dispatch_Substate },
-	{ 0x01D9F470, "GameSetSubState", (size_t)&GameSetSubState },
-	{ 0x01D9F4A0, "GameSetState", (size_t)&GameSetState },
+//	{ 0x01D9F460, "Dispatch_Substate", (size_t)&Dispatch_Substate },
+//	{ 0x01D9F470, "GameSetSubState", (size_t)&GameSetSubState },
+//	{ 0x01D9F4A0, "GameSetState", (size_t)&GameSetState },
 	//{ 0x, "GameSetBackground", (size_t)&GameSetBackground },
-	{ 0x01D9F7B0, "Voice_GetClientListening", (size_t)&Voice_GetClientListening },
-	{ 0x01D9F810, "Voice_SetClientListening", (size_t)&Voice_SetClientListening },
-	{ 0x01D9F890, "GetDispatch", (size_t)&GetDispatch },
-	{ 0x01D9F8D0, "FindAddressInTable", (size_t)&FindAddressInTable },
-	{ 0x01D9F910, "FindNameInTable", (size_t)&FindNameInTable },
+//	{ 0x01D9F7B0, "Voice_GetClientListening", (size_t)&Voice_GetClientListening },
+//	{ 0x01D9F810, "Voice_SetClientListening", (size_t)&Voice_SetClientListening },
+//	{ 0x01D9F890, "GetDispatch", (size_t)&GetDispatch },
+//	{ 0x01D9F8D0, "FindAddressInTable", (size_t)&FindAddressInTable },
+//	{ 0x01D9F910, "FindNameInTable", (size_t)&FindNameInTable },
 	//{ 0x, "ConvertNameToLocalPlatform", (size_t)&ConvertNameToLocalPlatform },
-	{ 0x01D9FAA0, "FunctionFromName", (size_t)&FunctionFromName },
-	{ 0x01D9FB00, "NameForFunction", (size_t)&NameForFunction },
-	{ 0x01D9FB50, "GetEntityInit", (size_t)&GetEntityInit },
-	{ 0x01D9FB70, "GetIOFunction", (size_t)&GetIOFunction },
-	{ 0x01D9FB90, "DLL_SetModKey", (size_t)&DLL_SetModKey },
-	{ 0x01D9FE50, "LoadEntityDLLs", (size_t)&LoadEntityDLLs },
-	{ 0x01DA02D0, "LoadThisDll", (size_t)&LoadThisDll },
-	{ 0x01DA0390, "ReleaseEntityDlls", (size_t)&ReleaseEntityDlls },
+//	{ 0x01D9FAA0, "FunctionFromName", (size_t)&FunctionFromName },
+//	{ 0x01D9FB00, "NameForFunction", (size_t)&NameForFunction },
+//	{ 0x01D9FB50, "GetEntityInit", (size_t)&GetEntityInit },
+//	{ 0x01D9FB70, "GetIOFunction", (size_t)&GetIOFunction },
+//	{ 0x01D9FB90, "DLL_SetModKey", (size_t)&DLL_SetModKey },
+//	{ 0x01D9FE50, "LoadEntityDLLs", (size_t)&LoadEntityDLLs },
+//	{ 0x01DA02D0, "LoadThisDll", (size_t)&LoadThisDll },
+//	{ 0x01DA0390, "ReleaseEntityDlls", (size_t)&ReleaseEntityDlls },
 	//{ 0x01DA0410, "EngineFprintf", (size_t)&EngineFprintf },
-	{ 0x01DA0420, "AlertMessage", (size_t)&AlertMessage },
+//	{ 0x01DA0420, "AlertMessage", (size_t)&AlertMessage },
 	//{ 0x01DA0640, "Sys_SplitPath", (size_t)&Sys_SplitPath },
-	{ 0x01D2BD90, "Con_Debug_f", (size_t)&Con_Debug_f },
-	{ 0x01D2BDD0, "Con_Init", (size_t)&Con_Init },
-	{ 0x01D2BFC0, "Con_DebugLog", (size_t)&Con_DebugLog },
-	{ 0x01D2C020, "Con_Printf", (size_t)&Con_Printf },
-	{ 0x01D2C1E0, "Con_SafePrintf", (size_t)&Con_SafePrintf },
-	{ 0x01D2C140, "Con_DPrintf", (size_t)&Con_DPrintf },
+//	{ 0x01D2BD90, "Con_Debug_f", (size_t)&Con_Debug_f },
+//	{ 0x01D2BDD0, "Con_Init", (size_t)&Con_Init },
+//	{ 0x01D2BFC0, "Con_DebugLog", (size_t)&Con_DebugLog },
+//	{ 0x01D2C020, "Con_Printf", (size_t)&Con_Printf },
+//	{ 0x01D2C1E0, "Con_SafePrintf", (size_t)&Con_SafePrintf },
+//	{ 0x01D2C140, "Con_DPrintf", (size_t)&Con_DPrintf },
 
 #ifdef _WIN32
 	{ 0x01DA0A70, "Sys_InitHardwareTimer", (size_t)&Sys_InitHardwareTimer },
@@ -1264,122 +1284,122 @@ FunctionHook g_FunctionHooks[] =
 
 #ifndef Pr_Cmds_region
 
-	{ 0x01D5CF00, "PF_makevectors_I", (size_t)&PF_makevectors_I },
-	{ 0x01D5CF20, "PF_Time", (size_t)&PF_Time },
-	{ 0x01D5CF40, "PF_setorigin_I", (size_t)&PF_setorigin_I },
-	{ 0x01D5CF80, "SetMinMaxSize", (size_t)&SetMinMaxSize },
-	{ 0x01D5D030, "PF_setsize_I", (size_t)&PF_setsize_I },
-	{ 0x01D5D050, "PF_setmodel_I", (size_t)&PF_setmodel_I },
-	{ 0x01D5D0F0, "PF_modelindex", (size_t)&PF_modelindex },
-	{ 0x01D5D110, "ModelFrames", (size_t)&ModelFrames },
-	{ 0x01D5D150, "PF_bprint", (size_t)&PF_bprint },
-	{ 0x01D5D170, "PF_sprint", (size_t)&PF_sprint },
-	{ 0x01D5D1D0, "ServerPrint", (size_t)&ServerPrint },
-	{ 0x01D5D1F0, "ClientPrintf", (size_t)&ClientPrintf },
-	{ 0x01D5D2A0, "PF_vectoyaw_I", (size_t)&PF_vectoyaw_I },
-	{ 0x01D5D330, "PF_vectoangles_I", (size_t)&PF_vectoangles_I },
-	{ 0x01D5D350, "PF_particle_I", (size_t)&PF_particle_I },
-	{ 0x01D5D380, "PF_ambientsound_I", (size_t)&PF_ambientsound_I },
-	{ 0x01D5D4C0, "PF_sound_I", (size_t)&PF_sound_I },
-	{ 0x01D5D5A0, "PF_traceline_Shared", (size_t)&PF_traceline_Shared },
-	{ 0x01D5D600, "PF_traceline_DLL", (size_t)&PF_traceline_DLL },
-	{ 0x01D5D6C0, "TraceHull", (size_t)&TraceHull },
-	{ 0x01D5D770, "TraceSphere", (size_t)&TraceSphere },
-	{ 0x01D5D780, "TraceModel", (size_t)&TraceModel },
-	{ 0x01D5D890, "SurfaceAtPoint", (size_t)&SurfaceAtPoint },
-	{ 0x01D5DA90, "TraceTexture", (size_t)&TraceTexture },
-	{ 0x01D5DCA0, "PF_TraceToss_Shared", (size_t)&PF_TraceToss_Shared },
-	{ 0x01D5DCE0, "SV_SetGlobalTrace", (size_t)&SV_SetGlobalTrace },
-	{ 0x01D5DD80, "PF_TraceToss_DLL", (size_t)&PF_TraceToss_DLL },
-	{ 0x01D5DE40, "TraceMonsterHull", (size_t)&TraceMonsterHull },
-	{ 0x01D5DF10, "PF_newcheckclient", (size_t)&PF_newcheckclient },
-	{ 0x01D5DFF0, "PF_checkclient_I", (size_t)&PF_checkclient_I },
-	{ 0x01D5E110, "PVSNode", (size_t)&PVSNode },
-	{ 0x01D5E1D0, "PVSMark", (size_t)&PVSMark },
-	{ 0x01D5E250, "PVSFindEntities", (size_t)&PVSFindEntities },
-	{ 0x01D5E360, "ValidCmd", (size_t)&ValidCmd },
-	{ 0x01D5E390, "PF_stuffcmd_I", (size_t)&PF_stuffcmd_I },
-	{ 0x01D5E450, "PF_localcmd_I", (size_t)&PF_localcmd_I },
-	{ 0x01D5E480, "PF_localexec_I", (size_t)&PF_localexec_I },
-	{ 0x01D5E490, "FindEntityInSphere", (size_t)&FindEntityInSphere },
-	{ 0x01D5E5C0, "PF_Spawn_I", (size_t)&PF_Spawn_I },
-	{ 0x01D5E5D0, "CreateNamedEntity", (size_t)&CreateNamedEntity },
-	{ 0x01D5E640, "PF_Remove_I", (size_t)&PF_Remove_I },
-	{ 0x01D5E920, "PF_find_Shared", (size_t)&PF_find_Shared },
-	{ 0x01D5E660, "iGetIndex", (size_t)&iGetIndex },
-	{ 0x01D5E8C0, "FindEntityByString", (size_t)&FindEntityByString },
-	{ 0x01D5E9B0, "GetEntityIllum", (size_t)&GetEntityIllum },
-	{ 0x01D5EA50, "PR_IsEmptyString", (size_t)&PR_IsEmptyString },
-	{ 0x01D5EA60, "PF_precache_sound_I", (size_t)&PF_precache_sound_I },
-	{ 0x01D5EB50, "EV_Precache", (size_t)&EV_Precache },
-	{ 0x01D5ECD0, "EV_PlayReliableEvent", (size_t)&EV_PlayReliableEvent },
-	{ 0x01D5EE10, "EV_Playback", (size_t)&EV_Playback },
-	{ 0x01D5F190, "EV_SV_Playback", (size_t)&EV_SV_Playback },
-	{ 0x01D5F210, "PF_precache_model_I", (size_t)&PF_precache_model_I },
-	{ 0x01D5F310, "PF_precache_generic_I", (size_t)&PF_precache_generic_I },
-	{ 0x01D5F3E0, "PF_IsMapValid_I", (size_t)&PF_IsMapValid_I },
-	{ 0x01D5F430, "PF_NumberOfEntities_I", (size_t)&PF_NumberOfEntities_I },
-	{ 0x01D5F460, "PF_GetInfoKeyBuffer_I", (size_t)&PF_GetInfoKeyBuffer_I },
-	{ 0x01D5F4B0, "PF_InfoKeyValue_I", (size_t)&PF_InfoKeyValue_I },
-	{ 0x01D5F4D0, "PF_SetKeyValue_I", (size_t)&PF_SetKeyValue_I },
-	{ 0x01D5F530, "PF_RemoveKey_I", (size_t)&PF_RemoveKey_I },
-	{ 0x01D5F550, "PF_SetClientKeyValue_I", (size_t)&PF_SetClientKeyValue_I },
-	{ 0x01D5F5E0, "PF_walkmove_I", (size_t)&PF_walkmove_I },
-	{ 0x01D5F690, "PF_droptofloor_I", (size_t)&PF_droptofloor_I },
-	{ 0x01D5F780, "PF_DecalIndex", (size_t)&PF_DecalIndex },
-	{ 0x01D5F7D0, "PF_lightstyle_I", (size_t)&PF_lightstyle_I },
-	{ 0x01D5F860, "PF_checkbottom_I", (size_t)&PF_checkbottom_I },
-	{ 0x01D5F880, "PF_pointcontents_I", (size_t)&PF_pointcontents_I },
-	{ 0x01D5F8A0, "PF_aim_I", (size_t)&PF_aim_I },
-	{ 0x01D5FB60, "PF_changeyaw_I", (size_t)&PF_changeyaw_I },
-	{ 0x01D5FC50, "PF_changepitch_I", (size_t)&PF_changepitch_I },
-	{ 0x01D5FD40, "PF_setview_I", (size_t)&PF_setview_I },
-	{ 0x01D5FDC0, "PF_crosshairangle_I", (size_t)&PF_crosshairangle_I },
-	{ 0x01D5FEC0, "PF_CreateFakeClient_I", (size_t)&PF_CreateFakeClient_I },
-	{ 0x01D60070, "PF_RunPlayerMove_I", (size_t)&PF_RunPlayerMove_I },
-	{ 0x01D60180, "WriteDest_Parm", (size_t)&WriteDest_Parm },
-	{ 0x01D60260, "PF_MessageBegin_I", (size_t)&PF_MessageBegin_I },
-	{ 0x01D60350, "PF_MessageEnd_I", (size_t)&PF_MessageEnd_I },
-	{ 0x01D605E0, "PF_WriteByte_I", (size_t)&PF_WriteByte_I },
-	{ 0x01D60610, "PF_WriteChar_I", (size_t)&PF_WriteChar_I },
-	{ 0x01D60640, "PF_WriteShort_I", (size_t)&PF_WriteShort_I },
-	{ 0x01D60670, "PF_WriteLong_I", (size_t)&PF_WriteLong_I },
-	{ 0x01D606A0, "PF_WriteAngle_I", (size_t)&PF_WriteAngle_I },
-	{ 0x01D606D0, "PF_WriteCoord_I", (size_t)&PF_WriteCoord_I },
-	{ 0x01D60710, "PF_WriteString_I", (size_t)&PF_WriteString_I },
-	{ 0x01D60740, "PF_WriteEntity_I", (size_t)&PF_WriteEntity_I },
-	{ 0x01D60770, "PF_makestatic_I", (size_t)&PF_makestatic_I },
-	{ 0x01D608C0, "PF_StaticDecal", (size_t)&PF_StaticDecal },
-	{ 0x01D60940, "PF_setspawnparms_I", (size_t)&PF_setspawnparms_I },
-	{ 0x01D60970, "PF_changelevel_I", (size_t)&PF_changelevel_I },
+//	{ 0x01D5CF00, "PF_makevectors_I", (size_t)&PF_makevectors_I },
+//	{ 0x01D5CF20, "PF_Time", (size_t)&PF_Time },
+//	{ 0x01D5CF40, "PF_setorigin_I", (size_t)&PF_setorigin_I },
+//	{ 0x01D5CF80, "SetMinMaxSize", (size_t)&SetMinMaxSize },
+//	{ 0x01D5D030, "PF_setsize_I", (size_t)&PF_setsize_I },
+//	{ 0x01D5D050, "PF_setmodel_I", (size_t)&PF_setmodel_I },
+//	{ 0x01D5D0F0, "PF_modelindex", (size_t)&PF_modelindex },
+//	{ 0x01D5D110, "ModelFrames", (size_t)&ModelFrames },
+//	{ 0x01D5D150, "PF_bprint", (size_t)&PF_bprint },
+//	{ 0x01D5D170, "PF_sprint", (size_t)&PF_sprint },
+//	{ 0x01D5D1D0, "ServerPrint", (size_t)&ServerPrint },
+//	{ 0x01D5D1F0, "ClientPrintf", (size_t)&ClientPrintf },
+//	{ 0x01D5D2A0, "PF_vectoyaw_I", (size_t)&PF_vectoyaw_I },
+//	{ 0x01D5D330, "PF_vectoangles_I", (size_t)&PF_vectoangles_I },
+//	{ 0x01D5D350, "PF_particle_I", (size_t)&PF_particle_I },
+//	{ 0x01D5D380, "PF_ambientsound_I", (size_t)&PF_ambientsound_I },
+//	{ 0x01D5D4C0, "PF_sound_I", (size_t)&PF_sound_I },
+//	{ 0x01D5D5A0, "PF_traceline_Shared", (size_t)&PF_traceline_Shared },
+//	{ 0x01D5D600, "PF_traceline_DLL", (size_t)&PF_traceline_DLL },
+//	{ 0x01D5D6C0, "TraceHull", (size_t)&TraceHull },
+//	{ 0x01D5D770, "TraceSphere", (size_t)&TraceSphere },
+//	{ 0x01D5D780, "TraceModel", (size_t)&TraceModel },
+//	{ 0x01D5D890, "SurfaceAtPoint", (size_t)&SurfaceAtPoint },
+//	{ 0x01D5DA90, "TraceTexture", (size_t)&TraceTexture },
+//	{ 0x01D5DCA0, "PF_TraceToss_Shared", (size_t)&PF_TraceToss_Shared },
+//	{ 0x01D5DCE0, "SV_SetGlobalTrace", (size_t)&SV_SetGlobalTrace },
+//	{ 0x01D5DD80, "PF_TraceToss_DLL", (size_t)&PF_TraceToss_DLL },
+//	{ 0x01D5DE40, "TraceMonsterHull", (size_t)&TraceMonsterHull },
+//	{ 0x01D5DF10, "PF_newcheckclient", (size_t)&PF_newcheckclient },
+//	{ 0x01D5DFF0, "PF_checkclient_I", (size_t)&PF_checkclient_I },
+//	{ 0x01D5E110, "PVSNode", (size_t)&PVSNode },
+//	{ 0x01D5E1D0, "PVSMark", (size_t)&PVSMark },
+//	{ 0x01D5E250, "PVSFindEntities", (size_t)&PVSFindEntities },
+//	{ 0x01D5E360, "ValidCmd", (size_t)&ValidCmd },
+//	{ 0x01D5E390, "PF_stuffcmd_I", (size_t)&PF_stuffcmd_I },
+//	{ 0x01D5E450, "PF_localcmd_I", (size_t)&PF_localcmd_I },
+//	{ 0x01D5E480, "PF_localexec_I", (size_t)&PF_localexec_I },
+//	{ 0x01D5E490, "FindEntityInSphere", (size_t)&FindEntityInSphere },
+//	{ 0x01D5E5C0, "PF_Spawn_I", (size_t)&PF_Spawn_I },
+//	{ 0x01D5E5D0, "CreateNamedEntity", (size_t)&CreateNamedEntity },
+//	{ 0x01D5E640, "PF_Remove_I", (size_t)&PF_Remove_I },
+//	{ 0x01D5E920, "PF_find_Shared", (size_t)&PF_find_Shared },
+//	{ 0x01D5E660, "iGetIndex", (size_t)&iGetIndex },
+//	{ 0x01D5E8C0, "FindEntityByString", (size_t)&FindEntityByString },
+//	{ 0x01D5E9B0, "GetEntityIllum", (size_t)&GetEntityIllum },
+//	{ 0x01D5EA50, "PR_IsEmptyString", (size_t)&PR_IsEmptyString },
+//	{ 0x01D5EA60, "PF_precache_sound_I", (size_t)&PF_precache_sound_I },
+//	{ 0x01D5EB50, "EV_Precache", (size_t)&EV_Precache },
+//	{ 0x01D5ECD0, "EV_PlayReliableEvent", (size_t)&EV_PlayReliableEvent },
+//	{ 0x01D5EE10, "EV_Playback", (size_t)&EV_Playback },
+//	{ 0x01D5F190, "EV_SV_Playback", (size_t)&EV_SV_Playback },
+//	{ 0x01D5F210, "PF_precache_model_I", (size_t)&PF_precache_model_I },
+//	{ 0x01D5F310, "PF_precache_generic_I", (size_t)&PF_precache_generic_I },
+//	{ 0x01D5F3E0, "PF_IsMapValid_I", (size_t)&PF_IsMapValid_I },
+//	{ 0x01D5F430, "PF_NumberOfEntities_I", (size_t)&PF_NumberOfEntities_I },
+//	{ 0x01D5F460, "PF_GetInfoKeyBuffer_I", (size_t)&PF_GetInfoKeyBuffer_I },
+//	{ 0x01D5F4B0, "PF_InfoKeyValue_I", (size_t)&PF_InfoKeyValue_I },
+//	{ 0x01D5F4D0, "PF_SetKeyValue_I", (size_t)&PF_SetKeyValue_I },
+//	{ 0x01D5F530, "PF_RemoveKey_I", (size_t)&PF_RemoveKey_I },
+//	{ 0x01D5F550, "PF_SetClientKeyValue_I", (size_t)&PF_SetClientKeyValue_I },
+//	{ 0x01D5F5E0, "PF_walkmove_I", (size_t)&PF_walkmove_I },
+//	{ 0x01D5F690, "PF_droptofloor_I", (size_t)&PF_droptofloor_I },
+//	{ 0x01D5F780, "PF_DecalIndex", (size_t)&PF_DecalIndex },
+//	{ 0x01D5F7D0, "PF_lightstyle_I", (size_t)&PF_lightstyle_I },
+//	{ 0x01D5F860, "PF_checkbottom_I", (size_t)&PF_checkbottom_I },
+//	{ 0x01D5F880, "PF_pointcontents_I", (size_t)&PF_pointcontents_I },
+//	{ 0x01D5F8A0, "PF_aim_I", (size_t)&PF_aim_I },
+//	{ 0x01D5FB60, "PF_changeyaw_I", (size_t)&PF_changeyaw_I },
+//	{ 0x01D5FC50, "PF_changepitch_I", (size_t)&PF_changepitch_I },
+//	{ 0x01D5FD40, "PF_setview_I", (size_t)&PF_setview_I },
+//	{ 0x01D5FDC0, "PF_crosshairangle_I", (size_t)&PF_crosshairangle_I },
+//	{ 0x01D5FEC0, "PF_CreateFakeClient_I", (size_t)&PF_CreateFakeClient_I },
+//	{ 0x01D60070, "PF_RunPlayerMove_I", (size_t)&PF_RunPlayerMove_I },
+//	{ 0x01D60180, "WriteDest_Parm", (size_t)&WriteDest_Parm },
+//	{ 0x01D60260, "PF_MessageBegin_I", (size_t)&PF_MessageBegin_I },
+//	{ 0x01D60350, "PF_MessageEnd_I", (size_t)&PF_MessageEnd_I },
+//	{ 0x01D605E0, "PF_WriteByte_I", (size_t)&PF_WriteByte_I },
+//	{ 0x01D60610, "PF_WriteChar_I", (size_t)&PF_WriteChar_I },
+//	{ 0x01D60640, "PF_WriteShort_I", (size_t)&PF_WriteShort_I },
+//	{ 0x01D60670, "PF_WriteLong_I", (size_t)&PF_WriteLong_I },
+//	{ 0x01D606A0, "PF_WriteAngle_I", (size_t)&PF_WriteAngle_I },
+//	{ 0x01D606D0, "PF_WriteCoord_I", (size_t)&PF_WriteCoord_I },
+//	{ 0x01D60710, "PF_WriteString_I", (size_t)&PF_WriteString_I },
+//	{ 0x01D60740, "PF_WriteEntity_I", (size_t)&PF_WriteEntity_I },
+//	{ 0x01D60770, "PF_makestatic_I", (size_t)&PF_makestatic_I },
+//	{ 0x01D608C0, "PF_StaticDecal", (size_t)&PF_StaticDecal },
+//	{ 0x01D60940, "PF_setspawnparms_I", (size_t)&PF_setspawnparms_I },
+//	{ 0x01D60970, "PF_changelevel_I", (size_t)&PF_changelevel_I },
 	{ 0x01D609D0, "SeedRandomNumberGenerator", (size_t)&SeedRandomNumberGenerator },
 	{ 0x01D60A10, "ran1", (size_t)&ran1 },
 	{ 0x01D60AE0, "fran1", (size_t)&fran1 },
 	{ 0x01D60B30, "RandomFloat", (size_t)&RandomFloat },
 	{ 0x01D60B60, "RandomLong", (size_t)&RandomLong },
-	{ 0x01D60BC0, "PF_FadeVolume", (size_t)&PF_FadeVolume },
-	{ 0x01D60C60, "PF_SetClientMaxspeed", (size_t)&PF_SetClientMaxspeed },
-	{ 0x01D60CA0, "PF_GetPlayerUserId", (size_t)&PF_GetPlayerUserId },
-	{ 0x01D60CF0, "PF_GetPlayerWONId", (size_t)&PF_GetPlayerWONId },
+//	{ 0x01D60BC0, "PF_FadeVolume", (size_t)&PF_FadeVolume },
+//	{ 0x01D60C60, "PF_SetClientMaxspeed", (size_t)&PF_SetClientMaxspeed },
+//	{ 0x01D60CA0, "PF_GetPlayerUserId", (size_t)&PF_GetPlayerUserId },
+//	{ 0x01D60CF0, "PF_GetPlayerWONId", (size_t)&PF_GetPlayerWONId },
 	{ 0x01D60D00, "PF_GetPlayerAuthId", (size_t)&PF_GetPlayerAuthId },
-	{ 0x01D60E00, "PF_BuildSoundMsg_I", (size_t)&PF_BuildSoundMsg_I },
-	{ 0x01D60E50, "PF_IsDedicatedServer", (size_t)&PF_IsDedicatedServer },
-	{ 0x01D60E60, "PF_GetPhysicsInfoString", (size_t)&PF_GetPhysicsInfoString },
-	{ 0x01D60EB0, "PF_GetPhysicsKeyValue", (size_t)&PF_GetPhysicsKeyValue },
-	{ 0x01D60F10, "PF_SetPhysicsKeyValue", (size_t)&PF_SetPhysicsKeyValue },
-	{ 0x01D60F70, "PF_GetCurrentPlayer", (size_t)&PF_GetCurrentPlayer },
-	{ 0x01D60FB0, "PF_CanSkipPlayer", (size_t)&PF_CanSkipPlayer },
-	{ 0x01D61000, "PF_SetGroupMask", (size_t)&PF_SetGroupMask },
-	{ 0x01D61020, "PF_CreateInstancedBaseline", (size_t)&PF_CreateInstancedBaseline },
-	{ 0x01D61070, "PF_Cvar_DirectSet", (size_t)&PF_Cvar_DirectSet },
-	{ 0x01D61090, "PF_ForceUnmodified", (size_t)&PF_ForceUnmodified },
-	{ 0x01D611B0, "PF_GetPlayerStats", (size_t)&PF_GetPlayerStats },
-	//{ 0x01D61230, "QueryClientCvarValueCmd", (size_t)&QueryClientCvarValueCmd }, //NOXREF
-	//{ 0x01D612D0, "QueryClientCvarValueCmd2", (size_t)&QueryClientCvarValueCmd2 }, //NOXREF
-	{ 0x01D61390, "QueryClientCvarValue", (size_t)&QueryClientCvarValue },
-	{ 0x01D61410, "QueryClientCvarValue2", (size_t)&QueryClientCvarValue2 },
-	{ 0x01D614A0, "hudCheckParm", (size_t)&hudCheckParm },
-	{ 0x01D614F0, "EngCheckParm", (size_t)&EngCheckParm },
+//	{ 0x01D60E00, "PF_BuildSoundMsg_I", (size_t)&PF_BuildSoundMsg_I },
+//	{ 0x01D60E50, "PF_IsDedicatedServer", (size_t)&PF_IsDedicatedServer },
+//	{ 0x01D60E60, "PF_GetPhysicsInfoString", (size_t)&PF_GetPhysicsInfoString },
+//	{ 0x01D60EB0, "PF_GetPhysicsKeyValue", (size_t)&PF_GetPhysicsKeyValue },
+//	{ 0x01D60F10, "PF_SetPhysicsKeyValue", (size_t)&PF_SetPhysicsKeyValue },
+//	{ 0x01D60F70, "PF_GetCurrentPlayer", (size_t)&PF_GetCurrentPlayer },
+//	{ 0x01D60FB0, "PF_CanSkipPlayer", (size_t)&PF_CanSkipPlayer },
+//	{ 0x01D61000, "PF_SetGroupMask", (size_t)&PF_SetGroupMask },
+//	{ 0x01D61020, "PF_CreateInstancedBaseline", (size_t)&PF_CreateInstancedBaseline },
+//	{ 0x01D61070, "PF_Cvar_DirectSet", (size_t)&PF_Cvar_DirectSet },
+//	{ 0x01D61090, "PF_ForceUnmodified", (size_t)&PF_ForceUnmodified },
+//	{ 0x01D611B0, "PF_GetPlayerStats", (size_t)&PF_GetPlayerStats },
+//	//{ 0x01D61230, "QueryClientCvarValueCmd", (size_t)&QueryClientCvarValueCmd }, //NOXREF
+//	//{ 0x01D612D0, "QueryClientCvarValueCmd2", (size_t)&QueryClientCvarValueCmd2 }, //NOXREF
+//	{ 0x01D61390, "QueryClientCvarValue", (size_t)&QueryClientCvarValue },
+//	{ 0x01D61410, "QueryClientCvarValue2", (size_t)&QueryClientCvarValue2 },
+//	{ 0x01D614A0, "hudCheckParm", (size_t)&hudCheckParm },
+//	{ 0x01D614F0, "EngCheckParm", (size_t)&EngCheckParm },
 
 #endif // Pr_Cmds_region
 
@@ -1466,14 +1486,17 @@ FunctionHook g_FunctionHooks[] =
 	{ 0x01D958F0, "SV_PushRotate", (size_t)&SV_PushRotate },
 	{ 0x01D95F00, "SV_Physics_Pusher", (size_t)&SV_Physics_Pusher },
 	{ 0x01D960F0, "SV_CheckWater", (size_t)&SV_CheckWater },
+
 	{ 0x01D96290, "SV_RecursiveWaterLevel", (size_t)&SV_RecursiveWaterLevel },
 	{ 0x01D96310, "SV_Submerged", (size_t)&SV_Submerged },
 	{ 0x01D96410, "SV_Physics_None", (size_t)&SV_Physics_None },
 	{ 0x01D96430, "SV_Physics_Follow", (size_t)&SV_Physics_Follow },
 	{ 0x01D964F0, "SV_Physics_Noclip", (size_t)&SV_Physics_Noclip },
+
 	{ 0x01D96560, "SV_CheckWaterTransition", (size_t)&SV_CheckWaterTransition },
 	{ 0x01D96740, "SV_Physics_Toss", (size_t)&SV_Physics_Toss },
 	{ 0x01D96B20, "PF_WaterMove", (size_t)&PF_WaterMove },
+
 	{ 0x01D96E70, "SV_Physics_Step", (size_t)&SV_Physics_Step },
 	{ 0x01D97240, "SV_Physics", (size_t)&SV_Physics },
 	{ 0x01D97480, "SV_Trace_Toss", (size_t)&SV_Trace_Toss },

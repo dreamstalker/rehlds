@@ -554,6 +554,27 @@ void Rehlds_Debug_logFree(void* ptr)
 	g_RehldsDebugLog.flush();
 }
 
+void Rehlds_Debug_LogDeltaFlags(delta_t* delta, int counter, bool verbose) {
+	unsigned int cksum = 0;
+
+	for (int i = 0; i < delta->fieldCount; i++) {
+		cksum = _mm_crc32_u16(cksum, delta->pdd[i].flags);
+	}
+	
+	g_RehldsDebugLog << "DF(c=" << counter << " crc=" << cksum << ")\n";
+	if (verbose) {
+		for (int i = 0; i < delta->fieldCount; i++) {
+			g_RehldsDebugLog << "DeltaFlagsVerbose(counter=" << counter << " id=" << delta->pdd[i].fieldName << " flags= " << delta->pdd[i].flags << ")\n";
+		}
+	}
+	g_RehldsDebugLog.flush();
+}
+
+void Rehlds_Debug_LogSzAlloc(int counter, int cursize, int maxsize, int flags) {
+	g_RehldsDebugLog << "SZAlloc(c=" << counter << " sz=" << cursize << " maxsz= " << maxsize << " f=" << flags << ")\n";
+	g_RehldsDebugLog.flush();
+}
+
 
 void Rehlds_Debug_Init(Module* engine)
 {

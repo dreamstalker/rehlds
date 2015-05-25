@@ -28,10 +28,6 @@
 
 #include "precompiled.h"
 
-
-
-
-
 char serverinfo[MAX_INFO_STRING];
 
 char gpszVersionString[32];
@@ -459,9 +455,29 @@ void MSG_WriteUsercmd(sizebuf_t *buf, usercmd_t *to, usercmd_t *from)
 
 typedef struct bf_write_s
 {
+
+	//For enhanced and safe bits writing functions
+#if defined(REHLDS_FIXES)
+
+#pragma pack(push, 1)
+	union {
+		uint64 u64;
+		uint32 u32[2];
+		uint8 u8[8];
+	} pendingData;
+	uint64 sse_highbits;
+#pragma pack(pop)
+
+	int nCurOutputBit;
+	sizebuf_t *pbuf;
+
+#else //defined(REHLDS_FIXES)
+
 	int nCurOutputBit;
 	unsigned char *pOutByte;
 	sizebuf_t *pbuf;
+
+#endif //defined(REHLDS_FIXES)
 } bf_write_t;
 
 typedef struct bf_read_s
@@ -476,7 +492,7 @@ typedef struct bf_read_s
 
 // Bit field reading/writing storage.
 bf_read_t bfread;
-bf_write_t bfwrite;
+ALIGN16 bf_write_t bfwrite;
 
 
 void COM_BitOpsInit(void)
@@ -484,6 +500,68 @@ void COM_BitOpsInit(void)
 	Q_memset(&bfwrite, 0, sizeof(bf_write_t));
 	Q_memset(&bfread, 0, sizeof(bf_read_t));
 }
+
+//Enhanced and safe bits writing functions
+#if defined(REHLDS_FIXES)
+
+void MSG_WBits_MaybeFlush() {
+	if (bfwrite.nCurOutputBit < 32)
+		return;
+
+	uint32* pDest = (uint32*)SZ_GetSpace(bfwrite.pbuf, 4);
+	if (!(bfwrite.pbuf->flags & SIZEBUF_OVERFLOWED))
+		*pDest = bfwrite.pendingData.u32[0];
+
+	bfwrite.pendingData.u32[0] = bfwrite.pendingData.u32[1];
+	bfwrite.pendingData.u32[1] = 0;
+	bfwrite.nCurOutputBit -= 32;
+}
+
+void MSG_WriteBits(uint32 data, int numbits)
+{
+	uint32 maxval = _mm_cvtsi128_si32(_mm_slli_epi64(_mm_cvtsi32_si128(1), numbits)) - 1; //maxval = (1 << numbits) - 1
+	if (data > maxval)
+		data = maxval;
+
+	MSG_WBits_MaybeFlush();
+
+	__m128i pending = _mm_load_si128((__m128i*) &bfwrite.pendingData.u64);
+
+	__m128i mmdata = _mm_slli_epi64(_mm_cvtsi32_si128(data), bfwrite.nCurOutputBit); //mmdata = data << bfwrite.nCurOutputBit
+	pending = _mm_or_si128(pending, mmdata);
+
+	_mm_store_si128((__m128i*) &bfwrite.pendingData.u64, pending);
+	bfwrite.nCurOutputBit += numbits;
+}
+
+void MSG_WriteOneBit(int nValue) {
+	MSG_WriteBits(nValue, 1);
+}
+
+void MSG_StartBitWriting(sizebuf_t *buf)
+{
+	bfwrite.nCurOutputBit = 0;
+	bfwrite.pbuf = buf;
+	bfwrite.pendingData.u64 = 0;
+}
+
+void MSG_EndBitWriting(sizebuf_t *buf)
+{
+	int bytesNeed = bfwrite.nCurOutputBit / 8;
+	if ((bfwrite.nCurOutputBit % 8) || bytesNeed == 0) {
+		bytesNeed++;
+	}
+
+	uint8* pData = (uint8*)SZ_GetSpace(bfwrite.pbuf, bytesNeed);
+	if (!(bfwrite.pbuf->flags & SIZEBUF_OVERFLOWED)) {
+		for (int i = 0; i < bytesNeed; i++) {
+			pData[i] = bfwrite.pendingData.u8[i];
+		}
+	}
+
+}
+
+#else // defined(REHLDS_FIXES)
 
 void MSG_WriteOneBit(int nValue)
 {
@@ -514,13 +592,6 @@ void MSG_StartBitWriting(sizebuf_t *buf)
 	bfwrite.nCurOutputBit = 0;
 	bfwrite.pbuf = buf;
 	bfwrite.pOutByte = &buf->data[buf->cursize];
-}
-
-NOXREF qboolean MSG_IsBitWriting(void)
-{
-	NOXREFCHECK;
-
-	return bfwrite.pbuf != 0;
 }
 
 void MSG_EndBitWriting(sizebuf_t *buf)
@@ -580,6 +651,15 @@ void MSG_WriteBits(uint32 data, int numbits)
 			*(uint32 *)bfwrite.pOutByte = data >> leftBits;
 		}
 	}
+}
+
+#endif //defined(REHLDS_FIXES)
+
+NOXREF qboolean MSG_IsBitWriting(void)
+{
+	NOXREFCHECK;
+
+	return bfwrite.pbuf != 0;
 }
 
 void MSG_WriteSBits(int data, int numbits)
@@ -1210,6 +1290,7 @@ void *SZ_GetSpace(sizebuf_t *buf, int length)
 {
 	void *data;
 	const char *buffername = buf->buffername ? buf->buffername : "???";
+
 
 	if (length < 0)
 	{

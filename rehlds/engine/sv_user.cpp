@@ -1226,8 +1226,17 @@ void SV_SetupMove(client_t *_host_client)
 		for (int j = 0; j < nextFrame->entities.num_entities; j++)
 		{
 			state = &nextFrame->entities.entities[j];
+
+#ifdef REHLDS_OPT_PEDANTIC
+			if (state->number <= 0)
+				continue;
+
+			if (state->number > g_psvs.maxclients)
+				break; // players are always in the beginning of the list, no need to look more
+#else
 			if (state->number <= 0 || state->number > g_psvs.maxclients)
 				continue;
+#endif
 
 			pos = &truepositions[state->number - 1];
 			if (pos->deadflag)

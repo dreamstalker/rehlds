@@ -15,4 +15,5 @@
 rehlds/version/appversion.h
 rehlds/msvc/PublishPath*.txt
 rehlds/_rehldsTestImg
+rehlds/_dev
 publish

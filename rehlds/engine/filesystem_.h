@@ -36,6 +36,12 @@
 #include "iregistry.h"
 #include "utlvector.h"
 
+#ifdef _WIN32
+#define FILESYSTEM_DLL_NAME "filesystem_stdio.dll"
+#else
+#define FILESYSTEM_DLL_NAME "filesystem_stdio.so"
+#endif
+
 #ifdef HOOK_ENGINE
 #define g_fallbackLocalizationFiles (*pg_fallbackLocalizationFiles)
 #define s_pBaseDir (*ps_pBaseDir)

@@ -35,7 +35,10 @@ int GradleAdapter::writeAllTestsInfoToFile(const char* fname) {
 
 int GradleAdapter::runTest(const char* groupName, const char* testName) {
 	Test* curTest = TestRegistry::getFirstTest();
-	while (curTest != NULL && strcmp(groupName, curTest->getGroup()) && strcmp(testName, curTest->getGroup())) {
+	while (curTest != NULL) {
+		if (!strcmp(groupName, curTest->getGroup()) && !strcmp(testName, curTest->getName())) {
+			break;
+		}
 		curTest = curTest->getNext();
 	}
 
@@ -55,11 +58,18 @@ int GradleAdapter::runTest(const char* groupName, const char* testName) {
 	}
 }
 
-int GradleAdapter::runAllTests() {
+int GradleAdapter::runGroup(const char* groupName) {
 	Test* curTest = TestRegistry::getFirstTest();
+	int ranTests = 0;
 	while (curTest != NULL) {
+		if (strcmp(groupName, curTest->getGroup())) {
+			curTest = curTest->getNext();
+			continue;
+		}
+
 		TestResult result;
 		curTest->run(result);
+		ranTests++;
 
 		if (result.getFailureCount()) {
 			return 1;
@@ -68,7 +78,31 @@ int GradleAdapter::runAllTests() {
 		curTest = curTest->getNext();
 	}
 
-	printf("There were no test failures\n");
+	if (ranTests == 0) {
+		printf("No tests with group='%s' found\n", groupName);
+		return 2;
+	}
+
+	printf("There were no test failures; Tests executed: %d\n", ranTests);
+	return 0;
+}
+
+int GradleAdapter::runAllTests() {
+	Test* curTest = TestRegistry::getFirstTest();
+	int ranTests = 0;
+	while (curTest != NULL) {
+		TestResult result;
+		curTest->run(result);
+		ranTests++;
+
+		if (result.getFailureCount()) {
+			return 1;
+		}
+
+		curTest = curTest->getNext();
+	}
+
+	printf("There were no test failures; Tests executed: %d\n", ranTests);
 	return 0;
 }
 
@@ -91,6 +125,14 @@ int GradleAdapter::testsEntryPoint(int argc, char* argv[]) {
 		}
 
 		return runTest(argv[2], argv[3]);
+	}
+
+	if (!strcmp(argv[1], "-runGroup")) {
+		if (argc != 3) {
+			printf("-runGroup requires group name\n");
+		}
+
+		return runGroup(argv[2]);
 	}
 
 	printf("Bad argument specified\n");

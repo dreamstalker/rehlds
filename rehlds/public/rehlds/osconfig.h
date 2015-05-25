@@ -43,6 +43,10 @@
 #include <setjmp.h>
 #include <assert.h>
 
+#include <algorithm>
+#include <deque>
+#include <functional>
+
 #ifdef _WIN32 // WINDOWS
 	#include <windows.h>
 	#include <winsock.h>
@@ -84,6 +88,9 @@
 #include <sstream>
 #include <fstream>
 #include <iomanip>
+
+#include <smmintrin.h>
+#include <xmmintrin.h>
 
 #ifdef _WIN32 // WINDOWS
 	#define _CRT_SECURE_NO_WARNINGS

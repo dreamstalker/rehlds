@@ -31,6 +31,12 @@ uint16 g_FRMsg_AllocEntPrivateData;
 
 cvar_t rehlds_flrec_frame = { "rehlds_flrec_frame", "1", 0, 1.0f, NULL };
 cvar_t rehlds_flrec_pvdata = { "rehlds_flrec_privdata", "1", 0, 1.0f, NULL };
+void FR_CheckInit() {
+#ifdef HOOK_ENGINE
+	if (!g_FlightRecorder)
+		FR_Init();
+#endif
+}
 
 void FR_Dump_f() {
 	const char* fname = "rehlds_flightrec.bin";
@@ -54,23 +60,27 @@ void FR_Rehlds_Init() {
 }
 
 void FR_StartFrame() {
+	FR_CheckInit();
 	g_FlightRecorder->StartMessage(g_FRMsg_Frame, true);
 	g_FlightRecorder->WriteDouble(realtime);
 	g_FlightRecorder->EndMessage(g_FRMsg_Frame, true);
 }
 
 void FR_EndFrame() {
+	FR_CheckInit();
 	g_FlightRecorder->StartMessage(g_FRMsg_Frame, false);
 	g_FlightRecorder->EndMessage(g_FRMsg_Frame, false);
 }
 
 void FR_AllocEntPrivateData(void* res) {
+	FR_CheckInit();
 	g_FlightRecorder->StartMessage(g_FRMsg_AllocEntPrivateData, true);
 	g_FlightRecorder->WriteUInt32((size_t)res);
 	g_FlightRecorder->EndMessage(g_FRMsg_AllocEntPrivateData, true);
 }
 
 void FR_FreeEntPrivateData(void* data) {
+	FR_CheckInit();
 	g_FlightRecorder->StartMessage(g_FRMsg_FreeEntPrivateData, true);
 	g_FlightRecorder->WriteUInt32((size_t)data);
 	g_FlightRecorder->EndMessage(g_FRMsg_FreeEntPrivateData, true);

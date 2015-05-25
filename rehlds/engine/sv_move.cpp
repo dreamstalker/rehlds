@@ -28,8 +28,6 @@
 
 #include "precompiled.h"
 
-#define DI_NODIR	-1
-
 /*
 * Local initialization
 */

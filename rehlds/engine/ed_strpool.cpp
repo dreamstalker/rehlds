@@ -4,7 +4,7 @@ class CStringPoolMap : public CStaticMap<const char*, char*, 8, 2048> {
 protected:
 	virtual uint32 hash(const char* const &val) {
 		unsigned int len = strlen(val);
-		return crc32((const uint8*)val, len);
+		return crc32c((const uint8*)val, len);
 	}
 
 	virtual bool equals(const char* const &val1, const char* const &val2) {

@@ -36,6 +36,12 @@
 #include "eiface.h"
 #include "FileSystem.h"
 
+#define FILETIME_TO_QWORD(ft) \
+		((((uint64)ft.dwHighDateTime) << 32) + ft.dwLowDateTime)
+
+#define FILETIME_TO_PAIR(f,h)\
+		(((uint64)f << 32) | h)
+
 /* <3d22f> ../engine/host_cmd.c:83 */
 typedef void (*SV_SAVEGAMECOMMENT_FUNC)(char *, int);
 

@@ -28,8 +28,6 @@
 
 #include "precompiled.h"
 
-#define DIST_EPSILON (0.03125f)
-
 hull_t box_hull;
 hull_t beam_hull;
 box_clipnodes_t box_clipnodes;
@@ -656,6 +654,8 @@ qboolean SV_RecursiveHullCheck(hull_t *hull, int num, float p1f, float p2f, cons
 	float midf;
 	float pdif = p2f - p1f;
 
+	float DIST_EPSILON = 0.03125f;
+
 	if (num >= 0)
 	{
 		if (num < hull->firstclipnode || num > hull->lastclipnode || !hull->planes)
@@ -791,6 +791,8 @@ qboolean SV_RecursiveHullCheck(hull_t *hull, int num, float p1f, float p2f, cons
 	float midf;
 	float pdif;
 	vec3_t custom_p1; // for holding custom p1 value
+
+	float DIST_EPSILON = 0.03125f;
 
 	while (num >= 0)
 	{
