@@ -44,6 +44,9 @@ delta_t *g_pentitydelta;
 delta_t *g_pcustomentitydelta;
 delta_t *g_pclientdelta;
 delta_t *g_pweapondelta;
+#ifdef REHLDS_OPT_PEDANTIC
+delta_t *g_pusercmddelta;
+#endif
 
 int hashstrings_collisions;
 
@@ -415,14 +418,18 @@ void SV_ReallocateDynamicData(void)
 	if (g_moved_edict)
 	{
 		Con_Printf("Reallocate on moved_edict\n");
-		// TODO: Free memory to prevent mem leaks?
+#ifdef REHLDS_FIXES
+		Mem_Free(g_moved_edict);
+#endif
 	}
 	g_moved_edict = (edict_t **)Mem_ZeroMalloc(sizeof(edict_t *) * nSize);
 
 	if (g_moved_from)
 	{
 		Con_Printf("Reallocate on moved_from\n");
-		// TODO: Free memory to prevent mem leaks?
+#ifdef REHLDS_FIXES
+		Mem_Free(g_moved_from);
+#endif
 	}
 	g_moved_from = (vec3_t *)Mem_ZeroMalloc(sizeof(vec3_t) * nSize);
 }
@@ -437,7 +444,9 @@ void SV_AllocClientFrames(void)
 		if (cl->frames)
 		{
 			Con_DPrintf("Allocating over frame pointer?\n");
-			// TODO: Free memory to prevent mem leaks?
+#ifdef REHLDS_FIXES
+			Mem_Free(cl->frames);
+#endif
 		}
 		cl->frames = (client_frame_t *)Mem_ZeroMalloc(sizeof(client_frame_t) * SV_UPDATE_BACKUP);
 	}
@@ -4084,23 +4093,21 @@ void SV_InvokeCallback(void)
 int SV_FindBestBaseline(int index, entity_state_t ** baseline, entity_state_t *to, int num, qboolean custom)
 {
 	int bestbitnumber;
+	delta_t* delta;
 
 	if (custom)
 	{
-		bestbitnumber = DELTA_TestDelta((byte *)*baseline, (byte *)&to[index], g_pcustomentitydelta);
+		delta = g_pcustomentitydelta;
 	}
 	else
 	{
 		if (SV_IsPlayerIndex(num))
-		{
-			bestbitnumber = DELTA_TestDelta((byte *)*baseline, (byte *)&to[index], g_pplayerdelta);
-		}
+			delta = g_pplayerdelta;
 		else
-		{
-			bestbitnumber = DELTA_TestDelta((byte *)*baseline, (byte *)&to[index], g_pentitydelta);
-		}
+			delta = g_pentitydelta;
 	}
 
+	bestbitnumber = DELTA_TestDelta((byte *)*baseline, (byte *)&to[index], delta);
 	bestbitnumber -= 6;
 
 	int i = 0;
@@ -4111,21 +4118,8 @@ int SV_FindBestBaseline(int index, entity_state_t ** baseline, entity_state_t *t
 	{
 		if (to[index].entityType == to[i].entityType)
 		{
-			if (custom)
-			{
-				bitnumber = DELTA_TestDelta((byte *)&to[i], (byte *)&to[index], g_pcustomentitydelta);
-			}
-			else
-			{
-				if (SV_IsPlayerIndex(num))
-				{
-					bitnumber = DELTA_TestDelta((byte *)&to[i], (byte *)&to[index], g_pplayerdelta);
-				}
-				else
-				{
-					bitnumber = DELTA_TestDelta((byte *)&to[i], (byte *)&to[index], g_pentitydelta);
-				}
-			}
+			bitnumber = DELTA_TestDelta((byte *)&to[i], (byte *)&to[index], delta);
+
 			if (bitnumber < bestbitnumber)
 			{
 				bestbitnumber = bitnumber;
@@ -6906,6 +6900,12 @@ void SV_InitDeltas(void)
 	g_peventdelta = SV_LookupDelta("event_t");
 	if (!g_peventdelta)
 		Sys_Error("No event_t encoder on server!\n");
+
+#ifdef REHLDS_OPT_PEDANTIC
+	g_pusercmddelta = SV_LookupDelta("usercmd_t");
+	if (!g_pusercmddelta)
+		Sys_Error("No usercmd_t encoder on server!\n");
+#endif
 
 #if defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)
 	g_DeltaJitRegistry.CreateAndRegisterDeltaJIT(&g_MetaDelta[0]);

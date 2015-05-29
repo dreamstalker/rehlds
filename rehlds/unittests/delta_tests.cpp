@@ -166,22 +166,9 @@ NOINLINE void _GetBitmaskAndBytecount(delta_t* delta, int* bits, int* bytecount,
 	}
 }
 
-NOINLINE void _CompareDeltaResults(const char* callsite, delta_res_t* def, delta_res_t* jit, int testscount)
-{
-	for (int i = 0; i < testscount; i++)
-	{
-		if (!!def[i].sendfields != !!jit[i].sendfields)
-			rehlds_syserror("%s: Test %i: !!sendfields not equals %i|%i", callsite, i, !!def[i].sendfields, !!jit[i].sendfields);
-		if (memcmp(def[i].bits, jit[i].bits, 8))
-			rehlds_syserror("%s: Test %i: bits not equals %p.%p|%p.%p", callsite, i, def[i].bits[0], def[i].bits[1], jit[i].bits[0], jit[i].bits[1]);
-		if (def[i].bytecount != jit[i].bytecount)
-			rehlds_syserror("%s: Test %i: bytecount not equal %i|%i", callsite, i, def[i].bytecount, jit[i].bytecount);
-	}
-}
-
 NOINLINE delta_t* _CreateTestDeltaDesc() {
 	static delta_description_t _fields[32];
-	delta_test_struct_t d; // "use" d variable
+	delta_test_struct_t d; d; // "use" d variable
 
 	_InitDeltaField(&_fields[0], 0x00, DT_BYTE, "b_00", offsetof(delta_test_struct_t, b_00), 1, 8, 1.0f, 1.0f);
 	_InitDeltaField(&_fields[1], 0x01, DT_BYTE, "b_01", offsetof(delta_test_struct_t, b_01), 1, 8, 1.0f, 1.0f);
@@ -328,6 +315,54 @@ TEST(MarkFieldsTest_TimeWindow, Delta, 1000) {
 			{ "TimeWindow_Above_Precision2", 'c', 'c', true, "w8_1C", []() { dst2.w8_1C = 0.1f; dst1.w8_1C = 0.12f; } },
 	};
 	_DeltaSimpleTests(delta, testdata, ARRAYSIZE(testdata));
+
+	SV_Shutdown();
+}
+
+TEST(TestDelta_Test, Delta, 1000)
+{
+	delta_t* delta = _CreateTestDeltaDesc();
+
+	delta_test_struct_t testdata[4], from;
+	int result[4];
+
+	for (size_t i = 0; i < 4; i++)
+		_FillTestDelta(&testdata[i], 0xCC);
+	_FillTestDelta(&from, 0xCC);
+
+	// equal
+	result[0] = 0;
+
+	// change byte + short + float
+	testdata[1].b_01 = 1;
+	testdata[1].s_12 = 1.0;
+	testdata[1].f_08 = 1.0;
+	result[1] = delta->pdd[1].significant_bits + delta->pdd[8].significant_bits + delta->pdd[4].significant_bits + (8 / 8 * 8 + 8);
+
+	// change float + float + string
+	testdata[2].f_18 = 2.0;
+	testdata[2].wb_20 = 2.0;
+	strcpy(testdata[2].s_24, "TestDelta_Test" );
+#ifdef REHLDS_FIXES
+	result[2] = delta->pdd[10].significant_bits + delta->pdd[12].significant_bits + strlen(testdata[2].s_24) * 8 + 8 + (13 / 8 * 8 + 8);
+#else
+	result[2] = delta->pdd[10].significant_bits + delta->pdd[12].significant_bits + (13 / 8 * 8 + 8);
+#endif
+
+	// change byte + int + float + short
+	testdata[3].b_4D = 4;
+	testdata[3].i_14 = 4;
+	testdata[3].w8_0C = 4.0;
+	testdata[3].s_12 = 4;
+	result[3] = delta->pdd[14].significant_bits + delta->pdd[9].significant_bits + delta->pdd[5].significant_bits + delta->pdd[8].significant_bits + (14 / 8 * 8 + 8);
+
+	for (size_t i = 0; i < 4; i++)
+	{
+		int tested = DELTA_TestDelta((uint8 *)&from, (uint8 *)&testdata[i], delta);
+
+		if (tested != result[i])
+			rehlds_syserror("TestDelta_Test: returned bitcount %i is not equal to true value %i", tested, result[i]);
+	}
 
 	SV_Shutdown();
 }

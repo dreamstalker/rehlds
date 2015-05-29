@@ -11,6 +11,7 @@ struct deltajit_field {
 	unsigned int length;
 	int type;
 	unsigned int numBlocks;
+	unsigned int significantBits;
 };
 
 struct deltajit_memblock_field {
@@ -42,12 +43,6 @@ struct deltajitdata_t {
 	deltajit_memblock_itr_t itrBlocks[DELTAJIT_MAX_BLOCKS];
 };
 
-enum deltajit_marked_count_type_t {
-	DJ_M_DONT_COUNT,
-	DJ_M_CHECK,
-	//DJ_M_COUNT, //not implemented yet
-};
-
 class CDeltaJit;
 
 class CDeltaJitRegistry {
@@ -74,6 +69,7 @@ union delta_marked_mask_t {
 extern CDeltaJitRegistry g_DeltaJitRegistry;
 
 extern int DELTAJit_Fields_Clear_Mark_Check(unsigned char *from, unsigned char *to, delta_t *pFields, void* pForceMarkMask);
+extern int DELTAJit_TestDelta(unsigned char *from, unsigned char *to, delta_t *pFields);
 extern void DELTAJit_SetSendFlagBits(delta_t *pFields, int *bits, int *bytecount);
 extern void DELTAJit_SetFieldByIndex(struct delta_s *pFields, int fieldNumber);
 extern void DELTAJit_UnsetFieldByIndex(struct delta_s *pFields, int fieldNumber);

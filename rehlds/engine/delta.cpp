@@ -422,6 +422,9 @@ void DELTA_ClearFlags(delta_t *pFields)
 /* <241d2> ../engine/delta.c:473 */
 int DELTA_TestDelta(unsigned char *from, unsigned char *to, delta_t *pFields)
 {
+#if defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)
+	return DELTAJit_TestDelta(from, to, pFields);
+#else
 	int i;
 	char *st1, *st2;
 	delta_description_t *pTest;
@@ -452,9 +455,10 @@ int DELTA_TestDelta(unsigned char *from, unsigned char *to, delta_t *pFields)
 			break;
 #ifdef REHLDS_FIXES
 		// don't use multiplier when checking, to increase performance
+		// check values binary like it does in jit
 		case DT_TIMEWINDOW_8:
 		case DT_TIMEWINDOW_BIG:
-			different = (int32)(*(float *)&from[pTest->fieldOffset]) != (int32)(*(float *)&to[pTest->fieldOffset]);
+			different = (*(int32 *)&from[pTest->fieldOffset]) != (*(int32 *)&to[pTest->fieldOffset]);
 			break;
 #else
 		case DT_TIMEWINDOW_8:
@@ -471,8 +475,10 @@ int DELTA_TestDelta(unsigned char *from, unsigned char *to, delta_t *pFields)
 			{
 #ifdef REHLDS_FIXES
 				different = TRUE;
-#endif // REHLDS_FIXES
+				length = Q_strlen(st2) * 8;
+#else // REHLDS_FIXES
 				length = Q_strlen(st2);
+#endif // REHLDS_FIXES
 			}
 			break;
 		default:
@@ -487,12 +493,13 @@ int DELTA_TestDelta(unsigned char *from, unsigned char *to, delta_t *pFields)
 		}
 	}
 
-	if (neededBits != -1)
+	if (highestBit != -1)
 	{
 		neededBits += highestBit / 8 * 8 + 8;
 	}
 
 	return neededBits;
+#endif
 }
 
 /* <24309> ../engine/delta.c:602 */
@@ -749,7 +756,6 @@ qboolean DELTA_CheckDelta(unsigned char *from, unsigned char *to, delta_t *pFiel
 NOINLINE qboolean DELTA_WriteDelta(unsigned char *from, unsigned char *to, qboolean force, delta_t *pFields, void(*callback)(void))
 {
 	qboolean sendfields;
-	int bytecount;
 
 #if defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)
 	sendfields = DELTAJit_Fields_Clear_Mark_Check(from, to, pFields, NULL);
