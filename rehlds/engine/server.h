@@ -561,6 +561,9 @@ extern delta_t *g_pentitydelta;
 extern delta_t *g_pcustomentitydelta;
 extern delta_t *g_pclientdelta;
 extern delta_t *g_pweapondelta;
+#ifdef REHLDS_OPT_PEDANTIC
+extern delta_t *g_pusercmddelta;
+#endif
 
 
 extern unsigned char fatpvs[1024];

@@ -1253,9 +1253,12 @@ NOXREF float MSG_ReadHiresAngle(void)
 
 void MSG_ReadUsercmd(usercmd_t *to, usercmd_t* from)
 {
-	delta_t *pdesc = SV_LookupDelta("usercmd_t");
 	MSG_StartBitReading(&net_message);
-	DELTA_ParseDelta((byte *)from, (byte *)to, pdesc);
+#ifdef REHLDS_OPT_PEDANTIC
+	DELTA_ParseDelta((byte *)from, (byte *)to, g_pusercmddelta);
+#else
+	DELTA_ParseDelta((byte *)from, (byte *)to, SV_LookupDelta("usercmd_t"));
+#endif
 	MSG_EndBitReading(&net_message);
 	COM_NormalizeAngles(to->viewangles);
 }

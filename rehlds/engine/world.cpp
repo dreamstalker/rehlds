@@ -283,7 +283,6 @@ areanode_t *SV_CreateAreaNode(int depth, vec_t *mins, vec_t *maxs)
 	anode->children[1] = SV_CreateAreaNode(depth + 1, mins1, maxs1);
 
 	return anode;
-
 }
 
 /* <ca877> ../engine/world.c:353 */
@@ -375,6 +374,7 @@ void SV_TouchLinks(edict_t *ent, areanode_t *node)
 }
 
 /* <ca8f2> ../engine/world.c:467 */
+#ifndef REHLDS_OPT_PEDANTIC
 void SV_FindTouchedLeafs(edict_t *ent, mnode_t *node, int *topnode)
 {
 	mplane_t *splitplane;
@@ -435,6 +435,87 @@ void SV_FindTouchedLeafs(edict_t *ent, mnode_t *node, int *topnode)
 	if (sides & 2)
 		SV_FindTouchedLeafs(ent, node->children[1], topnode);
 }
+#else // REHLDS_OPT_PEDANTIC
+// unrolled some tail recursion
+void SV_FindTouchedLeafs(edict_t *ent, mnode_t *node, int *topnode)
+{
+	mplane_t *splitplane;
+	int sides;
+
+	while (1)
+	{
+		if (node->contents == CONTENTS_SOLID)
+			return;
+
+		if (node->contents < 0)
+		{
+			if (ent->num_leafs < MAX_ENT_LEAFS)
+			{
+				mleaf_t *leaf = (mleaf_t *)node;
+				int leafnum = leaf - g_psv.worldmodel->leafs - 1;
+				ent->leafnums[ent->num_leafs] = leafnum;
+				ent->num_leafs++;
+			}
+			else
+			{
+				ent->num_leafs = MAX_ENT_LEAFS + 1;
+			}
+			return;
+		}
+
+		splitplane = node->plane;
+		if (splitplane->type >= 3)
+		{
+			sides = BoxOnPlaneSide(ent->v.absmin, ent->v.absmax, splitplane);
+
+			if (sides == 3)
+			{
+				if (*topnode == -1)
+					*topnode = node - g_psv.worldmodel->nodes;
+			}
+
+			if (sides & 1)
+				SV_FindTouchedLeafs(ent, node->children[0], topnode);
+
+			if (sides & 2)
+				SV_FindTouchedLeafs(ent, node->children[1], topnode);
+		}
+		else
+		{
+			if (splitplane->dist > ent->v.absmin[splitplane->type])
+			{
+				if (splitplane->dist < ent->v.absmax[splitplane->type])
+				{
+					// sides = 3;
+					// do both children nodes
+					if (*topnode == -1)
+						*topnode = node - g_psv.worldmodel->nodes;
+
+					SV_FindTouchedLeafs(ent, node->children[0], topnode);
+					node = node->children[1];
+					continue;
+				}
+				else
+				{
+					// sides = 2;
+					// do only SV_FindTouchedLeafs(ent, node->children[1], topnode);
+					node = node->children[1];
+					continue;
+				}
+			}
+			else
+			{
+				// sides = 1;
+				// do only SV_FindTouchedLeafs(ent, node->children[0], topnode);
+				node = node->children[0];
+				continue;
+			}
+		}
+
+		break;
+	}
+}
+#endif // REHLDS_OPT_PEDANTIC
 
 /* <caab0> ../engine/world.c:517 */
 void SV_LinkEdict(edict_t *ent, qboolean touch_triggers)
@@ -547,57 +628,78 @@ int SV_LinkContents(areanode_t *node, const vec_t *pos)
 	vec3_t localPosition;
 	vec3_t offset;
 
-	for (l = node->solid_edicts.next; l != &node->solid_edicts; l = next)
+#ifdef REHLDS_OPT_PEDANTIC
+	// unroll tail recursion
+	while (1)
+#endif
 	{
-		next = l->next;
-		touch = (edict_t *)((char *)l - offsetof(edict_t, area));
-		if (!touch->v.solid)
+		for (l = node->solid_edicts.next; l != &node->solid_edicts; l = next)
 		{
-			if (touch->v.groupinfo)
+			next = l->next;
+			touch = (edict_t *)((char *)l - offsetof(edict_t, area));
+			if (!touch->v.solid)
 			{
-				if (g_groupop)
+				if (touch->v.groupinfo)
 				{
-					if (g_groupop == GROUP_OP_NAND && (touch->v.groupinfo & g_groupmask))
-						continue;
+					if (g_groupop)
+					{
+						if (g_groupop == GROUP_OP_NAND && (touch->v.groupinfo & g_groupmask))
+							continue;
+					}
+					else
+					{
+						if (!(touch->v.groupinfo & g_groupmask))
+							continue;
+					}
 				}
-				else
+				pModel = g_psv.models[touch->v.modelindex];
+				if (pModel
+					&& !pModel->type
+					&& pos[0] <= (double)touch->v.absmax[0]
+					&& pos[1] <= (double)touch->v.absmax[1]
+					&& pos[2] <= (double)touch->v.absmax[2]
+					&& pos[0] >= (double)touch->v.absmin[0]
+					&& pos[1] >= (double)touch->v.absmin[1]
+					&& pos[2] >= (double)touch->v.absmin[2])
 				{
-					if (!(touch->v.groupinfo & g_groupmask))
-						continue;
+					int contents = touch->v.skin;
+					if (contents < -100 || contents > 100)
+						Con_DPrintf("Invalid contents on trigger field: %s\n", &pr_strings[touch->v.classname]);
+					hull = SV_HullForBsp(touch, vec3_origin, vec3_origin, offset);
+					localPosition[0] = pos[0] - offset[0];
+					localPosition[1] = pos[1] - offset[1];
+					localPosition[2] = pos[2] - offset[2];
+					if (SV_HullPointContents(hull, hull->firstclipnode, localPosition) != -1)
+						return contents;
 				}
-			}
-			pModel = g_psv.models[touch->v.modelindex];
-			if (pModel
-				&& !pModel->type
-				&& pos[0] <= (double)touch->v.absmax[0]
-				&& pos[1] <= (double)touch->v.absmax[1]
-				&& pos[2] <= (double)touch->v.absmax[2]
-				&& pos[0] >= (double)touch->v.absmin[0]
-				&& pos[1] >= (double)touch->v.absmin[1]
-				&& pos[2] >= (double)touch->v.absmin[2])
-			{
-				int contents = touch->v.skin;
-				if (contents < -100 || contents > 100)
-					Con_DPrintf("Invalid contents on trigger field: %s\n", &pr_strings[touch->v.classname]);
-				hull = SV_HullForBsp(touch, vec3_origin, vec3_origin, offset);
-				localPosition[0] = pos[0] - offset[0];
-				localPosition[1] = pos[1] - offset[1];
-				localPosition[2] = pos[2] - offset[2];
-				if (SV_HullPointContents(hull, hull->firstclipnode, localPosition) != -1)
-					return contents;
 			}
 		}
+
+		if (node->axis == -1)
+			return -1;
+
+#ifndef REHLDS_OPT_PEDANTIC
+		if (pos[node->axis] > node->dist)
+			return SV_LinkContents(node->children[0], pos);
+
+		if (pos[node->axis] < node->dist)
+			return SV_LinkContents(node->children[1], pos);
+#else // REHLDS_OPT_PEDANTIC
+		if (pos[node->axis] > node->dist)
+		{
+			node = node->children[0];
+			continue;
+		}
+
+		if (pos[node->axis] < node->dist)
+		{
+			node = node->children[1];
+			continue;
+		}
+
+		break;
+#endif // REHLDS_OPT_PEDANTIC
 	}
-
-
-	if (node->axis == -1)
-		return -1;
-
-	if (pos[node->axis] > node->dist)
-		return SV_LinkContents(node->children[0], pos);
-
-	if (pos[node->axis] < node->dist)
-		return SV_LinkContents(node->children[1], pos);
 
 	return -1;
 }
