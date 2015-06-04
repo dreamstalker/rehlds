@@ -47,10 +47,10 @@ float PM_TraceModel(physent_t *pEnt, vec_t *start, vec_t *end, trace_t *trace)
 	pmove->usehull = 2;
 	pHull = PM_HullForBsp(pEnt, offset);
 	pmove->usehull = saveHull;
-	start_l[0] = *start - offset[0];
+	start_l[0] = start[0] - offset[0];
 	start_l[1] = start[1] - offset[1];
 	start_l[2] = start[2] - offset[2];
-	end_l[0] = *end - offset[0];
+	end_l[0] = end[0] - offset[0];
 	end_l[1] = end[1] - offset[1];
 	end_l[2] = end[2] - offset[2];
 	SV_RecursiveHullCheck(pHull, pHull->firstclipnode, 0.0, 1.0, start_l, end_l, trace);
@@ -124,14 +124,13 @@ int PM_HullPointContents(hull_t *hull, int num, vec_t *p)
 		if (num < hull->firstclipnode || num > hull->lastclipnode)
 			Sys_Error("PM_HullPointContents: bad node number");
 		node = &hull->clipnodes[num];
-		plane = &hull->planes[hull->clipnodes[num].planenum];
+		plane = &hull->planes[node->planenum];
 
-		double tmpDist;
 		if (plane->type >= 3)
-			tmpDist = plane->normal[2] * p[2] + plane->normal[1] * p[1] + plane->normal[0] * *p;
+			d = _DotProduct(p, plane->normal) - plane->dist;
 		else
-			tmpDist = p[plane->type];
-		d = (float)(tmpDist - plane->dist);
+			d = p[plane->type] - plane->dist;
+
 		if (d >= 0.0)
 			num = node->children[0];
 		else
@@ -328,13 +327,13 @@ int _PM_TestPlayerPosition(vec_t *pos, pmtrace_t *ptrace, int(*pfnIgnore)(physen
 		test[2] = pos[2] - offset[2];
 		if (pe->solid == 4 && (pe->angles[0] != 0.0 || pe->angles[1] != 0.0 || pe->angles[2] != 0.0))
 		{
-			vec3_t forward, right, up, temp;
-
+			vec3_t forward, right, up;
 			AngleVectors(pe->angles, forward, right, up);
-			temp[0] = test[0]; temp[1] = test[1]; temp[2] = test[2];
-			test[0] = forward[2] * test[2] + forward[1] * test[1] + forward[0] * test[0];
-			test[1] = -(right[0] * temp[0] + right[2] * test[2] + right[1] * test[1]);
-			test[2] = up[1] * temp[1] + up[0] * temp[0] + up[2] * test[2];
+
+			vec3_t temp = {test[0], test[1], test[2]};
+			test[0] = _DotProduct(forward, temp);
+			test[1] = -_DotProduct(right, temp);
+			test[2] = _DotProduct(up, temp);
 		}
 		if (numhulls != 1)
 		{
@@ -477,18 +476,20 @@ pmtrace_t _PM_PlayerTrace(vec_t *start, vec_t *end, int traceFlags, int numphyse
 
 		if (pe->solid == SOLID_BSP && (pe->angles[0] != 0.0 || pe->angles[1] != 0.0 || pe->angles[2] != 0.0))
 		{
-			vec3_t temp, forward, right, up;
-			rotated = true;
+			vec3_t forward, right, up;
 			AngleVectors(pe->angles, forward, right, up);
-			temp[0] = start_l[0]; temp[1] = start_l[1]; temp[2] = start_l[2];
-			start_l[0] = forward[2] * start_l[2] + forward[1] * start_l[1] + forward[0] * start_l[0];
-			start_l[1] = -(right[0] * temp[0] + right[2] * start_l[2] + right[1] * start_l[1]);
-			start_l[2] = up[1] * temp[1] + up[0] * temp[0] + up[2] * start_l[2];
 
-			temp[0] = end_l[0]; temp[1] = end_l[1]; temp[2] = end_l[2];
-			end_l[0] = forward[2] * end_l[2] + forward[1] * end_l[1] + forward[0] * end_l[0];
-			end_l[1] = -(right[0] * temp[0] + right[2] * end_l[2] + right[1] * end_l[1]);
-			end_l[2] = up[1] * temp[1] + up[0] * temp[0] + up[2] * end_l[2];
+			vec3_t temp_start = {start_l[0], start_l[1], start_l[2]};
+			start_l[0] = _DotProduct(forward, temp_start);
+			start_l[1] = -_DotProduct(right, temp_start);
+			start_l[2] = _DotProduct(up, temp_start);
+
+			vec3_t temp_end = {end_l[0], end_l[1], end_l[2]};
+			end_l[0] = _DotProduct(forward, temp_end);
+			end_l[1] = -_DotProduct(right, temp_end);
+			end_l[2] = _DotProduct(up, temp_end);
+
+			rotated = true;
 		}
 		else
 		{
@@ -547,13 +548,13 @@ pmtrace_t _PM_PlayerTrace(vec_t *start, vec_t *end, int traceFlags, int numphyse
 		{
 			if (rotated)
 			{
-				vec3_t temp, forward, right, up;
+				vec3_t forward, right, up;
 				AngleVectorsTranspose(pe->angles, forward, right, up);
 
-				temp[0] = total.plane.normal[0]; temp[1] = total.plane.normal[1]; temp[2] = total.plane.normal[2];
-				total.plane.normal[0] = forward[2] * total.plane.normal[2] + forward[1] * total.plane.normal[1] + forward[0] * total.plane.normal[0];
-				total.plane.normal[1] = right[2] * total.plane.normal[2] + right[1] * total.plane.normal[1] + right[0] * temp[0];
-				total.plane.normal[2] = up[2] * total.plane.normal[2] + up[1] * temp[1] + up[0] * temp[0];
+				vec3_t temp = {total.plane.normal[0], total.plane.normal[1], total.plane.normal[2]};
+				total.plane.normal[0] = _DotProduct(forward, temp);
+				total.plane.normal[1] = _DotProduct(right, temp);
+				total.plane.normal[2] = _DotProduct(up, temp);
 			}
 			total.endpos[0] = (end[0] - start[0]) * total.fraction + start[0];
 			total.endpos[1] = (end[1] - start[1]) * total.fraction + start[1];
@@ -598,21 +599,13 @@ struct pmtrace_s *PM_TraceLine(float *start, float *end, int flags, int usehull,
 	if (flags)
 	{
 		if (flags == 1)
-		{
 			tr = _PM_PlayerTrace(start, end, 0, pmove->numvisent, pmove->visents, ignore_pe, 0);
-			pmove->usehull = oldhull;
-		}
-		else
-		{
-			pmove->usehull = oldhull;
-		}
 	}
 	else
 	{
 		tr = _PM_PlayerTrace(start, end, 0, pmove->numphysent, pmove->physents, ignore_pe, 0);
-		pmove->usehull = oldhull;
 	}
-
+	pmove->usehull = oldhull;
 	return &tr;
 }
 
@@ -626,22 +619,20 @@ struct pmtrace_s *PM_TraceLineEx(float *start, float *end, int flags, int usehul
 	pmove->usehull = usehull;
 	if (flags)
 	{
-		tr = _PM_PlayerTrace(start, end, 0, pmove->numvisent, pmove->visents, -1, pfnIgnore);
-		pmove->usehull = oldhull;
-		
+		tr = _PM_PlayerTrace(start, end, 0, pmove->numvisent, pmove->visents, -1, pfnIgnore);		
 	}
 	else
 	{
 		tr = PM_PlayerTraceEx(start, end, 0, pfnIgnore);
-		pmove->usehull = oldhull;
 	}
+	pmove->usehull = oldhull;
 	return &tr;
 }
 
+#ifndef REHLDS_OPT_PEDANTIC
 /* <6ef4a> ../engine/pmovetst.c:844 */
-qboolean PM_RecursiveHullCheck(hull_t *hull, int num, float p1f, float p2f, vec_t *p1, vec_t *p2, pmtrace_t *trace)
+qboolean PM_RecursiveHullCheck(hull_t *hull, int num, float p1f, float p2f, const vec_t *p1, const vec_t *p2, pmtrace_t *trace)
 {
-	qboolean retval;
 	dclipnode_t *node;
 	mplane_t *plane;
 	vec3_t mid;
@@ -651,43 +642,42 @@ qboolean PM_RecursiveHullCheck(hull_t *hull, int num, float p1f, float p2f, vec_
 	float t2;
 	float midf;
 
+	float DIST_EPSILON = 0.03125f;
+
 	if (num < 0)
 	{
-		if (num == -2)
+		if (num == CONTENTS_SOLID)
 		{
-			trace->startsolid = 1;
-			retval = 1;
+			trace->startsolid = TRUE;
 		}
 		else
 		{
-			trace->allsolid = 0;
-			if (num == -1)
+			trace->allsolid = FALSE;
+			if (num == CONTENTS_EMPTY)
 			{
-				trace->inopen = 1;
-				retval = 1;
+				trace->inopen = TRUE;
 			}
 			else
 			{
-				trace->inwater = 1;
-				retval = 1;
+				trace->inwater = TRUE;
 			}
 		}
-		return retval;
+		return TRUE;
 	}
 
 	if (hull->firstclipnode >= hull->lastclipnode)
 	{
-		trace->allsolid = 0;
-		trace->inopen = 1;
-		return 1;
+		trace->allsolid = FALSE;
+		trace->inopen = TRUE;
+		return TRUE;
 	}
 
 	node = &hull->clipnodes[num];
 	plane = &hull->planes[node->planenum];
 	if (plane->type >= 3u)
 	{
-		t1 = p1[2] * plane->normal[2] + p1[1] * plane->normal[1] + p1[0] * plane->normal[0] - plane->dist;
-		t2 = p2[2] * plane->normal[2] + p2[1] * plane->normal[1] + p2[0] * plane->normal[0] - plane->dist;
+		t1 = _DotProduct(p1, plane->normal) - plane->dist;
+		t2 = _DotProduct(p2, plane->normal) - plane->dist;
 	}
 	else
 	{
@@ -699,14 +689,14 @@ qboolean PM_RecursiveHullCheck(hull_t *hull, int num, float p1f, float p2f, vec_
 
 	if (t1 >= 0.0)
 	{
-		midf = t1 - 0.03125f;
+		midf = t1 - DIST_EPSILON;
 	}
 	else
 	{
 		if (t2 < 0.0)
 			return PM_RecursiveHullCheck(hull, node->children[1], p1f, p2f, p1, p2, trace);
 
-		midf = t1 + 0.03125f;
+		midf = t1 + DIST_EPSILON;
 	}
 	midf = midf / (t1 - t2);
 	if (midf >= 0.0)
@@ -787,3 +777,173 @@ qboolean PM_RecursiveHullCheck(hull_t *hull, int num, float p1f, float p2f, vec_
 	Con_DPrintf("Trace backed up past 0.0.\n");
 	return 0;
 }
+#else // REHLDS_OPT_PEDANTIC
+// version with unrolled tail recursion
+qboolean PM_RecursiveHullCheck(hull_t *hull, int num, float p1f, float p2f, const vec_t *p1, const vec_t *p2, pmtrace_t *trace)
+{
+	dclipnode_t *node;
+	mplane_t *plane;
+	vec3_t mid;
+	float pdif;
+	float frac;
+	float t1;
+	float t2;
+	float midf;
+	vec3_t custom_p1; // for holding custom p1 value
+
+	float DIST_EPSILON = 0.03125f;
+
+	while (1)
+	{
+		if (num < 0)
+		{
+			if (num == CONTENTS_SOLID)
+			{
+				trace->startsolid = TRUE;
+			}
+			else
+			{
+				trace->allsolid = FALSE;
+				if (num == CONTENTS_EMPTY)
+				{
+					trace->inopen = TRUE;
+				}
+				else
+				{
+					trace->inwater = TRUE;
+				}
+			}
+			return TRUE;
+		}
+
+		if (hull->firstclipnode >= hull->lastclipnode)
+		{
+			trace->allsolid = FALSE;
+			trace->inopen = TRUE;
+			return TRUE;
+		}
+
+		// find the point distances
+		node = &hull->clipnodes[num];
+		plane = &hull->planes[node->planenum];
+		if (plane->type >= 3u)
+		{
+			t1 = _DotProduct(p1, plane->normal) - plane->dist;
+			t2 = _DotProduct(p2, plane->normal) - plane->dist;
+		}
+		else
+		{
+			t1 = p1[plane->type] - plane->dist;
+			t2 = p2[plane->type] - plane->dist;
+		}
+		if (t1 >= 0.0 && t2 >= 0.0)
+		{
+			num = node->children[0]; // only 1 arg changed
+			continue;
+		}
+
+		if (t1 >= 0.0)
+		{
+			midf = t1 - DIST_EPSILON;
+		}
+		else
+		{
+			if (t2 < 0.0)
+			{
+				num = node->children[1];
+				continue;
+			}
+
+			midf = t1 + DIST_EPSILON;
+		}
+		midf = midf / (t1 - t2);
+		if (midf >= 0.0)
+		{
+			if (midf > 1.0)
+				midf = 1.0;
+		}
+		else
+		{
+			midf = 0.0;
+		}
+
+		pdif = p2f - p1f;
+		frac = pdif * midf + p1f;
+		mid[0] = (p2[0] - p1[0]) * midf + p1[0];
+		mid[1] = (p2[1] - p1[1]) * midf + p1[1];
+		mid[2] = (p2[2] - p1[2]) * midf + p1[2];
+
+		int side = (t1 >= 0.0) ? 0 : 1;
+
+		if (!PM_RecursiveHullCheck(hull, node->children[side], p1f, frac, p1, mid, trace))
+			return 0;
+
+		if (PM_HullPointContents(hull, node->children[side ^ 1], mid) != -2)
+		{
+			num = node->children[side ^ 1];
+			p1f = frac;
+			p1 = custom_p1;
+			custom_p1[0] = mid[0];
+			custom_p1[1] = mid[1];
+			custom_p1[2] = mid[2];
+			continue;
+		}
+
+		if (trace->allsolid)
+			return 0;
+
+		if (side)
+		{
+			trace->plane.normal[0] = vec3_origin[0] - plane->normal[0];
+			trace->plane.normal[1] = vec3_origin[1] - plane->normal[1];
+			trace->plane.normal[2] = vec3_origin[2] - plane->normal[2];
+			trace->plane.dist = -plane->dist;
+		}
+		else
+		{
+			trace->plane.normal[0] = plane->normal[0];
+			trace->plane.normal[1] = plane->normal[1];
+			trace->plane.normal[2] = plane->normal[2];
+			trace->plane.dist = plane->dist;
+		}
+
+		if (PM_HullPointContents(hull, hull->firstclipnode, mid) != -2)
+		{
+			trace->fraction = frac;
+			trace->endpos[0] = mid[0];
+			trace->endpos[1] = mid[1];
+			trace->endpos[2] = mid[2];
+			return 0;
+		}
+
+		while (1)
+		{
+			midf = (float)(midf - 0.05);
+			if (midf < 0.0)
+				break;
+
+			frac = pdif * midf + p1f;
+			mid[0] = (p2[0] - p1[0]) * midf + p1[0];
+			mid[1] = (p2[1] - p1[1]) * midf + p1[1];
+			mid[2] = (p2[2] - p1[2]) * midf + p1[2];
+			if (PM_HullPointContents(hull, hull->firstclipnode, mid) != -2)
+			{
+				trace->fraction = frac;
+				trace->endpos[0] = mid[0];
+				trace->endpos[1] = mid[1];
+				trace->endpos[2] = mid[2];
+				return 0;
+			}
+		}
+
+		trace->fraction = frac;
+		trace->endpos[0] = mid[0];
+		trace->endpos[1] = mid[1];
+		trace->endpos[2] = mid[2];
+		Con_DPrintf("Trace backed up past 0.0.\n");
+		return 0;
+	}
+
+	return 0;
+}
+#endif // REHLDS_OPT_PEDANTIC

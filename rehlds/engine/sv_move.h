@@ -35,6 +35,8 @@
 #include "maintypes.h"
 #include "server.h"
 
+#define DI_NODIR	-1
+
 #ifdef HOOK_ENGINE
 
 #define c_yes (*pc_yes)

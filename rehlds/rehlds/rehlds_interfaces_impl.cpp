@@ -146,11 +146,11 @@ const char* CRehldsServerData::GetName() {
 	return g_psv.name;
 }
 
-uint32_t CRehldsServerData::GetWorldmapCrc() {
+uint32 CRehldsServerData::GetWorldmapCrc() {
 	return g_psv.worldmapCRC;
 }
 
-uint8_t* CRehldsServerData::GetClientDllMd5() {
+uint8* CRehldsServerData::GetClientDllMd5() {
 	return g_psv.clientdllmd5;
 }
 

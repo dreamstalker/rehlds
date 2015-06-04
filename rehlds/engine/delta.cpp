@@ -31,19 +31,6 @@
 
 #ifndef Defines_and_Variables_region
 
-#define DT_BYTE				BIT(0)		// A byte
-#define DT_SHORT			BIT(1)		// 2 byte field
-#define DT_FLOAT			BIT(2)		// A floating point field
-#define DT_INTEGER			BIT(3)		// 4 byte integer
-#define DT_ANGLE			BIT(4)		// A floating point angle
-#define DT_TIMEWINDOW_8		BIT(5)		// A floating point timestamp relative to server time
-#define DT_TIMEWINDOW_BIG	BIT(6)		// A floating point timestamp relative to server time (with more precision and custom multiplier)
-#define DT_STRING			BIT(7)		// A null terminated string, sent as 8 byte chars
-#define DT_SIGNED			BIT(31)		// sign modificator
-
-#define FDT_MARK			BIT(0)		// Delta mark for sending
-
-
 /* <23bb1> ../engine/delta.c:47 */
 typedef struct delta_link_s
 {
@@ -362,41 +349,63 @@ int DELTA_FindFieldIndex(struct delta_s *pFields, const char *fieldname)
 	}
 
 	Con_Printf(__FUNCTION__ ":  Warning, couldn't find %s\n", fieldname);
-	return NULL;
+	return -1;
 }
 
 /* <24032> ../engine/delta.c:393 */
 void DELTA_SetField(struct delta_s *pFields, const char *fieldname)
 {
+#if defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)
+	int index = DELTA_FindFieldIndex(pFields, fieldname);
+
+	if (index != -1)
+		DELTA_SetFieldByIndex(pFields, index);
+#else
 	delta_description_t *pTest = DELTA_FindField(pFields, fieldname);
-	
+
 	if (pTest)
 	{
 		pTest->flags |= FDT_MARK;
 	}
+#endif
 }
 
 /* <240b2> ../engine/delta.c:411 */
 void DELTA_UnsetField(struct delta_s *pFields, const char *fieldname)
 {
+#if defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)
+	int index = DELTA_FindFieldIndex(pFields, fieldname);
+
+	if (index != -1)
+		DELTA_UnsetFieldByIndex(pFields, index);
+#else
 	delta_description_t *pTest = DELTA_FindField(pFields, fieldname);
-	
+
 	if (pTest)
 	{
 		pTest->flags &= ~FDT_MARK;
 	}
+#endif
 }
 
 /* <24132> ../engine/delta.c:429 */
 void DELTA_SetFieldByIndex(struct delta_s *pFields, int fieldNumber)
 {
+#if defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)
+	DELTAJit_SetFieldByIndex(pFields, fieldNumber);
+#else
 	pFields->pdd[fieldNumber].flags |= FDT_MARK;
+#endif
 }
 
 /* <2416a> ../engine/delta.c:441 */
 void DELTA_UnsetFieldByIndex(struct delta_s *pFields, int fieldNumber)
 {
+#if defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)
+	DELTAJit_UnsetFieldByIndex(pFields, fieldNumber);
+#else
 	pFields->pdd[fieldNumber].flags &= ~FDT_MARK;
+#endif
 }
 
 /* <23cc4> ../engine/delta.c:453 */
@@ -413,6 +422,9 @@ void DELTA_ClearFlags(delta_t *pFields)
 /* <241d2> ../engine/delta.c:473 */
 int DELTA_TestDelta(unsigned char *from, unsigned char *to, delta_t *pFields)
 {
+#if defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)
+	return DELTAJit_TestDelta(from, to, pFields);
+#else
 	int i;
 	char *st1, *st2;
 	delta_description_t *pTest;
@@ -434,25 +446,39 @@ int DELTA_TestDelta(unsigned char *from, unsigned char *to, delta_t *pFields)
 			different = from[pTest->fieldOffset] != to[pTest->fieldOffset];
 			break;
 		case DT_SHORT:
-			different = *(uint16_t *)&from[pTest->fieldOffset] != *(uint16_t *)&to[pTest->fieldOffset];
+			different = *(uint16 *)&from[pTest->fieldOffset] != *(uint16 *)&to[pTest->fieldOffset];
 			break;
 		case DT_FLOAT:
 		case DT_INTEGER:
 		case DT_ANGLE:
-			different = *(uint32_t *)&from[pTest->fieldOffset] != *(uint32_t *)&to[pTest->fieldOffset];
+			different = *(uint32 *)&from[pTest->fieldOffset] != *(uint32 *)&to[pTest->fieldOffset];
 			break;
+#ifdef REHLDS_FIXES
+		// don't use multiplier when checking, to increase performance
+		// check values binary like it does in jit
 		case DT_TIMEWINDOW_8:
-			different = (int32_t)(*(float *)&from[pTest->fieldOffset] * 100.0) != (int32_t)(*(float *)&to[pTest->fieldOffset] * 100.0);
+		case DT_TIMEWINDOW_BIG:
+			different = (*(int32 *)&from[pTest->fieldOffset]) != (*(int32 *)&to[pTest->fieldOffset]);
+			break;
+#else
+		case DT_TIMEWINDOW_8:
+			different = (int32)(*(float *)&from[pTest->fieldOffset] * 100.0) != (int32)(*(float *)&to[pTest->fieldOffset] * 100.0);
 			break;
 		case DT_TIMEWINDOW_BIG:
-			different = (int32_t)(*(float *)&from[pTest->fieldOffset] * 1000.0) != (int32_t)(*(float *)&to[pTest->fieldOffset] * 1000.0);
+			different = (int32)(*(float *)&from[pTest->fieldOffset] * 1000.0) != (int32)(*(float *)&to[pTest->fieldOffset] * 1000.0);
 			break;
+#endif
 		case DT_STRING:
 			st1 = (char*)&from[pTest->fieldOffset];
 			st2 = (char*)&to[pTest->fieldOffset];
 			if (!(!*st1 && !*st2 || *st1 && *st2 && !Q_stricmp(st1, st2)))	// Not sure why it is case insensitive, but it looks so
 			{
+#ifdef REHLDS_FIXES
+				different = TRUE;
+				length = Q_strlen(st2) * 8;
+#else // REHLDS_FIXES
 				length = Q_strlen(st2);
+#endif // REHLDS_FIXES
 			}
 			break;
 		default:
@@ -467,12 +493,13 @@ int DELTA_TestDelta(unsigned char *from, unsigned char *to, delta_t *pFields)
 		}
 	}
 
-	if (neededBits != -1)
+	if (highestBit != -1)
 	{
 		neededBits += highestBit / 8 * 8 + 8;
 	}
 
 	return neededBits;
+#endif
 }
 
 /* <24309> ../engine/delta.c:602 */
@@ -511,23 +538,33 @@ void DELTA_MarkSendFields(unsigned char *from, unsigned char *to, delta_t *pFiel
 				pTest->flags |= FDT_MARK;
 			break;
 		case DT_SHORT:
-			if (*(uint16_t *)&from[pTest->fieldOffset] != *(uint16_t *)&to[pTest->fieldOffset])
+			if (*(uint16 *)&from[pTest->fieldOffset] != *(uint16 *)&to[pTest->fieldOffset])
 				pTest->flags |= FDT_MARK;
 			break;
 		case DT_FLOAT:
 		case DT_INTEGER:
 		case DT_ANGLE:
-			if (*(uint32_t *)&from[pTest->fieldOffset] != *(uint32_t *)&to[pTest->fieldOffset])
+			if (*(uint32 *)&from[pTest->fieldOffset] != *(uint32 *)&to[pTest->fieldOffset])
 				pTest->flags |= FDT_MARK;
 			break;
+
+// don't use multiplier when checking, to increase performance
+#ifdef REHLDS_FIXES
 		case DT_TIMEWINDOW_8:
-			if ((int32_t)(*(float *)&from[pTest->fieldOffset] * 100.0) != (int32_t)(*(float *)&to[pTest->fieldOffset] * 100.0))
+		case DT_TIMEWINDOW_BIG:
+			if (*(uint32 *)&from[pTest->fieldOffset] != *(uint32 *)&to[pTest->fieldOffset])
+				pTest->flags |= FDT_MARK;
+			break;
+#else
+		case DT_TIMEWINDOW_8:
+			if ((int32)(*(float *)&from[pTest->fieldOffset] * 100.0) != (int32)(*(float *)&to[pTest->fieldOffset] * 100.0))
 				pTest->flags |= FDT_MARK;
 			break;
 		case DT_TIMEWINDOW_BIG:
-			if ((int32_t)(*(float *)&from[pTest->fieldOffset] * 1000.0) != (int32_t)(*(float *)&to[pTest->fieldOffset] * 1000.0))
+			if ((int32)(*(float *)&from[pTest->fieldOffset] * 1000.0) != (int32)(*(float *)&to[pTest->fieldOffset] * 1000.0))
 				pTest->flags |= FDT_MARK;
 			break;
+#endif
 		case DT_STRING:
 			st1 = (char*)&from[pTest->fieldOffset];
 			st2 = (char*)&to[pTest->fieldOffset];
@@ -549,24 +586,38 @@ void DELTA_SetSendFlagBits(delta_t *pFields, int *bits, int *bytecount)
 	delta_description_t *pTest;
 	int i;
 	int lastbit = -1;
-	int bitnumber;
 	int fieldCount = pFields->fieldCount;
 
 	Q_memset(bits, 0, 8);
 
-	lastbit = -1;
-	bitnumber = -1;
 	for (i = fieldCount - 1, pTest = &pFields->pdd[i]; i >= 0; i--, pTest--)
 	{
 		if (pTest->flags & FDT_MARK)
 		{
 			if (lastbit == -1)
-				bitnumber = i;
+				lastbit = i;
 			bits[i > 31 ? 1 : 0] |= 1 << (i & 0x1F);
-			lastbit = bitnumber;
 		}
 	}
+
+#ifdef REHLDS_FIXES
+	// fix for bad bytecount when no fields are marked
+	if (lastbit == -1) {
+		*bytecount = 0;
+		return;
+	}
+#endif
+
 	*bytecount = (lastbit >> 3) + 1;
+}
+
+qboolean DELTA_IsFieldMarked(delta_t* pFields, int fieldNumber)
+{
+#if defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)
+	return DELTAJit_IsFieldMarked(pFields, fieldNumber);
+#else 
+	return pFields->pdd[fieldNumber].flags & FDT_MARK;
+#endif
 }
 
 /* <2456d> ../engine/delta.c:782 */
@@ -582,8 +633,13 @@ void DELTA_WriteMarkedFields(unsigned char *from, unsigned char *to, delta_t *pF
 
 	for (i = 0, pTest = pFields->pdd; i < fieldCount; i++, pTest++)
 	{
+#if defined (REHLDS_OPT_PEDANTIC) || defined (REHLDS_FIXES)
+		if (!DELTA_IsFieldMarked(pFields, i))
+			continue;
+#else
 		if (!(pTest->flags & FDT_MARK))
 			continue;
+#endif
 
 		fieldSign = pTest->fieldType & DT_SIGNED;
 		fieldType = pTest->fieldType & ~DT_SIGNED;
@@ -592,28 +648,28 @@ void DELTA_WriteMarkedFields(unsigned char *from, unsigned char *to, delta_t *pF
 		case DT_BYTE:
 			if (fieldSign)
 			{
-				int8_t si8 = *(int8_t *)&to[pTest->fieldOffset];
-				si8 = (int8_t)((double)si8 * pTest->premultiply);
+				int8 si8 = *(int8 *)&to[pTest->fieldOffset];
+				si8 = (int8)((double)si8 * pTest->premultiply);
 				MSG_WriteSBits(si8, pTest->significant_bits);
 			}
 			else
 			{
-				uint8_t i8 = *(uint8_t *)&to[pTest->fieldOffset];
-				i8 = (uint8_t)((double)i8 * pTest->premultiply);
+				uint8 i8 = *(uint8 *)&to[pTest->fieldOffset];
+				i8 = (uint8)((double)i8 * pTest->premultiply);
 				MSG_WriteBits(i8, pTest->significant_bits);
 			}
 			break;
 		case DT_SHORT:
 			if (fieldSign)
 			{
-				int16_t si16 = *(int16_t *)&to[pTest->fieldOffset];
-				si16 = (int16_t)((double)si16 * pTest->premultiply);
+				int16 si16 = *(int16 *)&to[pTest->fieldOffset];
+				si16 = (int16)((double)si16 * pTest->premultiply);
 				MSG_WriteSBits(si16, pTest->significant_bits);
 			}
 			else
 			{
-				uint16_t i16 = *(uint16_t *)&to[pTest->fieldOffset];
-				i16 = (uint16_t)((double)i16 * pTest->premultiply);
+				uint16 i16 = *(uint16 *)&to[pTest->fieldOffset];
+				i16 = (uint16)((double)i16 * pTest->premultiply);
 				MSG_WriteBits(i16, pTest->significant_bits);
 			}
 			break;
@@ -622,11 +678,11 @@ void DELTA_WriteMarkedFields(unsigned char *from, unsigned char *to, delta_t *pF
 			double val = (double)(*(float *)&to[pTest->fieldOffset]) * pTest->premultiply;
 			if (fieldSign)
 			{
-				MSG_WriteSBits((int32_t)val, pTest->significant_bits);
+				MSG_WriteSBits((int32)val, pTest->significant_bits);
 			}
 			else
 			{
-				MSG_WriteBits((uint32_t)val, pTest->significant_bits);
+				MSG_WriteBits((uint32)val, pTest->significant_bits);
 			}
 			break;
 		}
@@ -634,19 +690,19 @@ void DELTA_WriteMarkedFields(unsigned char *from, unsigned char *to, delta_t *pF
 		{
 			if (fieldSign)
 			{
-				int32_t signedInt = *(int32_t *)&to[pTest->fieldOffset];
+				int32 signedInt = *(int32 *)&to[pTest->fieldOffset];
 				if (pTest->premultiply < 0.9999 || pTest->premultiply > 1.0001)
 				{
-					signedInt = (int32_t)((double)signedInt * pTest->premultiply);
+					signedInt = (int32)((double)signedInt * pTest->premultiply);
 				}
 				MSG_WriteSBits(signedInt, pTest->significant_bits);
 			}
 			else
 			{
-				uint32_t unsignedInt = *(uint32_t *)&to[pTest->fieldOffset];
+				uint32 unsignedInt = *(uint32 *)&to[pTest->fieldOffset];
 				if (pTest->premultiply < 0.9999 || pTest->premultiply > 1.0001)
 				{
-					unsignedInt = (uint32_t)((double)unsignedInt * pTest->premultiply);
+					unsignedInt = (uint32)((double)unsignedInt * pTest->premultiply);
 				}
 				MSG_WriteBits(unsignedInt, pTest->significant_bits);
 			}
@@ -659,15 +715,15 @@ void DELTA_WriteMarkedFields(unsigned char *from, unsigned char *to, delta_t *pF
 		case DT_TIMEWINDOW_8:
 		{
 			f2 = *(float *)&to[pTest->fieldOffset];
-			int32_t twVal = (int)(g_psv.time * 100.0) - (int)(f2 * 100.0);
+			int32 twVal = (int)(g_psv.time * 100.0) - (int)(f2 * 100.0);
 			MSG_WriteSBits(twVal, 8);
 			break;
 		}
 		case DT_TIMEWINDOW_BIG:
 		{
 			f2 = *(float *)&to[pTest->fieldOffset];
-			int32_t twVal = (int)(g_psv.time * pTest->premultiply) - (int)(f2 * pTest->premultiply);
-			MSG_WriteSBits((int32_t)twVal, pTest->significant_bits);
+			int32 twVal = (int)(g_psv.time * pTest->premultiply) - (int)(f2 * pTest->premultiply);
+			MSG_WriteSBits((int32)twVal, pTest->significant_bits);
 			break;
 		}
 		case DT_STRING:
@@ -681,36 +737,60 @@ void DELTA_WriteMarkedFields(unsigned char *from, unsigned char *to, delta_t *pF
 }
 
 /* <2467e> ../engine/delta.c:924 */
-int DELTA_CheckDelta(unsigned char *from, unsigned char *to, delta_t *pFields)
+qboolean DELTA_CheckDelta(unsigned char *from, unsigned char *to, delta_t *pFields)
 {
-	int sendfields;
+	qboolean sendfields;
+
+#if defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)
+	sendfields = DELTAJit_Fields_Clear_Mark_Check(from, to, pFields, NULL);
+#else
 	DELTA_ClearFlags(pFields);
 	DELTA_MarkSendFields(from, to, pFields);
 	sendfields = DELTA_CountSendFields(pFields);
+#endif
+	
 	return sendfields;
 }
 
 /* <247f5> ../engine/delta.c:949 */
-int DELTA_WriteDelta(unsigned char *from, unsigned char *to, qboolean force, delta_t *pFields, void(*callback)(void))
+NOINLINE qboolean DELTA_WriteDelta(unsigned char *from, unsigned char *to, qboolean force, delta_t *pFields, void(*callback)(void))
 {
-	int sendfields;
+	qboolean sendfields;
+
+#if defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)
+	sendfields = DELTAJit_Fields_Clear_Mark_Check(from, to, pFields, NULL);
+#else // REHLDS_OPT_PEDANTIC || REHLDS_FIXES
 	DELTA_ClearFlags(pFields);
 	DELTA_MarkSendFields(from, to, pFields);
 	sendfields = DELTA_CountSendFields(pFields);
+#endif // REHLDS_OPT_PEDANTIC || REHLDS_FIXES
+
 	_DELTA_WriteDelta(from, to, force, pFields, callback, sendfields);
 	return sendfields;
 }
 
-/* <24760> ../engine/delta.c:963 */
-int _DELTA_WriteDelta(unsigned char *from, unsigned char *to, qboolean force, delta_t *pFields, void(*callback)(void), int sendfields)
+#ifdef REHLDS_FIXES //Fix for https://github.com/dreamstalker/rehlds/issues/24
+qboolean DELTA_WriteDeltaForceMask(unsigned char *from, unsigned char *to, qboolean force, delta_t *pFields, void(*callback)(void), void* pForceMask) {
+	qboolean sendfields = DELTAJit_Fields_Clear_Mark_Check(from, to, pFields, pForceMask);
+	_DELTA_WriteDelta(from, to, force, pFields, callback, sendfields);
+	return sendfields;
+}
+#endif
+
+
+qboolean _DELTA_WriteDelta(unsigned char *from, unsigned char *to, qboolean force, delta_t *pFields, void(*callback)( void ), qboolean sendfields)
 {
 	int i;
 	int bytecount;
-	int bits[2];	// this is a limit with 64 fields max in delta
+	int bits[2];
 
 	if (sendfields || force)
 	{
+#if defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)
+		DELTAJit_SetSendFlagBits(pFields, bits, &bytecount);
+#else
 		DELTA_SetSendFlagBits(pFields, bits, &bytecount);
+#endif
 
 		if (callback)
 			callback();
@@ -718,7 +798,7 @@ int _DELTA_WriteDelta(unsigned char *from, unsigned char *to, qboolean force, de
 		MSG_WriteBits(bytecount, 3);
 		for (i = 0; i < bytecount; i++)
 		{
-			MSG_WriteBits(((byte*)bits)[i], 8);
+			MSG_WriteBits(( (byte*)bits )[i], 8);
 		}
 
 		DELTA_WriteMarkedFields(from, to, pFields);
@@ -726,6 +806,7 @@ int _DELTA_WriteDelta(unsigned char *from, unsigned char *to, qboolean force, de
 
 	return 1;
 }
+
 
 /* <24aa0> ../engine/delta.c:1010 */
 int DELTA_ParseDelta(unsigned char *from, unsigned char *to, delta_t *pFields)
@@ -769,14 +850,14 @@ int DELTA_ParseDelta(unsigned char *from, unsigned char *to, delta_t *pFields)
 				to[pTest->fieldOffset] = from[pTest->fieldOffset];
 				break;
 			case DT_SHORT:
-				*(uint16_t *)&to[pTest->fieldOffset] = *(uint16_t *)&from[pTest->fieldOffset];
+				*(uint16 *)&to[pTest->fieldOffset] = *(uint16 *)&from[pTest->fieldOffset];
 				break;
 			case DT_FLOAT:
 			case DT_INTEGER:
 			case DT_ANGLE:
 			case DT_TIMEWINDOW_8:
 			case DT_TIMEWINDOW_BIG:
-				*(uint32_t *)&to[pTest->fieldOffset] = *(uint32_t *)&from[pTest->fieldOffset];
+				*(uint32 *)&to[pTest->fieldOffset] = *(uint32 *)&from[pTest->fieldOffset];
 				break;
 			case DT_STRING:
 				Q_strcpy((char *)&to[pTest->fieldOffset], (char *)&from[pTest->fieldOffset]);
@@ -804,7 +885,7 @@ int DELTA_ParseDelta(unsigned char *from, unsigned char *to, delta_t *pFields)
 				{
 					d2 = d2 * pTest->postmultiply;
 				}
-				*(int8_t *)&to[pTest->fieldOffset] = (int8_t)d2;
+				*(int8 *)&to[pTest->fieldOffset] = (int8)d2;
 			}
 			else
 			{
@@ -817,7 +898,7 @@ int DELTA_ParseDelta(unsigned char *from, unsigned char *to, delta_t *pFields)
 				{
 					d2 = d2 * pTest->postmultiply;
 				}
-				*(uint8_t *)&to[pTest->fieldOffset] = (uint8_t)d2;
+				*(uint8 *)&to[pTest->fieldOffset] = (uint8)d2;
 			}
 			break;
 		case DT_SHORT:
@@ -832,7 +913,7 @@ int DELTA_ParseDelta(unsigned char *from, unsigned char *to, delta_t *pFields)
 				{
 					d2 = d2 * pTest->postmultiply;
 				}
-				*(int16_t *)&to[pTest->fieldOffset] = (int16_t)d2;
+				*(int16 *)&to[pTest->fieldOffset] = (int16)d2;
 			}
 			else
 			{
@@ -845,7 +926,7 @@ int DELTA_ParseDelta(unsigned char *from, unsigned char *to, delta_t *pFields)
 				{
 					d2 = d2 * pTest->postmultiply;
 				}
-				*(uint16_t *)&to[pTest->fieldOffset] = (uint16_t)d2;
+				*(uint16 *)&to[pTest->fieldOffset] = (uint16)d2;
 			}
 			break;
 		case DT_FLOAT:
@@ -879,7 +960,7 @@ int DELTA_ParseDelta(unsigned char *from, unsigned char *to, delta_t *pFields)
 				{
 					d2 = d2 * pTest->postmultiply;
 				}
-				*(int32_t *)&to[pTest->fieldOffset] = (int32_t)d2;
+				*(int32 *)&to[pTest->fieldOffset] = (int32)d2;
 			}
 			else
 			{
@@ -892,7 +973,7 @@ int DELTA_ParseDelta(unsigned char *from, unsigned char *to, delta_t *pFields)
 				{
 					d2 = d2 * pTest->postmultiply;
 				}
-				*(uint32_t *)&to[pTest->fieldOffset] = (uint32_t)d2;
+				*(uint32 *)&to[pTest->fieldOffset] = (uint32)d2;
 			}
 			break;
 		case DT_ANGLE:
@@ -1028,6 +1109,12 @@ delta_t *DELTA_BuildFromLinks(delta_link_t **pplinks)
 	DELTA_ReverseLinks(pplinks);
 
 	count = DELTA_CountLinks(*pplinks);
+
+#ifdef REHLDS_FIXES
+	if (count > DELTA_MAX_FIELDS)
+		Sys_Error(__FUNCTION__ ": Too many fields in delta description %i (MAX %i)\n", count, DELTA_MAX_FIELDS);
+#endif
+
 	pdesc = (delta_description_t *)Mem_ZeroMalloc(sizeof(delta_description_t) * count);
 
 	for (p = *pplinks, pcur = pdesc; p != NULL; p = p->next, pcur++)

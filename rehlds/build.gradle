@@ -122,7 +122,7 @@ void setupToolchain(NativeBinarySpec b) {
     }
     b.lib LazyNativeDepSet.create(dep_bzip2, 'bzip2', b.buildType.name, true)
 
-    cfg.singleDefines 'USE_BREAKPAD_HANDLER', 'DEDICATED', 'SWDS', 'REHLDS_SELF'
+    cfg.singleDefines 'USE_BREAKPAD_HANDLER', 'DEDICATED', 'SWDS', 'REHLDS_SELF', 'REHLDS_OPT_PEDANTIC'
 
     if (cfg instanceof MsvcToolchainConfig) {
         cfg.compilerOptions.pchConfig = new MsvcToolchainConfig.PrecompiledHeadersConfig(
@@ -184,6 +184,7 @@ class RehldsSrc {
                 include "**/*.cpp"
                 exclude "precompiled.cpp"
                 exclude GradleCppUtils.windows ? "tier0/platform_linux.cpp" : "tier0/platform_win32.cpp"
+				exclude "interface.cpp", "rehlds/crc32.cpp", "rehlds/sys_shared.cpp"
             }
 
             source {
@@ -320,9 +321,10 @@ model {
 
 task buildRelease {
     dependsOn binaries.withType(SharedLibraryBinarySpec).matching { SharedLibraryBinarySpec blib ->
-        blib.buildable && blib.buildType.name == 'release'
+		blib.buildable && blib.buildType.name == 'release' && !blib.name.contains('Rehlds_hooker_engine')
     }
 }
+
 
 task prepareDevEnvTests {
     def rehldsTests = new File(project.projectDir, '_dev/testDemos')

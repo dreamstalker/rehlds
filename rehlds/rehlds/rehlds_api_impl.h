@@ -27,7 +27,7 @@
 */
 #pragma once
 
-#include "maintypes.h"
+#include "archtypes.h"
 #include "rehlds_api.h"
 #include "rehlds_interfaces_impl.h"
 
@@ -56,8 +56,8 @@ typedef IVoidHookChainImpl<char*, int> CRehldsHook_SVC_GetChallenge_mod;
 typedef IVoidHookChainRegistryImpl<char*, int> CRehldsHookRegistry_SVC_GetChallenge_mod;
 
 //SV_CheckKeyInfo hook
-typedef IHookChainImpl<int, netadr_t*, char*, uint16_t*, int*, char*, char*> CRehldsHook_SV_CheckKeyInfo;
-typedef IHookChainRegistryImpl<int, netadr_t*, char*, uint16_t*, int*, char*, char*> CRehldsHookRegistry_SV_CheckKeyInfo;
+typedef IHookChainImpl<int, netadr_t*, char*, uint16*, int*, char*, char*> CRehldsHook_SV_CheckKeyInfo;
+typedef IHookChainRegistryImpl<int, netadr_t*, char*, uint16*, int*, char*, char*> CRehldsHookRegistry_SV_CheckKeyInfo;
 
 //SV_CheckIPRestrictions hook
 typedef IHookChainImpl<int, netadr_t*, int> CRehldsHook_SV_CheckIPRestrictions;
@@ -84,8 +84,8 @@ typedef IVoidHookChainImpl<IGameClient*> CRehldsHook_Steam_NotifyClientDisconnec
 typedef IVoidHookChainRegistryImpl<IGameClient*> CRehldsHookRegistry_Steam_NotifyClientDisconnect;
 
 //PreProcessPacket
-typedef IHookChainImpl<bool, uint8_t*, unsigned int, const netadr_t&> CRehldsHook_PreprocessPacket;
-typedef IHookChainRegistryImpl<bool, uint8_t*, unsigned int, const netadr_t&> CRehldsHookRegistry_PreprocessPacket;
+typedef IHookChainImpl<bool, uint8*, unsigned int, const netadr_t&> CRehldsHook_PreprocessPacket;
+typedef IHookChainRegistryImpl<bool, uint8*, unsigned int, const netadr_t&> CRehldsHookRegistry_PreprocessPacket;
 
 //ValidateCommand
 typedef IHookChainImpl<bool, const char*, cmd_source_t, IGameClient*> CRehldsHook_ValidateCommand;
@@ -96,8 +96,8 @@ typedef IVoidHookChainImpl<IGameClient*> CRehldsHook_ClientConnected;
 typedef IVoidHookChainRegistryImpl<IGameClient*> CRehldsHookRegistry_ClientConnected;
 
 //HandleNetCommand
-typedef IVoidHookChainImpl<IGameClient*, int8_t> CRehldsHook_HandleNetCommand;
-typedef IVoidHookChainRegistryImpl<IGameClient*, int8_t> CRehldsHookRegistry_HandleNetCommand;
+typedef IVoidHookChainImpl<IGameClient*, int8> CRehldsHook_HandleNetCommand;
+typedef IVoidHookChainRegistryImpl<IGameClient*, int8> CRehldsHookRegistry_HandleNetCommand;
 
 //Mod_LoadBrushModel
 typedef IVoidHookChainImpl<model_t*, void*> CRehldsHook_Mod_LoadBrushModel;

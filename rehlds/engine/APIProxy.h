@@ -289,7 +289,7 @@ typedef unsigned short				(*pfnEngSrc_pfnPrecacheEvent_t )		( int type, const ch
 typedef void						(*pfnEngSrc_pfnPlaybackEvent_t )		( int flags, const struct edict_s *pInvoker, unsigned short eventindex, float delay, float *origin, float *angles, float fparam1, float fparam2, int iparam1, int iparam2, int bparam1, int bparam2 );
 typedef void						(*pfnEngSrc_pfnWeaponAnim_t )			( int iAnim, int body );
 typedef float						(*pfnEngSrc_pfnRandomFloat_t )			( float flLow, float flHigh );
-typedef int32_t						(*pfnEngSrc_pfnRandomLong_t )			( int32_t lLow, int32_t lHigh );
+typedef int32						(*pfnEngSrc_pfnRandomLong_t )			( int32 lLow, int32 lHigh );
 typedef void						(*pfnEngSrc_pfnHookEvent_t )			( char *name, void ( *pfnEvent )( struct event_args_s *args ) );
 typedef int							(*pfnEngSrc_Con_IsVisible_t)			();
 typedef const char *				(*pfnEngSrc_pfnGetGameDirectory_t )		( void );
@@ -565,7 +565,7 @@ typedef void(*pfnEngDst_pfnPrecacheEvent_t)						(int *, const char* *);
 typedef void(*pfnEngDst_pfnPlaybackEvent_t)						(int *, const struct edict_s **, unsigned short *, float *, float **, float **, float *, float *, int *, int *, int *, int *);
 typedef void(*pfnEngDst_pfnWeaponAnim_t)						(int *, int *);
 typedef void(*pfnEngDst_pfnRandomFloat_t)						(float *, float *);
-typedef void(*pfnEngDst_pfnRandomLong_t)						(int32_t *, int32_t *);
+typedef void(*pfnEngDst_pfnRandomLong_t)						(int32 *, int32 *);
 typedef void(*pfnEngDst_pfnHookEvent_t)							(char **, void(**pfnEvent)(struct event_args_s *args));
 typedef void(*pfnEngDst_Con_IsVisible_t)						();
 typedef void(*pfnEngDst_pfnGetGameDirectory_t)					(void);

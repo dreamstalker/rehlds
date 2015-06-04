@@ -80,7 +80,6 @@ void Cbuf_AddText(char *text)
 // commands.
 void Cbuf_InsertText(char *text)
 {
-	char *temp = NULL;
 
 	int addLen = Q_strlen(text);
 	int currLen = cmd_text.cursize;
@@ -91,8 +90,18 @@ void Cbuf_InsertText(char *text)
 		return;
 	}
 
+#ifdef REHLDS_FIXES
+	if (currLen)
+		memmove(cmd_text.data + addLen, cmd_text.data, currLen);
+
+	Q_memcpy(cmd_text.data, text, addLen);
+	cmd_text.cursize += addLen;
+
+#else
+	char *temp = NULL;
 	if (currLen)
 	{
+		
 		temp = (char *)Z_Malloc(currLen);	// TODO: Optimize: better use memmove without need for a temp buffer
 		Q_memcpy(temp, cmd_text.data, currLen);
 		SZ_Clear(&cmd_text);
@@ -105,13 +114,12 @@ void Cbuf_InsertText(char *text)
 		SZ_Write(&cmd_text, temp, currLen);
 		Z_Free(temp);
 	}
+#endif // REHLDS_FIXES
 }
 
 /* <4f05> ../engine/cmd.c:148 */
 void Cbuf_InsertTextLines(char *text)
 {
-	char *temp = NULL;
-
 	int addLen = Q_strlen(text);
 	int currLen = cmd_text.cursize;
 
@@ -121,8 +129,22 @@ void Cbuf_InsertTextLines(char *text)
 		return;
 	}
 
+#ifdef REHLDS_FIXES
+	if (currLen)
+		memmove(cmd_text.data + addLen + 1, cmd_text.data, currLen);
+	
+	cmd_text.data[0] = '\n'; // TODO: Why we need leading \n, if there is no commands in the start?
+	Q_memcpy(&cmd_text.data[1], text, addLen);
+	cmd_text.data[addLen + 1] = '\n';
+
+	cmd_text.cursize += addLen + 2;
+
+#else
+
+	char *temp = NULL;
 	if (currLen)
 	{
+		
 		temp = (char *)Z_Malloc(currLen);
 		Q_memcpy(temp, cmd_text.data, currLen);
 		SZ_Clear(&cmd_text);
@@ -137,6 +159,7 @@ void Cbuf_InsertTextLines(char *text)
 		SZ_Write(&cmd_text, temp, currLen);
 		Z_Free(temp);
 	}
+#endif // REHLDS_FIXES
 }
 
 /* <5d96> ../engine/cmd.c:193 */
@@ -167,6 +190,18 @@ void Cbuf_Execute(void)
 				break;
 		}
 
+#ifdef REHLDS_FIXES
+		// save `i` if we truncate command
+		int len;
+
+		if (i > MAX_CMD_LINE - 1)
+			len = MAX_CMD_LINE - 1;
+		else
+			len = i;
+
+		Q_memcpy(line, text, len);
+		line[len] = 0;
+#else // REHLDS_FIXES
 		if (i > MAX_CMD_LINE - 1)
 		{
 			i = MAX_CMD_LINE - 1;
@@ -174,6 +209,7 @@ void Cbuf_Execute(void)
 
 		Q_memcpy(line, text, i);
 		line[i] = 0;
+#endif // REHLDS_FIXES
 
 		// delete the text from the command buffer and move remaining commands down
 		// this is necessary because commands (exec, alias) can insert data at the
@@ -187,7 +223,12 @@ void Cbuf_Execute(void)
 		{
 			i++;
 			cmd_text.cursize -= i;
+#ifdef REHLDS_FIXES
+			// dst overlaps src
+			memmove(text, text + i, cmd_text.cursize);
+#else // REHLDS_FIXES
 			Q_memcpy(text, text + i, cmd_text.cursize);
+#endif // REHLDS_FIXES
 		}
 
 		// execute the command line
@@ -823,7 +864,7 @@ void Cmd_RemoveWrapperCmds(void)
 }
 
 /* <5af2> ../engine/cmd.c:1035 */
-qboolean Cmd_Exists(char *cmd_name)
+qboolean Cmd_Exists(const char *cmd_name)
 {
 	cmd_function_t *cmd = cmd_functions;
 

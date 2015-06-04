@@ -26,6 +26,12 @@
 *
 */
 #pragma once
-#include "maintypes.h"
 
-extern bool g_HasSSE42;
+typedef struct cpuinfo_s
+{
+	uint8 sse3, ssse3, sse4_1, sse4_2, avx, avx2;
+} cpuinfo_t;
+
+extern cpuinfo_t cpuinfo;
+
+void Sys_CheckCpuInstructionsSupport(void);

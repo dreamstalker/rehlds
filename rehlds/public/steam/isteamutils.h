@@ -139,7 +139,7 @@ public:
 #endif
 
 #ifdef _PS3
-	virtual void PostPS3SysutilCallback( uint64_t status, uint64_t param, void* userdata ) = 0;
+	virtual void PostPS3SysutilCallback( uint64 status, uint64 param, void* userdata ) = 0;
 	virtual bool BIsReadyToShutdown() = 0;
 	virtual bool BIsPSNOnline() = 0;
 

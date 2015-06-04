@@ -34,10 +34,12 @@
 
 #include "maintypes.h"
 
-#define MAX_CLIENTS			32
-#define MAX_EDICTS			900
-#define MAX_NAME			32
+// TODO: I think this defines must be in /common/
+#define MAX_CLIENTS				32
+#define MAX_EDICTS				900
+#define MAX_NAME				32
 #define MAX_LIGHTSTYLES			64
+#define MAX_PACKET_ENTITIES		256
 
 #include "custom_int.h"
 #include "crc.h"
@@ -86,6 +88,8 @@
 #define HL_SOUND_HASHLOOKUP_SIZE (HL_SOUND_MAX * 2 - 1)
 
 #define HL_MODEL_MAX 512
+#define HL_GENERIC_MAX 512
+#define HL_EVENT_MAX 256
 
 // Authentication types
 #define AUTH_IDTYPE_UNKNOWN	0
@@ -131,15 +135,15 @@ typedef struct server_s
 	int num_resources;
 	consistency_t consistency_list[512];
 	int num_consistency;
-	char *model_precache[512];
-	struct model_s *models[512];
-	unsigned char model_precache_flags[512];
-	struct event_s event_precache[256];
-	char *sound_precache[512];
+	const char *model_precache[HL_MODEL_MAX];
+	struct model_s *models[HL_MODEL_MAX];
+	unsigned char model_precache_flags[HL_MODEL_MAX];
+	struct event_s event_precache[HL_EVENT_MAX];
+	const char *sound_precache[HL_SOUND_MAX];
 	short int sound_precache_hashedlookup[HL_SOUND_HASHLOOKUP_SIZE];
 	qboolean sound_precache_hashedlookup_built;
-	char *generic_precache[512];
-	char generic_precache_names[512][64];
+	const char *generic_precache[HL_GENERIC_MAX];
+	char generic_precache_names[HL_GENERIC_MAX][64];
 	int num_generic_names;
 	char *lightstyles[MAX_LIGHTSTYLES];
 	int num_edicts;
@@ -159,6 +163,19 @@ typedef struct server_s
 	sizebuf_t signon;
 	unsigned char signon_data[32768];
 } server_t;
+
+
+struct rehlds_server_t {
+
+	//map for sv.model_precache (for faster resolving of model index by its name)
+#if defined(REHLDS_FIXES)
+	CStringKeyStaticMap<int, 7, HL_MODEL_MAX * 2> modelsMap; //case-sensitive keys for better performance
+#elif defined(REHLDS_OPT_PEDANTIC)
+	CICaseStringKeyStaticMap<int, 7, HL_MODEL_MAX * 2> modelsMap; //use case-insensitive keys to conform original engine's behavior
+#endif
+
+};
+
 
 /* <3b30a> ../engine/server.h:163 */
 typedef struct client_frame_s
@@ -225,7 +242,7 @@ typedef struct client_s
 	int lc;
 	char physinfo[MAX_INFO_STRING];
 	qboolean m_bLoopback;
-	uint32_t m_VoiceStreams[2];
+	uint32 m_VoiceStreams[2];
 	double m_lastvoicetime;
 	int m_sendrescount;
 } client_t;
@@ -426,6 +443,8 @@ extern globalvars_t gGlobalVariables;
 extern server_static_t g_psvs;
 extern server_t g_psv;
 
+extern rehlds_server_t g_rehlds_sv;
+
 extern cvar_t sv_lan;
 extern cvar_t sv_lan_rate;
 extern cvar_t sv_aim;
@@ -542,6 +561,9 @@ extern delta_t *g_pentitydelta;
 extern delta_t *g_pcustomentitydelta;
 extern delta_t *g_pclientdelta;
 extern delta_t *g_pweapondelta;
+#ifdef REHLDS_OPT_PEDANTIC
+extern delta_t *g_pusercmddelta;
+#endif
 
 
 extern unsigned char fatpvs[1024];
@@ -693,7 +715,7 @@ void SV_SkipUpdates(void);
 void SV_SendClientMessages(void);
 void SV_ExtractFromUserinfo(client_t *cl);
 int SV_ModelIndex(const char *name);
-void SV_AddResource(resourcetype_t type, char *name, int size, unsigned char flags, int index);
+void SV_AddResource(resourcetype_t type, const char *name, int size, unsigned char flags, int index);
 void SV_CreateGenericResources(void);
 void SV_CreateResourceList(void);
 void SV_ClearCaches(void);

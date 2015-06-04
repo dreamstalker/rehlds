@@ -32,18 +32,8 @@
 typedef struct full_packet_entities_s
 {
 	int num_entities;
-	entity_state_t entities[256];
+	entity_state_t entities[MAX_PACKET_ENTITIES];
 } full_packet_entities_t;
-
-/* <a59b9> ../engine/sv_main.c:102 */
-typedef struct delta_info_s
-{
-	delta_info_s *next;
-	char *name;
-	char *loadfile;
-	delta_t *delta;
-} delta_info_t;
-
 
 int sv_lastnum;
 
@@ -54,6 +44,9 @@ delta_t *g_pentitydelta;
 delta_t *g_pcustomentitydelta;
 delta_t *g_pclientdelta;
 delta_t *g_pweapondelta;
+#ifdef REHLDS_OPT_PEDANTIC
+delta_t *g_pusercmddelta;
+#endif
 
 int hashstrings_collisions;
 
@@ -65,6 +58,8 @@ float g_LastScreenUpdateTime;
 globalvars_t gGlobalVariables;
 server_static_t g_psvs;
 server_t g_psv;
+
+rehlds_server_t g_rehlds_sv;
 
 decalname_t sv_decalnames[512];
 int sv_decalnamecount;
@@ -423,14 +418,18 @@ void SV_ReallocateDynamicData(void)
 	if (g_moved_edict)
 	{
 		Con_Printf("Reallocate on moved_edict\n");
-		// TODO: Free memory to prevent mem leaks?
+#ifdef REHLDS_FIXES
+		Mem_Free(g_moved_edict);
+#endif
 	}
 	g_moved_edict = (edict_t **)Mem_ZeroMalloc(sizeof(edict_t *) * nSize);
 
 	if (g_moved_from)
 	{
 		Con_Printf("Reallocate on moved_from\n");
-		// TODO: Free memory to prevent mem leaks?
+#ifdef REHLDS_FIXES
+		Mem_Free(g_moved_from);
+#endif
 	}
 	g_moved_from = (vec3_t *)Mem_ZeroMalloc(sizeof(vec3_t) * nSize);
 }
@@ -445,7 +444,9 @@ void SV_AllocClientFrames(void)
 		if (cl->frames)
 		{
 			Con_DPrintf("Allocating over frame pointer?\n");
-			// TODO: Free memory to prevent mem leaks?
+#ifdef REHLDS_FIXES
+			Mem_Free(cl->frames);
+#endif
 		}
 		cl->frames = (client_frame_t *)Mem_ZeroMalloc(sizeof(client_frame_t) * SV_UPDATE_BACKUP);
 	}
@@ -493,6 +494,13 @@ void SV_AllocPacketEntities(client_frame_t *frame, int numents)
 {
 	if (frame)
 	{
+#ifdef REHLDS_OPT_PEDANTIC
+		frame->entities.num_entities = numents;
+
+		// only alloc for max possible numents
+		if (!frame->entities.entities)
+			frame->entities.entities = (entity_state_t *)Mem_ZeroMalloc(sizeof(entity_state_t) * MAX_PACKET_ENTITIES);
+#else // REHLDS_OPT_PEDANTIC
 		if (frame->entities.entities)
 			SV_ClearPacketEntities(frame);
 
@@ -502,6 +510,7 @@ void SV_AllocPacketEntities(client_frame_t *frame, int numents)
 
 		frame->entities.num_entities = numents;
 		frame->entities.entities = (entity_state_t *)Mem_ZeroMalloc(sizeof(entity_state_t) * allocatedslots);
+#endif // REHLDS_OPT_PEDANTIC
 	}
 }
 
@@ -652,14 +661,16 @@ void SV_Users_f(void)
 /* <a651b> ../engine/sv_main.c:762 */
 void SV_CountPlayers(int *clients)
 {
-	*clients = 0;
+	int count = 0;
+	
 	client_s *cl = g_psvs.clients;
-
 	for (int i = 0; i < g_psvs.maxclients; i++, cl++)
 	{
-		if (cl->active || cl->spawned || cl->connected)
-			(*clients)++;
+		if (cl->active | cl->spawned | cl->connected)
+			count++;
 	}
+
+	*clients = count;
 }
 
 /* <a68a4> ../engine/sv_main.c:786 */
@@ -687,8 +698,15 @@ void SV_FindModelNumbers(void)
 	{
 		if (!g_psv.model_precache[i])
 			break;
+
+		//use case-sensitive names to increase performance
+#ifdef REHLDS_FIXES
 		if (!Q_stricmp(g_psv.model_precache[i], "models/player.mdl"))
 			sv_playermodel = i;
+#else
+		if (!Q_stricmp(g_psv.model_precache[i], "models/player.mdl"))
+			sv_playermodel = i;
+#endif
 	}
 }
 
@@ -818,7 +836,7 @@ qboolean SV_BuildSoundMsg(edict_t *entity, int channel, const char *sample, int 
 	if (field_mask & SND_FL_VOLUME)
 		MSG_WriteBits(volume, 8);
 	if (field_mask & SND_FL_ATTENUATION)
-		MSG_WriteBits((uint32_t)(attenuation * 64.0f), 8);
+		MSG_WriteBits((uint32)(attenuation * 64.0f), 8);
 	MSG_WriteBits(channel, 3);
 	MSG_WriteBits(ent, 11);
 	MSG_WriteBits(sound_num, (field_mask & SND_FL_LARGE_INDEX) ? 16 : 8);
@@ -853,14 +871,10 @@ int SV_LookupSoundIndex(const char *sample)
 	{
 		if (g_psv.state == ss_loading)
 		{
-			index = 1;
-			while (g_psv.sound_precache[index])
+			for (index = 1; index < HL_SOUND_MAX && g_psv.sound_precache[index]; index++) // TODO: why from 1?
 			{
 				if (!Q_stricmp(sample, g_psv.sound_precache[index]))
 					return index;
-				index++;
-				if (index >= HL_SOUND_MAX)
-					return 0;
 			}
 			return 0;
 		}
@@ -1382,11 +1396,17 @@ void SV_WriteClientdataToMessage(client_t *client, sizebuf_t *msg)
 			else
 				fdata = &host_client->frames[bits].weapondata[i];
 
-			if (DELTA_CheckDelta((byte *)fdata, (byte *)tdata, (delta_t *)g_pweapondelta))
+			if (DELTA_CheckDelta((byte *)fdata, (byte *)tdata, g_pweapondelta))
 			{
 				MSG_WriteBits(1, 1);
 				MSG_WriteBits(i, 6);
-				DELTA_WriteDelta((byte *)fdata, (byte *)tdata, TRUE, (delta_t *)g_pweapondelta, NULL);
+
+#if defined (REHLDS_OPT_PEDANTIC) || defined (REHLDS_FIXES)
+				// all calculations are already done
+				_DELTA_WriteDelta((byte *)fdata, (byte *)tdata, TRUE, g_pweapondelta, NULL, TRUE);
+#else
+				DELTA_WriteDelta((byte *)fdata, (byte *)tdata, TRUE, g_pweapondelta, NULL);
+#endif
 			}
 		}
 	}
@@ -1400,6 +1420,12 @@ void SV_WriteSpawn(sizebuf_t *msg)
 {
 	int i = 0;
 	client_t *client = g_psvs.clients;
+
+#ifdef REHLDS_FIXES
+	// do it before PutInServer to allow mods send messages from forward
+	SZ_Clear( &host_client->netchan.message );
+	SZ_Clear( &host_client->datagram );
+#endif // REHLDS_FIXES
 
 	if (g_psv.loadgame)
 	{
@@ -1429,8 +1455,10 @@ void SV_WriteSpawn(sizebuf_t *msg)
 		g_psv.state = ss_active;
 	}
 
+#ifndef REHLDS_FIXES
 	SZ_Clear(&host_client->netchan.message);
 	SZ_Clear(&host_client->datagram);
+#endif // REHLDS_FIXES
 
 	MSG_WriteByte(msg, svc_time);
 	MSG_WriteFloat(msg, g_psv.time);
@@ -1443,7 +1471,7 @@ void SV_WriteSpawn(sizebuf_t *msg)
 			SV_FullClientUpdate(client, msg);
 	}
 
-	for (i = 0; i < 64; i++)
+	for (i = 0; i < ARRAYSIZE( g_psv.lightstyles ); i++)
 	{
 		MSG_WriteByte(msg, svc_lightstyle);
 		MSG_WriteByte(msg, i);
@@ -1714,6 +1742,7 @@ int SV_GetFragmentSize(void *state)
 		const char *val = Info_ValueForKey(cl->userinfo, "cl_dlmax");
 		if (val[0] != 0)
 		{
+			size = Q_atoi( val );
 			size = clamp(size, 256, 1024);
 		}
 	}
@@ -1736,7 +1765,7 @@ qboolean SV_FilterUser(USERID_t *userid)
 		else
 		{
 			if (i + 1 < j)
-				memcpy(filter, &filter[1], sizeof(userfilter_t) * (j - i + 1));
+				memmove(filter, &filter[1], sizeof(userfilter_t) * (j - i + 1));
 
 			numuserfilters = --j;
 		}
@@ -2198,7 +2227,11 @@ void SV_ConnectClient_internal(void)
 	client_t *client;
 	netadr_t adr;
 	int nClientSlot;
+#ifdef REHLDS_FIXES
+	char userinfo[MAX_INFO_STRING];
+#else
 	char userinfo[1024];
+#endif
 	char protinfo[1024];
 	char cdkey[64];
 	const char *s;
@@ -2246,7 +2279,12 @@ void SV_ConnectClient_internal(void)
 	}
 
 	s = Cmd_Argv(4);
+#ifdef REHLDS_FIXES
+	// truncate to 255 before sanity checks
+	if (Q_strlen(s) > MAX_INFO_STRING - 1 || !Info_IsValid(s))
+#else
 	if (Q_strlen(s) > 256 || !Info_IsValid(s))
+#endif
 	{
 		SV_RejectConnection(&adr, "Invalid userinfo in connect command\n");
 		return;
@@ -2301,11 +2339,11 @@ void SV_ConnectClient_internal(void)
 			return;
 		}
 		memcpy(szSteamAuthBuf, &net_message.data[msg_readcount], len);
-		client->network_userid.clientip = *(uint32_t *)&adr.ip[0];
+		client->network_userid.clientip = *(uint32 *)&adr.ip[0];
 		if (adr.type == NA_LOOPBACK)
 		{
 			if (sv_lan.value <= 0.0f)
-				client->network_userid.clientip = *(uint32_t *)&adr.ip[0];
+				client->network_userid.clientip = *(uint32 *)&adr.ip[0];
 			else
 				client->network_userid.clientip = 0x7F000001; //127.0.0.1
 		}
@@ -2343,7 +2381,7 @@ void SV_ConnectClient_internal(void)
 		}
 		host_client->network_userid.idtype = AUTH_IDTYPE_LOCAL;
 		host_client->network_userid.m_SteamID = 0;
-		host_client->network_userid.clientip = *(uint32_t *)&adr.ip[0];
+		host_client->network_userid.clientip = *(uint32 *)&adr.ip[0];
 		Steam_NotifyBotConnect(client);
 	}
 
@@ -3045,7 +3083,7 @@ int SVC_GameDllQuery(const char *s)
 	valid = gEntityInterface.pfnConnectionlessPacket(&net_from, s, (char *) &data[4], &len);
 	if (len && len <= 2044)
 	{
-		*(uint32_t *)data = 0xFFFFFFFF; //connectionless packet
+		*(uint32 *)data = 0xFFFFFFFF; //connectionless packet
 		NET_SendPacket(NS_SERVER, len + 4, data, net_from);
 	}
 	return valid;
@@ -3486,7 +3524,7 @@ qboolean SV_FilterPacket(void)
 		ipfilter_t* curFilter = &ipfilters[i];
 		if (curFilter->compare.u32 == 0xFFFFFFFF || curFilter->banEndTime == 0.0f || curFilter->banEndTime > realtime)
 		{
-			if ((*(uint32_t*)net_from.ip & curFilter->mask) == curFilter->compare.u32)
+			if ((*(uint32*)net_from.ip & curFilter->mask) == curFilter->compare.u32)
 				return (int)sv_filterban.value;
 		}
 		else
@@ -3527,7 +3565,7 @@ void SV_ReadPackets(void)
 			continue;
 		}
 
-		if (*(uint32_t *)net_message.data == 0xFFFFFFFF)
+		if (*(uint32 *)net_message.data == 0xFFFFFFFF)
 		{
 			// Connectionless packet
 			if (CheckIP(net_from))
@@ -3806,6 +3844,10 @@ void SV_EmitEvents(client_t *cl, packet_entities_t *pack, sizebuf_t *msg)
 					MSG_WriteBits(1, 1);
 					DELTA_WriteDelta((byte *)&nullargs, (byte *)&info->args, TRUE, g_peventdelta, NULL);
 				}
+				else
+				{
+					MSG_WriteBits(0, 1);
+				}
 			}
 			else
 			{
@@ -4051,23 +4093,21 @@ void SV_InvokeCallback(void)
 int SV_FindBestBaseline(int index, entity_state_t ** baseline, entity_state_t *to, int num, qboolean custom)
 {
 	int bestbitnumber;
+	delta_t* delta;
 
 	if (custom)
 	{
-		bestbitnumber = DELTA_TestDelta((byte *)*baseline, (byte *)&to[index], g_pcustomentitydelta);
+		delta = g_pcustomentitydelta;
 	}
 	else
 	{
 		if (SV_IsPlayerIndex(num))
-		{
-			bestbitnumber = DELTA_TestDelta((byte *)*baseline, (byte *)&to[index], g_pplayerdelta);
-		}
+			delta = g_pplayerdelta;
 		else
-		{
-			bestbitnumber = DELTA_TestDelta((byte *)*baseline, (byte *)&to[index], g_pentitydelta);
-		}
+			delta = g_pentitydelta;
 	}
 
+	bestbitnumber = DELTA_TestDelta((byte *)*baseline, (byte *)&to[index], delta);
 	bestbitnumber -= 6;
 
 	int i = 0;
@@ -4078,21 +4118,8 @@ int SV_FindBestBaseline(int index, entity_state_t ** baseline, entity_state_t *t
 	{
 		if (to[index].entityType == to[i].entityType)
 		{
-			if (custom)
-			{
-				bitnumber = DELTA_TestDelta((byte *)&to[i], (byte *)&to[index], g_pcustomentitydelta);
-			}
-			else
-			{
-				if (SV_IsPlayerIndex(num))
-				{
-					bitnumber = DELTA_TestDelta((byte *)&to[i], (byte *)&to[index], g_pplayerdelta);
-				}
-				else
-				{
-					bitnumber = DELTA_TestDelta((byte *)&to[i], (byte *)&to[index], g_pentitydelta);
-				}
-			}
+			bitnumber = DELTA_TestDelta((byte *)&to[i], (byte *)&to[index], delta);
+
 			if (bitnumber < bestbitnumber)
 			{
 				bestbitnumber = bitnumber;
@@ -4118,11 +4145,19 @@ int SV_CreatePacketEntities(sv_delta_t type, client_t *client, packet_entities_t
 	int oldmax;
 	int numbase;
 
+	// fix for https://github.com/dreamstalker/rehlds/issues/24
+#ifdef REHLDS_FIXES
+	int baselineToIdx = -1; //index of the baseline in to->entities[]
+	uint64 toBaselinesForceMask[MAX_PACKET_ENTITIES];
+#endif
+
 	numbase = 0;
 	if (type == sv_packet_delta)
 	{
 		client_frame_t *fromframe = &client->frames[SV_UPDATE_MASK & client->delta_sequence];
 		from = &fromframe->entities;
+		_mm_prefetch((const char*)&from->entities[0], _MM_HINT_T0);
+		_mm_prefetch(((const char*)&from->entities[0]) + 64, _MM_HINT_T0);
 		oldmax = from->num_entities;
 		MSG_WriteByte(msg, svc_deltapacketentities);
 		MSG_WriteShort(msg, to->num_entities);
@@ -4136,8 +4171,8 @@ int SV_CreatePacketEntities(sv_delta_t type, client_t *client, packet_entities_t
 		MSG_WriteShort(msg, to->num_entities);
 	}
 
-	newnum = 0;
-	oldnum = 0;
+	newnum = 0; //index in to->entities
+	oldnum = 0; //index in from->entities
 	MSG_StartBitWriting(msg);
 	while (1)
 	{
@@ -4168,6 +4203,8 @@ int SV_CreatePacketEntities(sv_delta_t type, client_t *client, packet_entities_t
 			SV_SetCallback(newindex, FALSE, custom, &numbase, FALSE, 0);
 			DELTA_WriteDelta((uint8 *)&from->entities[oldnum], (uint8 *)baseline_, FALSE, custom ? g_pcustomentitydelta : (SV_IsPlayerIndex(newindex) ? g_pplayerdelta : g_pentitydelta), &SV_InvokeCallback);
 			++oldnum;
+			_mm_prefetch((const char*)&from->entities[oldnum], _MM_HINT_T0);
+			_mm_prefetch(((const char*)&from->entities[oldnum]) + 64, _MM_HINT_T0);
 			++newnum;
 			continue;
 		}
@@ -4178,6 +4215,8 @@ int SV_CreatePacketEntities(sv_delta_t type, client_t *client, packet_entities_t
 			{
 				SV_WriteDeltaHeader(oldindex, TRUE, FALSE, &numbase, FALSE, 0, FALSE, 0);
 				++oldnum;
+				_mm_prefetch((const char*)&from->entities[oldnum], _MM_HINT_T0);
+				_mm_prefetch(((const char*)&from->entities[oldnum]) + 64, _MM_HINT_T0);
 			}
 			continue;
 		}
@@ -4210,19 +4249,54 @@ int SV_CreatePacketEntities(sv_delta_t type, client_t *client, packet_entities_t
 			if (!from)
 			{
 				int offset = SV_FindBestBaseline(newnum, &baseline_, to->entities, newindex, custom);
+				_mm_prefetch((const char*)baseline_, _MM_HINT_T0);
+				_mm_prefetch(((const char*)baseline_) + 64, _MM_HINT_T0);
 				if (offset)
 					SV_SetCallback(newindex, 0, custom, &numbase, 1, offset);
+
+				// fix for https://github.com/dreamstalker/rehlds/issues/24
+#ifdef REHLDS_FIXES
+				if (offset) 
+					baselineToIdx = newnum - offset;
+#endif
 			}
 		}
 
+
+		delta_t* delta = custom ? g_pcustomentitydelta : (SV_IsPlayerIndex(newindex) ? g_pplayerdelta : g_pentitydelta);
+
+		// fix for https://github.com/dreamstalker/rehlds/issues/24
+#ifdef REHLDS_FIXES
+		DELTA_WriteDeltaForceMask(
+			(uint8 *)baseline_,
+			(uint8 *)&to->entities[newnum],
+			TRUE,
+			delta,
+			&SV_InvokeCallback,
+			baselineToIdx != -1 ? &toBaselinesForceMask[baselineToIdx] : NULL
+		);
+		baselineToIdx = -1;
+
+		uint64 origMask = DELTAJit_GetOriginalMask(delta);
+		uint64 usedMask = DELTAJit_GetMaskU64(delta);
+		uint64 diffMask = origMask ^ usedMask;
+
+		//Remember changed fields that was marked in original mask, but unmarked by the conditional encoder
+		toBaselinesForceMask[newnum] = diffMask & origMask;
+		
+		
+#else //REHLDS_FIXES
 		DELTA_WriteDelta(
 			(uint8 *)baseline_,
 			(uint8 *)&to->entities[newnum],
 			TRUE,
-			custom ? g_pcustomentitydelta : (SV_IsPlayerIndex(newindex) ? g_pplayerdelta : g_pentitydelta),
+			delta,
 			&SV_InvokeCallback
 			);
+#endif //REHLDS_FIXES
+
 		++newnum;
+		
 	}
 
 	MSG_WriteBits(0, 16);
@@ -4358,7 +4432,7 @@ void SV_EmitPings(client_t *client, sizebuf_t *msg)
 /* <a947b> ../engine/sv_main.c:5878 */
 void SV_WriteEntitiesToClient(client_t *client, sizebuf_t *msg)
 {
-	full_packet_entities_t fullpack;
+	
 	client_frame_t *frame = &client->frames[SV_UPDATE_MASK & client->netchan.outgoing_sequence];
 
 	unsigned char *pvs = NULL;
@@ -4366,41 +4440,68 @@ void SV_WriteEntitiesToClient(client_t *client, sizebuf_t *msg)
 	gEntityInterface.pfnSetupVisibility((edict_t*)client->pViewEntity, client->edict, &pvs, &pas);
 	unsigned char *pSet = pvs;
 
-	SV_ClearPacketEntities(frame);
 	packet_entities_t *pack = &frame->entities;
-	fullpack.num_entities = 0;
 
-	qboolean sendping = SV_ShouldUpdatePing(client);
+	// for REHLDS_OPT_PEDANTIC: Allocate the MAX_PACKET_ENTITIES ents in the frame's storage 
+	// This allows us to avoid intermediate 'fullpack' storage
+#ifdef REHLDS_OPT_PEDANTIC
+	SV_AllocPacketEntities(frame, MAX_PACKET_ENTITIES);
+	packet_entities_t *curPack = &frame->entities;
+	curPack->num_entities = 0;
+#else
+	SV_ClearPacketEntities(frame);
+	full_packet_entities_t fullpack;
+	fullpack.num_entities = 0;
+	full_packet_entities_t* curPack = &fullpack;
+#endif // REHLDS_OPT_PEDANTIC
 	
+	qboolean sendping = SV_ShouldUpdatePing(client);
 	int flags = client->lw != 0;
 
-	for (int e = 1; e < g_psv.num_edicts; e++)
+	int e;
+	for (e = 1; e <= g_psvs.maxclients; e++)
 	{
-		edict_t *ent = &g_psv.edicts[e];
-		int player = 0;
-		if (e >= 1 && e <= g_psvs.maxclients)
-		{
-			client_t *cl = &g_psvs.clients[e - 1];
-			if ((!cl->active && !cl->spawned) || cl->proxy)
-				continue;
+		client_t *cl = &g_psvs.clients[e - 1];
+		if( ( !cl->active && !cl->spawned ) || cl->proxy )
+			continue;
 
-			player = 1;
-		}
+		qboolean add = gEntityInterface.pfnAddToFullPack(&curPack->entities[curPack->num_entities], e, &g_psv.edicts[e], host_client->edict, flags, TRUE, pSet);
+		if (add)
+			++curPack->num_entities;
+	}
 
-		if (fullpack.num_entities >= 256)
+	for (; e < g_psv.num_edicts; e++)
+	{
+		if (curPack->num_entities >= MAX_PACKET_ENTITIES)
 		{
 			Con_DPrintf("Too many entities in visible packet list.\n");
 			break;
 		}
 
-		qboolean add = gEntityInterface.pfnAddToFullPack(&fullpack.entities[fullpack.num_entities], e, ent, host_client->edict, flags, player, pSet);
+		edict_t* ent = &g_psv.edicts[e];
+
+#ifdef REHLDS_OPT_PEDANTIC
+		//Part of gamedll's code is moved here to decrease amount of calls to AddToFullPack()
+		//We don't even try to transmit entities without model as well as invisible entities
+		if (ent->v.modelindex && !(ent->v.effects & EF_NODRAW)) {
+			qboolean add = gEntityInterface.pfnAddToFullPack(&curPack->entities[curPack->num_entities], e, &g_psv.edicts[e], host_client->edict, flags, FALSE, pSet);
+			if (add)
+				++curPack->num_entities;
+		}
+#else
+		qboolean add = gEntityInterface.pfnAddToFullPack(&curPack->entities[curPack->num_entities], e, &g_psv.edicts[e], host_client->edict, flags, FALSE, pSet);
 		if (add)
-			++fullpack.num_entities;
+			++curPack->num_entities;
+#endif //REHLDS_OPT_PEDANTIC
+
 	}
 
+	//for REHLDS_FIXES: Entities are already in the frame's storage, no need to copy them
+#ifndef REHLDS_OPT_PEDANTIC
 	SV_AllocPacketEntities(frame, fullpack.num_entities);
 	if (pack->num_entities)
 		Q_memcpy(pack->entities, fullpack.entities, sizeof(entity_state_t) * pack->num_entities);
+#endif
 
 	SV_EmitPacketEntities(client, pack, msg);
 	SV_EmitEvents(client, pack, msg);
@@ -4442,7 +4543,14 @@ qboolean SV_SendClientDatagram(client_t *client)
 	}
 	else
 	{
+#ifdef REHLDS_FIXES
+		if (msg.cursize + client->datagram.cursize > msg.maxsize)
+			Con_DPrintf("Warning: Ignoring unreliable datagram for %s, would overflow on msg\n", client->name);
+		else
+			SZ_Write(&msg, client->datagram.data, client->datagram.cursize);
+#else
 		SZ_Write(&msg, client->datagram.data, client->datagram.cursize);
+#endif
 	}
 
 	SZ_Clear(&client->datagram);
@@ -4474,7 +4582,12 @@ void SV_UpdateToReliableMessages(void)
 
 		host_client = client;
 
+#ifdef REHLDS_FIXES
+		// skip update in this frame if would overflow
+		if (client->sendinfo && client->sendinfo_time <= realtime && ( 1 + 1 + 4 + ( int )strlen( client->userinfo ) + 1 + 16 + g_psv.reliable_datagram.cursize <= g_psv.reliable_datagram.maxsize ) )
+#else // REHLDS_FIXES
 		if (client->sendinfo && client->sendinfo_time <= realtime)
+#endif // REHLDS_FIXES
 		{
 			client->sendinfo = FALSE;
 			client->sendinfo_time = realtime + 1.0;
@@ -4784,7 +4897,13 @@ int SV_ModelIndex(const char *name)
 	if (!name || !name[0])
 		return 0;
 
-	for (int i = 0; i < 512; i++)
+#ifdef REHLDS_OPT_PEDANTIC
+	auto node = g_rehlds_sv.modelsMap.get(name);
+	if (node) {
+		return node->val;
+	}
+#else
+	for (int i = 0; i < HL_MODEL_MAX; i++)
 	{
 		if (!g_psv.model_precache[i])
 			break;
@@ -4792,12 +4911,13 @@ int SV_ModelIndex(const char *name)
 		if (!Q_stricmp(g_psv.model_precache[i], name))
 			return i;
 	};
+#endif
 
 	Sys_Error("SV_ModelIndex: model %s not precached", name);
 }
 
 /* <a9992> ../engine/sv_main.c:6529 */
-void SV_AddResource(resourcetype_t type, char *name, int size, unsigned char flags, int index)
+void SV_AddResource(resourcetype_t type, const char *name, int size, unsigned char flags, int index)
 {
 	resource_t *r;
 	if (g_psv.num_resources >= 1280)
@@ -4873,14 +4993,18 @@ void SV_CreateGenericResources(void)
 /* <a9a24> ../engine/sv_main.c:6675 */
 void SV_CreateResourceList(void)
 {
-	char ** s;
+	char const ** s;
 	int ffirstsent = 0;
 	int i;
 	int nSize;
 	event_t *ep;
 
 	g_psv.num_resources = 0;
+#ifdef REHLDS_CHECKS
+	for (i = 1, s = &g_psv.generic_precache[1]; i < HL_GENERIC_MAX && *s != NULL; i++, s++)
+#else // REHLDS_CHECKS
 	for (i = 1, s = &g_psv.generic_precache[1]; *s != NULL; i++, s++)
+#endif // REHLDS_CHECKS
 	{
 		if (g_psvs.maxclients > 1)
 			nSize = FS_FileSize(*s);
@@ -4889,7 +5013,11 @@ void SV_CreateResourceList(void)
 
 		SV_AddResource(t_generic, *s, nSize, 1, i);
 	}
+#ifdef REHLDS_CHECKS
+	for (i = 1, s = &g_psv.sound_precache[1]; i < HL_SOUND_MAX && *s != NULL; i++, s++)
+#else // REHLDS_CHECKS
 	for (i = 1, s = &g_psv.sound_precache[1]; *s != NULL; i++, s++)
+#endif // REHLDS_CHECKS
 	{
 		if (**s == '!')
 		{
@@ -4907,7 +5035,11 @@ void SV_CreateResourceList(void)
 			SV_AddResource(t_sound, *s, nSize, 0, i);
 		}
 	}
+#ifdef REHLDS_CHECKS
+	for (i = 1, s = &g_psv.model_precache[1]; i < HL_MODEL_MAX && *s != NULL; i++, s++)
+#else // REHLDS_CHECKS
 	for (i = 1, s = &g_psv.model_precache[1]; *s != NULL; i++, s++)
+#endif // REHLDS_CHECKS
 	{
 		if (g_psvs.maxclients > 1 && **s != '*')
 			nSize = FS_FileSize(*s);
@@ -4919,7 +5051,7 @@ void SV_CreateResourceList(void)
 	for (i = 0; i < sv_decalnamecount; i++)
 		SV_AddResource(t_decal, sv_decalnames[i].name, Draw_DecalSize(i), 0, i);
 
-	for (i = 1; i < 255; i++)
+	for (i = 1; i < HL_EVENT_MAX; i++)
 	{
 		ep = &g_psv.event_precache[i];
 		if (!ep->filename)
@@ -4934,7 +5066,7 @@ void SV_ClearCaches(void)
 {
 	int i;
 	event_t *ep;
-	for (i = 1; i < 255; i++)
+	for (i = 1; i < HL_EVENT_MAX; i++)
 	{
 		ep = &g_psv.event_precache[i];
 		if (ep->filename == NULL)
@@ -5384,6 +5516,11 @@ int SV_SpawnServer(qboolean bIsDemo, char *server, char *startspot)
 
 	SV_AllocClientFrames();
 	Q_memset(&g_psv, 0, sizeof(server_t));
+
+#ifdef REHLDS_OPT_PEDANTIC
+	g_rehlds_sv.modelsMap.clear();
+#endif
+
 	Q_strncpy(g_psv.oldname, oldname, sizeof(oldname) - 1);
 	g_psv.oldname[sizeof(oldname) - 1] = 0;
 	Q_strncpy(g_psv.name, server, sizeof(g_psv.name) - 1);
@@ -5496,6 +5633,13 @@ int SV_SpawnServer(qboolean bIsDemo, char *server, char *startspot)
 	g_psv.model_precache_flags[1] |= RES_FATALIFMISSING;
 	g_psv.model_precache[1] = g_psv.modelname;
 
+#ifdef REHLDS_OPT_PEDANTIC
+	{
+		int __itmp = 1;
+		g_rehlds_sv.modelsMap.put(ED_NewString(g_psv.modelname), __itmp);
+	}
+#endif
+
 	g_psv.sound_precache[0] = pr_strings;
 	g_psv.model_precache[0] = pr_strings;
 	g_psv.generic_precache[0] = pr_strings;
@@ -5505,6 +5649,13 @@ int SV_SpawnServer(qboolean bIsDemo, char *server, char *startspot)
 		g_psv.model_precache[i + 1] = localmodels[i];
 		g_psv.models[i + 1] = Mod_ForName(localmodels[i], FALSE, FALSE);
 		g_psv.model_precache_flags[i + 1] |= RES_FATALIFMISSING;
+
+#ifdef REHLDS_OPT_PEDANTIC
+		{
+			int __itmp = i + 1;
+			g_rehlds_sv.modelsMap.put(g_psv.model_precache[i + 1], __itmp);
+		}
+#endif
 	}
 
 	Q_memset(&g_psv.edicts->v, 0, sizeof(entvars_t));
@@ -5613,8 +5764,8 @@ qboolean StringToFilter(const char *s, ipfilter_t *f)
 			if (i < 4)
 				continue;
 		}
-		f->mask = *(uint32_t *)m;
-		f->compare.u32 = *(uint32_t *)b;
+		f->mask = *(uint32 *)m;
+		f->compare.u32 = *(uint32 *)b;
 		return TRUE;
 	}
 	Con_Printf("Bad filter address: %s\n", cc);
@@ -6189,7 +6340,7 @@ void SV_ListIP_f(void)
 	Con_Printf("IP filter list:\n");
 	for (int i = 0; i < numipfilters; i++)
 	{
-		uint8_t* b = ipfilters[i].compare.octets;
+		uint8* b = ipfilters[i].compare.octets;
 		if (ipfilters[i].banTime == 0.0f) 
 			Con_Printf("%3i.%3i.%3i.%3i : permanent\n", b[0], b[1], b[2], b[3]);
 		else
@@ -6216,7 +6367,7 @@ void SV_WriteIP_f(void)
 		if (ipfilters[i].banTime != 0.0f)
 			continue;
 
-		uint8_t *b = ipfilters[i].compare.octets;
+		uint8 *b = ipfilters[i].compare.octets;
 		FS_FPrintf(f, "addip 0.0 %i.%i.%i.%i\n", b[0], b[1], b[2], b[3]);
 	}
 	FS_Close(f);
@@ -6612,7 +6763,7 @@ void SV_CheckForRcon(void)
 		}
 		else
 		{
-			if (*(uint32_t *)net_message.data == 0xFFFFFFFF)
+			if (*(uint32 *)net_message.data == 0xFFFFFFFF)
 				SV_HandleRconPacket();
 		}
 	}
@@ -6708,6 +6859,10 @@ void SV_RegisterDelta(char *name, char *loadfile)
 	p->delta = pdesc;
 	p->next = g_sv_delta;
 	g_sv_delta = p;
+
+#if defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)
+	g_DeltaJitRegistry.CreateAndRegisterDeltaJIT(pdesc);
+#endif
 }
 
 /* <aa966> ../engine/sv_main.c:9284 */
@@ -6745,6 +6900,16 @@ void SV_InitDeltas(void)
 	g_peventdelta = SV_LookupDelta("event_t");
 	if (!g_peventdelta)
 		Sys_Error("No event_t encoder on server!\n");
+
+#ifdef REHLDS_OPT_PEDANTIC
+	g_pusercmddelta = SV_LookupDelta("usercmd_t");
+	if (!g_pusercmddelta)
+		Sys_Error("No usercmd_t encoder on server!\n");
+#endif
+
+#if defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)
+	g_DeltaJitRegistry.CreateAndRegisterDeltaJIT(&g_MetaDelta[0]);
+#endif
 }
 
 /* <aac49> ../engine/sv_main.c:9339 */
@@ -6931,6 +7096,7 @@ void SV_Init(void)
 /* <aad4b> ../engine/sv_main.c:9558 */
 void SV_Shutdown(void)
 {
+	g_DeltaJitRegistry.Cleanup();
 	delta_info_t *p = g_sv_delta;
 	while (p)
 	{

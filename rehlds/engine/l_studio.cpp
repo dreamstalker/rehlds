@@ -34,12 +34,12 @@
 /* <42900> ../engine/l_studio.c:31 */
 void Mod_LoadStudioModel_internal(model_t * mod, void * buffer)
 {
-	uint8_t *poutdata;
-	uint8_t *pindata;
+	uint8 *poutdata;
+	uint8 *pindata;
 	mstudiotexture_t *ptexture;
 	int size;
 	int i;
-	uint8_t *pout;
+	uint8 *pout;
 
 	studiohdr_t * phdr = (studiohdr_t *)buffer;
 	i = LittleLong(phdr->version);
@@ -54,14 +54,14 @@ void Mod_LoadStudioModel_internal(model_t * mod, void * buffer)
 	mod->type = mod_studio;
 	mod->flags = phdr->flags;
 	Cache_Alloc(&mod->cache, phdr->length + 1280 * phdr->numtextures, mod->name);
-	pout = (uint8_t *)mod->cache.data;
+	pout = (uint8 *)mod->cache.data;
 	if (pout)
 	{
 		if (phdr->textureindex)
 		{
 			Q_memcpy(pout, buffer, phdr->texturedataindex);
 			poutdata = pout + phdr->texturedataindex;
-			pindata = (uint8_t*)buffer + phdr->texturedataindex;
+			pindata = (uint8*)buffer + phdr->texturedataindex;
 			ptexture = (mstudiotexture_t *)(pout + phdr->textureindex);
 			for (i = 0; i < phdr->numtextures; i++, ptexture++)
 			{
@@ -73,10 +73,10 @@ void Mod_LoadStudioModel_internal(model_t * mod, void * buffer)
 
 				for (int j = 0; j < 256; j++, pindata += 3, poutdata += 8)
 				{
-					((uint16_t*)poutdata)[0] = texgammatable[pindata[0]];
-					((uint16_t*)poutdata)[1] = texgammatable[pindata[1]];
-					((uint16_t*)poutdata)[2] = texgammatable[pindata[2]];
-					((uint16_t*)poutdata)[3] = 0;
+					((uint16*)poutdata)[0] = texgammatable[pindata[0]];
+					((uint16*)poutdata)[1] = texgammatable[pindata[1]];
+					((uint16*)poutdata)[2] = texgammatable[pindata[2]];
+					((uint16*)poutdata)[3] = 0;
 				}
 			}
 		}

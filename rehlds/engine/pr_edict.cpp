@@ -441,7 +441,7 @@ void InitEntityDLLFields(edict_t *pEdict)
 }
 
 /* <7f8ee> ../engine/pr_edict.c:594 */
-void *PvAllocEntPrivateData(edict_t *pEdict, int32_t cb)
+void *PvAllocEntPrivateData(edict_t *pEdict, int32 cb)
 {
 	FreeEntPrivateData(pEdict);
 

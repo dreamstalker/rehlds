@@ -116,7 +116,7 @@ private:
 	bool m_FuncCallsFree[TESTPLAYER_FUNCTREE_DEPTH];
 
 	std::ifstream m_InStream;
-	int64_t m_inStreamSize;
+	int64 m_inStreamSize;
 	bool m_bLastRead;
 	std::queue<IEngExtCall*> m_CommandsQueue;
 
@@ -132,6 +132,10 @@ private:
 	CSteamGameServerPlayingWrapper* m_GameServerWrapper;
 
 	void* m_SteamBreakpadContext;
+	int m_HeartBeatInterval;
+	int m_PrevHeartBeat;
+
+	DWORD m_StartTick;
 
 	hostent_data_t m_CurrentHostentData;
 	struct hostent m_CurrentHostent;
@@ -150,6 +154,8 @@ private:
 
 	int getOrRegisterSteamCallback(CCallbackBase* cb);
 
+	void maybeHeartBeat(int readPos);
+
 public:
 	void* allocFuncCall();
 	void freeFuncCall(void* fcall);
@@ -157,9 +163,9 @@ public:
 
 	IEngExtCall* getNextCall(bool peek, bool processCallbacks, ExtCallFuncs expectedOpcode, bool needStart, const char* callSource);
 
-	virtual uint32_t time(uint32_t* pTime);
-	virtual struct tm* localtime(uint32_t time);
-	virtual void srand(uint32_t seed);
+	virtual uint32 time(uint32* pTime);
+	virtual struct tm* localtime(uint32 time);
+	virtual void srand(uint32 seed);
 	virtual int rand();
 
 	virtual void Sleep(DWORD msec);

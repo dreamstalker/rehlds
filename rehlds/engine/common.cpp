@@ -28,10 +28,6 @@
 
 #include "precompiled.h"
 
-
-
-
-
 char serverinfo[MAX_INFO_STRING];
 
 char gpszVersionString[32];
@@ -263,14 +259,15 @@ float (*LittleFloat)(float l);
 
 int LongSwap(int l)
 {
-	byte b1, b2, b3, b4;
+	/*byte b1, b2, b3, b4;
 
 	b1 = l & 0xFF;
 	b2 = (l >> 8) & 0xFF;
 	b3 = (l >> 16) & 0xFF;
 	b4 = (l >> 24) & 0xFF;
 
-	return ((int)b1 << 24) + ((int)b2 << 16) + ((int)b3 << 8) + b4;
+	return ((int)b1 << 24) + ((int)b2 << 16) + ((int)b3 << 8) + b4;*/
+	return _byteswap_ulong(l);
 }
 
 int LongNoSwap(int l)
@@ -280,12 +277,16 @@ int LongNoSwap(int l)
 
 short ShortSwap(short l)
 {
+#ifdef _WIN32
+	return _byteswap_ushort(l); // xchg
+#else
 	byte b1, b2;
 
 	b1 = l & 0xFF;
 	b2 = (l >> 8) & 0xFF;
 
 	return (b1 << 8) + b2;
+#endif
 }
 
 short ShortNoSwap(short l)
@@ -295,7 +296,7 @@ short ShortNoSwap(short l)
 
 float FloatSwap(float f)
 {
-	union
+	/*union
 	{
 		float f;
 		byte b[4];
@@ -307,7 +308,9 @@ float FloatSwap(float f)
 	dat2.b[2] = dat1.b[1];
 	dat2.b[3] = dat1.b[0];
 
-	return dat2.f;
+	return dat2.f;*/
+	unsigned long u = _byteswap_ulong(*(unsigned long *)&f);
+	return *(float *)&u;
 }
 
 float FloatNoSwap(float f)
@@ -333,7 +336,7 @@ int msg_badread;
 int msg_readcount;
 
 // Some bit tables...
-const uint32_t BITTABLE[] =
+const uint32 BITTABLE[] =
 {
 	0x00000001, 0x00000002, 0x00000004, 0x00000008,
 	0x00000010, 0x00000020, 0x00000040, 0x00000080,
@@ -346,7 +349,7 @@ const uint32_t BITTABLE[] =
 	0x00000000,
 };
 
-const uint32_t ROWBITTABLE[] = 
+const uint32 ROWBITTABLE[] = 
 {
 	0x00000000, 0x00000001, 0x00000003, 0x00000007,
 	0x0000000F, 0x0000001F, 0x0000003F, 0x0000007F,
@@ -359,7 +362,7 @@ const uint32_t ROWBITTABLE[] =
 	0xFFFFFFFF,
 };
 
-const uint32_t INVBITTABLE[] =
+const uint32 INVBITTABLE[] =
 {
 	0xFFFFFFFE, 0xFFFFFFFD, 0xFFFFFFFB, 0xFFFFFFF7,
 	0xFFFFFFEF, 0xFFFFFFDF, 0xFFFFFFBF, 0xFFFFFF7F,
@@ -388,19 +391,19 @@ void MSG_WriteByte(sizebuf_t *sb, int c)
 void MSG_WriteShort(sizebuf_t *sb, int c)
 {
 	unsigned char *buf = (unsigned char *)SZ_GetSpace(sb, 2);
-	*(int16_t *)buf = (int16_t)c;
+	*(int16 *)buf = (int16)c;
 }
 
 void MSG_WriteWord(sizebuf_t *sb, int c)
 {
 	unsigned char *buf = (unsigned char *)SZ_GetSpace(sb, 2);
-	*(uint16_t *)buf = (uint16_t)c;
+	*(uint16 *)buf = (uint16)c;
 }
 
 void MSG_WriteLong(sizebuf_t *sb, int c)
 {
 	unsigned char *buf = (unsigned char *)SZ_GetSpace(sb, 4);
-	*(uint32_t *)buf = (uint32_t)c;
+	*(uint32 *)buf = (uint32)c;
 }
 
 void MSG_WriteFloat(sizebuf_t *sb, float f)
@@ -431,19 +434,19 @@ void MSG_WriteBuf(sizebuf_t *sb, int iSize, void *buf)
 
 void MSG_WriteAngle(sizebuf_t *sb, float f)
 {
-	MSG_WriteByte(sb, (int64_t)(fmod((double)f, 360.0) * 256.0 / 360.0) & 0xFF);
+	MSG_WriteByte(sb, (int64)(fmod((double)f, 360.0) * 256.0 / 360.0) & 0xFF);
 }
 
 void MSG_WriteHiresAngle(sizebuf_t *sb, float f)
 {
-	MSG_WriteShort(sb, (int64_t)(fmod((double)f, 360.0) * 65536.0 / 360.0) & 0xFFFF);
+	MSG_WriteShort(sb, (int64)(fmod((double)f, 360.0) * 65536.0 / 360.0) & 0xFFFF);
 }
 
 void MSG_WriteUsercmd(sizebuf_t *buf, usercmd_t *to, usercmd_t *from)
 {
 	delta_t **ppdesc;
 
-	ppdesc = (delta_t **)DELTA_LookupRegistration("usercmd_t");
+	ppdesc = DELTA_LookupRegistration("usercmd_t");
 	MSG_StartBitWriting(buf);
 	DELTA_WriteDelta((byte *)from, (byte *)to, 1, *ppdesc, 0);
 	MSG_EndBitWriting(buf);
@@ -452,9 +455,29 @@ void MSG_WriteUsercmd(sizebuf_t *buf, usercmd_t *to, usercmd_t *from)
 
 typedef struct bf_write_s
 {
+
+	//For enhanced and safe bits writing functions
+#if defined(REHLDS_FIXES)
+
+#pragma pack(push, 1)
+	union {
+		uint64 u64;
+		uint32 u32[2];
+		uint8 u8[8];
+	} pendingData;
+	uint64 sse_highbits;
+#pragma pack(pop)
+
+	int nCurOutputBit;
+	sizebuf_t *pbuf;
+
+#else //defined(REHLDS_FIXES)
+
 	int nCurOutputBit;
 	unsigned char *pOutByte;
 	sizebuf_t *pbuf;
+
+#endif //defined(REHLDS_FIXES)
 } bf_write_t;
 
 typedef struct bf_read_s
@@ -469,7 +492,7 @@ typedef struct bf_read_s
 
 // Bit field reading/writing storage.
 bf_read_t bfread;
-bf_write_t bfwrite;
+ALIGN16 bf_write_t bfwrite;
 
 
 void COM_BitOpsInit(void)
@@ -477,6 +500,68 @@ void COM_BitOpsInit(void)
 	Q_memset(&bfwrite, 0, sizeof(bf_write_t));
 	Q_memset(&bfread, 0, sizeof(bf_read_t));
 }
+
+//Enhanced and safe bits writing functions
+#if defined(REHLDS_FIXES)
+
+void MSG_WBits_MaybeFlush() {
+	if (bfwrite.nCurOutputBit < 32)
+		return;
+
+	uint32* pDest = (uint32*)SZ_GetSpace(bfwrite.pbuf, 4);
+	if (!(bfwrite.pbuf->flags & SIZEBUF_OVERFLOWED))
+		*pDest = bfwrite.pendingData.u32[0];
+
+	bfwrite.pendingData.u32[0] = bfwrite.pendingData.u32[1];
+	bfwrite.pendingData.u32[1] = 0;
+	bfwrite.nCurOutputBit -= 32;
+}
+
+void MSG_WriteBits(uint32 data, int numbits)
+{
+	uint32 maxval = _mm_cvtsi128_si32(_mm_slli_epi64(_mm_cvtsi32_si128(1), numbits)) - 1; //maxval = (1 << numbits) - 1
+	if (data > maxval)
+		data = maxval;
+
+	MSG_WBits_MaybeFlush();
+
+	__m128i pending = _mm_load_si128((__m128i*) &bfwrite.pendingData.u64);
+
+	__m128i mmdata = _mm_slli_epi64(_mm_cvtsi32_si128(data), bfwrite.nCurOutputBit); //mmdata = data << bfwrite.nCurOutputBit
+	pending = _mm_or_si128(pending, mmdata);
+
+	_mm_store_si128((__m128i*) &bfwrite.pendingData.u64, pending);
+	bfwrite.nCurOutputBit += numbits;
+}
+
+void MSG_WriteOneBit(int nValue) {
+	MSG_WriteBits(nValue, 1);
+}
+
+void MSG_StartBitWriting(sizebuf_t *buf)
+{
+	bfwrite.nCurOutputBit = 0;
+	bfwrite.pbuf = buf;
+	bfwrite.pendingData.u64 = 0;
+}
+
+void MSG_EndBitWriting(sizebuf_t *buf)
+{
+	int bytesNeed = bfwrite.nCurOutputBit / 8;
+	if ((bfwrite.nCurOutputBit % 8) || bytesNeed == 0) {
+		bytesNeed++;
+	}
+
+	uint8* pData = (uint8*)SZ_GetSpace(bfwrite.pbuf, bytesNeed);
+	if (!(bfwrite.pbuf->flags & SIZEBUF_OVERFLOWED)) {
+		for (int i = 0; i < bytesNeed; i++) {
+			pData[i] = bfwrite.pendingData.u8[i];
+		}
+	}
+
+}
+
+#else // defined(REHLDS_FIXES)
 
 void MSG_WriteOneBit(int nValue)
 {
@@ -509,13 +594,6 @@ void MSG_StartBitWriting(sizebuf_t *buf)
 	bfwrite.pOutByte = &buf->data[buf->cursize];
 }
 
-NOXREF qboolean MSG_IsBitWriting(void)
-{
-	NOXREFCHECK;
-
-	return bfwrite.pbuf != 0;
-}
-
 void MSG_EndBitWriting(sizebuf_t *buf)
 {
 	if (!(bfwrite.pbuf->flags & SIZEBUF_OVERFLOWED))
@@ -528,16 +606,16 @@ void MSG_EndBitWriting(sizebuf_t *buf)
 	}
 }
 
-void MSG_WriteBits(uint32_t data, int numbits)
+void MSG_WriteBits(uint32 data, int numbits)
 {
 	if (numbits < 32)
 	{
-		if (data >= (uint32_t)(1 << numbits))
+		if (data >= (uint32)(1 << numbits))
 			data = ROWBITTABLE[numbits];
 	}
 
 	int surplusBytes = 0;
-	if ((uint32_t)bfwrite.nCurOutputBit >= 8)
+	if ((uint32)bfwrite.nCurOutputBit >= 8)
 	{
 		surplusBytes = 1;
 		bfwrite.nCurOutputBit = 0;
@@ -554,7 +632,7 @@ void MSG_WriteBits(uint32_t data, int numbits)
 		SZ_GetSpace(bfwrite.pbuf, surplusBytes + bytesToWrite);
 		if (!(bfwrite.pbuf->flags & SIZEBUF_OVERFLOWED))
 		{
-			*(uint32_t *)bfwrite.pOutByte = (data << bfwrite.nCurOutputBit) | *(uint32_t *)bfwrite.pOutByte & ROWBITTABLE[bfwrite.nCurOutputBit];
+			*(uint32 *)bfwrite.pOutByte = (data << bfwrite.nCurOutputBit) | *(uint32 *)bfwrite.pOutByte & ROWBITTABLE[bfwrite.nCurOutputBit];
 			bfwrite.nCurOutputBit = 8;
 			if (bitsLeft)
 				bfwrite.nCurOutputBit = bitsLeft;
@@ -566,13 +644,22 @@ void MSG_WriteBits(uint32_t data, int numbits)
 		SZ_GetSpace(bfwrite.pbuf, surplusBytes + 4);
 		if (!(bfwrite.pbuf->flags & SIZEBUF_OVERFLOWED))
 		{
-			*(uint32_t *)bfwrite.pOutByte = (data << bfwrite.nCurOutputBit) | *(uint32_t *)bfwrite.pOutByte & ROWBITTABLE[bfwrite.nCurOutputBit];
+			*(uint32 *)bfwrite.pOutByte = (data << bfwrite.nCurOutputBit) | *(uint32 *)bfwrite.pOutByte & ROWBITTABLE[bfwrite.nCurOutputBit];
 			int leftBits = 32 - bfwrite.nCurOutputBit;
 			bfwrite.nCurOutputBit = bits & 7;
 			bfwrite.pOutByte += 4;
-			*(uint32_t *)bfwrite.pOutByte = data >> leftBits;
+			*(uint32 *)bfwrite.pOutByte = data >> leftBits;
 		}
 	}
+}
+
+#endif //defined(REHLDS_FIXES)
+
+NOXREF qboolean MSG_IsBitWriting(void)
+{
+	NOXREFCHECK;
+
+	return bfwrite.pbuf != 0;
 }
 
 void MSG_WriteSBits(int data, int numbits)
@@ -626,8 +713,8 @@ void MSG_WriteBitAngle(float fAngle, int numbits)
 		Sys_Error(__FUNCTION__ ": Can't write bit angle with 32 bits precision\n");
 	}
 
-	uint32_t shift = (1 << numbits);
-	uint32_t mask = shift - 1;
+	uint32 shift = (1 << numbits);
+	uint32 mask = shift - 1;
 
 	int d = (int)(shift * fmod((double)fAngle, 360.0)) / 360;
 	d &= mask;
@@ -725,9 +812,9 @@ int MSG_ReadOneBit(void)
 	return nValue;
 }
 
-uint32_t MSG_ReadBits(int numbits)
+uint32 MSG_ReadBits(int numbits)
 {
-	uint32_t result;
+	uint32 result;
 
 	if (msg_badread)
 	{
@@ -744,13 +831,13 @@ uint32_t MSG_ReadBits(int numbits)
 			bfread.nCurInputBit = 0;
 		}
 
-		uint32_t bits = (bfread.nCurInputBit + numbits) & 7;
+		uint32 bits = (bfread.nCurInputBit + numbits) & 7;
 
 		if ((unsigned int)(bfread.nCurInputBit + numbits) <= 32)
 		{
 			result = (*(unsigned int *)bfread.pInByte >> bfread.nCurInputBit) & ROWBITTABLE[numbits];
 
-			uint32_t bytes = (bfread.nCurInputBit + numbits) >> 3;
+			uint32 bytes = (bfread.nCurInputBit + numbits) >> 3;
 
 			if (bits)
 			{
@@ -785,12 +872,12 @@ uint32_t MSG_ReadBits(int numbits)
 	return result;
 }
 
-NOXREF uint32_t MSG_PeekBits(int numbits)
+NOXREF uint32 MSG_PeekBits(int numbits)
 {
 	NOXREFCHECK;
 
 	bf_read_t savebf = bfread;
-	uint32_t r = MSG_ReadBits(numbits);
+	uint32 r = MSG_ReadBits(numbits);
 	bfread = savebf;
 
 	return r;
@@ -889,8 +976,8 @@ NOXREF float MSG_ReadBitCoord(void)
 void MSG_WriteBitCoord(const float f)
 {
 	int signbit = f <= -0.125;
-	int intval = abs((int32_t)f);
-	int fractval = abs((int32_t)f * 8) & 7;
+	int intval = abs((int32)f);
+	int fractval = abs((int32)f * 8) & 7;
 
 	MSG_WriteOneBit(intval);
 	MSG_WriteOneBit(fractval);
@@ -1024,7 +1111,7 @@ int MSG_ReadShort(void)
 
 	if (msg_readcount + 2 <= net_message.cursize )
 	{
-		c = *(int16_t *)&net_message.data[msg_readcount];
+		c = *(int16 *)&net_message.data[msg_readcount];
 		msg_readcount += 2;
 	}
 	else
@@ -1044,7 +1131,7 @@ NOXREF int MSG_ReadWord(void)
 
 	if (msg_readcount + 2 <= net_message.cursize)
 	{
-		c = *(uint16_t *)&net_message.data[msg_readcount];
+		c = *(uint16 *)&net_message.data[msg_readcount];
 		msg_readcount += 2;
 	}
 	else
@@ -1062,7 +1149,7 @@ int MSG_ReadLong(void)
 
 	if (msg_readcount + 4 <= net_message.cursize)
 	{
-		c = *(uint32_t *)&net_message.data[msg_readcount];
+		c = *(uint32 *)&net_message.data[msg_readcount];
 		msg_readcount += 4;
 	}
 	else
@@ -1166,9 +1253,12 @@ NOXREF float MSG_ReadHiresAngle(void)
 
 void MSG_ReadUsercmd(usercmd_t *to, usercmd_t* from)
 {
-	delta_t *pdesc = SV_LookupDelta("usercmd_t");
 	MSG_StartBitReading(&net_message);
-	DELTA_ParseDelta((byte *)from, (byte *)to, pdesc);
+#ifdef REHLDS_OPT_PEDANTIC
+	DELTA_ParseDelta((byte *)from, (byte *)to, g_pusercmddelta);
+#else
+	DELTA_ParseDelta((byte *)from, (byte *)to, SV_LookupDelta("usercmd_t"));
+#endif
 	MSG_EndBitReading(&net_message);
 	COM_NormalizeAngles(to->viewangles);
 }
@@ -1203,6 +1293,7 @@ void *SZ_GetSpace(sizebuf_t *buf, int length)
 {
 	void *data;
 	const char *buffername = buf->buffername ? buf->buffername : "???";
+
 
 	if (length < 0)
 	{
@@ -2509,6 +2600,73 @@ void COM_UnMunge(unsigned char *data, int len, int seq)
 	}
 }
 
+#ifdef REHLDS_FIXES
+// unrolled version
+void COM_Munge2(unsigned char *data, int len, int seq)
+{
+	unsigned int *pc;
+	unsigned int *end;
+	unsigned int mSeq;
+
+	mSeq = _byteswap_ulong(~seq) ^ seq;
+	len /= 4;
+	end = (unsigned int *)data + (len & ~15);
+
+	for (pc = (unsigned int *)data; pc < end; pc += 16)
+	{
+		pc[0]  = _byteswap_ulong(pc[0])  ^ mSeq ^ 0xFFFFE7A5;
+		pc[1]  = _byteswap_ulong(pc[1])  ^ mSeq ^ 0xBFEFFFE5;
+		pc[2]  = _byteswap_ulong(pc[2])  ^ mSeq ^ 0xFFBFEFFF;
+		pc[3]  = _byteswap_ulong(pc[3])  ^ mSeq ^ 0xBFEFBFED;
+		pc[4]  = _byteswap_ulong(pc[4])  ^ mSeq ^ 0xBFAFEFBF;
+		pc[5]  = _byteswap_ulong(pc[5])  ^ mSeq ^ 0xFFBFAFEF;
+		pc[6]  = _byteswap_ulong(pc[6])  ^ mSeq ^ 0xFFEFBFAD;
+		pc[7]  = _byteswap_ulong(pc[7])  ^ mSeq ^ 0xFFFFEFBF;
+		pc[8]  = _byteswap_ulong(pc[8])  ^ mSeq ^ 0xFFEFF7EF;
+		pc[9]  = _byteswap_ulong(pc[9])  ^ mSeq ^ 0xBFEFE7F5;
+		pc[10] = _byteswap_ulong(pc[10]) ^ mSeq ^ 0xBFBFE7E5;
+		pc[11] = _byteswap_ulong(pc[11]) ^ mSeq ^ 0xFFAFB7E7;
+		pc[12] = _byteswap_ulong(pc[12]) ^ mSeq ^ 0xBFFFAFB5;
+		pc[13] = _byteswap_ulong(pc[13]) ^ mSeq ^ 0xBFAFFFAF;
+		pc[14] = _byteswap_ulong(pc[14]) ^ mSeq ^ 0xFFAFA7FF;
+		pc[15] = _byteswap_ulong(pc[15]) ^ mSeq ^ 0xFFEFA7A5;
+	}
+
+	switch(len & 15)
+	{
+	case 15:
+		pc[14] = _byteswap_ulong(pc[14]) ^ mSeq ^ 0xFFAFA7FF;
+	case 14:
+		pc[13] = _byteswap_ulong(pc[13]) ^ mSeq ^ 0xBFAFFFAF;
+	case 13:
+		pc[12] = _byteswap_ulong(pc[12]) ^ mSeq ^ 0xBFFFAFB5;
+	case 12:
+		pc[11] = _byteswap_ulong(pc[11]) ^ mSeq ^ 0xFFAFB7E7;
+	case 11:
+		pc[10] = _byteswap_ulong(pc[10]) ^ mSeq ^ 0xBFBFE7E5;
+	case 10:
+		pc[9] = _byteswap_ulong(pc[9])   ^ mSeq ^ 0xBFEFE7F5;
+	case 9:
+		pc[8] = _byteswap_ulong(pc[8])   ^ mSeq ^ 0xFFEFF7EF;
+	case 8:
+		pc[7] = _byteswap_ulong(pc[7])   ^ mSeq ^ 0xFFFFEFBF;
+	case 7:
+		pc[6] = _byteswap_ulong(pc[6])   ^ mSeq ^ 0xFFEFBFAD;
+	case 6:
+		pc[5] = _byteswap_ulong(pc[5])   ^ mSeq ^ 0xFFBFAFEF;
+	case 5:
+		pc[4] = _byteswap_ulong(pc[4])   ^ mSeq ^ 0xBFAFEFBF;
+	case 4:
+		pc[3] = _byteswap_ulong(pc[3])   ^ mSeq ^ 0xBFEFBFED;
+	case 3:
+		pc[2] = _byteswap_ulong(pc[2])   ^ mSeq ^ 0xFFBFEFFF;
+	case 2:
+		pc[1] = _byteswap_ulong(pc[1])   ^ mSeq ^ 0xBFEFFFE5;
+	case 1:
+		pc[0] = _byteswap_ulong(pc[0])   ^ mSeq ^ 0xFFFFE7A5;
+	}
+}
+#else // REHLDS_FIXES
 /* <124de> ../engine/common.c:3104 */
 void COM_Munge2(unsigned char *data, int len, int seq)
 {
@@ -2539,7 +2697,75 @@ void COM_Munge2(unsigned char *data, int len, int seq)
 		*pc = c;
 	}
 }
+#endif // REHLDS_FIXES
 
+#ifdef REHLDS_FIXES
+// unrolled version
+void COM_UnMunge2(unsigned char *data, int len, int seq)
+{
+	unsigned int *pc;
+	unsigned int *end;
+	unsigned int mSeq;
+
+	mSeq = _byteswap_ulong(~seq) ^ seq;
+	len /= 4;
+	end = (unsigned int *)data + (len & ~15);
+
+	for (pc = (unsigned int *)data; pc < end; pc += 16)
+	{
+		pc[0]  = _byteswap_ulong(pc[0]  ^ mSeq ^ 0xFFFFE7A5);
+		pc[1]  = _byteswap_ulong(pc[1]  ^ mSeq ^ 0xBFEFFFE5);
+		pc[2]  = _byteswap_ulong(pc[2]  ^ mSeq ^ 0xFFBFEFFF);
+		pc[3]  = _byteswap_ulong(pc[3]  ^ mSeq ^ 0xBFEFBFED);
+		pc[4]  = _byteswap_ulong(pc[4]  ^ mSeq ^ 0xBFAFEFBF);
+		pc[5]  = _byteswap_ulong(pc[5]  ^ mSeq ^ 0xFFBFAFEF);
+		pc[6]  = _byteswap_ulong(pc[6]  ^ mSeq ^ 0xFFEFBFAD);
+		pc[7]  = _byteswap_ulong(pc[7]  ^ mSeq ^ 0xFFFFEFBF);
+		pc[8]  = _byteswap_ulong(pc[8]  ^ mSeq ^ 0xFFEFF7EF);
+		pc[9]  = _byteswap_ulong(pc[9]  ^ mSeq ^ 0xBFEFE7F5);
+		pc[10] = _byteswap_ulong(pc[10] ^ mSeq ^ 0xBFBFE7E5);
+		pc[11] = _byteswap_ulong(pc[11] ^ mSeq ^ 0xFFAFB7E7);
+		pc[12] = _byteswap_ulong(pc[12] ^ mSeq ^ 0xBFFFAFB5);
+		pc[13] = _byteswap_ulong(pc[13] ^ mSeq ^ 0xBFAFFFAF);
+		pc[14] = _byteswap_ulong(pc[14] ^ mSeq ^ 0xFFAFA7FF);
+		pc[15] = _byteswap_ulong(pc[15] ^ mSeq ^ 0xFFEFA7A5);
+	}
+
+	switch(len & 15)
+	{
+	case 15:
+		pc[14] = _byteswap_ulong(pc[14] ^ mSeq ^ 0xFFAFA7FF);
+	case 14:
+		pc[13] = _byteswap_ulong(pc[13] ^ mSeq ^ 0xBFAFFFAF);
+	case 13:
+		pc[12] = _byteswap_ulong(pc[12] ^ mSeq ^ 0xBFFFAFB5);
+	case 12:
+		pc[11] = _byteswap_ulong(pc[11] ^ mSeq ^ 0xFFAFB7E7);
+	case 11:
+		pc[10] = _byteswap_ulong(pc[10] ^ mSeq ^ 0xBFBFE7E5);
+	case 10:
+		pc[9] = _byteswap_ulong(pc[9]   ^ mSeq ^ 0xBFEFE7F5);
+	case 9:
+		pc[8] = _byteswap_ulong(pc[8]   ^ mSeq ^ 0xFFEFF7EF);
+	case 8:
+		pc[7] = _byteswap_ulong(pc[7]   ^ mSeq ^ 0xFFFFEFBF);
+	case 7:
+		pc[6] = _byteswap_ulong(pc[6]   ^ mSeq ^ 0xFFEFBFAD);
+	case 6:
+		pc[5] = _byteswap_ulong(pc[5]   ^ mSeq ^ 0xFFBFAFEF);
+	case 5:
+		pc[4] = _byteswap_ulong(pc[4]   ^ mSeq ^ 0xBFAFEFBF);
+	case 4:
+		pc[3] = _byteswap_ulong(pc[3]   ^ mSeq ^ 0xBFEFBFED);
+	case 3:
+		pc[2] = _byteswap_ulong(pc[2]   ^ mSeq ^ 0xFFBFEFFF);
+	case 2:
+		pc[1] = _byteswap_ulong(pc[1]   ^ mSeq ^ 0xBFEFFFE5);
+	case 1:
+		pc[0] = _byteswap_ulong(pc[0]   ^ mSeq ^ 0xFFFFE7A5);
+	}
+}
+#else // REHLDS_FIXES
 /* <125b5> ../engine/common.c:3146 */
 void COM_UnMunge2(unsigned char *data, int len, int seq)
 {
@@ -2570,6 +2796,7 @@ void COM_UnMunge2(unsigned char *data, int len, int seq)
 		*pc = c;
 	}
 }
+#endif // REHLDS_FIXES
 
 /* <1269c> ../engine/common.c:3190 */
 void COM_Munge3(unsigned char *data, int len, int seq)

@@ -215,14 +215,14 @@ enginefuncs_t g_engfuncsExportedToDlls;
 #ifdef _WIN32
 void Sys_SetupFPUOptions()
 {
-	static uint8_t fpuOpts[32];
+	static uint8 fpuOpts[32];
 
 	__asm { fnstenv byte ptr fpuOpts }
 	fpuOpts[0] |= 0x3Fu;
 	__asm { fldenv  byte ptr fpuOpts }
 }
 
-__declspec(noinline) void Sys_InitFPUControlWords()
+NOINLINE void Sys_InitFPUControlWords()
 {
 	int fpucw = 0;
 	__asm { fnstcw fpucw }
@@ -280,14 +280,14 @@ void __cdecl Sys_InitHardwareTimer()
 }
 
 int g_SavedFPUCW1 = 0;
-__declspec(noinline) void Sys_FPUCW_Push_Prec64() {
-	uint16_t tmp = g_FPUCW_Mask_Prec_64Bit;
+NOINLINE void Sys_FPUCW_Push_Prec64() {
+	uint16 tmp = g_FPUCW_Mask_Prec_64Bit;
 	__asm { fnstcw  g_SavedFPUCW1 }
 	__asm { fldcw tmp }
 }
 
-__declspec(noinline) void Sys_FPUCW_Pop_Prec64() {
-	uint16_t tmp = g_SavedFPUCW1;
+NOINLINE void Sys_FPUCW_Pop_Prec64() {
+	uint16 tmp = g_SavedFPUCW1;
 	__asm { fldcw tmp }
 }
 

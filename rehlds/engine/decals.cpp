@@ -77,7 +77,7 @@ void Draw_CacheWadInitFromFile(FileHandle_t hFile, int len, char *name, int cach
 	wadinfo_t header;
 
 	FS_Read(&header, sizeof(wadinfo_t), 1, hFile);
-	if (Q_strncmp(header.identification, "WAD3", 4))
+	if (*(uint32 *)header.identification != MAKEID('W', 'A', 'D', '3'))
 		Sys_Error("Wad file %s doesn't have WAD3 id\n", name);
 	
 	wad->lumps = (lumpinfo_s *)Mem_Malloc(len - header.infotableofs);
@@ -115,7 +115,7 @@ qboolean Draw_CustomCacheWadInit(int cacheMax, cachewad_t *wad, void *raw, int n
 	lumpinfo_t *lump_p;
 	wadinfo_t header;
 	header = *(wadinfo_t *)raw;
-	if (Q_strncmp(header.identification, "WAD3", 4))
+	if (*(uint32 *)header.identification != MAKEID('W', 'A', 'D', '3'))
 	{
 		Con_Printf("Custom file doesn't have WAD3 id\n");
 		return FALSE;

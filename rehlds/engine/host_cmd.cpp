@@ -28,12 +28,6 @@
 
 #include "precompiled.h"
 
-#define FILETIME_TO_QWORD(ft) \
-		((((uint64_t)ft.dwHighDateTime) << 32) + ft.dwLowDateTime)
-
-#define FILETIME_TO_PAIR(f,h)\
-		(((uint64_t)f << 32) | h)
-
 /* <3d3ff> ../engine/host_cmd.c:4378 */
 typedef int(*SV_BLENDING_INTERFACE_FUNC)(int, struct sv_blending_interface_s **, struct server_studio_api_s *, float *, float *);
 
@@ -328,14 +322,14 @@ int Host_GetStartTime(void)
 /* <3e39a> ../engine/host_cmd.c:405 */
 void Host_UpdateStats(void)
 {
-	uint32_t runticks = 0;
-	uint32_t cputicks = 0;
+	uint32 runticks = 0;
+	uint32 cputicks = 0;
 
 	static float last = 0.0f;
 	static float lastAvg = 0.0f;
 
-	static uint64_t lastcputicks = 0;
-	static uint64_t lastrunticks = 0;
+	static uint64 lastcputicks = 0;
+	static uint64 lastrunticks = 0;
 
 #ifdef _WIN32
 
@@ -365,8 +359,8 @@ void Host_UpdateStats(void)
 		}
 		else
 		{
-			cputicks = (uint32_t)(lastcputicks & 0xFFFFFFFF);
-			runticks = (uint32_t)(lastcputicks >> 32);
+			cputicks = (uint32)(lastcputicks & 0xFFFFFFFF);
+			runticks = (uint32)(lastcputicks >> 32);
 		}
 
 		cpuPercent = 
@@ -428,7 +422,7 @@ void Host_UpdateStats(void)
 			lastcputicks = cputicks;
 
 		if (lastrunticks)
-			cpuPercent = (cputicks - lastcputicks) / (runticks - lastrunticks);
+			cpuPercent = (double)(cputicks - lastcputicks) / (double)(runticks - lastrunticks);
 		else
 			lastrunticks = runticks;
 
@@ -440,7 +434,7 @@ void Host_UpdateStats(void)
 		}
 		if (cpuPercent > 0.999)
 			cpuPercent = 0.999;
-		if (cpuPercent < 0.1)
+		else if (cpuPercent < 0.0)
 			cpuPercent = 0.0;
 		last = Sys_FloatTime();
 	}
@@ -2550,7 +2544,12 @@ void Host_Say(qboolean teamonly)
 		p[Q_strlen(p) - 1] = 0;
 	}
 
+#ifdef REHLDS_FIXES
+	// I think '\x01' don't need in TextMsg
+	Q_snprintf(text, sizeof(text), "<%s> ", Cvar_VariableString("hostname"));
+#else // REHLDS_FIXES
 	Q_snprintf(text, sizeof(text), "%c<%s> ", 1, Cvar_VariableString("hostname"));
+#endif // REHLDS_FIXES
 
 	if (Q_strlen(p) > 63)
 		p[63] = 0;
@@ -2569,10 +2568,19 @@ void Host_Say(qboolean teamonly)
 
 		host_client = client;
 
+#ifdef REHLDS_FIXES
+		// Text can be unsafe (format %, localize #) therefore need to send text as argument. TextMsg is used here instead of SayText, because SayText in Half-Life doesn't support arguments.
+		PF_MessageBegin_I(MSG_ONE, RegUserMsg("TextMsg", -1), NULL, &g_psv.edicts[j + 1]);
+		PF_WriteByte_I(HUD_PRINTTALK);
+		PF_WriteString_I("%s");
+		PF_WriteString_I(text);
+		PF_MessageEnd_I();
+#else // REHLDS_FIXES
 		PF_MessageBegin_I(MSG_ONE, RegUserMsg("SayText", -1), NULL, &g_psv.edicts[j + 1]);
 		PF_WriteByte_I(0);
 		PF_WriteString_I(text);
 		PF_MessageEnd_I();
+#endif // REHLDS_FIXES
 	}
 
 	host_client = save;

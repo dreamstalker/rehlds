@@ -113,7 +113,7 @@ void Cmd_RemoveMallocedCmds(int flag);
 NOXREF void Cmd_RemoveHudCmds(void);
 void Cmd_RemoveGameCmds(void);
 void Cmd_RemoveWrapperCmds(void);
-qboolean Cmd_Exists(char *cmd_name);
+qboolean Cmd_Exists(const char *cmd_name);
 NOXREF char *Cmd_CompleteCommand(char *search, int forward);
 void Cmd_ExecuteString(char *text, cmd_source_t src);
 qboolean Cmd_ForwardToServerInternal(sizebuf_t *pBuf);

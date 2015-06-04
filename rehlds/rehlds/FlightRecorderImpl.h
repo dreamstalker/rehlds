@@ -40,7 +40,7 @@ private:
 	struct recorder_state {
 		unsigned int wpos;
 		unsigned int lastMsgBeginPos;
-		uint16_t curMessage;
+		uint16 curMessage;
 	};
 
 	struct meta_header {
@@ -55,8 +55,8 @@ private:
 	};
 #pragma pack(pop)
 
-	uint8_t* m_MetaRegionPtr;
-	uint8_t* m_DataRegionPtr;
+	uint8* m_MetaRegionPtr;
+	uint8* m_DataRegionPtr;
 	meta_header* m_pMetaHeader;
 	recorder_state* m_pRecorderState;
 	data_header* m_pDataHeader;
@@ -85,20 +85,20 @@ private:
 public:
 	CRehldsFlightRecorder();
 
-	virtual void StartMessage(uint16_t msg, bool entrance);
-	virtual void EndMessage(uint16_t msg, bool entrance);
+	virtual void StartMessage(uint16 msg, bool entrance);
+	virtual void EndMessage(uint16 msg, bool entrance);
 
-	virtual void WriteInt8(int8_t v);
-	virtual void WriteUInt8(uint8_t v);
+	virtual void WriteInt8(int8 v);
+	virtual void WriteUInt8(uint8 v);
 
-	virtual void WriteInt16(int16_t v);
-	virtual void WriteUInt16(uint16_t v);
+	virtual void WriteInt16(int16 v);
+	virtual void WriteUInt16(uint16 v);
 
-	virtual void WriteInt32(int32_t v);
-	virtual void WriteUInt32(uint32_t v);
+	virtual void WriteInt32(int32 v);
+	virtual void WriteUInt32(uint32 v);
 
-	virtual void WriteInt64(int64_t v);
-	virtual void WriteUInt64(uint64_t v);
+	virtual void WriteInt64(int64 v);
+	virtual void WriteUInt64(uint64 v);
 
 	virtual void WriteFloat(float v);
 	virtual void WriteDouble(double v);
@@ -106,5 +106,5 @@ public:
 	virtual void WriteBuffer(const void* data, unsigned int len);
 	virtual void WriteString(const char* s);
 
-	virtual uint16_t RegisterMessage(const char* module, const char *message, unsigned int version, bool inOut);
+	virtual uint16 RegisterMessage(const char* module, const char *message, unsigned int version, bool inOut);
 };

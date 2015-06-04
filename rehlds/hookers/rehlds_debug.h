@@ -41,6 +41,9 @@ extern void Rehlds_Debug_logAlloc(size_t sz, void* ptr);
 extern void Rehlds_Debug_logRealloc(size_t sz, void* oldPtr, void* newPtr);
 extern void Rehlds_Debug_logFree(void* ptr);
 
+extern void Rehlds_Debug_LogDeltaFlags(delta_t* delta, int counter, bool verbose);
+extern void Rehlds_Debug_LogSzAlloc(int counter, int cursize, int maxsize, int flags);
+
 extern void Rehlds_Debug_Init(Module* engine);
 
 #endif

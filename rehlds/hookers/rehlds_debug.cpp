@@ -2,12 +2,12 @@
 
 #define REHLDS_DEBUG_MAX_EDICTS 2048
 
-uint32_t calcFloatChecksum(uint32_t crc, const float* pFloat) {
-	uint32_t sVal = *reinterpret_cast<const uint32_t*>(pFloat);
+uint32 calcFloatChecksum(uint32 crc, const float* pFloat) {
+	uint32 sVal = *reinterpret_cast<const uint32*>(pFloat);
 	return _mm_crc32_u32(crc, sVal);
 }
 
-uint32_t calcVec3Checksum(uint32_t crc, const vec_t* v)
+uint32 calcVec3Checksum(uint32 crc, const vec_t* v)
 {
 	crc = calcFloatChecksum(crc, v);
 	crc = calcFloatChecksum(crc, v + 1);
@@ -15,7 +15,7 @@ uint32_t calcVec3Checksum(uint32_t crc, const vec_t* v)
 	return crc;
 }
 
-uint32_t calcEdictRefChecksum(uint32_t crc, edict_t* ed) {
+uint32 calcEdictRefChecksum(uint32 crc, edict_t* ed) {
 	if (ed == NULL) {
 		return _mm_crc32_u32(crc, -1);
 	}
@@ -23,7 +23,7 @@ uint32_t calcEdictRefChecksum(uint32_t crc, edict_t* ed) {
 	return _mm_crc32_u32(crc, ed - g_psv.edicts);
 }
 
-uint32_t calcEngStringChecksum(uint32_t crc, int str) {
+uint32 calcEngStringChecksum(uint32 crc, int str) {
 	if (str == 0) {
 		return _mm_crc32_u8(crc, 0);
 	}
@@ -39,7 +39,7 @@ uint32_t calcEngStringChecksum(uint32_t crc, int str) {
 	return crc;
 }
 
-uint32_t calcEntvarsChecksum(uint32_t crc, const entvars_t* ev) {
+uint32 calcEntvarsChecksum(uint32 crc, const entvars_t* ev) {
 	crc = calcEngStringChecksum(crc, ev->classname);
 	crc = calcEngStringChecksum(crc, ev->globalname);
 
@@ -98,8 +98,8 @@ uint32_t calcEntvarsChecksum(uint32_t crc, const entvars_t* ev) {
 	crc = calcFloatChecksum(crc, &ev->frame);
 	crc = calcFloatChecksum(crc, &ev->animtime);
 	crc = calcFloatChecksum(crc, &ev->framerate);
-	crc = _mm_crc32_u32(crc, *(uint32_t*)&ev->controller[0]);
-	crc = _mm_crc32_u16(crc, *(uint16_t*)&ev->blending[0]);
+	crc = _mm_crc32_u32(crc, *(uint32*)&ev->controller[0]);
+	crc = _mm_crc32_u16(crc, *(uint16*)&ev->blending[0]);
 
 	crc = calcFloatChecksum(crc, &ev->scale);
 
@@ -175,7 +175,7 @@ uint32_t calcEntvarsChecksum(uint32_t crc, const entvars_t* ev) {
 	return crc;
 }
 
-uint32_t calcEdictChecksum(uint32_t crc, const edict_t* ed) {
+uint32 calcEdictChecksum(uint32 crc, const edict_t* ed) {
 	crc = _mm_crc32_u32(crc, ed->free);
 	if (ed->free)
 		return crc;
@@ -192,7 +192,7 @@ uint32_t calcEdictChecksum(uint32_t crc, const edict_t* ed) {
 }
 
 void PrintFloat(const float* pVal, std::stringstream &ss) {
-	uint32_t sVal = *reinterpret_cast<const uint32_t*>(pVal);
+	uint32 sVal = *reinterpret_cast<const uint32*>(pVal);
 	ss << "{ float: " << *pVal << "; raw: " << std::hex << sVal << " }";
 }
 
@@ -237,7 +237,7 @@ void PrintTrace(trace_t* trace, std::stringstream &ss)
 	if (trace->ent == NULL)
 		ss << "NULL";
 	else
-		ss << (uint32_t)(trace->ent - g_psv.edicts);
+		ss << (uint32)(trace->ent - g_psv.edicts);
 
 	ss << "; fraction: "; PrintFloat(&trace->fraction, ss);
 	ss << "; endpos: "; PrintVec3(trace->endpos, ss);
@@ -260,7 +260,7 @@ void PrintEdict(edict_t* ent, std::stringstream &ss, int flags)
 	}
 
 	ss << "{"
-		<< " id: " << (uint32_t)(ent - g_psv.edicts);
+		<< " id: " << (uint32)(ent - g_psv.edicts);
 	
 	if (flags & ED_PRINT_POSITION) {
 		ss << "; origin: "; PrintVec3(ent->v.origin, ss);
@@ -297,7 +297,7 @@ int __cdecl SV_PushRotate_hooked(edict_t *pusher, float movetime)
 	ss << "; movetime: "; PrintFloat(&movetime, ss);
 	ss << " )";
 
-	uint32_t entCheckSums[REHLDS_DEBUG_MAX_EDICTS];
+	uint32 entCheckSums[REHLDS_DEBUG_MAX_EDICTS];
 	for (int i = 0; i < g_psv.num_edicts; i++)
 		entCheckSums[i] = calcEdictChecksum(0, &g_psv.edicts[i]);
 
@@ -314,7 +314,7 @@ int __cdecl SV_PushRotate_hooked(edict_t *pusher, float movetime)
 	ess << " chanedEdicts: [ ";
 	
 	for (int i = 0; i < g_psv.num_edicts; i++) {
-		uint32_t newCrc = calcEdictChecksum(0, &g_psv.edicts[i]);
+		uint32 newCrc = calcEdictChecksum(0, &g_psv.edicts[i]);
 		if (newCrc != entCheckSums[i]) {
 			ess << " { " << i << ": " << entCheckSums[i] << " -> " << newCrc;
 			if (65097 == currentCallID) {
@@ -387,7 +387,7 @@ void __cdecl SV_SingleClipMoveToEntity_hooked(edict_t *ent, const vec_t *start, 
 	if (ent == NULL)
 		ss << "NULL";
 	else
-		ss << (uint32_t)(ent - g_psv.edicts);
+		ss << (uint32)(ent - g_psv.edicts);
 
 	ss << "; start: "; PrintVec3(start, ss);
 	ss << "; mins: "; PrintVec3(mins, ss);
@@ -551,6 +551,27 @@ void Rehlds_Debug_logRealloc(size_t sz, void* oldPtr, void* newPtr)
 void Rehlds_Debug_logFree(void* ptr)
 {
 	g_RehldsDebugLog << "free(" << std::hex << (size_t)ptr << ")\n";
+	g_RehldsDebugLog.flush();
+}
+
+void Rehlds_Debug_LogDeltaFlags(delta_t* delta, int counter, bool verbose) {
+	unsigned int cksum = 0;
+
+	for (int i = 0; i < delta->fieldCount; i++) {
+		cksum = _mm_crc32_u16(cksum, delta->pdd[i].flags);
+	}
+	
+	g_RehldsDebugLog << "DF(c=" << counter << " crc=" << cksum << ")\n";
+	if (verbose) {
+		for (int i = 0; i < delta->fieldCount; i++) {
+			g_RehldsDebugLog << "DeltaFlagsVerbose(counter=" << counter << " id=" << delta->pdd[i].fieldName << " flags= " << delta->pdd[i].flags << ")\n";
+		}
+	}
+	g_RehldsDebugLog.flush();
+}
+
+void Rehlds_Debug_LogSzAlloc(int counter, int cursize, int maxsize, int flags) {
+	g_RehldsDebugLog << "SZAlloc(c=" << counter << " sz=" << cursize << " maxsz= " << maxsize << " f=" << flags << ")\n";
 	g_RehldsDebugLog.flush();
 }
 

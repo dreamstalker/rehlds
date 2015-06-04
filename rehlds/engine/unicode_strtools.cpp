@@ -45,11 +45,11 @@ qboolean Q_IsValidUChar32(uchar32 uVal)
 // as a single character, as if they were a correctly-encoded 4-byte UTF-8 sequence.
 int Q_UTF8ToUChar32(const char *pUTF8_, uchar32 &uValueOut, bool &bErrorOut)
 {
-	const uint8_t *pUTF8 = (const uint8_t *)pUTF8_;
+	const uint8 *pUTF8 = (const uint8 *)pUTF8_;
 
 	int nBytes = 1;
-	uint32_t uValue = pUTF8[0];
-	uint32_t uMinValue = 0;
+	uint32 uValue = pUTF8[0];
+	uint32 uMinValue = 0;
 
 	// 0....... single byte
 	if (uValue < 0x80)
@@ -105,9 +105,9 @@ decodeError:
 decodeFinishedMaybeCESU8:
 	// Do we have a full UTF-16 surrogate pair that's been UTF-8 encoded afterwards?
 	// That is, do we have 0xD800-0xDBFF followed by 0xDC00-0xDFFF? If so, decode it all.
-	if ((uValue - 0xD800u) < 0x400u && pUTF8[3] == 0xED && (uint8_t)(pUTF8[4] - 0xB0) < 0x10 && (pUTF8[5] & 0xC0) == 0x80)
+	if ((uValue - 0xD800u) < 0x400u && pUTF8[3] == 0xED && (uint8)(pUTF8[4] - 0xB0) < 0x10 && (pUTF8[5] & 0xC0) == 0x80)
 	{
-		uValue = 0x10000 + ((uValue - 0xD800u) << 10) + ((uint8_t)(pUTF8[4] - 0xB0) << 6) + pUTF8[5] - 0x80;
+		uValue = 0x10000 + ((uValue - 0xD800u) << 10) + ((uint8)(pUTF8[4] - 0xB0) << 6) + pUTF8[5] - 0x80;
 		nBytes = 6;
 		uMinValue = 0x10000;
 	}

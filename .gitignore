@@ -4,6 +4,8 @@
 *.iml
 **/msvc/Debug*
 **/msvc/Release*
+**/msvc/Tests
+**/msvc/Test Fixes
 **/msvc/*.sdf
 **/msvc/*.opensdf
 **/msvc/*.user
@@ -13,4 +15,5 @@
 rehlds/version/appversion.h
 rehlds/msvc/PublishPath*.txt
 rehlds/_rehldsTestImg
+rehlds/_dev
 publish

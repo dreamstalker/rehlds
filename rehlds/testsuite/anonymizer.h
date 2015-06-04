@@ -138,33 +138,33 @@ private:
 
 	IReHLDSPlatform* m_BasePlatform;
 
-	std::unordered_map<uint32_t, uint32_t> m_Fake2RealIpMap;
-	std::unordered_map<uint32_t, uint32_t> m_Real2FakeIpMap;
+	std::unordered_map<uint32, uint32> m_Fake2RealIpMap;
+	std::unordered_map<uint32, uint32> m_Real2FakeIpMap;
 
-	uint32_t Fake2RealIp(uint32_t fakeIp, const char* callsite);
-	uint32_t Real2FakeIp(uint32_t realIp, const char* callsite);
+	uint32 Fake2RealIp(uint32 fakeIp, const char* callsite);
+	uint32 Real2FakeIp(uint32 realIp, const char* callsite);
 
 	void Real2FakeSockaddr(sockaddr* saddr, const char* callsite);
 	void Fake2RealSockaddr(sockaddr* saddr, const char* callsite);
-	char* IpToString(uint32_t ip);
+	char* IpToString(uint32 ip);
 
-	std::unordered_map<uint64_t, uint64_t> m_Fake2RealSteamId;
-	std::unordered_map<uint64_t, uint64_t> m_Real2FakeSteamId;
+	std::unordered_map<uint64, uint64> m_Fake2RealSteamId;
+	std::unordered_map<uint64, uint64> m_Real2FakeSteamId;
 
 	CSteamID Real2FakeSteamId(CSteamID realId, const char* callsite);
 	CSteamID Fake2RealSteamId(CSteamID fakeId, const char* callsite);
 
 
 	char* SteamIdToString(const CSteamID& steamid);
-	void ProcessConnectionlessPacket(uint8_t* data, unsigned int *len);
-	void ProcessConnectPacket(uint8_t* data, unsigned int *len);
+	void ProcessConnectionlessPacket(uint8* data, unsigned int *len);
+	void ProcessConnectPacket(uint8* data, unsigned int *len);
 
 	std::unordered_map<std::string, std::string> m_Real2FakeName;
 	std::unordered_map<std::string, std::string> m_Fake2RealName;
 
 	std::string Real2FakeName(const char* realName, const char* callsite);
 	std::string Fake2RealName(const char* fakeName, const char* callsite);
-	uint8_t m_OriginalConnectPacketData[4096];
+	uint8 m_OriginalConnectPacketData[4096];
 	unsigned int m_OriginalConnectPacketLen;
 
 	std::unordered_map<std::string, std::string> m_Real2FakeHost;
@@ -176,9 +176,9 @@ private:
 public:
 	CAnonymizingEngExtInterceptor(IReHLDSPlatform* basePlatform);
 
-	virtual uint32_t time(uint32_t* pTime);
-	virtual struct tm* localtime(uint32_t time);
-	virtual void srand(uint32_t seed);
+	virtual uint32 time(uint32* pTime);
+	virtual struct tm* localtime(uint32 time);
+	virtual void srand(uint32 seed);
 	virtual int rand();
 
 	virtual void Sleep(DWORD msec);

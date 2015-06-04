@@ -41,9 +41,10 @@
   /*      polynomial $edb88320                                              */
   /*                                                                        */
   /*  --------------------------------------------------------------------  */
-#include "precompiled.h"
+#include "crc32.h"
+#include "sys_shared.h"
 
-static uint32_t crc32_tab[] = {
+static uint32 crc32_tab[] = {
 
       0x00000000L, 0x77073096L, 0xee0e612cL, 0x990951baL, 0x076dc419L,
       0x706af48fL, 0xe963a535L, 0x9e6495a3L, 0x0edb8832L, 0x79dcb8a4L,
@@ -100,24 +101,24 @@ static uint32_t crc32_tab[] = {
    };
 
 
-uint32_t NOINLINE crc32_t_nosse(uint32_t iCRC, const uint8_t *s, unsigned int len) {
-	uint32_t crc32val = iCRC;
+uint32 crc32_t_nosse(uint32 iCRC, const uint8 *s, unsigned int len) {
+	uint32 crc32val = iCRC;
 	for (unsigned int i = 0; i < len; i++) {
 		crc32val = crc32_tab[(crc32val ^ s[i]) & 0xff] ^ (crc32val >> 8);
 	}
 	return crc32val;
 }
 
-uint32_t crc32_t(uint32_t iCRC, const uint8_t *s, unsigned int len) {
-	if (!g_HasSSE42) {
+uint32 crc32_t(uint32 iCRC, const uint8 *s, unsigned int len) {
+	if (!cpuinfo.sse4_2) {
 		return crc32_t_nosse(iCRC, s, len);
 	}
 
-	uint32_t crc32val = iCRC;
+	uint32 crc32val = iCRC;
 	unsigned int i = 0;
 
 	for (; i < (len >> 2); i += 4) {
-		crc32val = _mm_crc32_u32(crc32val, *(uint32_t*)&s[i]);
+		crc32val = _mm_crc32_u32(crc32val, *(uint32*)&s[i]);
 	}
 
 	for (; i < len; i++) {
@@ -127,6 +128,14 @@ uint32_t crc32_t(uint32_t iCRC, const uint8_t *s, unsigned int len) {
 	return crc32val;
 }
 
-uint32_t crc32(const uint8_t *buf, unsigned int len) {
+uint32 crc32(const uint8 *buf, unsigned int len) {
 	return crc32_t(0, buf, len);
+}
+
+uint32 crc32_t8_sse(uint32 iCRC, uint8 data) {
+	return _mm_crc32_u8(iCRC, data);
+}
+
+uint32 crc32_t8_nosse(uint32 iCRC, uint8 data) {
+	return crc32_tab[(iCRC ^ data) & 0xff] ^ (iCRC >> 8);
 }

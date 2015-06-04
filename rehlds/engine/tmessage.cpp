@@ -28,12 +28,6 @@
 
 #include "precompiled.h"
 
-#define MSGFILE_NAME	0
-#define MSGFILE_TEXT	1
-
-#define NAME_HEAP_SIZE	16384
-#define MAX_MESSAGES	1000
-
 char gNetworkTextMessageBuffer[MAX_NETMESSAGE][512];
 client_textmessage_t gMessageParms;
 

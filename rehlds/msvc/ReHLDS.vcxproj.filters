@@ -319,6 +319,18 @@
     <ClCompile Include="..\rehlds\flight_recorder.cpp">
       <Filter>rehlds</Filter>
     </ClCompile>
+    <ClCompile Include="..\engine\public_amalgamation.cpp">
+      <Filter>engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\unittests\mathlib_tests.cpp">
+      <Filter>unittests</Filter>
+    </ClCompile>
+    <ClCompile Include="..\engine\delta_jit.cpp">
+      <Filter>engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\unittests\delta_tests.cpp">
+      <Filter>unittests</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\hookers\memory.h">
@@ -521,9 +533,6 @@
     </ClInclude>
     <ClInclude Include="..\engine\cvar.h">
       <Filter>engine\common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\public\archtypes.h">
-      <Filter>public</Filter>
     </ClInclude>
     <ClInclude Include="..\public\FileSystem.h">
       <Filter>public</Filter>
@@ -1028,6 +1037,9 @@
     </ClInclude>
     <ClInclude Include="..\public\rehlds\bspfile.h">
       <Filter>public\rehlds</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\delta_jit.h">
+      <Filter>engine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

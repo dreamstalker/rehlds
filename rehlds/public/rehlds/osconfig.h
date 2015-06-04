@@ -43,6 +43,10 @@
 #include <setjmp.h>
 #include <assert.h>
 
+#include <algorithm>
+#include <deque>
+#include <functional>
+
 #ifdef _WIN32 // WINDOWS
 	#include <windows.h>
 	#include <winsock.h>
@@ -85,33 +89,8 @@
 #include <fstream>
 #include <iomanip>
 
-#ifdef _WIN32 // WINDOWS
-#ifndef _STDINT
-	typedef unsigned __int64 uint64_t;
-	typedef unsigned __int32 uint32_t;
-	typedef unsigned __int16 uint16_t;
-	typedef unsigned __int8 uint8_t;
-
-	typedef __int64 int64_t;
-	typedef __int32 int32_t;
-	typedef __int16 int16_t;
-	typedef __int8 int8_t;
-#endif
-#else // _WIN32
-	typedef unsigned long long uint64_t;
-	typedef unsigned int uint32_t;
-	typedef unsigned short uint16_t;
-	typedef unsigned char uint8_t;
-
-	#ifndef __int8_t_defined
-		typedef long long int64_t;
-		typedef int int32_t;
-		typedef short int16_t;
-		typedef char int8_t;
-	#endif
-
-	typedef unsigned char byte;
-#endif // _WIN32
+#include <smmintrin.h>
+#include <xmmintrin.h>
 
 #ifdef _WIN32 // WINDOWS
 	#define _CRT_SECURE_NO_WARNINGS
@@ -123,6 +102,7 @@
 	#define STDCALL __stdcall
 	#define HIDDEN
 	#define NOINLINE __declspec(noinline)
+	#define ALIGN16 __declspec(align(16))
 
 	//inline bool SOCKET_FIONBIO(SOCKET s, int m) { return (ioctlsocket(s, FIONBIO, (u_long*)&m) == 0); }
 	//inline int SOCKET_MSGLEN(SOCKET s, u_long& r) { return ioctlsocket(s, FIONREAD, (u_long*)&r); }
@@ -157,6 +137,7 @@
 	#define STDCALL __attribute__ ((stdcall))
 	#define HIDDEN __attribute__((visibility("hidden")))
 	#define NOINLINE __attribute__((noinline))
+	#define ALIGN16 __attribute__((aligned(16)))
 
 	//inline bool SOCKET_FIONBIO(SOCKET s, int m) { return (ioctl(s, FIONBIO, (int*)&m) == 0); }
 	//inline int SOCKET_MSGLEN(SOCKET s, u_long& r) { return ioctl(s, FIONREAD, (int*)&r); }

@@ -80,6 +80,9 @@ typedef float vec_t;				// needed before including progdefs.h
 // Vector class
 #include "vector.h"
 
+// Defining it as a (bogus) struct helps enforce type-checking
+#define vec3_t Vector
+
 // Shared engine/DLL constants
 #include "const.h"
 #include "progdefs.h"

@@ -40,6 +40,12 @@
 #include "engine_launcher_api.h"
 #include "idedicatedexports.h"
 
+#define FIFTEEN_MB			(15 * 1024 * 1024)
+#define MINIMUM_WIN_MEMORY		0x0e00000
+#define WARNING_MEMORY			0x0200000
+#define MAXIMUM_WIN_MEMORY		0x2800000 // Ask for 40 MB max
+#define MAXIMUM_DEDICATED_MEMORY	0x2800000 // Ask for 40 MB max
+
 #ifdef HOOK_ENGINE
 #define dedicated_ (*pdedicated)
 #define g_bIsWin95 (*pg_bIsWin95)

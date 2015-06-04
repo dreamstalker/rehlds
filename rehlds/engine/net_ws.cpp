@@ -28,10 +28,6 @@
 
 #include "precompiled.h"
 
-// Create general message queues
-#define NUM_MSG_QUEUES 40
-#define MSG_QUEUE_SIZE 1536
-
 #ifdef _WIN32
 CRITICAL_SECTION net_cs;
 #endif // _WIN32
@@ -457,7 +453,7 @@ qboolean NET_StringToSockaddr(const char *s, struct sockaddr *sadr)
 		sadr->sa_data[9] = (char)val;
 
 		sscanf(s + 22, "%u", &val);
-		*(uint16_t *)&sadr->sa_data[10] = htons(val);
+		*(uint16 *)&sadr->sa_data[10] = htons(val);
 
 		return TRUE;
 	}
@@ -492,7 +488,7 @@ qboolean NET_StringToSockaddr(const char *s, struct sockaddr *sadr)
 		{
 			return FALSE;
 		}
-		((sockaddr_in *)sadr)->sin_addr.s_addr = *(uint32_t *)h->h_addr;
+		((sockaddr_in *)sadr)->sin_addr.s_addr = *(uint32 *)h->h_addr;
 	}
 	return TRUE;
 }
@@ -1020,7 +1016,7 @@ qboolean NET_QueuePacket(netsrc_t sock)
 	}
 
 	NET_TransferRawData(&in_message, buf, ret);
-	if (*(uint32_t *)in_message.data == 0xFFFFFFFE)
+	if (*(uint32 *)in_message.data == 0xFFFFFFFE)
 	{
 		if (in_message.cursize >= 9)
 		{
@@ -1284,7 +1280,7 @@ qboolean NET_GetPacket_internal(netsrc_t sock)
 	return bret;
 }
 
-bool NET_GetPacketPreprocessor(uint8_t* data, unsigned int len, const netadr_t& srcAddr) {
+bool NET_GetPacketPreprocessor(uint8* data, unsigned int len, const netadr_t& srcAddr) {
 	return true;
 }
 

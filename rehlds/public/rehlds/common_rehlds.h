@@ -27,7 +27,7 @@
 */
 #pragma once
 
-#include "maintypes.h"
+#include "const.h"
 
 #define COM_TOKEN_LEN	1024
 
@@ -46,7 +46,7 @@
 typedef struct sizebuf_s
 {
 	const char *buffername;
-	uint16_t flags;
+	uint16 flags;
 	byte *data;
 	int maxsize;
 	int cursize;

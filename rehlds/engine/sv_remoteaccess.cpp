@@ -304,3 +304,10 @@ void NotifyDedicatedServerUI(const char *message)
 {
 	g_ServerRemoteAccess.SendMessageToAdminUI(message);
 }
+
+
+#ifndef HOOK_ENGINE
+
+EXPOSE_SINGLE_INTERFACE_GLOBALVAR(CServerRemoteAccess, IGameServerData, GAMESERVERDATA_INTERFACE_VERSION, g_ServerRemoteAccess)
+
+#endif //HOOK_ENGINE

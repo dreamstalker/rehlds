@@ -49,7 +49,7 @@ int gMsgDest;
 int gMsgType;
 qboolean gMsgStarted;
 vec3_t gMsgOrigin;
-int32_t idum;
+int32 idum;
 int g_groupop;
 int g_groupmask;
 unsigned char checkpvs[1024];
@@ -130,16 +130,23 @@ void PF_setsize_I(edict_t *e, const float *rgflMin, const float *rgflMax)
 /* <78451> ../engine/pr_cmds.c:184 */
 void PF_setmodel_I(edict_t *e, const char *m)
 {
-	char** check = &g_psv.model_precache[0];
+	const char** check = &g_psv.model_precache[0];
 	int i = 0;
 
 #ifdef REHLDS_CHECKS
-	for (; *check && i < 512; i++, check++)
+	for (; *check && i < HL_MODEL_MAX; i++, check++)
 #else
 	for (; *check; i++, check++)
 #endif
 	{
+
+		//use case-sensitive names to increase performance
+#ifdef REHLDS_FIXES
+		if (!Q_strcmp(*check, m))
+#else
 		if (!Q_stricmp(*check, m))
+#endif
+		
 		{
 			e->v.modelindex = i;
 			model_t *mod = g_psv.models[i];
@@ -273,7 +280,6 @@ void PF_particle_I(const float *org, const float *dir, float color, float count)
 /* <786e7> ../engine/pr_cmds.c:390 */
 void PF_ambientsound_I(edict_t *entity, float *pos, const char *samp, float vol, float attenuation, int fFlags, int pitch)
 {
-	char **check;
 	int i;
 	int soundnum;
 	int ent;
@@ -291,19 +297,20 @@ void PF_ambientsound_I(edict_t *entity, float *pos, const char *samp, float vol,
 	}
 	else
 	{
-		i = 0;
-		check = g_psv.sound_precache;
-		while (*check && Q_stricmp(*check, samp)) {
-			i++;
-			check++;
+		for (i = 0; i < HL_SOUND_MAX; i++)
+		{
+			if (g_psv.sound_precache[i] && !Q_stricmp(g_psv.sound_precache[i], samp))
+			{
+				soundnum = i;
+				break;
+			}
 		}
-		if (!check[0])
+
+		if (i == HL_SOUND_MAX)
 		{
 			Con_Printf("no precache: %s\n", samp);
 			return;
 		}
-
-		soundnum = i;
 	}
 
 	ent = NUM_FOR_EDICT(entity);
@@ -341,7 +348,12 @@ void PF_sound_I(edict_t *entity, int channel, const char *sample, float volume, 
 /* <78cdd> ../engine/pr_cmds.c:491 */
 void PF_traceline_Shared(const float *v1, const float *v2, int nomonsters, edict_t *ent)
 {
+#ifdef REHLDS_OPT_PEDANTIC
+	trace_t trace = SV_Move_Point(v1, v2, nomonsters, ent);
+#else // REHLDS_OPT_PEDANTIC
 	trace_t trace = SV_Move(v1, vec3_origin, vec3_origin, v2, nomonsters, ent, 0);
+#endif // REHLDS_OPT_PEDANTIC
+
 	gGlobalVariables.trace_flags = 0;
 	SV_SetGlobalTrace(&trace);
 } 
@@ -454,8 +466,8 @@ msurface_t *SurfaceAtPoint(model_t *pModel, mnode_t *node, vec_t *start, vec_t *
 		return 0;
 
 	plane = node->plane;
-	front = start[2] * plane->normal[2] + plane->normal[0] * start[0] + start[1] * plane->normal[1] - plane->dist;
-	back = plane->normal[0] * end[0] + plane->normal[2] * end[2] + plane->normal[1] * end[1] - plane->dist;
+	front = _DotProduct(start, plane->normal) - plane->dist;
+	back = _DotProduct(end, plane->normal) - plane->dist;
 	s = (front < 0.0f) ? 1 : 0;
 	t = (back < 0.0f) ? 1 : 0;
 	if (t == s)
@@ -476,8 +488,8 @@ msurface_t *SurfaceAtPoint(model_t *pModel, mnode_t *node, vec_t *start, vec_t *
 	{
 		surf = &pModel->surfaces[node->firstsurface + i];
 		tex = surf->texinfo;
-		ds = (int)(mid[2] * tex->vecs[0][2] + mid[1] * tex->vecs[0][1] + mid[0] * tex->vecs[0][0] + tex->vecs[0][3]);
-		dt = (int)(mid[2] * tex->vecs[1][2] + mid[1] * tex->vecs[1][1] + mid[0] * tex->vecs[1][0] + tex->vecs[1][3]);
+		ds = (int)(_DotProduct(mid, tex->vecs[0]) + tex->vecs[0][3]);
+		dt = (int)(_DotProduct(mid, tex->vecs[1]) + tex->vecs[1][3]);
 		if (ds >= surf->texturemins[0])
 		{
 			if (dt >= surf->texturemins[1])
@@ -527,14 +539,14 @@ const char *TraceTexture(edict_t *pTextureEntity, const float *v1, const float *
 			AngleVectors(pTextureEntity->v.angles, forward, right, up);
 
 			temp[0] = start[0];	temp[1] = start[1]; temp[2] = start[2];
-			start[0] = forward[2] * start[2] + forward[1] * start[1] + forward[0] * start[0];
-			start[1] = -(right[0] * temp[0] + right[2] * start[2] + right[1] * start[1]);
-			start[2] = up[1] * temp[1] + up[0] * temp[0] + up[2] * start[2];
+			start[0] = _DotProduct(forward, temp);
+			start[1] = -_DotProduct(right, temp);
+			start[2] = _DotProduct(up, temp);
 			
 			temp[0] = end[0]; temp[1] = end[1]; temp[2] = end[2];
-			end[0] = forward[2] * end[2] + forward[1] * end[1] + forward[0] * end[0];
-			end[1] = -(right[0] * temp[0] + right[2] * end[2] + right[1] * end[1]);
-			end[2] = up[1] * temp[1] + up[0] * temp[0] + up[2] * end[2];
+			end[0] = _DotProduct(forward, temp);
+			end[1] = -_DotProduct(right, temp);
+			end[2] = _DotProduct(up, temp);
 		}
 	}
 	else
@@ -1043,7 +1055,7 @@ qboolean PR_IsEmptyString(const char *s)
 }
 
 /* <795b5> ../engine/pr_cmds.c:1397 */
-int PF_precache_sound_I(char *s)
+int PF_precache_sound_I(const char *s)
 {
 	int i;
 
@@ -1059,41 +1071,42 @@ int PF_precache_sound_I(char *s)
 	if (g_psv.state == ss_loading)
 	{
 		g_psv.sound_precache_hashedlookup_built = 0;
-		i = 0;
-		while (1)
+
+		for (i = 0; i < HL_SOUND_MAX; i++)
 		{
 			if (!g_psv.sound_precache[i])
-				break;
+			{
+#ifdef REHLDS_FIXES
+				// For more information, see EV_Precache
+				g_psv.sound_precache[i] = ED_NewString(s);
+#else
+				g_psv.sound_precache[i] = s;
+#endif // REHLDS_FIXES
+				return i;
+			}
 
 			if (!Q_stricmp(g_psv.sound_precache[i], s))
 				return i;
-
-			++i;
-			if (i >= 512)
-				Host_Error(
-				"PF_precache_sound_I: Sound '%s' failed to precache because the item count is over the %d limit.\nReduce the number of brush models and/or regular models in the map to correct this.",
-				s,
-				512);
 		}
-		g_psv.sound_precache[i] = s;
+
+		Host_Error(
+			"PF_precache_sound_I: Sound '%s' failed to precache because the item count is over the %d limit.\nReduce the number of brush models and/or regular models in the map to correct this.",
+			s,
+			HL_SOUND_MAX);
 	}
 	else
 	{
-		i = 0;
-		while (1)
+		// precaching not enabled. check if already exists.
+		for (i = 0; i < HL_SOUND_MAX; i++)
 		{
-			if (g_psv.sound_precache[i])
-			{
-				if (!Q_stricmp(g_psv.sound_precache[i], s))
-					break;
-			}
-			++i;
-			if (i >= 512)
-				Host_Error("PF_precache_sound_I: '%s' Precache can only be done in spawn functions", s);
+			if (g_psv.sound_precache[i] && !Q_stricmp(g_psv.sound_precache[i], s))
+					return i;
 		}
+
+		Host_Error("PF_precache_sound_I: '%s' Precache can only be done in spawn functions", s);
 	}
 
-	return i;
+	return -1; // unreach
 }
 
 /* <79609> ../engine/pr_cmds.c:1455 */
@@ -1107,7 +1120,7 @@ short unsigned int EV_Precache(int type, const char *psz)
 
 	if (g_psv.state == ss_loading)
 	{
-		for (int i = 1; i < 256; i++)
+		for (int i = 1; i < HL_EVENT_MAX; i++)
 		{
 			struct event_s* ev = &g_psv.event_precache[i];
 			if (!ev->filename)
@@ -1115,16 +1128,23 @@ short unsigned int EV_Precache(int type, const char *psz)
 				if (type != 1)
 					Host_Error("EV_Precache:  only file type 1 supported currently\n");
 
-				char szpath[260];
-				_snprintf(szpath, 0x104u, "%s", psz);
+				char szpath[MAX_PATH];
+				_snprintf(szpath, sizeof(szpath), "%s", psz);
 				COM_FixSlashes(szpath);
 
 				int scriptSize = 0;
 				char* evScript = (char*) COM_LoadFile(szpath, 5, &scriptSize);
 				if (!evScript)
 					Host_Error("EV_Precache:  file %s missing from server\n", psz);
-
+#ifdef REHLDS_FIXES
+				// Many modders don't know that the resource names passed to precache functions must be a static strings.
+				// Also some metamod modules can be unloaded during the server running.
+				// Thereafter the pointers to resource names, precached by this modules becomes invalid and access to them will cause segfault error.
+				// Reallocating strings in the rehlds temporary hunk memory helps to avoid these problems.
+				g_psv.event_precache[i].filename = ED_NewString(psz);
+#else
 				g_psv.event_precache[i].filename = psz;
+#endif // REHLDS_FIXES
 				g_psv.event_precache[i].filesize = scriptSize;
 				g_psv.event_precache[i].pszScript = evScript;
 				g_psv.event_precache[i].index = i;
@@ -1139,7 +1159,7 @@ short unsigned int EV_Precache(int type, const char *psz)
 	}
 	else
 	{
-		for (int i = 1; i < 256; i++)
+		for (int i = 1; i < HL_EVENT_MAX; i++)
 		{
 			struct event_s* ev = &g_psv.event_precache[i];
 			if (!Q_stricmp(ev->filename, psz))
@@ -1235,7 +1255,7 @@ void EV_Playback(int flags, const edict_t *pInvoker, short unsigned int eventind
 	eargs.bparam1 = bparam1;
 	eargs.bparam2 = bparam2;
 
-	if (eventindex < 1u || eventindex >= 0x100u)
+	if (eventindex < 1u || eventindex >= HL_EVENT_MAX)
 	{
 		Con_DPrintf("EV_Playback:  index out of range %i\n", eventindex);
 		return;
@@ -1383,7 +1403,7 @@ void EV_SV_Playback(int flags, int clientindex, short unsigned int eventindex, f
 }
 
 /* <799da> ../engine/pr_cmds.c:1849 */
-int PF_precache_model_I(char *s)
+int PF_precache_model_I(const char *s)
 {
 	int iOptional = 0;
 	if (!s)
@@ -1400,19 +1420,35 @@ int PF_precache_model_I(char *s)
 
 	if (g_psv.state == ss_loading)
 	{
-		for (int i = 0; i < 512; i++)
+		for (int i = 0; i < HL_MODEL_MAX; i++)
 		{
 			if (!g_psv.model_precache[i])
 			{
+#ifdef REHLDS_FIXES
+				// For more information, see EV_Precache
+				g_psv.model_precache[i] = ED_NewString(s);
+#else
 				g_psv.model_precache[i] = s;
+#endif // REHLDS_FIXES
+
+#ifdef REHLDS_OPT_PEDANTIC
+				g_rehlds_sv.modelsMap.put(g_psv.model_precache[i], i);
+#endif //REHLDS_OPT_PEDANTIC
+
 				g_psv.models[i] = Mod_ForName(s, 1, 1);
 				if (!iOptional)
 					g_psv.model_precache_flags[i] |= 1u;
 				return i;
 			}
 
+			//use case-sensitive names to increase performance
+#ifdef REHLDS_FIXES
+			if (!Q_strcmp(g_psv.model_precache[i], s))
+				return i;
+#else
 			if (!Q_stricmp(g_psv.model_precache[i], s))
 				return i;
+#endif
 		}
 		Host_Error(
 			"PF_precache_model_I: Model '%s' failed to precache because the item count is over the %d limit.\nReduce the number of brush models and/or regular models in the map to correct this.",
@@ -1421,10 +1457,16 @@ int PF_precache_model_I(char *s)
 	}
 	else
 	{
-		for (int i = 0; i < 512; i++)
+		for (int i = 0; i < HL_MODEL_MAX; i++)
 		{
+			//use case-sensitive names to increase performance
+#ifdef REHLDS_FIXES
+			if (!Q_strcmp(g_psv.model_precache[i], s))
+				return i;
+#else
 			if (!Q_stricmp(g_psv.model_precache[i], s))
 				return i;
+#endif
 		}
 		Host_Error("PF_precache_model_I: '%s' Precache can only be done in spawn functions", s);
 	}
@@ -1442,11 +1484,16 @@ int PF_precache_generic_I(char *s)
 
 	if (g_psv.state == ss_loading)
 	{
-		for (int i = 0; i < 512; i++)
+		for (int i = 0; i < HL_GENERIC_MAX; i++)
 		{
 			if (!g_psv.generic_precache[i])
 			{
+#ifdef REHLDS_FIXES
+				// For more information, see EV_Precache
+				g_psv.generic_precache[i] = ED_NewString(s);
+#else
 				g_psv.generic_precache[i] = s;
+#endif // REHLDS_FIXES
 				return i;
 			}
 
@@ -1456,11 +1503,11 @@ int PF_precache_generic_I(char *s)
 		Host_Error(
 			"PF_precache_generic_I: Generic item '%s' failed to precache because the item count is over the %d limit.\nReduce the number of brush models and/or regular models in the map to correct this.",
 			s,
-			512);
+			HL_GENERIC_MAX);
 	}
 	else
 	{
-		for (int i = 0; i < 512; i++)
+		for (int i = 0; i < HL_GENERIC_MAX; i++)
 		{
 			if (!Q_stricmp(g_psv.generic_precache[i], s))
 				return i;
@@ -1529,13 +1576,13 @@ char *PF_GetInfoKeyBuffer_I(edict_t *e)
 }
 
 /* <79b55> ../engine/pr_cmds.c:2012 */
-char *PF_InfoKeyValue_I(char *infobuffer, char *key)
+char *PF_InfoKeyValue_I(char *infobuffer, const char *key)
 {
 	return (char *)Info_ValueForKey(infobuffer, key);
 }
 
 /* <79b91> ../engine/pr_cmds.c:2022 */
-void PF_SetKeyValue_I(char *infobuffer, char *key, char *value)
+void PF_SetKeyValue_I(char *infobuffer, const char *key, const char *value)
 {
 	if (infobuffer == localinfo)
 	{
@@ -1562,7 +1609,7 @@ void PF_RemoveKey_I(char *s, const char *key)
 }
 
 /* <79c0f> ../engine/pr_cmds.c:2047 */
-void PF_SetClientKeyValue_I(int clientIndex, char *infobuffer, char *key, char *value)
+void PF_SetClientKeyValue_I(int clientIndex, char *infobuffer, const char *key, const char *value)
 {
 	client_t *pClient;
 
@@ -1932,10 +1979,10 @@ edict_t *PF_CreateFakeClient_I(const char *netname)
 	ent->v.pContainingEntity = ent;
 	ent->v.flags = FL_FAKECLIENT | FL_CLIENT;
 
-	Info_SetValueForKey(fakeclient->userinfo, "name", netname, 256);
-	Info_SetValueForKey(fakeclient->userinfo, "model", "gordon", 256);
-	Info_SetValueForKey(fakeclient->userinfo, "topcolor", "1", 256);
-	Info_SetValueForKey(fakeclient->userinfo, "bottomcolor", "1", 256);
+	Info_SetValueForKey(fakeclient->userinfo, "name", netname, MAX_INFO_STRING);
+	Info_SetValueForKey(fakeclient->userinfo, "model", "gordon", MAX_INFO_STRING);
+	Info_SetValueForKey(fakeclient->userinfo, "topcolor", "1", MAX_INFO_STRING);
+	Info_SetValueForKey(fakeclient->userinfo, "bottomcolor", "1", MAX_INFO_STRING);
 	fakeclient->sendinfo = 1;
 	SV_ExtractFromUserinfo(fakeclient);
 
@@ -2277,7 +2324,7 @@ void PF_setspawnparms_I(edict_t *ent)
 }
 
 /* <7a539> ../engine/pr_cmds.c:2956 */
-void PF_changelevel_I(char *s1, char *s2)
+void PF_changelevel_I(const char *s1, const char *s2)
 {
 	static int last_spawncount;
 
@@ -2314,7 +2361,7 @@ void SeedRandomNumberGenerator(void)
 #define NDIV (1+(IM-1)/NTAB)
 
 /* <7a598> ../engine/pr_cmds.c:3003 */
-int32_t ran1(void)
+int32 ran1(void)
 {
 	int j;
 	long k;
@@ -2368,7 +2415,7 @@ float RandomFloat(float flLow, float flHigh)
 }
 
 /* <7a6b2> ../engine/pr_cmds.c:3056 */
-int32_t RandomLong(int32_t lLow, int32_t lHigh)
+int32 RandomLong(int32 lLow, int32 lHigh)
 {
 #ifndef SWDS
 	g_engdstAddrs.pfnRandomLong(&lLow, &lHigh);
@@ -2414,10 +2461,10 @@ void PF_FadeVolume(const edict_t *clientent, int fadePercent, int fadeOutSeconds
 		return;
 
 	MSG_WriteChar(&client->netchan.message, svc_soundfade);
-	MSG_WriteByte(&client->netchan.message, (uint8_t)fadePercent);
-	MSG_WriteByte(&client->netchan.message, (uint8_t)holdTime);
-	MSG_WriteByte(&client->netchan.message, (uint8_t)fadeOutSeconds);
-	MSG_WriteByte(&client->netchan.message, (uint8_t)fadeInSeconds);
+	MSG_WriteByte(&client->netchan.message, (uint8)fadePercent);
+	MSG_WriteByte(&client->netchan.message, (uint8)holdTime);
+	MSG_WriteByte(&client->netchan.message, (uint8)fadeOutSeconds);
+	MSG_WriteByte(&client->netchan.message, (uint8)fadeInSeconds);
 }
 
 /* <7a7a1> ../engine/pr_cmds.c:3124 */
@@ -2593,7 +2640,7 @@ int PF_CreateInstancedBaseline(int classname, struct entity_state_s *baseline)
 }
 
 /* <7abdb> ../engine/pr_cmds.c:3332 */
-void PF_Cvar_DirectSet(struct cvar_s *var, char *value)
+void PF_Cvar_DirectSet(struct cvar_s *var, const char *value)
 {
 	Cvar_DirectSet(var, value);
 }

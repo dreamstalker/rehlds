@@ -79,11 +79,8 @@ int W_LoadWadFile(char *filename)
 	Q_strncpy(wad->wadname, filename, sizeof(wad->wadname) - 1);
 	wadinfo_t *header = (wadinfo_t *)wad->wad_base;
 	wad->wadname[sizeof(wad->wadname) - 1] = 0;
-	wad->loaded = 1;
-	if (header->identification[0] != 'W'
-		|| header->identification[1] != 'A'
-		|| header->identification[2] != 'D'
-		|| header->identification[3] != '3')
+	wad->loaded = TRUE;
+	if (*(uint32 *)header->identification != MAKEID('W', 'A', 'D', '3'))
 		Sys_Error("Wad file %s doesn't have WAD3 id\n", filename);
 	wad->wad_numlumps = LittleLong(header->numlumps);
 

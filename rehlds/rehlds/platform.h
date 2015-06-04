@@ -10,9 +10,9 @@ typedef int(__stdcall *setsockopt_proto)(SOCKET s, int level, int optname, const
 
 class IReHLDSPlatform {
 public:
-	virtual uint32_t time(uint32_t* pTime) = 0;
-	virtual struct tm* localtime(uint32_t time) = 0;
-	virtual void srand(uint32_t seed) = 0;
+	virtual uint32 time(uint32* pTime) = 0;
+	virtual struct tm* localtime(uint32 time) = 0;
+	virtual void srand(uint32 seed) = 0;
 	virtual int rand() = 0;
 
 #ifdef _WIN32
@@ -65,9 +65,9 @@ private:
 public:
 	CSimplePlatform();
 
-	virtual uint32_t time(uint32_t* pTime);
-	virtual struct tm* localtime(uint32_t time);
-	virtual void srand(uint32_t seed);
+	virtual uint32 time(uint32* pTime);
+	virtual struct tm* localtime(uint32 time);
+	virtual void srand(uint32 seed);
 	virtual int rand();
 
 #ifdef _WIN32
