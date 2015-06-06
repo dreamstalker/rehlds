@@ -48,5 +48,5 @@ project.version = versionInfo.asMavenVersion()
 apply from: 'publish.gradle'
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.4-rc-2'
+    gradleVersion = '2.4'
 }
