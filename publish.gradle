@@ -120,6 +120,7 @@ publishing {
 }
 
 Properties repoCreds = new Properties()
+project.ext.repoCreds = repoCreds
 if (file('repo_creds.properties').exists()) {
     println 'Loading maven repo credentials'
     file('repo_creds.properties').withReader('UTF-8', { Reader r ->
@@ -147,5 +148,6 @@ task doPublish {
     dependsOn 'publishPackage'
     if (repoCreds.getProperty('username') && repoCreds.getProperty('password')) {
         dependsOn 'publish'
+        dependsOn ':flightrec/decoder_api:publish'
     }
 }

@@ -1,6 +1,7 @@
 apply plugin: 'java'
 
 group = 'org.rehlds.flightrec'
+version = rootProject.version
 
 sourceCompatibility = '1.7'
 targetCompatibility = '1.7'
