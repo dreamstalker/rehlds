@@ -454,7 +454,7 @@ void *PvAllocEntPrivateData(edict_t *pEdict, int32 cb)
 
 #ifdef REHLDS_FLIGHT_REC
 	if (rehlds_flrec_pvdata.string[0] != '0') {
-		FR_AllocEntPrivateData(pEdict->pvPrivateData);
+		FR_AllocEntPrivateData(pEdict->pvPrivateData, cb);
 	}
 #endif //REHLDS_FLIGHT_REC
 

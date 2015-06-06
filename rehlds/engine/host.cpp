@@ -883,6 +883,8 @@ void Host_CheckConnectionFailure(void)
 /* <364fd> ../engine/host.c:1350 */
 void _Host_Frame(float time)
 {
+	
+
 	static double host_times[6];
 	if (setjmp(host_enddemo))
 		return;
@@ -892,8 +894,9 @@ void _Host_Frame(float time)
 		return;
 
 #ifdef REHLDS_FLIGHT_REC
+	static long frameCounter = 0;
 	if (rehlds_flrec_frame.string[0] != '0') {
-		FR_StartFrame();
+		FR_StartFrame(frameCounter);
 	}
 #endif //REHLDS_FLIGHT_REC
 
@@ -957,8 +960,9 @@ void _Host_Frame(float time)
 
 #ifdef REHLDS_FLIGHT_REC
 	if (rehlds_flrec_frame.string[0] != '0') {
-		FR_EndFrame();
+		FR_EndFrame(frameCounter);
 	}
+	frameCounter++;
 #endif //REHLDS_FLIGHT_REC
 }
 

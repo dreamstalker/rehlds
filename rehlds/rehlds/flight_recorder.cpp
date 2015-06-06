@@ -54,28 +54,31 @@ void FR_Rehlds_Init() {
 	Cvar_RegisterVariable(&rehlds_flrec_pvdata);
 	Cmd_AddCommand("rehlds_flrec_dump", &FR_Dump_f);
 
-	g_FRMsg_Frame = g_FlightRecorder->RegisterMessage("rehlds", "Frame", 1, true);
+	g_FRMsg_Frame = g_FlightRecorder->RegisterMessage("rehlds", "Frame", 2, true);
 	g_FRMsg_FreeEntPrivateData = g_FlightRecorder->RegisterMessage("rehlds", "FreeEntPrivateData", 1, false);
-	g_FRMsg_AllocEntPrivateData = g_FlightRecorder->RegisterMessage("rehlds", "AllocEntPrivateData", 1, false);
+	g_FRMsg_AllocEntPrivateData = g_FlightRecorder->RegisterMessage("rehlds", "AllocEntPrivateData", 2, false);
 }
 
-void FR_StartFrame() {
+void FR_StartFrame(long frameCounter) {
 	FR_CheckInit();
 	g_FlightRecorder->StartMessage(g_FRMsg_Frame, true);
+	g_FlightRecorder->WriteInt64(frameCounter);
 	g_FlightRecorder->WriteDouble(realtime);
 	g_FlightRecorder->EndMessage(g_FRMsg_Frame, true);
 }
 
-void FR_EndFrame() {
+void FR_EndFrame(long frameCounter) {
 	FR_CheckInit();
 	g_FlightRecorder->StartMessage(g_FRMsg_Frame, false);
+	g_FlightRecorder->WriteInt64(frameCounter);
 	g_FlightRecorder->EndMessage(g_FRMsg_Frame, false);
 }
 
-void FR_AllocEntPrivateData(void* res) {
+void FR_AllocEntPrivateData(void* res, int size) {
 	FR_CheckInit();
 	g_FlightRecorder->StartMessage(g_FRMsg_AllocEntPrivateData, true);
 	g_FlightRecorder->WriteUInt32((size_t)res);
+	g_FlightRecorder->WriteInt32(size);
 	g_FlightRecorder->EndMessage(g_FRMsg_AllocEntPrivateData, true);
 }
 

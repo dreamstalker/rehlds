@@ -36,6 +36,11 @@ public:
 
 private:
 
+	enum meta_record_type_t {
+		MRT_MESSAGE_DEF = 1,
+		MRT_SHUNT = 2,
+	};
+
 #pragma pack(push, 1)
 	struct recorder_state {
 		unsigned int wpos;

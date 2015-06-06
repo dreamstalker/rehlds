@@ -59,15 +59,19 @@ CRehldsFlightRecorder::CRehldsFlightRecorder() {
 
 void CRehldsFlightRecorder::InitHeadersContent() {
 	m_pMetaHeader->version = FLIGHT_RECORDER_VERSION;
+	m_pMetaHeader->regionSize = META_REGION_SIZE;
 	m_pMetaHeader->metaRegionPos = 0;
 	m_pMetaHeader->numMessages = 0;
+	m_pMetaHeader->headerCrc32 = crc32c_t(0, m_MetaRegion, ((uint8*)m_pMetaHeader - m_MetaRegion) + offsetof(meta_header, headerCrc32));
 
 	m_pRecorderState->wpos = 0;
 	m_pRecorderState->lastMsgBeginPos = 0xFFFFFFFF;
 	m_pRecorderState->curMessage = 0;
 
 	m_pDataHeader->version = FLIGHT_RECORDER_VERSION;
+	m_pDataHeader->regionSize = DATA_REGION_SIZE;
 	m_pDataHeader->prevItrLastPos = 0xFFFFFFFF;
+	m_pDataHeader->headerCrc32 = crc32c_t(0, m_DataRegion, ((uint8*)m_pDataHeader - m_DataRegion) + offsetof(data_header, headerCrc32));
 }
 
 void CRehldsFlightRecorder::MoveToStart() {
@@ -206,10 +210,11 @@ uint16 CRehldsFlightRecorder::RegisterMessage(const char* module, const char *me
 	sizebuf_t sb;
 	sb.buffername = "FlightRecorded Meta";
 	sb.cursize = m_pMetaHeader->metaRegionPos;
-	sb.maxsize = META_REGION_MAIN_SIZE;
+	sb.maxsize = META_REGION_MAIN_SIZE - META_REGION_HEADER;
 	sb.flags = 0;
 	sb.data = m_MetaRegionPtr;
 
+	MSG_WriteByte(&sb, MRT_MESSAGE_DEF);
 	MSG_WriteShort(&sb, msgId);
 	MSG_WriteString(&sb, module);
 	MSG_WriteString(&sb, message);

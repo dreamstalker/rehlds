@@ -36,9 +36,9 @@ extern void FR_Dump_f();
 extern void FR_Rehlds_Init();
 
 
-extern void FR_StartFrame();
-extern void FR_EndFrame();
+extern void FR_StartFrame(long frameCounter);
+extern void FR_EndFrame(long frameCounter);
 extern void FR_FreeEntPrivateData(void* data);
-extern void FR_AllocEntPrivateData(void* res);
+extern void FR_AllocEntPrivateData(void* res, int size);
 
 #endif //REHLDS_FLIGHT_REC
