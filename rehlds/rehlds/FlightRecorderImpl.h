@@ -36,6 +36,11 @@ public:
 
 private:
 
+	enum meta_record_type_t {
+		MRT_MESSAGE_DEF = 1,
+		MRT_SHUNT = 2,
+	};
+
 #pragma pack(push, 1)
 	struct recorder_state {
 		unsigned int wpos;
@@ -45,15 +50,22 @@ private:
 
 	struct meta_header {
 		unsigned int version;
+		unsigned int regionSize;
+		unsigned int headerCrc32;
 		unsigned int numMessages;
 		unsigned int metaRegionPos;
 	};
 
 	struct data_header {
 		unsigned int version;
+		unsigned int regionSize;
+		unsigned int headerCrc32;
 		unsigned int prevItrLastPos;
 	};
 #pragma pack(pop)
+
+	uint8* m_MetaRegion;
+	uint8* m_DataRegion;
 
 	uint8* m_MetaRegionPtr;
 	uint8* m_DataRegionPtr;
@@ -84,6 +96,7 @@ private:
 
 public:
 	CRehldsFlightRecorder();
+	void dump(const char* fname);
 
 	virtual void StartMessage(uint16 msg, bool entrance);
 	virtual void EndMessage(uint16 msg, bool entrance);

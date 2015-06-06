@@ -452,7 +452,11 @@ void *PvAllocEntPrivateData(edict_t *pEdict, int32 cb)
 
 	pEdict->pvPrivateData = Mem_Calloc(1, cb);
 
-	FR_AllocEntPrivateData(pEdict->pvPrivateData);
+#ifdef REHLDS_FLIGHT_REC
+	if (rehlds_flrec_pvdata.string[0] != '0') {
+		FR_AllocEntPrivateData(pEdict->pvPrivateData, cb);
+	}
+#endif //REHLDS_FLIGHT_REC
 
 	return pEdict->pvPrivateData;
 }
@@ -478,7 +482,11 @@ void FreeEntPrivateData(edict_t *pEdict)
 			gNewDLLFunctions.pfnOnFreeEntPrivateData(pEdict);
 		}
 
-		FR_FreeEntPrivateData(pEdict->pvPrivateData);
+#ifdef REHLDS_FLIGHT_REC
+		if (rehlds_flrec_pvdata.string[0] != '0') {
+			FR_FreeEntPrivateData(pEdict->pvPrivateData);
+		}
+#endif //REHLDS_FLIGHT_REC
 
 		Mem_Free(pEdict->pvPrivateData);
 		pEdict->pvPrivateData = 0;

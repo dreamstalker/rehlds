@@ -1,13 +1,13 @@
 #pragma once
 
 #include "archtypes.h"
-#include "crc32.h"
+#include "crc32c.h"
 
 template<typename T_KEY, typename T_VAL, unsigned int ASSOC_2N, unsigned int MAX_VALS>
 class CStaticMap {
 protected:
 	virtual uint32 hash(const T_KEY& val) {
-		return crc32((const unsigned char*)&val, sizeof(T_KEY));
+		return crc32c((const unsigned char*)&val, sizeof(T_KEY));
 	}
 
 	virtual bool equals(const T_KEY& val1, const T_KEY& val2) {
@@ -207,7 +207,7 @@ template<typename T_VAL, unsigned int ASSOC_2N, unsigned int MAX_VALS>
 class CStringKeyStaticMap : public CStaticMap<const char*, T_VAL, ASSOC_2N, MAX_VALS> {
 protected:
 	virtual uint32 hash(const char* const &val) {
-		return crc32((const unsigned char*)val, strlen(val));
+		return crc32c((const unsigned char*)val, strlen(val));
 	}
 
 	virtual bool equals(const char* const &val1, const char* const &val2) {
@@ -232,7 +232,7 @@ protected:
 				if (cc >= 'A' || cc <= 'Z') {
 					cc |= 0x20;
 				}
-				cksum = crc32_t8_sse(cksum, cc);
+				cksum = crc32c_t8_sse(cksum, cc);
 			}
 		} else {
 			while (*pcc) {
@@ -240,7 +240,7 @@ protected:
 				if (cc >= 'A' || cc <= 'Z') {
 					cc |= 0x20;
 				}
-				cksum = crc32_t8_nosse(cksum, cc);
+				cksum = crc32c_t8_nosse(cksum, cc);
 			}
 		}
 		return cksum;

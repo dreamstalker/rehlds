@@ -883,6 +883,8 @@ void Host_CheckConnectionFailure(void)
 /* <364fd> ../engine/host.c:1350 */
 void _Host_Frame(float time)
 {
+	
+
 	static double host_times[6];
 	if (setjmp(host_enddemo))
 		return;
@@ -891,7 +893,12 @@ void _Host_Frame(float time)
 	if (!Host_FilterTime(time))
 		return;
 
-	FR_StartFrame();
+#ifdef REHLDS_FLIGHT_REC
+	static long frameCounter = 0;
+	if (rehlds_flrec_frame.string[0] != '0') {
+		FR_StartFrame(frameCounter);
+	}
+#endif //REHLDS_FLIGHT_REC
 
 	//SystemWrapper_RunFrame(host_frametime);
 
@@ -951,7 +958,12 @@ void _Host_Frame(float time)
 		Host_Quit_f();
 	}
 
-	FR_EndFrame();
+#ifdef REHLDS_FLIGHT_REC
+	if (rehlds_flrec_frame.string[0] != '0') {
+		FR_EndFrame(frameCounter);
+	}
+	frameCounter++;
+#endif //REHLDS_FLIGHT_REC
 }
 
 /* <36628> ../engine/host.c:1501 */
@@ -1136,12 +1148,17 @@ int Host_Init(quakeparms_t *parms)
 	Ed_StrPool_Init();
 #endif //REHLDS_FIXES
 
-	FR_Init();
+	FR_Init(); //don't put it under REHLDS_FLIGHT_REC to allow recording via Rehlds API
 
 	Cbuf_Init();
 	Cmd_Init();
 	Cvar_Init();
 	Cvar_CmdInit();
+
+#ifdef REHLDS_FLIGHT_REC
+	FR_Rehlds_Init();
+#endif //REHLDS_FLIGHT_REC
+
 	V_Init();
 	Chase_Init();
 	COM_Init(parms->basedir);
