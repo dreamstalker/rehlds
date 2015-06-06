@@ -156,7 +156,7 @@ void setupToolchain(NativeBinarySpec b) {
         ])
         cfg.compilerOptions.args '-Qoption,cpp,--treat_func_as_string_literal_cpp'
         cfg.projectLibpath(project, '/lib/linux32')
-        cfg.extraLibs 'dl', 'm', 'stdc++', 'steam_api'
+        cfg.extraLibs 'dl', 'm', 'steam_api'
     }
 
     if (!unitTestExecutable && !swdsLib) {
