@@ -280,7 +280,7 @@ int SV_FlyMove(edict_t *ent, float time, trace_t *steptrace)
 		{
 			blocked |= 2u;
 			if (steptrace)
-				memcpy(steptrace, &trace, 0x38u);
+				Q_memcpy(steptrace, &trace, 0x38u);
 		}
 
 		SV_Impact(ent, trace.ent, &trace);

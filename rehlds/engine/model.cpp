@@ -282,10 +282,10 @@ model_t *Mod_LoadModel(model_t *mod, qboolean crash, qboolean trackCRC)
 		while (*(p++) == '/')
 			;
 
-		strncpy(tmpName, p, sizeof(tmpName) - 1);
+		Q_strncpy(tmpName, p, sizeof(tmpName) - 1);
 		tmpName[sizeof(tmpName) - 1] = '\0';
 
-		strncpy(mod->name, tmpName, sizeof(mod->name) - 1);
+		Q_strncpy(mod->name, tmpName, sizeof(mod->name) - 1);
 		mod->name[sizeof(mod->name) - 1] = '\0';
 	}
 
@@ -652,7 +652,7 @@ void Mod_LoadVisibility(lump_t *l)
 		return;
 	}
 	loadmodel->visdata = (byte*) Hunk_AllocName(l->filelen, loadname);
-	memcpy(loadmodel->visdata, mod_base + l->fileofs, l->filelen);
+	Q_memcpy(loadmodel->visdata, mod_base + l->fileofs, l->filelen);
 }
 
 /* <513a6> ../engine/model.c:913 */

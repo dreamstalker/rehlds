@@ -83,8 +83,8 @@
 #define MAX_STREAMS		2
 
 // Flow control bytes per second limits
-#define MAX_RATE		20000
-#define MIN_RATE		1000
+#define MAX_RATE		100000.0f
+#define MIN_RATE		1000.0f
 
 // Default data rate
 #define DEFAULT_RATE	(9999.0f)
@@ -237,7 +237,12 @@ typedef struct flow_s
 
 // Size of fragmentation buffer internal buffers
 #define FRAGMENT_SIZE 1400
+
+#ifndef REHLDS_FIXES
 #define MAX_FRAGMENTS 25000
+#else
+#define MAX_FRAGMENTS ((65536 + FRAGMENT_SIZE - 1) / FRAGMENT_SIZE) // should be enough for any send buf
+#endif
 
 #define UDP_HEADER_SIZE 28
 #define MAX_RELIABLE_PAYLOAD 1200

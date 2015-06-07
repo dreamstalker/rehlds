@@ -57,7 +57,7 @@ int CServerRemoteAccess::ReadDataResponse_noVirt(void *data, int len)
 		bytesToCopy = 0;
 
 	if (bytesToCopy)
-		memcpy(data, response.Base(), bytesToCopy);
+		Q_memcpy(data, response.Base(), bytesToCopy);
 
 	m_iBytesSent += bytesToCopy;
 
@@ -150,7 +150,7 @@ void CServerRemoteAccess::GetMapList(CUtlBuffer &value)
 	char mapName[MAX_PATH];
 	char mapwild[64];
 
-	strcpy(mapwild, "maps/*.bsp");
+	Q_strcpy(mapwild, "maps/*.bsp");
 	for (findfn = Sys_FindFirst(mapwild, 0); findfn; findfn = Sys_FindNext(0))
 	{
 		_snprintf(curDir, MAX_PATH, "maps/%s", findfn);

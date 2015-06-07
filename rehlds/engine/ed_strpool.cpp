@@ -20,7 +20,7 @@ CStringPoolMap g_EdStringPool;
 sizebuf_t g_EdStringPool_Hunk;
 
 void Ed_StrPool_Init() {
-	memset(&g_EdStringPool_Hunk, 0, sizeof(g_EdStringPool_Hunk));
+	Q_memset(&g_EdStringPool_Hunk, 0, sizeof(g_EdStringPool_Hunk));
 
 	g_EdStringPool_Hunk.maxsize = 128 * 1024;
 	g_EdStringPool_Hunk.data = (byte*) Hunk_AllocName(g_EdStringPool_Hunk.maxsize, "Ed_StrPool");
@@ -43,7 +43,7 @@ char* Ed_StrPool_Alloc(const char* origStr) {
 		Sys_Error(__FUNCTION__ ": Too long string allocated: %s", origStr);
 	}
 
-	strcpy(str, origStr);
+	Q_strcpy(str, origStr);
 	char* new_p = str;
 	for (unsigned int i = 0; i < len; i++, new_p++)
 	{
@@ -80,7 +80,7 @@ char* Ed_StrPool_Alloc(const char* origStr) {
 
 	if (!val) {
 		val = (char*) Hunk_Alloc(len);
-		memcpy(val, str, len);
+		Q_memcpy(val, str, len);
 	}
 
 	g_EdStringPool.put(val, val);

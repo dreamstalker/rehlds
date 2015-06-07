@@ -1063,7 +1063,7 @@ void Host_Version(void)
 
 	Q_strcpy(gpszVersionString, "1.0.1.4");
 	Q_strcpy(gpszProductString, "valve");
-	strcpy(szFileName, "steam.inf");
+	Q_strcpy(szFileName, "steam.inf");
 	FileHandle_t fp = FS_Open(szFileName, "r");
 	if (fp)
 	{
@@ -1128,7 +1128,7 @@ int Host_Init(quakeparms_t *parms)
 
 	CRehldsPlatformHolder::get()->srand(CRehldsPlatformHolder::get()->time(NULL));
 
-	memcpy(&host_parms, parms, sizeof(host_parms));
+	Q_memcpy(&host_parms, parms, sizeof(host_parms));
 	com_argc = parms->argc;
 	com_argv = parms->argv;
 	realtime = 0;

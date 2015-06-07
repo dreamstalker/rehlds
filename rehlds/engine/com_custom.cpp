@@ -95,7 +95,7 @@ qboolean COM_CreateCustomization(customization_t *pListHead, resource_t *pResour
 		*pCustomization = 0;
 	pCust = (customization_t *)Mem_ZeroMalloc(sizeof(customization_t));
 
-	memcpy(&pCust->resource, pResource, sizeof(pCust->resource));
+	Q_memcpy(&pCust->resource, pResource, sizeof(pCust->resource));
 	if (pResource->nDownloadSize <= 0)
 	{
 		bError = 1;

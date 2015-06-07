@@ -431,7 +431,7 @@ void SV_CopyEdictToPhysent(physent_t *pe, int e, edict_t *check)
 			}
 			else
 			{
-				sprintf(pe->name, "?");
+				Q_sprintf(pe->name, "?");
 			}
 		}
 		else
@@ -577,7 +577,7 @@ void SV_AddLinksToPM_(areanode_t *node, float *pmove_mins, float *pmove_maxs)
 			pe = &pmove->moveents[pmove->nummoveent++];
 		}
 		
-		memcpy(pe, ve, sizeof(physent_t));
+		Q_memcpy(pe, ve, sizeof(physent_t));
 	}
 
 	if (node->axis != -1)
@@ -838,7 +838,7 @@ void SV_RunCmd(usercmd_t *ucmd, int random_seed)
 	pmove->friction = sv_player->v.friction;
 	pmove->spectator = 0;
 	pmove->waterjumptime = sv_player->v.teleport_time;
-	memcpy(&pmove->cmd, &cmd, sizeof(pmove->cmd));
+	Q_memcpy(&pmove->cmd, &cmd, sizeof(pmove->cmd));
 	pmove->dead = sv_player->v.health <= 0.0;
 	pmove->movetype = sv_player->v.movetype;
 	pmove->flags = sv_player->v.flags;

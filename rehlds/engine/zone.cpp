@@ -404,7 +404,7 @@ NOXREF void Hunk_Print(qboolean all)
 		//
 		// print the single block
 		//
-		memcpy(name, h->name, HUNK_NAME_LEN);
+		Q_memcpy(name, h->name, HUNK_NAME_LEN);
 		if (all)
 			Con_Printf("%8p :%8i %8s\n", h, h->size, name);
 
@@ -412,7 +412,7 @@ NOXREF void Hunk_Print(qboolean all)
 		// print the total
 		//
 		if (next == endlow || next == endhigh ||
-			strncmp(h->name, next->name, HUNK_NAME_LEN))
+			Q_strncmp(h->name, next->name, HUNK_NAME_LEN))
 		{
 			if (!all)
 				Con_Printf("          :%8i %8s (TOTAL)\n", sum, name);
@@ -906,13 +906,13 @@ NOXREF char *CommatizeNumber(int num, char *pout)
 	int len = 0;
 	int i;
 	char outbuf[50];
-	memset(outbuf, 0, 50);
+	Q_memset(outbuf, 0, 50);
 	while (num)
 	{
 		char tempbuf[50];
 		int temp = num % 1000;
 		num = num / 1000;
-		strcpy(tempbuf, outbuf);
+		Q_strcpy(tempbuf, outbuf);
 
 		Q_snprintf(outbuf, sizeof(outbuf), ",%03i%s", temp, tempbuf);
 	}
@@ -924,9 +924,9 @@ NOXREF char *CommatizeNumber(int num, char *pout)
 			break;
 
 	if (i == len)
-		strcpy(pout, "0");
+		Q_strcpy(pout, "0");
 	else
-		strcpy(pout, &outbuf[i]);	//copy from i to get rid of the first comma and leading zeros
+		Q_strcpy(pout, &outbuf[i]);	//copy from i to get rid of the first comma and leading zeros
 
 	return pout;
 }

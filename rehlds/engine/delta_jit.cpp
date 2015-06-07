@@ -65,7 +65,7 @@ void DELTAJIT_CreateDescription(delta_t* delta, deltajitdata_t &jitdesc) {
 		return;
 	}
 
-	memset(&jitdesc, 0, sizeof(jitdesc));
+	Q_memset(&jitdesc, 0, sizeof(jitdesc));
 	jitdesc.numblocks = numMemBlocks;
 	jitdesc.numFields = delta->fieldCount;
 

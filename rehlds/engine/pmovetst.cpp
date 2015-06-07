@@ -288,7 +288,7 @@ int _PM_TestPlayerPosition(vec_t *pos, pmtrace_t *ptrace, int(*pfnIgnore)(physen
 
 	tr = PM_PlayerTrace(pmove->origin, pmove->origin, 0, -1);
 	if (ptrace)
-		memcpy(ptrace, &tr, sizeof(tr));
+		Q_memcpy(ptrace, &tr, sizeof(tr));
 
 	for (int i = 0; i < pmove->numphysent; i++)
 	{
@@ -527,7 +527,7 @@ pmtrace_t _PM_PlayerTrace(vec_t *start, vec_t *end, int traceFlags, int numphyse
 					if (j == 0 || testtrace.allsolid || testtrace.startsolid || testtrace.fraction < total.fraction)
 					{
 						bool remember = (total.startsolid == 0);
-						memcpy(&total, &testtrace, sizeof(total));
+						Q_memcpy(&total, &testtrace, sizeof(total));
 						if (!remember)
 							total.startsolid = 1;
 						closest = j;
@@ -563,7 +563,7 @@ pmtrace_t _PM_PlayerTrace(vec_t *start, vec_t *end, int traceFlags, int numphyse
 
 		if (total.fraction < trace.fraction)
 		{
-			memcpy(&trace, &total, sizeof(trace));
+			Q_memcpy(&trace, &total, sizeof(trace));
 			trace.ent = i;
 		}
 	}

@@ -505,7 +505,7 @@ NOXREF void Sys_Warning(const char *pszWarning, ...)
 	char text[1024];
 
 	va_start(argptr, pszWarning);
-	vsnprintf(text, sizeof(text), pszWarning, argptr);
+	Q_vsnprintf(text, sizeof(text), pszWarning, argptr);
 	va_end(argptr);
 
 	Sys_Printf(text);
@@ -1084,7 +1084,7 @@ void LoadThisDll(const char *szDllFilename)
 	}
 
 	pextdll = &g_rgextdll[g_iextdllMac++];
-	memset(pextdll, 0, sizeof(*pextdll));
+	Q_memset(pextdll, 0, sizeof(*pextdll));
 	pextdll->lDLLHandle = hDLL;
 	return;
 

@@ -1113,7 +1113,7 @@ void SV_SingleClipMoveToEntity(edict_t *ent, const vec_t *start, const vec_t *mi
 			if (i == 0 || testtrace.allsolid || testtrace.startsolid || testtrace.fraction < trace->fraction)
 			{
 				int isSolid = trace->startsolid;
-				memcpy(trace, &testtrace, sizeof(trace_t));
+				Q_memcpy(trace, &testtrace, sizeof(trace_t));
 				if (isSolid)
 					trace->startsolid = TRUE;
 				closest = i;

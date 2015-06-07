@@ -341,13 +341,13 @@ void FS_Rename(const char *originalName, const char *newName)
 
 	if (FS_GetLocalPath(originalName, localPath, 512))
 	{
-		strcpy(newPath, localPath);
+		Q_strcpy(newPath, localPath);
 		cut = strstr(newPath, originalName);
 
 		if (cut)
 		{
 			*cut = 0;
-			strcat(newPath, newName);
+			Q_strcat(newPath, newName);
 			rename(localPath, newPath);
 		}
 	}

@@ -119,6 +119,7 @@ extern int loadsize;
 
 #define Q_memset memset
 #define Q_memcpy memcpy
+#define Q_memmove memmove
 #define Q_strlen strlen
 #define Q_memcmp memcmp
 #define Q_strcpy strcpy

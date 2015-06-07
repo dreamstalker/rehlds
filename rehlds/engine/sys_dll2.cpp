@@ -207,7 +207,7 @@ NOXREF void Sys_CheckOSVersion(void)
 {
 	struct _OSVERSIONINFOA verInfo;
 
-	memset(&verInfo, 0, sizeof(verInfo));
+	Q_memset(&verInfo, 0, sizeof(verInfo));
 	verInfo.dwOSVersionInfoSize = sizeof(verInfo);
 	if (!GetVersionExA(&verInfo))
 		Sys_Error("Couldn't get OS info");
@@ -500,7 +500,7 @@ int Sys_InitGame(char *lpOrgCmdLine, char *pBaseDir, void *pwnd, int bIsDedicate
 	}
 #endif // SWDS
 	g_bIsDedicatedServer = bIsDedicated;
-	memset(&gmodinfo, 0, sizeof(modinfo_t));
+	Q_memset(&gmodinfo, 0, sizeof(modinfo_t));
 	SV_ResetModInfo();
 	TraceInit("Sys_Init()", "Sys_Shutdown()", 0);
 
@@ -642,7 +642,7 @@ NOXREF int BuildMapCycleListHints(char **hints)
 		Con_Printf("Unable to allocate memory for map cycle hints list");
 		return 0;
 	}
-	strcpy(*hints, szMap);
+	Q_strcpy(*hints, szMap);
 	length = FS_Size(pFile);
 	if (length)
 	{
@@ -695,7 +695,7 @@ bool CDedicatedServerAPI::Init_noVirt(char *basedir, char *cmdline, CreateInterf
 	if (!dedicated_)
 		return false;
 
-	strcpy(this->m_OrigCmd, cmdline);
+	Q_strcpy(this->m_OrigCmd, cmdline);
 	if (!strstr(cmdline, "-nobreakpad"))
 	{
 		CRehldsPlatformHolder::get()->SteamAPI_UseBreakpadCrashHandler(va("%d", build_number()), "Aug  8 2013", "11:17:26", 0, 0, 0);
