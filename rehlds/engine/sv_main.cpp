@@ -95,7 +95,7 @@ int numuserfilters;
 int sv_playermodel;
 
 //int player_datacounts[32];
-char outputbuf[1400];
+char outputbuf[MAX_ROUTEABLE_PACKET];
 
 redirect_t sv_redirected;
 netadr_t sv_redirectto;
@@ -1527,7 +1527,7 @@ void SV_New_f(void)
 {
 	int i;
 	client_t *client;
-	unsigned char data[65536];
+	unsigned char data[NET_MAX_PAYLOAD];
 	sizebuf_t msg;
 	edict_t *ent;
 	char szRejectReason[128];
@@ -1611,7 +1611,7 @@ void SV_New_f(void)
 /* <a7132> ../engine/sv_main.c:2057 */
 void SV_SendRes_f(void)
 {
-	unsigned char data[65536];
+	unsigned char data[NET_MAX_PAYLOAD];
 	sizebuf_t msg;
 
 	Q_memset(&msg, 0, sizeof(msg));
@@ -1636,7 +1636,7 @@ void SV_SendRes_f(void)
 /* <a8922> ../engine/sv_main.c:2096 */
 void SV_Spawn_f(void)
 {
-	unsigned char data[65536];
+	unsigned char data[NET_MAX_PAYLOAD];
 	sizebuf_t msg;
 
 	Q_memset(&msg, 0, sizeof(msg));
@@ -2778,7 +2778,7 @@ NOXREF void SVC_InfoString(void)
 	int count = 0;
 	int proxy = 0;
 	sizebuf_t buf;
-	unsigned char data[1400];
+	unsigned char data[MAX_ROUTEABLE_PACKET];
 	char address[256];
 	char gd[260];
 	char info[2048];
@@ -2891,7 +2891,7 @@ NOXREF void SVC_Info(qboolean bDetailed)
 	int i;
 	int count = 0;
 	sizebuf_t buf;
-	unsigned char data[1400];
+	unsigned char data[MAX_ROUTEABLE_PACKET];
 	char szModURL_Info[512];
 	char szModURL_DL[512];
 	int mod_version;
@@ -4551,7 +4551,7 @@ void SV_CleanupEnts(void)
 /* <a96d8> ../engine/sv_main.c:5999 */
 qboolean SV_SendClientDatagram(client_t *client)
 {
-	unsigned char buf[4000];
+	unsigned char buf[MAX_DATAGRAM];
 	sizebuf_t msg;
 
 	msg.buffername = "Client Datagram";
@@ -5361,7 +5361,7 @@ void SetCStrikeFlags(void)
 void SV_ActivateServer(int runPhysics)
 {
 	int i;
-	unsigned char data[65536];
+	unsigned char data[NET_MAX_PAYLOAD];
 	sizebuf_t msg;
 	client_t *cl;
 	UserMsg *pTemp;

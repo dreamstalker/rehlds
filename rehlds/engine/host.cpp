@@ -1088,7 +1088,7 @@ void Host_Version(void)
 					{
 						char szSteamVersionId[32];
 						FS_GetInterfaceVersion(szSteamVersionId, sizeof(szSteamVersionId) - 1);
-						_snprintf(gpszVersionString, sizeof(gpszVersionString), "%s/%s", &com_token[Q_strlen("PatchVersion=")], szSteamVersionId);
+						Q_snprintf(gpszVersionString, sizeof(gpszVersionString), "%s/%s", &com_token[Q_strlen("PatchVersion=")], szSteamVersionId);
 						gpszVersionString[sizeof(gpszVersionString) - 1] = 0;
 					}
 					++gotKeys;
@@ -1179,7 +1179,7 @@ int Host_Init(quakeparms_t *parms)
 
 
 
-	_snprintf(versionString, sizeof(versionString), "%s,%i,%i", gpszVersionString, PROTOCOL_VERSION, build_number());
+	Q_snprintf(versionString, sizeof(versionString), "%s,%i,%i", gpszVersionString, PROTOCOL_VERSION, build_number());
 	Cvar_Set("sv_version", versionString);
 	Con_DPrintf("%4.1f Mb heap\n", (double)parms->memsize / (1024.0f * 1024.0f));
 	R_InitTextures();

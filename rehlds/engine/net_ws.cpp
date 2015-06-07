@@ -49,8 +49,8 @@ qboolean noipx;
 
 int use_thread;
 
-unsigned char net_message_buffer[65536];
-unsigned char in_message_buf[65536];
+unsigned char net_message_buffer[NET_MAX_PAYLOAD];
+unsigned char in_message_buf[NET_MAX_PAYLOAD];
 sizebuf_t in_message;
 netadr_t in_from;
 
@@ -841,13 +841,13 @@ void NET_FlushSocket(netsrc_t sock)
 	struct sockaddr from;
 	socklen_t fromlen;
 	int net_socket;
-	unsigned char buf[4010];
+	unsigned char buf[MAX_UDP_PACKET];
 
 	net_socket = ip_sockets[sock];
 	if (net_socket)
 	{
 		fromlen = 16;
-		while (CRehldsPlatformHolder::get()->recvfrom(net_socket, (char*)buf, 4010, 0, &from, &fromlen) > 0)
+		while (CRehldsPlatformHolder::get()->recvfrom(net_socket, (char*)buf, sizeof buf, 0, &from, &fromlen) > 0)
 			;
 	}
 }
@@ -911,7 +911,7 @@ qboolean NET_GetLong(unsigned char *pData, int size, int *outSize)
 				);
 		}
 
-		if (SPLIT_SIZE * packetNumber + packetPayloadSize > 4010)
+		if (SPLIT_SIZE * packetNumber + packetPayloadSize > MAX_UDP_PACKET)
 		{
 			Con_Printf("Malformed packet size (%i, %i)\n", SPLIT_SIZE * packetNumber, packetPayloadSize);
 #ifdef REHLDS_FIXES
@@ -928,7 +928,7 @@ qboolean NET_GetLong(unsigned char *pData, int size, int *outSize)
 
 	if (packetCount > 0)
 	{
-		for (int i = 0; i < packetCount; i++)
+		for (unsigned int i = 0; i < packetCount; i++)
 		{
 			if (gNetSplitFlags[i] != gNetSplit.currentSequence)
 			{
@@ -947,7 +947,7 @@ qboolean NET_GetLong(unsigned char *pData, int size, int *outSize)
 	}
 
 	gNetSplit.currentSequence = -1;
-	if (gNetSplit.totalSize <= 4010)
+	if (gNetSplit.totalSize <= MAX_UDP_PACKET)
 	{
 		Q_memcpy(pData, gNetSplit.buffer, gNetSplit.totalSize);
 		*outSize = gNetSplit.totalSize;
@@ -972,7 +972,7 @@ qboolean NET_QueuePacket(netsrc_t sock)
 	int net_socket;                                               //  1026
 	int protocol;                                                 //  1027
 	int err;                                                      //  1028
-	unsigned char buf[4010];                                            //  1029
+	unsigned char buf[MAX_UDP_PACKET];                                            //  1029
 
 #ifdef _WIN32
 	for (protocol = 0; protocol < 2; protocol++)
@@ -991,7 +991,7 @@ qboolean NET_QueuePacket(netsrc_t sock)
 			continue;
 
 		fromlen = sizeof(from);
-		ret = CRehldsPlatformHolder::get()->recvfrom(net_socket, (char *)buf, 4010, 0, &from, &fromlen);
+		ret = CRehldsPlatformHolder::get()->recvfrom(net_socket, (char *)buf, sizeof buf, 0, &from, &fromlen);
 		if (ret == -1)
 		{
 #ifdef _WIN32
@@ -1021,13 +1021,13 @@ qboolean NET_QueuePacket(netsrc_t sock)
 			continue;
 		}
 		SockadrToNetadr(&from, &in_from);
-		if (ret != 4010)
+		if (ret != MAX_UDP_PACKET)
 			break;
 
 		Con_Printf("NET_QueuePacket:  Oversize packet from %s\n", NET_AdrToString(in_from));
 	}
 
-	if (ret == -1 || ret == 4010) {
+	if (ret == -1 || ret == MAX_UDP_PACKET) {
 		return NET_LagPacket(0, sock, 0, 0);
 	}
 

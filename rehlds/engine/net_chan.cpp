@@ -117,12 +117,13 @@ void Netchan_OutOfBandPrint(netsrc_t sock, netadr_t adr, char *format, ...)
 {
 	va_list argptr;
 	char string[8192];
+	size_t len;
 
 	va_start(argptr, format);
-	Q_vsnprintf(string, sizeof(string), format, argptr);
+	len = Q_vsnprintf(string, sizeof(string), format, argptr);
 	va_end(argptr);
 
-	Netchan_OutOfBand(sock, adr, Q_strlen(string) + 1, (byte *)string);
+	Netchan_OutOfBand(sock, adr, len + 1, (byte *)string);
 }
 
 /* <65776> ../engine/net_chan.c:196 */
@@ -417,7 +418,7 @@ void Netchan_Transmit(netchan_t *chan, int length, byte *data)
 					FileHandle_t hfile;
 					if (pbuf->iscompressed)
 					{
-						_snprintf(compressedfilename, sizeof(compressedfilename), "%s.ztmp", pbuf->filename);
+						Q_snprintf(compressedfilename, sizeof(compressedfilename), "%s.ztmp", pbuf->filename);
 						hfile = FS_Open(compressedfilename, "rb");
 					}
 					else
@@ -500,7 +501,7 @@ void Netchan_Transmit(netchan_t *chan, int length, byte *data)
 	}
 
 	// Is there room for the unreliable payload?
-	int max_send_size = 1400;
+	int max_send_size = MAX_ROUTEABLE_PACKET;
 	if (!send_resending)
 		max_send_size = sb_send.maxsize;
 
@@ -539,7 +540,7 @@ void Netchan_Transmit(netchan_t *chan, int length, byte *data)
 		NET_SendPacket(chan->sock, sb_send.cursize, sb_send.data, chan->remote_address);
 	}
 
-	if (g_psv.active && sv_lan.value != 0.0f && sv_lan_rate.value > 1000.0)
+	if (g_psv.active && sv_lan.value != 0.0f && sv_lan_rate.value > MIN_RATE)
 		fRate = 1.0 / sv_lan_rate.value;
 	else
 		fRate = 1.0 / chan->rate;
@@ -655,7 +656,7 @@ qboolean Netchan_Validate(netchan_t *chan, qboolean *frag_message, unsigned int 
 		if (FRAG_GETCOUNT(fragid[i]) > MAX_FRAGMENTS || FRAG_GETID(fragid[i]) > FRAG_GETCOUNT(fragid[i]))
 			return FALSE;
 
-		if ((size_t)frag_length[i] > FRAGMENT_SIZE || (size_t)frag_offset[i] > 65535)
+		if ((size_t)frag_length[i] > FRAGMENT_SIZE || (size_t)frag_offset[i] > NET_MAX_PAYLOAD - 1)
 			return FALSE;
 
 		int frag_end = frag_offset[i] + frag_length[i];
@@ -1208,7 +1209,7 @@ int Netchan_CreateFileFragments(qboolean server, netchan_t *chan, const char *fi
 	fragbufwaiting_t *p;
 	int send;
 	fragbuf_t *buf;
-	char compressedfilename[260];
+	char compressedfilename[MAX_PATH];
 	int firstfragment;
 	int bufferid;
 	int bCompressed;
@@ -1221,7 +1222,7 @@ int Netchan_CreateFileFragments(qboolean server, netchan_t *chan, const char *fi
 	bCompressed = FALSE;
 	chunksize = chan->pfnNetchan_Blocksize(chan->connection_status);
 
-	Q_snprintf(compressedfilename, 0x104u, "%s.ztmp", filename);
+	Q_snprintf(compressedfilename, sizeof compressedfilename, "%s.ztmp", filename);
 	compressedFileTime = FS_GetFileTime(compressedfilename);
 	if (compressedFileTime >= FS_GetFileTime(filename))
 	{

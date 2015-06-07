@@ -106,7 +106,7 @@ typedef struct LONGPACKET_t
 	int splitCount;
 	int totalSize;
 	// TODO: It should be NET_MAX_MESSAGE, but value differs
-	char buffer[4010];	// This has to be big enough to hold the largest message
+	char buffer[MAX_UDP_PACKET];	// This has to be big enough to hold the largest message
 } LONGPACKET;
 
 /* <d2ae9> ../engine/net_ws.c:900 */
@@ -212,8 +212,8 @@ extern cvar_t net_graph;
 extern cvar_t net_graphwidth;
 extern cvar_t net_scale;
 extern cvar_t net_graphpos;
-extern unsigned char net_message_buffer[65536];
-extern unsigned char in_message_buf[65536];
+extern unsigned char net_message_buffer[NET_MAX_PAYLOAD];
+extern unsigned char in_message_buf[NET_MAX_PAYLOAD];
 extern sizebuf_t in_message;
 extern netadr_t in_from;
 extern int ip_sockets[3];

@@ -94,13 +94,13 @@ const char* CServerRemoteAccess::LookupStringValue(const char *variable)
 				count++;
 		}
 
-		_snprintf(s_ReturnBuf, sizeof(s_ReturnBuf) - 1, "%d", count);
+		Q_snprintf(s_ReturnBuf, sizeof(s_ReturnBuf) - 1, "%d", count);
 		return s_ReturnBuf;
 	}
 
 	if (!Q_stricmp(variable, "maxplayers"))
 	{
-		_snprintf(s_ReturnBuf, sizeof(s_ReturnBuf) - 1, "%d", g_psvs.maxclients);
+		Q_snprintf(s_ReturnBuf, sizeof(s_ReturnBuf) - 1, "%d", g_psvs.maxclients);
 		return s_ReturnBuf;
 	}
 
@@ -153,7 +153,7 @@ void CServerRemoteAccess::GetMapList(CUtlBuffer &value)
 	Q_strcpy(mapwild, "maps/*.bsp");
 	for (findfn = Sys_FindFirst(mapwild, 0); findfn; findfn = Sys_FindNext(0))
 	{
-		_snprintf(curDir, MAX_PATH, "maps/%s", findfn);
+		Q_snprintf(curDir, MAX_PATH, "maps/%s", findfn);
 		FS_GetLocalPath(curDir, curDir, MAX_PATH);
 		if (Q_strstr(curDir, com_gamedir))
 		{

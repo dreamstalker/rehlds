@@ -1129,7 +1129,7 @@ short unsigned int EV_Precache(int type, const char *psz)
 					Host_Error("EV_Precache:  only file type 1 supported currently\n");
 
 				char szpath[MAX_PATH];
-				_snprintf(szpath, sizeof(szpath), "%s", psz);
+				Q_snprintf(szpath, sizeof(szpath), "%s", psz);
 				COM_FixSlashes(szpath);
 
 				int scriptSize = 0;
@@ -1525,7 +1525,7 @@ int PF_IsMapValid_I(char *mapname)
 		return 0;
 
 	
-	_snprintf(cBuf, sizeof(cBuf), "maps/%.32s.bsp", mapname);
+	Q_snprintf(cBuf, sizeof(cBuf), "maps/%.32s.bsp", mapname);
 	return FS_FileExists(cBuf);
 }
 

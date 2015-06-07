@@ -112,7 +112,7 @@ qboolean TEX_InitFromWad(char *path)
 	{
 		ForwardSlashes(pszWadFile);
 		COM_FileBase(pszWadFile, wadName);
-		_snprintf(wadPath, 0x100u, "%s", wadName);
+		Q_snprintf(wadPath, 0x100u, "%s", wadName);
 		COM_DefaultExtension(wadPath, ".wad");
 
 		if (Q_strstr(wadName, "pldecal") || Q_strstr(wadName, "tempdecal"))

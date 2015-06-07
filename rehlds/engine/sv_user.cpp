@@ -285,7 +285,7 @@ int SV_TransferConsistencyInfo(void)
 		}
 		else
 		{
-			_snprintf(filename, MAX_PATH, "sound/%s", r->szFileName);
+			Q_snprintf(filename, MAX_PATH, "sound/%s", r->szFileName);
 		}
 		MD5_Hash_File(r->rgucMD5_hash, filename, FALSE, FALSE, NULL);
 

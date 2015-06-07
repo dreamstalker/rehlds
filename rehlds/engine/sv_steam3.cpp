@@ -198,7 +198,7 @@ void CSteam3Server::OnGSClientApprove(GSClientApprove_t *pGSClientSteam2Accept)
 	}
 	else
 	{
-		_snprintf(msg, 0x200u, "\"%s<%i><%s><>\" STEAM USERID validated\n", cl->name, cl->userid, SV_GetClientIDString(cl));
+		Q_snprintf(msg, 0x200u, "\"%s<%i><%s><>\" STEAM USERID validated\n", cl->name, cl->userid, SV_GetClientIDString(cl));
 		Con_DPrintf("%s", msg);
 		Log_Printf("%s", msg);
 	}
