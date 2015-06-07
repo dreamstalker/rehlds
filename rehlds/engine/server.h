@@ -59,7 +59,7 @@
 #include "userid.h"
 #include "pm_defs.h"
 #include "inst_baseline.h"
-
+#include "net_ws.h"
 
 #define DEFAULT_SOUND_PACKET_VOLUME			255
 #define DEFAULT_SOUND_PACKET_ATTENUATION	1.0f
@@ -153,9 +153,9 @@ typedef struct server_s
 	extra_baselines_t *instance_baselines;
 	server_state_t state;
 	sizebuf_t datagram;
-	unsigned char datagram_buf[4000];
+	unsigned char datagram_buf[MAX_DATAGRAM];
 	sizebuf_t reliable_datagram;
-	unsigned char reliable_datagram_buf[4000];
+	unsigned char reliable_datagram_buf[MAX_DATAGRAM];
 	sizebuf_t multicast;
 	unsigned char multicast_buf[1024];
 	sizebuf_t spectator;
@@ -212,7 +212,7 @@ typedef struct client_s
 	double nextping;
 	double svtimebase;
 	sizebuf_t datagram;
-	byte datagram_buf[4000];
+	byte datagram_buf[MAX_DATAGRAM];
 	double connection_started;
 	double next_messagetime;
 	double next_messageinterval;
@@ -533,7 +533,7 @@ extern cvar_t sv_allow_dlfile;
 extern cvar_t sv_version;
 extern int sv_playermodel;
 
-extern char outputbuf[1400];
+extern char outputbuf[MAX_ROUTEABLE_PACKET];
 extern redirect_t sv_redirected;
 extern netadr_t sv_redirectto;
 

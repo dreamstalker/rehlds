@@ -1129,7 +1129,7 @@ short unsigned int EV_Precache(int type, const char *psz)
 					Host_Error("EV_Precache:  only file type 1 supported currently\n");
 
 				char szpath[MAX_PATH];
-				_snprintf(szpath, sizeof(szpath), "%s", psz);
+				Q_snprintf(szpath, sizeof(szpath), "%s", psz);
 				COM_FixSlashes(szpath);
 
 				int scriptSize = 0;
@@ -1361,7 +1361,7 @@ void EV_Playback(int flags, const edict_t *pInvoker, short unsigned int eventind
 				ei->packet_index = -1;
 				if (pInvoker)
 					ei->entity_index = invoker;
-				memcpy(&ei->args, &eargs, sizeof(ei->args));
+				Q_memcpy(&ei->args, &eargs, sizeof(ei->args));
 				ei->fire_time = delay;
 				continue;
 			}
@@ -1382,7 +1382,7 @@ void EV_Playback(int flags, const edict_t *pInvoker, short unsigned int eventind
 			ei->packet_index = -1;
 			if (pInvoker)
 				ei->entity_index = invoker;
-			memcpy(&ei->args, &eargs, sizeof(ei->args));
+			Q_memcpy(&ei->args, &eargs, sizeof(ei->args));
 			ei->fire_time = delay;
 		}
 		
@@ -1525,7 +1525,7 @@ int PF_IsMapValid_I(char *mapname)
 		return 0;
 
 	
-	_snprintf(cBuf, sizeof(cBuf), "maps/%.32s.bsp", mapname);
+	Q_snprintf(cBuf, sizeof(cBuf), "maps/%.32s.bsp", mapname);
 	return FS_FileExists(cBuf);
 }
 
@@ -2024,7 +2024,7 @@ void PF_RunPlayerMove_I(edict_t *fakeclient, const float *viewangles, float forw
 
 	SV_PreRunCmd();
 	SV_RunCmd(&cmd, 0);
-	memcpy(&host_client->lastcmd, &cmd, sizeof(host_client->lastcmd));
+	Q_memcpy(&host_client->lastcmd, &cmd, sizeof(host_client->lastcmd));
 
 	sv_player = oldclient;
 	host_client = old;
@@ -2634,7 +2634,7 @@ int PF_CreateInstancedBaseline(int classname, struct entity_state_s *baseline)
 		return 0;
 
 	bls->classname[bls->number] = classname;
-	memcpy(&bls->baseline[bls->number], baseline, sizeof(struct entity_state_s));
+	Q_memcpy(&bls->baseline[bls->number], baseline, sizeof(struct entity_state_s));
 	bls->number += 1;
 	return bls->number;
 }

@@ -49,8 +49,8 @@ qboolean noipx;
 
 int use_thread;
 
-unsigned char net_message_buffer[65536];
-unsigned char in_message_buf[65536];
+unsigned char net_message_buffer[NET_MAX_PAYLOAD];
+unsigned char in_message_buf[NET_MAX_PAYLOAD];
 sizebuf_t in_message;
 netadr_t in_from;
 
@@ -154,7 +154,7 @@ short unsigned int Q_ntohs(short unsigned int netshort)
 }
 
 /* <d31f4> ../engine/net_ws.c:194 */
-void NetadrToSockadr(netadr_t *a, struct sockaddr *s)
+void NetadrToSockadr(const netadr_t *a, struct sockaddr *s)
 {
 	Q_memset(s, 0, sizeof(*s));
 
@@ -216,7 +216,7 @@ NOXREF short unsigned int NET_HostToNetShort(short unsigned int us_in)
 }
 
 /* <d32b0> ../engine/net_ws.c:252 */
-qboolean NET_CompareAdr(netadr_t a, netadr_t b)
+qboolean NET_CompareAdr(netadr_t& a, netadr_t& b)
 {
 	if (a.type != b.type)
 	{
@@ -249,7 +249,7 @@ qboolean NET_CompareAdr(netadr_t a, netadr_t b)
 }
 
 /* <d32e9> ../engine/net_ws.c:277 */
-qboolean NET_CompareClassBAdr(netadr_t a, netadr_t b)
+qboolean NET_CompareClassBAdr(netadr_t& a, netadr_t& b)
 {
 	if (a.type != b.type)
 	{
@@ -277,7 +277,7 @@ qboolean NET_CompareClassBAdr(netadr_t a, netadr_t b)
 }
 
 /* <d3325> ../engine/net_ws.c:302 */
-qboolean NET_IsReservedAdr(netadr_t a)
+qboolean NET_IsReservedAdr(netadr_t& a)
 {
 	if (a.type == NA_LOOPBACK)
 	{
@@ -314,7 +314,7 @@ qboolean NET_IsReservedAdr(netadr_t a)
 }
 
 /* <d3352> ../engine/net_ws.c:332 */
-qboolean NET_CompareBaseAdr(netadr_t a, netadr_t b)
+qboolean NET_CompareBaseAdr(netadr_t& a, netadr_t& b)
 {
 	if (a.type != b.type)
 	{
@@ -345,7 +345,7 @@ qboolean NET_CompareBaseAdr(netadr_t a, netadr_t b)
 }
 
 /* <d2bd7> ../engine/net_ws.c:357 */
-char *NET_AdrToString(netadr_t a)
+char *NET_AdrToString(const netadr_t& a)
 {
 	static char s[64];
 
@@ -364,7 +364,7 @@ char *NET_AdrToString(netadr_t a)
 }
 
 /* <d3406> ../engine/net_ws.c:375 */
-char *NET_BaseAdrToString(netadr_t a)
+char *NET_BaseAdrToString(netadr_t& a)
 {
 	static char s[64];
 
@@ -515,7 +515,7 @@ qboolean NET_StringToAdr(const char *s, netadr_t *a)
 }
 
 /* <d3579> ../engine/net_ws.c:502 */
-qboolean NET_IsLocalAddress(netadr_t adr)
+qboolean NET_IsLocalAddress(netadr_t& adr)
 {
 	return adr.type == NA_LOOPBACK ? TRUE : FALSE;
 }
@@ -625,7 +625,7 @@ qboolean NET_GetLoopPacket(netsrc_t sock, netadr_t *in_from_, sizebuf_t *msg)
 }
 
 /* <d3659> ../engine/net_ws.c:612 */
-void NET_SendLoopPacket(netsrc_t sock, int length, void *data, netadr_t to)
+void NET_SendLoopPacket(netsrc_t sock, int length, void *data, const netadr_t& to)
 {
 	int i;
 	loopback_t *loop;
@@ -722,7 +722,7 @@ void NET_AddToLagged(netsrc_t sock, packetlag_t *pList, packetlag_t *pPacket, ne
 	pPacket->pPacketData = pStart;
 	pPacket->nSize = messagedata.cursize;
 	pPacket->receivedTime = timestamp;
-	memcpy(&pPacket->net_from_, net_from_, sizeof(netadr_t));
+	Q_memcpy(&pPacket->net_from_, net_from_, sizeof(netadr_t));
 }
 
 /* <d385e> ../engine/net_ws.c:731 */
@@ -827,7 +827,7 @@ qboolean NET_LagPacket(qboolean newdata, netsrc_t sock, netadr_t *from, sizebuf_
 
 	NET_RemoveFromPacketList(pPacket);
 	NET_TransferRawData(&in_message, pPacket->pPacketData, pPacket->nSize);
-	memcpy(&in_from, &pPacket->net_from_, sizeof(in_from));
+	Q_memcpy(&in_from, &pPacket->net_from_, sizeof(in_from));
 	if (pPacket->pPacketData)
 		free(pPacket->pPacketData);
 
@@ -841,13 +841,13 @@ void NET_FlushSocket(netsrc_t sock)
 	struct sockaddr from;
 	socklen_t fromlen;
 	int net_socket;
-	unsigned char buf[4010];
+	unsigned char buf[MAX_UDP_PACKET];
 
 	net_socket = ip_sockets[sock];
 	if (net_socket)
 	{
 		fromlen = 16;
-		while (CRehldsPlatformHolder::get()->recvfrom(net_socket, (char*)buf, 4010, 0, &from, &fromlen) > 0)
+		while (CRehldsPlatformHolder::get()->recvfrom(net_socket, (char*)buf, sizeof buf, 0, &from, &fromlen) > 0)
 			;
 	}
 }
@@ -855,27 +855,36 @@ void NET_FlushSocket(netsrc_t sock)
 /* <d2cf1> ../engine/net_ws.c:911 */
 qboolean NET_GetLong(unsigned char *pData, int size, int *outSize)
 {
-	int packetNumber;                                             //   913
-	int packetCount;                                              //   913
+	unsigned int packetNumber;                                             //   913
+	unsigned int packetCount;                                              //   913
 	int sequenceNumber;                                           //   913
 	unsigned char packetID;                                       //   914
 	static int gNetSplitFlags[NET_WS_MAX_FRAGMENTS];                                           //   918
 	SPLITPACKET *pHeader = (SPLITPACKET *) pData;                                        //   915
-	
 
 	sequenceNumber = pHeader->sequenceNumber;
 	packetID = pHeader->packetID;
 	packetCount = packetID & 0xF;
 	packetNumber = (unsigned int)packetID >> 4;
+
 	if (packetNumber >= NET_WS_MAX_FRAGMENTS || packetCount > NET_WS_MAX_FRAGMENTS)
 	{
-		Con_Printf("Malformed packet number (%i)\n", packetID >> 4);
+		Con_Printf("Malformed packet number (%i/%i)\n", packetNumber + 1, packetCount);
 		return FALSE;
 	}
 	if (gNetSplit.currentSequence == -1 || sequenceNumber != gNetSplit.currentSequence)
 	{
 		gNetSplit.currentSequence = pHeader->sequenceNumber;
-		gNetSplit.splitCount = packetID & 0xF;
+		gNetSplit.splitCount = packetCount;
+
+#ifdef REHLDS_FIXES
+		gNetSplit.totalSize = 0;
+
+		// clear part's sequence
+		for (int i = 0; i < NET_WS_MAX_FRAGMENTS; i++)
+			gNetSplitFlags[i] = -1;
+#endif
+
 		if (net_showpackets.value == 4.0f)
 			Con_Printf("<-- Split packet restart %i count %i seq\n", gNetSplit.splitCount, sequenceNumber);
 	}
@@ -902,13 +911,16 @@ qboolean NET_GetLong(unsigned char *pData, int size, int *outSize)
 				);
 		}
 
-		if (SPLIT_SIZE * packetNumber + packetPayloadSize > 4010)
+		if (SPLIT_SIZE * packetNumber + packetPayloadSize > MAX_UDP_PACKET)
 		{
 			Con_Printf("Malformed packet size (%i, %i)\n", SPLIT_SIZE * packetNumber, packetPayloadSize);
+#ifdef REHLDS_FIXES
+			gNetSplit.currentSequence = -1;
+#endif
 			return FALSE;
 		}
 
-		memcpy(&gNetSplit.buffer[SPLIT_SIZE * packetNumber], pHeader + 1, packetPayloadSize);
+		Q_memcpy(&gNetSplit.buffer[SPLIT_SIZE * packetNumber], pHeader + 1, packetPayloadSize);
 	}
 
 	if (gNetSplit.splitCount > 0)
@@ -916,35 +928,39 @@ qboolean NET_GetLong(unsigned char *pData, int size, int *outSize)
 
 	if (packetCount > 0)
 	{
-		int i = 0;
-		while (gNetSplitFlags[i] == gNetSplit.currentSequence && i < packetCount)
-			++i;
-
-		if (i < packetCount)
+		for (unsigned int i = 0; i < packetCount; i++)
 		{
-			Con_Printf(
-				"Split packet without all %i parts, part %i had wrong sequence %i/%i\n",
-				packetCount,
-				i + 1,
-				gNetSplitFlags[i],
-				gNetSplit.currentSequence);
-			return FALSE;
+			if (gNetSplitFlags[i] != gNetSplit.currentSequence)
+			{
+				Con_Printf(
+					"Split packet without all %i parts, part %i had wrong sequence %i/%i\n",
+					packetCount,
+					i + 1,
+					gNetSplitFlags[i],
+					gNetSplit.currentSequence);
+#ifdef REHLDS_FIXES
+				gNetSplit.currentSequence = -1; // no more parts can be attached, clear it
+#endif
+				return FALSE;
+			}
 		}
 	}
 
 	gNetSplit.currentSequence = -1;
-	if (gNetSplit.totalSize <= 4010)
+	if (gNetSplit.totalSize <= MAX_UDP_PACKET)
 	{
-		memcpy(pData, gNetSplit.buffer, gNetSplit.totalSize);
+		Q_memcpy(pData, gNetSplit.buffer, gNetSplit.totalSize);
 		*outSize = gNetSplit.totalSize;
 		return TRUE;
 	}
 	else
 	{
+#ifdef REHLDS_FIXES
+		*outSize = 0;
+#endif
 		Con_Printf("Split packet too large! %d bytes\n", gNetSplit.totalSize);
 		return FALSE;
 	}
-
 }
 
 /* <d3bd9> ../engine/net_ws.c:1021 */
@@ -956,7 +972,7 @@ qboolean NET_QueuePacket(netsrc_t sock)
 	int net_socket;                                               //  1026
 	int protocol;                                                 //  1027
 	int err;                                                      //  1028
-	unsigned char buf[4010];                                            //  1029
+	unsigned char buf[MAX_UDP_PACKET];                                            //  1029
 
 #ifdef _WIN32
 	for (protocol = 0; protocol < 2; protocol++)
@@ -975,7 +991,7 @@ qboolean NET_QueuePacket(netsrc_t sock)
 			continue;
 
 		fromlen = sizeof(from);
-		ret = CRehldsPlatformHolder::get()->recvfrom(net_socket, (char *)buf, 4010, 0, &from, &fromlen);
+		ret = CRehldsPlatformHolder::get()->recvfrom(net_socket, (char *)buf, sizeof buf, 0, &from, &fromlen);
 		if (ret == -1)
 		{
 #ifdef _WIN32
@@ -1005,13 +1021,13 @@ qboolean NET_QueuePacket(netsrc_t sock)
 			continue;
 		}
 		SockadrToNetadr(&from, &in_from);
-		if (ret != 4010)
+		if (ret != MAX_UDP_PACKET)
 			break;
 
 		Con_Printf("NET_QueuePacket:  Oversize packet from %s\n", NET_AdrToString(in_from));
 	}
 
-	if (ret == -1 || ret == 4010) {
+	if (ret == -1 || ret == MAX_UDP_PACKET) {
 		return NET_LagPacket(0, sock, 0, 0);
 	}
 
@@ -1260,7 +1276,7 @@ qboolean NET_GetPacket_internal(netsrc_t sock)
 	{
 		Q_memcpy(net_message.data, in_message.data, in_message.cursize);
 		net_message.cursize = in_message.cursize;
-		memcpy(&net_from, &in_from, 0x14u);
+		Q_memcpy(&net_from, &in_from, 0x14u);
 		NET_ThreadUnlock();
 		return bret;
 	}
@@ -1373,12 +1389,12 @@ int NET_SendLong(netsrc_t sock, int s, const char *buf, int len, int flags, cons
 
 			pPacket->packetID = (packetNumber << 4) + packetCount;
 
-			memcpy(packet + sizeof(SPLITPACKET), buf + (packetNumber * SPLIT_SIZE), size);
+			Q_memcpy(packet + sizeof(SPLITPACKET), buf + (packetNumber * SPLIT_SIZE), size);
 
 			if (net_showpackets.value == 4.0f)
 			{
 				netadr_t adr;
-				memset(&adr, 0, sizeof(adr));
+				Q_memset(&adr, 0, sizeof(adr));
 
 				SockadrToNetadr((struct sockaddr *)to, &adr);
 
@@ -1420,7 +1436,7 @@ void NET_SendPacket_api(unsigned int length, void *data, const netadr_t &to) {
 }
 
 /* <d43aa> ../engine/net_ws.c:1599 */
-void NET_SendPacket(netsrc_t sock, int length, void *data, netadr_t to)
+void NET_SendPacket(netsrc_t sock, int length, void *data, const netadr_t& to)
 {
 	int ret;
 	struct sockaddr addr;
@@ -2091,7 +2107,7 @@ void NET_Shutdown(void)
 }
 
 /* <d4ccb> ../engine/net_ws.c:2470 */
-qboolean NET_JoinGroup(netsrc_t sock, netadr_t addr)
+qboolean NET_JoinGroup(netsrc_t sock, netadr_t& addr)
 {
 	ip_mreq mreq;
 	int net_socket = ip_sockets[sock];
@@ -2117,7 +2133,7 @@ qboolean NET_JoinGroup(netsrc_t sock, netadr_t addr)
 }
 
 /* <d4d51> ../engine/net_ws.c:2504 */
-qboolean NET_LeaveGroup(netsrc_t sock, netadr_t addr)
+qboolean NET_LeaveGroup(netsrc_t sock, netadr_t& addr)
 {
 	ip_mreq mreq;
 	int net_socket = ip_sockets[sock];

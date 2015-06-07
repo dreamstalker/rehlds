@@ -1063,7 +1063,7 @@ void Host_Version(void)
 
 	Q_strcpy(gpszVersionString, "1.0.1.4");
 	Q_strcpy(gpszProductString, "valve");
-	strcpy(szFileName, "steam.inf");
+	Q_strcpy(szFileName, "steam.inf");
 	FileHandle_t fp = FS_Open(szFileName, "r");
 	if (fp)
 	{
@@ -1088,7 +1088,7 @@ void Host_Version(void)
 					{
 						char szSteamVersionId[32];
 						FS_GetInterfaceVersion(szSteamVersionId, sizeof(szSteamVersionId) - 1);
-						_snprintf(gpszVersionString, sizeof(gpszVersionString), "%s/%s", &com_token[Q_strlen("PatchVersion=")], szSteamVersionId);
+						Q_snprintf(gpszVersionString, sizeof(gpszVersionString), "%s/%s", &com_token[Q_strlen("PatchVersion=")], szSteamVersionId);
 						gpszVersionString[sizeof(gpszVersionString) - 1] = 0;
 					}
 					++gotKeys;
@@ -1128,7 +1128,7 @@ int Host_Init(quakeparms_t *parms)
 
 	CRehldsPlatformHolder::get()->srand(CRehldsPlatformHolder::get()->time(NULL));
 
-	memcpy(&host_parms, parms, sizeof(host_parms));
+	Q_memcpy(&host_parms, parms, sizeof(host_parms));
 	com_argc = parms->argc;
 	com_argv = parms->argv;
 	realtime = 0;
@@ -1179,7 +1179,7 @@ int Host_Init(quakeparms_t *parms)
 
 
 
-	_snprintf(versionString, sizeof(versionString), "%s,%i,%i", gpszVersionString, PROTOCOL_VERSION, build_number());
+	Q_snprintf(versionString, sizeof(versionString), "%s,%i,%i", gpszVersionString, PROTOCOL_VERSION, build_number());
 	Cvar_Set("sv_version", versionString);
 	Con_DPrintf("%4.1f Mb heap\n", (double)parms->memsize / (1024.0f * 1024.0f));
 	R_InitTextures();

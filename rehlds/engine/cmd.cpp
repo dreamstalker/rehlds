@@ -92,7 +92,7 @@ void Cbuf_InsertText(char *text)
 
 #ifdef REHLDS_FIXES
 	if (currLen)
-		memmove(cmd_text.data + addLen, cmd_text.data, currLen);
+		Q_memmove(cmd_text.data + addLen, cmd_text.data, currLen);
 
 	Q_memcpy(cmd_text.data, text, addLen);
 	cmd_text.cursize += addLen;
@@ -131,7 +131,7 @@ void Cbuf_InsertTextLines(char *text)
 
 #ifdef REHLDS_FIXES
 	if (currLen)
-		memmove(cmd_text.data + addLen + 1, cmd_text.data, currLen);
+		Q_memmove(cmd_text.data + addLen + 1, cmd_text.data, currLen);
 	
 	cmd_text.data[0] = '\n'; // TODO: Why we need leading \n, if there is no commands in the start?
 	Q_memcpy(&cmd_text.data[1], text, addLen);
@@ -225,7 +225,7 @@ void Cbuf_Execute(void)
 			cmd_text.cursize -= i;
 #ifdef REHLDS_FIXES
 			// dst overlaps src
-			memmove(text, text + i, cmd_text.cursize);
+			Q_memmove(text, text + i, cmd_text.cursize);
 #else // REHLDS_FIXES
 			Q_memcpy(text, text + i, cmd_text.cursize);
 #endif // REHLDS_FIXES
@@ -559,7 +559,7 @@ void Cmd_Shutdown(void)
 	{
 		Z_Free(cmd_argv[i]);
 	}
-	memset(cmd_argv, 0, sizeof(cmd_argv));
+	Q_memset(cmd_argv, 0, sizeof(cmd_argv));
 	cmd_argc = 0;
 	cmd_args = NULL;
 

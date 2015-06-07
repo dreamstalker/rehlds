@@ -117,12 +117,13 @@ void Netchan_OutOfBandPrint(netsrc_t sock, netadr_t adr, char *format, ...)
 {
 	va_list argptr;
 	char string[8192];
+	size_t len;
 
 	va_start(argptr, format);
-	Q_vsnprintf(string, sizeof(string), format, argptr);
+	len = Q_vsnprintf(string, sizeof(string), format, argptr);
 	va_end(argptr);
 
-	Netchan_OutOfBand(sock, adr, Q_strlen(string) + 1, (byte *)string);
+	Netchan_OutOfBand(sock, adr, len + 1, (byte *)string);
 }
 
 /* <65776> ../engine/net_chan.c:196 */
@@ -379,7 +380,7 @@ void Netchan_Transmit(netchan_t *chan, int length, byte *data)
 		}
 
 		if (send_from_regular) {
-			memcpy(chan->reliable_buf, chan->message_buf, chan->message.cursize);
+			Q_memcpy(chan->reliable_buf, chan->message_buf, chan->message.cursize);
 			chan->reliable_length = chan->message.cursize;
 			SZ_Clear(&chan->message);
 
@@ -417,7 +418,7 @@ void Netchan_Transmit(netchan_t *chan, int length, byte *data)
 					FileHandle_t hfile;
 					if (pbuf->iscompressed)
 					{
-						_snprintf(compressedfilename, sizeof(compressedfilename), "%s.ztmp", pbuf->filename);
+						Q_snprintf(compressedfilename, sizeof(compressedfilename), "%s.ztmp", pbuf->filename);
 						hfile = FS_Open(compressedfilename, "rb");
 					}
 					else
@@ -431,7 +432,7 @@ void Netchan_Transmit(netchan_t *chan, int length, byte *data)
 				}
 
 
-				memcpy(chan->reliable_buf + chan->reliable_length, pbuf->frag_message.data, pbuf->frag_message.cursize);
+				Q_memcpy(chan->reliable_buf + chan->reliable_length, pbuf->frag_message.data, pbuf->frag_message.cursize);
 				chan->reliable_length += pbuf->frag_message.cursize;
 				chan->frag_length[i] = pbuf->frag_message.cursize;
 
@@ -500,7 +501,7 @@ void Netchan_Transmit(netchan_t *chan, int length, byte *data)
 	}
 
 	// Is there room for the unreliable payload?
-	int max_send_size = 1400;
+	int max_send_size = MAX_ROUTEABLE_PACKET;
 	if (!send_resending)
 		max_send_size = sb_send.maxsize;
 
@@ -539,7 +540,7 @@ void Netchan_Transmit(netchan_t *chan, int length, byte *data)
 		NET_SendPacket(chan->sock, sb_send.cursize, sb_send.data, chan->remote_address);
 	}
 
-	if (g_psv.active && sv_lan.value != 0.0f && sv_lan_rate.value > 1000.0)
+	if (g_psv.active && sv_lan.value != 0.0f && sv_lan_rate.value > MIN_RATE)
 		fRate = 1.0 / sv_lan_rate.value;
 	else
 		fRate = 1.0 / chan->rate;
@@ -640,6 +641,7 @@ qboolean Netchan_Validate(netchan_t *chan, qboolean *frag_message, unsigned int 
 		if (!frag_message[i])
 			continue;
 
+#ifndef REHLDS_FIXES
 		if (FRAG_GETID(fragid[i]) > MAX_FRAGMENTS || FRAG_GETCOUNT(fragid[i]) > MAX_FRAGMENTS)
 		{
 			return FALSE;
@@ -649,7 +651,27 @@ qboolean Netchan_Validate(netchan_t *chan, qboolean *frag_message, unsigned int 
 		{
 			return FALSE;
 		}
+#else // REHLDS_FIXES
+		// total fragments should be <= MAX_FRAGMENTS and current fragment can't be > total fragments
+		if (FRAG_GETCOUNT(fragid[i]) > MAX_FRAGMENTS || FRAG_GETID(fragid[i]) > FRAG_GETCOUNT(fragid[i]))
+			return FALSE;
 
+		if ((size_t)frag_length[i] > FRAGMENT_SIZE || (size_t)frag_offset[i] > NET_MAX_PAYLOAD - 1)
+			return FALSE;
+
+		int frag_end = frag_offset[i] + frag_length[i];
+
+		// end of fragment is out of the packet
+		if (frag_end + msg_readcount > net_message.cursize)
+			return FALSE;
+
+		// fragment overlaps next stream's fragment or placed after it
+		for (int j = i + 1; j < MAX_STREAMS; j++)
+		{
+			if (frag_end > frag_offset[j]) // don't add msg_readcount for comparison
+				return FALSE;
+		}
+#endif // REHLDS_FIXES
 	}
 
 	return TRUE;
@@ -850,17 +872,15 @@ qboolean Netchan_Process(netchan_t *chan)
 			}
 
 			// Rearrange incoming data to not have the frag stuff in the middle of it
-
 			int wpos = msg_readcount + frag_offset[i];
-			int rpos = msg_readcount + frag_offset[i] + frag_length[i];
-			int epos = net_message.cursize - rpos;
-			for (j = 0; j < epos; j++) {
-				net_message.data[wpos + j] = net_message.data[rpos + j];
-			}
+			int rpos = wpos + frag_length[i];
+			
+			Q_memmove(net_message.data + wpos, net_message.data + rpos, net_message.cursize - rpos);
 			net_message.cursize -= frag_length[i];
+
 			for (j = i + 1; j < MAX_STREAMS; j++)
 			{
-				frag_offset[j] -= frag_length[i];
+				frag_offset[j] -= frag_length[i]; // fragments order already validated
 			}
 		}
 
@@ -1015,8 +1035,8 @@ void Netchan_CreateFragments_(qboolean server, netchan_t *chan, sizebuf_t *msg)
 		if (!BZ2_bzBuffToBuffCompress((char *)compressed, &compressedSize, (char *)msg->data, msg->cursize, 9, 0, 30))
 		{
 			Con_DPrintf("Compressing split packet (%d -> %d bytes)\n", msg->cursize, compressedSize);
-			memcpy(msg->data, hdr, sizeof(hdr));
-			memcpy(msg->data + sizeof(hdr), compressed, compressedSize);
+			Q_memcpy(msg->data, hdr, sizeof(hdr));
+			Q_memcpy(msg->data + sizeof(hdr), compressed, compressedSize);
 			msg->cursize = compressedSize + sizeof(hdr);
 		}
 	}
@@ -1189,7 +1209,7 @@ int Netchan_CreateFileFragments(qboolean server, netchan_t *chan, const char *fi
 	fragbufwaiting_t *p;
 	int send;
 	fragbuf_t *buf;
-	char compressedfilename[260];
+	char compressedfilename[MAX_PATH];
 	int firstfragment;
 	int bufferid;
 	int bCompressed;
@@ -1202,7 +1222,7 @@ int Netchan_CreateFileFragments(qboolean server, netchan_t *chan, const char *fi
 	bCompressed = FALSE;
 	chunksize = chan->pfnNetchan_Blocksize(chan->connection_status);
 
-	Q_snprintf(compressedfilename, 0x104u, "%s.ztmp", filename);
+	Q_snprintf(compressedfilename, sizeof compressedfilename, "%s.ztmp", filename);
 	compressedFileTime = FS_GetFileTime(compressedfilename);
 	if (compressedFileTime >= FS_GetFileTime(filename))
 	{
@@ -1388,7 +1408,7 @@ qboolean Netchan_CopyNormalFragments(netchan_t *chan)
 		char uncompressed[65536];
 		unsigned int uncompressedSize = 65536;
 		BZ2_bzBuffToBuffDecompress(uncompressed, &uncompressedSize, (char*)net_message.data + 4, net_message.cursize - 4, 1, 0);
-		memcpy(net_message.data, uncompressed, uncompressedSize);
+		Q_memcpy(net_message.data, uncompressed, uncompressedSize);
 		net_message.cursize = uncompressedSize;
 	}
 
@@ -1504,12 +1524,12 @@ qboolean Netchan_CopyFileFragments(netchan_t *chan)
 		{
 			// Copy it in
 			cursize -= msg_readcount;
-			memcpy(&buffer[pos], &p->frag_message.data[msg_readcount], cursize);
+			Q_memcpy(&buffer[pos], &p->frag_message.data[msg_readcount], cursize);
 			p->frag_message.cursize = cursize;
 		}
 		else
 		{
-			memcpy(&buffer[pos], p->frag_message.data, cursize);
+			Q_memcpy(&buffer[pos], p->frag_message.data, cursize);
 		}
 		pos += p->frag_message.cursize;
 		Mem_Free(p);
@@ -1550,10 +1570,10 @@ qboolean Netchan_CopyFileFragments(netchan_t *chan)
 			FileHandle_t handle;
 
 #ifdef REHLDS_CHECKS
-			strncpy(filedir, filename, sizeof(filedir) - 1);
+			Q_strncpy(filedir, filename, sizeof(filedir) - 1);
 			filedir[sizeof(filedir) - 1] = 0;
 #else
-			strncpy(filedir, filename, sizeof(filedir));
+			Q_strncpy(filedir, filename, sizeof(filedir));
 #endif // REHLDS_CHECKS
 			COM_FixSlashes(filedir);
 			pszFileName = strrchr(filedir, '\\');

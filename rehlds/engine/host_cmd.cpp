@@ -508,8 +508,8 @@ void Host_Quit_Restart_f(void)
 
 	if (g_psv.active || (g_pcls.state == ca_active && g_pcls.trueaddress[0] && g_pPostRestartCmdLineArgs))
 	{
-		strcat(g_pPostRestartCmdLineArgs, " +connect ");
-		strcat(g_pPostRestartCmdLineArgs, g_pcls.servername);
+		Q_strcat(g_pPostRestartCmdLineArgs, " +connect ");
+		Q_strcat(g_pPostRestartCmdLineArgs, g_pcls.servername);
 	}
 	else
 	{
@@ -520,7 +520,7 @@ void Host_Quit_Restart_f(void)
 				Cbuf_AddText("save quick\n");
 				Cbuf_Execute();
 
-				strcat(g_pPostRestartCmdLineArgs, " +load quick");
+				Q_strcat(g_pPostRestartCmdLineArgs, " +load quick");
 			}
 		}
 
@@ -839,7 +839,7 @@ void Host_Map(qboolean bIsDemo, char *mapstring, char *mapName, qboolean loadGam
 			{
 				Q_strcpy(g_pcls.spawnparms, "");
 				for (i = 0; i < Cmd_Argc(); i++)
-					strncat(g_pcls.spawnparms, Cmd_Argv(i), sizeof(g_pcls.spawnparms) - strlen(g_pcls.spawnparms) - 1);
+					Q_strncat(g_pcls.spawnparms, Cmd_Argv(i), sizeof(g_pcls.spawnparms) - strlen(g_pcls.spawnparms) - 1);
 			}
 		}
 		if (sv_gpNewUserMsgs)
@@ -898,8 +898,8 @@ void Host_Map_f(void)
 	mapstring[0] = 0;
 	for (i = 0; i < Cmd_Argc(); i++)
 	{
-		strncat(mapstring, Cmd_Argv(i), 62 - Q_strlen(mapstring));
-		strncat(mapstring, " ", 62 - Q_strlen(mapstring));
+		Q_strncat(mapstring, Cmd_Argv(i), 62 - Q_strlen(mapstring));
+		Q_strncat(mapstring, " ", 62 - Q_strlen(mapstring));
 	}
 	Q_strcat(mapstring, "\n");
 	Q_strncpy(name, Cmd_Argv(1), sizeof(name) - 1);
@@ -2312,7 +2312,7 @@ void Host_ClearSaveDirectory(void)
 	const char *pfn;
 
 	Q_snprintf(szName, sizeof(szName), "%s", Host_SaveGameDirectory());
-	strncat(szName, "*.HL?", sizeof(szName) - strlen(szName) - 1);
+	Q_strncat(szName, "*.HL?", sizeof(szName) - strlen(szName) - 1);
 	COM_FixSlashes(szName);
 
 	if (Sys_FindFirstPathID(szName, "GAMECONFIG") != NULL)
@@ -2321,7 +2321,7 @@ void Host_ClearSaveDirectory(void)
 		Q_snprintf(szName, sizeof(szName), "%s", Host_SaveGameDirectory());
 		COM_FixSlashes(szName);
 		FS_CreateDirHierarchy(szName, "GAMECONFIG");
-		strncat(szName, "*.HL?", sizeof(szName) - strlen(szName) - 1);
+		Q_strncat(szName, "*.HL?", sizeof(szName) - strlen(szName) - 1);
 
 		for (pfn = Sys_FindFirstPathID(szName, "GAMECONFIG"); pfn; pfn = Sys_FindNext(NULL))
 		{

@@ -2030,7 +2030,7 @@ NOXREF int COM_ExpandFilename(char *filename)
 	char netpath[MAX_PATH];
 
 	FS_GetLocalPath(filename, netpath, ARRAYSIZE(netpath));
-	strcpy(filename, netpath);
+	Q_strcpy(filename, netpath);
 	return *filename != 0;
 }
 
@@ -2303,12 +2303,12 @@ void COM_ParseDirectoryFromCmd(const char *pCmdName, char *pDirName, const char 
 	if (pParameter)
 	{
 		// Grab it
-		strcpy(pDirName, pParameter);
+		Q_strcpy(pDirName, pParameter);
 	}
 	else if (pDefault)
 	{
 		// Ok, then use the default
-		strcpy(pDirName, pDefault);
+		Q_strcpy(pDirName, pDefault);
 	}
 	else
 	{

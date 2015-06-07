@@ -137,7 +137,7 @@ typedef struct client_static_s
 	cactive_t state;
 	netchan_t netchan;
 	sizebuf_t datagram;
-	byte datagram_buf[4000];
+	byte datagram_buf[MAX_DATAGRAM];
 	double connect_time;
 	int connect_retry;
 	int challenge;
@@ -146,7 +146,7 @@ typedef struct client_static_s
 	char trueaddress[32];
 	float slist_time;
 	int signon;
-	char servername[260];
+	char servername[MAX_PATH];
 	char mapstring[64];
 	char spawnparms[2048];
 	char userinfo[256];
@@ -164,7 +164,7 @@ typedef struct client_static_s
 	FileHandle_t demoheader;
 	qboolean demowaiting;
 	qboolean demoappending;
-	char demofilename[260];
+	char demofilename[MAX_PATH];
 	int demoframecount;
 	int td_lastframe;
 	int td_startframe;
@@ -174,7 +174,7 @@ typedef struct client_static_s
 	double packet_loss_recalc_time;
 	int playerbits;
 	soundfade_t soundfade;
-	char physinfo[256];
+	char physinfo[MAX_PHYSINFO_STRING];
 	unsigned char md5_clientdll[16];
 	netadr_t game_stream;
 	netadr_t connect_stream;
@@ -210,7 +210,7 @@ typedef struct client_state_s
 	vec3_t simorg;
 	vec3_t simvel;
 	vec3_t simangles;
-	vec_t predicted_origins[64][3];
+	vec3_t predicted_origins[64];
 	vec3_t prediction_error;
 	float idealpitch;
 	vec3_t viewheight;

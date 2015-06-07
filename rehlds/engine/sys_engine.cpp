@@ -90,7 +90,7 @@ void ForceReloadProfile()
 		Sys_Error("Only dedicated mode is supported");
 		/*
 		v0 = GetRateRegistrySetting(rate.string);
-		strncpy(szRate, v0, 0x20u);
+		Q_strncpy(szRate, v0, 0x20u);
 		Cvar_DirectSet(&rate, szRate);
 		*/
 	}

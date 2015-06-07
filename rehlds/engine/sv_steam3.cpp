@@ -186,19 +186,19 @@ void CSteam3Server::OnGSClientApprove(GSClientApprove_t *pGSClientSteam2Accept)
 	char msg[256];
 	if (SV_FilterUser(&cl->network_userid))
 	{
-		sprintf(msg, "You have been banned from this server\n");
+		Q_sprintf(msg, "You have been banned from this server\n");
 		SV_RejectConnection(&cl->netchan.remote_address, msg);
 		SV_DropClient(cl, 0, "STEAM UserID %s is in server ban list\n", SV_GetClientIDString(cl));
 	}
 	else if (SV_CheckForDuplicateSteamID(cl) != -1)
 	{
-		sprintf(msg, "Your UserID is already in use on this server.\n");
+		Q_sprintf(msg, "Your UserID is already in use on this server.\n");
 		SV_RejectConnection(&cl->netchan.remote_address, msg);
 		SV_DropClient(cl, 0, "STEAM UserID %s is already\nin use on this server\n", SV_GetClientIDString(cl));
 	}
 	else
 	{
-		_snprintf(msg, 0x200u, "\"%s<%i><%s><>\" STEAM USERID validated\n", cl->name, cl->userid, SV_GetClientIDString(cl));
+		Q_snprintf(msg, 0x200u, "\"%s<%i><%s><>\" STEAM USERID validated\n", cl->name, cl->userid, SV_GetClientIDString(cl));
 		Con_DPrintf("%s", msg);
 		Log_Printf("%s", msg);
 	}

@@ -282,10 +282,10 @@ model_t *Mod_LoadModel(model_t *mod, qboolean crash, qboolean trackCRC)
 		while (*(p++) == '/')
 			;
 
-		strncpy(tmpName, p, sizeof(tmpName) - 1);
+		Q_strncpy(tmpName, p, sizeof(tmpName) - 1);
 		tmpName[sizeof(tmpName) - 1] = '\0';
 
-		strncpy(mod->name, tmpName, sizeof(mod->name) - 1);
+		Q_strncpy(mod->name, tmpName, sizeof(mod->name) - 1);
 		mod->name[sizeof(mod->name) - 1] = '\0';
 	}
 
@@ -392,7 +392,7 @@ void Mod_AdInit(void)
 		s = com_argv[i + 1];
 		if (s && *s)
 		{
-			_snprintf(filename, MAX_PATH, "%s", s);
+			Q_snprintf(filename, MAX_PATH, "%s", s);
 			if (FS_FileSize(filename) > 0)
 			{
 				Sys_Error("Mod_Init(): reverse me");
@@ -652,7 +652,7 @@ void Mod_LoadVisibility(lump_t *l)
 		return;
 	}
 	loadmodel->visdata = (byte*) Hunk_AllocName(l->filelen, loadname);
-	memcpy(loadmodel->visdata, mod_base + l->fileofs, l->filelen);
+	Q_memcpy(loadmodel->visdata, mod_base + l->fileofs, l->filelen);
 }
 
 /* <513a6> ../engine/model.c:913 */
@@ -1326,7 +1326,7 @@ void Mod_LoadBrushModel_internal(model_t *mod, void *buffer)
 	
 		if (i < mod->numsubmodels - 1)
 		{
-			_snprintf(name, 10, "*%i", i + 1);
+			Q_snprintf(name, 10, "*%i", i + 1);
 			submodel = Mod_FindName(0, name);
 			*submodel = *mod;
 			loadmodel = submodel;
