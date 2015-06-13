@@ -17,4 +17,6 @@ public:
 	static void CharEquals(std::string message, char expected, char actual, const char* fileName, long lineNumber);
 
 	static void DoubleEquals(std::string message, double expected, double actual, double epsilon, const char* fileName, long lineNumber);
+
+	static void MemoryEquals(std::string message, void* expected, void* actual, int size, const char* fileName, long lineNumber);
 };
