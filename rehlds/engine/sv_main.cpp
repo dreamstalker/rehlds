@@ -2017,67 +2017,27 @@ int SV_CheckForDuplicateNames(char *userinfo, qboolean bIsReconnecting, int nExc
 	const char *val;
 	int i;
 	client_t *client;
-	int dupc;
-	char newname[MAX_NAME];
-	int retval = 0;
-
-	// TODO: Refactor names checking in SV_CheckForDuplicateNames, SV_CheckUserInfo and SV_ExtractFromUserinfo
-#ifdef REHLDS_FIXES
+	int dupc = 0;
 	char rawname[MAX_NAME];
+	char newname[MAX_NAME];
+	int changed = FALSE;
 
 	val = Info_ValueForKey(userinfo, "name");
-	Q_strncpy(rawname, val, sizeof(rawname) - 1);
-	rawname[sizeof(rawname) - 1] = 0;
+	Q_strncpy(rawname, val, MAX_NAME - 1);
 
-	// Fix name to not start with '#', so it will not resemble userid
-	for (char *p = rawname; *p == '#'; p++) *p = ' ';
-
-	TrimSpace(rawname, newname);
-
-	if (!Q_UnicodeValidate(newname))
-	{
-		Q_UnicodeRepair(newname);
-	}
-
-	if (newname[0] == 0 || !Q_stricmp(newname, "console") || Q_strstr(newname, "..") != NULL)
-	{
-		Info_SetValueForKey(userinfo, "name", "unnamed", MAX_INFO_STRING);
-		val = Info_ValueForKey(userinfo, "name");
-		retval = 1;
-	}
-#else // REHLDS_FIXES
-	val = Info_ValueForKey(userinfo, "name");
-
-	if (val == NULL || val[0] == 0 || Q_strstr(val, "..") != NULL)
-	{
-		Info_SetValueForKey(userinfo, "name", "unnamed", MAX_INFO_STRING);
-		return 1;
-	}
-#endif // REHLDS_FIXES
-
-	dupc = 1;
 	while (true)
 	{
-		client = g_psvs.clients;
-
-		i = 0;
-		while (!client->connected || (i == nExcludeSlot && bIsReconnecting) || Q_stricmp(client->name, val))
+		for (i = 0, client = g_psvs.clients; i < g_psvs.maxclients; i++, client++)
 		{
-			client++;
-			i++;
-			if (i >= g_psvs.maxclients)
-				return retval;
+			if (client->active && !(i == nExcludeSlot && bIsReconnecting) && !Q_stricmp(client->name, val))
+				break;
 		}
 
-		if (val[0] == '(')
-		{
-			if (val[2] == ')')
-				val += 3;
-			else if (val[3] == ')')
-				val += 4;
-		}
+		// no duplicates for current name
+		if (i == g_psvs.maxclients)
+			return changed;
 
-		Q_snprintf(newname, sizeof(newname), "(%d)%-0.*s", dupc, 28, val);
+		Q_snprintf(newname, sizeof(newname), "(%d)%-0.*s", ++dupc, 28, rawname);
 #ifdef REHLDS_FIXES
 		// Fix possibly incorrectly cut UTF8 chars
 		if (!Q_UnicodeValidate(newname))
@@ -2086,14 +2046,11 @@ int SV_CheckForDuplicateNames(char *userinfo, qboolean bIsReconnecting, int nExc
 		}
 #endif // REHLDS_FIXES
 		Info_SetValueForKey(userinfo, "name", newname, MAX_INFO_STRING);
-
-		retval = 1;
-		dupc++;
-
 		val = Info_ValueForKey(userinfo, "name");
+		changed = TRUE;
 	}
 
-	return retval;
+	return changed;
 }
 
 /* <a76d2> ../engine/sv_main.c:2710 */
@@ -2127,26 +2084,13 @@ int SV_CheckUserInfo(netadr_t *adr, char *userinfo, qboolean bIsReconnecting, in
 	Info_RemoveKey(userinfo, "password");
 
 	s = Info_ValueForKey(userinfo, "name");
-	if (Q_strlen(s) > 0)
-	{
-		Q_strncpy(newname, s, sizeof(newname) - 1);
-		newname[sizeof(newname) - 1] = 0;
-	}
-	else
-	{
-		Q_strcpy(newname, "unnamed");
-	}
+	Q_strncpy(newname, s, sizeof(newname) - 1);
+	newname[sizeof(newname) - 1] = '\0';
 
-	// TODO: Refactor names checking in SV_CheckForDuplicateNames, SV_CheckUserInfo and SV_ExtractFromUserinfo
 	for (pChar = newname; *pChar; pChar++)
 	{
 		if (*pChar == '%' || *pChar == '&')
 			*pChar = ' ';
-	}
-
-	for (pChar = newname; *pChar == '#'; pChar++)
-	{
-		*pChar = ' ';
 	}
 
 	TrimSpace(newname, name);
@@ -2156,7 +2100,19 @@ int SV_CheckUserInfo(netadr_t *adr, char *userinfo, qboolean bIsReconnecting, in
 		Q_UnicodeRepair(name);
 	}
 
-	Info_SetValueForKey(userinfo, "name", name, MAX_INFO_STRING);
+	for (pChar = newname; *pChar == '#'; pChar++)
+	{
+		*pChar = ' ';
+	}
+
+	if (name[0] == 0 || !Q_stricmp(name, "console") || Q_strstr(name, "..") != NULL)
+	{
+		Info_SetValueForKey(userinfo, "name", "unnamed", MAX_INFO_STRING);
+	}
+	else
+	{
+		Info_SetValueForKey(userinfo, "name", name, MAX_INFO_STRING);
+	}
 
 	if (SV_CheckForDuplicateNames(userinfo, bIsReconnecting, nReconnectSlot))
 	{
@@ -2166,7 +2122,7 @@ int SV_CheckUserInfo(netadr_t *adr, char *userinfo, qboolean bIsReconnecting, in
 
 	s = Info_ValueForKey(userinfo, "*hltv");
 
-	if (!Q_strlen(s))
+	if (!s[0])
 		return 1;
 
 	switch (Q_atoi(s))
@@ -4795,13 +4751,15 @@ void SV_ExtractFromUserinfo(client_t *cl)
 
 	char *userinfo = cl->userinfo;
 
-	// TODO: Refactor names checking in SV_CheckForDuplicateNames, SV_CheckUserInfo and SV_ExtractFromUserinfo
 	val = Info_ValueForKey(userinfo, "name");
 	Q_strncpy(rawname, val, sizeof(rawname) - 1);
 	rawname[sizeof(rawname) - 1] = 0;
 
-	// Fix name to not start with '#', so it will not resemble userid
-	for (char *p = rawname; *p == '#'; p++) *p = ' ';
+	for (char *p = rawname; *p; p++)
+	{
+		if (*p == '%' || *p == '&')
+			*p = ' ';
+	}
 
 	TrimSpace(rawname, newname);
 
@@ -4809,6 +4767,9 @@ void SV_ExtractFromUserinfo(client_t *cl)
 	{
 		Q_UnicodeRepair(newname);
 	}
+
+	// Fix name to not start with '#', so it will not resemble userid
+	for (char *p = rawname; *p == '#'; p++) *p = ' ';
 
 	if (newname[0] == 0 || !Q_stricmp(newname, "console")
 #ifdef REHLDS_FIXES
@@ -4818,57 +4779,14 @@ void SV_ExtractFromUserinfo(client_t *cl)
 #endif // REHLDS_FIXES
 	{
 		Info_SetValueForKey(userinfo, "name", "unnamed", MAX_INFO_STRING);
-		val = Info_ValueForKey(userinfo, "name");
 	}
 	else if (Q_strcmp(val, newname))
 	{
 		Info_SetValueForKey(userinfo, "name", newname, MAX_INFO_STRING);
-		val = Info_ValueForKey(userinfo, "name");
 	}
 
 	// Check for duplicate names
-	dupc = 1;
-	while (true)
-	{
-		client = g_psvs.clients;
-
-		i = 0;
-		while (!client->active || !client->spawned || client == cl || Q_stricmp(client->name, val))
-		{
-			client++;
-			i++;
-			if (i >= g_psvs.maxclients)
-				break;
-		}
-		if (i >= g_psvs.maxclients)
-			break;
-
-		// Doesn't look we need this stuff, snprintf will do this work
-		//if (Q_strlen(val) > 31)
-		//	val[28] = 0;
-
-		if (val[0] == '(')
-		{
-			if (val[2] == ')')
-				val += 3;
-			else if (val[3] == ')')
-				val += 4;
-		}
-
-		Q_snprintf(newname, sizeof(newname), "(%d)%-0.*s", dupc, 28, val);
-#ifdef REHLDS_FIXES
-		// Fix possibly incorrectly cut UTF8 chars
-		if (!Q_UnicodeValidate(newname))
-		{
-			Q_UnicodeRepair(newname);
-		}
-#endif // REHLDS_FIXES
-		Info_SetValueForKey(userinfo, "name", newname, MAX_INFO_STRING);
-
-		dupc++;
-
-		val = Info_ValueForKey(userinfo, "name");
-	}
+	SV_CheckForDuplicateNames(userinfo, TRUE, cl - g_psvs.clients);
 
 	gEntityInterface.pfnClientUserInfoChanged(cl->edict, userinfo);
 
@@ -4882,7 +4800,7 @@ void SV_ExtractFromUserinfo(client_t *cl)
 	if (val[0] != 0)
 	{
 		i = Q_atoi(val);
-		cl->netchan.rate = clamp(i, 1000, 100000);
+		cl->netchan.rate = clamp(i, MIN_RATE, MAX_RATE);
 	}
 
 	val = Info_ValueForKey(userinfo, "topcolor");
