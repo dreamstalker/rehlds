@@ -136,6 +136,7 @@ private:
 	int m_PrevHeartBeat;
 
 	DWORD m_StartTick;
+	int m_NumFrames;
 
 	hostent_data_t m_CurrentHostentData;
 	struct hostent m_CurrentHostent;

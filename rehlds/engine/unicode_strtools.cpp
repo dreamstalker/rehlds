@@ -363,7 +363,7 @@ int Q_UnicodeConvertT(const T_IN* pIn, T_OUT *pOut, int nOutBytes, enum EStringC
 		if (nMaxOut <= 0)
 			return 0;
 
-		while (pIn)
+		while (*pIn)
 		{
 			bool bErr;
 			uchar32 uVal;
