@@ -69,10 +69,11 @@ protected:
 #define CHARS_EQUAL(msg,expected,actual)\
 { Assertions::CharEquals(msg,expected, actual, __FILE__, __LINE__); }
 
-
 #define DOUBLES_EQUAL(msg, expected,actual,threshold)\
 { Assertions::DoubleEquals(msg,expected, actual, threshold, __FILE__, __LINE__); }
 
+#define MEM_EQUAL(msg, expected,actual,size)\
+{ Assertions::MemoryEquals(msg,expected, actual, size, __FILE__, __LINE__); }
 
 
 #define FAIL(text) \

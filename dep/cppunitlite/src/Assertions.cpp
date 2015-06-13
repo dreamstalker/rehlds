@@ -63,3 +63,21 @@ void Assertions::DoubleEquals(std::string message, double expected, double actua
 		throw TestFailException(ss.str(), std::string(fileName), lineNumber);
 	}
 }
+
+void Assertions::MemoryEquals(std::string message, void* expected, void* actual, int size, const char* fileName, long lineNumber) {
+	if (memcmp(expected, actual, size)) {
+		std::stringstream ss;
+		ss << message << " (expected '";
+		for (int i = 0; i < size; i++) {
+			unsigned char b = *((unsigned char*)expected + i);
+			ss << std::hex << (unsigned int) b << " ";
+		}
+		ss << "', got '";
+		for (int i = 0; i < size; i++) {
+			unsigned char b = *((unsigned char*)actual + i);
+			ss << std::hex << (unsigned int)b << " ";
+		}
+		ss << "')";
+		throw TestFailException(ss.str(), std::string(fileName), lineNumber);
+	}
+}
