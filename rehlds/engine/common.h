@@ -170,6 +170,9 @@ NOBODY uint64 Q_strtoull(char *str);
 
 #endif // Q_functions
 
+//strcpy that works correctly with overlapping src and dst buffers
+char* strcpy_safe(char* dst, char* src);
+
 int build_number(void);
 char *Info_Serverinfo(void);
 
