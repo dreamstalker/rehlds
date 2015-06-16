@@ -337,6 +337,9 @@
     <ClCompile Include="..\unittests\unicode_tests.cpp">
       <Filter>unittests</Filter>
     </ClCompile>
+    <ClCompile Include="..\unittests\info_tests.cpp">
+      <Filter>unittests</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\hookers\memory.h">

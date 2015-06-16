@@ -33,6 +33,12 @@ char serverinfo[MAX_INFO_STRING];
 char gpszVersionString[32];
 char gpszProductString[32];
 
+char* strcpy_safe(char* dst, char* src) {
+	int len = strlen(src);
+	memmove(dst, src, len + 1);
+	return dst;
+}
+
 
 /* <e875> ../engine/common.c:80 */
 char *Info_Serverinfo(void)
