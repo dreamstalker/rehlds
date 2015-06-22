@@ -185,6 +185,10 @@ IRehldsHookRegistry_Mod_LoadStudioModel* CRehldsHookchains::Mod_LoadStudioModel(
 	return &m_Mod_LoadStudioModel;
 }
 
+IRehldsHookRegistry_ExecuteServerStringCmd* CRehldsHookchains::ExecuteServerStringCmd() {
+	return &m_ExecuteServerStringCmd;
+}
+
 int CRehldsApi::GetMajorVersion()
 {
 	return REHLDS_API_VERSION_MAJOR;

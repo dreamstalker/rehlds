@@ -944,21 +944,7 @@ bool ValidateCmd_API(const char* cmd, cmd_source_t src, IGameClient* client) {
 	return true;
 }
 
-/* <5d4e> ../engine/cmd.c:1133 */
-void Cmd_ExecuteString(char *text, cmd_source_t src)
-{
-	cmd_source = src;
-	Cmd_TokenizeString(text);
-
-	if (!Cmd_Argc())
-	{
-		return;
-	}
-
-	IGameClient* cl = (src == src_client) ? GetRehldsApiClient(host_client) : NULL;
-	if (!g_RehldsHookchains.m_ValidateCommand.callChain(ValidateCmd_API, cmd_argv[0], src, cl))
-		return;
-
+void Cmd_ExecuteString_internal(const char* cmdName, cmd_source_t src, IGameClient* client) {
 	// Search in functions
 	cmd_function_t *cmd = cmd_functions;
 	while (cmd)
@@ -984,7 +970,7 @@ void Cmd_ExecuteString(char *text, cmd_source_t src)
 	{
 		if (!Q_stricmp(cmd_argv[0], a->name))
 		{
-			
+
 			Cbuf_InsertText(a->value);
 			return;
 		}
@@ -998,6 +984,24 @@ void Cmd_ExecuteString(char *text, cmd_source_t src)
 		// Send to a server if nothing processed locally and connected
 		Cmd_ForwardToServer();
 	}
+}
+
+/* <5d4e> ../engine/cmd.c:1133 */
+void Cmd_ExecuteString(char *text, cmd_source_t src)
+{
+	cmd_source = src;
+	Cmd_TokenizeString(text);
+
+	if (!Cmd_Argc())
+	{
+		return;
+	}
+
+	IGameClient* cl = (src == src_client) ? GetRehldsApiClient(host_client) : NULL;
+	if (!g_RehldsHookchains.m_ValidateCommand.callChain(ValidateCmd_API, cmd_argv[0], src, cl))
+		return;
+
+	g_RehldsHookchains.m_ExecuteServerStringCmd.callChain(Cmd_ExecuteString_internal, cmd_argv[0], src, cl);
 }
 
 /* <5c15> ../engine/cmd.c:1181 */

@@ -175,6 +175,6 @@
 	static const bool __isLinux = true;
 #endif
 
-extern void rehlds_syserror(const char* fmt, ...);
+extern void __declspec(noreturn) rehlds_syserror(const char* fmt, ...);
 
 #endif // _OSCONFIG_H

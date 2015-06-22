@@ -27,6 +27,10 @@
 */
 #include "sys_shared.h"
 
+#if defined(__GNUC__)
+#include <cpuid.h>
+#endif
+
 #define SSE3_FLAG		(1<<0)
 #define SSSE3_FLAG		(1<<9)
 #define SSE4_1_FLAG		(1<<19)

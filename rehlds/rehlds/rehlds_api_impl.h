@@ -91,6 +91,10 @@ typedef IHookChainRegistryImpl<bool, uint8*, unsigned int, const netadr_t&> CReh
 typedef IHookChainImpl<bool, const char*, cmd_source_t, IGameClient*> CRehldsHook_ValidateCommand;
 typedef IHookChainRegistryImpl<bool, const char*, cmd_source_t, IGameClient*> CRehldsHookRegistry_ValidateCommand;
 
+//ExecuteServerStringCmd
+typedef IVoidHookChainImpl<const char*, cmd_source_t, IGameClient*> CRehldsHook_ExecuteServerStringCmd;
+typedef IVoidHookChainRegistryImpl<const char*, cmd_source_t, IGameClient*> CRehldsHookRegistry_ExecuteServerStringCmd;
+
 //ClientConnected
 typedef IVoidHookChainImpl<IGameClient*> CRehldsHook_ClientConnected;
 typedef IVoidHookChainRegistryImpl<IGameClient*> CRehldsHookRegistry_ClientConnected;
@@ -128,6 +132,7 @@ public:
 	CRehldsHookRegistry_HandleNetCommand m_HandleNetCommand;
 	CRehldsHookRegistry_Mod_LoadBrushModel m_Mod_LoadBrushModel;
 	CRehldsHookRegistry_Mod_LoadStudioModel m_Mod_LoadStudioModel;
+	CRehldsHookRegistry_ExecuteServerStringCmd m_ExecuteServerStringCmd;
 
 public:
 	virtual IRehldsHookRegistry_Steam_NotifyClientConnect* Steam_NotifyClientConnect();
@@ -149,6 +154,7 @@ public:
 	virtual IRehldsHookRegistry_HandleNetCommand* HandleNetCommand();
 	virtual IRehldsHookRegistry_Mod_LoadBrushModel* Mod_LoadBrushModel();
 	virtual IRehldsHookRegistry_Mod_LoadStudioModel* Mod_LoadStudioModel();
+	virtual IRehldsHookRegistry_ExecuteServerStringCmd* ExecuteServerStringCmd();
 };
 
 extern CRehldsHookchains g_RehldsHookchains;
