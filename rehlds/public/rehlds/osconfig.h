@@ -78,7 +78,6 @@
 	#include <sys/types.h>
 	#include <sys/sysinfo.h>
 	#include <unistd.h>
-	#include <cpuid.h>
 
 	// Deail with stupid macro in kernel.h
 	#undef __FUNCTION__
