@@ -4619,6 +4619,12 @@ void SV_UpdateToReliableMessages(void)
 		SZ_Clear(&g_psv.spectator);
 	}
 
+	//Fix for the "server failed to transmit file 'AY&SY..." bug
+	//https://github.com/dreamstalker/rehlds/issues/38
+#ifdef REHLDS_FIXES
+	bool svReliableCompressed = false;
+#endif
+
 	// Send broadcast data
 	for (i = 0; i < g_psvs.maxclients; i++)
 	{
@@ -4626,6 +4632,19 @@ void SV_UpdateToReliableMessages(void)
 
 		if (!client->fakeclient && client->active)
 		{
+			//Fix for the "server failed to transmit file 'AY&SY..." bug
+			//https://github.com/dreamstalker/rehlds/issues/38
+#ifdef REHLDS_FIXES
+			if (!svReliableCompressed && g_psv.reliable_datagram.cursize + client->netchan.message.cursize < client->netchan.message.maxsize)
+			{
+				SZ_Write(&client->netchan.message, g_psv.reliable_datagram.data, g_psv.reliable_datagram.cursize);
+			}
+			else
+			{
+				Netchan_CreateFragments(TRUE, &client->netchan, &g_psv.reliable_datagram);
+				svReliableCompressed = true;
+			}
+#else
 			if (g_psv.reliable_datagram.cursize + client->netchan.message.cursize < client->netchan.message.maxsize)
 			{
 				SZ_Write(&client->netchan.message, g_psv.reliable_datagram.data, g_psv.reliable_datagram.cursize);
@@ -4634,6 +4653,7 @@ void SV_UpdateToReliableMessages(void)
 			{
 				Netchan_CreateFragments(TRUE, &client->netchan, &g_psv.reliable_datagram);
 			}
+#endif
 
 			if (g_psv.datagram.cursize + client->datagram.cursize < client->datagram.maxsize)
 			{
