@@ -167,7 +167,7 @@ NOXREF void R_AddToStudioCache(float frame, int sequence, const vec_t *angles, c
 
 	Q_memcpy(&cache_hull[nCurrentHull], pHulls, sizeof(hull_t) * numhulls);
 	Q_memcpy(&cache_planes[nCurrentPlane], studio_planes,sizeof(mplane_t) * 6 * numhulls);
-	Q_memcpy(&cache_hull_hitgroup[nCurrentHull], studio_hull_hitgroup, sizeof(int *) * numhulls);
+	Q_memcpy(&cache_hull_hitgroup[nCurrentHull], studio_hull_hitgroup, sizeof(int) * numhulls);
 
 	p->numhulls = numhulls;
 
@@ -1150,8 +1150,11 @@ int R_GetStudioBounds(const char *filename, float *mins, float *maxs)
 	{
 		if (LittleLong(*(unsigned int *)pBuffer) == 'TSDI')
 			iret = R_StudioComputeBounds((unsigned char*)pBuffer, mins, maxs);
+#ifndef REHLDS_FIXES
+		//wrong release memory code	
 		else
 			COM_FreeFile(pBuffer);
+#endif
 	}
 
 	if (usingReadBuffer)

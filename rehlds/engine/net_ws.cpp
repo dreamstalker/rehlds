@@ -974,6 +974,10 @@ qboolean NET_QueuePacket(netsrc_t sock)
 	int err;                                                      //  1028
 	unsigned char buf[MAX_UDP_PACKET];                                            //  1029
 
+#ifdef REHLDS_FIXES
+	ret = -1;
+#endif
+
 #ifdef _WIN32
 	for (protocol = 0; protocol < 2; protocol++)
 #else
@@ -1849,18 +1853,25 @@ void NET_GetLocalAddress(void)
 	else
 	{
 		if (Q_strcmp(ipname.string, "localhost"))
-			Q_strncpy(buff, ipname.string, 511);
+			Q_strncpy(buff, ipname.string,  ARRAYSIZE(buff) - 1);
 		else
 		{
 #ifdef _WIN32
-			CRehldsPlatformHolder::get()->gethostname(buff, 512);
+			CRehldsPlatformHolder::get()->gethostname(buff,  ARRAYSIZE(buff));
 #else
-			gethostname(buff, 512);
+			gethostname(buff, ARRAYSIZE(buff));
 #endif // _WIN32
 		}
 
-		buff[511] = 0;
+		buff[ARRAYSIZE(buff) - 1] = 0;
+
+#ifdef REHLDS_FIXES
+		//check if address is valid
+		if (NET_StringToAdr(buff, &net_local_adr))
+		{
+#else
 		NET_StringToAdr(buff, &net_local_adr);
+#endif
 		namelen = sizeof(address);
 #ifdef _WIN32
 		if (CRehldsPlatformHolder::get()->getsockname((SOCKET)ip_sockets[NS_SERVER], (struct sockaddr *)&address, (socklen_t *)&namelen) == SOCKET_ERROR)
@@ -1882,6 +1893,14 @@ void NET_GetLocalAddress(void)
 			Con_Printf("Server IP address %s\n", NET_AdrToString(net_local_adr));
 			Cvar_Set("net_address", va(NET_AdrToString(net_local_adr)));
 		}
+
+#ifdef REHLDS_FIXES
+		}
+		else
+		{
+			Con_Printf("Could not get TCP/IP address, Invalid hostname '%s'\n", buff);
+		}
+#endif
 	}
 
 #ifdef _WIN32

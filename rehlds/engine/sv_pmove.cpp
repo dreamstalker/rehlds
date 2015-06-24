@@ -52,8 +52,10 @@ const char *PM_SV_TraceTexture(int ground, vec_t *vstart, vec_t *vend)
 		return NULL;
 
 	edict_t *pent = &g_psv.edicts[pe->info];
+
+	/* Unreachable code
 	if (!pent)
 		return NULL;
-
+	*/
 	return TraceTexture(pent, vstart, vend);
 }

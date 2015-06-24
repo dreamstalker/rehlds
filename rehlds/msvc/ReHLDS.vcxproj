@@ -828,7 +828,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>REHLDS_FLIGHT_REC;REHLDS_OPT_PEDANTIC;REHLDS_SELF;REHLDS_CHECKS;USE_BREAKPAD_HANDLER;DEDICATED;SWDS;_CRT_SECURE_NO_WARNINGS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>REHLDS_FIXES;REHLDS_FLIGHT_REC;REHLDS_OPT_PEDANTIC;REHLDS_SELF;REHLDS_CHECKS;USE_BREAKPAD_HANDLER;DEDICATED;SWDS;_CRT_SECURE_NO_WARNINGS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <FloatingPointModel>Precise</FloatingPointModel>
       <AdditionalOptions>/arch:IA32 %(AdditionalOptions)</AdditionalOptions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>

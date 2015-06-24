@@ -120,7 +120,9 @@ void Sys_ShutdownGame(void);
 void ClearIOStates(void);
 
 NOBODY class IBaseInterface *__CreateCEngineAPIIEngineAPI_interface(void);
-NOXREF int BuildMapCycleListHints(char **hints);
+
+// Needs rechecking
+//NOXREF int BuildMapCycleListHints(char **hints);
 
 NOBODY class IBaseInterface *__CreateCDedicatedServerAPIIDedicatedServerAPI_interface(void);
 NOBODY void _GLOBAL__sub_I_D_SurfaceCacheForRes(void);

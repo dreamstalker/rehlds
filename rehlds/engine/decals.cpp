@@ -212,7 +212,7 @@ void Draw_MiptexTexture(cachewad_t *wad, unsigned char *data)
 		tex->name[15] = 0;
 	}
 #ifdef SWDS
-	if (pal[765] || pal[766] || pal[767] != -1)
+	if (pal[765] || pal[766] || pal[767] != 0xFF)
 		tex->name[0] = '}';
 	else
 		tex->name[0] = '{';
@@ -224,7 +224,7 @@ void Draw_MiptexTexture(cachewad_t *wad, unsigned char *data)
 		pal[3 * i + 1] = texgammatable[pal[3 * i + 1] & 0xFF];
 		pal[3 * i + 2] = texgammatable[pal[3 * i + 2] & 0xFF];
 	}
-	if (pal[765] || pal[766] || pal[767] != -1)
+	if (pal[765] || pal[766] || pal[767] != 0xFF)
 	{
 		tex->name[0] = '}';
 		if (gfCustomBuild)
@@ -313,7 +313,7 @@ NOXREF int Draw_DecalIndex(int id)
 	//Used hw -> CL_Restore
 	char tmp[32];
 	char *pName;
-	if (!decal_names[id])
+	if (!decal_names[id][0])
 		Sys_Error("Used decal #%d without a name\n", id);
 
 	pName = decal_names[id];
@@ -481,8 +481,8 @@ void Decal_MergeInDecals(cachewad_t *pwad, const char *pathID)
 
 		pwad->basedirs = (char **)Mem_Malloc(sizeof(char *));
 		*decal_wad->basedirs = Mem_Strdup(pathID);
-		decal_wad->lumppathindices = (int *)Mem_Malloc(sizeof(int *) * decal_wad->cacheMax);
-		Q_memset(decal_wad->lumppathindices, 0, sizeof(int *) * decal_wad->cacheMax);
+		decal_wad->lumppathindices = (int *)Mem_Malloc(sizeof(int) * decal_wad->cacheMax);
+		Q_memset(decal_wad->lumppathindices, 0, sizeof(int) * decal_wad->cacheMax);
 		return;
 	}
 
@@ -501,8 +501,8 @@ void Decal_MergeInDecals(cachewad_t *pwad, const char *pathID)
 	Draw_AllocateCacheSpace(final, final->cacheMax, 0);
 	final->pfnCacheBuild = decal_wad->pfnCacheBuild;
 	final->cacheExtra = decal_wad->cacheExtra;
-	final->lumppathindices = (int *)Mem_Malloc(sizeof(int *) * final->cacheMax);
-	Q_memset(final->lumppathindices, 0, sizeof(int *) * final->cacheMax);
+	final->lumppathindices = (int *)Mem_Malloc(sizeof(int) * final->cacheMax);
+	Q_memset(final->lumppathindices, 0, sizeof(int) * final->cacheMax);
 
 	final->numpaths = 2;
 	final->basedirs = (char **)Mem_Malloc(sizeof(char *) * 2);

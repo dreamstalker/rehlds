@@ -1158,6 +1158,11 @@ void Netchan_CreateFileFragmentsFromBuffer(qboolean server, netchan_t *chan, con
 			else
 				rehlds_syserror(__FUNCTION__ "Reverse me: client-side code");
 
+#ifdef REHLDS_FIXES
+			if (bCompressed) {
+				Mem_Free(pbuf);
+			}
+#endif
 			return;
 		}
 
@@ -1196,6 +1201,11 @@ void Netchan_CreateFileFragmentsFromBuffer(qboolean server, netchan_t *chan, con
 		p->next = wait;
 	}
 
+#ifdef REHLDS_FIXES
+	if (bCompressed) {
+		Mem_Free(pbuf);
+	}
+#endif
 }
 
 /* <66564> ../engine/net_chan.c:1500 */
@@ -1224,28 +1234,24 @@ int Netchan_CreateFileFragments(qboolean server, netchan_t *chan, const char *fi
 
 	Q_snprintf(compressedfilename, sizeof compressedfilename, "%s.ztmp", filename);
 	compressedFileTime = FS_GetFileTime(compressedfilename);
-	if (compressedFileTime >= FS_GetFileTime(filename))
+	if (compressedFileTime >= FS_GetFileTime(filename) && (hfile = FS_Open(compressedfilename, "rb")))
 	{
-		hfile = FS_Open(compressedfilename, "rb");
-		if (hfile)
+		filesize = FS_Size(hfile);
+		FS_Close(hfile);
+		bCompressed = 1;
+		hfile = FS_Open(filename, "rb");
+		if (!hfile)
 		{
-			filesize = FS_Size(hfile);
-			FS_Close(hfile);
-			bCompressed = 1;
-			hfile = FS_Open(filename, "rb");
-			if (!hfile)
-			{
-				Con_Printf("Warning:  Unable to open %s for transfer\n", filename);
-				return 0;
-			}
+			Con_Printf("Warning:  Unable to open %s for transfer\n", filename);
+			return 0;
+		}
 
-			uncompressed_size = FS_Size(hfile);
-			if (uncompressed_size > sv_filetransfermaxsize.value)
-			{
-				FS_Close(hfile);
-				Con_Printf("Warning:  File %s is too big to transfer from host %s\n", filename, NET_AdrToString(chan->remote_address));
-				return 0;
-			}
+		uncompressed_size = FS_Size(hfile);
+		if (uncompressed_size > sv_filetransfermaxsize.value)
+		{
+			FS_Close(hfile);
+			Con_Printf("Warning:  File %s is too big to transfer from host %s\n", filename, NET_AdrToString(chan->remote_address));
+			return 0;
 		}
 	}
 	else
@@ -1430,7 +1436,7 @@ qboolean Netchan_CopyFileFragments(netchan_t *chan)
 	char compressor[32];
 	fragbuf_s *n;
 	qboolean bCompressed;
-	size_t uncompressedSize;
+	unsigned int uncompressedSize;
 
 
 	if (!chan->incomingready[FRAG_FILE_STREAM])
@@ -1456,7 +1462,16 @@ qboolean Netchan_CopyFileFragments(netchan_t *chan)
 	if (!Q_stricmp(compressor, "bz2"))
 		bCompressed = TRUE;
 
-	uncompressedSize = MSG_ReadLong();
+	uncompressedSize = (unsigned int)MSG_ReadLong();
+
+#ifdef REHLDS_FIXES
+	if (uncompressedSize > 1024 * 64) {
+		Con_Printf("Received too large file (size=%u)\nFlushing input queue\n", uncompressedSize);
+		Netchan_FlushIncoming(chan, 1);
+		return FALSE;
+	}
+#endif
+
 	if (Q_strlen(filename) <= 0)
 	{
 		Con_Printf("File fragment received with no filename\nFlushing input queue\n");
@@ -1594,6 +1609,10 @@ qboolean Netchan_CopyFileFragments(netchan_t *chan)
 			{
 				Con_Printf("File open failed %s\n", filename);
 				Netchan_FlushIncoming(chan, 1);
+
+#ifdef REHLDS_FIXES
+				Mem_Free(buffer);
+#endif
 				return FALSE;
 			}
 

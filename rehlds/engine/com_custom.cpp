@@ -186,6 +186,11 @@ int COM_SizeofResourceList(resource_t *pList, resourceinfo_t *ri)
 	Q_memset(ri, 0, sizeof(*ri));
 	for (p = pList->pNext; p != pList; p = p->pNext)
 	{
+#ifdef REHLDS_FIXES
+		//skip resources with invalid type
+		if (p->type >= rt_max)
+			continue;
+#endif
 		nSize += p->nDownloadSize;
 		if (p->type != t_model || p->nIndex != 1)
 		{

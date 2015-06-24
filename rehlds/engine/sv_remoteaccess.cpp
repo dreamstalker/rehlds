@@ -2,6 +2,11 @@
 
 class CServerRemoteAccess g_ServerRemoteAccess;
 
+CServerRemoteAccess::CServerRemoteAccess() {
+	m_iBytesSent = 0;
+	m_iBytesReceived = 0;
+}
+
 void CServerRemoteAccess::WriteDataRequest(const void *buffer, int bufferSize)
 {
 	WriteDataRequest_noVirt(buffer, bufferSize);
@@ -153,11 +158,20 @@ void CServerRemoteAccess::GetMapList(CUtlBuffer &value)
 	Q_strcpy(mapwild, "maps/*.bsp");
 	for (findfn = Sys_FindFirst(mapwild, 0); findfn; findfn = Sys_FindNext(0))
 	{
-		Q_snprintf(curDir, MAX_PATH, "maps/%s", findfn);
-		FS_GetLocalPath(curDir, curDir, MAX_PATH);
+		Q_snprintf(curDir, ARRAYSIZE(curDir), "maps/%s", findfn);
+#ifdef REHLDS_CHECKS
+		curDir[ARRAYSIZE(curDir) - 1] = 0;
+#endif
+
+		FS_GetLocalPath(curDir, curDir, ARRAYSIZE(curDir));
 		if (Q_strstr(curDir, com_gamedir))
 		{
+#ifdef REHLDS_CHECKS
+			Q_strncpy(mapName, findfn, ARRAYSIZE(mapName));
+			mapName[ARRAYSIZE(mapName) - 1] = 0;
+#else
 			Q_strcpy(mapName, findfn);
+#endif
 			extension = Q_strstr(mapName, ".bsp");
 			if (extension)
 				*extension = 0;

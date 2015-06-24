@@ -46,6 +46,7 @@ private:
 	int                        m_iBytesReceived;
 
 public:
+	CServerRemoteAccess();
 
 	virtual ~CServerRemoteAccess() { }
 

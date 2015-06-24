@@ -3385,7 +3385,7 @@ void SV_ConnectionlessPacket(void)
 
 	else if (!Q_stricmp(c, "log"))
 	{
-		if (sv_logrelay.value != 0.0f && args && Q_strlen(args) > 4)
+		if (sv_logrelay.value != 0.0f && Q_strlen(args) > 4)
 		{
 			const char *s = &args[Q_strlen("log ")];
 			if (s && s[0])
@@ -3515,7 +3515,7 @@ qboolean SV_FilterPacket(void)
 		else
 		{
 			if (i < numipfilters - 1)
-				Q_memcpy(curFilter, &curFilter[1], sizeof(ipfilter_t) * (numipfilters - i - 1));
+				memmove(curFilter, &curFilter[1], sizeof(ipfilter_t) * (numipfilters - i - 1));
 
 			--numipfilters;
 		}
@@ -4307,7 +4307,9 @@ qboolean SV_ShouldUpdatePing(client_t *client)
 		return 1;
 	}
 
-	SV_CalcPing(client);
+	//useless call
+	//SV_CalcPing(client);
+
 	return client->lastcmd.buttons & 0x8000;
 }
 
@@ -6466,9 +6468,7 @@ qboolean IsSafeFileToDownload(const char *filename)
 	char lwrfilename[MAX_PATH];
 
 	if (!filename)
-	{
 		return FALSE;
-	}
 
 #ifdef REHLDS_FIXES
 	// FIXED: Allow to download customizations
@@ -6479,7 +6479,10 @@ qboolean IsSafeFileToDownload(const char *filename)
 #endif // REHLDS_FIXES
 
 	// Convert to lower case
-	Q_strncpy(lwrfilename, filename, sizeof(lwrfilename));
+	Q_strncpy(lwrfilename, filename, ARRAYSIZE(lwrfilename));
+#ifdef REHLDS_CHECKS
+	lwrfilename[ARRAYSIZE(lwrfilename) - 1] = 0;
+#endif
 	Q_strlwr(lwrfilename);
 
 	first = Q_strchr(lwrfilename, '.');

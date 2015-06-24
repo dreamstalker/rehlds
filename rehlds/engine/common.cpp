@@ -822,6 +822,10 @@ uint32 MSG_ReadBits(int numbits)
 {
 	uint32 result;
 
+	if (numbits > 32) {
+		rehlds_syserror("%s: invalid numbits %d\n", __FUNCTION__, numbits);
+	}
+
 	if (msg_badread)
 	{
 		result = 1;

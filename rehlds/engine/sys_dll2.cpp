@@ -126,6 +126,9 @@ void Sys_GetCDKey(char *pszCDKey, int *nLength, int *bDedicated)
 		else
 		{
 			CRC32_t crc;
+#ifdef REHLDS_FIXES
+			crc = 0;
+#endif
 			CRC32_ProcessBuffer(&crc, hostname, Q_strlen(hostname));
 			Q_snprintf(key, sizeof(key), "%u", crc);
 		}
@@ -617,6 +620,7 @@ IBaseInterface *CreateCEngineAPI(void)
 InterfaceReg g_CreateCEngineAPI = InterfaceReg(CreateCEngineAPI, "VENGINE_LAUNCHER_API_VERSION002");
 
 /* <908b7> ../engine/sys_dll2.cpp:1070 */
+/* Needs rechecking
 NOXREF int BuildMapCycleListHints(char **hints)
 {
 	char szMap[262];
@@ -683,6 +687,7 @@ NOXREF int BuildMapCycleListHints(char **hints)
 	Q_strcat(*hints, szMap);
 	return 1;
 }
+*/
 
 bool CDedicatedServerAPI::Init(char *basedir, char *cmdline, CreateInterfaceFn launcherFactory, CreateInterfaceFn filesystemFactory)
 {
@@ -695,7 +700,12 @@ bool CDedicatedServerAPI::Init_noVirt(char *basedir, char *cmdline, CreateInterf
 	if (!dedicated_)
 		return false;
 
+#ifdef REHLDS_CHECKS
+	Q_strncpy(this->m_OrigCmd, cmdline, ARRAYSIZE(this->m_OrigCmd));
+	this->m_OrigCmd[ARRAYSIZE(this->m_OrigCmd) - 1] = 0;
+#else
 	Q_strcpy(this->m_OrigCmd, cmdline);
+#endif
 	if (!strstr(cmdline, "-nobreakpad"))
 	{
 		CRehldsPlatformHolder::get()->SteamAPI_UseBreakpadCrashHandler(va("%d", build_number()), "Aug  8 2013", "11:17:26", 0, 0, 0);

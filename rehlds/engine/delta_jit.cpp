@@ -10,8 +10,8 @@ uint32 DELTAJIT_CreateMask(int startBit, int endBit) {
 	if (endBit > 32) endBit = 32;
 
 	uint32 res = 0xFFFFFFFF;
-	res &= (0xFFFFFFFF << startBit);
-	res &= (0xFFFFFFFF >> (32 - endBit));
+	res &= startBit < 32 ? (0xFFFFFFFF << startBit) : 0;
+	res &= endBit > 0 ? (0xFFFFFFFF >> (32 - endBit)) : 0;
 	return res;
 }
 
@@ -102,7 +102,10 @@ void DELTAJIT_CreateDescription(delta_t* delta, deltajitdata_t &jitdesc) {
 				blockId++;
 				firstBlock = false;
 			}
-			blockField->last = true;
+
+			if (blockField) {
+				blockField->last = true;
+			}
 		}
 	}
 
@@ -514,7 +517,7 @@ public:
 private:
 	jitasm::Reg32 neededBits = ebx;
 	jitasm::Reg32 highestBit = ebp;
-	size_t highest_id;
+	size_t highest_id = 0;
 };
 
 CDeltaTestDeltaJIT::CDeltaTestDeltaJIT(deltajitdata_t *_jitdesc) : jitdesc(_jitdesc)
@@ -607,6 +610,7 @@ CDeltaJit::CDeltaJit(delta_t* _delta, CDeltaClearMarkFieldsJIT* _cleanMarkCheckF
 	delta = _delta;
 	cleanMarkCheckFunc = _cleanMarkCheckFunc;
 	testDeltaFunc = _testDeltaFunc;
+	markedFieldsMaskSize = 0;
 }
 
 CDeltaJit::~CDeltaJit() {

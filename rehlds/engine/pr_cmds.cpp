@@ -481,8 +481,10 @@ msurface_t *SurfaceAtPoint(model_t *pModel, mnode_t *node, vec_t *start, vec_t *
 	if (surf)
 		return surf;
 
+	/* Unreachable code
 	if (t == s)
 		return NULL;
+	*/
 
 	for (int i = 0; i < node->numsurfaces; i++)
 	{
@@ -2100,7 +2102,9 @@ void PF_MessageBegin_I(int msg_dest, int msg_type, const float *pOrigin, edict_t
 			gMsgOrigin[1] = pOrigin[1];
 			gMsgOrigin[2] = pOrigin[2];
 		}
-		Host_IsSinglePlayerGame();
+
+		//No idea why is it called here
+		//Host_IsSinglePlayerGame();
 	}
 
 	gMsgBuffer.flags = SIZEBUF_ALLOW_OVERFLOW;
