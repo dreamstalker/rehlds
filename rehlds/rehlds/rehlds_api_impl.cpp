@@ -51,6 +51,10 @@ int* GetMsgBadRead_api() {
 	return &msg_badread;
 }
 
+cmd_source_t* GetCmdSource_api() {
+	return &cmd_source;
+}
+
 CRehldsServerStatic g_RehldsServerStatic;
 CRehldsServerData g_RehldsServerData;
 CRehldsHookchains g_RehldsHookchains;
@@ -75,7 +79,8 @@ RehldsFuncs_t g_RehldsApiFuncs =
 	&GSBSecure_api,
 	&GetBuildNumber_api,
 	&GetRealTime_api,
-	&GetMsgBadRead_api
+	&GetMsgBadRead_api,
+	&GetCmdSource_api
 };
 
 sizebuf_t* GetNetMessage_api()
