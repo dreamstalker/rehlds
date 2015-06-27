@@ -687,7 +687,7 @@ qboolean Steam_NotifyClientConnect_api(IGameClient *cl, const void *pvSteam2Key,
 qboolean Steam_NotifyClientConnect(client_t *cl, const void *pvSteam2Key, unsigned int ucbSteam2Key)
 {
 	return g_RehldsHookchains.m_Steam_NotifyClientConnect
-		.callChain(Steam_NotifyClientConnect_api, GetRehldsApiClient(cl), pvSteam2Key, ucbSteam2Key);
+		.callChain(Steam_NotifyClientConnect_api, FALSE, GetRehldsApiClient(cl), pvSteam2Key, ucbSteam2Key);
 }
 
 
@@ -708,7 +708,7 @@ qboolean Steam_NotifyBotConnect_api(IGameClient* cl)
 
 qboolean Steam_NotifyBotConnect(client_t *cl)
 {
-	return g_RehldsHookchains.m_Steam_NotifyBotConnect.callChain(Steam_NotifyBotConnect_api, GetRehldsApiClient(cl));
+	return g_RehldsHookchains.m_Steam_NotifyBotConnect.callChain(Steam_NotifyBotConnect_api, FALSE, GetRehldsApiClient(cl));
 }
 
 /* <f18cf> ../engine/sv_steam3.cpp:924 */

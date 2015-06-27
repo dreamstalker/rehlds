@@ -135,7 +135,7 @@ uint32 crc32c_t_sse(uint32 iCRC, const uint8 *buf, unsigned int len) {
 }
 
 uint32 crc32c_t(uint32 iCRC, const uint8 *buf, unsigned int len) {
-	return cpuinfo.sse4_2 ? crc32c_t_nosse(iCRC, buf, len) : crc32c_t_nosse(iCRC, buf, len);
+	return cpuinfo.sse4_2 ? crc32c_t_sse(iCRC, buf, len) : crc32c_t_nosse(iCRC, buf, len);
 }
 
 uint32 crc32c(const uint8 *buf, int len) {

@@ -14,7 +14,7 @@ void Assertions::StringEquals(std::string message, std::string expected, std::st
 }
 
 void Assertions::StringEquals(std::string message, const char* expected, const char* actual, const char* fileName, long lineNumber) {
-	if (expected == NULL) {
+	if (actual == NULL) {
 		std::stringstream ss;
 		ss << message << " (expected '" << expected << "', got NULL";
 		throw TestFailException(ss.str(), std::string(fileName), lineNumber);

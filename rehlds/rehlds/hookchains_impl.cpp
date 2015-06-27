@@ -19,6 +19,7 @@
 #include "precompiled.h"
 
 AbstractHookChain::AbstractHookChain() {
+	memset(m_Hooks, 0, sizeof(m_Hooks));
 	m_NumHooks = 0;
 	m_CurHook = 0;
 	m_bOriginalCalled = false;
@@ -39,6 +40,7 @@ void AbstractHookChain::init(void* origFunc, void* hooks, int numHooks) {
 
 AbstractHookChainRegistry::AbstractHookChainRegistry()
 {
+	memset(m_Hooks, 0, sizeof(m_Hooks));
 	m_NumHooks = 0;
 }
 

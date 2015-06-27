@@ -470,6 +470,7 @@
     <ClInclude Include="..\public\FileSystem.h" />
     <ClInclude Include="..\public\idedicatedexports.h" />
     <ClInclude Include="..\public\interface.h" />
+    <ClInclude Include="..\public\iosutil.h" />
     <ClInclude Include="..\public\iregistry.h" />
     <ClInclude Include="..\public\protected_things.h" />
     <ClInclude Include="..\public\rehlds\archtypes.h" />
