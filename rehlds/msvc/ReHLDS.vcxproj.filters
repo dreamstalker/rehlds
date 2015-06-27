@@ -1050,6 +1050,9 @@
     <ClInclude Include="..\public\rehlds\crc32c.h">
       <Filter>public\rehlds</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\iosutil.h">
+      <Filter>public</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\linux\appversion.sh">

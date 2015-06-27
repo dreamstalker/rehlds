@@ -998,7 +998,7 @@ void Cmd_ExecuteString(char *text, cmd_source_t src)
 	}
 
 	IGameClient* cl = (src == src_client) ? GetRehldsApiClient(host_client) : NULL;
-	if (!g_RehldsHookchains.m_ValidateCommand.callChain(ValidateCmd_API, cmd_argv[0], src, cl))
+	if (!g_RehldsHookchains.m_ValidateCommand.callChain(ValidateCmd_API, false, cmd_argv[0], src, cl))
 		return;
 
 	g_RehldsHookchains.m_ExecuteServerStringCmd.callChain(Cmd_ExecuteString_internal, cmd_argv[0], src, cl);

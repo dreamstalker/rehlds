@@ -33,6 +33,8 @@
 #include "utlbuffer.h"
 #include "utlrbtree.h"
 
+#include "iosutil.h"
+
 //testsuite
 #include "testsuite.h"
 #include "funccalls.h"
