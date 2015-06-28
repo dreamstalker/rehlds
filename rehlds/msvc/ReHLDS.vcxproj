@@ -268,6 +268,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Play|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Swds Play|Win32'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\unittests\rehlds_tests_shared.cpp" />
     <ClCompile Include="..\unittests\struct_offsets_tests.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Swds|Win32'">true</ExcludedFromBuild>
@@ -546,6 +547,7 @@
     <ClInclude Include="..\testsuite\player.h" />
     <ClInclude Include="..\testsuite\recorder.h" />
     <ClInclude Include="..\testsuite\testsuite.h" />
+    <ClInclude Include="..\unittests\rehlds_tests_shared.h" />
     <ClInclude Include="..\version\version.h" />
   </ItemGroup>
   <ItemGroup>
@@ -904,7 +906,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>REHLDS_FLIGHT_REC;REHLDS_OPT_PEDANTIC;REHLDS_SELF;_BUILD_FROM_IDE;USE_BREAKPAD_HANDLER;DEDICATED;SWDS;_CRT_SECURE_NO_WARNINGS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>REHLDS_FLIGHT_REC;REHLDS_OPT_PEDANTIC;REHLDS_SELF;REHLDS_UNIT_TESTS;_BUILD_FROM_IDE;USE_BREAKPAD_HANDLER;DEDICATED;SWDS;_CRT_SECURE_NO_WARNINGS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>precompiled.h</PrecompiledHeaderFile>
@@ -940,7 +942,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>REHLDS_FLIGHT_REC;REHLDS_OPT_PEDANTIC;REHLDS_FIXES;REHLDS_SELF;_BUILD_FROM_IDE;USE_BREAKPAD_HANDLER;DEDICATED;SWDS;_CRT_SECURE_NO_WARNINGS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>REHLDS_FLIGHT_REC;REHLDS_OPT_PEDANTIC;REHLDS_FIXES;REHLDS_SELF;REHLDS_UNIT_TESTS;_BUILD_FROM_IDE;USE_BREAKPAD_HANDLER;DEDICATED;SWDS;_CRT_SECURE_NO_WARNINGS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>precompiled.h</PrecompiledHeaderFile>

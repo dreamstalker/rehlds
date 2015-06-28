@@ -162,6 +162,10 @@ void setupToolchain(NativeBinarySpec b) {
     if (!unitTestExecutable && !swdsLib) {
         cfg.singleDefines 'HOOK_ENGINE'
     }
+	
+	if (unitTestExecutable) {
+		cfg.singleDefines 'REHLDS_UNIT_TESTS'
+	}
 
     if (rehldsFixes) {
         cfg.singleDefines 'REHLDS_FIXES', 'REHLDS_CHECKS'

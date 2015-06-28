@@ -1,4 +1,5 @@
 #include "precompiled.h"
+#include "rehlds_tests_shared.h"
 #include "cppunitlite/TestHarness.h"
 
 TEST(AngleVectorsTest, MathLib, 1000) {

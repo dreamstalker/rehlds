@@ -1,4 +1,5 @@
 #include "precompiled.h"
+#include "rehlds_tests_shared.h"
 #include "cppunitlite/TestHarness.h"
 
 #pragma pack(push, 1)
@@ -239,6 +240,8 @@ void _DeltaSimpleTests(delta_t* delta, delta_simpletest_data_t* tests, int tests
 
 
 TEST(MarkFieldsTest_Simple_Primitives, Delta, 1000) {
+	EngineInitializer engInitGuard;
+
 	delta_t* delta = _CreateTestDeltaDesc();
 
 	delta_simpletest_data_t testdata[] = {
@@ -254,11 +257,11 @@ TEST(MarkFieldsTest_Simple_Primitives, Delta, 1000) {
 			{ "Float_1BlockCheck", 0x71, 0x71, true, "f_18", []() { dst2.f_18 = 0; } },
 	};
 	_DeltaSimpleTests(delta, testdata, ARRAYSIZE(testdata));
-
-	SV_Shutdown();
 }
 
 TEST(MarkFieldsTest_InterBlock, Delta, 1000) {
+	EngineInitializer engInitGuard;
+
 	delta_t* delta = _CreateTestDeltaDesc();
 
 	delta_simpletest_data_t testdata[] = {
@@ -279,11 +282,11 @@ TEST(MarkFieldsTest_InterBlock, Delta, 1000) {
 			{ "Interblock2_val_3b", 0x71, 0x71, true, "i_5D", []() { dst2.i_5D &= 0x00FFFFFF; } },
 	};
 	_DeltaSimpleTests(delta, testdata, ARRAYSIZE(testdata));
-
-	SV_Shutdown();
 }
 
 TEST(MarkFieldsTest_Strings, Delta, 1000) {
+	EngineInitializer engInitGuard;
+
 	delta_t* delta = _CreateTestDeltaDesc();
 
 	delta_simpletest_data_t testdata[] = {
@@ -296,11 +299,11 @@ TEST(MarkFieldsTest_Strings, Delta, 1000) {
 			{ "Str_case_check", 'c', 'c', true, "", []() { dst1.s_24[0] = 'C'; } },
 	};
 	_DeltaSimpleTests(delta, testdata, ARRAYSIZE(testdata));
-
-	SV_Shutdown();
 }
 
 TEST(MarkFieldsTest_TimeWindow, Delta, 1000) {
+	EngineInitializer engInitGuard;
+
 #ifdef REHLDS_FIXES
 	bool rehlds_fixes = true;
 #else
@@ -315,12 +318,11 @@ TEST(MarkFieldsTest_TimeWindow, Delta, 1000) {
 			{ "TimeWindow_Above_Precision2", 'c', 'c', true, "w8_1C", []() { dst2.w8_1C = 0.1f; dst1.w8_1C = 0.12f; } },
 	};
 	_DeltaSimpleTests(delta, testdata, ARRAYSIZE(testdata));
-
-	SV_Shutdown();
 }
 
-TEST(TestDelta_Test, Delta, 1000)
-{
+TEST(TestDelta_Test, Delta, 1000) {
+	EngineInitializer engInitGuard;
+
 	delta_t* delta = _CreateTestDeltaDesc();
 
 	delta_test_struct_t testdata[4], from;
@@ -363,6 +365,4 @@ TEST(TestDelta_Test, Delta, 1000)
 		if (tested != result[i])
 			rehlds_syserror("TestDelta_Test: returned bitcount %i is not equal to true value %i", tested, result[i]);
 	}
-
-	SV_Shutdown();
 }

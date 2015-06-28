@@ -116,6 +116,10 @@
 	inline void* sys_allocmem(unsigned int size) {
 		return VirtualAlloc(NULL, size, MEM_COMMIT, PAGE_READWRITE);
 	}
+
+	inline void sys_freemem(void* ptr, unsigned int size) {
+		VirtualFree(ptr, 0, MEM_RELEASE);
+	}
 #else // _WIN32
 	#ifndef PAGESIZE
 		#define PAGESIZE 4096
@@ -152,6 +156,9 @@
 
 	inline void* sys_allocmem(unsigned int size) {
 		return mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+	}
+	inline void sys_freemem(void* ptr, unsigned int size) {
+		munmap(ptr, size);
 	}
 
 	#define WSAENOPROTOOPT ENOPROTOOPT

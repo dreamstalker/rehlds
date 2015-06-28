@@ -96,6 +96,7 @@ private:
 
 public:
 	CRehldsFlightRecorder();
+	virtual ~CRehldsFlightRecorder();
 	void dump(const char* fname);
 
 	virtual void StartMessage(uint16 msg, bool entrance);

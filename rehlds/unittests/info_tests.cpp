@@ -1,7 +1,10 @@
 #include "precompiled.h"
+#include "rehlds_tests_shared.h"
 #include "cppunitlite/TestHarness.h"
 
 TEST(PrefixedKeysRemove, Info, 1000) {
+	EngineInitializer engInitGuard;
+
 	struct testdata_t {
 		const char* inData;
 		const char* outData;
@@ -31,6 +34,8 @@ TEST(PrefixedKeysRemove, Info, 1000) {
 }
 
 TEST(SetValueForStarKey, Info, 1000) {
+	EngineInitializer engInitGuard;
+
 	struct testdata_t {
 		const char* initialInfo;
 		const char* key;
@@ -91,6 +96,8 @@ TEST(SetValueForStarKey, Info, 1000) {
 }
 
 TEST(RemoveKeyValue, Info, 1000) {
+	EngineInitializer engInitGuard;
+
 	struct testdata_t {
 		const char* initialInfo;
 		const char* key;
@@ -124,6 +131,8 @@ TEST(RemoveKeyValue, Info, 1000) {
 }
 
 TEST(GetKeyValue, Info, 1000) {
+	EngineInitializer engInitGuard;
+
 	struct testdata_t {
 		const char* info;
 		const char* key;

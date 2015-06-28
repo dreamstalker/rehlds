@@ -11,5 +11,8 @@ public class RehldsDecodersModule extends SimpleDecoderModule {
         registerDecoder(new AllocEntPrivateDataV1Decoder());
 
         registerDecoder(new FrameV2Decoder());
+
+        registerDecoder(new LogV1Decoder());
+        registerDecoder(new AllocEntPrivateDataV2Decoder());
     }
 }

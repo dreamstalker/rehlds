@@ -72,6 +72,10 @@ void Log_Printf(const char *fmt, ...)
 	Q_vsnprintf(&string[Q_strlen(string)], sizeof(string) - Q_strlen(string), fmt, argptr);
 	va_end(argptr);
 
+#ifdef REHLDS_FLIGHT_REC
+	FR_Log("REHLDS_LOG", string);
+#endif
+
 	if (g_psvs.log.net_log_ || firstLog != NULL)
 	{
 		if (g_psvs.log.net_log_)

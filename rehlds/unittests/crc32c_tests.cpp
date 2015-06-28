@@ -1,7 +1,9 @@
 #include "precompiled.h"
+#include "rehlds_tests_shared.h"
 #include "cppunitlite/TestHarness.h"
 
 TEST(CRC32C_Hash, CRC32C, 1000) {
+
 	Sys_CheckCpuInstructionsSupport();
 	CHECK("SSE4.2 Support", cpuinfo.sse4_2);
 

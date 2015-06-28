@@ -57,6 +57,11 @@ CRehldsFlightRecorder::CRehldsFlightRecorder() {
 	m_DataRegionPtr = m_DataRegion + DATA_REGION_HEADER;
 }
 
+CRehldsFlightRecorder::~CRehldsFlightRecorder() {
+	sys_freemem(m_MetaRegion, META_REGION_SIZE);
+	sys_freemem(m_DataRegion, DATA_REGION_SIZE);
+}
+
 void CRehldsFlightRecorder::InitHeadersContent() {
 	m_pMetaHeader->version = FLIGHT_RECORDER_VERSION;
 	m_pMetaHeader->regionSize = META_REGION_SIZE;

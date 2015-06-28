@@ -55,6 +55,12 @@ cmd_source_t* GetCmdSource_api() {
 	return &cmd_source;
 }
 
+void Log_api(const char* prefix, const char* msg) {
+#ifdef REHLDS_FLIGHT_REC
+	FR_Log(prefix, msg);
+#endif
+}
+
 CRehldsServerStatic g_RehldsServerStatic;
 CRehldsServerData g_RehldsServerData;
 CRehldsHookchains g_RehldsHookchains;
@@ -80,7 +86,8 @@ RehldsFuncs_t g_RehldsApiFuncs =
 	&GetBuildNumber_api,
 	&GetRealTime_api,
 	&GetMsgBadRead_api,
-	&GetCmdSource_api
+	&GetCmdSource_api,
+	&Log_api
 };
 
 sizebuf_t* GetNetMessage_api()

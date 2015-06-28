@@ -22,6 +22,7 @@
 extern CRehldsFlightRecorder* g_FlightRecorder;
 
 extern void FR_Init();
+extern void FR_Shutdown();
 
 #ifdef REHLDS_FLIGHT_REC
 
@@ -40,5 +41,6 @@ extern void FR_StartFrame(long frameCounter);
 extern void FR_EndFrame(long frameCounter);
 extern void FR_FreeEntPrivateData(void* data);
 extern void FR_AllocEntPrivateData(void* res, int size);
+extern void FR_Log(const char* prefix, const char* msg);
 
 #endif //REHLDS_FLIGHT_REC

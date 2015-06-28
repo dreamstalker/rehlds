@@ -35,7 +35,7 @@
 #include "model.h"
 
 #define REHLDS_API_VERSION_MAJOR 1
-#define REHLDS_API_VERSION_MINOR 1
+#define REHLDS_API_VERSION_MINOR 2
 
 //Steam_NotifyClientConnect hook
 typedef IHookChain<qboolean, IGameClient*, const void*, unsigned int> IRehldsHook_Steam_NotifyClientConnect;
@@ -165,6 +165,7 @@ struct RehldsFuncs_t {
 	double(*GetRealTime)();
 	int*(*GetMsgBadRead)();
 	cmd_source_t*(*GetCmdSource)();
+	void(*Log)(const char* prefix, const char* msg);
 };
 
 class IRehldsApi {
