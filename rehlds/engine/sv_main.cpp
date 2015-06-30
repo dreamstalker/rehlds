@@ -2395,6 +2395,9 @@ void EXT_FUNC SV_ConnectClient_internal(void)
 	host_client->datagram.buffername = host_client->name;
 	host_client->sendinfo_time = 0.0f;
 
+	//Rehlds Security
+	Rehlds_Security_ClientConnected(host_client - g_psvs.clients);
+
 	g_RehldsHookchains.m_ClientConnected.callChain(NULL, GetRehldsApiClient(host_client));
 }
 

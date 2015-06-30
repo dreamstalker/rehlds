@@ -958,6 +958,9 @@ void _Host_Frame(float time)
 		Host_Quit_f();
 	}
 
+	//Rehlds Security
+	Rehlds_Security_Frame();
+
 #ifdef REHLDS_FLIGHT_REC
 	if (rehlds_flrec_frame.string[0] != '0') {
 		FR_EndFrame(frameCounter);
@@ -1177,6 +1180,8 @@ int Host_Init(quakeparms_t *parms)
 	//SystemWrapper_Init();
 	Host_Version();
 
+	//Rehlds Security
+	Rehlds_Security_Init();
 
 
 	Q_snprintf(versionString, sizeof(versionString), "%s,%i,%i", gpszVersionString, PROTOCOL_VERSION, build_number());
@@ -1265,6 +1270,9 @@ void Host_Shutdown(void)
 	//VGui_Shutdown();
 	if (g_pcls.state != ca_dedicated)
 		ClientDLL_Shutdown();
+
+	//Rehlds Security
+	Rehlds_Security_Shutdown();
 
 	Cmd_RemoveGameCmds();
 	Cmd_Shutdown();

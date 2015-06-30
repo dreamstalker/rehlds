@@ -1560,6 +1560,19 @@ void SV_ParseMove(client_t *pSenderClient)
 		net_drop = 0;
 	}
 
+	//check move commands rate for this player
+#ifdef REHLDS_FIXES
+	int numCmdsToIssue = numcmds;
+	if (net_drop > 0) {
+		numCmdsToIssue += net_drop;
+	}
+	g_MoveCommandRateLimiter.MoveCommandsIssued(host_client - g_psvs.clients, numCmdsToIssue);
+	
+	if (!host_client->active) {
+		return; //return if player was kicked
+	}
+#endif
+
 	sv_player->v.button = cmds[0].buttons;
 	sv_player->v.light_level = cmds[0].lightlevel;
 	SV_EstablishTimeBase(host_client, cmds, net_drop, numbackup, numcmds);
