@@ -102,6 +102,7 @@
 	#define HIDDEN
 	#define NOINLINE __declspec(noinline)
 	#define ALIGN16 __declspec(align(16))
+	#define FORCE_STACK_ALIGN
 
 	//inline bool SOCKET_FIONBIO(SOCKET s, int m) { return (ioctlsocket(s, FIONBIO, (u_long*)&m) == 0); }
 	//inline int SOCKET_MSGLEN(SOCKET s, u_long& r) { return ioctlsocket(s, FIONREAD, (u_long*)&r); }
@@ -141,6 +142,7 @@
 	#define HIDDEN __attribute__((visibility("hidden")))
 	#define NOINLINE __attribute__((noinline))
 	#define ALIGN16 __attribute__((aligned(16)))
+	#define FORCE_STACK_ALIGN __attribute__((force_align_arg_pointer))
 
 	//inline bool SOCKET_FIONBIO(SOCKET s, int m) { return (ioctl(s, FIONBIO, (int*)&m) == 0); }
 	//inline int SOCKET_MSGLEN(SOCKET s, u_long& r) { return ioctl(s, FIONREAD, (int*)&r); }
@@ -180,6 +182,8 @@
 	static const bool __isWindows = false;
 	static const bool __isLinux = true;
 #endif
+
+#define EXT_FUNC FORCE_STACK_ALIGN
 
 extern void __declspec(noreturn) rehlds_syserror(const char* fmt, ...);
 

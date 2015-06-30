@@ -1019,7 +1019,7 @@ Cache_Check
 */
 
 /* <ce723> ../engine/zone.c:1018 */
-void *Cache_Check(cache_user_t *c)
+void* EXT_FUNC Cache_Check(cache_user_t *c)
 {
 	cache_system_t *cs;
 

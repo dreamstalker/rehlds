@@ -50,7 +50,7 @@ void *Mem_Realloc(void *memblock, size_t size)
 }
 
 /* <47d8e> ../engine/mem.c:28 */
-void *Mem_Calloc(int num, size_t size)
+void* EXT_FUNC Mem_Calloc(int num, size_t size)
 {
 	return calloc(num, size);
 }

@@ -141,6 +141,10 @@ NOBODY int InvertMatrix(const float *m, float *out);
 //	float *r3;                                                   //   161
 //}
 
+void EXT_FUNC AngleVectors_ext(const vec_t *angles, vec_t *forward, vec_t *right, vec_t *up) {
+	AngleVectors(angles, forward, right, up);
+}
+
 /* <47067> ../engine/mathlib.c:267 */
 void AngleVectors(const vec_t *angles, vec_t *forward, vec_t *right, vec_t *up)
 {

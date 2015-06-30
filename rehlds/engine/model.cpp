@@ -54,7 +54,7 @@ void SW_Mod_Init(void)
 }
 
 /* <52f8d> ../engine/model.c:164 */
-void *Mod_Extradata(model_t *mod)
+void* EXT_FUNC Mod_Extradata(model_t *mod)
 {
 	void *r;
 
@@ -1253,7 +1253,7 @@ void Mod_LoadBrushModel(model_t *mod, void *buffer)
 }
 
 /* <52314> ../engine/model.c:1584 */
-void Mod_LoadBrushModel_internal(model_t *mod, void *buffer)
+void EXT_FUNC Mod_LoadBrushModel_internal(model_t *mod, void *buffer)
 {
 	dmodel_t *bm;
 	model_t *submodel;

@@ -1300,7 +1300,7 @@ qboolean NET_GetPacket_internal(netsrc_t sock)
 	return bret;
 }
 
-bool NET_GetPacketPreprocessor(uint8* data, unsigned int len, const netadr_t& srcAddr) {
+bool EXT_FUNC NET_GetPacketPreprocessor(uint8* data, unsigned int len, const netadr_t& srcAddr) {
 	return true;
 }
 
@@ -1435,7 +1435,7 @@ int NET_SendLong(netsrc_t sock, int s, const char *buf, int len, int flags, cons
 	}
 }
 
-void NET_SendPacket_api(unsigned int length, void *data, const netadr_t &to) {
+void EXT_FUNC NET_SendPacket_api(unsigned int length, void *data, const netadr_t &to) {
 	NET_SendPacket(NS_SERVER, length, data, to);
 }
 

@@ -62,6 +62,7 @@ void BOPS_Error(void);
 
 int BoxOnPlaneSide(vec_t *emins, vec_t *emaxs, mplane_t *p);
 NOBODY int InvertMatrix(const float *m, float *out);
+void AngleVectors_ext(const vec_t *angles, vec_t *forward, vec_t *right, vec_t *up);
 void AngleVectors(const vec_t *angles, vec_t *forward, vec_t *right, vec_t *up);
 void AngleVectorsTranspose(const vec_t *angles, vec_t *forward, vec_t *right, vec_t *up);
 void AngleMatrix(const vec_t *angles, float(*matrix)[4]);
