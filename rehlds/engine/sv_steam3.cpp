@@ -679,7 +679,7 @@ const char *Steam_GetCommunityName()
 	return NULL;
 }
 
-qboolean Steam_NotifyClientConnect_api(IGameClient *cl, const void *pvSteam2Key, unsigned int ucbSteam2Key)
+qboolean EXT_FUNC Steam_NotifyClientConnect_api(IGameClient *cl, const void *pvSteam2Key, unsigned int ucbSteam2Key)
 {
 	return Steam_NotifyClientConnect_internal(cl->GetClient(), pvSteam2Key, ucbSteam2Key);
 }
@@ -692,7 +692,7 @@ qboolean Steam_NotifyClientConnect(client_t *cl, const void *pvSteam2Key, unsign
 
 
 /* <f1884> ../engine/sv_steam3.cpp:914 */
-qboolean Steam_NotifyClientConnect_internal(client_t *cl, const void *pvSteam2Key, unsigned int ucbSteam2Key)
+qboolean EXT_FUNC Steam_NotifyClientConnect_internal(client_t *cl, const void *pvSteam2Key, unsigned int ucbSteam2Key)
 {
 	if (Steam3Server())
 	{
@@ -701,7 +701,7 @@ qboolean Steam_NotifyClientConnect_internal(client_t *cl, const void *pvSteam2Ke
 	return NULL;
 }
 
-qboolean Steam_NotifyBotConnect_api(IGameClient* cl)
+qboolean EXT_FUNC Steam_NotifyBotConnect_api(IGameClient* cl)
 {
 	return Steam_NotifyBotConnect_internal(cl->GetClient());
 }
@@ -721,7 +721,7 @@ qboolean Steam_NotifyBotConnect_internal(client_t *cl)
 	return NULL;
 }
 
-void Steam_NotifyClientDisconnect_api(IGameClient* cl)
+void EXT_FUNC Steam_NotifyClientDisconnect_api(IGameClient* cl)
 {
 	Steam_NotifyClientDisconnect_internal(cl->GetClient());
 }

@@ -1043,7 +1043,7 @@ void SV_Multicast(edict_t *ent, vec_t *origin, int to, qboolean reliable)
 }
 
 /* <a6f4f> ../engine/sv_main.c:1328 */
-void SV_WriteMovevarsToClient(sizebuf_t *message)
+void EXT_FUNC SV_WriteMovevarsToClient(sizebuf_t *message)
 {
 	MSG_WriteByte(message, svc_newmovevars);
 	MSG_WriteFloat(message, movevars.gravity);
@@ -1075,7 +1075,7 @@ void SV_WriteMovevarsToClient(sizebuf_t *message)
 }
 
 /* <a6f79> ../engine/sv_main.c:1365 */
-void SV_WriteDeltaDescriptionsToClient(sizebuf_t *msg)
+void EXT_FUNC SV_WriteDeltaDescriptionsToClient(sizebuf_t *msg)
 {
 	int i, c;
 
@@ -1102,7 +1102,7 @@ void SV_WriteDeltaDescriptionsToClient(sizebuf_t *msg)
 }
 
 /* <a7002> ../engine/sv_main.c:1407 */
-void SV_SetMoveVars(void)
+void EXT_FUNC SV_SetMoveVars(void)
 {
 	movevars.entgravity			= 1.0f;
 	movevars.gravity			= sv_gravity.value;
@@ -1175,7 +1175,7 @@ void SV_QueryMovevarsChanged(void)
 	}
 }
 
-void SV_SendServerinfo_mod(sizebuf_t *msg, IGameClient* cl)
+void EXT_FUNC SV_SendServerinfo_mod(sizebuf_t *msg, IGameClient* cl)
 {
 	SV_SendServerinfo_internal(msg, cl->GetClient());
 }
@@ -1508,7 +1508,7 @@ void SV_WriteSpawn(sizebuf_t *msg)
 }
 
 /* <a7277> ../engine/sv_main.c:1920 */
-void SV_SendUserReg(sizebuf_t *msg)
+void EXT_FUNC SV_SendUserReg(sizebuf_t *msg)
 {
 	for (UserMsg *pMsg = sv_gpNewUserMsgs; pMsg; pMsg = pMsg->next)
 	{
@@ -1703,7 +1703,7 @@ void SV_CheckUpdateRate(double *rate)
 }
 
 /* <a7302> ../engine/sv_main.c:2189 */
-void SV_RejectConnection(netadr_t *adr, char *fmt, ...)
+void EXT_FUNC SV_RejectConnection(netadr_t *adr, char *fmt, ...)
 {
 	va_list argptr;
 	char text[1024];
@@ -1751,7 +1751,7 @@ int SV_GetFragmentSize(void *state)
 }
 
 /* <ab01b> ../engine/sv_main.c:2266 */
-qboolean SV_FilterUser(USERID_t *userid)
+qboolean EXT_FUNC SV_FilterUser(USERID_t *userid)
 {
 	int j = numuserfilters;
 	for (int i = numuserfilters - 1; i >= 0; i--)
@@ -1780,7 +1780,7 @@ int SV_CheckProtocol(netadr_t *adr, int nProtocol)
 }
 
 /* <a7396> ../engine/sv_main.c:2302 */
-int SV_CheckProtocol_internal(netadr_t *adr, int nProtocol)
+int EXT_FUNC SV_CheckProtocol_internal(netadr_t *adr, int nProtocol)
 {
 	if (adr == NULL)
 	{
@@ -1831,7 +1831,7 @@ challenge_t g_rg_sv_challenges[1024];
 int g_oldest_challenge = 0;
 #endif
 
-bool SV_CheckChallenge_api(const netadr_t &adr, int nChallengeValue) {
+bool EXT_FUNC SV_CheckChallenge_api(const netadr_t &adr, int nChallengeValue) {
 	netadr_t localAdr = adr;
 	return SV_CheckChallenge(&localAdr, nChallengeValue) != 0;
 }
@@ -1867,7 +1867,7 @@ int SV_CheckIPRestrictions(netadr_t *adr, int nAuthProtocol)
 }
 
 /* <a743d> ../engine/sv_main.c:2393 */
-int SV_CheckIPRestrictions_internal(netadr_t *adr, int nAuthProtocol)
+int EXT_FUNC SV_CheckIPRestrictions_internal(netadr_t *adr, int nAuthProtocol)
 {
 	if (sv_lan.value || nAuthProtocol != 3)
 	{
@@ -1908,7 +1908,7 @@ int SV_FinishCertificateCheck(netadr_t *adr, int nAuthProtocol, char *szRawCerti
 }
 
 /* <a74f4> ../engine/sv_main.c:2461 */
-int SV_FinishCertificateCheck_internal(netadr_t *adr, int nAuthProtocol, char *szRawCertificate, char *userinfo)
+int EXT_FUNC SV_FinishCertificateCheck_internal(netadr_t *adr, int nAuthProtocol, char *szRawCertificate, char *userinfo)
 {
 	if (nAuthProtocol != 2)
 	{
@@ -1949,7 +1949,7 @@ int SV_CheckKeyInfo(netadr_t *adr, char *protinfo, short unsigned int *port, int
 }
 
 /* <a7584> ../engine/sv_main.c:2527 */
-int SV_CheckKeyInfo_internal(netadr_t *adr, char *protinfo, short unsigned int *port, int *pAuthProtocol, char *pszRaw, char *cdkey)
+int EXT_FUNC SV_CheckKeyInfo_internal(netadr_t *adr, char *protinfo, short unsigned int *port, int *pAuthProtocol, char *pszRaw, char *cdkey)
 {
 	const char *s = Info_ValueForKey(protinfo, "prot");
 	int nAuthProtocol = Q_atoi(s);
@@ -2181,7 +2181,7 @@ void SV_ConnectClient(void)
 }
 
 /* <ab6f0> ../engine/sv_main.c:2859 */
-void SV_ConnectClient_internal(void)
+void EXT_FUNC SV_ConnectClient_internal(void)
 {
 	client_t *client;
 	netadr_t adr;
@@ -3897,7 +3897,7 @@ void SV_AddToFatPVS(vec_t *org, mnode_t *node)
 }
 
 /* <a8af2> ../engine/sv_main.c:5239 */
-unsigned char *SV_FatPVS(float *org)
+unsigned char* EXT_FUNC SV_FatPVS(float *org)
 {
 	fatbytes = (g_psv.worldmodel->numleafs + 31) >> 3;
 	Q_memset(fatpvs, 0, fatbytes);
@@ -3950,7 +3950,7 @@ void SV_AddToFatPAS(vec_t *org, mnode_t *node)
 }
 
 /* <a8bac> ../engine/sv_main.c:5295 */
-unsigned char *SV_FatPAS(float *org)
+unsigned char* EXT_FUNC SV_FatPAS(float *org)
 {
 	fatpasbytes = (g_psv.worldmodel->numleafs + 31) >> 3;
 	Q_memset(fatpas, 0, fatpasbytes);
@@ -4351,7 +4351,7 @@ void SV_GetNetInfo(client_t *client, int *ping, int *packet_loss)
 }
 
 /* <a92a5> ../engine/sv_main.c:5775 */
-int SV_CheckVisibility(edict_t *entity, unsigned char *pset)
+int EXT_FUNC SV_CheckVisibility(edict_t *entity, unsigned char *pset)
 {
 	int leaf;
 
@@ -5668,7 +5668,7 @@ void SV_ClearEntities(void)
 	}
 }
 /* <aa1be> ../engine/sv_main.c:7620 */
-int RegUserMsg(const char *pszName, int iSize)
+int EXT_FUNC RegUserMsg(const char *pszName, int iSize)
 {
 	if (giNextUserMsg > 255 || !pszName || Q_strlen(pszName) > 11 || iSize > 192)
 		return 0;
@@ -7087,7 +7087,7 @@ qboolean SV_CompareUserID(USERID_t *id1, USERID_t *id2)
 }
 
 /* <a5ef9> ../engine/sv_main.c:9585 */
-qboolean SV_CompareUserID_internal(USERID_t *id1, USERID_t *id2)
+qboolean EXT_FUNC SV_CompareUserID_internal(USERID_t *id1, USERID_t *id2)
 {
 	if (id1 == NULL || id2 == NULL)
 		return FALSE;
@@ -7110,13 +7110,13 @@ qboolean SV_CompareUserID_internal(USERID_t *id1, USERID_t *id2)
 	return Q_stricmp(szID1, szID2) ? FALSE : TRUE;
 }
 
-char *SV_GetIDString(USERID_t *id)
+char* SV_GetIDString(USERID_t *id)
 {
 	return g_RehldsHookchains.m_SV_GetIDString.callChain(SV_GetIDString_internal, 0, id);
 }
 
 /* <aad82> ../engine/sv_main.c:9625 */
-char *SV_GetIDString_internal(USERID_t *id)
+char* EXT_FUNC SV_GetIDString_internal(USERID_t *id)
 {
 	static char idstr[64];
 

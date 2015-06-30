@@ -120,7 +120,7 @@ enginefuncs_t g_engfuncsExportedToDlls = {
 	FindEntityByString, GetEntityIllum,
 	FindEntityInSphere, PF_checkclient_I,
 	PVSFindEntities, PF_makevectors_I,
-	AngleVectors, PF_Spawn_I,
+	AngleVectors_ext, PF_Spawn_I,
 	PF_Remove_I, CreateNamedEntity,
 	PF_makestatic_I, PF_checkbottom_I,
 	PF_droptofloor_I, PF_walkmove_I,
@@ -541,7 +541,7 @@ void Sys_Quit(void)
 
 #ifdef _WIN32
 
-double Sys_FloatTime(void)
+double EXT_FUNC Sys_FloatTime(void)
 {
 	unsigned int currentTime;
 	int savedOldTime;
@@ -650,7 +650,7 @@ NOBODY void GameSetBackground(qboolean bNewSetting);
 //}
 
 /* <8d191> ../engine/sys_dll.c:1076 */
-qboolean Voice_GetClientListening(int iReceiver, int iSender)
+qboolean EXT_FUNC Voice_GetClientListening(int iReceiver, int iSender)
 {
 	--iReceiver;
 	--iSender;
@@ -666,7 +666,7 @@ qboolean Voice_GetClientListening(int iReceiver, int iSender)
 }
 
 /* <8d1d0> ../engine/sys_dll.c:1090 */
-qboolean Voice_SetClientListening(int iReceiver, int iSender, qboolean bListen)
+qboolean EXT_FUNC Voice_SetClientListening(int iReceiver, int iSender, qboolean bListen)
 {
 	--iReceiver;
 	--iSender;
@@ -763,13 +763,13 @@ NOBODY const char *ConvertNameToLocalPlatform(const char *pchInName);
 //}
 
 /* <8df19> ../engine/sys_dll.c:1499 */
-uint32 FunctionFromName(const char *pName)
+uint32 EXT_FUNC FunctionFromName(const char *pName)
 {
 	return 0; //TODO: do we really need to reverse it?
 }
 
 /* <8de9a> ../engine/sys_dll.c:1518 */
-const char *NameForFunction(uint32 function)
+const char* EXT_FUNC NameForFunction(uint32 function)
 {
 	int i;
 	const char *pName;
@@ -1142,13 +1142,13 @@ void ReleaseEntityDlls(void)
 }
 
 /* <8ddcb> ../engine/sys_dll.c:2006 */
-void EngineFprintf(void *pfile, const char *szFmt, ...)
+void EXT_FUNC EngineFprintf(void *pfile, const char *szFmt, ...)
 {
 	AlertMessage(at_console, "EngineFprintf:  Obsolete API\n");
 }
 
 /* <8dd6f> ../engine/sys_dll.c:2022 */
-void AlertMessage(ALERT_TYPE atype, const char *szFmt, ...)
+void EXT_FUNC AlertMessage(ALERT_TYPE atype, const char *szFmt, ...)
 {
 	va_list argptr;
 	static char szOut[1024];
@@ -1327,7 +1327,7 @@ void Con_DebugLog(const char *file, const char *fmt, ...)
 }
 
 /* <8dcfd> ../engine/sys_dll.c:2407 */
-void Con_Printf(const char *fmt, ...)
+void EXT_FUNC Con_Printf(const char *fmt, ...)
 {
 	char Dest[4096];
 	va_list va;
@@ -1413,7 +1413,7 @@ void Con_DPrintf(const char *fmt, ...)
 
 #else //defined(REHLDS_FIXES) and defined(REHLDS_FLIGHT_REC)
 
-void  Con_DPrintf(const char *fmt, ...)
+void  EXT_FUNC Con_DPrintf(const char *fmt, ...)
 {
 	va_list argptr;
 

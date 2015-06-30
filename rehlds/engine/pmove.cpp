@@ -91,7 +91,7 @@ qboolean PM_AddToTouched(pmtrace_t tr, vec_t *impactvelocity)
 }
 
 /* <69b96> ../engine/pmove.c:63 */
-void PM_StuckTouch(int hitent, pmtrace_t *ptraceresult)
+void EXT_FUNC PM_StuckTouch(int hitent, pmtrace_t *ptraceresult)
 {
 #ifdef REHLDS_CHECKS
 	if (hitent >= MAX_PHYSENTS)	// FIXED: added for preventing buffer overrun

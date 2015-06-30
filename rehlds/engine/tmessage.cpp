@@ -73,7 +73,7 @@ client_textmessage_t gNetworkTextMessage[MAX_NETMESSAGE];
 #endif //HOOK_ENGINE
 
 /* <c5144> ../engine/tmessage.c:47 */
-char *memfgets(unsigned char *pMemFile, int fileSize, int *pFilePos, char *pBuffer, int bufferSize)
+char* EXT_FUNC memfgets(unsigned char *pMemFile, int fileSize, int *pFilePos, char *pBuffer, int bufferSize)
 {
 	int filePos;
 	int last;

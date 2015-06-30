@@ -523,7 +523,7 @@ void MSG_WBits_MaybeFlush() {
 	bfwrite.nCurOutputBit -= 32;
 }
 
-void NOINLINE MSG_WriteBits(uint32 data, int numbits)
+void MSG_WriteBits(uint32 data, int numbits)
 {
 	uint32 maxval = _mm_cvtsi128_si32(_mm_slli_epi64(_mm_cvtsi32_si128(1), numbits)) - 1; //maxval = (1 << numbits) - 1
 	if (data > maxval)
@@ -544,14 +544,14 @@ void MSG_WriteOneBit(int nValue) {
 	MSG_WriteBits(nValue, 1);
 }
 
-void NOINLINE MSG_StartBitWriting(sizebuf_t *buf)
+void MSG_StartBitWriting(sizebuf_t *buf)
 {
 	bfwrite.nCurOutputBit = 0;
 	bfwrite.pbuf = buf;
 	bfwrite.pendingData.u64 = 0;
 }
 
-void NOINLINE MSG_EndBitWriting(sizebuf_t *buf)
+void MSG_EndBitWriting(sizebuf_t *buf)
 {
 	int bytesNeed = bfwrite.nCurOutputBit / 8;
 	if ((bfwrite.nCurOutputBit % 8) || bytesNeed == 0) {
@@ -2045,7 +2045,7 @@ NOXREF int COM_ExpandFilename(char *filename)
 }
 
 /* <11a36> ../engine/common.c:2446 */
-int COM_FileSize(char *filename)
+int EXT_FUNC COM_FileSize(char *filename)
 {
 	FileHandle_t fp;
 	int iSize;
@@ -2061,7 +2061,7 @@ int COM_FileSize(char *filename)
 }
 
 /* <11a83> ../engine/common.c:2472 */
-unsigned char *COM_LoadFile(const char *path, int usehunk, int *pLength)
+unsigned char* EXT_FUNC COM_LoadFile(const char *path, int usehunk, int *pLength)
 {
 	char base[33];
 	unsigned char *buf = NULL;
@@ -2143,7 +2143,7 @@ unsigned char *COM_LoadFile(const char *path, int usehunk, int *pLength)
 }
 
 /* <11b0f> ../engine/common.c:2538 */
-void COM_FreeFile(void *buffer)
+void EXT_FUNC COM_FreeFile(void *buffer)
 {
 #ifndef SWDS
 	g_engdstAddrs->COM_FreeFile();
@@ -2239,7 +2239,7 @@ unsigned char *COM_LoadTempFile(char *path, int *pLength)
 }
 
 /* <11ccb> ../engine/common.c:2657 */
-void COM_LoadCacheFile(char *path, struct cache_user_s *cu)
+void EXT_FUNC COM_LoadCacheFile(char *path, struct cache_user_s *cu)
 {
 	loadcache = cu;
 	COM_LoadFile(path, 3, 0);
@@ -2456,13 +2456,13 @@ void COM_Log(char *pszFile, char *fmt, ...)
 }
 
 /* <120a6> ../engine/common.c:2900 */
-unsigned char *COM_LoadFileForMe(char *filename, int *pLength)
+unsigned char* EXT_FUNC COM_LoadFileForMe(char *filename, int *pLength)
 {
 	return COM_LoadFile(filename, 5, pLength);
 }
 
 /* <120e3> ../engine/common.c:2905 */
-int COM_CompareFileTime(char *filename1, char *filename2, int *iCompare)
+int EXT_FUNC COM_CompareFileTime(char *filename1, char *filename2, int *iCompare)
 {
 	int ft1;
 	int ft2;
@@ -2494,7 +2494,7 @@ int COM_CompareFileTime(char *filename1, char *filename2, int *iCompare)
 }
 
 /* <12165> ../engine/common.c:2930 */
-void COM_GetGameDir(char *szGameDir)
+void EXT_FUNC COM_GetGameDir(char *szGameDir)
 {
 	if (szGameDir)
 	{
@@ -2888,7 +2888,7 @@ typedef struct
 #define WAVE_HEADER_LENGTH 128
 
 /* <1285a> ../engine/common.c:3287 */
-unsigned int COM_GetApproxWavePlayLength(const char *filepath)
+unsigned int EXT_FUNC COM_GetApproxWavePlayLength(const char *filepath)
 {
 	char buf[WAVE_HEADER_LENGTH + 1];
 	int filelength;

@@ -27,35 +27,35 @@
 */
 #include "precompiled.h"
 
-char* GetClientFallback_api() {
+char* EXT_FUNC GetClientFallback_api() {
 	return com_clientfallback;
 }
 
-int* GetAllowCheats_api() {
+int* EXT_FUNC GetAllowCheats_api() {
 	return &allow_cheats;
 }
 
-bool GSBSecure_api() {
+bool EXT_FUNC GSBSecure_api() {
 	return Steam_GSBSecure() != 0;
 }
 
-int GetBuildNumber_api() {
+int EXT_FUNC GetBuildNumber_api() {
 	return build_number();
 }
 
-double GetRealTime_api() {
+double EXT_FUNC GetRealTime_api() {
 	return realtime;
 }
 
-int* GetMsgBadRead_api() {
+int* EXT_FUNC GetMsgBadRead_api() {
 	return &msg_badread;
 }
 
-cmd_source_t* GetCmdSource_api() {
+cmd_source_t* EXT_FUNC GetCmdSource_api() {
 	return &cmd_source;
 }
 
-void Log_api(const char* prefix, const char* msg) {
+void EXT_FUNC Log_api(const char* prefix, const char* msg) {
 #ifdef REHLDS_FLIGHT_REC
 	FR_Log(prefix, msg);
 #endif
@@ -90,12 +90,12 @@ RehldsFuncs_t g_RehldsApiFuncs =
 	&Log_api
 };
 
-sizebuf_t* GetNetMessage_api()
+sizebuf_t* EXT_FUNC GetNetMessage_api()
 {
 	return &net_message;
 }
 
-IGameClient* GetHostClient_api()
+IGameClient* EXT_FUNC GetHostClient_api()
 {
 	if (host_client == NULL)
 		return NULL;
@@ -103,7 +103,7 @@ IGameClient* GetHostClient_api()
 	return GetRehldsApiClient(host_client);
 }
 
-extern int* GetMsgReadCount_api()
+extern int* EXT_FUNC GetMsgReadCount_api()
 {
 	return &msg_readcount;
 }
@@ -201,35 +201,35 @@ IRehldsHookRegistry_ExecuteServerStringCmd* CRehldsHookchains::ExecuteServerStri
 	return &m_ExecuteServerStringCmd;
 }
 
-int CRehldsApi::GetMajorVersion()
+int EXT_FUNC CRehldsApi::GetMajorVersion()
 {
 	return REHLDS_API_VERSION_MAJOR;
 }
 
-int CRehldsApi::GetMinorVersion()
+int EXT_FUNC CRehldsApi::GetMinorVersion()
 {
 	return REHLDS_API_VERSION_MINOR;
 }
 
-const RehldsFuncs_t* CRehldsApi::GetFuncs()
+const RehldsFuncs_t* EXT_FUNC CRehldsApi::GetFuncs()
 {
 	return &g_RehldsApiFuncs;
 }
 
-IRehldsHookchains* CRehldsApi::GetHookchains()
+IRehldsHookchains* EXT_FUNC CRehldsApi::GetHookchains()
 {
 	return &g_RehldsHookchains;
 }
 
-IRehldsServerStatic* CRehldsApi::GetServerStatic() {
+IRehldsServerStatic* EXT_FUNC CRehldsApi::GetServerStatic() {
 	return &g_RehldsServerStatic;
 }
 
-IRehldsServerData* CRehldsApi::GetServerData() {
+IRehldsServerData* EXT_FUNC CRehldsApi::GetServerData() {
 	return &g_RehldsServerData;
 }
 
-IRehldsFlightRecorder* CRehldsApi::GetFlightRecorder() {
+IRehldsFlightRecorder* EXT_FUNC CRehldsApi::GetFlightRecorder() {
 	return g_FlightRecorder;
 }
 

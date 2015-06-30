@@ -442,7 +442,7 @@ void Host_ClientCommands(const char *fmt, ...)
 	va_end(argptr);
 }
 
-void SV_DropClient_api(IGameClient* cl, bool crash, const char* fmt, ...)
+void EXT_FUNC SV_DropClient_api(IGameClient* cl, bool crash, const char* fmt, ...)
 {
 	char buf[1024];
 	va_list argptr;

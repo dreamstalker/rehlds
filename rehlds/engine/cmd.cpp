@@ -567,7 +567,7 @@ void Cmd_Shutdown(void)
 }
 
 /* <5536> ../engine/cmd.c:677 */
-int Cmd_Argc(void)
+int EXT_FUNC Cmd_Argc(void)
 {
 #ifndef SWDS
 	g_engdstAddrs->Cmd_Argc();
@@ -577,7 +577,7 @@ int Cmd_Argc(void)
 }
 
 /* <5547> ../engine/cmd.c:689 */
-const char *Cmd_Argv(int arg)
+const char* EXT_FUNC Cmd_Argv(int arg)
 {
 #ifndef SWDS
 	g_engdstAddrs->Cmd_Argv(&arg);
@@ -591,7 +591,7 @@ const char *Cmd_Argv(int arg)
 }
 
 /* <5565> ../engine/cmd.c:703 */
-const char *Cmd_Args(void)
+const char* EXT_FUNC Cmd_Args(void)
 {
 #ifndef SWDS
 	g_engdstAddrs->Cmd_Args();
@@ -610,7 +610,7 @@ Takes a null terminated string. Does not need to be \n terminated.
 Breaks the string up into arg tokens.
 ============
 */
-void Cmd_TokenizeString(char *text)
+void EXT_FUNC Cmd_TokenizeString(char *text)
 {
 	int i;
 	int arglen;
@@ -816,7 +816,7 @@ NOXREF void Cmd_AddWrapperCommand(char *cmd_name, xcommand_t function)
 }
 
 /* <58d2> ../engine/cmd.c:960 */
-void Cmd_AddGameCommand(char *cmd_name, xcommand_t function)
+void EXT_FUNC Cmd_AddGameCommand(char *cmd_name, xcommand_t function)
 {
 	Cmd_AddMallocCommand(cmd_name, function, FCMD_GAME_COMMAND);
 }
@@ -940,11 +940,11 @@ NOXREF char *Cmd_CompleteCommand(char *search, int forward)
 	return NULL;
 }
 
-bool ValidateCmd_API(const char* cmd, cmd_source_t src, IGameClient* client) {
+bool EXT_FUNC ValidateCmd_API(const char* cmd, cmd_source_t src, IGameClient* client) {
 	return true;
 }
 
-void Cmd_ExecuteString_internal(const char* cmdName, cmd_source_t src, IGameClient* client) {
+void EXT_FUNC Cmd_ExecuteString_internal(const char* cmdName, cmd_source_t src, IGameClient* client) {
 	// Search in functions
 	cmd_function_t *cmd = cmd_functions;
 	while (cmd)

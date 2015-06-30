@@ -40,7 +40,7 @@ key and returns the associated value, or an empty string.
 ===============
 */
 /* <40d86> ../engine/info.c:23 */
-const char *Info_ValueForKey(const char *s, const char *key)
+const char* EXT_FUNC Info_ValueForKey(const char *s, const char *key)
 {
 	// use few (two?) buffers so compares work without stomping on each other
 	static char value[INFO_MAX_BUFFER_VALUES][MAX_KV_LEN];

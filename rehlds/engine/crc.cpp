@@ -99,19 +99,19 @@ static const uint32 pulCRCTable[256] =
 
 
 /* <193b9> ../engine/crc.c:86 */
-void CRC32_Init(CRC32_t *pulCRC)
+void EXT_FUNC CRC32_Init(CRC32_t *pulCRC)
 {
 	*pulCRC = -1;
 }
 
 /* <193d9> ../engine/crc.c:91 */
-CRC32_t CRC32_Final(CRC32_t pulCRC)
+CRC32_t EXT_FUNC CRC32_Final(CRC32_t pulCRC)
 {
 	return ~pulCRC;
 }
 
 /* <19453> ../engine/crc.c:96 */
-void CRC32_ProcessByte(CRC32_t *pulCRC, unsigned char ch)
+void EXT_FUNC CRC32_ProcessByte(CRC32_t *pulCRC, unsigned char ch)
 {
 	CRC32_t ulCrc = *pulCRC;
 	ulCrc = pulCRCTable[(ulCrc & 0xFF) ^ ch] ^ ((ulCrc ^ ch) >> 8);
@@ -119,7 +119,7 @@ void CRC32_ProcessByte(CRC32_t *pulCRC, unsigned char ch)
 }
 
 /* <19496> ../engine/crc.c:106 */
-void CRC32_ProcessBuffer(CRC32_t *pulCRC, void *pBuffer, int nBuffer)
+void EXT_FUNC CRC32_ProcessBuffer(CRC32_t *pulCRC, void *pBuffer, int nBuffer)
 {
 	CRC32_t ulCrc = *pulCRC;
 	uint8* pb = (uint8*)pBuffer;

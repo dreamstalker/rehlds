@@ -537,7 +537,7 @@ void SV_NewChaseDir2(edict_t *actor, vec_t *vecGoal, float dist)
 }
 
 /* <ae777> ../engine/sv_move.c:690 */
-void SV_MoveToOrigin_I(edict_t *ent, const float *pflGoal, float dist, int iStrafe)
+void EXT_FUNC SV_MoveToOrigin_I(edict_t *ent, const float *pflGoal, float dist, int iStrafe)
 {
 	vec3_t vecGoal;
 	vec3_t vecDir;
