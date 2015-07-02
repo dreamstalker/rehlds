@@ -212,6 +212,7 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Test Fixes|Win32'">precompiled.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="..\rehlds\RehldsRuntimeConfig.cpp" />
+    <ClCompile Include="..\rehlds\rehlds_security.cpp" />
     <ClCompile Include="..\rehlds\structSizeCheck.cpp" />
     <ClCompile Include="..\testsuite\anonymizer.cpp" />
     <ClCompile Include="..\testsuite\funccalls.cpp" />
@@ -542,6 +543,7 @@
     <ClInclude Include="..\rehlds\RehldsRuntimeConfig.h" />
     <ClInclude Include="..\rehlds\rehlds_api_impl.h" />
     <ClInclude Include="..\rehlds\rehlds_interfaces_impl.h" />
+    <ClInclude Include="..\rehlds\rehlds_security.h" />
     <ClInclude Include="..\testsuite\anonymizer.h" />
     <ClInclude Include="..\testsuite\funccalls.h" />
     <ClInclude Include="..\testsuite\player.h" />
