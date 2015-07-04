@@ -85,6 +85,10 @@ public:
 #endif
 };
 
+#ifndef REHLDS_SELF
+struct client_t;
+#endif
+
 class IRehldsServerStatic {
 public:
 	virtual ~IRehldsServerStatic() { }
@@ -92,6 +96,8 @@ public:
 	virtual int GetMaxClients() = 0;
 	virtual bool IsLogActive() = 0;
 	virtual IGameClient* GetClient(int id) = 0;
+	virtual client_t* GetClient_t(int id) = 0;
+	virtual int GetIndexOfClient_t(client_t* client) = 0;
 };
 
 class IRehldsServerData {
