@@ -1194,7 +1194,12 @@ void SV_ClipToLinks(areanode_t *node, moveclip_t *clip)
 			Sys_Error("Trigger in clipping list");
 
 		if (gNewDLLFunctions.pfnShouldCollide && !gNewDLLFunctions.pfnShouldCollide(touch, clip->passedict))
+#ifdef REHLDS_FIXES
+			// https://github.com/dreamstalker/rehlds/issues/46
+			continue;
+#else
 			return;
+#endif
 
 		if (touch->v.solid == SOLID_BSP)
 		{
