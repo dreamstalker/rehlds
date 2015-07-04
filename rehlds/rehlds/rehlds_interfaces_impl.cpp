@@ -136,6 +136,25 @@ IGameClient* EXT_FUNC CRehldsServerStatic::GetClient(int id)
 	return g_GameClients[id];
 }
 
+client_t* EXT_FUNC CRehldsServerStatic::GetClient_t(int id)
+{
+	if (id < 0 || id >= g_psvs.maxclients)
+		Sys_Error(__FUNCTION__": invalid id provided: %d", id);
+
+	return &g_psvs.clients[id];
+}
+
+int EXT_FUNC CRehldsServerStatic::GetIndexOfClient_t(client_t* client)
+{
+	if (client < g_psvs.clients || client >= &g_psvs.clients[g_psvs.maxclients])
+		return -1;
+
+	if (((size_t)client - (size_t)g_psvs.clients) % sizeof(client_t))
+		return -1;
+
+	return int(client - g_psvs.clients);
+}
+
 
 
 const char* EXT_FUNC CRehldsServerData::GetModelName() {
