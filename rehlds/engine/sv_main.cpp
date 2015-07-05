@@ -2029,7 +2029,7 @@ int SV_CheckForDuplicateNames(char *userinfo, qboolean bIsReconnecting, int nExc
 	{
 		for (i = 0, client = g_psvs.clients; i < g_psvs.maxclients; i++, client++)
 		{
-			if (client->active && !(i == nExcludeSlot && bIsReconnecting) && !Q_stricmp(client->name, val))
+			if (client->connected && !(i == nExcludeSlot && bIsReconnecting) && !Q_stricmp(client->name, val))
 				break;
 		}
 
