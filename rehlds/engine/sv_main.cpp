@@ -730,8 +730,13 @@ void SV_StartParticle(const vec_t *org, const vec_t *dir, int color, int count)
 	}
 }
 
-/* <a6df2> ../engine/sv_main.c:887 */
 void SV_StartSound(int recipients, edict_t *entity, int channel, const char *sample, int volume, float attenuation, int fFlags, int pitch)
+{
+	g_RehldsHookchains.m_SV_StartSound.callChain(SV_StartSound_internal, recipients, entity, channel, sample, volume, attenuation, fFlags, pitch);
+}
+
+/* <a6df2> ../engine/sv_main.c:887 */
+void EXT_FUNC SV_StartSound_internal(int recipients, edict_t *entity, int channel, const char *sample, int volume, float attenuation, int fFlags, int pitch)
 {
 	vec3_t origin;
 
@@ -3719,8 +3724,18 @@ void SV_FullClientUpdate(client_t *cl, sizebuf_t *sb)
 	MSG_WriteBuf(sb, sizeof(digest), digest);
 }
 
+void EXT_FUNC SV_EmitEvents_api(IGameClient *cl, packet_entities_t *pack, sizebuf_t *ms)
+{
+	SV_EmitEvents_internal(cl->GetClient(), pack, ms);
+}
+
+void SV_EmitEvents(client_t *cl, packet_entities_t *pack, sizebuf_t *ms)
+{
+	g_RehldsHookchains.m_SV_EmitEvents.callChain(SV_EmitEvents_api, GetRehldsApiClient(cl), pack, ms);
+}
+
 /* <a8995> ../engine/sv_main.c:5027 */
-void SV_EmitEvents(client_t *cl, packet_entities_t *pack, sizebuf_t *msg)
+void SV_EmitEvents_internal(client_t *cl, packet_entities_t *pack, sizebuf_t *msg)
 {
 	int i;
 	int ev;

@@ -122,6 +122,7 @@ protected:
 
 protected:
 	void addHook(void* hookFunc);
+	void removeHook(void* hookFunc);
 
 public:
 	AbstractHookChainRegistry();
@@ -144,6 +145,9 @@ public:
 	virtual void registerHook(hookfunc_t hook) {
 		addHook((void*)hook);
 	}
+	virtual void unregisterHook(hookfunc_t hook) {
+		removeHook((void*)hook);
+	}
 };
 
 template<typename ...t_args>
@@ -162,5 +166,8 @@ public:
 
 	virtual void registerHook(hookfunc_t hook) {
 		addHook((void*)hook);
+	}
+	virtual void unregisterHook(hookfunc_t hook) {
+		removeHook((void*)hook);
 	}
 };

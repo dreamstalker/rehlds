@@ -961,8 +961,13 @@ edict_t* EXT_FUNC CreateNamedEntity(int className)
 	}
 }
 
+void PF_Remove_I(edict_t *ed)
+{
+	g_RehldsHookchains.m_PF_Remove_I.callChain(PF_Remove_I_internal, ed);
+}
+
 /* <7941a> ../engine/pr_cmds.c:1253 */
-void EXT_FUNC PF_Remove_I(edict_t *ed)
+void EXT_FUNC PF_Remove_I_internal(edict_t *ed)
 {
 	ED_Free(ed);
 }
@@ -1172,8 +1177,18 @@ short unsigned int EXT_FUNC EV_Precache(int type, const char *psz)
 	}
 }
 
+void EXT_FUNC EV_PlayReliableEvent_api(IGameClient *cl, int entindex, short unsigned int eventindex, float delay, event_args_t *pargs)
+{
+	EV_PlayReliableEvent_internal(cl->GetClient(), entindex, eventindex, delay, pargs);
+}
+
+void EV_PlayReliableEvent(client_t *cl, int entindex, short unsigned int eventindex, float delay, event_args_t *pargs)
+{
+	g_RehldsHookchains.m_EV_PlayReliableEvent.callChain(EV_PlayReliableEvent_api, GetRehldsApiClient(cl), entindex, eventindex, delay, pargs);
+}
+
 /* <796ae> ../engine/pr_cmds.c:1531 */
-void EXT_FUNC EV_PlayReliableEvent(client_t *cl, int entindex, short unsigned int eventindex, float delay, event_args_t *pargs)
+void EV_PlayReliableEvent_internal(client_t *cl, int entindex, short unsigned int eventindex, float delay, event_args_t *pargs)
 {
 //	unsigned char data;                                           //  1533
 //	sizebuf_t msg;                                                //  1534
@@ -2546,8 +2561,13 @@ const char* EXT_FUNC PF_GetPlayerAuthId(edict_t *e)
 	return szAuthID[count];
 }
 
+void PF_BuildSoundMsg_I(edict_t *entity, int channel, const char *sample, float volume, float attenuation, int fFlags, int pitch, int msg_dest, int msg_type, const float *pOrigin, edict_t *ed)
+{
+	g_RehldsHookchains.m_PF_BuildSoundMsg_I.callChain(PF_BuildSoundMsg_I_internal, entity, channel, sample, volume, attenuation, fFlags, pitch, msg_dest, msg_type, pOrigin, ed);
+}
+
 /* <7a902> ../engine/pr_cmds.c:3229 */
-void EXT_FUNC PF_BuildSoundMsg_I(edict_t *entity, int channel, const char *sample, float volume, float attenuation, int fFlags, int pitch, int msg_dest, int msg_type, const float *pOrigin, edict_t *ed)
+void EXT_FUNC PF_BuildSoundMsg_I_internal(edict_t *entity, int channel, const char *sample, float volume, float attenuation, int fFlags, int pitch, int msg_dest, int msg_type, const float *pOrigin, edict_t *ed)
 {
 	PF_MessageBegin_I(msg_dest, msg_type, pOrigin, ed);
 	SV_BuildSoundMsg(entity, channel, sample, (int)volume, attenuation, fFlags, pitch, pOrigin, &gMsgBuffer);
