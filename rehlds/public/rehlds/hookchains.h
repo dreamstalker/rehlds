@@ -45,6 +45,7 @@ public:
 	typedef t_ret(*hookfunc_t)(IHookChain<t_ret, t_args...>*, t_args...);
 
 	virtual void registerHook(hookfunc_t hook) = 0;
+	virtual void unregisterHook(hookfunc_t hook) = 0;
 };
 
 
@@ -64,4 +65,5 @@ public:
 	typedef void(*hookfunc_t)(IVoidHookChain<t_args...>*, t_args...);
 
 	virtual void registerHook(hookfunc_t hook) = 0;
+	virtual void unregisterHook(hookfunc_t hook) = 0;
 };

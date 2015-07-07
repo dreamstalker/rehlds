@@ -61,6 +61,10 @@ void EXT_FUNC Log_api(const char* prefix, const char* msg) {
 #endif
 }
 
+DLL_FUNCTIONS* EXT_FUNC GetEntityInterface_api() {
+	return &gEntityInterface;
+}
+
 CRehldsServerStatic g_RehldsServerStatic;
 CRehldsServerData g_RehldsServerData;
 CRehldsHookchains g_RehldsHookchains;
@@ -87,7 +91,15 @@ RehldsFuncs_t g_RehldsApiFuncs =
 	&GetRealTime_api,
 	&GetMsgBadRead_api,
 	&GetCmdSource_api,
-	&Log_api
+	&Log_api,
+	&GetEntityInterface_api,
+	&EV_PlayReliableEvent_api,
+	&SV_LookupSoundIndex,
+	&MSG_StartBitWriting,
+	&MSG_WriteBits,
+	&MSG_WriteBitVec3Coord,
+	&MSG_EndBitWriting,
+	&SZ_GetSpace
 };
 
 sizebuf_t* EXT_FUNC GetNetMessage_api()
@@ -199,6 +211,26 @@ IRehldsHookRegistry_Mod_LoadStudioModel* CRehldsHookchains::Mod_LoadStudioModel(
 
 IRehldsHookRegistry_ExecuteServerStringCmd* CRehldsHookchains::ExecuteServerStringCmd() {
 	return &m_ExecuteServerStringCmd;
+}
+
+IRehldsHookRegistry_SV_EmitEvents* CRehldsHookchains::SV_EmitEvents() {
+	return &m_SV_EmitEvents;
+}
+
+IRehldsHookRegistry_EV_PlayReliableEvent* CRehldsHookchains::EV_PlayReliableEvent() {
+	return &m_EV_PlayReliableEvent;
+}
+
+IRehldsHookRegistry_SV_StartSound* CRehldsHookchains::SV_StartSound() {
+	return &m_SV_StartSound;
+}
+
+IRehldsHookRegistry_PF_Remove_I* CRehldsHookchains::PF_Remove_I() {
+	return &m_PF_Remove_I;
+}
+
+IRehldsHookRegistry_PF_BuildSoundMsg_I* CRehldsHookchains::PF_BuildSoundMsg_I() {
+	return &m_PF_BuildSoundMsg_I;
 }
 
 int EXT_FUNC CRehldsApi::GetMajorVersion()

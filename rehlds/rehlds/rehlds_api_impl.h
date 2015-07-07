@@ -111,6 +111,26 @@ typedef IVoidHookChainRegistryImpl<model_t*, void*> CRehldsHookRegistry_Mod_Load
 typedef IVoidHookChainImpl<model_t*, void*> CRehldsHook_Mod_LoadStudioModel;
 typedef IVoidHookChainRegistryImpl<model_t*, void*> CRehldsHookRegistry_Mod_LoadStudioModel;
 
+//SV_EmitEvents hook
+typedef IVoidHookChainImpl<IGameClient *, packet_entities_t *, sizebuf_t *> CRehldsHook_SV_EmitEvents;
+typedef IVoidHookChainRegistryImpl<IGameClient *, packet_entities_t *, sizebuf_t *> CRehldsHookRegistry_SV_EmitEvents;
+
+//EV_PlayReliableEvent hook
+typedef IVoidHookChainImpl<IGameClient *, int, short unsigned int, float, event_args_t *> CRehldsHook_EV_PlayReliableEvent;
+typedef IVoidHookChainRegistryImpl<IGameClient *, int, short unsigned int, float, event_args_t *> CRehldsHookRegistry_EV_PlayReliableEvent;
+
+//SV_StartSound hook
+typedef IVoidHookChainImpl<int , edict_t *, int, const char *, int, float, int, int> CRehldsHook_SV_StartSound;
+typedef IVoidHookChainRegistryImpl<int , edict_t *, int, const char *, int, float, int, int> CRehldsHookRegistry_SV_StartSound;
+
+//PF_Remove_I hook
+typedef IVoidHookChainImpl<edict_t *> CRehldsHook_PF_Remove_I;
+typedef IVoidHookChainRegistryImpl<edict_t *> CRehldsHookRegistry_PF_Remove_I;
+
+//PF_BuildSoundMsg_I hook
+typedef IVoidHookChainImpl<edict_t *, int, const char *, float, float, int, int, int, int, const float *, edict_t *> CRehldsHook_PF_BuildSoundMsg_I;
+typedef IVoidHookChainRegistryImpl<edict_t *, int, const char *, float, float, int, int, int, int, const float *, edict_t *> CRehldsHookRegistry_PF_BuildSoundMsg_I;
+
 class CRehldsHookchains : public IRehldsHookchains {
 public:
 	CRehldsHookRegistry_Steam_NotifyClientConnect m_Steam_NotifyClientConnect;
@@ -133,6 +153,11 @@ public:
 	CRehldsHookRegistry_Mod_LoadBrushModel m_Mod_LoadBrushModel;
 	CRehldsHookRegistry_Mod_LoadStudioModel m_Mod_LoadStudioModel;
 	CRehldsHookRegistry_ExecuteServerStringCmd m_ExecuteServerStringCmd;
+	CRehldsHookRegistry_SV_EmitEvents m_SV_EmitEvents;
+	CRehldsHookRegistry_EV_PlayReliableEvent m_EV_PlayReliableEvent;
+	CRehldsHookRegistry_SV_StartSound m_SV_StartSound;
+	CRehldsHookRegistry_PF_Remove_I m_PF_Remove_I;
+	CRehldsHookRegistry_PF_BuildSoundMsg_I m_PF_BuildSoundMsg_I;
 
 public:
 	virtual IRehldsHookRegistry_Steam_NotifyClientConnect* Steam_NotifyClientConnect();
@@ -155,6 +180,11 @@ public:
 	virtual IRehldsHookRegistry_Mod_LoadBrushModel* Mod_LoadBrushModel();
 	virtual IRehldsHookRegistry_Mod_LoadStudioModel* Mod_LoadStudioModel();
 	virtual IRehldsHookRegistry_ExecuteServerStringCmd* ExecuteServerStringCmd();
+	virtual IRehldsHookRegistry_SV_EmitEvents* SV_EmitEvents();
+	virtual IRehldsHookRegistry_EV_PlayReliableEvent* EV_PlayReliableEvent();
+	virtual IRehldsHookRegistry_SV_StartSound* SV_StartSound();
+	virtual IRehldsHookRegistry_PF_Remove_I* PF_Remove_I();
+	virtual IRehldsHookRegistry_PF_BuildSoundMsg_I* PF_BuildSoundMsg_I();
 };
 
 extern CRehldsHookchains g_RehldsHookchains;
