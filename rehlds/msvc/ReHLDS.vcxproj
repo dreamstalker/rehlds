@@ -185,6 +185,7 @@
     <ClCompile Include="..\public\utlbuffer.cpp" />
     <ClCompile Include="..\rehlds\FlightRecorderImpl.cpp" />
     <ClCompile Include="..\rehlds\flight_recorder.cpp" />
+    <ClCompile Include="..\rehlds\math_utils.cpp" />
     <ClCompile Include="..\rehlds\rehlds_api_impl.cpp" />
     <ClCompile Include="..\rehlds\rehlds_interfaces_impl.cpp" />
     <ClCompile Include="..\rehlds\hookchains_impl.cpp" />
@@ -268,6 +269,14 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Play|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Swds Play|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\unittests\math_util_tests.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Swds|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Play|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Record|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Play|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Swds Play|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Swds Play|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\unittests\rehlds_tests_shared.cpp" />
     <ClCompile Include="..\unittests\struct_offsets_tests.cpp">
@@ -538,6 +547,7 @@
     <ClInclude Include="..\rehlds\FlightRecorderImpl.h" />
     <ClInclude Include="..\rehlds\flight_recorder.h" />
     <ClInclude Include="..\rehlds\hookchains_impl.h" />
+    <ClInclude Include="..\rehlds\math_utils.h" />
     <ClInclude Include="..\rehlds\platform.h" />
     <ClInclude Include="..\rehlds\precompiled.h" />
     <ClInclude Include="..\rehlds\RehldsRuntimeConfig.h" />
@@ -833,7 +843,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>REHLDS_FIXES;REHLDS_FLIGHT_REC;REHLDS_OPT_PEDANTIC;REHLDS_SELF;REHLDS_CHECKS;USE_BREAKPAD_HANDLER;DEDICATED;SWDS;_CRT_SECURE_NO_WARNINGS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>REHLDS_FLIGHT_REC;REHLDS_OPT_PEDANTIC;REHLDS_SELF;REHLDS_CHECKS;USE_BREAKPAD_HANDLER;DEDICATED;SWDS;_CRT_SECURE_NO_WARNINGS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <FloatingPointModel>Precise</FloatingPointModel>
       <AdditionalOptions>/arch:IA32 %(AdditionalOptions)</AdditionalOptions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>

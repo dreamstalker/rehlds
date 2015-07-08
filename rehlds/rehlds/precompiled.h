@@ -19,6 +19,8 @@
 #include "RehldsRuntimeConfig.h"
 #include "rehlds_debug.h"
 
+#include "math_utils.h"
+
 #ifdef HOOK_ENGINE
 #include "hooker.h"
 #endif
@@ -34,6 +36,7 @@
 #include "utlrbtree.h"
 
 #include "iosutil.h"
+
 
 //testsuite
 #include "testsuite.h"

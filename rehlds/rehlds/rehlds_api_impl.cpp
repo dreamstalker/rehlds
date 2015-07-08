@@ -65,6 +65,52 @@ DLL_FUNCTIONS* EXT_FUNC GetEntityInterface_api() {
 	return &gEntityInterface;
 }
 
+bool EXT_FUNC GetHitboxCorners(int hitboxId, float* /* [8*3] */ corners) {
+	mplane_t* right = &studio_planes[hitboxId * 6 + 0 * 2 + 0];
+	mplane_t* left = &studio_planes[hitboxId * 6 + 0 * 2 + 1];
+	mplane_t* rear = &studio_planes[hitboxId * 6 + 1 * 2 + 0];
+	mplane_t* front = &studio_planes[hitboxId * 6 + 1 * 2 + 1];
+	mplane_t* top = &studio_planes[hitboxId * 6 + 2 * 2 + 0];
+	mplane_t* bottom = &studio_planes[hitboxId * 6 + 2 * 2 + 1];
+
+	float p[3];
+
+	if (PIR_1 != CalcPlanesIntersection(left, front, bottom, p))
+		return false;
+	corners[0 * 3 + 0] = p[0]; corners[0 * 3 + 1] = p[1]; corners[0 * 3 + 1] = p[2];
+
+	if (PIR_1 != CalcPlanesIntersection(left, front, top, p))
+		return false;
+	corners[1 * 3 + 0] = p[0]; corners[1 * 3 + 1] = p[1]; corners[1 * 3 + 1] = p[2];
+
+	if (PIR_1 != CalcPlanesIntersection(right, front, top, p))
+		return false;
+	corners[2 * 3 + 0] = p[0]; corners[2 * 3 + 1] = p[1]; corners[2 * 3 + 1] = p[2];
+
+	if (PIR_1 != CalcPlanesIntersection(right, front, bottom, p))
+		return false;
+	corners[3 * 3 + 0] = p[0]; corners[3 * 3 + 1] = p[1]; corners[3 * 3 + 1] = p[2];
+
+
+	if (PIR_1 != CalcPlanesIntersection(left, rear, bottom, p))
+		return false;
+	corners[4 * 3 + 0] = p[0]; corners[4 * 3 + 1] = p[1]; corners[4 * 3 + 1] = p[2];
+
+	if (PIR_1 != CalcPlanesIntersection(left, rear, top, p))
+		return false;
+	corners[5 * 3 + 0] = p[0]; corners[5 * 3 + 1] = p[1]; corners[5 * 3 + 1] = p[2];
+
+	if (PIR_1 != CalcPlanesIntersection(right, rear, top, p))
+		return false;
+	corners[6 * 3 + 0] = p[0]; corners[6 * 3 + 1] = p[1]; corners[6 * 3 + 1] = p[2];
+
+	if (PIR_1 != CalcPlanesIntersection(right, rear, bottom, p))
+		return false;
+	corners[7 * 3 + 0] = p[0]; corners[7 * 3 + 1] = p[1]; corners[7 * 3 + 1] = p[2];
+
+	return true;
+}
+
 CRehldsServerStatic g_RehldsServerStatic;
 CRehldsServerData g_RehldsServerData;
 CRehldsHookchains g_RehldsHookchains;
@@ -99,7 +145,8 @@ RehldsFuncs_t g_RehldsApiFuncs =
 	&MSG_WriteBits,
 	&MSG_WriteBitVec3Coord,
 	&MSG_EndBitWriting,
-	&SZ_GetSpace
+	&SZ_GetSpace,
+	&GetHitboxCorners
 };
 
 sizebuf_t* EXT_FUNC GetNetMessage_api()
