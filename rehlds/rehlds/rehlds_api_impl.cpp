@@ -77,36 +77,36 @@ bool EXT_FUNC GetHitboxCorners(int hitboxId, float* /* [8*3] */ corners) {
 
 	if (PIR_1 != CalcPlanesIntersection(left, front, bottom, p))
 		return false;
-	corners[0 * 3 + 0] = p[0]; corners[0 * 3 + 1] = p[1]; corners[0 * 3 + 1] = p[2];
+	corners[0 * 3 + 0] = p[0]; corners[0 * 3 + 1] = p[1]; corners[0 * 3 + 2] = p[2];
 
 	if (PIR_1 != CalcPlanesIntersection(left, front, top, p))
 		return false;
-	corners[1 * 3 + 0] = p[0]; corners[1 * 3 + 1] = p[1]; corners[1 * 3 + 1] = p[2];
+	corners[1 * 3 + 0] = p[0]; corners[1 * 3 + 1] = p[1]; corners[1 * 3 + 2] = p[2];
 
 	if (PIR_1 != CalcPlanesIntersection(right, front, top, p))
 		return false;
-	corners[2 * 3 + 0] = p[0]; corners[2 * 3 + 1] = p[1]; corners[2 * 3 + 1] = p[2];
+	corners[2 * 3 + 0] = p[0]; corners[2 * 3 + 1] = p[1]; corners[2 * 3 + 2] = p[2];
 
 	if (PIR_1 != CalcPlanesIntersection(right, front, bottom, p))
 		return false;
-	corners[3 * 3 + 0] = p[0]; corners[3 * 3 + 1] = p[1]; corners[3 * 3 + 1] = p[2];
+	corners[3 * 3 + 0] = p[0]; corners[3 * 3 + 1] = p[1]; corners[3 * 3 + 2] = p[2];
 
 
 	if (PIR_1 != CalcPlanesIntersection(left, rear, bottom, p))
 		return false;
-	corners[4 * 3 + 0] = p[0]; corners[4 * 3 + 1] = p[1]; corners[4 * 3 + 1] = p[2];
+	corners[4 * 3 + 0] = p[0]; corners[4 * 3 + 1] = p[1]; corners[4 * 3 + 2] = p[2];
 
 	if (PIR_1 != CalcPlanesIntersection(left, rear, top, p))
 		return false;
-	corners[5 * 3 + 0] = p[0]; corners[5 * 3 + 1] = p[1]; corners[5 * 3 + 1] = p[2];
+	corners[5 * 3 + 0] = p[0]; corners[5 * 3 + 1] = p[1]; corners[5 * 3 + 2] = p[2];
 
 	if (PIR_1 != CalcPlanesIntersection(right, rear, top, p))
 		return false;
-	corners[6 * 3 + 0] = p[0]; corners[6 * 3 + 1] = p[1]; corners[6 * 3 + 1] = p[2];
+	corners[6 * 3 + 0] = p[0]; corners[6 * 3 + 1] = p[1]; corners[6 * 3 + 2] = p[2];
 
 	if (PIR_1 != CalcPlanesIntersection(right, rear, bottom, p))
 		return false;
-	corners[7 * 3 + 0] = p[0]; corners[7 * 3 + 1] = p[1]; corners[7 * 3 + 1] = p[2];
+	corners[7 * 3 + 0] = p[0]; corners[7 * 3 + 1] = p[1]; corners[7 * 3 + 2] = p[2];
 
 	return true;
 }

@@ -650,12 +650,56 @@ hull_t *R_StudioHull(model_t *pModel, float frame, int sequence, const vec_t *an
 		{
 			mplane_t* plane0 = &studio_planes[i * 6 + j * 2 + 0];
 			mplane_t* plane1 = &studio_planes[i * 6 + j * 2 + 1];
+
+#ifdef REHLDS_FIXES
+			//Correct size addition
+			SV_SetStudioHullPlane(plane0, pbbox[i].bone, j, pbbox[i].bbmax[j] + size[j]);
+			SV_SetStudioHullPlane(plane1, pbbox[i].bone, j, pbbox[i].bbmin[j] - size[j]);
+#else
 			SV_SetStudioHullPlane(plane0, pbbox[i].bone, j, pbbox[i].bbmax[j]);
 			SV_SetStudioHullPlane(plane1, pbbox[i].bone, j, pbbox[i].bbmin[j]);
 
 			plane0->dist += fabs(plane0->normal[0] * size[0]) + fabs(plane0->normal[1] * size[1]) + fabs(plane0->normal[2] * size[2]);
 			plane1->dist -= fabs(plane1->normal[0] * size[0]) + fabs(plane1->normal[1] * size[1]) + fabs(plane1->normal[2] * size[2]);
+#endif
 		}
+
+		/* BEGIN DEBUG */
+		vec3_t vertices[] = {
+			{ pbbox[i].bbmin[0] - size[0], pbbox[i].bbmin[1] - size[1], pbbox[i].bbmin[2] - size[2] },
+			{ pbbox[i].bbmin[0] - size[0], pbbox[i].bbmin[1] - size[1], pbbox[i].bbmax[2] + size[2] },
+			{ pbbox[i].bbmax[0] + size[0], pbbox[i].bbmin[1] - size[1], pbbox[i].bbmax[2] + size[2] },
+			{ pbbox[i].bbmax[0] + size[0], pbbox[i].bbmin[1] - size[1], pbbox[i].bbmin[2] - size[2] },
+
+			{ pbbox[i].bbmin[0] - size[0], pbbox[i].bbmax[1] + size[1], pbbox[i].bbmin[2] - size[2] },
+			{ pbbox[i].bbmin[0] - size[0], pbbox[i].bbmax[1] + size[1], pbbox[i].bbmax[2] + size[2] },
+			{ pbbox[i].bbmax[0] + size[0], pbbox[i].bbmax[1] + size[1], pbbox[i].bbmax[2] + size[2] },
+			{ pbbox[i].bbmax[0] + size[0], pbbox[i].bbmax[1] + size[1], pbbox[i].bbmin[2] - size[2] }
+		};
+
+		vec3_t transformedVertices[8];
+
+		for (int j = 0; j < 8; j++) {
+			VectorTransform(vertices[j], (float*)bonetransform[pbbox[i].bone], transformedVertices[j]);
+		}
+
+		float vertices2[3 * 8];
+		GetHitboxCorners(i, vertices2);
+
+		for (int j = 0; j < 8; j++) {
+			if (fabs(vertices2[0 + j*3] - transformedVertices[j][0]) > 0.2) {
+				Con_Printf("X Mismatch! %d\n", j);
+			}
+			if (fabs(vertices2[1 + j * 3] - transformedVertices[j][1]) > 0.2) {
+				Con_Printf("Y Mismatch! %d\n", j);
+			}
+			if (fabs(vertices2[2 + j * 3] - transformedVertices[j][2]) > 0.2) {
+				Con_Printf("Z Mismatch! %d\n", j);
+			}
+
+		}
+
+		/* END DEBUG */
 	}
 
 	*pNumHulls = (bSkipShield == 1) ? pstudiohdr->numhitboxes - 1 : pstudiohdr->numhitboxes;
