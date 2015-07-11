@@ -59,6 +59,7 @@ r_studiocache_t rgStudioCache[STUDIO_CACHE_SIZE];
 int nCurrentHull;
 int nCurrentPlane;
 int r_cachecurrent;
+int g_studio_numhulls;
 
 int studio_hull_hitgroup[STUDIO_NUM_HULLS];
 hull_t studio_hull[STUDIO_NUM_HULLS];
@@ -704,6 +705,8 @@ hull_t *R_StudioHull(model_t *pModel, float frame, int sequence, const vec_t *an
 	}
 
 	*pNumHulls = (bSkipShield == 1) ? pstudiohdr->numhitboxes - 1 : pstudiohdr->numhitboxes;
+	g_studio_numhulls = *pNumHulls;
+
 	if (r_cachestudio.value != 0)
 	{
 #ifdef SWDS

@@ -199,7 +199,7 @@ struct RehldsFuncs_t {
 	void(*MSG_WriteBitVec3Coord)(const float *fa);
 	void(*MSG_EndBitWriting)(sizebuf_t *buf);
 	void*(*SZ_GetSpace)(sizebuf_t *buf, int length);
-	bool(*GetHitboxCorners)(int hitboxId, float* /* [8*3] */ corners);
+	bool(*GetHitboxCorners)(int hitboxId, float* /* [8*3] */ corners, int* pGroupId);
 };
 
 class IRehldsApi {

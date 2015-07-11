@@ -31,7 +31,7 @@
 #include "rehlds_api.h"
 #include "rehlds_interfaces_impl.h"
 
-extern bool GetHitboxCorners(int hitboxId, float* /* [8*3] */ corners);
+extern bool GetHitboxCorners(int hitboxId, float* /* [8*3] */ corners, int* pGroupId);
 
 //Steam_NotifyClientConnect
 typedef IHookChainImpl<qboolean, IGameClient*, const void*, unsigned int> CRehldsHook_Steam_NotifyClientConnect;

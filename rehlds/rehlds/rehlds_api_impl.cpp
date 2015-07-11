@@ -65,7 +65,11 @@ DLL_FUNCTIONS* EXT_FUNC GetEntityInterface_api() {
 	return &gEntityInterface;
 }
 
-bool EXT_FUNC GetHitboxCorners(int hitboxId, float* /* [8*3] */ corners) {
+bool EXT_FUNC GetHitboxCorners(int hitboxId, float* /* [8*3] */ corners, int* pGroupId) {
+	if (hitboxId < 0 || hitboxId >= g_studio_numhulls) {
+		return false;
+	}
+
 	mplane_t* right = &studio_planes[hitboxId * 6 + 0 * 2 + 0];
 	mplane_t* left = &studio_planes[hitboxId * 6 + 0 * 2 + 1];
 	mplane_t* rear = &studio_planes[hitboxId * 6 + 1 * 2 + 0];
@@ -107,6 +111,10 @@ bool EXT_FUNC GetHitboxCorners(int hitboxId, float* /* [8*3] */ corners) {
 	if (PIR_1 != CalcPlanesIntersection(right, rear, bottom, p))
 		return false;
 	corners[7 * 3 + 0] = p[0]; corners[7 * 3 + 1] = p[1]; corners[7 * 3 + 2] = p[2];
+
+	if (pGroupId) {
+		*pGroupId = studio_hull_hitgroup[hitboxId];
+	}
 
 	return true;
 }
