@@ -665,6 +665,7 @@ hull_t *R_StudioHull(model_t *pModel, float frame, int sequence, const vec_t *an
 		}
 
 		/* BEGIN DEBUG */
+		/*
 		vec3_t vertices[] = {
 			{ pbbox[i].bbmin[0] - size[0], pbbox[i].bbmin[1] - size[1], pbbox[i].bbmin[2] - size[2] },
 			{ pbbox[i].bbmin[0] - size[0], pbbox[i].bbmin[1] - size[1], pbbox[i].bbmax[2] + size[2] },
@@ -698,7 +699,7 @@ hull_t *R_StudioHull(model_t *pModel, float frame, int sequence, const vec_t *an
 			}
 
 		}
-
+		*/
 		/* END DEBUG */
 	}
 
