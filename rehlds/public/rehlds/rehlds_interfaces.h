@@ -108,4 +108,6 @@ public:
 	virtual const char* GetName() = 0;
 	virtual uint32 GetWorldmapCrc() = 0;
 	virtual uint8* GetClientDllMd5() = 0;
+
+	virtual void SetModelName(const char* modelname) = 0;
 };
