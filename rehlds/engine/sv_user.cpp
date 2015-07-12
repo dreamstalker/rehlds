@@ -1436,9 +1436,9 @@ bool EXT_FUNC SV_SetupMoveEx_api(IGameClient* client, float* rewindTime)
 #else
 
 	if (rewindTime) {
-		targettime = float(realtime - clientLatency - cl_interptime + sv_unlagpush.value);
-	} else {
 		targettime = float(realtime - *rewindTime);
+	} else {
+		targettime = float(realtime - clientLatency - cl_interptime + sv_unlagpush.value);
 	}
 
 #endif // REHLDS_FIXES
