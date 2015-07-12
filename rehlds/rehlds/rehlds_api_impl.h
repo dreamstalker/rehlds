@@ -32,6 +32,7 @@
 #include "rehlds_interfaces_impl.h"
 
 extern bool GetHitboxCorners(int hitboxId, float* /* [8*3] */ corners, int* pGroupId);
+extern void SetupHitboxTracing();
 
 //Steam_NotifyClientConnect
 typedef IHookChainImpl<qboolean, IGameClient*, const void*, unsigned int> CRehldsHook_Steam_NotifyClientConnect;

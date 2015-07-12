@@ -70,6 +70,14 @@ void EXT_FUNC CGameClient::SetConnected(bool connected) {
 	m_pClient->connected = connected ? 1 : 0;
 }
 
+usercmd_t* EXT_FUNC CGameClient::GetLastCommand() {
+	return &m_pClient->lastcmd;
+}
+
+float EXT_FUNC CGameClient::GetLatency() {
+	return m_pClient->latency;
+}
+
 INetChan* EXT_FUNC CGameClient::GetNetChan()
 {
 	return &m_NetChan;

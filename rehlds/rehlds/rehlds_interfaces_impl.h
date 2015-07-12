@@ -77,6 +77,9 @@ public:
 	virtual bool IsConnected();
 	virtual void SetConnected(bool connected);
 
+	virtual usercmd_t* GetLastCommand();
+	virtual float GetLatency();
+
 
 	virtual client_t* GetClient();
 };

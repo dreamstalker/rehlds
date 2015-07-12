@@ -119,6 +119,10 @@ bool EXT_FUNC GetHitboxCorners(int hitboxId, float* /* [8*3] */ corners, int* pG
 	return true;
 }
 
+void EXT_FUNC SetupHitboxTracing() {
+	g_studio_numhulls = 0;
+}
+
 CRehldsServerStatic g_RehldsServerStatic;
 CRehldsServerData g_RehldsServerData;
 CRehldsHookchains g_RehldsHookchains;
@@ -154,7 +158,10 @@ RehldsFuncs_t g_RehldsApiFuncs =
 	&MSG_WriteBitVec3Coord,
 	&MSG_EndBitWriting,
 	&SZ_GetSpace,
-	&GetHitboxCorners
+	&GetHitboxCorners,
+	&SetupHitboxTracing,
+	&SV_SetupMoveEx_api,
+	&SV_RestoreMove_api
 };
 
 sizebuf_t* EXT_FUNC GetNetMessage_api()

@@ -1350,6 +1350,247 @@ void SV_SetupMove(client_t *_host_client)
 	}
 }
 
+/* <c0030> ../engine/sv_user.c:1426 */
+bool EXT_FUNC SV_SetupMoveEx_api(IGameClient* client, float* rewindTime)
+{
+	struct client_s *cl;
+	float cl_interptime;
+	client_frame_t *nextFrame;
+	entity_state_t *state;
+	sv_adjusted_positions_t *pos;
+	float frac;
+	entity_state_t *pnextstate;
+	int i;
+	client_frame_t *frame;
+	vec3_t origin;
+	vec3_t delta;
+
+	client_t* _host_client = client->GetClient();
+
+
+#ifdef REHLDS_FIXES
+	double targettime; //FP precision fix
+#else
+	float targettime;
+#endif // REHLDS_FIXES
+
+	Q_memset(truepositions, 0, sizeof(truepositions));
+	nofind = 1;
+	if (!gEntityInterface.pfnAllowLagCompensation())
+		return false;
+
+	if (sv_unlag.value == 0.0f || !_host_client->lw || !_host_client->lc)
+		return false;
+
+	if (g_psvs.maxclients <= 1 || !_host_client->active)
+		return false;
+
+	nofind = 0;
+	for (int i = 0; i < g_psvs.maxclients; i++)
+	{
+		cl = &g_psvs.clients[i];
+		if (cl == _host_client || !cl->active)
+			continue;
+
+		truepositions[i].oldorg[0] = cl->edict->v.origin[0];
+		truepositions[i].oldorg[1] = cl->edict->v.origin[1];
+		truepositions[i].oldorg[2] = cl->edict->v.origin[2];
+		truepositions[i].oldabsmin[0] = cl->edict->v.absmin[0];
+		truepositions[i].oldabsmin[1] = cl->edict->v.absmin[1];
+		truepositions[i].oldabsmin[2] = cl->edict->v.absmin[2];
+		truepositions[i].oldabsmax[0] = cl->edict->v.absmax[0];
+		truepositions[i].oldabsmax[1] = cl->edict->v.absmax[1];
+		truepositions[i].active = 1;
+		truepositions[i].oldabsmax[2] = cl->edict->v.absmax[2];
+	}
+
+	float clientLatency = _host_client->latency;
+	if (clientLatency > 1.5)
+		clientLatency = 1.5f;
+
+	if (sv_maxunlag.value != 0.0f)
+	{
+		if (sv_maxunlag.value < 0.0)
+			Cvar_SetValue("sv_maxunlag", 0.0);
+
+		if (clientLatency >= sv_maxunlag.value)
+			clientLatency = sv_maxunlag.value;
+	}
+
+	cl_interptime = _host_client->lastcmd.lerp_msec / 1000.0f;
+
+	if (cl_interptime > 0.1)
+		cl_interptime = 0.1f;
+
+	if (_host_client->next_messageinterval > cl_interptime)
+		cl_interptime = (float)_host_client->next_messageinterval;
+
+#ifdef REHLDS_FIXES
+	// FP Precision fix (targettime is double there, not float)
+	if (rewindTime) {
+		targettime = realtime - *rewindTime;
+	} else {
+		targettime = realtime - clientLatency - cl_interptime + sv_unlagpush.value;
+	}
+
+#else
+
+	if (rewindTime) {
+		targettime = float(realtime - clientLatency - cl_interptime + sv_unlagpush.value);
+	} else {
+		targettime = float(realtime - *rewindTime);
+	}
+
+#endif // REHLDS_FIXES
+
+	if (targettime > realtime)
+		targettime = realtime;
+
+	if (SV_UPDATE_BACKUP <= 0)
+	{
+		Q_memset(truepositions, 0, sizeof(truepositions));
+		nofind = 1;
+		return false;
+	}
+
+	frame = nextFrame = NULL;
+	for (i = 0; i < SV_UPDATE_BACKUP; i++, frame = nextFrame)
+	{
+		nextFrame = &_host_client->frames[SV_UPDATE_MASK & (_host_client->netchan.outgoing_sequence + ~i)];
+		for (int j = 0; j < nextFrame->entities.num_entities; j++)
+		{
+			state = &nextFrame->entities.entities[j];
+
+#ifdef REHLDS_OPT_PEDANTIC
+			if (state->number <= 0)
+				continue;
+
+			if (state->number > g_psvs.maxclients)
+				break; // players are always in the beginning of the list, no need to look more
+#else
+			if (state->number <= 0 || state->number > g_psvs.maxclients)
+				continue;
+#endif
+
+			pos = &truepositions[state->number - 1];
+			if (pos->deadflag)
+				continue;
+
+
+			if (state->health <= 0)
+				pos->deadflag = 1;
+
+			if (state->effects & EF_NOINTERP)
+				pos->deadflag = 1;
+
+			if (pos->temp_org_setflag)
+			{
+				if (SV_UnlagCheckTeleport(state->origin, pos->temp_org))
+					pos->deadflag = 1;
+			}
+			else
+			{
+				pos->temp_org_setflag = 1;
+			}
+
+			pos->temp_org[0] = state->origin[0];
+			pos->temp_org[1] = state->origin[1];
+			pos->temp_org[2] = state->origin[2];
+		}
+
+		if (targettime > nextFrame->senttime)
+			break;
+	}
+
+	if (i >= SV_UPDATE_BACKUP || targettime - nextFrame->senttime > 1.0)
+	{
+		Q_memset(truepositions, 0, 0xB00u);
+		nofind = 1;
+		return false;
+	}
+
+	if (frame)
+	{
+		float timeDiff = float(frame->senttime - nextFrame->senttime);
+		if (timeDiff == 0.0)
+			frac = 0.0;
+		else
+		{
+			frac = float((targettime - nextFrame->senttime) / timeDiff);
+			if (frac <= 1.0)
+			{
+				if (frac < 0.0)
+					frac = 0.0;
+			}
+			else
+				frac = 1.0;
+		}
+	}
+	else
+	{
+		frame = nextFrame;
+		frac = 0.0;
+	}
+
+	for (i = 0; i < nextFrame->entities.num_entities; i++)
+	{
+		state = &nextFrame->entities.entities[i];
+		if (state->number <= 0 || state->number > g_psvs.maxclients)
+			continue;
+
+		cl = &g_psvs.clients[state->number - 1];
+		if (cl == _host_client || !cl->active)
+			continue;
+
+		pos = &truepositions[state->number - 1];
+		if (pos->deadflag)
+			continue;
+
+		if (!pos->active)
+		{
+			Con_DPrintf("tried to store off position of bogus player %i/%s\n", i, cl->name);
+			continue;
+		}
+
+		pnextstate = SV_FindEntInPack(state->number, &frame->entities);
+
+		if (pnextstate)
+		{
+			delta[0] = pnextstate->origin[0] - state->origin[0];
+			delta[1] = pnextstate->origin[1] - state->origin[1];
+			delta[2] = pnextstate->origin[2] - state->origin[2];
+			VectorMA(state->origin, frac, delta, origin);
+		}
+		else
+		{
+			origin[0] = state->origin[0];
+			origin[1] = state->origin[1];
+			origin[2] = state->origin[2];
+		}
+		pos->neworg[0] = origin[0];
+		pos->neworg[1] = origin[1];
+		pos->neworg[2] = origin[2];
+		pos->initial_correction_org[0] = origin[0];
+		pos->initial_correction_org[1] = origin[1];
+		pos->initial_correction_org[2] = origin[2];
+		if (!VectorCompare(origin, cl->edict->v.origin))
+		{
+			cl->edict->v.origin[0] = origin[0];
+			cl->edict->v.origin[1] = origin[1];
+			cl->edict->v.origin[2] = origin[2];
+			SV_LinkEdict(cl->edict, 0);
+			pos->needrelink = 1;
+		}
+	}
+
+	return true;
+}
+
+void EXT_FUNC SV_RestoreMove_api(IGameClient* client) {
+	SV_RestoreMove(client->GetClient());
+}
+
+
 /* <c01e6> ../engine/sv_user.c:1670 */
 void SV_RestoreMove(client_t *_host_client)
 {
