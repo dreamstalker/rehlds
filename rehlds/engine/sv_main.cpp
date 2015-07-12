@@ -868,7 +868,7 @@ int SV_HashString(const char *string, int iBounds)
 }
 
 /* <a6ad2> ../engine/sv_main.c:1087 */
-int SV_LookupSoundIndex(const char *sample)
+int EXT_FUNC SV_LookupSoundIndex(const char *sample)
 {
 	int index;
 
