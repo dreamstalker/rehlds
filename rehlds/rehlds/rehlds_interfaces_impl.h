@@ -96,6 +96,8 @@ public:
 	virtual const char* GetName();
 	virtual uint32 GetWorldmapCrc();
 	virtual uint8* GetClientDllMd5();
+
+	virtual void SetModelName(const char* modelname);
 };
 
 extern CGameClient** g_GameClients;
