@@ -1182,7 +1182,7 @@ void EXT_FUNC EV_PlayReliableEvent_api(IGameClient *cl, int entindex, short unsi
 	EV_PlayReliableEvent_internal(cl->GetClient(), entindex, eventindex, delay, pargs);
 }
 
-void EXT_FUNC EV_PlayReliableEvent(client_t *cl, int entindex, short unsigned int eventindex, float delay, event_args_t *pargs)
+void EV_PlayReliableEvent(client_t *cl, int entindex, short unsigned int eventindex, float delay, event_args_t *pargs)
 {
 	g_RehldsHookchains.m_EV_PlayReliableEvent.callChain(EV_PlayReliableEvent_api, GetRehldsApiClient(cl), entindex, eventindex, delay, pargs);
 }

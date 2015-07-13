@@ -690,9 +690,8 @@ qboolean Steam_NotifyClientConnect(client_t *cl, const void *pvSteam2Key, unsign
 		.callChain(Steam_NotifyClientConnect_api, FALSE, GetRehldsApiClient(cl), pvSteam2Key, ucbSteam2Key);
 }
 
-
 /* <f1884> ../engine/sv_steam3.cpp:914 */
-qboolean EXT_FUNC Steam_NotifyClientConnect_internal(client_t *cl, const void *pvSteam2Key, unsigned int ucbSteam2Key)
+qboolean Steam_NotifyClientConnect_internal(client_t *cl, const void *pvSteam2Key, unsigned int ucbSteam2Key)
 {
 	if (Steam3Server())
 	{

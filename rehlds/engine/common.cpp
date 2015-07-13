@@ -1299,7 +1299,7 @@ void SZ_Clear(sizebuf_t *buf)
 	buf->cursize = 0;
 }
 
-void *SZ_GetSpace(sizebuf_t *buf, int length)
+void *EXT_FUNC SZ_GetSpace(sizebuf_t *buf, int length)
 {
 	void *data;
 	const char *buffername = buf->buffername ? buf->buffername : "???";
