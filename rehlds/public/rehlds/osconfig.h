@@ -51,6 +51,7 @@
 	#include <windows.h>
 	#include <winsock.h>
 	#include <wsipx.h> // for support IPX
+	#define PSAPI_VERSION 1
 	#include <psapi.h>
 	#include <nmmintrin.h>
 	#include <fcntl.h>
