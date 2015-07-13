@@ -65,6 +65,22 @@ DLL_FUNCTIONS* EXT_FUNC GetEntityInterface_api() {
 	return &gEntityInterface;
 }
 
+void EXT_FUNC MSG_StartBitWriting_api(sizebuf_t *buf) {
+	MSG_StartBitWriting(buf);
+}
+
+void EXT_FUNC MSG_WriteBits_api(uint32 data, int numbits) {
+	MSG_WriteBits(data, numbits);
+}
+
+void EXT_FUNC MSG_WriteBitVec3Coord_api(const vec3_t fa) {
+	MSG_WriteBitVec3Coord(fa);
+}
+
+void EXT_FUNC MSG_EndBitWriting_api(sizebuf_t *buf) {
+	MSG_EndBitWriting(buf);
+}
+
 CRehldsServerStatic g_RehldsServerStatic;
 CRehldsServerData g_RehldsServerData;
 CRehldsHookchains g_RehldsHookchains;
@@ -95,10 +111,10 @@ RehldsFuncs_t g_RehldsApiFuncs =
 	&GetEntityInterface_api,
 	&EV_PlayReliableEvent_api,
 	&SV_LookupSoundIndex,
-	&MSG_StartBitWriting,
-	&MSG_WriteBits,
-	&MSG_WriteBitVec3Coord,
-	&MSG_EndBitWriting,
+	&MSG_StartBitWriting_api,
+	&MSG_WriteBits_api,
+	&MSG_WriteBitVec3Coord_api,
+	&MSG_EndBitWriting_api,
 	&SZ_GetSpace
 };
 
