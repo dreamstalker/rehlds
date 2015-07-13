@@ -161,6 +161,11 @@ const char* EXT_FUNC CRehldsServerData::GetModelName() {
 	return g_psv.modelname;
 }
 
+void EXT_FUNC CRehldsServerData::SetModelName(const char* modelname) {
+	Q_strncpy(g_psv.modelname, modelname, ARRAYSIZE(g_psv.modelname) - 1);
+	g_psv.modelname[ARRAYSIZE(g_psv.modelname) - 1] = '\0';
+}
+
 const char* EXT_FUNC CRehldsServerData::GetName() {
 	return g_psv.name;
 }
