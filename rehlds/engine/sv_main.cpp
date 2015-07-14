@@ -2454,7 +2454,11 @@ void SVC_GetChallenge(void)
 		i = oldest;
 #endif
 		// generate new challenge number
-		g_rg_sv_challenges[i].challenge = ( RandomLong(0, 36863) << 16 ) | ( RandomLong(0, 65535) );
+#ifdef REHLDS_FIXES
+		g_rg_sv_challenges[i].challenge = (RandomLong(0, 0x7fff) << 16) | (RandomLong(0, 0xffff));
+#else // REHLDS_FIXES
+		g_rg_sv_challenges[i].challenge = (RandomLong(0, 36863) << 16) | (RandomLong(0, 65535));
+#endif // REHLDS_FIXES
 		g_rg_sv_challenges[i].adr = net_from;
 		g_rg_sv_challenges[i].time = (int)realtime;
 	}
@@ -2517,7 +2521,11 @@ void SVC_ServiceChallenge(void)
 		i = oldest;
 #endif
 		// generate new challenge number
+#ifdef REHLDS_FIXES
+		g_rg_sv_challenges[i].challenge = (RandomLong(0, 0x7fff) << 16) | (RandomLong(0, 0xffff));
+#else // REHLDS_FIXES
 		g_rg_sv_challenges[i].challenge = (RandomLong(0, 36863) << 16) | (RandomLong(0, 65535));
+#endif // REHLDS_FIXES
 		g_rg_sv_challenges[i].adr = net_from;
 		g_rg_sv_challenges[i].time = (int)realtime;
 	}
