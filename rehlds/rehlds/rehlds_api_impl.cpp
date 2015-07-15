@@ -249,6 +249,10 @@ IRehldsHookRegistry_PF_BuildSoundMsg_I* CRehldsHookchains::PF_BuildSoundMsg_I() 
 	return &m_PF_BuildSoundMsg_I;
 }
 
+IRehldsHookRegistry_PrepareUserInfoToTransmit* CRehldsHookchains::PrepareUserInfoToTransmit() {
+	return &m_PrepareUserInfoToTransmit;
+}
+
 int EXT_FUNC CRehldsApi::GetMajorVersion()
 {
 	return REHLDS_API_VERSION_MAJOR;
