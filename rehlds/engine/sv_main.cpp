@@ -2098,7 +2098,12 @@ int SV_CheckUserInfo(netadr_t *adr, char *userinfo, qboolean bIsReconnecting, in
 			*pChar = ' ';
 	}
 
+#ifdef REHLDS_FIXES
+	Q_strcpy(name, newname);
+	Q_StripUnprintableAndSpace(name);
+#else // REHLDS_FIXES
 	TrimSpace(newname, name);
+#endif // REHLDS_FIXES
 
 	if (!Q_UnicodeValidate(name))
 	{
@@ -4807,7 +4812,12 @@ void SV_ExtractFromUserinfo(client_t *cl)
 			*p = ' ';
 	}
 
+#ifdef REHLDS_FIXES
+	Q_strcpy(newname, rawname);
+	Q_StripUnprintableAndSpace(newname);
+#else // REHLDS_FIXES
 	TrimSpace(rawname, newname);
+#endif // REHLDS_FIXES
 
 	if (!Q_UnicodeValidate(newname))
 	{

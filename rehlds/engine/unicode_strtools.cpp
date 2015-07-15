@@ -116,6 +116,11 @@ decodeFinishedMaybeCESU8:
 
 int __cdecl Q_IsUnprintableW(uchar16 c)
 {
+#ifdef REHLDS_FIXES
+	if (!iswprint(c))
+		return 1;
+#endif // REHLDS_FIXES
+
 	switch (c)
 	{
 	case 0x202A:
