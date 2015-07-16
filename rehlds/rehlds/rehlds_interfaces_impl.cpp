@@ -205,6 +205,9 @@ void Rehlds_Interfaces_InitClients()
 
 IGameClient* GetRehldsApiClient(client_t* cl)
 {
+	if (cl == NULL)
+		return NULL; //I think it's logical.
+
 	int idx = cl - g_psvs.clients;
 	if (idx < 0 || idx >= g_psvs.maxclients)
 	{

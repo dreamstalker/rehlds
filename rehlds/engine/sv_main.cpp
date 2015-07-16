@@ -3713,28 +3713,33 @@ int SV_CalcPing(client_t *cl)
 	return 0;
 }
 
-/* <a874a> ../engine/sv_main.c:4991 */
-void SV_FullClientUpdate(client_t *cl, sizebuf_t *sb)
+void EXT_FUNC SV_WriteFullClientUpdate_internal(IGameClient *client, char *info, size_t maxlen, sizebuf_t *sb, IGameClient *receiver)
 {
-	unsigned int i;
-	char info[MAX_INFO_STRING];
+	client_t* cl = client->GetClient();
 	MD5Context_t ctx;
 	unsigned char digest[16];
-
-	i = cl - g_psvs.clients;
-	Q_strncpy(info, cl->userinfo, sizeof(info) - 1);
-	info[sizeof(info) - 1] = 0;
-	Info_RemovePrefixedKeys(info, '_');
 
 	MD5Init(&ctx);
 	MD5Update(&ctx, (unsigned char*)cl->hashedcdkey, sizeof(cl->hashedcdkey));
 	MD5Final(digest, &ctx);
 
 	MSG_WriteByte(sb, svc_updateuserinfo);
-	MSG_WriteByte(sb, i);
+	MSG_WriteByte(sb, cl - g_psvs.clients);
 	MSG_WriteLong(sb, cl->userid);
 	MSG_WriteString(sb, info);
 	MSG_WriteBuf(sb, sizeof(digest), digest);
+}
+
+/* <a874a> ../engine/sv_main.c:4991 */
+void SV_FullClientUpdate(client_t *cl, sizebuf_t *sb)
+{
+	char info[MAX_INFO_STRING];
+
+	Q_strncpy(info, cl->userinfo, sizeof(info) - 1);
+	info[sizeof(info) - 1] = 0;
+	Info_RemovePrefixedKeys(info, '_');
+
+	g_RehldsHookchains.m_SV_WriteFullClientUpdate.callChain(SV_WriteFullClientUpdate_internal, GetRehldsApiClient(cl), info, MAX_INFO_STRING, sb, GetRehldsApiClient((sb == &g_psv.reliable_datagram) ? NULL : host_client));
 }
 
 void EXT_FUNC SV_EmitEvents_api(IGameClient *cl, packet_entities_t *pack, sizebuf_t *ms)

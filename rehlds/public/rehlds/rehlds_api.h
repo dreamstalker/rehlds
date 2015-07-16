@@ -137,6 +137,10 @@ typedef IVoidHookChainRegistry<edict_t *> IRehldsHookRegistry_PF_Remove_I;
 typedef IVoidHookChain<edict_t *, int, const char *, float, float, int, int, int, int, const float *, edict_t *> IRehldsHook_PF_BuildSoundMsg_I;
 typedef IVoidHookChainRegistry<edict_t *, int, const char *, float, float, int, int, int, int, const float *, edict_t *> IRehldsHookRegistry_PF_BuildSoundMsg_I;
 
+//SV_WriteFullClientUpdate hook
+typedef IVoidHookChain<IGameClient *, char *, size_t, sizebuf_t *, IGameClient *> IRehldsHook_SV_WriteFullClientUpdate;
+typedef IVoidHookChainRegistry<IGameClient *, char *, size_t, sizebuf_t *, IGameClient *> IRehldsHookRegistry_SV_WriteFullClientUpdate;
+
 class IRehldsHookchains {
 public:
 	virtual ~IRehldsHookchains() { }
@@ -166,6 +170,7 @@ public:
 	virtual IRehldsHookRegistry_SV_StartSound* SV_StartSound() = 0;
 	virtual IRehldsHookRegistry_PF_Remove_I* PF_Remove_I() = 0;
 	virtual IRehldsHookRegistry_PF_BuildSoundMsg_I* PF_BuildSoundMsg_I() = 0;
+	virtual IRehldsHookRegistry_SV_WriteFullClientUpdate* SV_WriteFullClientUpdate() = 0;
 };
 
 struct RehldsFuncs_t {
