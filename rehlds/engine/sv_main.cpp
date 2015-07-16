@@ -3726,6 +3726,8 @@ void SV_FullClientUpdate(client_t *cl, sizebuf_t *sb)
 	info[sizeof(info) - 1] = 0;
 	Info_RemovePrefixedKeys(info, '_');
 
+	g_RehldsHookchains.m_PrepareUserInfoToTransmit.callChain(nullptr, GetRehldsApiClient(cl), info);
+
 	MD5Init(&ctx);
 	MD5Update(&ctx, (unsigned char*)cl->hashedcdkey, sizeof(cl->hashedcdkey));
 	MD5Final(digest, &ctx);
