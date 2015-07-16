@@ -408,6 +408,14 @@ void SV_ParseResourceList(client_t *pSenderClient)
 	SV_ClearResourceList(&host_client->resourcesneeded);
 	SV_ClearResourceList(&host_client->resourcesonhand);
 
+#ifdef REHLDS_FIXES
+	if (total > 1) // client uses only one custom resource (spray decal)
+	{
+		SV_DropClient(host_client, false, "Too many resources in client resource list");
+		return;
+	}
+#endif // REHLDS_CHECKS
+
 	for (i = 0; i < total; i++)
 	{
 		resource = (resource_t *)Mem_ZeroMalloc(sizeof(resource_t));
@@ -428,6 +436,7 @@ void SV_ParseResourceList(client_t *pSenderClient)
 
 		if (msg_badread || resource->type > t_world ||
 #ifdef REHLDS_FIXES
+			resource->type != t_decal || !(resource->ucFlags & RES_CUSTOM) || Q_strcmp(resource->szFileName, "tempdecal.wad") != 0 || // client uses only tempdecal.wad for customization
 			resource->nDownloadSize <= 0 ||		// FIXED: Check that download size is valid
 #endif // REHLDS_FIXES
 			resource->nDownloadSize > 1024 * 1024 * 1024)	// FIXME: Are they gone crazy??!
