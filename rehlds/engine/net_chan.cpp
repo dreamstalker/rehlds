@@ -1399,15 +1399,40 @@ qboolean Netchan_CopyNormalFragments(netchan_t *chan)
 	SZ_Clear(&net_message);
 	MSG_BeginReading();
 
+#ifdef REHLDS_FIXES
+	bool overflowed = false;
+#endif // REHLDS_FIXES
+
 	while (p)
 	{
 		n = p->next;
 
+#ifdef REHLDS_FIXES
+		if (net_message.cursize + p->frag_message.cursize <= net_message.maxsize)
+			SZ_Write(&net_message, p->frag_message.data, p->frag_message.cursize);
+		else
+			overflowed = true;
+#else // REHLDS_FIXES
 		SZ_Write(&net_message, p->frag_message.data, p->frag_message.cursize);
+#endif // REHLDS_FIXES
 
 		Mem_Free(p);
 		p = n;
 	}
+
+#ifdef REHLDS_FIXES
+	if (overflowed)
+	{
+		Con_Printf("Netchan_CopyNormalFragments:  Overflowed\n");
+
+		SZ_Clear(&net_message);
+
+		chan->incomingbufs[FRAG_NORMAL_STREAM] = NULL;
+		chan->incomingready[FRAG_NORMAL_STREAM] = false;
+
+		return FALSE;
+	}
+#endif // REHLDS_FIXES
 
 	if (*(uint32 *)net_message.data == MAKEID('B', 'Z', '2', '\0'))
 	{
