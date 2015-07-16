@@ -2426,6 +2426,7 @@ void Host_Changelevel2_f(void)
 void Host_Version_f(void)
 {
 	Con_Printf("Protocol version %i\nExe version %s (%s)\n", PROTOCOL_VERSION, gpszVersionString, gpszProductString);
+	Con_Printf("ReHLDS API version %i.%i\n", REHLDS_API_VERSION_MAJOR, REHLDS_API_VERSION_MINOR);
 #ifdef REHLDS_FIXES
 	Con_Printf("Exe build: " __TIME__ " " __DATE__ " (%i)\n", build_number());
 #else // REHLDS_FIXES
