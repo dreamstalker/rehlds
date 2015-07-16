@@ -250,7 +250,7 @@ typedef struct flow_s
 #ifndef REHLDS_FIXES
 #define MAX_FRAGMENTS 25000
 #else
-#define MAX_FRAGMENTS ((NET_MAX_PAYLOAD + FRAGMENT_SIZE - 1) / FRAGMENT_SIZE) // should be enough for any send buf
+#define MAX_FRAGMENTS (NET_MAX_PAYLOAD / FRAGMENT_SIZE) // should be enough for any send buf
 #endif
 
 #define UDP_HEADER_SIZE 28
