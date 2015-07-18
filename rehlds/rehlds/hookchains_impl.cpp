@@ -17,26 +17,7 @@
 */
 
 #include "precompiled.h"
-
-AbstractHookChain::AbstractHookChain() {
-	memset(m_Hooks, 0, sizeof(m_Hooks));
-	m_NumHooks = 0;
-	m_CurHook = 0;
-	m_bOriginalCalled = false;
-	m_OriginalFunc = NULL;
-}
-
-void* AbstractHookChain::nextHook() {
-	return (m_CurHook < m_NumHooks) ? m_Hooks[m_CurHook++] : NULL;
-}
-
-void AbstractHookChain::init(void* origFunc, void* hooks, int numHooks) {
-	m_OriginalFunc = origFunc;
-	m_NumHooks = numHooks;
-	m_CurHook = 0;
-	m_bOriginalCalled = false;
-	memcpy(m_Hooks, hooks, numHooks * sizeof(size_t));
-}
+#include "hookchains_impl.h"
 
 AbstractHookChainRegistry::AbstractHookChainRegistry()
 {

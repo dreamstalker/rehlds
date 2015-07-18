@@ -253,6 +253,10 @@ IRehldsHookRegistry_SV_WriteFullClientUpdate* CRehldsHookchains::SV_WriteFullCli
 	return &m_SV_WriteFullClientUpdate;
 }
 
+IRehldsHookRegistry_GenericFileConsistencyResponce* CRehldsHookchains::GenericFileConsistencyResponce() {
+	return &m_GenericFileConsistencyResponce;
+}
+
 int EXT_FUNC CRehldsApi::GetMajorVersion()
 {
 	return REHLDS_API_VERSION_MAJOR;

@@ -142,7 +142,10 @@ void SV_ParseConsistencyResponse(client_t *pSenderClient)
 		Q_memcpy(resbuffer, r->rguc_reserved, sizeof(resbuffer));
 		if (!Q_memcmp(resbuffer, nullbuffer, sizeof(resbuffer)))
 		{
-			if (MSG_ReadBits(32) != *(uint32 *)&r->rgucMD5_hash[0])
+			uint32 hash = MSG_ReadBits(32);
+			g_RehldsHookchains.m_GenericFileConsistencyResponce.callChain(NULL, GetRehldsApiClient(pSenderClient), r, hash);
+
+			if (hash != *(uint32 *)&r->rgucMD5_hash[0])
 				c = idx + 1;
 		}
 		else

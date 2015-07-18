@@ -77,6 +77,7 @@ public:
 class INetChan {
 public:
 	virtual const netadr_t* GetRemoteAdr() = 0;
+	virtual sizebuf_t* GetMessageBuf() = 0;
 
 
 	// this must be the last virtual function in class
@@ -108,6 +109,8 @@ public:
 	virtual const char* GetName() = 0;
 	virtual uint32 GetWorldmapCrc() = 0;
 	virtual uint8* GetClientDllMd5() = 0;
+	virtual sizebuf_t* GetDatagram() = 0;
+	virtual sizebuf_t* GetReliableDatagram() = 0;
 
 	virtual void SetModelName(const char* modelname) = 0;
 };

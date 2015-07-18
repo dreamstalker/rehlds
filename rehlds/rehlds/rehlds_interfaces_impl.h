@@ -39,8 +39,7 @@ public:
 	CNetChan(netchan_t* chan);
 
 	virtual const netadr_t* GetRemoteAdr();
-
-
+	virtual sizebuf_t* GetMessageBuf();
 
 	virtual netchan_t* GetChan();
 };
@@ -96,6 +95,8 @@ public:
 	virtual const char* GetName();
 	virtual uint32 GetWorldmapCrc();
 	virtual uint8* GetClientDllMd5();
+	virtual sizebuf_t* GetDatagram();
+	virtual sizebuf_t* GetReliableDatagram();
 
 	virtual void SetModelName(const char* modelname);
 };

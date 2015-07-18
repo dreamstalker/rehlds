@@ -34,8 +34,8 @@
 #include "interface.h"
 #include "model.h"
 
-#define REHLDS_API_VERSION_MAJOR 1
-#define REHLDS_API_VERSION_MINOR 3
+#define REHLDS_API_VERSION_MAJOR 2
+#define REHLDS_API_VERSION_MINOR 0
 
 //Steam_NotifyClientConnect hook
 typedef IHookChain<qboolean, IGameClient*, const void*, unsigned int> IRehldsHook_Steam_NotifyClientConnect;
@@ -141,6 +141,10 @@ typedef IVoidHookChainRegistry<edict_t *, int, const char *, float, float, int, 
 typedef IVoidHookChain<IGameClient *, char *, size_t, sizebuf_t *, IGameClient *> IRehldsHook_SV_WriteFullClientUpdate;
 typedef IVoidHookChainRegistry<IGameClient *, char *, size_t, sizebuf_t *, IGameClient *> IRehldsHookRegistry_SV_WriteFullClientUpdate;
 
+//SV_GenericFileConsistencyResponce hook
+typedef IVoidHookChain<IGameClient *, resource_t *, uint32> IRehldsHook_GenericFileConsistencyResponce;
+typedef IVoidHookChainRegistry<IGameClient *, resource_t *, uint32> IRehldsHookRegistry_GenericFileConsistencyResponce;
+
 class IRehldsHookchains {
 public:
 	virtual ~IRehldsHookchains() { }
@@ -171,6 +175,7 @@ public:
 	virtual IRehldsHookRegistry_PF_Remove_I* PF_Remove_I() = 0;
 	virtual IRehldsHookRegistry_PF_BuildSoundMsg_I* PF_BuildSoundMsg_I() = 0;
 	virtual IRehldsHookRegistry_SV_WriteFullClientUpdate* SV_WriteFullClientUpdate() = 0;
+	virtual IRehldsHookRegistry_GenericFileConsistencyResponce* GenericFileConsistencyResponce() = 0;
 };
 
 struct RehldsFuncs_t {
