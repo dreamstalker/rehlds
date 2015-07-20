@@ -46,7 +46,7 @@ void W_CleanupName(char *in, char *out)
 		out[i] = c;
 	}
 	if (i < 16)
-		memset(&out[i], 0, 16 - i);
+		Q_memset(&out[i], 0, 16 - i);
 }
 
 /* <c6d06> ../engine/wad.c:62 */
@@ -149,7 +149,7 @@ void W_Shutdown(void)
 		if (!wad->loaded)
 			break;
 
-		memset(wad, 0, sizeof(wadlist_t));
+		Q_memset(wad, 0, sizeof(wadlist_t));
 	}
 }
 

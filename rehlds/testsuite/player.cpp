@@ -52,6 +52,7 @@ CPlayingEngExtInterceptor::CPlayingEngExtInterceptor(const char* fname, bool str
 	printf("Playing testsuite\nrecorders's cmdline: %s\n", cmdLine);
 
 	m_StartTick = ::GetTickCount();
+	m_NumFrames = 0;
 }
 
 void* CPlayingEngExtInterceptor::allocFuncCall()
@@ -148,9 +149,13 @@ IEngExtCall* CPlayingEngExtInterceptor::getNextCall(bool peek, bool processCallb
 
 	if (cmd->getOpcode() == ECF_NONE) {
 		DWORD endTick = ::GetTickCount();
-		FILE* fl = fopen("rehlds_demo_stats.log", "w");
+		FILE* fl = fopen("rehlds_demo_stats.xml", "w");
 		if (fl) {
-			fprintf(fl, "Finished playing demo; duration=%umsec", (endTick - m_StartTick));
+			fprintf(fl, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+			fprintf(fl, "<DemoStats>\n");
+			fprintf(fl, "  <Duration>%u</Duration>\n", (endTick - m_StartTick));
+			fprintf(fl, "  <NumFrames>%u</NumFrames>\n", m_NumFrames);
+			fprintf(fl, "</DemoStats>\n");
 			fclose(fl);
 		}
 		TerminateProcess(GetCurrentProcess(), 777);
@@ -450,6 +455,10 @@ int CPlayingEngExtInterceptor::recvfrom(SOCKET s, char* buf, int len, int flags,
 	}
 
 	freeFuncCall(playCall); freeFuncCall(playEndCall);
+
+	if (res == -1) {
+		m_NumFrames++;
+	}
 
 	return res;
 }

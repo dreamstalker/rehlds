@@ -233,7 +233,6 @@ void Host_Motd_f(void)
 	FileHandle_t pFile;
 	char *pFileList;
 	char *next;
-	char *now;
 
 	pFileList = motdfile.string;
 	if (*pFileList == '/' || Q_strstr(pFileList, ":") || Q_strstr(pFileList, "..") || Q_strstr(pFileList, "\\"))
@@ -250,11 +249,12 @@ void Host_Motd_f(void)
 	length = FS_Size(pFile);
 	if (length > 0)
 	{
-		now = (char *)Mem_Malloc(length + 1);
-		if (now)
+		char* buf = (char *)Mem_Malloc(length + 1);
+		if (buf)
 		{
-			FS_Read(now, length, 1, pFile);
-			now[length] = 0;
+			FS_Read(buf, length, 1, pFile);
+			buf[length] = 0;
+			char* now = buf;
 			Con_Printf("motd:");
 			next = strchr(now, '\n');
 			while (next != NULL)
@@ -264,9 +264,10 @@ void Host_Motd_f(void)
 				now = next + 1;
 				next = strchr(now, '\n');
 			}
-			if (now)
-				Con_Printf("%s\n", now);
-			Mem_Free(now);
+
+			Con_Printf("%s\n", now);
+
+			Mem_Free(buf);
 		}
 	}
 	FS_Close(pFile);
@@ -508,8 +509,8 @@ void Host_Quit_Restart_f(void)
 
 	if (g_psv.active || (g_pcls.state == ca_active && g_pcls.trueaddress[0] && g_pPostRestartCmdLineArgs))
 	{
-		strcat(g_pPostRestartCmdLineArgs, " +connect ");
-		strcat(g_pPostRestartCmdLineArgs, g_pcls.servername);
+		Q_strcat(g_pPostRestartCmdLineArgs, " +connect ");
+		Q_strcat(g_pPostRestartCmdLineArgs, g_pcls.servername);
 	}
 	else
 	{
@@ -520,7 +521,7 @@ void Host_Quit_Restart_f(void)
 				Cbuf_AddText("save quick\n");
 				Cbuf_Execute();
 
-				strcat(g_pPostRestartCmdLineArgs, " +load quick");
+				Q_strcat(g_pPostRestartCmdLineArgs, " +load quick");
 			}
 		}
 
@@ -555,9 +556,9 @@ void Host_Status_f(void)
 	client_t *client;
 	int seconds;
 	int minutes;
-	int hltv_slots;
-	int hltv_specs;
-	int hltv_delay;
+	int hltv_slots = 0;
+	int hltv_specs = 0;
+	int hltv_delay = 0;
 	char *val;
 	int hours;
 	int j;
@@ -839,7 +840,7 @@ void Host_Map(qboolean bIsDemo, char *mapstring, char *mapName, qboolean loadGam
 			{
 				Q_strcpy(g_pcls.spawnparms, "");
 				for (i = 0; i < Cmd_Argc(); i++)
-					strncat(g_pcls.spawnparms, Cmd_Argv(i), sizeof(g_pcls.spawnparms) - strlen(g_pcls.spawnparms) - 1);
+					Q_strncat(g_pcls.spawnparms, Cmd_Argv(i), sizeof(g_pcls.spawnparms) - strlen(g_pcls.spawnparms) - 1);
 			}
 		}
 		if (sv_gpNewUserMsgs)
@@ -898,8 +899,8 @@ void Host_Map_f(void)
 	mapstring[0] = 0;
 	for (i = 0; i < Cmd_Argc(); i++)
 	{
-		strncat(mapstring, Cmd_Argv(i), 62 - Q_strlen(mapstring));
-		strncat(mapstring, " ", 62 - Q_strlen(mapstring));
+		Q_strncat(mapstring, Cmd_Argv(i), 62 - Q_strlen(mapstring));
+		Q_strncat(mapstring, " ", 62 - Q_strlen(mapstring));
 	}
 	Q_strcat(mapstring, "\n");
 	Q_strncpy(name, Cmd_Argv(1), sizeof(name) - 1);
@@ -1034,7 +1035,11 @@ const char *Host_FindRecentSave(char *pNameBuf)
 	const char *findfn;
 	char basefilename[MAX_PATH];
 	int found;
+#ifdef REHLDS_FIXES
+	int32 newest = 0;
+#else
 	int32 newest;
+#endif
 	int32 ft;
 	char szPath[MAX_PATH];
 
@@ -1049,7 +1054,7 @@ const char *Host_FindRecentSave(char *pNameBuf)
 		{
 			Q_snprintf(szPath, sizeof(szPath), "%s%s", Host_SaveGameDirectory(), findfn);
 			ft = FS_GetFileTime(szPath);
-			if (ft > 0 && (!ft || newest < ft))
+			if (ft > 0 && (!found || newest < ft))
 			{
 				found = 1;
 				newest = ft;
@@ -2312,7 +2317,7 @@ void Host_ClearSaveDirectory(void)
 	const char *pfn;
 
 	Q_snprintf(szName, sizeof(szName), "%s", Host_SaveGameDirectory());
-	strncat(szName, "*.HL?", sizeof(szName) - strlen(szName) - 1);
+	Q_strncat(szName, "*.HL?", sizeof(szName) - strlen(szName) - 1);
 	COM_FixSlashes(szName);
 
 	if (Sys_FindFirstPathID(szName, "GAMECONFIG") != NULL)
@@ -2321,7 +2326,7 @@ void Host_ClearSaveDirectory(void)
 		Q_snprintf(szName, sizeof(szName), "%s", Host_SaveGameDirectory());
 		COM_FixSlashes(szName);
 		FS_CreateDirHierarchy(szName, "GAMECONFIG");
-		strncat(szName, "*.HL?", sizeof(szName) - strlen(szName) - 1);
+		Q_strncat(szName, "*.HL?", sizeof(szName) - strlen(szName) - 1);
 
 		for (pfn = Sys_FindFirstPathID(szName, "GAMECONFIG"); pfn; pfn = Sys_FindNext(NULL))
 		{
@@ -2421,6 +2426,7 @@ void Host_Changelevel2_f(void)
 void Host_Version_f(void)
 {
 	Con_Printf("Protocol version %i\nExe version %s (%s)\n", PROTOCOL_VERSION, gpszVersionString, gpszProductString);
+	Con_Printf("ReHLDS API version %i.%i\n", REHLDS_API_VERSION_MAJOR, REHLDS_API_VERSION_MINOR);
 #ifdef REHLDS_FIXES
 	Con_Printf("Exe build: " __TIME__ " " __DATE__ " (%i)\n", build_number());
 #else // REHLDS_FIXES
@@ -2563,7 +2569,7 @@ void Host_Say(qboolean teamonly)
 
 	for (j = 0, client = g_psvs.clients; j < g_psvs.maxclients; j++, client++)
 	{
-		if (!client || !client->active || !client->spawned || client->fakeclient)
+		if (!client->active || !client->spawned || client->fakeclient)
 			continue;
 
 		host_client = client;
@@ -2630,7 +2636,7 @@ void Host_Tell_f(void)
 		p[Q_strlen(p) - 1] = 0;
 	}
 
-	j = sizeof(text) - 2 - Q_strlen(text);
+	j = ARRAYSIZE(text) - 2 - Q_strlen(text);
 	if (Q_strlen(p) > (unsigned int)j)
 		p[j] = 0;
 

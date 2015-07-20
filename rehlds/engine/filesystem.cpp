@@ -325,7 +325,11 @@ int FileSystem_SetGameDirectory(const char *pDefaultDir, const char *pGameDir)
 	}
 
 	pchLang = CRehldsPlatformHolder::get()->SteamApps() ? CRehldsPlatformHolder::get()->SteamApps()->GetCurrentGameLanguage() : NULL;
-	strncpy(language, pchLang ? pchLang : "english", sizeof(language));
+	Q_strncpy(language, pchLang ? pchLang : "english", ARRAYSIZE(language));
+#ifdef REHLDS_CHECKS
+	language[ARRAYSIZE(language) - 1] = 0;
+#endif
+
 	if (!g_bIsDedicatedServer && !IsGameSubscribed(pGameDir))
 		return 0;
 
@@ -469,12 +473,15 @@ int FileSystem_AddFallbackGameDir(const char *pGameDir)
 	char language[128];
 
 	const char * pchLang = CRehldsPlatformHolder::get()->SteamApps() ? CRehldsPlatformHolder::get()->SteamApps()->GetCurrentGameLanguage() : NULL;
-	strncpy(language, pchLang ? pchLang : "english", sizeof(language));
+	Q_strncpy(language, pchLang ? pchLang : "english", ARRAYSIZE(language));
+#ifdef REHLDS_CHECKS
+	language[ARRAYSIZE(language) - 1] = 0;
+#endif
 
 	if (strlen(language) != 0 && Q_stricmp(language, "english"))
 	{
 		char temp[MAX_PATH];
-		sprintf(temp, "%s/%s_%s", GetBaseDirectory(), pGameDir, language);
+		Q_sprintf(temp, "%s/%s_%s", GetBaseDirectory(), pGameDir, language);
 		g_pFileSystem->AddSearchPath(temp, "GAME");
 	}
 	g_pFileSystem->AddSearchPath(pGameDir, "GAME");
@@ -484,7 +491,13 @@ int FileSystem_AddFallbackGameDir(const char *pGameDir)
 /* <28fd7> ../engine/filesystem.cpp:626 */
 int FileSystem_Init(char *basedir, void *voidfilesystemFactory)
 {
+#ifdef REHLDS_CHECKS
+	Q_strncpy(s_pBaseDir, basedir, ARRAYSIZE(s_pBaseDir));
+	s_pBaseDir[ARRAYSIZE(s_pBaseDir) - 1] = 0;
+#else
 	Q_strcpy(s_pBaseDir, basedir);
+#endif
+
 	host_parms.basedir = s_pBaseDir;
 
 	if (FileSystem_LoadDLL((CreateInterfaceFn)voidfilesystemFactory))

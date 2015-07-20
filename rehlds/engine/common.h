@@ -119,6 +119,7 @@ extern int loadsize;
 
 #define Q_memset memset
 #define Q_memcpy memcpy
+#define Q_memmove memmove
 #define Q_strlen strlen
 #define Q_memcmp memcmp
 #define Q_strcpy strcpy
@@ -168,6 +169,9 @@ NOBODY char *Q_strstr(const char *s1, const char *search);
 NOBODY uint64 Q_strtoull(char *str);
 
 #endif // Q_functions
+
+//strcpy that works correctly with overlapping src and dst buffers
+char* strcpy_safe(char* dst, char* src);
 
 int build_number(void);
 char *Info_Serverinfo(void);

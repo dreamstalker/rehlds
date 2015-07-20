@@ -27,28 +27,58 @@
 */
 #include "precompiled.h"
 
-char* GetClientFallback_api() {
+char* EXT_FUNC GetClientFallback_api() {
 	return com_clientfallback;
 }
 
-int* GetAllowCheats_api() {
+int* EXT_FUNC GetAllowCheats_api() {
 	return &allow_cheats;
 }
 
-bool GSBSecure_api() {
+bool EXT_FUNC GSBSecure_api() {
 	return Steam_GSBSecure() != 0;
 }
 
-int GetBuildNumber_api() {
+int EXT_FUNC GetBuildNumber_api() {
 	return build_number();
 }
 
-double GetRealTime_api() {
+double EXT_FUNC GetRealTime_api() {
 	return realtime;
 }
 
-int* GetMsgBadRead_api() {
+int* EXT_FUNC GetMsgBadRead_api() {
 	return &msg_badread;
+}
+
+cmd_source_t* EXT_FUNC GetCmdSource_api() {
+	return &cmd_source;
+}
+
+void EXT_FUNC Log_api(const char* prefix, const char* msg) {
+#ifdef REHLDS_FLIGHT_REC
+	FR_Log(prefix, msg);
+#endif
+}
+
+DLL_FUNCTIONS* EXT_FUNC GetEntityInterface_api() {
+	return &gEntityInterface;
+}
+
+void EXT_FUNC MSG_StartBitWriting_api(sizebuf_t *buf) {
+	MSG_StartBitWriting(buf);
+}
+
+void EXT_FUNC MSG_WriteBits_api(uint32 data, int numbits) {
+	MSG_WriteBits(data, numbits);
+}
+
+void EXT_FUNC MSG_WriteBitVec3Coord_api(const vec3_t fa) {
+	MSG_WriteBitVec3Coord(fa);
+}
+
+void EXT_FUNC MSG_EndBitWriting_api(sizebuf_t *buf) {
+	MSG_EndBitWriting(buf);
 }
 
 CRehldsServerStatic g_RehldsServerStatic;
@@ -75,15 +105,25 @@ RehldsFuncs_t g_RehldsApiFuncs =
 	&GSBSecure_api,
 	&GetBuildNumber_api,
 	&GetRealTime_api,
-	&GetMsgBadRead_api
+	&GetMsgBadRead_api,
+	&GetCmdSource_api,
+	&Log_api,
+	&GetEntityInterface_api,
+	&EV_PlayReliableEvent_api,
+	&SV_LookupSoundIndex,
+	&MSG_StartBitWriting_api,
+	&MSG_WriteBits_api,
+	&MSG_WriteBitVec3Coord_api,
+	&MSG_EndBitWriting_api,
+	&SZ_GetSpace
 };
 
-sizebuf_t* GetNetMessage_api()
+sizebuf_t* EXT_FUNC GetNetMessage_api()
 {
 	return &net_message;
 }
 
-IGameClient* GetHostClient_api()
+IGameClient* EXT_FUNC GetHostClient_api()
 {
 	if (host_client == NULL)
 		return NULL;
@@ -91,7 +131,7 @@ IGameClient* GetHostClient_api()
 	return GetRehldsApiClient(host_client);
 }
 
-extern int* GetMsgReadCount_api()
+extern int* EXT_FUNC GetMsgReadCount_api()
 {
 	return &msg_readcount;
 }
@@ -185,35 +225,63 @@ IRehldsHookRegistry_Mod_LoadStudioModel* CRehldsHookchains::Mod_LoadStudioModel(
 	return &m_Mod_LoadStudioModel;
 }
 
-int CRehldsApi::GetMajorVersion()
+IRehldsHookRegistry_ExecuteServerStringCmd* CRehldsHookchains::ExecuteServerStringCmd() {
+	return &m_ExecuteServerStringCmd;
+}
+
+IRehldsHookRegistry_SV_EmitEvents* CRehldsHookchains::SV_EmitEvents() {
+	return &m_SV_EmitEvents;
+}
+
+IRehldsHookRegistry_EV_PlayReliableEvent* CRehldsHookchains::EV_PlayReliableEvent() {
+	return &m_EV_PlayReliableEvent;
+}
+
+IRehldsHookRegistry_SV_StartSound* CRehldsHookchains::SV_StartSound() {
+	return &m_SV_StartSound;
+}
+
+IRehldsHookRegistry_PF_Remove_I* CRehldsHookchains::PF_Remove_I() {
+	return &m_PF_Remove_I;
+}
+
+IRehldsHookRegistry_PF_BuildSoundMsg_I* CRehldsHookchains::PF_BuildSoundMsg_I() {
+	return &m_PF_BuildSoundMsg_I;
+}
+
+IRehldsHookRegistry_SV_WriteFullClientUpdate* CRehldsHookchains::SV_WriteFullClientUpdate() {
+	return &m_SV_WriteFullClientUpdate;
+}
+
+int EXT_FUNC CRehldsApi::GetMajorVersion()
 {
 	return REHLDS_API_VERSION_MAJOR;
 }
 
-int CRehldsApi::GetMinorVersion()
+int EXT_FUNC CRehldsApi::GetMinorVersion()
 {
 	return REHLDS_API_VERSION_MINOR;
 }
 
-const RehldsFuncs_t* CRehldsApi::GetFuncs()
+const RehldsFuncs_t* EXT_FUNC CRehldsApi::GetFuncs()
 {
 	return &g_RehldsApiFuncs;
 }
 
-IRehldsHookchains* CRehldsApi::GetHookchains()
+IRehldsHookchains* EXT_FUNC CRehldsApi::GetHookchains()
 {
 	return &g_RehldsHookchains;
 }
 
-IRehldsServerStatic* CRehldsApi::GetServerStatic() {
+IRehldsServerStatic* EXT_FUNC CRehldsApi::GetServerStatic() {
 	return &g_RehldsServerStatic;
 }
 
-IRehldsServerData* CRehldsApi::GetServerData() {
+IRehldsServerData* EXT_FUNC CRehldsApi::GetServerData() {
 	return &g_RehldsServerData;
 }
 
-IRehldsFlightRecorder* CRehldsApi::GetFlightRecorder() {
+IRehldsFlightRecorder* EXT_FUNC CRehldsApi::GetFlightRecorder() {
 	return g_FlightRecorder;
 }
 

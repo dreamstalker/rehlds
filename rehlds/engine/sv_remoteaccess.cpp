@@ -2,6 +2,11 @@
 
 class CServerRemoteAccess g_ServerRemoteAccess;
 
+CServerRemoteAccess::CServerRemoteAccess() {
+	m_iBytesSent = 0;
+	m_iBytesReceived = 0;
+}
+
 void CServerRemoteAccess::WriteDataRequest(const void *buffer, int bufferSize)
 {
 	WriteDataRequest_noVirt(buffer, bufferSize);
@@ -57,7 +62,7 @@ int CServerRemoteAccess::ReadDataResponse_noVirt(void *data, int len)
 		bytesToCopy = 0;
 
 	if (bytesToCopy)
-		memcpy(data, response.Base(), bytesToCopy);
+		Q_memcpy(data, response.Base(), bytesToCopy);
 
 	m_iBytesSent += bytesToCopy;
 
@@ -94,13 +99,13 @@ const char* CServerRemoteAccess::LookupStringValue(const char *variable)
 				count++;
 		}
 
-		_snprintf(s_ReturnBuf, sizeof(s_ReturnBuf) - 1, "%d", count);
+		Q_snprintf(s_ReturnBuf, sizeof(s_ReturnBuf) - 1, "%d", count);
 		return s_ReturnBuf;
 	}
 
 	if (!Q_stricmp(variable, "maxplayers"))
 	{
-		_snprintf(s_ReturnBuf, sizeof(s_ReturnBuf) - 1, "%d", g_psvs.maxclients);
+		Q_snprintf(s_ReturnBuf, sizeof(s_ReturnBuf) - 1, "%d", g_psvs.maxclients);
 		return s_ReturnBuf;
 	}
 
@@ -150,14 +155,23 @@ void CServerRemoteAccess::GetMapList(CUtlBuffer &value)
 	char mapName[MAX_PATH];
 	char mapwild[64];
 
-	strcpy(mapwild, "maps/*.bsp");
+	Q_strcpy(mapwild, "maps/*.bsp");
 	for (findfn = Sys_FindFirst(mapwild, 0); findfn; findfn = Sys_FindNext(0))
 	{
-		_snprintf(curDir, MAX_PATH, "maps/%s", findfn);
-		FS_GetLocalPath(curDir, curDir, MAX_PATH);
+		Q_snprintf(curDir, ARRAYSIZE(curDir), "maps/%s", findfn);
+#ifdef REHLDS_CHECKS
+		curDir[ARRAYSIZE(curDir) - 1] = 0;
+#endif
+
+		FS_GetLocalPath(curDir, curDir, ARRAYSIZE(curDir));
 		if (Q_strstr(curDir, com_gamedir))
 		{
+#ifdef REHLDS_CHECKS
+			Q_strncpy(mapName, findfn, ARRAYSIZE(mapName));
+			mapName[ARRAYSIZE(mapName) - 1] = 0;
+#else
 			Q_strcpy(mapName, findfn);
+#endif
 			extension = Q_strstr(mapName, ".bsp");
 			if (extension)
 				*extension = 0;

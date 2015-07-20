@@ -442,7 +442,7 @@ void Host_ClientCommands(const char *fmt, ...)
 	va_end(argptr);
 }
 
-void SV_DropClient_api(IGameClient* cl, bool crash, const char* fmt, ...)
+void EXT_FUNC SV_DropClient_api(IGameClient* cl, bool crash, const char* fmt, ...)
 {
 	char buf[1024];
 	va_list argptr;
@@ -883,6 +883,8 @@ void Host_CheckConnectionFailure(void)
 /* <364fd> ../engine/host.c:1350 */
 void _Host_Frame(float time)
 {
+	
+
 	static double host_times[6];
 	if (setjmp(host_enddemo))
 		return;
@@ -891,7 +893,12 @@ void _Host_Frame(float time)
 	if (!Host_FilterTime(time))
 		return;
 
-	FR_StartFrame();
+#ifdef REHLDS_FLIGHT_REC
+	static long frameCounter = 0;
+	if (rehlds_flrec_frame.string[0] != '0') {
+		FR_StartFrame(frameCounter);
+	}
+#endif //REHLDS_FLIGHT_REC
 
 	//SystemWrapper_RunFrame(host_frametime);
 
@@ -951,7 +958,15 @@ void _Host_Frame(float time)
 		Host_Quit_f();
 	}
 
-	FR_EndFrame();
+	//Rehlds Security
+	Rehlds_Security_Frame();
+
+#ifdef REHLDS_FLIGHT_REC
+	if (rehlds_flrec_frame.string[0] != '0') {
+		FR_EndFrame(frameCounter);
+	}
+	frameCounter++;
+#endif //REHLDS_FLIGHT_REC
 }
 
 /* <36628> ../engine/host.c:1501 */
@@ -1051,7 +1066,7 @@ void Host_Version(void)
 
 	Q_strcpy(gpszVersionString, "1.0.1.4");
 	Q_strcpy(gpszProductString, "valve");
-	strcpy(szFileName, "steam.inf");
+	Q_strcpy(szFileName, "steam.inf");
 	FileHandle_t fp = FS_Open(szFileName, "r");
 	if (fp)
 	{
@@ -1076,7 +1091,7 @@ void Host_Version(void)
 					{
 						char szSteamVersionId[32];
 						FS_GetInterfaceVersion(szSteamVersionId, sizeof(szSteamVersionId) - 1);
-						_snprintf(gpszVersionString, sizeof(gpszVersionString), "%s/%s", &com_token[Q_strlen("PatchVersion=")], szSteamVersionId);
+						Q_snprintf(gpszVersionString, sizeof(gpszVersionString), "%s/%s", &com_token[Q_strlen("PatchVersion=")], szSteamVersionId);
 						gpszVersionString[sizeof(gpszVersionString) - 1] = 0;
 					}
 					++gotKeys;
@@ -1116,7 +1131,7 @@ int Host_Init(quakeparms_t *parms)
 
 	CRehldsPlatformHolder::get()->srand(CRehldsPlatformHolder::get()->time(NULL));
 
-	memcpy(&host_parms, parms, sizeof(host_parms));
+	Q_memcpy(&host_parms, parms, sizeof(host_parms));
 	com_argc = parms->argc;
 	com_argv = parms->argv;
 	realtime = 0;
@@ -1136,12 +1151,17 @@ int Host_Init(quakeparms_t *parms)
 	Ed_StrPool_Init();
 #endif //REHLDS_FIXES
 
-	FR_Init();
+	FR_Init(); //don't put it under REHLDS_FLIGHT_REC to allow recording via Rehlds API
 
 	Cbuf_Init();
 	Cmd_Init();
 	Cvar_Init();
 	Cvar_CmdInit();
+
+#ifdef REHLDS_FLIGHT_REC
+	FR_Rehlds_Init();
+#endif //REHLDS_FLIGHT_REC
+
 	V_Init();
 	Chase_Init();
 	COM_Init(parms->basedir);
@@ -1160,9 +1180,11 @@ int Host_Init(quakeparms_t *parms)
 	//SystemWrapper_Init();
 	Host_Version();
 
+	//Rehlds Security
+	Rehlds_Security_Init();
 
 
-	_snprintf(versionString, sizeof(versionString), "%s,%i,%i", gpszVersionString, PROTOCOL_VERSION, build_number());
+	Q_snprintf(versionString, sizeof(versionString), "%s,%i,%i", gpszVersionString, PROTOCOL_VERSION, build_number());
 	Cvar_Set("sv_version", versionString);
 	Con_DPrintf("%4.1f Mb heap\n", (double)parms->memsize / (1024.0f * 1024.0f));
 	R_InitTextures();
@@ -1248,6 +1270,9 @@ void Host_Shutdown(void)
 	//VGui_Shutdown();
 	if (g_pcls.state != ca_dedicated)
 		ClientDLL_Shutdown();
+
+	//Rehlds Security
+	Rehlds_Security_Shutdown();
 
 	Cmd_RemoveGameCmds();
 	Cmd_Shutdown();

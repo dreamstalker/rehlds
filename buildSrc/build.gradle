@@ -19,7 +19,7 @@ dependencies {
     compile 'commons-lang:commons-lang:2.6'
     compile 'joda-time:joda-time:2.7'
 
-    compile 'org.doomedsociety.gradlecpp:gradle-cpp-plugin:1.1'
+    compile 'org.doomedsociety.gradlecpp:gradle-cpp-plugin:1.2'
 
     compile 'org.eclipse.jgit:org.eclipse.jgit:3.7.0.201502260915-r'
 

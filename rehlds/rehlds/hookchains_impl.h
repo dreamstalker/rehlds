@@ -60,6 +60,11 @@ private:
 
 public:
 	virtual ~IHookChainImpl() { }
+
+	IHookChainImpl(t_ret defaultResult) {
+		m_OriginalReturnResult = defaultResult;
+	}
+
 	virtual t_ret callNext(t_args... args) {
 		void* nextvhook = nextHook();
 		if (nextvhook) {
@@ -117,6 +122,7 @@ protected:
 
 protected:
 	void addHook(void* hookFunc);
+	void removeHook(void* hookFunc);
 
 public:
 	AbstractHookChainRegistry();
@@ -130,14 +136,17 @@ public:
 
 	virtual ~IHookChainRegistryImpl() { }
 
-	t_ret callChain(origfunc_t origFunc, t_args... args) {
-		IHookChainImpl<t_ret, t_args...> chain;
+	t_ret callChain(origfunc_t origFunc, t_ret defaultResult, t_args... args) {
+		IHookChainImpl<t_ret, t_args...> chain(defaultResult);
 		chain.init((void*)origFunc, m_Hooks, m_NumHooks);
 		return chain.callNext(args...);
 	}
 
 	virtual void registerHook(hookfunc_t hook) {
 		addHook((void*)hook);
+	}
+	virtual void unregisterHook(hookfunc_t hook) {
+		removeHook((void*)hook);
 	}
 };
 
@@ -157,5 +166,8 @@ public:
 
 	virtual void registerHook(hookfunc_t hook) {
 		addHook((void*)hook);
+	}
+	virtual void unregisterHook(hookfunc_t hook) {
+		removeHook((void*)hook);
 	}
 };

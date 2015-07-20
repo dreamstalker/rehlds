@@ -335,7 +335,7 @@ delta_description_t *DELTA_FindField(delta_t *pFields, const char *pszField)
 }
 
 /* <23fd7> ../engine/delta.c:370 */
-int DELTA_FindFieldIndex(struct delta_s *pFields, const char *fieldname)
+int EXT_FUNC DELTA_FindFieldIndex(struct delta_s *pFields, const char *fieldname)
 {
 	int fieldCount = pFields->fieldCount;
 	delta_description_t *pitem = pFields->pdd;
@@ -353,7 +353,7 @@ int DELTA_FindFieldIndex(struct delta_s *pFields, const char *fieldname)
 }
 
 /* <24032> ../engine/delta.c:393 */
-void DELTA_SetField(struct delta_s *pFields, const char *fieldname)
+void EXT_FUNC DELTA_SetField(struct delta_s *pFields, const char *fieldname)
 {
 #if defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)
 	int index = DELTA_FindFieldIndex(pFields, fieldname);
@@ -371,7 +371,7 @@ void DELTA_SetField(struct delta_s *pFields, const char *fieldname)
 }
 
 /* <240b2> ../engine/delta.c:411 */
-void DELTA_UnsetField(struct delta_s *pFields, const char *fieldname)
+void EXT_FUNC DELTA_UnsetField(struct delta_s *pFields, const char *fieldname)
 {
 #if defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)
 	int index = DELTA_FindFieldIndex(pFields, fieldname);
@@ -389,7 +389,7 @@ void DELTA_UnsetField(struct delta_s *pFields, const char *fieldname)
 }
 
 /* <24132> ../engine/delta.c:429 */
-void DELTA_SetFieldByIndex(struct delta_s *pFields, int fieldNumber)
+void EXT_FUNC DELTA_SetFieldByIndex(struct delta_s *pFields, int fieldNumber)
 {
 #if defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)
 	DELTAJit_SetFieldByIndex(pFields, fieldNumber);
@@ -399,7 +399,7 @@ void DELTA_SetFieldByIndex(struct delta_s *pFields, int fieldNumber)
 }
 
 /* <2416a> ../engine/delta.c:441 */
-void DELTA_UnsetFieldByIndex(struct delta_s *pFields, int fieldNumber)
+void EXT_FUNC DELTA_UnsetFieldByIndex(struct delta_s *pFields, int fieldNumber)
 {
 #if defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)
 	DELTAJit_UnsetFieldByIndex(pFields, fieldNumber);
@@ -1014,7 +1014,7 @@ int DELTA_ParseDelta(unsigned char *from, unsigned char *to, delta_t *pFields)
 }
 
 /* <24c50> ../engine/delta.c:1276 */
-void DELTA_AddEncoder(char *name, void(*conditionalencode)(struct delta_s *, const unsigned char *, const unsigned char *))
+void EXT_FUNC DELTA_AddEncoder(char *name, void(*conditionalencode)(struct delta_s *, const unsigned char *, const unsigned char *))
 {
 	delta_encoder_t *p = (delta_encoder_t *)Mem_ZeroMalloc(sizeof(delta_encoder_t));
 	p->name = Mem_Strdup(name);

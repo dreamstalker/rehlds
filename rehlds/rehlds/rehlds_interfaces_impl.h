@@ -86,6 +86,8 @@ public:
 	virtual int GetMaxClients();
 	virtual bool IsLogActive();
 	virtual IGameClient* GetClient(int id);
+	virtual client_t* GetClient_t(int id);
+	virtual int GetIndexOfClient_t(client_t* client);
 };
 
 class CRehldsServerData : public IRehldsServerData {
@@ -94,6 +96,8 @@ public:
 	virtual const char* GetName();
 	virtual uint32 GetWorldmapCrc();
 	virtual uint8* GetClientDllMd5();
+
+	virtual void SetModelName(const char* modelname);
 };
 
 extern CGameClient** g_GameClients;

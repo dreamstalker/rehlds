@@ -89,7 +89,7 @@ void CL_InitClosest(void) { }
 void CL_Init(void) { }
 
 /* <1c4cb> ../engine/cl_null.c:30 */
-void CL_Particle(vec_t *origin, int color, float life, int zpos, int zvel) { }
+void EXT_FUNC CL_Particle(vec_t *origin, int color, float life, int zpos, int zvel) { }
 
 /* <1c530> ../engine/cl_null.c:31 */
 void CL_PredictMove(qboolean repredicting) { }
@@ -180,7 +180,7 @@ void CL_RedoPrediction(void) { }
 void CL_SetLastUpdate(void) { }
 
 /* <1c7d7> ../engine/cl_null.c:65 */
-void Con_NPrintf(int idx, const char *fmt, ...) { }
+void EXT_FUNC Con_NPrintf(int idx, const char *fmt, ...) { }
 void Sequence_OnLevelLoad( const char* mapName ) { }
 
 /* <1c80d> ../engine/cl_null.c:69 */
@@ -205,29 +205,29 @@ void CL_KeepConnectionActive(void) { }
 void CL_UpdateModuleC(void) { }
 
 /* <1c8cc> ../engine/cl_null.c:81 */
-int VGuiWrap2_IsInCareerMatch(void) { return 0; }
+int EXT_FUNC VGuiWrap2_IsInCareerMatch(void) { return 0; }
 
 /* <1c8e3> ../engine/cl_null.c:83 */
 void VguiWrap2_GetCareerUI(void) { }
 
 /* <1c8f6> ../engine/cl_null.c:85 */
-int VGuiWrap2_GetLocalizedStringLength(const char *label) { return 0; }
+int EXT_FUNC VGuiWrap2_GetLocalizedStringLength(const char *label) { return 0; }
 void VGuiWrap2_LoadingStarted(const char *resourceType, const char *resourceName) {}
 
 /* <1c921> ../engine/cl_null.c:87 */
-void ConstructTutorMessageDecayBuffer(int *buffer, int bufferLength) { }
+void EXT_FUNC ConstructTutorMessageDecayBuffer(int *buffer, int bufferLength) { }
 
 /* <1c95c> ../engine/cl_null.c:88 */
-void ProcessTutorMessageDecayBuffer(int *buffer, int bufferLength) { }
+void EXT_FUNC ProcessTutorMessageDecayBuffer(int *buffer, int bufferLength) { }
 
 /* <1c991> ../engine/cl_null.c:89 */
-int GetTimesTutorMessageShown(int id) { return -1; }
+int EXT_FUNC GetTimesTutorMessageShown(int id) { return -1; }
 
 /* <1c9bb> ../engine/cl_null.c:90 */
-void RegisterTutorMessageShown(int mid) { }
+void EXT_FUNC RegisterTutorMessageShown(int mid) { }
 
 /* <1c9e2> ../engine/cl_null.c:91 */
-void ResetTutorMessageDecayData(void) { }
+void EXT_FUNC ResetTutorMessageDecayData(void) { }
 
 /* <1c9f5> ../engine/cl_null.c:92 */
 void SetCareerAudioState(int state) { }

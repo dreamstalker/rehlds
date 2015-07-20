@@ -8,7 +8,7 @@
 #include "mathlib.h"
 
 #include "sys_shared.h"
-#include "crc32.h"
+#include "crc32c.h"
 #include "static_map.h"
 
 #include "ed_strpool.h"
@@ -33,6 +33,8 @@
 #include "utlbuffer.h"
 #include "utlrbtree.h"
 
+#include "iosutil.h"
+
 //testsuite
 #include "testsuite.h"
 #include "funccalls.h"
@@ -52,5 +54,6 @@
 #include "rehlds_api_impl.h"
 #include "FlightRecorderImpl.h"
 #include "flight_recorder.h"
+#include "rehlds_security.h"
 
 #include "dlls/cdll_dll.h"

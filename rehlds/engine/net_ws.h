@@ -106,7 +106,7 @@ typedef struct LONGPACKET_t
 	int splitCount;
 	int totalSize;
 	// TODO: It should be NET_MAX_MESSAGE, but value differs
-	char buffer[4010];	// This has to be big enough to hold the largest message
+	char buffer[MAX_UDP_PACKET];	// This has to be big enough to hold the largest message
 } LONGPACKET;
 
 /* <d2ae9> ../engine/net_ws.c:900 */
@@ -212,8 +212,8 @@ extern cvar_t net_graph;
 extern cvar_t net_graphwidth;
 extern cvar_t net_scale;
 extern cvar_t net_graphpos;
-extern unsigned char net_message_buffer[65536];
-extern unsigned char in_message_buf[65536];
+extern unsigned char net_message_buffer[NET_MAX_PAYLOAD];
+extern unsigned char in_message_buf[NET_MAX_PAYLOAD];
 extern sizebuf_t in_message;
 extern netadr_t in_from;
 extern int ip_sockets[3];
@@ -228,22 +228,22 @@ extern net_messages_t *normalqueue;
 void NET_ThreadLock(void);
 void NET_ThreadUnlock(void);
 short unsigned int Q_ntohs(short unsigned int netshort);
-void NetadrToSockadr(netadr_t *a, struct sockaddr *s);
+void NetadrToSockadr(const netadr_t *a, struct sockaddr *s);
 void SockadrToNetadr(const struct sockaddr *s, netadr_t *a);
 NOXREF short unsigned int NET_HostToNetShort(short unsigned int us_in);
-qboolean NET_CompareAdr(netadr_t a, netadr_t b);
-qboolean NET_CompareClassBAdr(netadr_t a, netadr_t b);
-qboolean NET_IsReservedAdr(netadr_t a);
-qboolean NET_CompareBaseAdr(netadr_t a, netadr_t b);
-char *NET_AdrToString(netadr_t a);
-char *NET_BaseAdrToString(netadr_t a);
+qboolean NET_CompareAdr(netadr_t& a, netadr_t& b);
+qboolean NET_CompareClassBAdr(netadr_t& a, netadr_t& b);
+qboolean NET_IsReservedAdr(netadr_t& a);
+qboolean NET_CompareBaseAdr(netadr_t& a, netadr_t& b);
+char *NET_AdrToString(const netadr_t& a);
+char *NET_BaseAdrToString(netadr_t& a);
 qboolean NET_StringToSockaddr(const char *s, struct sockaddr *sadr);
 qboolean NET_StringToAdr(const char *s, netadr_t *a);
-qboolean NET_IsLocalAddress(netadr_t adr);
+qboolean NET_IsLocalAddress(netadr_t& adr);
 char *NET_ErrorString(int code);
 void NET_TransferRawData(sizebuf_t *msg, unsigned char *pStart, int nSize);
 qboolean NET_GetLoopPacket(netsrc_t sock, netadr_t *in_from_, sizebuf_t *msg);
-void NET_SendLoopPacket(netsrc_t sock, int length, void *data, netadr_t to);
+void NET_SendLoopPacket(netsrc_t sock, int length, void *data, const netadr_t& to);
 void NET_RemoveFromPacketList(packetlag_t *pPacket);
 NOXREF int NET_CountLaggedList(packetlag_t *pList);
 void NET_ClearLaggedList(packetlag_t *pList);
@@ -265,7 +265,7 @@ void NET_AllocateQueues(void);
 void NET_FlushQueues(void);
 int NET_SendLong(netsrc_t sock, int s, const char *buf, int len, int flags, const struct sockaddr *to, int tolen);
 void NET_SendPacket_api(unsigned int length, void *data, const netadr_t &to);
-void NET_SendPacket(netsrc_t sock, int length, void *data, netadr_t to);
+void NET_SendPacket(netsrc_t sock, int length, void *data, const netadr_t& to);
 int NET_IPSocket(char *net_interface, int port, qboolean multicast);
 void NET_OpenIP(void);
 int NET_IPXSocket(int hostshort);
@@ -277,7 +277,7 @@ void MaxPlayers_f(void);
 void NET_Init(void);
 void NET_ClearLagData(qboolean bClient, qboolean bServer);
 void NET_Shutdown(void);
-qboolean NET_JoinGroup(netsrc_t sock, netadr_t addr);
-qboolean NET_LeaveGroup(netsrc_t sock, netadr_t addr);
+qboolean NET_JoinGroup(netsrc_t sock, netadr_t& addr);
+qboolean NET_LeaveGroup(netsrc_t sock, netadr_t& addr);
 
 #endif // NET_WS_H

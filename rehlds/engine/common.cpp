@@ -33,6 +33,12 @@ char serverinfo[MAX_INFO_STRING];
 char gpszVersionString[32];
 char gpszProductString[32];
 
+char* strcpy_safe(char* dst, char* src) {
+	int len = strlen(src);
+	memmove(dst, src, len + 1);
+	return dst;
+}
+
 
 /* <e875> ../engine/common.c:80 */
 char *Info_Serverinfo(void)
@@ -816,6 +822,10 @@ uint32 MSG_ReadBits(int numbits)
 {
 	uint32 result;
 
+	if (numbits > 32) {
+		rehlds_syserror("%s: invalid numbits %d\n", __FUNCTION__, numbits);
+	}
+
 	if (msg_badread)
 	{
 		result = 1;
@@ -1289,7 +1299,7 @@ void SZ_Clear(sizebuf_t *buf)
 	buf->cursize = 0;
 }
 
-void *SZ_GetSpace(sizebuf_t *buf, int length)
+void *EXT_FUNC SZ_GetSpace(sizebuf_t *buf, int length)
 {
 	void *data;
 	const char *buffername = buf->buffername ? buf->buffername : "???";
@@ -2030,12 +2040,12 @@ NOXREF int COM_ExpandFilename(char *filename)
 	char netpath[MAX_PATH];
 
 	FS_GetLocalPath(filename, netpath, ARRAYSIZE(netpath));
-	strcpy(filename, netpath);
+	Q_strcpy(filename, netpath);
 	return *filename != 0;
 }
 
 /* <11a36> ../engine/common.c:2446 */
-int COM_FileSize(char *filename)
+int EXT_FUNC COM_FileSize(char *filename)
 {
 	FileHandle_t fp;
 	int iSize;
@@ -2051,7 +2061,7 @@ int COM_FileSize(char *filename)
 }
 
 /* <11a83> ../engine/common.c:2472 */
-unsigned char *COM_LoadFile(const char *path, int usehunk, int *pLength)
+unsigned char* EXT_FUNC COM_LoadFile(const char *path, int usehunk, int *pLength)
 {
 	char base[33];
 	unsigned char *buf = NULL;
@@ -2133,7 +2143,7 @@ unsigned char *COM_LoadFile(const char *path, int usehunk, int *pLength)
 }
 
 /* <11b0f> ../engine/common.c:2538 */
-void COM_FreeFile(void *buffer)
+void EXT_FUNC COM_FreeFile(void *buffer)
 {
 #ifndef SWDS
 	g_engdstAddrs->COM_FreeFile();
@@ -2229,7 +2239,7 @@ unsigned char *COM_LoadTempFile(char *path, int *pLength)
 }
 
 /* <11ccb> ../engine/common.c:2657 */
-void COM_LoadCacheFile(char *path, struct cache_user_s *cu)
+void EXT_FUNC COM_LoadCacheFile(char *path, struct cache_user_s *cu)
 {
 	loadcache = cu;
 	COM_LoadFile(path, 3, 0);
@@ -2303,12 +2313,12 @@ void COM_ParseDirectoryFromCmd(const char *pCmdName, char *pDirName, const char 
 	if (pParameter)
 	{
 		// Grab it
-		strcpy(pDirName, pParameter);
+		Q_strcpy(pDirName, pParameter);
 	}
 	else if (pDefault)
 	{
 		// Ok, then use the default
-		strcpy(pDirName, pDefault);
+		Q_strcpy(pDirName, pDefault);
 	}
 	else
 	{
@@ -2446,13 +2456,13 @@ void COM_Log(char *pszFile, char *fmt, ...)
 }
 
 /* <120a6> ../engine/common.c:2900 */
-unsigned char *COM_LoadFileForMe(char *filename, int *pLength)
+unsigned char* EXT_FUNC COM_LoadFileForMe(char *filename, int *pLength)
 {
 	return COM_LoadFile(filename, 5, pLength);
 }
 
 /* <120e3> ../engine/common.c:2905 */
-int COM_CompareFileTime(char *filename1, char *filename2, int *iCompare)
+int EXT_FUNC COM_CompareFileTime(char *filename1, char *filename2, int *iCompare)
 {
 	int ft1;
 	int ft2;
@@ -2484,7 +2494,7 @@ int COM_CompareFileTime(char *filename1, char *filename2, int *iCompare)
 }
 
 /* <12165> ../engine/common.c:2930 */
-void COM_GetGameDir(char *szGameDir)
+void EXT_FUNC COM_GetGameDir(char *szGameDir)
 {
 	if (szGameDir)
 	{
@@ -2878,7 +2888,7 @@ typedef struct
 #define WAVE_HEADER_LENGTH 128
 
 /* <1285a> ../engine/common.c:3287 */
-unsigned int COM_GetApproxWavePlayLength(const char *filepath)
+unsigned int EXT_FUNC COM_GetApproxWavePlayLength(const char *filepath)
 {
 	char buf[WAVE_HEADER_LENGTH + 1];
 	int filelength;

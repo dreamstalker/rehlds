@@ -11,7 +11,8 @@
 Test::Test (const char* testName, const char* testGroup, int timeout) 
 	: name_ (testName), group_ (testGroup), timeout_(timeout)
 {
-	TestRegistry::addTest (this);
+	next_ = NULL;
+	TestRegistry::addTest(this);
 }
 
 

@@ -183,22 +183,28 @@ void CSteam3Server::OnGSClientApprove(GSClientApprove_t *pGSClientSteam2Accept)
 	if (!cl)
 		return;
 
-	char msg[256];
+	
 	if (SV_FilterUser(&cl->network_userid))
 	{
-		sprintf(msg, "You have been banned from this server\n");
+		char msg[256];
+		Q_sprintf(msg, "You have been banned from this server\n");
 		SV_RejectConnection(&cl->netchan.remote_address, msg);
 		SV_DropClient(cl, 0, "STEAM UserID %s is in server ban list\n", SV_GetClientIDString(cl));
 	}
 	else if (SV_CheckForDuplicateSteamID(cl) != -1)
 	{
-		sprintf(msg, "Your UserID is already in use on this server.\n");
+		char msg[256];
+		Q_sprintf(msg, "Your UserID is already in use on this server.\n");
 		SV_RejectConnection(&cl->netchan.remote_address, msg);
 		SV_DropClient(cl, 0, "STEAM UserID %s is already\nin use on this server\n", SV_GetClientIDString(cl));
 	}
 	else
 	{
-		_snprintf(msg, 0x200u, "\"%s<%i><%s><>\" STEAM USERID validated\n", cl->name, cl->userid, SV_GetClientIDString(cl));
+		char msg[512];
+		Q_snprintf(msg, ARRAYSIZE(msg), "\"%s<%i><%s><>\" STEAM USERID validated\n", cl->name, cl->userid, SV_GetClientIDString(cl));
+#ifdef REHLDS_CHECKS
+		msg[ARRAYSIZE(msg) - 1] = 0;
+#endif
 		Con_DPrintf("%s", msg);
 		Log_Printf("%s", msg);
 	}
@@ -241,6 +247,9 @@ CSteam3Server::CSteam3Server(void) :
 	m_CallbackLogonFailure(this, &CSteam3Server::OnLogonFailure),
 	m_SteamIDGS(1, 0, k_EUniverseInvalid, k_EAccountTypeInvalid)
 {
+	m_bHasActivePlayers = false;
+	m_bWantToBeSecure = false;
+	m_bLanOnly = false;
 }
 
 /* <ee234> ../engine/sv_steam3.cpp:375 */
@@ -670,7 +679,7 @@ const char *Steam_GetCommunityName()
 	return NULL;
 }
 
-qboolean Steam_NotifyClientConnect_api(IGameClient *cl, const void *pvSteam2Key, unsigned int ucbSteam2Key)
+qboolean EXT_FUNC Steam_NotifyClientConnect_api(IGameClient *cl, const void *pvSteam2Key, unsigned int ucbSteam2Key)
 {
 	return Steam_NotifyClientConnect_internal(cl->GetClient(), pvSteam2Key, ucbSteam2Key);
 }
@@ -678,9 +687,8 @@ qboolean Steam_NotifyClientConnect_api(IGameClient *cl, const void *pvSteam2Key,
 qboolean Steam_NotifyClientConnect(client_t *cl, const void *pvSteam2Key, unsigned int ucbSteam2Key)
 {
 	return g_RehldsHookchains.m_Steam_NotifyClientConnect
-		.callChain(Steam_NotifyClientConnect_api, GetRehldsApiClient(cl), pvSteam2Key, ucbSteam2Key);
+		.callChain(Steam_NotifyClientConnect_api, FALSE, GetRehldsApiClient(cl), pvSteam2Key, ucbSteam2Key);
 }
-
 
 /* <f1884> ../engine/sv_steam3.cpp:914 */
 qboolean Steam_NotifyClientConnect_internal(client_t *cl, const void *pvSteam2Key, unsigned int ucbSteam2Key)
@@ -692,14 +700,14 @@ qboolean Steam_NotifyClientConnect_internal(client_t *cl, const void *pvSteam2Ke
 	return NULL;
 }
 
-qboolean Steam_NotifyBotConnect_api(IGameClient* cl)
+qboolean EXT_FUNC Steam_NotifyBotConnect_api(IGameClient* cl)
 {
 	return Steam_NotifyBotConnect_internal(cl->GetClient());
 }
 
 qboolean Steam_NotifyBotConnect(client_t *cl)
 {
-	return g_RehldsHookchains.m_Steam_NotifyBotConnect.callChain(Steam_NotifyBotConnect_api, GetRehldsApiClient(cl));
+	return g_RehldsHookchains.m_Steam_NotifyBotConnect.callChain(Steam_NotifyBotConnect_api, FALSE, GetRehldsApiClient(cl));
 }
 
 /* <f18cf> ../engine/sv_steam3.cpp:924 */
@@ -712,7 +720,7 @@ qboolean Steam_NotifyBotConnect_internal(client_t *cl)
 	return NULL;
 }
 
-void Steam_NotifyClientDisconnect_api(IGameClient* cl)
+void EXT_FUNC Steam_NotifyClientDisconnect_api(IGameClient* cl)
 {
 	Steam_NotifyClientDisconnect_internal(cl->GetClient());
 }
@@ -821,7 +829,8 @@ uint64 Steam_GSGetSteamID()
 /* <f1d2a> ../engine/sv_steam3.cpp:1031 */
 qboolean Steam_GSBSecure(void)
 {
-	Steam3Server();
+	//useless call
+	//Steam3Server();
 	return CRehldsPlatformHolder::get()->SteamGameServer()->BSecure();
 }
 

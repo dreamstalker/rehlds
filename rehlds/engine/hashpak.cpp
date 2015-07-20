@@ -163,7 +163,7 @@ qboolean HPAK_FindResource(hash_pack_directory_t *pDir, unsigned char *hash, str
 		if (Q_memcmp(hash, pDir->p_rgEntries[i].resource.rgucMD5_hash, 16) == 0)
 		{
 			if (pResourceEntry)
-				memcpy(pResourceEntry, &pDir->p_rgEntries[i].resource, sizeof(resource_t));
+				Q_memcpy(pResourceEntry, &pDir->p_rgEntries[i].resource, sizeof(resource_t));
 
 			return TRUE;
 		}
@@ -180,7 +180,7 @@ void HPAK_AddToQueue(char *pakname, struct resource_s *pResource, void *pData, F
 
 	Q_memset(n, 0, sizeof(hash_pack_queue_t));
 	n->pakname = Mem_Strdup(pakname);
-	memcpy(&n->resource, pResource, sizeof(resource_t));
+	Q_memcpy(&n->resource, pResource, sizeof(resource_t));
 	n->datasize = pResource->nDownloadSize;
 	n->data = Mem_Malloc(pResource->nDownloadSize);
 	if (!n->data)
@@ -363,7 +363,7 @@ void HPAK_AddLump(qboolean bUseQueue, char *pakname, struct resource_s *pResourc
 			pNewEntry = &newdirectory.p_rgEntries[i];
 			while (i < olddirectory.nEntries)
 			{
-				memcpy(&newdirectory.p_rgEntries[i + 1], &olddirectory.p_rgEntries[i + 1], sizeof(hash_pack_entry_t));
+				Q_memcpy(&newdirectory.p_rgEntries[i + 1], &olddirectory.p_rgEntries[i + 1], sizeof(hash_pack_entry_t));
 				i++;
 			}
 			break;
@@ -378,7 +378,7 @@ void HPAK_AddLump(qboolean bUseQueue, char *pakname, struct resource_s *pResourc
 	Q_memset(pNewEntry, 0, sizeof(hash_pack_entry_t));
 	FS_Seek(iWrite, hash_pack_header.nDirectoryOffset, FILESYSTEM_SEEK_HEAD);
 
-	memcpy(&pNewEntry->resource, pResource, sizeof(resource_t));
+	Q_memcpy(&pNewEntry->resource, pResource, sizeof(resource_t));
 
 	pNewEntry->nOffset = FS_Tell(iWrite);
 	pNewEntry->nFileLength = pResource->nDownloadSize;
@@ -523,7 +523,7 @@ void HPAK_RemoveLump(char *pakname, resource_t *pResource)
 		if (Q_memcmp(olddir.p_rgEntries[i].resource.rgucMD5_hash, pResource->rgucMD5_hash, 16))
 		{
 			newentry = &newdir.p_rgEntries[n++];
-			memcpy(newentry, oldentry, sizeof(hash_pack_entry_t));
+			Q_memcpy(newentry, oldentry, sizeof(hash_pack_entry_t));
 			newentry->nOffset = FS_Tell(tmp);
 
 			FS_Seek(fp, oldentry->nOffset, FILESYSTEM_SEEK_HEAD);
@@ -599,7 +599,7 @@ qboolean HPAK_ResourceForIndex(char *pakname, int nIndex, struct resource_s *pRe
 	directory.p_rgEntries = (hash_pack_entry_t *)Mem_Malloc(sizeof(hash_pack_entry_t) * directory.nEntries);
 	FS_Read(directory.p_rgEntries, sizeof(hash_pack_entry_t) * directory.nEntries, 1, fp);
 	entry = &directory.p_rgEntries[nIndex - 1];
-	memcpy(pResource, &entry->resource, sizeof(resource_t));
+	Q_memcpy(pResource, &entry->resource, sizeof(resource_t));
 	FS_Close(fp);
 	Mem_Free(directory.p_rgEntries);
 	return TRUE;
@@ -622,7 +622,7 @@ qboolean HPAK_ResourceForHash(char *pakname, unsigned char *hash, struct resourc
 				continue;
 
 			if (pResourceEntry)
-				memcpy(pResourceEntry, &p->resource, sizeof(resource_t));
+				Q_memcpy(pResourceEntry, &p->resource, sizeof(resource_t));
 
 			return TRUE;
 		}
@@ -734,25 +734,25 @@ void HPAK_List_f(void)
 		switch (entry->resource.type)
 		{
 			case t_sound:
-				strcpy(type, "sound");
+				Q_strcpy(type, "sound");
 				break;
 			case t_skin:
-				strcpy(type, "skin");
+				Q_strcpy(type, "skin");
 				break;
 			case t_model:
-				strcpy(type, "model");
+				Q_strcpy(type, "model");
 				break;
 			case t_decal:
-				strcpy(type, "decal");
+				Q_strcpy(type, "decal");
 				break;
 			case t_generic:
-				strcpy(type, "generic");
+				Q_strcpy(type, "generic");
 				break;
 			case t_eventscript:
-				strcpy(type, "event");
+				Q_strcpy(type, "event");
 				break;
 			default:
-				strcpy(type, "?");
+				Q_strcpy(type, "?");
 				break;
 		}
 		Con_Printf("%i: %10s %.2fK %s\n  :  %s\n", nCurrent + 1, type, entry->resource.nDownloadSize / 1024.0f, szFileName, MD5_Print(entry->resource.rgucMD5_hash));
@@ -834,7 +834,7 @@ void HPAK_CreatePak(char *pakname, struct resource_s *pResource, void *pData, Fi
 	Q_memset(hash_pack_dir.p_rgEntries, 0, sizeof(hash_pack_entry_t) * hash_pack_dir.nEntries);
 
 	pCurrentEntry = &hash_pack_dir.p_rgEntries[0];
-	memcpy(&pCurrentEntry->resource, pResource, sizeof(resource_t));
+	Q_memcpy(&pCurrentEntry->resource, pResource, sizeof(resource_t));
 
 	pCurrentEntry->nOffset = FS_Tell(fp);
 	pCurrentEntry->nFileLength = pResource->nDownloadSize;
@@ -963,25 +963,25 @@ void HPAK_Validate_f(void)
 		switch (entry->resource.type)
 		{
 			case t_sound:
-				strcpy(type, "sound");
+				Q_strcpy(type, "sound");
 				break;
 			case t_skin:
-				strcpy(type, "skin");
+				Q_strcpy(type, "skin");
 				break;
 			case t_model:
-				strcpy(type, "model");
+				Q_strcpy(type, "model");
 				break;
 			case t_decal:
-				strcpy(type, "decal");
+				Q_strcpy(type, "decal");
 				break;
 			case t_generic:
-				strcpy(type, "generic");
+				Q_strcpy(type, "generic");
 				break;
 			case t_eventscript:
-				strcpy(type, "event");
+				Q_strcpy(type, "event");
 				break;
 			default:
-				strcpy(type, "?");
+				Q_strcpy(type, "?");
 				break;
 		}
 
@@ -1113,25 +1113,25 @@ void HPAK_Extract_f(void)
 			switch (entry->resource.type)
 			{
 				case t_sound:
-					strcpy(type, "sound");
+					Q_strcpy(type, "sound");
 					break;
 				case t_skin:
-					strcpy(type, "skin");
+					Q_strcpy(type, "skin");
 					break;
 				case t_model:
-					strcpy(type, "model");
+					Q_strcpy(type, "model");
 					break;
 				case t_decal:
-					strcpy(type, "decal");
+					Q_strcpy(type, "decal");
 					break;
 				case t_generic:
-					strcpy(type, "generic");
+					Q_strcpy(type, "generic");
 					break;
 				case t_eventscript:
-					strcpy(type, "event");
+					Q_strcpy(type, "event");
 					break;
 				default:
-					strcpy(type, "?");
+					Q_strcpy(type, "?");
 					break;
 			}
 

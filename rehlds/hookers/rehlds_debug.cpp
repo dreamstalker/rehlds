@@ -192,6 +192,7 @@ uint32 calcEdictChecksum(uint32 crc, const edict_t* ed) {
 }
 
 void PrintFloat(const float* pVal, std::stringstream &ss) {
+	IosFlagSaver iosfs(ss);
 	uint32 sVal = *reinterpret_cast<const uint32*>(pVal);
 	ss << "{ float: " << *pVal << "; raw: " << std::hex << sVal << " }";
 }
@@ -254,6 +255,7 @@ enum PrintEdictFlags_e {
 
 void PrintEdict(edict_t* ent, std::stringstream &ss, int flags)
 {
+	IosFlagSaver iosfs(ss);
 	if (ent == NULL) {
 		ss << "NULL";
 		return;
@@ -538,18 +540,21 @@ void __cdecl SV_Physics_Step_hooked(edict_t *ent)
 
 void Rehlds_Debug_logAlloc(size_t sz, void* ptr)
 {
+	IosFlagSaver iosfs(g_RehldsDebugLog);
 	g_RehldsDebugLog << "malloc(" << sz << ") => " << std::hex << (size_t)ptr << "\n";
 	g_RehldsDebugLog.flush();
 }
 
 void Rehlds_Debug_logRealloc(size_t sz, void* oldPtr, void* newPtr)
 {
-	g_RehldsDebugLog << "realloc(" << std::hex << (size_t)oldPtr << ", " << sz << ") => " << std::hex << (size_t)newPtr << "\n";
+	IosFlagSaver iosfs(g_RehldsDebugLog);
+	g_RehldsDebugLog << "realloc(" << std::hex << (size_t)oldPtr << ", " << sz << ") => " << (size_t)newPtr << "\n";
 	g_RehldsDebugLog.flush();
 }
 
 void Rehlds_Debug_logFree(void* ptr)
 {
+	IosFlagSaver iosfs(g_RehldsDebugLog);
 	g_RehldsDebugLog << "free(" << std::hex << (size_t)ptr << ")\n";
 	g_RehldsDebugLog.flush();
 }

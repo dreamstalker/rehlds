@@ -32,7 +32,7 @@
 
 
 /* <42900> ../engine/l_studio.c:31 */
-void Mod_LoadStudioModel_internal(model_t * mod, void * buffer)
+void EXT_FUNC Mod_LoadStudioModel_internal(model_t * mod, void * buffer)
 {
 	uint8 *poutdata;
 	uint8 *pindata;

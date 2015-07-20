@@ -95,7 +95,7 @@ int numuserfilters;
 int sv_playermodel;
 
 //int player_datacounts[32];
-char outputbuf[1400];
+char outputbuf[MAX_ROUTEABLE_PACKET];
 
 redirect_t sv_redirected;
 netadr_t sv_redirectto;
@@ -730,8 +730,13 @@ void SV_StartParticle(const vec_t *org, const vec_t *dir, int color, int count)
 	}
 }
 
-/* <a6df2> ../engine/sv_main.c:887 */
 void SV_StartSound(int recipients, edict_t *entity, int channel, const char *sample, int volume, float attenuation, int fFlags, int pitch)
+{
+	g_RehldsHookchains.m_SV_StartSound.callChain(SV_StartSound_internal, recipients, entity, channel, sample, volume, attenuation, fFlags, pitch);
+}
+
+/* <a6df2> ../engine/sv_main.c:887 */
+void EXT_FUNC SV_StartSound_internal(int recipients, edict_t *entity, int channel, const char *sample, int volume, float attenuation, int fFlags, int pitch)
 {
 	vec3_t origin;
 
@@ -863,7 +868,7 @@ int SV_HashString(const char *string, int iBounds)
 }
 
 /* <a6ad2> ../engine/sv_main.c:1087 */
-int SV_LookupSoundIndex(const char *sample)
+int EXT_FUNC SV_LookupSoundIndex(const char *sample)
 {
 	int index;
 
@@ -1043,7 +1048,7 @@ void SV_Multicast(edict_t *ent, vec_t *origin, int to, qboolean reliable)
 }
 
 /* <a6f4f> ../engine/sv_main.c:1328 */
-void SV_WriteMovevarsToClient(sizebuf_t *message)
+void EXT_FUNC SV_WriteMovevarsToClient(sizebuf_t *message)
 {
 	MSG_WriteByte(message, svc_newmovevars);
 	MSG_WriteFloat(message, movevars.gravity);
@@ -1075,7 +1080,7 @@ void SV_WriteMovevarsToClient(sizebuf_t *message)
 }
 
 /* <a6f79> ../engine/sv_main.c:1365 */
-void SV_WriteDeltaDescriptionsToClient(sizebuf_t *msg)
+void EXT_FUNC SV_WriteDeltaDescriptionsToClient(sizebuf_t *msg)
 {
 	int i, c;
 
@@ -1102,7 +1107,7 @@ void SV_WriteDeltaDescriptionsToClient(sizebuf_t *msg)
 }
 
 /* <a7002> ../engine/sv_main.c:1407 */
-void SV_SetMoveVars(void)
+void EXT_FUNC SV_SetMoveVars(void)
 {
 	movevars.entgravity			= 1.0f;
 	movevars.gravity			= sv_gravity.value;
@@ -1175,7 +1180,7 @@ void SV_QueryMovevarsChanged(void)
 	}
 }
 
-void SV_SendServerinfo_mod(sizebuf_t *msg, IGameClient* cl)
+void EXT_FUNC SV_SendServerinfo_mod(sizebuf_t *msg, IGameClient* cl)
 {
 	SV_SendServerinfo_internal(msg, cl->GetClient());
 }
@@ -1508,7 +1513,7 @@ void SV_WriteSpawn(sizebuf_t *msg)
 }
 
 /* <a7277> ../engine/sv_main.c:1920 */
-void SV_SendUserReg(sizebuf_t *msg)
+void EXT_FUNC SV_SendUserReg(sizebuf_t *msg)
 {
 	for (UserMsg *pMsg = sv_gpNewUserMsgs; pMsg; pMsg = pMsg->next)
 	{
@@ -1527,7 +1532,7 @@ void SV_New_f(void)
 {
 	int i;
 	client_t *client;
-	unsigned char data[65536];
+	unsigned char data[NET_MAX_PAYLOAD];
 	sizebuf_t msg;
 	edict_t *ent;
 	char szRejectReason[128];
@@ -1611,7 +1616,7 @@ void SV_New_f(void)
 /* <a7132> ../engine/sv_main.c:2057 */
 void SV_SendRes_f(void)
 {
-	unsigned char data[65536];
+	unsigned char data[NET_MAX_PAYLOAD];
 	sizebuf_t msg;
 
 	Q_memset(&msg, 0, sizeof(msg));
@@ -1636,7 +1641,7 @@ void SV_SendRes_f(void)
 /* <a8922> ../engine/sv_main.c:2096 */
 void SV_Spawn_f(void)
 {
-	unsigned char data[65536];
+	unsigned char data[NET_MAX_PAYLOAD];
 	sizebuf_t msg;
 
 	Q_memset(&msg, 0, sizeof(msg));
@@ -1703,7 +1708,7 @@ void SV_CheckUpdateRate(double *rate)
 }
 
 /* <a7302> ../engine/sv_main.c:2189 */
-void SV_RejectConnection(netadr_t *adr, char *fmt, ...)
+void EXT_FUNC SV_RejectConnection(netadr_t *adr, char *fmt, ...)
 {
 	va_list argptr;
 	char text[1024];
@@ -1751,7 +1756,7 @@ int SV_GetFragmentSize(void *state)
 }
 
 /* <ab01b> ../engine/sv_main.c:2266 */
-qboolean SV_FilterUser(USERID_t *userid)
+qboolean EXT_FUNC SV_FilterUser(USERID_t *userid)
 {
 	int j = numuserfilters;
 	for (int i = numuserfilters - 1; i >= 0; i--)
@@ -1765,7 +1770,7 @@ qboolean SV_FilterUser(USERID_t *userid)
 		else
 		{
 			if (i + 1 < j)
-				memmove(filter, &filter[1], sizeof(userfilter_t) * (j - i + 1));
+				Q_memmove(filter, &filter[1], sizeof(userfilter_t) * (j - i + 1));
 
 			numuserfilters = --j;
 		}
@@ -1776,11 +1781,11 @@ qboolean SV_FilterUser(USERID_t *userid)
 
 int SV_CheckProtocol(netadr_t *adr, int nProtocol)
 {
-	return g_RehldsHookchains.m_SV_CheckProtocol.callChain(SV_CheckProtocol_internal, adr, nProtocol);
+	return g_RehldsHookchains.m_SV_CheckProtocol.callChain(SV_CheckProtocol_internal, 0, adr, nProtocol);
 }
 
 /* <a7396> ../engine/sv_main.c:2302 */
-int SV_CheckProtocol_internal(netadr_t *adr, int nProtocol)
+int EXT_FUNC SV_CheckProtocol_internal(netadr_t *adr, int nProtocol)
 {
 	if (adr == NULL)
 	{
@@ -1827,8 +1832,11 @@ typedef struct challenge_s
 } challenge_t;
 
 challenge_t g_rg_sv_challenges[1024];
+#ifdef REHLDS_OPT_PEDANTIC
+int g_oldest_challenge = 0;
+#endif
 
-bool SV_CheckChallenge_api(const netadr_t &adr, int nChallengeValue) {
+bool EXT_FUNC SV_CheckChallenge_api(const netadr_t &adr, int nChallengeValue) {
 	netadr_t localAdr = adr;
 	return SV_CheckChallenge(&localAdr, nChallengeValue) != 0;
 }
@@ -1860,11 +1868,11 @@ int SV_CheckChallenge(netadr_t *adr, int nChallengeValue)
 
 int SV_CheckIPRestrictions(netadr_t *adr, int nAuthProtocol)
 {
-	return g_RehldsHookchains.m_SV_CheckIPRestrictions.callChain(SV_CheckIPRestrictions_internal, adr, nAuthProtocol);
+	return g_RehldsHookchains.m_SV_CheckIPRestrictions.callChain(SV_CheckIPRestrictions_internal, 0, adr, nAuthProtocol);
 }
 
 /* <a743d> ../engine/sv_main.c:2393 */
-int SV_CheckIPRestrictions_internal(netadr_t *adr, int nAuthProtocol)
+int EXT_FUNC SV_CheckIPRestrictions_internal(netadr_t *adr, int nAuthProtocol)
 {
 	if (sv_lan.value || nAuthProtocol != 3)
 	{
@@ -1901,11 +1909,11 @@ int SV_CheckIPConnectionReuse(netadr_t *adr)
 
 int SV_FinishCertificateCheck(netadr_t *adr, int nAuthProtocol, char *szRawCertificate, char *userinfo)
 {
-	return g_RehldsHookchains.m_SV_FinishCertificateCheck.callChain(SV_FinishCertificateCheck_internal, adr, nAuthProtocol, szRawCertificate, userinfo);
+	return g_RehldsHookchains.m_SV_FinishCertificateCheck.callChain(SV_FinishCertificateCheck_internal, 0, adr, nAuthProtocol, szRawCertificate, userinfo);
 }
 
 /* <a74f4> ../engine/sv_main.c:2461 */
-int SV_FinishCertificateCheck_internal(netadr_t *adr, int nAuthProtocol, char *szRawCertificate, char *userinfo)
+int EXT_FUNC SV_FinishCertificateCheck_internal(netadr_t *adr, int nAuthProtocol, char *szRawCertificate, char *userinfo)
 {
 	if (nAuthProtocol != 2)
 	{
@@ -1942,11 +1950,11 @@ int SV_FinishCertificateCheck_internal(netadr_t *adr, int nAuthProtocol, char *s
 
 int SV_CheckKeyInfo(netadr_t *adr, char *protinfo, short unsigned int *port, int *pAuthProtocol, char *pszRaw, char *cdkey)
 {
-	return g_RehldsHookchains.m_SV_CheckKeyInfo.callChain(SV_CheckKeyInfo_internal, adr, protinfo, port, pAuthProtocol, pszRaw, cdkey);
+	return g_RehldsHookchains.m_SV_CheckKeyInfo.callChain(SV_CheckKeyInfo_internal, 0, adr, protinfo, port, pAuthProtocol, pszRaw, cdkey);
 }
 
 /* <a7584> ../engine/sv_main.c:2527 */
-int SV_CheckKeyInfo_internal(netadr_t *adr, char *protinfo, short unsigned int *port, int *pAuthProtocol, char *pszRaw, char *cdkey)
+int EXT_FUNC SV_CheckKeyInfo_internal(netadr_t *adr, char *protinfo, short unsigned int *port, int *pAuthProtocol, char *pszRaw, char *cdkey)
 {
 	const char *s = Info_ValueForKey(protinfo, "prot");
 	int nAuthProtocol = Q_atoi(s);
@@ -2014,67 +2022,27 @@ int SV_CheckForDuplicateNames(char *userinfo, qboolean bIsReconnecting, int nExc
 	const char *val;
 	int i;
 	client_t *client;
-	int dupc;
-	char newname[MAX_NAME];
-	int retval = 0;
-
-	// TODO: Refactor names checking in SV_CheckForDuplicateNames, SV_CheckUserInfo and SV_ExtractFromUserinfo
-#ifdef REHLDS_FIXES
+	int dupc = 0;
 	char rawname[MAX_NAME];
+	char newname[MAX_NAME];
+	int changed = FALSE;
 
 	val = Info_ValueForKey(userinfo, "name");
-	Q_strncpy(rawname, val, sizeof(rawname) - 1);
-	rawname[sizeof(rawname) - 1] = 0;
+	Q_strncpy(rawname, val, MAX_NAME - 1);
 
-	// Fix name to not start with '#', so it will not resemble userid
-	for (char *p = rawname; *p == '#'; p++) *p = ' ';
-
-	TrimSpace(rawname, newname);
-
-	if (!Q_UnicodeValidate(newname))
-	{
-		Q_UnicodeRepair(newname);
-	}
-
-	if (newname[0] == 0 || !Q_stricmp(newname, "console") || Q_strstr(newname, "..") != NULL)
-	{
-		Info_SetValueForKey(userinfo, "name", "unnamed", MAX_INFO_STRING);
-		val = Info_ValueForKey(userinfo, "name");
-		retval = 1;
-	}
-#else // REHLDS_FIXES
-	val = Info_ValueForKey(userinfo, "name");
-
-	if (val == NULL || val[0] == 0 || Q_strstr(val, "..") != NULL)
-	{
-		Info_SetValueForKey(userinfo, "name", "unnamed", MAX_INFO_STRING);
-		return 1;
-	}
-#endif // REHLDS_FIXES
-
-	dupc = 1;
 	while (true)
 	{
-		client = g_psvs.clients;
-
-		i = 0;
-		while (!client->connected || (i == nExcludeSlot && bIsReconnecting) || Q_stricmp(client->name, val))
+		for (i = 0, client = g_psvs.clients; i < g_psvs.maxclients; i++, client++)
 		{
-			client++;
-			i++;
-			if (i >= g_psvs.maxclients)
-				return retval;
+			if (client->connected && !(i == nExcludeSlot && bIsReconnecting) && !Q_stricmp(client->name, val))
+				break;
 		}
 
-		if (val[0] == '(')
-		{
-			if (val[2] == ')')
-				val += 3;
-			else if (val[3] == ')')
-				val += 4;
-		}
+		// no duplicates for current name
+		if (i == g_psvs.maxclients)
+			return changed;
 
-		Q_snprintf(newname, sizeof(newname), "(%d)%-0.*s", dupc, 28, val);
+		Q_snprintf(newname, sizeof(newname), "(%d)%-0.*s", ++dupc, 28, rawname);
 #ifdef REHLDS_FIXES
 		// Fix possibly incorrectly cut UTF8 chars
 		if (!Q_UnicodeValidate(newname))
@@ -2083,14 +2051,11 @@ int SV_CheckForDuplicateNames(char *userinfo, qboolean bIsReconnecting, int nExc
 		}
 #endif // REHLDS_FIXES
 		Info_SetValueForKey(userinfo, "name", newname, MAX_INFO_STRING);
-
-		retval = 1;
-		dupc++;
-
 		val = Info_ValueForKey(userinfo, "name");
+		changed = TRUE;
 	}
 
-	return retval;
+	return changed;
 }
 
 /* <a76d2> ../engine/sv_main.c:2710 */
@@ -2124,21 +2089,25 @@ int SV_CheckUserInfo(netadr_t *adr, char *userinfo, qboolean bIsReconnecting, in
 	Info_RemoveKey(userinfo, "password");
 
 	s = Info_ValueForKey(userinfo, "name");
-	if (Q_strlen(s) > 0)
-	{
-		Q_strncpy(newname, s, sizeof(newname) - 1);
-		newname[sizeof(newname) - 1] = 0;
-	}
-	else
-	{
-		Q_strcpy(newname, "unnamed");
-	}
+	Q_strncpy(newname, s, sizeof(newname) - 1);
+	newname[sizeof(newname) - 1] = '\0';
 
-	// TODO: Refactor names checking in SV_CheckForDuplicateNames, SV_CheckUserInfo and SV_ExtractFromUserinfo
 	for (pChar = newname; *pChar; pChar++)
 	{
 		if (*pChar == '%' || *pChar == '&')
 			*pChar = ' ';
+	}
+
+#ifdef REHLDS_FIXES
+	Q_strcpy(name, newname);
+	Q_StripUnprintableAndSpace(name);
+#else // REHLDS_FIXES
+	TrimSpace(newname, name);
+#endif // REHLDS_FIXES
+
+	if (!Q_UnicodeValidate(name))
+	{
+		Q_UnicodeRepair(name);
 	}
 
 	for (pChar = newname; *pChar == '#'; pChar++)
@@ -2146,14 +2115,14 @@ int SV_CheckUserInfo(netadr_t *adr, char *userinfo, qboolean bIsReconnecting, in
 		*pChar = ' ';
 	}
 
-	TrimSpace(newname, name);
-
-	if (!Q_UnicodeValidate(name))
+	if (name[0] == 0 || !Q_stricmp(name, "console") || Q_strstr(name, "..") != NULL)
 	{
-		Q_UnicodeRepair(name);
+		Info_SetValueForKey(userinfo, "name", "unnamed", MAX_INFO_STRING);
 	}
-
-	Info_SetValueForKey(userinfo, "name", name, MAX_INFO_STRING);
+	else
+	{
+		Info_SetValueForKey(userinfo, "name", name, MAX_INFO_STRING);
+	}
 
 	if (SV_CheckForDuplicateNames(userinfo, bIsReconnecting, nReconnectSlot))
 	{
@@ -2163,7 +2132,7 @@ int SV_CheckUserInfo(netadr_t *adr, char *userinfo, qboolean bIsReconnecting, in
 
 	s = Info_ValueForKey(userinfo, "*hltv");
 
-	if (!Q_strlen(s))
+	if (!s[0])
 		return 1;
 
 	switch (Q_atoi(s))
@@ -2222,7 +2191,7 @@ void SV_ConnectClient(void)
 }
 
 /* <ab6f0> ../engine/sv_main.c:2859 */
-void SV_ConnectClient_internal(void)
+void EXT_FUNC SV_ConnectClient_internal(void)
 {
 	client_t *client;
 	netadr_t adr;
@@ -2243,7 +2212,7 @@ void SV_ConnectClient_internal(void)
 	qboolean bIsSecure;
 
 	client = NULL;
-	memcpy(&adr, &net_from, sizeof(adr));
+	Q_memcpy(&adr, &net_from, sizeof(adr));
 	nAuthProtocol = -1;
 	reconnect = FALSE;
 	port = Q_atoi("27005");
@@ -2338,7 +2307,7 @@ void SV_ConnectClient_internal(void)
 			SV_RejectConnection(&adr, "STEAM certificate length error! %i/%i\n", net_message.cursize - msg_readcount, sizeof(szSteamAuthBuf));
 			return;
 		}
-		memcpy(szSteamAuthBuf, &net_message.data[msg_readcount], len);
+		Q_memcpy(szSteamAuthBuf, &net_message.data[msg_readcount], len);
 		client->network_userid.clientip = *(uint32 *)&adr.ip[0];
 		if (adr.type == NA_LOOPBACK)
 		{
@@ -2428,13 +2397,16 @@ void SV_ConnectClient_internal(void)
 	host_client->userinfo[MAX_INFO_STRING - 1] = 0;
 
 	SV_ExtractFromUserinfo(host_client);
-	Info_SetValueForStarKey(host_client->userinfo, "*sid", va("%I64d", host_client->network_userid.m_SteamID), MAX_INFO_STRING);
+	Info_SetValueForStarKey(host_client->userinfo, "*sid", va("%lld", host_client->network_userid.m_SteamID), MAX_INFO_STRING);
 
 	host_client->datagram.flags = 1;
 	host_client->datagram.data = (byte *)host_client->datagram_buf;
 	host_client->datagram.maxsize = sizeof(host_client->datagram_buf);
 	host_client->datagram.buffername = host_client->name;
 	host_client->sendinfo_time = 0.0f;
+
+	//Rehlds Security
+	Rehlds_Security_ClientConnected(host_client - g_psvs.clients);
 
 	g_RehldsHookchains.m_ClientConnected.callChain(NULL, GetRehldsApiClient(host_client));
 }
@@ -2450,8 +2422,10 @@ void SVC_Ping(void)
 void SVC_GetChallenge(void)
 {
 	int i;
+#ifndef REHLDS_OPT_PEDANTIC
 	int oldest = 0;
-	int oldestTime = 0x7FFFFFFFu;
+	int oldestTime = INT_MAX;
+#endif
 	char data[1024];
 	qboolean steam = FALSE;
 
@@ -2464,19 +2438,34 @@ void SVC_GetChallenge(void)
 	{
 		if (NET_CompareBaseAdr(net_from, g_rg_sv_challenges[i].adr))
 			break;
+#ifndef REHLDS_OPT_PEDANTIC
 		if (g_rg_sv_challenges[i].time < oldestTime)
 		{
 			oldest = i;
 			oldestTime = g_rg_sv_challenges[i].time;
 		}
+#endif
 	}
 	
 	if (i == MAX_CHALLENGES)
 	{
+#ifdef REHLDS_OPT_PEDANTIC
+		// oldest challenge is always next after last generated
+		i = g_oldest_challenge++;
+
+		if (g_oldest_challenge >= MAX_CHALLENGES)
+			g_oldest_challenge = 0;
+#else
 		i = oldest;
-		g_rg_sv_challenges[oldest].challenge = (RandomLong(0, 0x8FFFu) << 16) | RandomLong(0, 0xFFFFu);
-		g_rg_sv_challenges[oldest].adr = net_from;
-		g_rg_sv_challenges[oldest].time = realtime;
+#endif
+		// generate new challenge number
+#ifdef REHLDS_FIXES
+		g_rg_sv_challenges[i].challenge = (RandomLong(0, 0x7fff) << 16) | (RandomLong(0, 0xffff));
+#else // REHLDS_FIXES
+		g_rg_sv_challenges[i].challenge = (RandomLong(0, 36863) << 16) | (RandomLong(0, 65535));
+#endif // REHLDS_FIXES
+		g_rg_sv_challenges[i].adr = net_from;
+		g_rg_sv_challenges[i].time = (int)realtime;
 	}
 	if (steam)
 		Q_snprintf(data, sizeof(data), "\xFF\xFF\xFF\xFF%c00000000 %u 3 %I64i %d\n", S2C_CHALLENGE, g_rg_sv_challenges[i].challenge, Steam_GSGetSteamID(), Steam_GSBSecure());
@@ -2495,8 +2484,10 @@ void SVC_GetChallenge(void)
 void SVC_ServiceChallenge(void)
 {
 	int i;
+#ifndef REHLDS_OPT_PEDANTIC
 	int oldest = 0;
-	int oldestTime = 0x7FFFFFFFu;
+	int oldestTime = INT_MAX;
+#endif
 	char data[128];
 	const char *type;
 
@@ -2515,18 +2506,33 @@ void SVC_ServiceChallenge(void)
 		if (NET_CompareBaseAdr(net_from, g_rg_sv_challenges[i].adr))
 			break;
 
+#ifndef REHLDS_OPT_PEDANTIC
 		if (g_rg_sv_challenges[i].time < oldestTime)
 		{
 			oldestTime = g_rg_sv_challenges[i].time;
 			oldest = i;
 		}
+#endif
 	}
-	if (i == MAX_CHALLENGES)
+	if (i == MAX_CHALLENGES) // no challenge for ip
 	{
-		g_rg_sv_challenges[oldest].challenge = (RandomLong(0, 36863) << 16) | (RandomLong(0, 65535));
-		g_rg_sv_challenges[oldest].adr = net_from;
-		g_rg_sv_challenges[oldest].time = (int)realtime;
+#ifdef REHLDS_OPT_PEDANTIC
+		// oldest challenge is always next after last generated
+		i = g_oldest_challenge++;
+
+		if(g_oldest_challenge >= MAX_CHALLENGES)
+			g_oldest_challenge = 0;
+#else
 		i = oldest;
+#endif
+		// generate new challenge number
+#ifdef REHLDS_FIXES
+		g_rg_sv_challenges[i].challenge = (RandomLong(0, 0x7fff) << 16) | (RandomLong(0, 0xffff));
+#else // REHLDS_FIXES
+		g_rg_sv_challenges[i].challenge = (RandomLong(0, 36863) << 16) | (RandomLong(0, 65535));
+#endif // REHLDS_FIXES
+		g_rg_sv_challenges[i].adr = net_from;
+		g_rg_sv_challenges[i].time = (int)realtime;
 	}
 	Q_snprintf(data, sizeof(data), "%c%c%c%cchallenge %s %u\n", 255, 255, 255, 255, type, g_rg_sv_challenges[i].challenge);
 
@@ -2749,7 +2755,7 @@ NOXREF void SVC_InfoString(void)
 	int count = 0;
 	int proxy = 0;
 	sizebuf_t buf;
-	unsigned char data[1400];
+	unsigned char data[MAX_ROUTEABLE_PACKET];
 	char address[256];
 	char gd[260];
 	char info[2048];
@@ -2862,7 +2868,7 @@ NOXREF void SVC_Info(qboolean bDetailed)
 	int i;
 	int count = 0;
 	sizebuf_t buf;
-	unsigned char data[1400];
+	unsigned char data[MAX_ROUTEABLE_PACKET];
 	char szModURL_Info[512];
 	char szModURL_DL[512];
 	int mod_version;
@@ -3135,7 +3141,7 @@ void SV_EndRedirect(void)
 /* <a81f5> ../engine/sv_main.c:4170 */
 void SV_BeginRedirect(redirect_t rd, netadr_t *addr)
 {
-	memcpy(&sv_redirectto, addr, sizeof(sv_redirectto));
+	Q_memcpy(&sv_redirectto, addr, sizeof(sv_redirectto));
 	sv_redirected = rd;
 	outputbuf[0] = 0;
 }
@@ -3400,7 +3406,7 @@ void SV_ConnectionlessPacket(void)
 
 	else if (!Q_stricmp(c, "log"))
 	{
-		if (sv_logrelay.value != 0.0f && args && Q_strlen(args) > 4)
+		if (sv_logrelay.value != 0.0f && Q_strlen(args) > 4)
 		{
 			const char *s = &args[Q_strlen("log ")];
 			if (s && s[0])
@@ -3441,8 +3447,8 @@ void SV_CheckRate(client_t *cl)
 	{
 		if (cl->netchan.rate > sv_maxrate.value)
 		{
-			if (sv_maxrate.value > 100000.0f)
-				cl->netchan.rate = 100000.0;
+			if (sv_maxrate.value > MAX_RATE)
+				cl->netchan.rate = MAX_RATE;
 			else
 				cl->netchan.rate = sv_maxrate.value;
 		}
@@ -3451,8 +3457,8 @@ void SV_CheckRate(client_t *cl)
 	{
 		if (cl->netchan.rate < sv_minrate.value)
 		{
-			if (sv_minrate.value < 1000.0f)
-				cl->netchan.rate = 1000.0;
+			if (sv_minrate.value < MIN_RATE)
+				cl->netchan.rate = MIN_RATE;
 			else
 				cl->netchan.rate = sv_minrate.value;
 		}
@@ -3530,7 +3536,7 @@ qboolean SV_FilterPacket(void)
 		else
 		{
 			if (i < numipfilters - 1)
-				memcpy(curFilter, &curFilter[1], sizeof(ipfilter_t) * (numipfilters - i - 1));
+				memmove(curFilter, &curFilter[1], sizeof(ipfilter_t) * (numipfilters - i - 1));
 
 			--numipfilters;
 		}
@@ -3707,32 +3713,47 @@ int SV_CalcPing(client_t *cl)
 	return 0;
 }
 
-/* <a874a> ../engine/sv_main.c:4991 */
-void SV_FullClientUpdate(client_t *cl, sizebuf_t *sb)
+void EXT_FUNC SV_WriteFullClientUpdate_internal(IGameClient *client, char *info, size_t maxlen, sizebuf_t *sb, IGameClient *receiver)
 {
-	unsigned int i;
-	char info[MAX_INFO_STRING];
+	client_t* cl = client->GetClient();
 	MD5Context_t ctx;
 	unsigned char digest[16];
-
-	i = cl - g_psvs.clients;
-	Q_strncpy(info, cl->userinfo, sizeof(info) - 1);
-	info[sizeof(info) - 1] = 0;
-	Info_RemovePrefixedKeys(info, '_');
 
 	MD5Init(&ctx);
 	MD5Update(&ctx, (unsigned char*)cl->hashedcdkey, sizeof(cl->hashedcdkey));
 	MD5Final(digest, &ctx);
 
 	MSG_WriteByte(sb, svc_updateuserinfo);
-	MSG_WriteByte(sb, i);
+	MSG_WriteByte(sb, cl - g_psvs.clients);
 	MSG_WriteLong(sb, cl->userid);
 	MSG_WriteString(sb, info);
 	MSG_WriteBuf(sb, sizeof(digest), digest);
 }
 
+/* <a874a> ../engine/sv_main.c:4991 */
+void SV_FullClientUpdate(client_t *cl, sizebuf_t *sb)
+{
+	char info[MAX_INFO_STRING];
+
+	Q_strncpy(info, cl->userinfo, sizeof(info) - 1);
+	info[sizeof(info) - 1] = 0;
+	Info_RemovePrefixedKeys(info, '_');
+
+	g_RehldsHookchains.m_SV_WriteFullClientUpdate.callChain(SV_WriteFullClientUpdate_internal, GetRehldsApiClient(cl), info, MAX_INFO_STRING, sb, GetRehldsApiClient((sb == &g_psv.reliable_datagram) ? NULL : host_client));
+}
+
+void EXT_FUNC SV_EmitEvents_api(IGameClient *cl, packet_entities_t *pack, sizebuf_t *ms)
+{
+	SV_EmitEvents_internal(cl->GetClient(), pack, ms);
+}
+
+void SV_EmitEvents(client_t *cl, packet_entities_t *pack, sizebuf_t *ms)
+{
+	g_RehldsHookchains.m_SV_EmitEvents.callChain(SV_EmitEvents_api, GetRehldsApiClient(cl), pack, ms);
+}
+
 /* <a8995> ../engine/sv_main.c:5027 */
-void SV_EmitEvents(client_t *cl, packet_entities_t *pack, sizebuf_t *msg)
+void SV_EmitEvents_internal(client_t *cl, packet_entities_t *pack, sizebuf_t *msg)
 {
 	int i;
 	int ev;
@@ -3912,7 +3933,7 @@ void SV_AddToFatPVS(vec_t *org, mnode_t *node)
 }
 
 /* <a8af2> ../engine/sv_main.c:5239 */
-unsigned char *SV_FatPVS(float *org)
+unsigned char* EXT_FUNC SV_FatPVS(float *org)
 {
 	fatbytes = (g_psv.worldmodel->numleafs + 31) >> 3;
 	Q_memset(fatpvs, 0, fatbytes);
@@ -3965,7 +3986,7 @@ void SV_AddToFatPAS(vec_t *org, mnode_t *node)
 }
 
 /* <a8bac> ../engine/sv_main.c:5295 */
-unsigned char *SV_FatPAS(float *org)
+unsigned char* EXT_FUNC SV_FatPAS(float *org)
 {
 	fatpasbytes = (g_psv.worldmodel->numleafs + 31) >> 3;
 	Q_memset(fatpas, 0, fatpasbytes);
@@ -4322,7 +4343,9 @@ qboolean SV_ShouldUpdatePing(client_t *client)
 		return 1;
 	}
 
-	SV_CalcPing(client);
+	//useless call
+	//SV_CalcPing(client);
+
 	return client->lastcmd.buttons & 0x8000;
 }
 
@@ -4364,7 +4387,7 @@ void SV_GetNetInfo(client_t *client, int *ping, int *packet_loss)
 }
 
 /* <a92a5> ../engine/sv_main.c:5775 */
-int SV_CheckVisibility(edict_t *entity, unsigned char *pset)
+int EXT_FUNC SV_CheckVisibility(edict_t *entity, unsigned char *pset)
 {
 	int leaf;
 
@@ -4522,7 +4545,7 @@ void SV_CleanupEnts(void)
 /* <a96d8> ../engine/sv_main.c:5999 */
 qboolean SV_SendClientDatagram(client_t *client)
 {
-	unsigned char buf[4000];
+	unsigned char buf[MAX_DATAGRAM];
 	sizebuf_t msg;
 
 	msg.buffername = "Client Datagram";
@@ -4634,6 +4657,12 @@ void SV_UpdateToReliableMessages(void)
 		SZ_Clear(&g_psv.spectator);
 	}
 
+	//Fix for the "server failed to transmit file 'AY&SY..." bug
+	//https://github.com/dreamstalker/rehlds/issues/38
+#ifdef REHLDS_FIXES
+	bool svReliableCompressed = false;
+#endif
+
 	// Send broadcast data
 	for (i = 0; i < g_psvs.maxclients; i++)
 	{
@@ -4641,6 +4670,19 @@ void SV_UpdateToReliableMessages(void)
 
 		if (!client->fakeclient && client->active)
 		{
+			//Fix for the "server failed to transmit file 'AY&SY..." bug
+			//https://github.com/dreamstalker/rehlds/issues/38
+#ifdef REHLDS_FIXES
+			if (!svReliableCompressed && g_psv.reliable_datagram.cursize + client->netchan.message.cursize < client->netchan.message.maxsize)
+			{
+				SZ_Write(&client->netchan.message, g_psv.reliable_datagram.data, g_psv.reliable_datagram.cursize);
+			}
+			else
+			{
+				Netchan_CreateFragments(TRUE, &client->netchan, &g_psv.reliable_datagram);
+				svReliableCompressed = true;
+			}
+#else
 			if (g_psv.reliable_datagram.cursize + client->netchan.message.cursize < client->netchan.message.maxsize)
 			{
 				SZ_Write(&client->netchan.message, g_psv.reliable_datagram.data, g_psv.reliable_datagram.cursize);
@@ -4649,6 +4691,7 @@ void SV_UpdateToReliableMessages(void)
 			{
 				Netchan_CreateFragments(TRUE, &client->netchan, &g_psv.reliable_datagram);
 			}
+#endif
 
 			if (g_psv.datagram.cursize + client->datagram.cursize < client->datagram.maxsize)
 			{
@@ -4759,27 +4802,35 @@ void SV_ExtractFromUserinfo(client_t *cl)
 {
 	const char *val;
 	int i;
-	client_t *client;
-	int dupc;
 	char newname[MAX_NAME];
 	char rawname[MAX_NAME];
 
 	char *userinfo = cl->userinfo;
 
-	// TODO: Refactor names checking in SV_CheckForDuplicateNames, SV_CheckUserInfo and SV_ExtractFromUserinfo
 	val = Info_ValueForKey(userinfo, "name");
 	Q_strncpy(rawname, val, sizeof(rawname) - 1);
 	rawname[sizeof(rawname) - 1] = 0;
 
-	// Fix name to not start with '#', so it will not resemble userid
-	for (char *p = rawname; *p == '#'; p++) *p = ' ';
+	for (char *p = rawname; *p; p++)
+	{
+		if (*p == '%' || *p == '&')
+			*p = ' ';
+	}
 
+#ifdef REHLDS_FIXES
+	Q_strcpy(newname, rawname);
+	Q_StripUnprintableAndSpace(newname);
+#else // REHLDS_FIXES
 	TrimSpace(rawname, newname);
+#endif // REHLDS_FIXES
 
 	if (!Q_UnicodeValidate(newname))
 	{
 		Q_UnicodeRepair(newname);
 	}
+
+	// Fix name to not start with '#', so it will not resemble userid
+	for (char *p = rawname; *p == '#'; p++) *p = ' ';
 
 	if (newname[0] == 0 || !Q_stricmp(newname, "console")
 #ifdef REHLDS_FIXES
@@ -4789,57 +4840,14 @@ void SV_ExtractFromUserinfo(client_t *cl)
 #endif // REHLDS_FIXES
 	{
 		Info_SetValueForKey(userinfo, "name", "unnamed", MAX_INFO_STRING);
-		val = Info_ValueForKey(userinfo, "name");
 	}
 	else if (Q_strcmp(val, newname))
 	{
 		Info_SetValueForKey(userinfo, "name", newname, MAX_INFO_STRING);
-		val = Info_ValueForKey(userinfo, "name");
 	}
 
 	// Check for duplicate names
-	dupc = 1;
-	while (true)
-	{
-		client = g_psvs.clients;
-
-		i = 0;
-		while (!client->active || !client->spawned || client == cl || Q_stricmp(client->name, val))
-		{
-			client++;
-			i++;
-			if (i >= g_psvs.maxclients)
-				break;
-		}
-		if (i >= g_psvs.maxclients)
-			break;
-
-		// Doesn't look we need this stuff, snprintf will do this work
-		//if (Q_strlen(val) > 31)
-		//	val[28] = 0;
-
-		if (val[0] == '(')
-		{
-			if (val[2] == ')')
-				val += 3;
-			else if (val[3] == ')')
-				val += 4;
-		}
-
-		Q_snprintf(newname, sizeof(newname), "(%d)%-0.*s", dupc, 28, val);
-#ifdef REHLDS_FIXES
-		// Fix possibly incorrectly cut UTF8 chars
-		if (!Q_UnicodeValidate(newname))
-		{
-			Q_UnicodeRepair(newname);
-		}
-#endif // REHLDS_FIXES
-		Info_SetValueForKey(userinfo, "name", newname, MAX_INFO_STRING);
-
-		dupc++;
-
-		val = Info_ValueForKey(userinfo, "name");
-	}
+	SV_CheckForDuplicateNames(userinfo, TRUE, cl - g_psvs.clients);
 
 	gEntityInterface.pfnClientUserInfoChanged(cl->edict, userinfo);
 
@@ -4853,7 +4861,7 @@ void SV_ExtractFromUserinfo(client_t *cl)
 	if (val[0] != 0)
 	{
 		i = Q_atoi(val);
-		cl->netchan.rate = clamp(i, 1000, 100000);
+		cl->netchan.rate = clamp(i, MIN_RATE, MAX_RATE);
 	}
 
 	val = Info_ValueForKey(userinfo, "topcolor");
@@ -5332,7 +5340,7 @@ void SetCStrikeFlags(void)
 void SV_ActivateServer(int runPhysics)
 {
 	int i;
-	unsigned char data[65536];
+	unsigned char data[NET_MAX_PAYLOAD];
 	sizebuf_t msg;
 	client_t *cl;
 	UserMsg *pTemp;
@@ -5701,7 +5709,7 @@ void SV_ClearEntities(void)
 	}
 }
 /* <aa1be> ../engine/sv_main.c:7620 */
-int RegUserMsg(const char *pszName, int iSize)
+int EXT_FUNC RegUserMsg(const char *pszName, int iSize)
 {
 	if (giNextUserMsg > 255 || !pszName || Q_strlen(pszName) > 11 || iSize > 192)
 		return 0;
@@ -5916,13 +5924,13 @@ void SV_BanId_f(void)
 	userfilters[i].banTime = banTime;
 	userfilters[i].banEndTime = (banTime == 0.0f) ? 0.0f : banTime * 60.0f + realtime;
 
-	memcpy(&userfilters[i].userid, id, sizeof(USERID_t));
+	Q_memcpy(&userfilters[i].userid, id, sizeof(USERID_t));
 
 	// give 3-rd party plugins a chance to serialize ID
 	g_RehldsHookchains.m_SerializeSteamId.callChain(NULL, &userfilters[i].userid);
 
 	if (banTime == 0.0f)
-		sprintf(szreason, "permanently");
+		Q_sprintf(szreason, "permanently");
 	else
 		Q_snprintf(szreason, sizeof(szreason), "for %.2f minutes", banTime);
 
@@ -6022,7 +6030,7 @@ void Host_Kick_f(void)
 			argsStartNum = 3;
 		}
 
-		strncpy(idstring, p, 63);
+		Q_strncpy(idstring, p, 63);
 		idstring[63] = 0;
 		
 		if (!Q_strnicmp(idstring, "STEAM_", 6) || !Q_strnicmp(idstring, "VALVE_", 6))
@@ -6143,7 +6151,7 @@ void SV_RemoveId_f(void)
 		return;
 	}
 
-	strncpy(idstring, Cmd_Argv(1), sizeof(idstring) - 1);
+	Q_strncpy(idstring, Cmd_Argv(1), sizeof(idstring) - 1);
 	idstring[63] = 0;
 	if (!idstring[0])
 	{
@@ -6162,10 +6170,10 @@ void SV_RemoveId_f(void)
 		slot--;
 
 		USERID_t id;
-		memcpy(&id, &userfilters[slot].userid, sizeof(id));
+		Q_memcpy(&id, &userfilters[slot].userid, sizeof(id));
 
 		if (slot + 1 < numuserfilters)
-			memcpy(&userfilters[slot], &userfilters[slot + 1], (numuserfilters - (slot + 1)) * sizeof(userfilter_t));
+			Q_memcpy(&userfilters[slot], &userfilters[slot + 1], (numuserfilters - (slot + 1)) * sizeof(userfilter_t));
 		
 		numuserfilters--;
 		Con_Printf("UserID filter removed for %s, id %s\n", idstring, SV_GetIDString(&id));
@@ -6183,7 +6191,7 @@ void SV_RemoveId_f(void)
 			if (!Q_stricmp(SV_GetIDString(&userfilters[i].userid), idstring))
 			{
 				if (i + 1 < numuserfilters)
-					memcpy(&userfilters[i], &userfilters[i + 1], (numuserfilters - (i + 1)) * sizeof(userfilter_t));
+					Q_memcpy(&userfilters[i], &userfilters[i + 1], (numuserfilters - (i + 1)) * sizeof(userfilter_t));
 
 				numuserfilters--;
 				Con_Printf("UserID filter removed for %s\n", idstring);
@@ -6292,7 +6300,7 @@ void SV_AddIP_f(void)
 		if (!host_client->connected || !host_client->active || !host_client->spawned || host_client->fakeclient)
 			continue;
 
-		memcpy(&net_from, &host_client->netchan.remote_address, sizeof(net_from));
+		Q_memcpy(&net_from, &host_client->netchan.remote_address, sizeof(net_from));
 		if (SV_FilterPacket())
 		{
 			SV_ClientPrintf("The server operator has added you to banned list\n");
@@ -6314,7 +6322,7 @@ void SV_RemoveIP_f(void)
 		if (ipfilters[i].mask == f.mask && ipfilters[i].compare.u32 == f.compare.u32)
 		{
 			if (i + 1 < numipfilters)
-				memcpy(&ipfilters[i], &ipfilters[i + 1], (numipfilters - (i + 1)) * sizeof(ipfilter_t));
+				Q_memcpy(&ipfilters[i], &ipfilters[i + 1], (numipfilters - (i + 1)) * sizeof(ipfilter_t));
 			numipfilters--;
 			ipfilters[numipfilters].banTime = 0.0f;
 			ipfilters[numipfilters].banEndTime = 0.0f;
@@ -6384,19 +6392,19 @@ void SV_KickPlayer(int nPlayerSlot, int nReason)
 		return;
 
 	USERID_t id;
-	memcpy(&id, &client->network_userid, sizeof(id));
+	Q_memcpy(&id, &client->network_userid, sizeof(id));
 
 	Log_Printf("Secure: \"%s<%i><%s><>\" was detected cheating and dropped from the server.\n", client->name, client->userid, SV_GetIDString(&id), nReason);
 	
 	char rgchT[1024];
 	rgchT[0] = svc_print;
-	sprintf(
+	Q_sprintf(
 		&rgchT[1],
 		"\n********************************************\nYou have been automatically disconnected\nfrom this secure server because an illegal\ncheat was detected on your computer.\nRepeat violators may be permanently banned\nfrom all secure servers.\n\nFor help cleaning your system of cheats, visit:\nhttp://www.counter-strike.net/cheat.html\n********************************************\n\n"
 	);
 	Netchan_Transmit(&g_psvs.clients[nPlayerSlot].netchan, strlen(rgchT) + 1, (byte *)rgchT);
 
-	sprintf(rgchT, "%s was automatically disconnected\nfrom this secure server.\n", client->name);
+	Q_sprintf(rgchT, "%s was automatically disconnected\nfrom this secure server.\n", client->name);
 	for (int i = 0; i < g_psvs.maxclients; i++)
 	{
 		if (!g_psvs.clients[i].active && !g_psvs.clients[i].spawned || g_psvs.clients[i].fakeclient)
@@ -6499,9 +6507,7 @@ qboolean IsSafeFileToDownload(const char *filename)
 	char lwrfilename[MAX_PATH];
 
 	if (!filename)
-	{
 		return FALSE;
-	}
 
 #ifdef REHLDS_FIXES
 	// FIXED: Allow to download customizations
@@ -6512,7 +6518,10 @@ qboolean IsSafeFileToDownload(const char *filename)
 #endif // REHLDS_FIXES
 
 	// Convert to lower case
-	Q_strncpy(lwrfilename, filename, sizeof(lwrfilename));
+	Q_strncpy(lwrfilename, filename, ARRAYSIZE(lwrfilename));
+#ifdef REHLDS_CHECKS
+	lwrfilename[ARRAYSIZE(lwrfilename) - 1] = 0;
+#endif
 	Q_strlwr(lwrfilename);
 
 	first = Q_strchr(lwrfilename, '.');
@@ -7115,11 +7124,11 @@ void SV_Shutdown(void)
 
 qboolean SV_CompareUserID(USERID_t *id1, USERID_t *id2)
 {
-	return g_RehldsHookchains.m_SV_CompareUserID.callChain(SV_CompareUserID_internal, id1, id2);
+	return g_RehldsHookchains.m_SV_CompareUserID.callChain(SV_CompareUserID_internal, 0, id1, id2);
 }
 
 /* <a5ef9> ../engine/sv_main.c:9585 */
-qboolean SV_CompareUserID_internal(USERID_t *id1, USERID_t *id2)
+qboolean EXT_FUNC SV_CompareUserID_internal(USERID_t *id1, USERID_t *id2)
 {
 	if (id1 == NULL || id2 == NULL)
 		return FALSE;
@@ -7133,22 +7142,22 @@ qboolean SV_CompareUserID_internal(USERID_t *id1, USERID_t *id2)
 	char szID1[64];
 	char szID2[64];
 
-	strncpy(szID1, SV_GetIDString(id1), sizeof(szID1) - 1);
+	Q_strncpy(szID1, SV_GetIDString(id1), sizeof(szID1) - 1);
 	szID1[sizeof(szID1) - 1] = 0;
 
-	strncpy(szID2, SV_GetIDString(id2), sizeof(szID2) - 1);
+	Q_strncpy(szID2, SV_GetIDString(id2), sizeof(szID2) - 1);
 	szID2[sizeof(szID2) - 1] = 0;
 
 	return Q_stricmp(szID1, szID2) ? FALSE : TRUE;
 }
 
-char *SV_GetIDString(USERID_t *id)
+char* SV_GetIDString(USERID_t *id)
 {
-	return g_RehldsHookchains.m_SV_GetIDString.callChain(SV_GetIDString_internal, id);
+	return g_RehldsHookchains.m_SV_GetIDString.callChain(SV_GetIDString_internal, 0, id);
 }
 
 /* <aad82> ../engine/sv_main.c:9625 */
-char *SV_GetIDString_internal(USERID_t *id)
+char* EXT_FUNC SV_GetIDString_internal(USERID_t *id)
 {
 	static char idstr[64];
 

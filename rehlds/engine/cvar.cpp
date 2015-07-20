@@ -347,7 +347,7 @@ void Cvar_SetValue(const char *var_name, float value)
 }
 
 /* <189df> ../engine/cvar.c:391 */
-void Cvar_RegisterVariable(cvar_t *variable)
+void EXT_FUNC Cvar_RegisterVariable(cvar_t *variable)
 {
 	char *oldstr;
 	cvar_t *v, *c;

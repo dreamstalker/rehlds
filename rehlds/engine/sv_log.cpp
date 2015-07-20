@@ -72,6 +72,10 @@ void Log_Printf(const char *fmt, ...)
 	Q_vsnprintf(&string[Q_strlen(string)], sizeof(string) - Q_strlen(string), fmt, argptr);
 	va_end(argptr);
 
+#ifdef REHLDS_FLIGHT_REC
+	FR_Log("REHLDS_LOG", string);
+#endif
+
 	if (g_psvs.log.net_log_ || firstLog != NULL)
 	{
 		if (g_psvs.log.net_log_)
@@ -220,7 +224,7 @@ void SV_SetLogAddress_f(void)
 	}
 
 	g_psvs.log.net_log_ = TRUE;
-	memcpy(&g_psvs.log.net_address_, &adr, sizeof(netadr_t));
+	Q_memcpy(&g_psvs.log.net_address_, &adr, sizeof(netadr_t));
 	Con_Printf("logaddress:  %s\n", NET_AdrToString(adr));
 }
 
@@ -292,7 +296,7 @@ void SV_AddLogAddress_f(void)
 		}
 
 		tmp->next = NULL;
-		memcpy(&tmp->log.net_address_, &adr, sizeof(netadr_t));
+		Q_memcpy(&tmp->log.net_address_, &adr, sizeof(netadr_t));
 
 		list = firstLog;
 
@@ -310,7 +314,7 @@ void SV_AddLogAddress_f(void)
 			return;
 		}
 		firstLog->next = NULL;
-		memcpy(&firstLog->log.net_address_, &adr, sizeof(netadr_t));
+		Q_memcpy(&firstLog->log.net_address_, &adr, sizeof(netadr_t));
 	}
 
 	Con_Printf("logaddress_add:  %s\n", NET_AdrToString(adr));

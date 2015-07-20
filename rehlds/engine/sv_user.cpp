@@ -285,7 +285,7 @@ int SV_TransferConsistencyInfo(void)
 		}
 		else
 		{
-			_snprintf(filename, MAX_PATH, "sound/%s", r->szFileName);
+			Q_snprintf(filename, MAX_PATH, "sound/%s", r->szFileName);
 		}
 		MD5_Hash_File(r->rgucMD5_hash, filename, FALSE, FALSE, NULL);
 
@@ -431,7 +431,7 @@ void SV_CopyEdictToPhysent(physent_t *pe, int e, edict_t *check)
 			}
 			else
 			{
-				sprintf(pe->name, "?");
+				Q_sprintf(pe->name, "?");
 			}
 		}
 		else
@@ -577,7 +577,7 @@ void SV_AddLinksToPM_(areanode_t *node, float *pmove_mins, float *pmove_maxs)
 			pe = &pmove->moveents[pmove->nummoveent++];
 		}
 		
-		memcpy(pe, ve, sizeof(physent_t));
+		Q_memcpy(pe, ve, sizeof(physent_t));
 	}
 
 	if (node->axis != -1)
@@ -838,7 +838,7 @@ void SV_RunCmd(usercmd_t *ucmd, int random_seed)
 	pmove->friction = sv_player->v.friction;
 	pmove->spectator = 0;
 	pmove->waterjumptime = sv_player->v.teleport_time;
-	memcpy(&pmove->cmd, &cmd, sizeof(pmove->cmd));
+	Q_memcpy(&pmove->cmd, &cmd, sizeof(pmove->cmd));
 	pmove->dead = sv_player->v.health <= 0.0;
 	pmove->movetype = sv_player->v.movetype;
 	pmove->flags = sv_player->v.flags;
@@ -1560,6 +1560,19 @@ void SV_ParseMove(client_t *pSenderClient)
 		net_drop = 0;
 	}
 
+	//check move commands rate for this player
+#ifdef REHLDS_FIXES
+	int numCmdsToIssue = numcmds;
+	if (net_drop > 0) {
+		numCmdsToIssue += net_drop;
+	}
+	g_MoveCommandRateLimiter.MoveCommandsIssued(host_client - g_psvs.clients, numCmdsToIssue);
+	
+	if (!host_client->active) {
+		return; //return if player was kicked
+	}
+#endif
+
 	sv_player->v.button = cmds[0].buttons;
 	sv_player->v.light_level = cmds[0].lightlevel;
 	SV_EstablishTimeBase(host_client, cmds, net_drop, numbackup, numcmds);
@@ -1669,7 +1682,7 @@ void SV_ParseCvarValue2(client_t *cl)
 	Con_DPrintf("Cvar query response: name:%s, request ID %d, cvar:%s, value:%s\n", cl->name, requestID, cvarName, value);
 }
 
-void SV_HandleClientMessage_api(IGameClient* client, int8 opcode) {
+void EXT_FUNC SV_HandleClientMessage_api(IGameClient* client, int8 opcode) {
 	client_t* cl = client->GetClient();
 	if (opcode < clc_bad || opcode > clc_cvarvalue2)
 	{

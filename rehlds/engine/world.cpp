@@ -1113,7 +1113,7 @@ void SV_SingleClipMoveToEntity(edict_t *ent, const vec_t *start, const vec_t *mi
 			if (i == 0 || testtrace.allsolid || testtrace.startsolid || testtrace.fraction < trace->fraction)
 			{
 				int isSolid = trace->startsolid;
-				memcpy(trace, &testtrace, sizeof(trace_t));
+				Q_memcpy(trace, &testtrace, sizeof(trace_t));
 				if (isSolid)
 					trace->startsolid = TRUE;
 				closest = i;
@@ -1128,18 +1128,18 @@ void SV_SingleClipMoveToEntity(edict_t *ent, const vec_t *start, const vec_t *mi
 		if (rotated)
 		{
 			vec3_t right;
-			vec3_t forward;
 			vec3_t up;
+			vec3_t forward;
 			vec3_t temp;
 
-			AngleVectorsTranspose(ent->v.angles, up, right, forward);
+			AngleVectorsTranspose(ent->v.angles, forward, right, up);
 			temp[0] = trace->plane.normal[0];
 			temp[1] = trace->plane.normal[1];
 			temp[2] = trace->plane.normal[2];
 
-			trace->plane.normal[0] = _DotProduct(up, temp);
+			trace->plane.normal[0] = _DotProduct(forward, temp);
 			trace->plane.normal[1] = _DotProduct(right, temp);
-			trace->plane.normal[2] = _DotProduct(forward, temp);
+			trace->plane.normal[2] = _DotProduct(up, temp);
 		}
 
 		trace->endpos[0] = (end[0] - start[0]) * trace->fraction + start[0];
@@ -1194,7 +1194,12 @@ void SV_ClipToLinks(areanode_t *node, moveclip_t *clip)
 			Sys_Error("Trigger in clipping list");
 
 		if (gNewDLLFunctions.pfnShouldCollide && !gNewDLLFunctions.pfnShouldCollide(touch, clip->passedict))
+#ifdef REHLDS_FIXES
+			// https://github.com/dreamstalker/rehlds/issues/46
+			continue;
+#else
 			return;
+#endif
 
 		if (touch->v.solid == SOLID_BSP)
 		{

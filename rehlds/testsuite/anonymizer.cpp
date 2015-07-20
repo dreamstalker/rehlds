@@ -1,12 +1,5 @@
 #include "precompiled.h"
 
-uint64 NET_AdrToLong(const netadr_t &a) {
-	if (a.type != NA_IP)
-		return -1;
-
-	return a.ip[0] | (a.ip[1] << 8) | (a.ip[2] << 16) | (a.ip[3] << 24) | (uint64)a.port << 32;
-}
-
 CSteamCallbackAnonymizingWrapper::CSteamCallbackAnonymizingWrapper(CAnonymizingEngExtInterceptor* anonymizer, CCallbackBase* cb, int id)
 {
 	m_Anonymizer = anonymizer;

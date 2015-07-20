@@ -5,6 +5,14 @@ apply plugin: 'maven-publish'
 apply from: 'shared.gradle'
 group = 'rehlds'
 
+apply plugin: 'idea'
+
+idea {
+    project {
+        languageLevel = 'JDK_1_7'
+    }
+}
+
 def gitInfo = GitVersioner.versionForDir(project.rootDir)
 if (!gitInfo) {
     throw new RuntimeException('Running outside git repository')
@@ -40,5 +48,5 @@ project.version = versionInfo.asMavenVersion()
 apply from: 'publish.gradle'
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.4-rc-2'
+    gradleVersion = '2.4'
 }

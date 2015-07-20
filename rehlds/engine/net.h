@@ -83,16 +83,25 @@
 #define MAX_STREAMS		2
 
 // Flow control bytes per second limits
-#define MAX_RATE		20000
-#define MIN_RATE		1000
+#define MAX_RATE		100000.0f
+#define MIN_RATE		1000.0f
 
 // Default data rate
 #define DEFAULT_RATE	(9999.0f)
 
 // NETWORKING INFO
 
+// Max size of udp packet payload
+#define	MAX_UDP_PACKET	4010 // 9 bytes SPLITHEADER + 4000 payload?
+
+// Max length of a reliable message
+#define	MAX_MSGLEN		3990 // 10 reserved for fragheader?
+
+// Max length of unreliable message
+#define	MAX_DATAGRAM	4000
+
 // This is the packet payload without any header bytes (which are attached for actual sending)
-#define NET_MAX_PAYLOAD 3990
+#define NET_MAX_PAYLOAD 65536
 
 // This is the payload plus any header info (excluding UDP header)
 
@@ -116,7 +125,7 @@
 // Pad this to next higher 16 byte boundary
 // This is the largest packet that can come in/out over the wire, before processing the header
 //  bytes will be stripped by the networking channel layer
-//#define NET_MAX_MESSAGE PAD_NUMBER( ( NET_MAX_PAYLOAD + HEADER_BYTES ), 16 )
+//#define NET_MAX_MESSAGE PAD_NUMBER( ( MAX_MSGLEN + HEADER_BYTES ), 16 )
 // This is currently used value in the engine. TODO: define above gives 4016, check it why.
 #define NET_MAX_MESSAGE 4037
 
@@ -237,7 +246,12 @@ typedef struct flow_s
 
 // Size of fragmentation buffer internal buffers
 #define FRAGMENT_SIZE 1400
+
+#ifndef REHLDS_FIXES
 #define MAX_FRAGMENTS 25000
+#else
+#define MAX_FRAGMENTS (NET_MAX_PAYLOAD / FRAGMENT_SIZE) // should be enough for any send buf
+#endif
 
 #define UDP_HEADER_SIZE 28
 #define MAX_RELIABLE_PAYLOAD 1200
@@ -330,11 +344,11 @@ typedef struct netchan_s
 
 	// Staging and holding areas
 	sizebuf_t message;
-	byte message_buf[NET_MAX_PAYLOAD];
+	byte message_buf[MAX_MSGLEN];
 
 	// Reliable message buffer. We keep adding to it until reliable is acknowledged. Then we clear it.
 	int reliable_length;
-	byte reliable_buf[NET_MAX_PAYLOAD];
+	byte reliable_buf[MAX_MSGLEN];
 
 	// Waiting list of buffered fragments to go onto queue. Multiple outgoing buffers can be queued in succession.
 	fragbufwaiting_t *waitlist[MAX_STREAMS];

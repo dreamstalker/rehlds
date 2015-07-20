@@ -75,19 +75,19 @@ sizebuf_t gMsgBuffer;
 #endif //HOOK_ENGINE
 
 /* <782a3> ../engine/pr_cmds.c:53 */
-void PF_makevectors_I(const float *rgflVector)
+void EXT_FUNC PF_makevectors_I(const float *rgflVector)
 {
 	AngleVectors(rgflVector, gGlobalVariables.v_forward, gGlobalVariables.v_right, gGlobalVariables.v_up);
 }
 
 /* <782cb> ../engine/pr_cmds.c:58 */
-float PF_Time(void)
+float EXT_FUNC PF_Time(void)
 {
 	return Sys_FloatTime();
 }
 
 /* <782e4> ../engine/pr_cmds.c:74 */
-void PF_setorigin_I(edict_t *e, const float *org)
+void EXT_FUNC PF_setorigin_I(edict_t *e, const float *org)
 {
 	if (!e)
 		return;
@@ -99,7 +99,7 @@ void PF_setorigin_I(edict_t *e, const float *org)
 }
 
 /* <78317> ../engine/pr_cmds.c:84 */
-void SetMinMaxSize(edict_t *e, const float *min, const float *max, qboolean rotate)
+void EXT_FUNC SetMinMaxSize(edict_t *e, const float *min, const float *max, qboolean rotate)
 {
 	for (int i = 0; i < 3; i++)
 	{
@@ -122,13 +122,13 @@ void SetMinMaxSize(edict_t *e, const float *min, const float *max, qboolean rota
 }
 
 /* <7840f> ../engine/pr_cmds.c:169 */
-void PF_setsize_I(edict_t *e, const float *rgflMin, const float *rgflMax)
+void EXT_FUNC PF_setsize_I(edict_t *e, const float *rgflMin, const float *rgflMax)
 {
 	SetMinMaxSize(e, rgflMin, rgflMax, 0);
 }
 
 /* <78451> ../engine/pr_cmds.c:184 */
-void PF_setmodel_I(edict_t *e, const char *m)
+void EXT_FUNC PF_setmodel_I(edict_t *e, const char *m)
 {
 	const char** check = &g_psv.model_precache[0];
 	int i = 0;
@@ -168,13 +168,13 @@ void PF_setmodel_I(edict_t *e, const char *m)
 }
 
 /* <784b4> ../engine/pr_cmds.c:210 */
-int PF_modelindex(const char *pstr)
+int EXT_FUNC PF_modelindex(const char *pstr)
 {
 	return SV_ModelIndex(pstr);
 }
 
 /* <784df> ../engine/pr_cmds.c:217 */
-int ModelFrames(int modelIndex)
+int EXT_FUNC ModelFrames(int modelIndex)
 {
 	if (modelIndex <= 0 || modelIndex >= 512)
 	{
@@ -186,13 +186,13 @@ int ModelFrames(int modelIndex)
 }
 
 /* <7851a> ../engine/pr_cmds.c:239 */
-void PF_bprint(char *s)
+void EXT_FUNC PF_bprint(char *s)
 {
 	SV_BroadcastPrintf("%s", s);
 }
 
 /* <78540> ../engine/pr_cmds.c:253 */
-void PF_sprint(char *s, int entnum)
+void EXT_FUNC PF_sprint(char *s, int entnum)
 {
 	if (entnum <= 0 || entnum > g_psvs.maxclients)
 	{
@@ -209,13 +209,13 @@ void PF_sprint(char *s, int entnum)
 }
 
 /* <78589> ../engine/pr_cmds.c:280 */
-void ServerPrint(const char *szMsg)
+void EXT_FUNC ServerPrint(const char *szMsg)
 {
 	Con_Printf("%s", szMsg);
 }
 
 /* <785b3> ../engine/pr_cmds.c:293 */
-void ClientPrintf(edict_t *pEdict, PRINT_TYPE ptype, const char *szMsg)
+void EXT_FUNC ClientPrintf(edict_t *pEdict, PRINT_TYPE ptype, const char *szMsg)
 {
 	client_t *client;
 	int entnum;
@@ -252,7 +252,7 @@ void ClientPrintf(edict_t *pEdict, PRINT_TYPE ptype, const char *szMsg)
 }
 
 /* <7861b> ../engine/pr_cmds.c:339 */
-float PF_vectoyaw_I(const float *rgflVector)
+float EXT_FUNC PF_vectoyaw_I(const float *rgflVector)
 {
 	float yaw = 0.0f;
 	if (rgflVector[1] == 0.0f && rgflVector[0] == 0.0f)
@@ -266,19 +266,19 @@ float PF_vectoyaw_I(const float *rgflVector)
 }
 
 /* <78659> ../engine/pr_cmds.c:363 */
-void PF_vectoangles_I(const float *rgflVectorIn, float *rgflVectorOut)
+void EXT_FUNC PF_vectoangles_I(const float *rgflVectorIn, float *rgflVectorOut)
 {
 	VectorAngles(rgflVectorIn, rgflVectorOut);
 }
 
 /* <78691> ../engine/pr_cmds.c:377 */
-void PF_particle_I(const float *org, const float *dir, float color, float count)
+void EXT_FUNC PF_particle_I(const float *org, const float *dir, float color, float count)
 {
 	SV_StartParticle(org, dir, color, count);
 }
 
 /* <786e7> ../engine/pr_cmds.c:390 */
-void PF_ambientsound_I(edict_t *entity, float *pos, const char *samp, float vol, float attenuation, int fFlags, int pitch)
+void EXT_FUNC PF_ambientsound_I(edict_t *entity, float *pos, const char *samp, float vol, float attenuation, int fFlags, int pitch)
 {
 	int i;
 	int soundnum;
@@ -332,7 +332,7 @@ void PF_ambientsound_I(edict_t *entity, float *pos, const char *samp, float vol,
 }
 
 /* <787c0> ../engine/pr_cmds.c:459 */
-void PF_sound_I(edict_t *entity, int channel, const char *sample, float volume, float attenuation, int fFlags, int pitch)
+void EXT_FUNC PF_sound_I(edict_t *entity, int channel, const char *sample, float volume, float attenuation, int fFlags, int pitch)
 {
 	if (volume < 0.0 || volume > 255.0)
 		Sys_Error("EMIT_SOUND: volume = %i", volume);
@@ -346,7 +346,7 @@ void PF_sound_I(edict_t *entity, int channel, const char *sample, float volume, 
 }
 
 /* <78cdd> ../engine/pr_cmds.c:491 */
-void PF_traceline_Shared(const float *v1, const float *v2, int nomonsters, edict_t *ent)
+void EXT_FUNC PF_traceline_Shared(const float *v1, const float *v2, int nomonsters, edict_t *ent)
 {
 #ifdef REHLDS_OPT_PEDANTIC
 	trace_t trace = SV_Move_Point(v1, v2, nomonsters, ent);
@@ -359,7 +359,7 @@ void PF_traceline_Shared(const float *v1, const float *v2, int nomonsters, edict
 } 
 
 /* <78d1c> ../engine/pr_cmds.c:502 */
-void PF_traceline_DLL(const float *v1, const float *v2, int fNoMonsters, edict_t *pentToSkip, TraceResult *ptr)
+void EXT_FUNC PF_traceline_DLL(const float *v1, const float *v2, int fNoMonsters, edict_t *pentToSkip, TraceResult *ptr)
 {
 	PF_traceline_Shared(v1, v2, fNoMonsters, pentToSkip ? pentToSkip : &g_psv.edicts[0]);
 	ptr->fAllSolid = (int)gGlobalVariables.trace_allsolid;
@@ -379,7 +379,7 @@ void PF_traceline_DLL(const float *v1, const float *v2, int fNoMonsters, edict_t
 }
 
 /* <78844> ../engine/pr_cmds.c:531 */
-void TraceHull(const float *v1, const float *v2, int fNoMonsters, int hullNumber, edict_t *pentToSkip, TraceResult *ptr)
+void EXT_FUNC TraceHull(const float *v1, const float *v2, int fNoMonsters, int hullNumber, edict_t *pentToSkip, TraceResult *ptr)
 {
 	hullNumber = hullNumber;
 	if (hullNumber < 0 || hullNumber > 3)
@@ -403,13 +403,13 @@ void TraceHull(const float *v1, const float *v2, int fNoMonsters, int hullNumber
 }
 
 /* <788c8> ../engine/pr_cmds.c:556 */
-void TraceSphere(const float *v1, const float *v2, int fNoMonsters, float radius, edict_t *pentToSkip, TraceResult *ptr)
+void EXT_FUNC TraceSphere(const float *v1, const float *v2, int fNoMonsters, float radius, edict_t *pentToSkip, TraceResult *ptr)
 {
 	Sys_Error("TraceSphere not yet implemented!\n");
 }
 
 /* <7893a> ../engine/pr_cmds.c:578 */
-void TraceModel(const float *v1, const float *v2, int hullNumber, edict_t *pent, TraceResult *ptr)
+void EXT_FUNC TraceModel(const float *v1, const float *v2, int hullNumber, edict_t *pent, TraceResult *ptr)
 {
 	int oldMovetype, oldSolid;
 
@@ -448,7 +448,7 @@ void TraceModel(const float *v1, const float *v2, int hullNumber, edict_t *pent,
 }
 
 /* <789df> ../engine/pr_cmds.c:619 */
-msurface_t *SurfaceAtPoint(model_t *pModel, mnode_t *node, vec_t *start, vec_t *end)
+msurface_t* EXT_FUNC SurfaceAtPoint(model_t *pModel, mnode_t *node, vec_t *start, vec_t *end)
 {
 	mplane_t *plane;
 	int s;
@@ -481,8 +481,10 @@ msurface_t *SurfaceAtPoint(model_t *pModel, mnode_t *node, vec_t *start, vec_t *
 	if (surf)
 		return surf;
 
+	/* Unreachable code
 	if (t == s)
 		return NULL;
+	*/
 
 	for (int i = 0; i < node->numsurfaces; i++)
 	{
@@ -504,7 +506,7 @@ msurface_t *SurfaceAtPoint(model_t *pModel, mnode_t *node, vec_t *start, vec_t *
 }
 
 /* <78af9> ../engine/pr_cmds.c:688 */
-const char *TraceTexture(edict_t *pTextureEntity, const float *v1, const float *v2)
+const char* EXT_FUNC TraceTexture(edict_t *pTextureEntity, const float *v1, const float *v2)
 {
 	int firstnode;
 	model_t *pmodel;
@@ -571,14 +573,14 @@ const char *TraceTexture(edict_t *pTextureEntity, const float *v1, const float *
 }
 
 /* <78c30> ../engine/pr_cmds.c:749 */
-void PF_TraceToss_Shared(edict_t *ent, edict_t *ignore)
+void EXT_FUNC PF_TraceToss_Shared(edict_t *ent, edict_t *ignore)
 {
 	trace_t trace = SV_Trace_Toss(ent, ignore);
 	SV_SetGlobalTrace(&trace);
 }
 
 /* <78c06> ../engine/pr_cmds.c:758 */
-void SV_SetGlobalTrace(trace_t *ptrace)
+void EXT_FUNC SV_SetGlobalTrace(trace_t *ptrace)
 {
 	gGlobalVariables.trace_fraction = ptrace->fraction;
 	gGlobalVariables.trace_allsolid = (float)ptrace->allsolid;
@@ -605,7 +607,7 @@ void SV_SetGlobalTrace(trace_t *ptrace)
 }
 
 /* <78dc1> ../engine/pr_cmds.c:775 */
-void PF_TraceToss_DLL(edict_t *pent, edict_t *pentToIgnore, TraceResult *ptr)
+void EXT_FUNC PF_TraceToss_DLL(edict_t *pent, edict_t *pentToIgnore, TraceResult *ptr)
 {
 	PF_TraceToss_Shared(pent, pentToIgnore ? pentToIgnore : &g_psv.edicts[0]);
 
@@ -626,7 +628,7 @@ void PF_TraceToss_DLL(edict_t *pent, edict_t *pentToIgnore, TraceResult *ptr)
 }
 
 /* <78e3a> ../engine/pr_cmds.c:791 */
-int TraceMonsterHull(edict_t *pEdict, const float *v1, const float *v2, int fNoMonsters, edict_t *pentToSkip, TraceResult *ptr)
+int EXT_FUNC TraceMonsterHull(edict_t *pEdict, const float *v1, const float *v2, int fNoMonsters, edict_t *pentToSkip, TraceResult *ptr)
 {
 	qboolean monsterClip = (pEdict->v.flags & FL_MONSTERCLIP) ? 1 : 0;
 	trace_t trace = SV_Move(v1, pEdict->v.mins, pEdict->v.maxs, v2, fNoMonsters, pentToSkip, monsterClip);
@@ -652,7 +654,7 @@ int TraceMonsterHull(edict_t *pEdict, const float *v1, const float *v2, int fNoM
 }
 
 /* <78ed1> ../engine/pr_cmds.c:830 */
-int PF_newcheckclient(int check)
+int EXT_FUNC PF_newcheckclient(int check)
 {
 	int i;
 	unsigned char *pvs;
@@ -689,7 +691,7 @@ int PF_newcheckclient(int check)
 }
 
 /* <78f53> ../engine/pr_cmds.c:898 */
-edict_t *PF_checkclient_I(edict_t *pEdict)
+edict_t* EXT_FUNC PF_checkclient_I(edict_t *pEdict)
 {
 	edict_t *ent; 
 	mleaf_t *leaf; 
@@ -725,7 +727,7 @@ edict_t *PF_checkclient_I(edict_t *pEdict)
 }
 
 /* <78fbe> ../engine/pr_cmds.c:942 */
-mnode_t *PVSNode(mnode_t *node, vec_t *emins, vec_t *emaxs)
+mnode_t* EXT_FUNC PVSNode(mnode_t *node, vec_t *emins, vec_t *emaxs)
 {
 	mplane_t *splitplane;
 	int sides;
@@ -772,7 +774,7 @@ mnode_t *PVSNode(mnode_t *node, vec_t *emins, vec_t *emaxs)
 }
 
 /* <7903a> ../engine/pr_cmds.c:976 */
-void PVSMark(model_t *pmodel, unsigned char *ppvs)
+void EXT_FUNC PVSMark(model_t *pmodel, unsigned char *ppvs)
 {
 	++r_visframecount;
 	for (int i = 0; i < pmodel->numleafs; i++)
@@ -792,7 +794,7 @@ void PVSMark(model_t *pmodel, unsigned char *ppvs)
 }
 
 /* <790b0> ../engine/pr_cmds.c:1009 */
-edict_t *PVSFindEntities(edict_t *pplayer)
+edict_t* EXT_FUNC PVSFindEntities(edict_t *pplayer)
 {
 	edict_t *pent;
 	edict_t *pchain;
@@ -836,14 +838,14 @@ edict_t *PVSFindEntities(edict_t *pplayer)
 }
 
 /* <79182> ../engine/pr_cmds.c:1055 */
-qboolean ValidCmd(const char *pCmd)
+qboolean EXT_FUNC ValidCmd(const char *pCmd)
 {
 	int len = Q_strlen(pCmd);
 	return len && (pCmd[len - 1] == '\n' || pCmd[len - 1] == ';');
 } 
 
 /* <791d5> ../engine/pr_cmds.c:1079 */
-void PF_stuffcmd_I(edict_t *pEdict, char *szFmt, ...)
+void EXT_FUNC PF_stuffcmd_I(edict_t *pEdict, char *szFmt, ...)
 {
 	int entnum;
 	client_t *old;
@@ -881,7 +883,7 @@ void PF_stuffcmd_I(edict_t *pEdict, char *szFmt, ...)
 }
 
 /* <79292> ../engine/pr_cmds.c:1119 */
-void PF_localcmd_I(char *str)
+void EXT_FUNC PF_localcmd_I(char *str)
 {
 	if (ValidCmd(str))
 		Cbuf_AddText(str);
@@ -890,13 +892,13 @@ void PF_localcmd_I(char *str)
 }
 
 /* <792e8> ../engine/pr_cmds.c:1137 */
-void PF_localexec_I(void)
+void EXT_FUNC PF_localexec_I(void)
 {
 	Cbuf_Execute();
 }
 
 /* <792fd> ../engine/pr_cmds.c:1154 */
-edict_t *FindEntityInSphere(edict_t *pEdictStartSearchAfter, const float *org, float rad)
+edict_t* EXT_FUNC FindEntityInSphere(edict_t *pEdictStartSearchAfter, const float *org, float rad)
 {
 	int e = pEdictStartSearchAfter ? NUM_FOR_EDICT(pEdictStartSearchAfter) : 0;
 
@@ -929,13 +931,13 @@ edict_t *FindEntityInSphere(edict_t *pEdictStartSearchAfter, const float *org, f
 }
 
 /* <793a2> ../engine/pr_cmds.c:1219 */
-edict_t *PF_Spawn_I(void)
+edict_t* EXT_FUNC PF_Spawn_I(void)
 {
 	return ED_Alloc();
 }
 
 /* <793cc> ../engine/pr_cmds.c:1226 */
-edict_t *CreateNamedEntity(int className)
+edict_t* EXT_FUNC CreateNamedEntity(int className)
 {
 	edict_t *pedict;
 	ENTITYINIT pEntityInit;
@@ -959,14 +961,19 @@ edict_t *CreateNamedEntity(int className)
 	}
 }
 
+void EXT_FUNC PF_Remove_I(edict_t *ed)
+{
+	g_RehldsHookchains.m_PF_Remove_I.callChain(PF_Remove_I_internal, ed);
+}
+
 /* <7941a> ../engine/pr_cmds.c:1253 */
-void PF_Remove_I(edict_t *ed)
+void EXT_FUNC PF_Remove_I_internal(edict_t *ed)
 {
 	ED_Free(ed);
 }
 
 /* <7820f> ../engine/pr_cmds.c:1263 */
-edict_t *PF_find_Shared(int eStartSearchAfter, int iFieldToMatch, const char *szValueToFind)
+edict_t* EXT_FUNC PF_find_Shared(int eStartSearchAfter, int iFieldToMatch, const char *szValueToFind)
 {
 	for (int e = eStartSearchAfter + 1; e < g_psv.num_edicts; e++)
 	{
@@ -988,7 +995,7 @@ edict_t *PF_find_Shared(int eStartSearchAfter, int iFieldToMatch, const char *sz
 
 /* <79442> ../engine/pr_cmds.c:1290 */
 
-int iGetIndex(const char *pszField)
+int EXT_FUNC iGetIndex(const char *pszField)
 {
 	char sz[512];
 
@@ -1017,7 +1024,7 @@ int iGetIndex(const char *pszField)
 }
 
 /* <7949b> ../engine/pr_cmds.c:1332 */
-edict_t *FindEntityByString(edict_t *pEdictStartSearchAfter, const char *pszField, const char *pszValue)
+edict_t* EXT_FUNC FindEntityByString(edict_t *pEdictStartSearchAfter, const char *pszField, const char *pszValue)
 {
 	if (!pszValue)
 		return NULL;
@@ -1030,7 +1037,7 @@ edict_t *FindEntityByString(edict_t *pEdictStartSearchAfter, const char *pszFiel
 }
 
 /* <79540> ../engine/pr_cmds.c:1348 */
-int GetEntityIllum(edict_t *pEnt)
+int EXT_FUNC GetEntityIllum(edict_t *pEnt)
 {
 	if (!pEnt)
 		return -1;
@@ -1049,13 +1056,13 @@ int GetEntityIllum(edict_t *pEnt)
 }
 
 /* <78265> ../engine/pr_cmds.c:1383 */
-qboolean PR_IsEmptyString(const char *s)
+qboolean EXT_FUNC PR_IsEmptyString(const char *s)
 {
 	return s[0] < ' ';
 }
 
 /* <795b5> ../engine/pr_cmds.c:1397 */
-int PF_precache_sound_I(const char *s)
+int EXT_FUNC PF_precache_sound_I(const char *s)
 {
 	int i;
 
@@ -1110,7 +1117,7 @@ int PF_precache_sound_I(const char *s)
 }
 
 /* <79609> ../engine/pr_cmds.c:1455 */
-short unsigned int EV_Precache(int type, const char *psz)
+short unsigned int EXT_FUNC EV_Precache(int type, const char *psz)
 {
 	if (!psz)
 		Host_Error("EV_Precache: NULL pointer");
@@ -1129,7 +1136,7 @@ short unsigned int EV_Precache(int type, const char *psz)
 					Host_Error("EV_Precache:  only file type 1 supported currently\n");
 
 				char szpath[MAX_PATH];
-				_snprintf(szpath, sizeof(szpath), "%s", psz);
+				Q_snprintf(szpath, sizeof(szpath), "%s", psz);
 				COM_FixSlashes(szpath);
 
 				int scriptSize = 0;
@@ -1170,8 +1177,18 @@ short unsigned int EV_Precache(int type, const char *psz)
 	}
 }
 
-/* <796ae> ../engine/pr_cmds.c:1531 */
+void EXT_FUNC EV_PlayReliableEvent_api(IGameClient *cl, int entindex, short unsigned int eventindex, float delay, event_args_t *pargs)
+{
+	EV_PlayReliableEvent_internal(cl->GetClient(), entindex, eventindex, delay, pargs);
+}
+
 void EV_PlayReliableEvent(client_t *cl, int entindex, short unsigned int eventindex, float delay, event_args_t *pargs)
+{
+	g_RehldsHookchains.m_EV_PlayReliableEvent.callChain(EV_PlayReliableEvent_api, GetRehldsApiClient(cl), entindex, eventindex, delay, pargs);
+}
+
+/* <796ae> ../engine/pr_cmds.c:1531 */
+void EV_PlayReliableEvent_internal(client_t *cl, int entindex, short unsigned int eventindex, float delay, event_args_t *pargs)
 {
 //	unsigned char data;                                           //  1533
 //	sizebuf_t msg;                                                //  1534
@@ -1219,7 +1236,7 @@ void EV_PlayReliableEvent(client_t *cl, int entindex, short unsigned int eventin
 }
 
 /* <79769> ../engine/pr_cmds.c:1595 */
-void EV_Playback(int flags, const edict_t *pInvoker, short unsigned int eventindex, float delay, float *origin, float *angles, float fparam1, float fparam2, int iparam1, int iparam2, int bparam1, int bparam2)
+void EXT_FUNC EV_Playback(int flags, const edict_t *pInvoker, short unsigned int eventindex, float delay, float *origin, float *angles, float fparam1, float fparam2, int iparam1, int iparam2, int bparam1, int bparam2)
 {
 	client_t *cl;
 	signed int j;
@@ -1361,7 +1378,7 @@ void EV_Playback(int flags, const edict_t *pInvoker, short unsigned int eventind
 				ei->packet_index = -1;
 				if (pInvoker)
 					ei->entity_index = invoker;
-				memcpy(&ei->args, &eargs, sizeof(ei->args));
+				Q_memcpy(&ei->args, &eargs, sizeof(ei->args));
 				ei->fire_time = delay;
 				continue;
 			}
@@ -1382,7 +1399,7 @@ void EV_Playback(int flags, const edict_t *pInvoker, short unsigned int eventind
 			ei->packet_index = -1;
 			if (pInvoker)
 				ei->entity_index = invoker;
-			memcpy(&ei->args, &eargs, sizeof(ei->args));
+			Q_memcpy(&ei->args, &eargs, sizeof(ei->args));
 			ei->fire_time = delay;
 		}
 		
@@ -1390,7 +1407,7 @@ void EV_Playback(int flags, const edict_t *pInvoker, short unsigned int eventind
 }
 
 /* <798fb> ../engine/pr_cmds.c:1826 */
-void EV_SV_Playback(int flags, int clientindex, short unsigned int eventindex, float delay, float *origin, float *angles, float fparam1, float fparam2, int iparam1, int iparam2, int bparam1, int bparam2)
+void EXT_FUNC EV_SV_Playback(int flags, int clientindex, short unsigned int eventindex, float delay, float *origin, float *angles, float fparam1, float fparam2, int iparam1, int iparam2, int bparam1, int bparam2)
 {
 	if (flags & FEV_CLIENT)
 		return;
@@ -1403,7 +1420,7 @@ void EV_SV_Playback(int flags, int clientindex, short unsigned int eventindex, f
 }
 
 /* <799da> ../engine/pr_cmds.c:1849 */
-int PF_precache_model_I(const char *s)
+int EXT_FUNC PF_precache_model_I(const char *s)
 {
 	int iOptional = 0;
 	if (!s)
@@ -1473,7 +1490,7 @@ int PF_precache_model_I(const char *s)
 }
 
 /* <79a3f> ../engine/pr_cmds.c:1903 */
-int PF_precache_generic_I(char *s)
+int EXT_FUNC PF_precache_generic_I(char *s)
 // TODO: Call to Con_Printf is replaced with Host_Error in 6153
 {
 	if (!s)
@@ -1518,19 +1535,19 @@ int PF_precache_generic_I(char *s)
 }
 
 /* <79a93> ../engine/pr_cmds.c:1944 */
-int PF_IsMapValid_I(char *mapname)
+int EXT_FUNC PF_IsMapValid_I(char *mapname)
 {
 	char cBuf[260];
 	if (!mapname || strlen(mapname) == 0)
 		return 0;
 
 	
-	_snprintf(cBuf, sizeof(cBuf), "maps/%.32s.bsp", mapname);
+	Q_snprintf(cBuf, sizeof(cBuf), "maps/%.32s.bsp", mapname);
 	return FS_FileExists(cBuf);
 }
 
 /* <79ad1> ../engine/pr_cmds.c:1955 */
-int PF_NumberOfEntities_I(void)
+int EXT_FUNC PF_NumberOfEntities_I(void)
 {
 	int ent_count = 0;
 	for (int i = 1; i < g_psv.num_edicts; i++)
@@ -1543,7 +1560,7 @@ int PF_NumberOfEntities_I(void)
 }
 
 /* <79b0e> ../engine/pr_cmds.c:1977 */
-char *PF_GetInfoKeyBuffer_I(edict_t *e)
+char* EXT_FUNC PF_GetInfoKeyBuffer_I(edict_t *e)
 {
 	int e1;
 	char *value;
@@ -1576,13 +1593,13 @@ char *PF_GetInfoKeyBuffer_I(edict_t *e)
 }
 
 /* <79b55> ../engine/pr_cmds.c:2012 */
-char *PF_InfoKeyValue_I(char *infobuffer, const char *key)
+char* EXT_FUNC PF_InfoKeyValue_I(char *infobuffer, const char *key)
 {
 	return (char *)Info_ValueForKey(infobuffer, key);
 }
 
 /* <79b91> ../engine/pr_cmds.c:2022 */
-void PF_SetKeyValue_I(char *infobuffer, const char *key, const char *value)
+void EXT_FUNC PF_SetKeyValue_I(char *infobuffer, const char *key, const char *value)
 {
 	if (infobuffer == localinfo)
 	{
@@ -1603,13 +1620,13 @@ void PF_SetKeyValue_I(char *infobuffer, const char *key, const char *value)
 }
 
 /* <79bd9> ../engine/pr_cmds.c:2037 */
-void PF_RemoveKey_I(char *s, const char *key)
+void EXT_FUNC PF_RemoveKey_I(char *s, const char *key)
 {
 	Info_RemoveKey(s, key);
 }
 
 /* <79c0f> ../engine/pr_cmds.c:2047 */
-void PF_SetClientKeyValue_I(int clientIndex, char *infobuffer, const char *key, const char *value)
+void EXT_FUNC PF_SetClientKeyValue_I(int clientIndex, char *infobuffer, const char *key, const char *value)
 {
 	client_t *pClient;
 
@@ -1631,7 +1648,7 @@ void PF_SetClientKeyValue_I(int clientIndex, char *infobuffer, const char *key, 
 }
 
 /* <79c74> ../engine/pr_cmds.c:2078 */
-int PF_walkmove_I(edict_t *ent, float yaw, float dist, int iMode)
+int EXT_FUNC PF_walkmove_I(edict_t *ent, float yaw, float dist, int iMode)
 {
 	vec3_t move;
 
@@ -1656,7 +1673,7 @@ int PF_walkmove_I(edict_t *ent, float yaw, float dist, int iMode)
 }
 
 /* <79cef> ../engine/pr_cmds.c:2120 */
-int PF_droptofloor_I(edict_t *ent)
+int EXT_FUNC PF_droptofloor_I(edict_t *ent)
 {
 	vec3_t end;
 	trace_t trace;
@@ -1683,7 +1700,7 @@ int PF_droptofloor_I(edict_t *ent)
 }
 
 /* <79d4c> ../engine/pr_cmds.c:2158 */
-int PF_DecalIndex(const char *name)
+int EXT_FUNC PF_DecalIndex(const char *name)
 {
 	for (int i = 0; i < sv_decalnamecount; i++)
 	{
@@ -1695,7 +1712,7 @@ int PF_DecalIndex(const char *name)
 }
 
 /* <79d88> ../engine/pr_cmds.c:2180 */
-void PF_lightstyle_I(int style, char *val)
+void EXT_FUNC PF_lightstyle_I(int style, char *val)
 {
 	g_psv.lightstyles[style] = val;
 	if (g_psv.state != ss_active)
@@ -1714,19 +1731,19 @@ void PF_lightstyle_I(int style, char *val)
 }
 
 /* <79ddf> ../engine/pr_cmds.c:2209 */
-int PF_checkbottom_I(edict_t *pEdict)
+int EXT_FUNC PF_checkbottom_I(edict_t *pEdict)
 {
 	return SV_CheckBottom(pEdict);
 }
 
 /* <79e0c> ../engine/pr_cmds.c:2221 */
-int PF_pointcontents_I(const float *rgflVector)
+int EXT_FUNC PF_pointcontents_I(const float *rgflVector)
 {
 	return SV_PointContents(rgflVector);
 }
 
 /* <79e39> ../engine/pr_cmds.c:2237 */
-void PF_aim_I(edict_t *ent, float speed, float *rgflReturn)
+void EXT_FUNC PF_aim_I(edict_t *ent, float speed, float *rgflReturn)
 {
 	vec3_t start;                                                 //  2240
 	vec3_t dir;                                                   //  2240
@@ -1813,7 +1830,7 @@ void PF_aim_I(edict_t *ent, float speed, float *rgflReturn)
 }
 
 /* <79f2a> ../engine/pr_cmds.c:2313 */
-void PF_changeyaw_I(edict_t *ent)
+void EXT_FUNC PF_changeyaw_I(edict_t *ent)
 {
 	float ideal;
 	float current;
@@ -1853,7 +1870,7 @@ void PF_changeyaw_I(edict_t *ent)
 }
 
 /* <79f94> ../engine/pr_cmds.c:2355 */
-void PF_changepitch_I(edict_t *ent)
+void EXT_FUNC PF_changepitch_I(edict_t *ent)
 {
 	float ideal;
 	float current;
@@ -1893,7 +1910,7 @@ void PF_changepitch_I(edict_t *ent)
 }
 
 /* <79ffe> ../engine/pr_cmds.c:2398 */
-void PF_setview_I(const edict_t *clientent, const edict_t *viewent)
+void EXT_FUNC PF_setview_I(const edict_t *clientent, const edict_t *viewent)
 {
 	int clientnum = NUM_FOR_EDICT(clientent);
 	if (clientnum < 1 || clientnum > g_psvs.maxclients)
@@ -1909,7 +1926,7 @@ void PF_setview_I(const edict_t *clientent, const edict_t *viewent)
 }
 
 /* <7a057> ../engine/pr_cmds.c:2426 */
-void PF_crosshairangle_I(const edict_t *clientent, float pitch, float yaw)
+void EXT_FUNC PF_crosshairangle_I(const edict_t *clientent, float pitch, float yaw)
 {
 	int clientnum = NUM_FOR_EDICT(clientent);
 	if (clientnum < 1 || clientnum > g_psvs.maxclients)
@@ -1938,7 +1955,7 @@ void PF_crosshairangle_I(const edict_t *clientent, float pitch, float yaw)
 }
 
 /* <7a0c1> ../engine/pr_cmds.c:2457 */
-edict_t *PF_CreateFakeClient_I(const char *netname)
+edict_t* EXT_FUNC PF_CreateFakeClient_I(const char *netname)
 {
 	client_t *fakeclient;
 	edict_t *ent;
@@ -1994,7 +2011,7 @@ edict_t *PF_CreateFakeClient_I(const char *netname)
 }
 
 /* <7a12b> ../engine/pr_cmds.c:2519 */
-void PF_RunPlayerMove_I(edict_t *fakeclient, const float *viewangles, float forwardmove, float sidemove, float upmove, short unsigned int buttons, unsigned char impulse, unsigned char msec)
+void EXT_FUNC PF_RunPlayerMove_I(edict_t *fakeclient, const float *viewangles, float forwardmove, float sidemove, float upmove, short unsigned int buttons, unsigned char impulse, unsigned char msec)
 {
 	usercmd_t cmd;
 	edict_t *oldclient;
@@ -2024,14 +2041,14 @@ void PF_RunPlayerMove_I(edict_t *fakeclient, const float *viewangles, float forw
 
 	SV_PreRunCmd();
 	SV_RunCmd(&cmd, 0);
-	memcpy(&host_client->lastcmd, &cmd, sizeof(host_client->lastcmd));
+	Q_memcpy(&host_client->lastcmd, &cmd, sizeof(host_client->lastcmd));
 
 	sv_player = oldclient;
 	host_client = old;
 }
 
 /* <7a1fe> ../engine/pr_cmds.c:2578 */
-sizebuf_t *WriteDest_Parm(int dest)
+sizebuf_t* EXT_FUNC WriteDest_Parm(int dest)
 {
 	int entnum;
 
@@ -2069,7 +2086,7 @@ sizebuf_t *WriteDest_Parm(int dest)
 }
 
 /* <7a23d> ../engine/pr_cmds.c:2624 */
-void PF_MessageBegin_I(int msg_dest, int msg_type, const float *pOrigin, edict_t *ed)
+void EXT_FUNC PF_MessageBegin_I(int msg_dest, int msg_type, const float *pOrigin, edict_t *ed)
 {
 	if (msg_dest == MSG_ONE || msg_dest == MSG_ONE_UNRELIABLE)
 	{
@@ -2100,7 +2117,9 @@ void PF_MessageBegin_I(int msg_dest, int msg_type, const float *pOrigin, edict_t
 			gMsgOrigin[1] = pOrigin[1];
 			gMsgOrigin[2] = pOrigin[2];
 		}
-		Host_IsSinglePlayerGame();
+
+		//No idea why is it called here
+		//Host_IsSinglePlayerGame();
 	}
 
 	gMsgBuffer.flags = SIZEBUF_ALLOW_OVERFLOW;
@@ -2108,7 +2127,7 @@ void PF_MessageBegin_I(int msg_dest, int msg_type, const float *pOrigin, edict_t
 }
 
 /* <7a293> ../engine/pr_cmds.c:2669 */
-void PF_MessageEnd_I(void)
+void EXT_FUNC PF_MessageEnd_I(void)
 {
 	qboolean MsgIsVarLength = 0;
 	if (!gMsgStarted)
@@ -2208,7 +2227,7 @@ void PF_MessageEnd_I(void)
 }
 
 /* <7a317> ../engine/pr_cmds.c:2802 */
-void PF_WriteByte_I(int iValue)
+void EXT_FUNC PF_WriteByte_I(int iValue)
 {
 	if (!gMsgStarted)
 		Sys_Error("WRITE_BYTE called with no active message\n");
@@ -2216,7 +2235,7 @@ void PF_WriteByte_I(int iValue)
 }
 
 /* <7a341> ../engine/pr_cmds.c:2810 */
-void PF_WriteChar_I(int iValue)
+void EXT_FUNC PF_WriteChar_I(int iValue)
 {
 	if (!gMsgStarted)
 		Sys_Error("WRITE_CHAR called with no active message\n");
@@ -2224,7 +2243,7 @@ void PF_WriteChar_I(int iValue)
 }
 
 /* <7a36b> ../engine/pr_cmds.c:2818 */
-void PF_WriteShort_I(int iValue)
+void EXT_FUNC PF_WriteShort_I(int iValue)
 {
 	if (!gMsgStarted)
 		Sys_Error("WRITE_SHORT called with no active message\n");
@@ -2232,7 +2251,7 @@ void PF_WriteShort_I(int iValue)
 }
 
 /* <7a395> ../engine/pr_cmds.c:2826 */
-void PF_WriteLong_I(int iValue)
+void EXT_FUNC PF_WriteLong_I(int iValue)
 {
 	if (!gMsgStarted)
 		Sys_Error("PF_WriteLong_I called with no active message\n");
@@ -2240,7 +2259,7 @@ void PF_WriteLong_I(int iValue)
 }
 
 /* <7a3bf> ../engine/pr_cmds.c:2834 */
-void PF_WriteAngle_I(float flValue)
+void EXT_FUNC PF_WriteAngle_I(float flValue)
 {
 	if (!gMsgStarted)
 		Sys_Error("PF_WriteAngle_I called with no active message\n");
@@ -2248,7 +2267,7 @@ void PF_WriteAngle_I(float flValue)
 }
 
 /* <7a3e9> ../engine/pr_cmds.c:2842 */
-void PF_WriteCoord_I(float flValue)
+void EXT_FUNC PF_WriteCoord_I(float flValue)
 {
 	if (!gMsgStarted)
 		Sys_Error("PF_WriteCoord_I called with no active message\n");
@@ -2256,7 +2275,7 @@ void PF_WriteCoord_I(float flValue)
 }
 
 /* <7a413> ../engine/pr_cmds.c:2851 */
-void PF_WriteString_I(const char *sz)
+void EXT_FUNC PF_WriteString_I(const char *sz)
 {
 	if (!gMsgStarted)
 		Sys_Error("PF_WriteString_I called with no active message\n");
@@ -2264,7 +2283,7 @@ void PF_WriteString_I(const char *sz)
 }
 
 /* <7a43c> ../engine/pr_cmds.c:2859 */
-void PF_WriteEntity_I(int iValue)
+void EXT_FUNC PF_WriteEntity_I(int iValue)
 {
 	if (!gMsgStarted)
 		Sys_Error("PF_WriteEntity_I called with no active message\n");
@@ -2272,7 +2291,7 @@ void PF_WriteEntity_I(int iValue)
 }
 
 /* <7a466> ../engine/pr_cmds.c:2874 */
-void PF_makestatic_I(edict_t *ent)
+void EXT_FUNC PF_makestatic_I(edict_t *ent)
 {
 	MSG_WriteByte(&g_psv.signon, svc_spawnstatic);
 	MSG_WriteShort(&g_psv.signon, SV_ModelIndex(&pr_strings[ent->v.model]));
@@ -2301,7 +2320,7 @@ void PF_makestatic_I(edict_t *ent)
 }
 
 /* <7a49e> ../engine/pr_cmds.c:2910 */
-void PF_StaticDecal(const float *origin, int decalIndex, int entityIndex, int modelIndex)
+void EXT_FUNC PF_StaticDecal(const float *origin, int decalIndex, int entityIndex, int modelIndex)
 {
 	MSG_WriteByte(&g_psv.signon, svc_temp_entity);
 	MSG_WriteByte(&g_psv.signon, TE_BSPDECAL);
@@ -2316,7 +2335,7 @@ void PF_StaticDecal(const float *origin, int decalIndex, int entityIndex, int mo
 }
 
 /* <7a4f5> ../engine/pr_cmds.c:2935 */
-void PF_setspawnparms_I(edict_t *ent)
+void EXT_FUNC PF_setspawnparms_I(edict_t *ent)
 {
 	int i = NUM_FOR_EDICT(ent);
 	if (i < 1 || i > g_psvs.maxclients)
@@ -2324,7 +2343,7 @@ void PF_setspawnparms_I(edict_t *ent)
 }
 
 /* <7a539> ../engine/pr_cmds.c:2956 */
-void PF_changelevel_I(const char *s1, const char *s2)
+void EXT_FUNC PF_changelevel_I(const char *s1, const char *s2)
 {
 	static int last_spawncount;
 
@@ -2404,7 +2423,7 @@ float fran1(void)
 }
 
 /* <7a644> ../engine/pr_cmds.c:3045 */
-float RandomFloat(float flLow, float flHigh)
+float EXT_FUNC RandomFloat(float flLow, float flHigh)
 {
 #ifndef SWDS
 	g_engdstAddrs.pfnRandomFloat(&flLow, &flHigh);
@@ -2415,7 +2434,7 @@ float RandomFloat(float flLow, float flHigh)
 }
 
 /* <7a6b2> ../engine/pr_cmds.c:3056 */
-int32 RandomLong(int32 lLow, int32 lHigh)
+int32 EXT_FUNC RandomLong(int32 lLow, int32 lHigh)
 {
 #ifndef SWDS
 	g_engdstAddrs.pfnRandomLong(&lLow, &lHigh);
@@ -2447,7 +2466,7 @@ int32 RandomLong(int32 lLow, int32 lHigh)
 }
 
 /* <7a71b> ../engine/pr_cmds.c:3089 */
-void PF_FadeVolume(const edict_t *clientent, int fadePercent, int fadeOutSeconds, int holdTime, int fadeInSeconds)
+void EXT_FUNC PF_FadeVolume(const edict_t *clientent, int fadePercent, int fadeOutSeconds, int holdTime, int fadeInSeconds)
 {
 	int entnum = NUM_FOR_EDICT(clientent);
 	if (entnum < 1 || entnum > g_psvs.maxclients)
@@ -2468,7 +2487,7 @@ void PF_FadeVolume(const edict_t *clientent, int fadePercent, int fadeOutSeconds
 }
 
 /* <7a7a1> ../engine/pr_cmds.c:3124 */
-void PF_SetClientMaxspeed(edict_t *clientent, float fNewMaxspeed)
+void EXT_FUNC PF_SetClientMaxspeed(edict_t *clientent, float fNewMaxspeed)
 {
 	int entnum = NUM_FOR_EDICT(clientent);
 	if (entnum < 1 || entnum > g_psvs.maxclients)
@@ -2478,7 +2497,7 @@ void PF_SetClientMaxspeed(edict_t *clientent, float fNewMaxspeed)
 }
 
 /* <7a80b> ../engine/pr_cmds.c:3149 */
-int PF_GetPlayerUserId(edict_t *e)
+int EXT_FUNC PF_GetPlayerUserId(edict_t *e)
 {
 	if (!g_psv.active || !e)
 		return -1;
@@ -2493,13 +2512,13 @@ int PF_GetPlayerUserId(edict_t *e)
 }
 
 /* <7a854> ../engine/pr_cmds.c:3172 */
-unsigned int PF_GetPlayerWONId(edict_t *e)
+unsigned int EXT_FUNC PF_GetPlayerWONId(edict_t *e)
 {
 	return 0xFFFFFFFF;
 }
 
 /* <7a87f> ../engine/pr_cmds.c:3180 */
-const char *PF_GetPlayerAuthId(edict_t *e)
+const char* EXT_FUNC PF_GetPlayerAuthId(edict_t *e)
 {
 	static char szAuthID[5][64];
 	static int count = 0;
@@ -2542,8 +2561,13 @@ const char *PF_GetPlayerAuthId(edict_t *e)
 	return szAuthID[count];
 }
 
+void EXT_FUNC PF_BuildSoundMsg_I(edict_t *entity, int channel, const char *sample, float volume, float attenuation, int fFlags, int pitch, int msg_dest, int msg_type, const float *pOrigin, edict_t *ed)
+{
+	g_RehldsHookchains.m_PF_BuildSoundMsg_I.callChain(PF_BuildSoundMsg_I_internal, entity, channel, sample, volume, attenuation, fFlags, pitch, msg_dest, msg_type, pOrigin, ed);
+}
+
 /* <7a902> ../engine/pr_cmds.c:3229 */
-void PF_BuildSoundMsg_I(edict_t *entity, int channel, const char *sample, float volume, float attenuation, int fFlags, int pitch, int msg_dest, int msg_type, const float *pOrigin, edict_t *ed)
+void EXT_FUNC PF_BuildSoundMsg_I_internal(edict_t *entity, int channel, const char *sample, float volume, float attenuation, int fFlags, int pitch, int msg_dest, int msg_type, const float *pOrigin, edict_t *ed)
 {
 	PF_MessageBegin_I(msg_dest, msg_type, pOrigin, ed);
 	SV_BuildSoundMsg(entity, channel, sample, (int)volume, attenuation, fFlags, pitch, pOrigin, &gMsgBuffer);
@@ -2551,13 +2575,13 @@ void PF_BuildSoundMsg_I(edict_t *entity, int channel, const char *sample, float 
 }
 
 /* <7a9c1> ../engine/pr_cmds.c:3240 */
-int PF_IsDedicatedServer(void)
+int EXT_FUNC PF_IsDedicatedServer(void)
 {
 	return g_bIsDedicatedServer;
 }
 
 /* <7a9da> ../engine/pr_cmds.c:3245 */
-const char *PF_GetPhysicsInfoString(const edict_t *pClient)
+const char* EXT_FUNC PF_GetPhysicsInfoString(const edict_t *pClient)
 {
 	int entnum = NUM_FOR_EDICT(pClient);
 	if (entnum < 1 || entnum > g_psvs.maxclients)
@@ -2571,7 +2595,7 @@ const char *PF_GetPhysicsInfoString(const edict_t *pClient)
 }
 
 /* <7aa28> ../engine/pr_cmds.c:3259 */
-const char *PF_GetPhysicsKeyValue(const edict_t *pClient, const char *key)
+const char* EXT_FUNC PF_GetPhysicsKeyValue(const edict_t *pClient, const char *key)
 {
 	int entnum = NUM_FOR_EDICT(pClient);
 	if (entnum < 1 || entnum > g_psvs.maxclients)
@@ -2585,7 +2609,7 @@ const char *PF_GetPhysicsKeyValue(const edict_t *pClient, const char *key)
 }
 
 /* <7aa85> ../engine/pr_cmds.c:3273 */
-void PF_SetPhysicsKeyValue(const edict_t *pClient, const char *key, const char *value)
+void EXT_FUNC PF_SetPhysicsKeyValue(const edict_t *pClient, const char *key, const char *value)
 {
 	int entnum = NUM_FOR_EDICT(pClient);
 	if (entnum < 1 || entnum > g_psvs.maxclients)
@@ -2596,7 +2620,7 @@ void PF_SetPhysicsKeyValue(const edict_t *pClient, const char *key, const char *
 }
 
 /* <7aaed> ../engine/pr_cmds.c:3287 */
-int PF_GetCurrentPlayer(void)
+int EXT_FUNC PF_GetCurrentPlayer(void)
 {
 	int idx = host_client - g_psvs.clients;
 	if (idx < 0 || idx >= g_psvs.maxclients)
@@ -2606,7 +2630,7 @@ int PF_GetCurrentPlayer(void)
 }
 
 /* <7ab19> ../engine/pr_cmds.c:3296 */
-int PF_CanSkipPlayer(const edict_t *pClient)
+int EXT_FUNC PF_CanSkipPlayer(const edict_t *pClient)
 {
 	int entnum = NUM_FOR_EDICT(pClient);
 	if (entnum < 1 || entnum > g_psvs.maxclients)
@@ -2620,33 +2644,33 @@ int PF_CanSkipPlayer(const edict_t *pClient)
 }
 
 /* <7ab67> ../engine/pr_cmds.c:3313 */
-void PF_SetGroupMask(int mask, int op)
+void EXT_FUNC PF_SetGroupMask(int mask, int op)
 {
 	g_groupmask = mask;
 	g_groupop = op;
 }
 
 /* <7ab9e> ../engine/pr_cmds.c:3319 */
-int PF_CreateInstancedBaseline(int classname, struct entity_state_s *baseline)
+int EXT_FUNC PF_CreateInstancedBaseline(int classname, struct entity_state_s *baseline)
 {
 	extra_baselines_t *bls = g_psv.instance_baselines;
 	if (bls->number >= NUM_BASELINES)
 		return 0;
 
 	bls->classname[bls->number] = classname;
-	memcpy(&bls->baseline[bls->number], baseline, sizeof(struct entity_state_s));
+	Q_memcpy(&bls->baseline[bls->number], baseline, sizeof(struct entity_state_s));
 	bls->number += 1;
 	return bls->number;
 }
 
 /* <7abdb> ../engine/pr_cmds.c:3332 */
-void PF_Cvar_DirectSet(struct cvar_s *var, const char *value)
+void EXT_FUNC PF_Cvar_DirectSet(struct cvar_s *var, const char *value)
 {
 	Cvar_DirectSet(var, value);
 }
 
 /* <7ac13> ../engine/pr_cmds.c:3337 */
-void PF_ForceUnmodified(FORCE_TYPE type, float *mins, float *maxs, const char *filename)
+void EXT_FUNC PF_ForceUnmodified(FORCE_TYPE type, float *mins, float *maxs, const char *filename)
 {
 	int i;
 
@@ -2702,7 +2726,7 @@ void PF_ForceUnmodified(FORCE_TYPE type, float *mins, float *maxs, const char *f
 }
 
 /* <7ac92> ../engine/pr_cmds.c:3386 */
-void PF_GetPlayerStats(const edict_t *pClient, int *ping, int *packet_loss)
+void EXT_FUNC PF_GetPlayerStats(const edict_t *pClient, int *ping, int *packet_loss)
 {
 	*packet_loss = 0;
 	*ping = 0;
@@ -2770,7 +2794,7 @@ NOXREF void QueryClientCvarValueCmd2(void)
 }
 
 /* <7acfa> ../engine/pr_cmds.c:3461 */
-void QueryClientCvarValue(const edict_t *player, const char *cvarName)
+void EXT_FUNC QueryClientCvarValue(const edict_t *player, const char *cvarName)
 {
 
 	int entnum = NUM_FOR_EDICT(player);
@@ -2788,7 +2812,7 @@ void QueryClientCvarValue(const edict_t *player, const char *cvarName)
 }
 
 /* <7adb3> ../engine/pr_cmds.c:3485 */
-void QueryClientCvarValue2(const edict_t *player, const char *cvarName, int requestID)
+void EXT_FUNC QueryClientCvarValue2(const edict_t *player, const char *cvarName, int requestID)
 {
 	int entnum = NUM_FOR_EDICT(player);
 	if (entnum < 1 || entnum > g_psvs.maxclients)

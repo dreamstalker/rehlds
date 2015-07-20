@@ -116,6 +116,11 @@ decodeFinishedMaybeCESU8:
 
 int __cdecl Q_IsUnprintableW(uchar16 c)
 {
+#ifdef REHLDS_FIXES
+	if (!iswprint(c))
+		return 1;
+#endif // REHLDS_FIXES
+
 	switch (c)
 	{
 	case 0x202A:
@@ -363,7 +368,7 @@ int Q_UnicodeConvertT(const T_IN* pIn, T_OUT *pOut, int nOutBytes, enum EStringC
 		if (nMaxOut <= 0)
 			return 0;
 
-		while (pIn)
+		while (*pIn)
 		{
 			bool bErr;
 			uchar32 uVal;

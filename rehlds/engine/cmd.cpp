@@ -92,7 +92,7 @@ void Cbuf_InsertText(char *text)
 
 #ifdef REHLDS_FIXES
 	if (currLen)
-		memmove(cmd_text.data + addLen, cmd_text.data, currLen);
+		Q_memmove(cmd_text.data + addLen, cmd_text.data, currLen);
 
 	Q_memcpy(cmd_text.data, text, addLen);
 	cmd_text.cursize += addLen;
@@ -131,7 +131,7 @@ void Cbuf_InsertTextLines(char *text)
 
 #ifdef REHLDS_FIXES
 	if (currLen)
-		memmove(cmd_text.data + addLen + 1, cmd_text.data, currLen);
+		Q_memmove(cmd_text.data + addLen + 1, cmd_text.data, currLen);
 	
 	cmd_text.data[0] = '\n'; // TODO: Why we need leading \n, if there is no commands in the start?
 	Q_memcpy(&cmd_text.data[1], text, addLen);
@@ -225,7 +225,7 @@ void Cbuf_Execute(void)
 			cmd_text.cursize -= i;
 #ifdef REHLDS_FIXES
 			// dst overlaps src
-			memmove(text, text + i, cmd_text.cursize);
+			Q_memmove(text, text + i, cmd_text.cursize);
 #else // REHLDS_FIXES
 			Q_memcpy(text, text + i, cmd_text.cursize);
 #endif // REHLDS_FIXES
@@ -559,7 +559,7 @@ void Cmd_Shutdown(void)
 	{
 		Z_Free(cmd_argv[i]);
 	}
-	memset(cmd_argv, 0, sizeof(cmd_argv));
+	Q_memset(cmd_argv, 0, sizeof(cmd_argv));
 	cmd_argc = 0;
 	cmd_args = NULL;
 
@@ -567,7 +567,7 @@ void Cmd_Shutdown(void)
 }
 
 /* <5536> ../engine/cmd.c:677 */
-int Cmd_Argc(void)
+int EXT_FUNC Cmd_Argc(void)
 {
 #ifndef SWDS
 	g_engdstAddrs->Cmd_Argc();
@@ -577,7 +577,7 @@ int Cmd_Argc(void)
 }
 
 /* <5547> ../engine/cmd.c:689 */
-const char *Cmd_Argv(int arg)
+const char* EXT_FUNC Cmd_Argv(int arg)
 {
 #ifndef SWDS
 	g_engdstAddrs->Cmd_Argv(&arg);
@@ -591,7 +591,7 @@ const char *Cmd_Argv(int arg)
 }
 
 /* <5565> ../engine/cmd.c:703 */
-const char *Cmd_Args(void)
+const char* EXT_FUNC Cmd_Args(void)
 {
 #ifndef SWDS
 	g_engdstAddrs->Cmd_Args();
@@ -610,7 +610,7 @@ Takes a null terminated string. Does not need to be \n terminated.
 Breaks the string up into arg tokens.
 ============
 */
-void Cmd_TokenizeString(char *text)
+void EXT_FUNC Cmd_TokenizeString(char *text)
 {
 	int i;
 	int arglen;
@@ -816,7 +816,7 @@ NOXREF void Cmd_AddWrapperCommand(char *cmd_name, xcommand_t function)
 }
 
 /* <58d2> ../engine/cmd.c:960 */
-void Cmd_AddGameCommand(char *cmd_name, xcommand_t function)
+void EXT_FUNC Cmd_AddGameCommand(char *cmd_name, xcommand_t function)
 {
 	Cmd_AddMallocCommand(cmd_name, function, FCMD_GAME_COMMAND);
 }
@@ -940,25 +940,11 @@ NOXREF char *Cmd_CompleteCommand(char *search, int forward)
 	return NULL;
 }
 
-bool ValidateCmd_API(const char* cmd, cmd_source_t src, IGameClient* client) {
+bool EXT_FUNC ValidateCmd_API(const char* cmd, cmd_source_t src, IGameClient* client) {
 	return true;
 }
 
-/* <5d4e> ../engine/cmd.c:1133 */
-void Cmd_ExecuteString(char *text, cmd_source_t src)
-{
-	cmd_source = src;
-	Cmd_TokenizeString(text);
-
-	if (!Cmd_Argc())
-	{
-		return;
-	}
-
-	IGameClient* cl = (src == src_client) ? GetRehldsApiClient(host_client) : NULL;
-	if (!g_RehldsHookchains.m_ValidateCommand.callChain(ValidateCmd_API, cmd_argv[0], src, cl))
-		return;
-
+void EXT_FUNC Cmd_ExecuteString_internal(const char* cmdName, cmd_source_t src, IGameClient* client) {
 	// Search in functions
 	cmd_function_t *cmd = cmd_functions;
 	while (cmd)
@@ -984,7 +970,7 @@ void Cmd_ExecuteString(char *text, cmd_source_t src)
 	{
 		if (!Q_stricmp(cmd_argv[0], a->name))
 		{
-			
+
 			Cbuf_InsertText(a->value);
 			return;
 		}
@@ -998,6 +984,24 @@ void Cmd_ExecuteString(char *text, cmd_source_t src)
 		// Send to a server if nothing processed locally and connected
 		Cmd_ForwardToServer();
 	}
+}
+
+/* <5d4e> ../engine/cmd.c:1133 */
+void Cmd_ExecuteString(char *text, cmd_source_t src)
+{
+	cmd_source = src;
+	Cmd_TokenizeString(text);
+
+	if (!Cmd_Argc())
+	{
+		return;
+	}
+
+	IGameClient* cl = (src == src_client) ? GetRehldsApiClient(host_client) : NULL;
+	if (!g_RehldsHookchains.m_ValidateCommand.callChain(ValidateCmd_API, false, cmd_argv[0], src, cl))
+		return;
+
+	g_RehldsHookchains.m_ExecuteServerStringCmd.callChain(Cmd_ExecuteString_internal, cmd_argv[0], src, cl);
 }
 
 /* <5c15> ../engine/cmd.c:1181 */

@@ -167,7 +167,7 @@ NOXREF void R_AddToStudioCache(float frame, int sequence, const vec_t *angles, c
 
 	Q_memcpy(&cache_hull[nCurrentHull], pHulls, sizeof(hull_t) * numhulls);
 	Q_memcpy(&cache_planes[nCurrentPlane], studio_planes,sizeof(mplane_t) * 6 * numhulls);
-	Q_memcpy(&cache_hull_hitgroup[nCurrentHull], studio_hull_hitgroup, sizeof(int *) * numhulls);
+	Q_memcpy(&cache_hull_hitgroup[nCurrentHull], studio_hull_hitgroup, sizeof(int) * numhulls);
 
 	p->numhulls = numhulls;
 
@@ -513,7 +513,7 @@ mstudioanim_t *R_GetAnim(model_t *psubmodel, mstudioseqdesc_t *pseqdesc)
 }
 
 /* <836d8> ../engine/r_studio.c:696 */
-void SV_StudioSetupBones(model_t *pModel, float frame, int sequence, const vec_t *angles, const vec_t *origin, const unsigned char *pcontroller, const unsigned char *pblending, int iBone, const edict_t *edict)
+void EXT_FUNC SV_StudioSetupBones(model_t *pModel, float frame, int sequence, const vec_t *angles, const vec_t *origin, const unsigned char *pcontroller, const unsigned char *pblending, int iBone, const edict_t *edict)
 {
 	static vec4_t q1[128];
 	static vec3_t pos1[128];
@@ -901,12 +901,12 @@ qboolean SV_CheckSphereIntersection(edict_t *ent, const vec_t *start, const vec_
 
 
 /* <840e2> ../engine/r_studio.c:1302 */
-void AnimationAutomove(const edict_t *pEdict, float flTime)
+void EXT_FUNC AnimationAutomove(const edict_t *pEdict, float flTime)
 {
 }
 
 /* <8411a> ../engine/r_studio.c:1329 */
-void GetBonePosition(const edict_t *pEdict, int iBone, float *rgflOrigin, float *rgflAngles)
+void EXT_FUNC GetBonePosition(const edict_t *pEdict, int iBone, float *rgflOrigin, float *rgflAngles)
 {
 	pstudiohdr = (studiohdr_t *)Mod_Extradata(g_psv.models[pEdict->v.modelindex]);
 	g_pSvBlendingAPI->SV_StudioSetupBones(
@@ -930,7 +930,7 @@ void GetBonePosition(const edict_t *pEdict, int iBone, float *rgflOrigin, float 
 }
 
 /* <84171> ../engine/r_studio.c:1351 */
-void GetAttachment(const edict_t *pEdict, int iAttachment, float *rgflOrigin, float *rgflAngles)
+void EXT_FUNC GetAttachment(const edict_t *pEdict, int iAttachment, float *rgflOrigin, float *rgflAngles)
 {
 	mstudioattachment_t *pattachment;
 	vec3_t angles;
@@ -1150,8 +1150,11 @@ int R_GetStudioBounds(const char *filename, float *mins, float *maxs)
 	{
 		if (LittleLong(*(unsigned int *)pBuffer) == 'TSDI')
 			iret = R_StudioComputeBounds((unsigned char*)pBuffer, mins, maxs);
+#ifndef REHLDS_FIXES
+		//wrong release memory code	
 		else
 			COM_FreeFile(pBuffer);
+#endif
 	}
 
 	if (usingReadBuffer)

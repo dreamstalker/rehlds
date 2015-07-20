@@ -441,7 +441,7 @@ void InitEntityDLLFields(edict_t *pEdict)
 }
 
 /* <7f8ee> ../engine/pr_edict.c:594 */
-void *PvAllocEntPrivateData(edict_t *pEdict, int32 cb)
+void* EXT_FUNC PvAllocEntPrivateData(edict_t *pEdict, int32 cb)
 {
 	FreeEntPrivateData(pEdict);
 
@@ -452,13 +452,17 @@ void *PvAllocEntPrivateData(edict_t *pEdict, int32 cb)
 
 	pEdict->pvPrivateData = Mem_Calloc(1, cb);
 
-	FR_AllocEntPrivateData(pEdict->pvPrivateData);
+#ifdef REHLDS_FLIGHT_REC
+	if (rehlds_flrec_pvdata.string[0] != '0') {
+		FR_AllocEntPrivateData(pEdict->pvPrivateData, cb);
+	}
+#endif //REHLDS_FLIGHT_REC
 
 	return pEdict->pvPrivateData;
 }
 
 /* <7f943> ../engine/pr_edict.c:607 */
-void *PvEntPrivateData(edict_t *pEdict)
+void* EXT_FUNC PvEntPrivateData(edict_t *pEdict)
 {
 	if (!pEdict)
 	{
@@ -478,7 +482,11 @@ void FreeEntPrivateData(edict_t *pEdict)
 			gNewDLLFunctions.pfnOnFreeEntPrivateData(pEdict);
 		}
 
-		FR_FreeEntPrivateData(pEdict->pvPrivateData);
+#ifdef REHLDS_FLIGHT_REC
+		if (rehlds_flrec_pvdata.string[0] != '0') {
+			FR_FreeEntPrivateData(pEdict->pvPrivateData);
+		}
+#endif //REHLDS_FLIGHT_REC
 
 		Mem_Free(pEdict->pvPrivateData);
 		pEdict->pvPrivateData = 0;
@@ -495,19 +503,19 @@ void FreeAllEntPrivateData(void)
 }
 
 /* <7f9d0> ../engine/pr_edict.c:660 */
-edict_t *PEntityOfEntOffset(int iEntOffset)
+edict_t* EXT_FUNC PEntityOfEntOffset(int iEntOffset)
 {
 	return (edict_t *)((char *)g_psv.edicts + iEntOffset);
 }
 
 /* <7f9fd> ../engine/pr_edict.c:665 */
-int EntOffsetOfPEntity(const edict_t *pEdict)
+int EXT_FUNC EntOffsetOfPEntity(const edict_t *pEdict)
 {
 	return (char *)pEdict - (char *)g_psv.edicts;
 }
 
 /* <7fa2a> ../engine/pr_edict.c:670 */
-int IndexOfEdict(const edict_t *pEdict)
+int EXT_FUNC IndexOfEdict(const edict_t *pEdict)
 {
 	int index = 0;
 	if (pEdict)
@@ -526,7 +534,7 @@ int IndexOfEdict(const edict_t *pEdict)
 }
 
 /* <7fa68> ../engine/pr_edict.c:691 */
-edict_t *PEntityOfEntIndex(int iEntIndex)
+edict_t* EXT_FUNC PEntityOfEntIndex(int iEntIndex)
 {
 	if (iEntIndex < 0 || iEntIndex >= g_psv.max_edicts)
 	{
@@ -554,19 +562,19 @@ edict_t *PEntityOfEntIndex(int iEntIndex)
 }
 
 /* <7fac3> ../engine/pr_edict.c:711 */
-const char *SzFromIndex(int iString)
+const char* EXT_FUNC SzFromIndex(int iString)
 {
 	return (const char *)(pr_strings + iString);
 }
 
 /* <7faf0> ../engine/pr_edict.c:721 */
-entvars_t *GetVarsOfEnt(edict_t *pEdict)
+entvars_t* EXT_FUNC GetVarsOfEnt(edict_t *pEdict)
 {
 	return &pEdict->v;
 }
 
 /* <7fb23> ../engine/pr_edict.c:731 */
-edict_t *FindEntityByVars(entvars_t *pvars)
+edict_t* EXT_FUNC FindEntityByVars(entvars_t *pvars)
 {
 	for (int i = 0; i < g_psv.num_edicts; i++)
 	{
@@ -580,37 +588,37 @@ edict_t *FindEntityByVars(entvars_t *pvars)
 }
 
 /* <7fb75> ../engine/pr_edict.c:747 */
-float CVarGetFloat(const char *szVarName)
+float EXT_FUNC CVarGetFloat(const char *szVarName)
 {
 	return Cvar_VariableValue(szVarName);
 }
 
 /* <7fba2> ../engine/pr_edict.c:753 */
-const char *CVarGetString(const char *szVarName)
+const char* EXT_FUNC CVarGetString(const char *szVarName)
 {
 	return Cvar_VariableString(szVarName);
 }
 
 /* <7fbcf> ../engine/pr_edict.c:759 */
-cvar_t *CVarGetPointer(const char *szVarName)
+cvar_t* EXT_FUNC CVarGetPointer(const char *szVarName)
 {
 	return Cvar_FindVar(szVarName);
 }
 
 /* <7fbfc> ../engine/pr_edict.c:765 */
-void CVarSetFloat(const char *szVarName, float flValue)
+void EXT_FUNC CVarSetFloat(const char *szVarName, float flValue)
 {
 	Cvar_SetValue(szVarName, flValue);
 }
 
 /* <7fc34> ../engine/pr_edict.c:771 */
-void CVarSetString(const char *szVarName, const char *szValue)
+void EXT_FUNC CVarSetString(const char *szVarName, const char *szValue)
 {
 	Cvar_Set(szVarName, szValue);
 }
 
 /* <7fc6c> ../engine/pr_edict.c:777 */
-void CVarRegister(cvar_t *pCvar)
+void EXT_FUNC CVarRegister(cvar_t *pCvar)
 {
 	if (pCvar)
 	{
@@ -620,13 +628,13 @@ void CVarRegister(cvar_t *pCvar)
 }
 
 /* <7fc95> ../engine/pr_edict.c:794 */
-int AllocEngineString(const char *szValue)
+int EXT_FUNC AllocEngineString(const char *szValue)
 {
 	return ED_NewString(szValue) - pr_strings;
 }
 
 /* <7fd06> ../engine/pr_edict.c:802 */
-void SaveSpawnParms(edict_t *pEdict)
+void EXT_FUNC SaveSpawnParms(edict_t *pEdict)
 {
 	int eoffset = NUM_FOR_EDICT(pEdict);
 	if (eoffset < 1 || eoffset > g_psvs.maxclients)
@@ -637,7 +645,7 @@ void SaveSpawnParms(edict_t *pEdict)
 }
 
 /* <7fd78> ../engine/pr_edict.c:815 */
-void *GetModelPtr(edict_t *pEdict)
+void* EXT_FUNC GetModelPtr(edict_t *pEdict)
 {
 	if (!pEdict)
 	{

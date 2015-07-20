@@ -59,7 +59,7 @@
 #include "userid.h"
 #include "pm_defs.h"
 #include "inst_baseline.h"
-
+#include "net_ws.h"
 
 #define DEFAULT_SOUND_PACKET_VOLUME			255
 #define DEFAULT_SOUND_PACKET_ATTENUATION	1.0f
@@ -153,9 +153,9 @@ typedef struct server_s
 	extra_baselines_t *instance_baselines;
 	server_state_t state;
 	sizebuf_t datagram;
-	unsigned char datagram_buf[4000];
+	unsigned char datagram_buf[MAX_DATAGRAM];
 	sizebuf_t reliable_datagram;
-	unsigned char reliable_datagram_buf[4000];
+	unsigned char reliable_datagram_buf[MAX_DATAGRAM];
 	sizebuf_t multicast;
 	unsigned char multicast_buf[1024];
 	sizebuf_t spectator;
@@ -212,7 +212,7 @@ typedef struct client_s
 	double nextping;
 	double svtimebase;
 	sizebuf_t datagram;
-	byte datagram_buf[4000];
+	byte datagram_buf[MAX_DATAGRAM];
 	double connection_started;
 	double next_messagetime;
 	double next_messageinterval;
@@ -533,7 +533,7 @@ extern cvar_t sv_allow_dlfile;
 extern cvar_t sv_version;
 extern int sv_playermodel;
 
-extern char outputbuf[1400];
+extern char outputbuf[MAX_ROUTEABLE_PACKET];
 extern redirect_t sv_redirected;
 extern netadr_t sv_redirectto;
 
@@ -610,6 +610,7 @@ void SV_CountProxies(int *proxies);
 void SV_FindModelNumbers(void);
 void SV_StartParticle(const vec_t *org, const vec_t *dir, int color, int count);
 void SV_StartSound(int recipients, edict_t *entity, int channel, const char *sample, int volume, float attenuation, int fFlags, int pitch);
+void SV_StartSound_internal(int recipients, edict_t *entity, int channel, const char *sample, int volume, float attenuation, int fFlags, int pitch);
 qboolean SV_BuildSoundMsg(edict_t *entity, int channel, const char *sample, int volume, float attenuation, int fFlags, int pitch, const float *origin, sizebuf_t *buffer);
 int SV_HashString(const char *string, int iBounds);
 int SV_LookupSoundIndex(const char *sample);
@@ -689,6 +690,7 @@ void SV_CheckTimeouts(void);
 int SV_CalcPing(client_t *cl);
 void SV_FullClientUpdate(client_t *cl, sizebuf_t *sb);
 void SV_EmitEvents(client_t *cl, packet_entities_t *pack, sizebuf_t *msg);
+void SV_EmitEvents_internal(client_t *cl, packet_entities_t *pack, sizebuf_t *msg);
 void SV_AddToFatPVS(vec_t *org, mnode_t *node);
 unsigned char *SV_FatPVS(float *org);
 void SV_AddToFatPAS(vec_t *org, mnode_t *node);

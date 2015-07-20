@@ -21,13 +21,26 @@
 
 extern CRehldsFlightRecorder* g_FlightRecorder;
 
+extern void FR_Init();
+extern void FR_Shutdown();
+
+#ifdef REHLDS_FLIGHT_REC
+
+extern cvar_t rehlds_flrec_frame;
+extern cvar_t rehlds_flrec_pvdata;
+
 extern uint16 g_FRMsg_Frame;
 extern uint16 g_FRMsg_FreeEntPrivateData;
 extern uint16 g_FRMsg_AllocEntPrivateData;
 
-extern void FR_Init();
+extern void FR_Dump_f();
+extern void FR_Rehlds_Init();
 
-extern void FR_StartFrame();
-extern void FR_EndFrame();
+
+extern void FR_StartFrame(long frameCounter);
+extern void FR_EndFrame(long frameCounter);
 extern void FR_FreeEntPrivateData(void* data);
-extern void FR_AllocEntPrivateData(void* res);
+extern void FR_AllocEntPrivateData(void* res, int size);
+extern void FR_Log(const char* prefix, const char* msg);
+
+#endif //REHLDS_FLIGHT_REC

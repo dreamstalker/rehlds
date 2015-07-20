@@ -54,6 +54,10 @@ CEngine::CEngine()
 	m_nTrapKey = 0;
 	m_nTrapButtons = 0;
 	m_nQuitting = QUIT_NOTQUITTING;
+
+#ifdef REHLDS_FIXES
+	m_fCurTime = 0.0;
+#endif
 }
 
 /* <95a38> ../engine/sys_engine.cpp:164 */
@@ -90,7 +94,7 @@ void ForceReloadProfile()
 		Sys_Error("Only dedicated mode is supported");
 		/*
 		v0 = GetRateRegistrySetting(rate.string);
-		strncpy(szRate, v0, 0x20u);
+		Q_strncpy(szRate, v0, 0x20u);
 		Cvar_DirectSet(&rate, szRate);
 		*/
 	}

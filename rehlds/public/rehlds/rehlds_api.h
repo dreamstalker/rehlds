@@ -35,7 +35,7 @@
 #include "model.h"
 
 #define REHLDS_API_VERSION_MAJOR 1
-#define REHLDS_API_VERSION_MINOR 0
+#define REHLDS_API_VERSION_MINOR 3
 
 //Steam_NotifyClientConnect hook
 typedef IHookChain<qboolean, IGameClient*, const void*, unsigned int> IRehldsHook_Steam_NotifyClientConnect;
@@ -97,6 +97,10 @@ typedef IHookChainRegistry<bool, uint8*, unsigned int, const netadr_t&> IRehldsH
 typedef IHookChain<bool, const char*, cmd_source_t, IGameClient*> IRehldsHook_ValidateCommand;
 typedef IHookChainRegistry<bool, const char*, cmd_source_t, IGameClient*> IRehldsHookRegistry_ValidateCommand;
 
+//ExecuteServerStringCmd
+typedef IVoidHookChain<const char*, cmd_source_t, IGameClient*> IRehldsHook_ExecuteServerStringCmd;
+typedef IVoidHookChainRegistry<const char*, cmd_source_t, IGameClient*> IRehldsHookRegistry_ExecuteServerStringCmd;
+
 //ClientConnected
 typedef IVoidHookChain<IGameClient*> IRehldsHook_ClientConnected;
 typedef IVoidHookChainRegistry<IGameClient*> IRehldsHookRegistry_ClientConnected;
@@ -112,6 +116,30 @@ typedef IVoidHookChainRegistry<model_t*, void*> IRehldsHookRegistry_Mod_LoadBrus
 //Mod_LoadStudioModel
 typedef IVoidHookChain<model_t*, void*> IRehldsHook_Mod_LoadStudioModel;
 typedef IVoidHookChainRegistry<model_t*, void*> IRehldsHookRegistry_Mod_LoadStudioModel;
+
+//SV_EmitEvents hook
+typedef IVoidHookChain<IGameClient *, packet_entities_t *, sizebuf_t *> IRehldsHook_SV_EmitEvents;
+typedef IVoidHookChainRegistry<IGameClient *, packet_entities_t *, sizebuf_t *> IRehldsHookRegistry_SV_EmitEvents;
+
+//EV_PlayReliableEvent hook
+typedef IVoidHookChain<IGameClient *, int, short unsigned int, float, event_args_t *> IRehldsHook_EV_PlayReliableEvent;
+typedef IVoidHookChainRegistry<IGameClient *, int, short unsigned int, float, event_args_t *> IRehldsHookRegistry_EV_PlayReliableEvent;
+
+//SV_StartSound hook
+typedef IVoidHookChain<int , edict_t *, int, const char *, int, float, int, int> IRehldsHook_SV_StartSound;
+typedef IVoidHookChainRegistry<int , edict_t *, int, const char *, int, float, int, int> IRehldsHookRegistry_SV_StartSound;
+
+//PF_Remove_I hook
+typedef IVoidHookChain<edict_t *> IRehldsHook_PF_Remove_I;
+typedef IVoidHookChainRegistry<edict_t *> IRehldsHookRegistry_PF_Remove_I;
+
+//PF_BuildSoundMsg_I hook
+typedef IVoidHookChain<edict_t *, int, const char *, float, float, int, int, int, int, const float *, edict_t *> IRehldsHook_PF_BuildSoundMsg_I;
+typedef IVoidHookChainRegistry<edict_t *, int, const char *, float, float, int, int, int, int, const float *, edict_t *> IRehldsHookRegistry_PF_BuildSoundMsg_I;
+
+//SV_WriteFullClientUpdate hook
+typedef IVoidHookChain<IGameClient *, char *, size_t, sizebuf_t *, IGameClient *> IRehldsHook_SV_WriteFullClientUpdate;
+typedef IVoidHookChainRegistry<IGameClient *, char *, size_t, sizebuf_t *, IGameClient *> IRehldsHookRegistry_SV_WriteFullClientUpdate;
 
 class IRehldsHookchains {
 public:
@@ -136,6 +164,13 @@ public:
 	virtual IRehldsHookRegistry_HandleNetCommand* HandleNetCommand() = 0;
 	virtual IRehldsHookRegistry_Mod_LoadBrushModel* Mod_LoadBrushModel() = 0;
 	virtual IRehldsHookRegistry_Mod_LoadStudioModel* Mod_LoadStudioModel() = 0;
+	virtual IRehldsHookRegistry_ExecuteServerStringCmd* ExecuteServerStringCmd() = 0;
+	virtual IRehldsHookRegistry_SV_EmitEvents* SV_EmitEvents() = 0;
+	virtual IRehldsHookRegistry_EV_PlayReliableEvent* EV_PlayReliableEvent() = 0;
+	virtual IRehldsHookRegistry_SV_StartSound* SV_StartSound() = 0;
+	virtual IRehldsHookRegistry_PF_Remove_I* PF_Remove_I() = 0;
+	virtual IRehldsHookRegistry_PF_BuildSoundMsg_I* PF_BuildSoundMsg_I() = 0;
+	virtual IRehldsHookRegistry_SV_WriteFullClientUpdate* SV_WriteFullClientUpdate() = 0;
 };
 
 struct RehldsFuncs_t {
@@ -159,6 +194,16 @@ struct RehldsFuncs_t {
 	int(*GetBuildNumber)();
 	double(*GetRealTime)();
 	int*(*GetMsgBadRead)();
+	cmd_source_t*(*GetCmdSource)();
+	void(*Log)(const char* prefix, const char* msg);
+	DLL_FUNCTIONS *(*GetEntityInterface)();
+	void(*EV_PlayReliableEvent)(IGameClient *cl, int entindex, short unsigned int eventindex, float delay, event_args_t *pargs);
+	int(*SV_LookupSoundIndex)(const char *sample);
+	void(*MSG_StartBitWriting)(sizebuf_t *buf);
+	void(*MSG_WriteBits)(uint32 data, int numbits);
+	void(*MSG_WriteBitVec3Coord)(const float *fa);
+	void(*MSG_EndBitWriting)(sizebuf_t *buf);
+	void*(*SZ_GetSpace)(sizebuf_t *buf, int length);
 };
 
 class IRehldsApi {

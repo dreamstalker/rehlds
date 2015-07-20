@@ -339,15 +339,21 @@ void FS_Rename(const char *originalName, const char *newName)
 	char localPath[512];
 	char newPath[512];
 
-	if (FS_GetLocalPath(originalName, localPath, 512))
+	if (FS_GetLocalPath(originalName, localPath, ARRAYSIZE(localPath)))
 	{
-		strcpy(newPath, localPath);
+		Q_strcpy(newPath, localPath);
 		cut = strstr(newPath, originalName);
 
 		if (cut)
 		{
 			*cut = 0;
-			strcat(newPath, newName);
+#ifdef REHLDS_CHECKS
+			Q_strncat(newPath, newName, ARRAYSIZE(newPath) - strlen(newPath));
+			newPath[ARRAYSIZE(newPath) - 1] = 0;
+#else
+			Q_strcat(newPath, newName);
+#endif
+			
 			rename(localPath, newPath);
 		}
 	}

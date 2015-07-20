@@ -10,50 +10,69 @@ void _copyFile(String from, String to) {
     GradleCppUtils.copyFile(project.file(from), project.file(to), false)
 }
 
-task publishPrepareFiles << {
-    def pubRootDir = project.file('publish/publishRoot')
-    if (pubRootDir.exists()) {
-        if (!pubRootDir.deleteDir()) {
-            throw new RuntimeException("Failed to delete ${pubRootDir}")
+task publishPrepareFiles {
+    dependsOn ':flightrec/decoder:uberjar'
+    doLast {
+        def pubRootDir = project.file('publish/publishRoot')
+        if (pubRootDir.exists()) {
+            if (!pubRootDir.deleteDir()) {
+                throw new RuntimeException("Failed to delete ${pubRootDir}")
+            }
         }
-    }
 
-    pubRootDir.mkdirs()
+        pubRootDir.mkdirs()
 
-    //bugfixed binaries
-    project.file('publish/publishRoot/bin/bugfixed').mkdirs()
-    _copyFileToDir('publish/releaseRehldsFixes/swds.dll', 'publish/publishRoot/bin/bugfixed/')
-    _copyFileToDir('publish/releaseRehldsFixes/swds.pdb', 'publish/publishRoot/bin/bugfixed/')
-    _copyFile('publish/releaseRehldsFixes/libengine_i486.so', 'publish/publishRoot/bin/bugfixed/engine_i486.so')
+        //bugfixed binaries
+        project.file('publish/publishRoot/bin/bugfixed').mkdirs()
+        _copyFileToDir('publish/releaseRehldsFixes/swds.dll', 'publish/publishRoot/bin/bugfixed/')
+        _copyFileToDir('publish/releaseRehldsFixes/swds.pdb', 'publish/publishRoot/bin/bugfixed/')
+        _copyFile('publish/releaseRehldsFixes/libengine_i486.so', 'publish/publishRoot/bin/bugfixed/engine_i486.so')
 
-    //pure binaries
-    project.file('publish/publishRoot/bin/pure').mkdirs()
-    _copyFileToDir('publish/releaseRehldsNofixes/swds.dll', 'publish/publishRoot/bin/pure/')
-    _copyFileToDir('publish/releaseRehldsNofixes/swds.pdb', 'publish/publishRoot/bin/pure/')
-    _copyFile('publish/releaseRehldsNofixes/libengine_i486.so', 'publish/publishRoot/bin/pure/engine_i486.so')
+        //pure binaries
+        project.file('publish/publishRoot/bin/pure').mkdirs()
+        _copyFileToDir('publish/releaseRehldsNofixes/swds.dll', 'publish/publishRoot/bin/pure/')
+        _copyFileToDir('publish/releaseRehldsNofixes/swds.pdb', 'publish/publishRoot/bin/pure/')
+        _copyFile('publish/releaseRehldsNofixes/libengine_i486.so', 'publish/publishRoot/bin/pure/engine_i486.so')
 
-    //hlsdk
-    project.file('publish/publishRoot/hlsdk').mkdirs()
-    copy {
-        from 'rehlds/common'
-        into 'publish/publishRoot/hlsdk/common'
-    }
-    copy {
-        from 'rehlds/dlls'
-        into 'publish/publishRoot/hlsdk/dlls'
-    }
-    copy {
-        from 'rehlds/pm_shared'
-        into 'publish/publishRoot/hlsdk/pm_shared'
-    }
-    copy {
-        from 'rehlds/public'
-        into 'publish/publishRoot/hlsdk/public'
-        include 'interface.h', 'interface.cpp', 'FileSystem.h'
-    }
-    copy {
-        from 'rehlds/public/rehlds'
-        into 'publish/publishRoot/hlsdk/engine'
+        //hlsdk
+        project.file('publish/publishRoot/hlsdk').mkdirs()
+        copy {
+            from 'rehlds/common'
+            into 'publish/publishRoot/hlsdk/common'
+        }
+        copy {
+            from 'rehlds/dlls'
+            into 'publish/publishRoot/hlsdk/dlls'
+        }
+        copy {
+            from 'rehlds/pm_shared'
+            into 'publish/publishRoot/hlsdk/pm_shared'
+        }
+        copy {
+            from 'rehlds/public'
+            into 'publish/publishRoot/hlsdk/public'
+            include 'interface.h', 'interface.cpp', 'FileSystem.h'
+        }
+        copy {
+            from 'rehlds/public/rehlds'
+            into 'publish/publishRoot/hlsdk/engine'
+        }
+
+        //flightrecorder
+
+        def flightRecJarTask = project(':flightrec/decoder').tasks.getByName('uberjar')
+        println flightRecJarTask
+        println flightRecJarTask.class.name
+        File flightRecJarFile = flightRecJarTask.archivePath
+        project.file('publish/publishRoot/flighrec').mkdirs()
+        copy {
+            from flightRecJarFile
+            into 'publish/publishRoot/flighrec'
+        }
+        copy {
+            from new File(project(':flightrec/decoder').projectDir, 'pub')
+            into 'publish/publishRoot/flighrec'
+        }
     }
 }
 
@@ -101,6 +120,7 @@ publishing {
 }
 
 Properties repoCreds = new Properties()
+project.ext.repoCreds = repoCreds
 if (file('repo_creds.properties').exists()) {
     println 'Loading maven repo credentials'
     file('repo_creds.properties').withReader('UTF-8', { Reader r ->
@@ -128,5 +148,6 @@ task doPublish {
     dependsOn 'publishPackage'
     if (repoCreds.getProperty('username') && repoCreds.getProperty('password')) {
         dependsOn 'publish'
+        dependsOn ':flightrec/decoder_api:publish'
     }
 }

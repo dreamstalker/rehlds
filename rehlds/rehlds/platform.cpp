@@ -191,7 +191,7 @@ void CSimplePlatform::SteamAPI_UnregisterCallback(CCallbackBase *pCallback)
 	::SteamAPI_UnregisterCallback(pCallback);
 }
 
-void rehlds_syserror(const char* fmt, ...) {
+void __declspec(noreturn) rehlds_syserror(const char* fmt, ...) {
 	va_list			argptr;
 	static char		string[8192];
 

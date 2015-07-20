@@ -30,7 +30,6 @@
 
 // NOTE: This file contains a lot of fixes that are not covered by REHLDS_FIXES define.
 // TODO: Most of the Info_ functions can be speedup via removing unneded copy of key and values.
-// TODO: We have a problem with Q_strcpy, because it maps to strcpy which have undefined behavior when strings overlaps (possibly we need to use memmove solution here)
 
 /*
 ===============
@@ -41,7 +40,7 @@ key and returns the associated value, or an empty string.
 ===============
 */
 /* <40d86> ../engine/info.c:23 */
-const char *Info_ValueForKey(const char *s, const char *key)
+const char* EXT_FUNC Info_ValueForKey(const char *s, const char *key)
 {
 	// use few (two?) buffers so compares work without stomping on each other
 	static char value[INFO_MAX_BUFFER_VALUES][MAX_KV_LEN];
@@ -179,7 +178,7 @@ void Info_RemoveKey(char *s, const char *key)
 		// Compare keys
 		if (!Q_strncmp(key, pkey, cmpsize))
 		{
-			Q_strcpy(start, s);	// remove this part
+			strcpy_safe(start, s);	// remove this part
 			s = start;	// continue searching
 		}
 	}
@@ -245,7 +244,7 @@ void Info_RemovePrefixedKeys(char *s, const char prefix)
 
 		if (pkey[0] == prefix)
 		{
-			Q_strcpy(start, s);	// remove this part
+			strcpy_safe(start, s);	// remove this part
 			s = start;	// continue searching
 		}
 	}

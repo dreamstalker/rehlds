@@ -40,6 +40,8 @@ public:
 	Failure (std::string message, std::string testName) {
 		this->testName = testName;
 		this->message = message;
+		this->fileName = "<unknown>";
+		this->lineNumber = -1;
 	}
 
 	std::string testName;
