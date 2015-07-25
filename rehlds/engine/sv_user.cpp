@@ -781,6 +781,9 @@ void SV_RunCmd(usercmd_t *ucmd, int random_seed)
 	sv_player->v.clbasevelocity[1] = 0;
 	sv_player->v.clbasevelocity[2] = 0;
 	sv_player->v.button = ucmd->buttons;
+#ifdef REHLDS_FIXES
+	sv_player->v.light_level = ucmd->lightlevel;
+#endif
 	SV_CheckMovingGround(sv_player, frametime);
 	pmove->oldangles[0] = sv_player->v.v_angle[0];
 	pmove->oldangles[1] = sv_player->v.v_angle[1];
@@ -1498,7 +1501,7 @@ void SV_ParseMove(client_t *pSenderClient)
 	pSenderClient->m_bLoopback = (packetLossByte >> 7) & 1;
 	totalcmds = numcmds + numbackup;
 	net_drop += 1 - numcmds;
-	if (totalcmds < 0 || totalcmds >= 63)
+	if (totalcmds < 0 || totalcmds >= CMD_MAXBACKUP - 1)
 	{
 		Con_Printf("SV_ReadClientMessage: too many cmds %i sent for %s/%s\n", totalcmds, host_client->name, NET_AdrToString(host_client->netchan.remote_address));
 		SV_DropClient(host_client, 0, "CMD_MAXBACKUP hit");
@@ -1534,9 +1537,12 @@ void SV_ParseMove(client_t *pSenderClient)
 	host_client->packet_loss = packet_loss;
 	if (!g_psv.paused && (g_psvs.maxclients > 1 || !key_dest) && !(sv_player->v.flags & FL_FROZEN))
 	{
+#ifndef REHLDS_FIXES
+		// dup and more correct in SV_RunCmd
 		sv_player->v.v_angle[0] = cmds[0].viewangles[0];
 		sv_player->v.v_angle[1] = cmds[0].viewangles[1];
 		sv_player->v.v_angle[2] = cmds[0].viewangles[2];
+#endif
 	}
 	else
 	{
@@ -1573,8 +1579,11 @@ void SV_ParseMove(client_t *pSenderClient)
 	}
 #endif
 
+#ifndef REHLDS_FIXES
+	// dup and more correct in SV_RunCmd
 	sv_player->v.button = cmds[0].buttons;
 	sv_player->v.light_level = cmds[0].lightlevel;
+#endif
 	SV_EstablishTimeBase(host_client, cmds, net_drop, numbackup, numcmds);
 	if (net_drop < 24)
 	{
@@ -1597,7 +1606,14 @@ void SV_ParseMove(client_t *pSenderClient)
 		SV_RunCmd(&cmds[i], host_client->netchan.incoming_sequence - i);
 	}
 
+#ifdef REHLDS_FIXES
+	if (numcmds)
+		host_client->lastcmd = cmds[numcmds - 1];
+	else if (numbackup)
+		host_client->lastcmd = cmds[0];
+#else
 	host_client->lastcmd = cmds[0];
+#endif
 
 	frame->ping_time -= float(host_client->lastcmd.msec * 0.5 / 1000.0);
 	if (frame->ping_time < 0.0)

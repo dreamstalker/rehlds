@@ -37,6 +37,7 @@
 #include "world.h"
 #include "pm_defs.h"
 
+#define CMD_MAXBACKUP 64
 
 typedef struct command_s command_t;
 

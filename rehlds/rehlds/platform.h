@@ -60,10 +60,12 @@ class CSimplePlatform : public IReHLDSPlatform {
 private:
 #ifdef _WIN32
 	setsockopt_proto setsockopt_v11;
+	HMODULE wsock;
 #endif
 
 public:
 	CSimplePlatform();
+	virtual ~CSimplePlatform();
 
 	virtual uint32 time(uint32* pTime);
 	virtual struct tm* localtime(uint32 time);

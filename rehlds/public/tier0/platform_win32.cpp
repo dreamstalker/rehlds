@@ -10,6 +10,7 @@
 static LARGE_INTEGER g_PerformanceFrequency;
 static LARGE_INTEGER g_MSPerformanceFrequency;
 static LARGE_INTEGER g_ClockStart;
+static HINSTANCE g_pVTuneDLL;
 
 static void InitTime()
 {
@@ -45,6 +46,11 @@ unsigned long Plat_MSTime()
 	return (unsigned long)((CurrentTime.QuadPart - g_ClockStart.QuadPart) / g_MSPerformanceFrequency.QuadPart);
 }
 
+void free_vtune()
+{
+	FreeLibrary(g_pVTuneDLL);
+}
+
 bool vtune(bool resume)
 {
 	static bool bInitialized = false;
@@ -56,12 +62,13 @@ bool vtune(bool resume)
 	{
 		bInitialized = true;
 
-		HINSTANCE pVTuneDLL = LoadLibrary("vtuneapi.dll");
+		g_pVTuneDLL = LoadLibrary("vtuneapi.dll");
 
-		if (pVTuneDLL)
+		if (g_pVTuneDLL)
 		{
-			VTResume = (void(__cdecl *)())GetProcAddress(pVTuneDLL, "VTResume");
-			VTPause = (void(__cdecl *)())GetProcAddress(pVTuneDLL, "VTPause");
+			VTResume = (void(__cdecl *)())GetProcAddress(g_pVTuneDLL, "VTResume");
+			VTPause = (void(__cdecl *)())GetProcAddress(g_pVTuneDLL, "VTPause");
+			atexit(free_vtune);
 		}
 	}
 
