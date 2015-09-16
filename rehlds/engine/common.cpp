@@ -1702,7 +1702,11 @@ inquotes:
 /* <11495> ../engine/common.c:2049 */
 char *COM_ParseLine(char *data)
 {
+#ifndef REHLDS_FIXES
+	unsigned int c;
+#else
 	int c;
+#endif
 	int len;
 
 	if (s_com_token_unget)
@@ -1719,9 +1723,18 @@ char *COM_ParseLine(char *data)
 		return NULL;
 	}
 
-	c = *data;	// TODO: data is signed, so will c, next check for >= ' ' will fail for upper ASCII
+	c = *data;
 
 	// parse a line out of the data
+#ifndef REHLDS_FIXES
+	while ((c >= ' ' || c == '\t') && (len < COM_TOKEN_LEN - 1))
+	{
+		com_token[len] = c;
+		data++;
+		len++;
+		c = *data;
+	}
+#else
 	do
 	{
 		com_token[len] = c;	// TODO: Here c may be any ASCII, \n for example, but we are copy it in the token
@@ -1729,6 +1742,7 @@ char *COM_ParseLine(char *data)
 		len++;
 		c = *data;
 	} while (c >= ' ' && (len < COM_TOKEN_LEN - 1));	// TODO: Will break on \t, may be it shouldn't?
+#endif
 
 	com_token[len] = 0;
 
@@ -1738,7 +1752,7 @@ char *COM_ParseLine(char *data)
 	}
 
 	// eat whitespace (LF,CR,etc.) at the end of this line
-	while ((c = *data) < ' ')
+	while ((c = *data) < ' ' && c != '\t')
 	{
 		if (c == 0)
 		{

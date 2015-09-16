@@ -118,12 +118,12 @@ typedef IVoidHookChain<model_t*, void*> IRehldsHook_Mod_LoadStudioModel;
 typedef IVoidHookChainRegistry<model_t*, void*> IRehldsHookRegistry_Mod_LoadStudioModel;
 
 //SV_EmitEvents hook
-typedef IVoidHookChain<IGameClient *, packet_entities_t *, sizebuf_t *> IRehldsHook_SV_EmitEvents;
-typedef IVoidHookChainRegistry<IGameClient *, packet_entities_t *, sizebuf_t *> IRehldsHookRegistry_SV_EmitEvents;
+typedef IVoidHookChain<IGameClient *, struct packet_entities_s *, sizebuf_t *> IRehldsHook_SV_EmitEvents;
+typedef IVoidHookChainRegistry<IGameClient *, struct packet_entities_s *, sizebuf_t *> IRehldsHookRegistry_SV_EmitEvents;
 
 //EV_PlayReliableEvent hook
-typedef IVoidHookChain<IGameClient *, int, short unsigned int, float, event_args_t *> IRehldsHook_EV_PlayReliableEvent;
-typedef IVoidHookChainRegistry<IGameClient *, int, short unsigned int, float, event_args_t *> IRehldsHookRegistry_EV_PlayReliableEvent;
+typedef IVoidHookChain<IGameClient *, int, short unsigned int, float, struct event_args_s *> IRehldsHook_EV_PlayReliableEvent;
+typedef IVoidHookChainRegistry<IGameClient *, int, short unsigned int, float, struct event_args_s *> IRehldsHookRegistry_EV_PlayReliableEvent;
 
 //SV_StartSound hook
 typedef IVoidHookChain<int , edict_t *, int, const char *, int, float, int, int> IRehldsHook_SV_StartSound;
@@ -197,7 +197,7 @@ struct RehldsFuncs_t {
 	cmd_source_t*(*GetCmdSource)();
 	void(*Log)(const char* prefix, const char* msg);
 	DLL_FUNCTIONS *(*GetEntityInterface)();
-	void(*EV_PlayReliableEvent)(IGameClient *cl, int entindex, short unsigned int eventindex, float delay, event_args_t *pargs);
+	void(*EV_PlayReliableEvent)(IGameClient *cl, int entindex, short unsigned int eventindex, float delay, struct event_args_s *pargs);
 	int(*SV_LookupSoundIndex)(const char *sample);
 	void(*MSG_StartBitWriting)(sizebuf_t *buf);
 	void(*MSG_WriteBits)(uint32 data, int numbits);
