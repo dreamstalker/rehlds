@@ -111,6 +111,11 @@ const netadr_t* EXT_FUNC CNetChan::GetRemoteAdr()
 	return &m_pNetChan->remote_address;
 }
 
+sizebuf_t* EXT_FUNC CNetChan::GetMessageBuf()
+{
+	return &m_pNetChan->message;
+}
+
 netchan_t* EXT_FUNC CNetChan::GetChan()
 {
 	return m_pNetChan;
@@ -176,6 +181,14 @@ uint32 EXT_FUNC CRehldsServerData::GetWorldmapCrc() {
 
 uint8* EXT_FUNC CRehldsServerData::GetClientDllMd5() {
 	return g_psv.clientdllmd5;
+}
+
+sizebuf_t* EXT_FUNC CRehldsServerData::GetDatagram() {
+	return &g_psv.datagram;
+}
+
+sizebuf_t* EXT_FUNC CRehldsServerData::GetReliableDatagram() {
+	return &g_psv.reliable_datagram;
 }
 
 void Rehlds_Interfaces_FreeClients() 

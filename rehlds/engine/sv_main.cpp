@@ -1781,7 +1781,7 @@ qboolean EXT_FUNC SV_FilterUser(USERID_t *userid)
 
 int SV_CheckProtocol(netadr_t *adr, int nProtocol)
 {
-	return g_RehldsHookchains.m_SV_CheckProtocol.callChain(SV_CheckProtocol_internal, 0, adr, nProtocol);
+	return g_RehldsHookchains.m_SV_CheckProtocol.callChain(SV_CheckProtocol_internal, adr, nProtocol);
 }
 
 /* <a7396> ../engine/sv_main.c:2302 */
@@ -1868,7 +1868,7 @@ int SV_CheckChallenge(netadr_t *adr, int nChallengeValue)
 
 int SV_CheckIPRestrictions(netadr_t *adr, int nAuthProtocol)
 {
-	return g_RehldsHookchains.m_SV_CheckIPRestrictions.callChain(SV_CheckIPRestrictions_internal, 0, adr, nAuthProtocol);
+	return g_RehldsHookchains.m_SV_CheckIPRestrictions.callChain(SV_CheckIPRestrictions_internal, adr, nAuthProtocol);
 }
 
 /* <a743d> ../engine/sv_main.c:2393 */
@@ -1909,7 +1909,7 @@ int SV_CheckIPConnectionReuse(netadr_t *adr)
 
 int SV_FinishCertificateCheck(netadr_t *adr, int nAuthProtocol, char *szRawCertificate, char *userinfo)
 {
-	return g_RehldsHookchains.m_SV_FinishCertificateCheck.callChain(SV_FinishCertificateCheck_internal, 0, adr, nAuthProtocol, szRawCertificate, userinfo);
+	return g_RehldsHookchains.m_SV_FinishCertificateCheck.callChain(SV_FinishCertificateCheck_internal, adr, nAuthProtocol, szRawCertificate, userinfo);
 }
 
 /* <a74f4> ../engine/sv_main.c:2461 */
@@ -1950,7 +1950,7 @@ int EXT_FUNC SV_FinishCertificateCheck_internal(netadr_t *adr, int nAuthProtocol
 
 int SV_CheckKeyInfo(netadr_t *adr, char *protinfo, short unsigned int *port, int *pAuthProtocol, char *pszRaw, char *cdkey)
 {
-	return g_RehldsHookchains.m_SV_CheckKeyInfo.callChain(SV_CheckKeyInfo_internal, 0, adr, protinfo, port, pAuthProtocol, pszRaw, cdkey);
+	return g_RehldsHookchains.m_SV_CheckKeyInfo.callChain(SV_CheckKeyInfo_internal, adr, protinfo, port, pAuthProtocol, pszRaw, cdkey);
 }
 
 /* <a7584> ../engine/sv_main.c:2527 */
@@ -7124,7 +7124,7 @@ void SV_Shutdown(void)
 
 qboolean SV_CompareUserID(USERID_t *id1, USERID_t *id2)
 {
-	return g_RehldsHookchains.m_SV_CompareUserID.callChain(SV_CompareUserID_internal, 0, id1, id2);
+	return g_RehldsHookchains.m_SV_CompareUserID.callChain(SV_CompareUserID_internal, id1, id2);
 }
 
 /* <a5ef9> ../engine/sv_main.c:9585 */
@@ -7153,7 +7153,7 @@ qboolean EXT_FUNC SV_CompareUserID_internal(USERID_t *id1, USERID_t *id2)
 
 char* SV_GetIDString(USERID_t *id)
 {
-	return g_RehldsHookchains.m_SV_GetIDString.callChain(SV_GetIDString_internal, 0, id);
+	return g_RehldsHookchains.m_SV_GetIDString.callChain(SV_GetIDString_internal, id);
 }
 
 /* <aad82> ../engine/sv_main.c:9625 */

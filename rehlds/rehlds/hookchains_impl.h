@@ -28,96 +28,82 @@
 #pragma once
 #include "hookchains.h"
 
-#define MAX_HOOKS_IN_CHAIN 64
+#define MAX_HOOKS_IN_CHAIN 63
 
-class AbstractHookChain {
-
-protected:
-	void* m_Hooks[MAX_HOOKS_IN_CHAIN];
-	void* m_OriginalFunc;
-	int m_CurHook;
-	int m_NumHooks;
-
-	bool m_bOriginalCalled;
-
-	AbstractHookChain();
-
-	void* nextHook();
-
-public:
-	void init(void* origFunc, void* hooks, int numHooks);
-};
-
-
+// Implementation for chains in modules
 template<typename t_ret, typename ...t_args>
-class IHookChainImpl : public IHookChain<t_ret, t_args...>, public AbstractHookChain {
+class IHookChainImpl : public IHookChain<t_ret, t_args...> {
 public:
 	typedef t_ret(*hookfunc_t)(IHookChain<t_ret, t_args...>*, t_args...);
 	typedef t_ret(*origfunc_t)(t_args...);
 
-private:
-	t_ret m_OriginalReturnResult;
-
-public:
-	virtual ~IHookChainImpl() { }
-
-	IHookChainImpl(t_ret defaultResult) {
-		m_OriginalReturnResult = defaultResult;
+	IHookChainImpl(void** hooks, origfunc_t orig) : m_Hooks(hooks), m_OriginalFunc(orig)
+	{
+		if (orig == NULL)
+			rehlds_syserror("Non-void HookChain without original function.");
 	}
+
+	virtual ~IHookChainImpl() {}
 
 	virtual t_ret callNext(t_args... args) {
-		void* nextvhook = nextHook();
-		if (nextvhook) {
-			hookfunc_t nexthook = (hookfunc_t)nextvhook;
-			return nexthook(this, args...);
+		hookfunc_t nexthook = (hookfunc_t)m_Hooks[0];
+
+		if (nexthook)
+		{
+			IHookChainImpl nextChain(m_Hooks + 1, m_OriginalFunc);
+			return nexthook(&nextChain, args...);
 		}
 
-		origfunc_t origfunc = (origfunc_t)m_OriginalFunc;
-		m_OriginalReturnResult = origfunc(args...);
-		m_bOriginalCalled = true;
-		return m_OriginalReturnResult;
+		return m_OriginalFunc(args...);
 	}
 
-	virtual t_ret getOriginalReturnResult() {
-		return m_OriginalReturnResult;
+	virtual t_ret callOriginal(t_args... args) {
+		return m_OriginalFunc(args...);
 	}
 
-	virtual bool isOriginalCalled() {
-		return m_bOriginalCalled;
-	}
+private:
+	void** m_Hooks;
+	origfunc_t m_OriginalFunc;
 };
 
+// Implementation for void chains in modules
 template<typename ...t_args>
-class IVoidHookChainImpl : public IVoidHookChain<t_args...>, public AbstractHookChain {
+class IVoidHookChainImpl : public IVoidHookChain<t_args...> {
 public:
 	typedef void(*hookfunc_t)(IVoidHookChain<t_args...>*, t_args...);
 	typedef void(*origfunc_t)(t_args...);
 
-	virtual ~IVoidHookChainImpl() { }
+	IVoidHookChainImpl(void** hooks, origfunc_t orig) : m_Hooks(hooks), m_OriginalFunc(orig) {}
+	virtual ~IVoidHookChainImpl() {}
 
 	virtual void callNext(t_args... args) {
-		void* nextvhook = nextHook();
-		if (nextvhook) {
-			hookfunc_t nexthook = (hookfunc_t)nextvhook;
-			nexthook(this, args...);
-			return;
-		}
+		hookfunc_t nexthook = (hookfunc_t)m_Hooks[0];
 
+		if (nexthook)
+		{
+			IVoidHookChainImpl nextChain(m_Hooks + 1, m_OriginalFunc);
+			nexthook(&nextChain, args...);
+		}
+		else
+		{
+			if (m_OriginalFunc)
+				m_OriginalFunc(args...);
+		}
+	}
+
+	virtual void callOriginal(t_args... args) {
 		origfunc_t origfunc = (origfunc_t)m_OriginalFunc;
-		if (origfunc) {
-			origfunc(args...);
-		}
-		m_bOriginalCalled = true;
+		origfunc(args...);
 	}
 
-	virtual bool isOriginalCalled() {
-		return m_bOriginalCalled;
-	}
+private:
+	void** m_Hooks;
+	origfunc_t m_OriginalFunc;
 };
 
 class AbstractHookChainRegistry {
 protected:
-	void* m_Hooks[MAX_HOOKS_IN_CHAIN];
+	void* m_Hooks[MAX_HOOKS_IN_CHAIN + 1]; // +1 for null
 	int m_NumHooks;
 
 protected:
@@ -136,9 +122,8 @@ public:
 
 	virtual ~IHookChainRegistryImpl() { }
 
-	t_ret callChain(origfunc_t origFunc, t_ret defaultResult, t_args... args) {
-		IHookChainImpl<t_ret, t_args...> chain(defaultResult);
-		chain.init((void*)origFunc, m_Hooks, m_NumHooks);
+	t_ret callChain(origfunc_t origFunc, t_args... args) {
+		IHookChainImpl<t_ret, t_args...> chain(m_Hooks, origFunc);
 		return chain.callNext(args...);
 	}
 
@@ -159,14 +144,14 @@ public:
 	virtual ~IVoidHookChainRegistryImpl() { }
 
 	void callChain(origfunc_t origFunc, t_args... args) {
-		IVoidHookChainImpl<t_args...> chain;
-		chain.init((void*)origFunc, m_Hooks, m_NumHooks);
+		IVoidHookChainImpl<t_args...> chain(m_Hooks, origFunc);
 		chain.callNext(args...);
 	}
 
 	virtual void registerHook(hookfunc_t hook) {
 		addHook((void*)hook);
 	}
+
 	virtual void unregisterHook(hookfunc_t hook) {
 		removeHook((void*)hook);
 	}

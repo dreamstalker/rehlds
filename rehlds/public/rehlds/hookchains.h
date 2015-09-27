@@ -30,12 +30,22 @@
 template<typename t_ret, typename ...t_args>
 class IHookChain {
 protected:
-	virtual ~IHookChain() {	}
+	virtual ~IHookChain() {}
 
 public:
 	virtual t_ret callNext(t_args... args) = 0;
-	virtual t_ret getOriginalReturnResult() = 0;
-	virtual bool isOriginalCalled() = 0;
+	virtual t_ret callOriginal(t_args... args) = 0;
+};
+
+template<typename ...t_args>
+class IVoidHookChain
+{
+protected:
+	virtual ~IVoidHookChain() {}
+
+public:
+	virtual void callNext(t_args... args) = 0;
+	virtual void callOriginal(t_args... args) = 0;
 };
 
 // Hook chain registry(for hooks [un]registration)
@@ -46,16 +56,6 @@ public:
 
 	virtual void registerHook(hookfunc_t hook) = 0;
 	virtual void unregisterHook(hookfunc_t hook) = 0;
-};
-
-
-
-
-template<typename ...t_args>
-class IVoidHookChain {
-public:
-	virtual void callNext(t_args... args) = 0;
-	virtual bool isOriginalCalled() = 0;
 };
 
 // Hook chain registry(for hooks [un]registration)

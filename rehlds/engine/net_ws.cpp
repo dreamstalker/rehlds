@@ -1307,7 +1307,7 @@ bool EXT_FUNC NET_GetPacketPreprocessor(uint8* data, unsigned int len, const net
 qboolean NET_GetPacket(netsrc_t sock) {
 	qboolean getRes = NET_GetPacket_internal(sock);
 	while (getRes) {
-		bool pass = g_RehldsHookchains.m_PreprocessPacket.callChain(NET_GetPacketPreprocessor, FALSE, net_message.data, net_message.cursize, net_from);
+		bool pass = g_RehldsHookchains.m_PreprocessPacket.callChain(NET_GetPacketPreprocessor, net_message.data, net_message.cursize, net_from);
 		if (pass) {
 			return 1;
 		}
