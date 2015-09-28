@@ -55,6 +55,9 @@ protected:
 	} \
 }
 
+#define CHECK_WARNING_OUT(msg, condition) { if (!(condition)) { Assertions::ConditionFailed(msg,#condition, __FILE__, __LINE__, true); return; \
+	} \
+}
 
 #define ZSTR_EQUAL(msg,expected,actual) { \
 	Assertions::StringEquals((msg), (expected), (actual), __FILE__, __LINE__); \

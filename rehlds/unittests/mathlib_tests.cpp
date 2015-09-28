@@ -5,15 +5,7 @@
 
 TEST(AngleVectorsTest, MathLib, 1000) {
 	Sys_CheckCpuInstructionsSupport();
-	//CHECK("SSE4.1 Support", cpuinfo.sse4_1);
-	if (!cpuinfo.sse4_1)
-	{
-		std::stringstream ss;
-		ss << "Test '" __FUNCTION__ "' not runned: sse 4.1 doesn't supported";
-		std::cout << ss.str() << std::endl;
-		std::cout.flush();
-		return;
-	}
+	CHECK_WARNING_OUT("SSE4.1 Support", cpuinfo.sse4_1);
 
 	struct testdata_t {
 		vec3_t angles;
@@ -50,15 +42,7 @@ TEST(AngleVectorsTest, MathLib, 1000) {
 
 TEST(AngleVectorsTransposeTest, MathLib, 1000) {
 	Sys_CheckCpuInstructionsSupport();
-	//CHECK("SSE4.1 Support", cpuinfo.sse4_1);
-	if (!cpuinfo.sse4_1)
-	{
-		std::stringstream ss;
-		ss << "Test '" __FUNCTION__ "' not runned: sse 4.1 doesn't supported";
-		std::cout << ss.str() << std::endl;
-		std::cout.flush();
-		return;
-	}
+	CHECK_WARNING_OUT("SSE4.1 Support", cpuinfo.sse4_1);
 
 	struct testdata_t {
 		vec3_t angles;
@@ -95,15 +79,7 @@ TEST(AngleVectorsTransposeTest, MathLib, 1000) {
 
 TEST(AngleMatrixTest, MathLib, 1000) {
 	Sys_CheckCpuInstructionsSupport();
-	//CHECK("SSE4.1 Support", cpuinfo.sse4_1);
-	if (!cpuinfo.sse4_1)
-	{
-		std::stringstream ss;
-		ss << "Test '" __FUNCTION__ "' not runned: sse 4.1 doesn't supported";
-		std::cout << ss.str() << std::endl;
-		std::cout.flush();
-		return;
-	}
+	CHECK_WARNING_OUT("SSE4.1 Support", cpuinfo.sse4_1);
 
 	struct testdata_t {
 		vec3_t angles;
@@ -145,15 +121,7 @@ TEST(AngleMatrixTest, MathLib, 1000) {
 
 TEST(DotProductTest, MathLib, 1000) {
 	Sys_CheckCpuInstructionsSupport();
-	//CHECK("SSE4.1 Support", cpuinfo.sse4_1);
-	if (!cpuinfo.sse4_1)
-	{
-		std::stringstream ss;
-		ss << "Test '" __FUNCTION__ "' not runned: sse 4.1 doesn't supported";
-		std::cout << ss.str() << std::endl;
-		std::cout.flush();
-		return;
-	}
+	CHECK_WARNING_OUT("SSE4.1 Support", cpuinfo.sse4_1);
 
 	struct testdata_t {
 		vec3_t v1;
@@ -179,15 +147,7 @@ TEST(DotProductTest, MathLib, 1000) {
 
 TEST(CrossProductTest, MathLib, 1000) {
 	Sys_CheckCpuInstructionsSupport();
-	//CHECK("SSE4.1 Support", cpuinfo.sse4_1);
-	if (!cpuinfo.sse4_1)
-	{
-		std::stringstream ss;
-		ss << "Test '" __FUNCTION__ "' not runned: sse 4.1 doesn't supported";
-		std::cout << ss.str() << std::endl;
-		std::cout.flush();
-		return;
-	}
+	CHECK_WARNING_OUT("SSE4.1 Support", cpuinfo.sse4_1);
 
 	struct testdata_t {
 		vec3_t v1;
@@ -217,15 +177,7 @@ TEST(CrossProductTest, MathLib, 1000) {
 
 TEST(LengthTest, MathLib, 1000) {
 	Sys_CheckCpuInstructionsSupport();
-	//CHECK("SSE4.1 Support", cpuinfo.sse4_1);
-	if (!cpuinfo.sse4_1)
-	{
-		std::stringstream ss;
-		ss << "Test '" __FUNCTION__ "' not runned: sse 4.1 doesn't supported";
-		std::cout << ss.str() << std::endl;
-		std::cout.flush();
-		return;
-	}
+	CHECK_WARNING_OUT("SSE4.1 Support", cpuinfo.sse4_1);
 
 	struct testdata_t {
 		vec3_t v;
@@ -250,15 +202,7 @@ TEST(LengthTest, MathLib, 1000) {
 
 TEST(Length2DTest, MathLib, 1000) {
 	Sys_CheckCpuInstructionsSupport();
-	//CHECK("SSE4.1 Support", cpuinfo.sse4_1);
-	if (!cpuinfo.sse4_1)
-	{
-		std::stringstream ss;
-		ss << "Test '" __FUNCTION__ "' not runned: sse 4.1 doesn't supported";
-		std::cout << ss.str() << std::endl;
-		std::cout.flush();
-		return;
-	}
+	CHECK_WARNING_OUT("SSE4.1 Support", cpuinfo.sse4_1);
 
 	struct testdata_t {
 		vec3_t v;
@@ -283,15 +227,7 @@ TEST(Length2DTest, MathLib, 1000) {
 
 TEST(VectorNormalizeTest, MathLib, 1000) {
 	Sys_CheckCpuInstructionsSupport();
-	//CHECK("SSE4.1 Support", cpuinfo.sse4_1);
-	if (!cpuinfo.sse4_1)
-	{
-		std::stringstream ss;
-		ss << "Test '" __FUNCTION__ "' not runned: sse 4.1 doesn't supported";
-		std::cout << ss.str() << std::endl;
-		std::cout.flush();
-		return;
-	}
+	CHECK_WARNING_OUT("SSE4.1 Support", cpuinfo.sse4_1);
 
 	struct testdata_t {
 		vec3_t vecIn;
@@ -322,15 +258,7 @@ TEST(VectorNormalizeTest, MathLib, 1000) {
 
 TEST(VectorAnglesTest, MathLib, 1000) {
 	Sys_CheckCpuInstructionsSupport();
-	//CHECK("SSE4.1 Support", cpuinfo.sse4_1);
-	if (!cpuinfo.sse4_1)
-	{
-		std::stringstream ss;
-		ss << "Test '" __FUNCTION__ "' not runned: sse 4.1 doesn't supported";
-		std::cout << ss.str() << std::endl;
-		std::cout.flush();
-		return;
-	}
+	CHECK_WARNING_OUT("SSE4.1 Support", cpuinfo.sse4_1);
 
 	struct testdata_t {
 		vec3_t forward;

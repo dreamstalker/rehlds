@@ -13,6 +13,10 @@ public:
 	int getFailureCount() {
 		return failureCount;
 	}
+	int getWarningCount() {
+		return warningCount;
+	}
 private:
 	int				failureCount;
+	int			warningCount;
 };

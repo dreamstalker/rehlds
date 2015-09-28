@@ -6,12 +6,13 @@
 class TestFailException : public std::exception {
 public:
 
-	TestFailException(std::string message, std::string fileName, long lineNumber) {
+	TestFailException(std::string message, std::string fileName, long lineNumber, bool onlyWarning = false) {
 		std::stringstream ss;
 		ss << message << " at " << fileName << " line " << lineNumber;
 		this->message = ss.str();
 		this->fileName = fileName;
 		this->lineNumber = lineNumber;
+		this->warning = onlyWarning;
 	}
 
 	virtual ~TestFailException() throw() {
@@ -21,6 +22,7 @@ public:
 	std::string message;
 	std::string fileName;
 	long lineNumber;
+	bool warning;
 
 	virtual const char * what() const throw() {
 		return message.c_str();
@@ -35,6 +37,7 @@ public:
 		this->message = e.message;
 		this->fileName = e.fileName;
 		this->lineNumber = e.lineNumber;
+		this->warning = e.warning;
 	}
 
 	Failure (std::string message, std::string testName) {
@@ -48,6 +51,7 @@ public:
 	std::string message;
 	std::string fileName;
 	long lineNumber;
+	bool warning;
 };
 
 

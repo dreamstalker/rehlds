@@ -53,6 +53,9 @@ int GradleAdapter::runTest(const char* groupName, const char* testName) {
 	if (result.getFailureCount()) {
 		return 1;
 	}
+	else if (result.getWarningCount()) {
+		return 3;
+	}
 	else {
 		return 0;
 	}
@@ -61,6 +64,7 @@ int GradleAdapter::runTest(const char* groupName, const char* testName) {
 int GradleAdapter::runGroup(const char* groupName) {
 	Test* curTest = TestRegistry::getFirstTest();
 	int ranTests = 0;
+	int warnTest = 0;
 	while (curTest != NULL) {
 		if (strcmp(groupName, curTest->getGroup())) {
 			curTest = curTest->getNext();
@@ -75,12 +79,22 @@ int GradleAdapter::runGroup(const char* groupName) {
 			return 1;
 		}
 
+		if (result.getWarningCount()) {
+			
+			warnTest++;
+		}
+
 		curTest = curTest->getNext();
 	}
 
 	if (ranTests == 0) {
 		printf("No tests with group='%s' found\n", groupName);
 		return 2;
+	}
+
+	if (warnTest > 0) {
+		printf("There were no test failures, but with warnings: %d; Tests executed: %d\n", warnTest, ranTests);
+		return 3;
 	}
 
 	printf("There were no test failures; Tests executed: %d\n", ranTests);
@@ -90,6 +104,7 @@ int GradleAdapter::runGroup(const char* groupName) {
 int GradleAdapter::runAllTests() {
 	Test* curTest = TestRegistry::getFirstTest();
 	int ranTests = 0;
+	int warnTest = 0;
 	while (curTest != NULL) {
 		TestResult result;
 		curTest->run(result);
@@ -99,7 +114,17 @@ int GradleAdapter::runAllTests() {
 			return 1;
 		}
 
+		if (result.getWarningCount()) {
+			
+			warnTest++;
+		}
+
 		curTest = curTest->getNext();
+	}
+
+	if (warnTest > 0) {
+		printf("There were no test failures, but with warnings: %d; Tests executed: %d\n", warnTest, ranTests);
+		return 3;
 	}
 
 	printf("There were no test failures; Tests executed: %d\n", ranTests);

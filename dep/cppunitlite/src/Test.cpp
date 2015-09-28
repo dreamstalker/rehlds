@@ -30,8 +30,8 @@ void Test::setNext(Test *test)
 void Test::run(TestResult &result) {
 	try {
 		runInternal();
-	} catch (TestFailException *e) {
-		result.addFailure(Failure(*e, name_));
+	} catch (TestFailException &e) {
+		result.addFailure(Failure(e, name_));
 	} catch (std::exception &e) {
 		std::stringstream ss;
 		ss << "unexpected exception " << e.what();

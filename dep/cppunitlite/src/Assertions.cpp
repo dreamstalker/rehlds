@@ -26,10 +26,10 @@ void Assertions::StringEquals(std::string message, const char* expected, const c
 	}
 }
 
-void Assertions::ConditionFailed(std::string message, std::string condition, const char* fileName, long lineNumber) {
+void Assertions::ConditionFailed(std::string message, std::string condition, const char* fileName, long lineNumber, bool onlyWarning) {
 	std::stringstream ss;
 	ss << message << " (condition failed: " << condition << ")";
-	throw TestFailException(ss.str(), std::string(fileName), lineNumber);
+	throw TestFailException(ss.str(), std::string(fileName), lineNumber, onlyWarning);
 }
 
 void Assertions::LongEquals(std::string message, long expected, long actual, const char* fileName, long lineNumber) {

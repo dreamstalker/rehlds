@@ -6,15 +6,7 @@
 TEST(CRC32C_Hash, CRC32C, 1000) {
 
 	Sys_CheckCpuInstructionsSupport();
-	//CHECK("SSE4.1 Support", cpuinfo.sse4_1);
-	if (!cpuinfo.sse4_2)
-	{
-		std::stringstream ss;
-		ss << "Test '" __FUNCTION__ "' not runned: sse 4.2 doesn't supported";
-		std::cout << ss.str() << std::endl;
-		std::cout.flush();
-		return;
-	}
+	CHECK_WARNING_OUT("SSE4.1 Support", cpuinfo.sse4_1);
 
 	struct testdata_t {
 		const char* src;
