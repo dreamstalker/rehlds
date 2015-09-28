@@ -25,6 +25,7 @@ class CppUnitTestPlugin implements Plugin<Project> {
 
     private static class TestExecStatus {
         boolean successful
+	boolean warning
         int exitCode
         String output
         long durationMsec
@@ -119,7 +120,8 @@ class CppUnitTestPlugin implements Plugin<Project> {
 
         return new TestExecStatus(
                 exitCode: exitVal,
-                successful: (exitVal == 0),
+                successful: (exitVal == 0 || exitVal == 3),
+		warning: (exitVal == 3),
                 output: sout.toString(),
                 durationMsec: endTime - startTime,
                 cmdLine: cmdParams.join(' '),
@@ -201,6 +203,7 @@ class CppUnitTestPlugin implements Plugin<Project> {
                 println "Running ${root.test.size()} tests..."
                 TeamCityIntegration.suiteStarted("unitTests.${libBin.name}")
                 int failCount = 0;
+                int warnCount = 0;	
                 root.test.list().each { testInfo ->
                     def testName = '' + testInfo.@name.text()
                     def testGroup = '' + testInfo.@group.text()
@@ -223,7 +226,14 @@ class CppUnitTestPlugin implements Plugin<Project> {
                         failCount++
                     } else {
                         if (!TeamCityIntegration.writeOutput) {
-                            println " OK"
+
+                                if (testExecStatus.warning) {
+                                        println " WARNING"
+                                        dumpTestExecStatus(testExecStatus)
+                                        warnCount++
+                                }
+                                else
+                                        println " OK"
                         }
                     }
 
@@ -235,6 +245,10 @@ class CppUnitTestPlugin implements Plugin<Project> {
 
                 if (failCount) {
                     throw new GradleException("CPP unit tests: ${failCount} tests failed");
+                }
+
+                else if (warnCount) {
+                    println "CPP unit tests: ${warnCount} tests warnings";
                 }
             }
         })
