@@ -6,7 +6,7 @@
 TEST(CRC32C_Hash, CRC32C, 1000) {
 
 	Sys_CheckCpuInstructionsSupport();
-	CHECK_WARNING_OUT("SSE4.1 Support", cpuinfo.sse4_1);
+	CHECK_WARNING_OUT("SSE4.2 Support", cpuinfo.sse4_2);
 
 	struct testdata_t {
 		const char* src;

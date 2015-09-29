@@ -1251,7 +1251,7 @@ void NET_FreeMsg(net_messages_t *pmsg)
 }
 
 /* <d40a2> ../engine/net_ws.c:1391 */
-qboolean NET_GetPacket_internal(netsrc_t sock)
+qboolean NET_GetPacket(netsrc_t sock)
 {
 	net_messages_t *pmsg;                                        //  1393
 	qboolean bret;                                                //  1396
@@ -1298,25 +1298,6 @@ qboolean NET_GetPacket_internal(netsrc_t sock)
 	}
 	NET_ThreadUnlock();
 	return bret;
-}
-
-bool EXT_FUNC NET_GetPacketPreprocessor(uint8* data, unsigned int len, const netadr_t& srcAddr) {
-	return true;
-}
-
-qboolean NET_GetPacket(netsrc_t sock) {
-	qboolean getRes = NET_GetPacket_internal(sock);
-	while (getRes) {
-		bool pass = g_RehldsHookchains.m_PreprocessPacket.callChain(NET_GetPacketPreprocessor, net_message.data, net_message.cursize, net_from);
-		if (pass) {
-			return 1;
-		}
-
-		//packet was consumed by 3rd party plugin, try to read another one
-		getRes = NET_GetPacket_internal(sock);
-	}
-
-	return 0;
 }
 
 /* <d41a9> ../engine/net_ws.c:1454 */
