@@ -91,13 +91,6 @@
 #define HL_GENERIC_MAX 512
 #define HL_EVENT_MAX 256
 
-// Authentication types
-#define AUTH_IDTYPE_UNKNOWN	0
-#define AUTH_IDTYPE_STEAM	1
-#define AUTH_IDTYPE_VALVE	2
-#define AUTH_IDTYPE_LOCAL	3
-
-
 /* <87d6f> ../engine/server.h:43 */
 typedef enum redirect_e
 {

@@ -3560,6 +3560,11 @@ void SV_SendBan(void)
 	SZ_Clear(&net_message);
 }
 
+bool EXT_FUNC NET_GetPacketPreprocessor(uint8* data, unsigned int len, const netadr_t& srcAddr)
+{
+	return true;
+}
+
 /* <ab9af> ../engine/sv_main.c:4818 */
 void SV_ReadPackets(void)
 {
@@ -3570,6 +3575,10 @@ void SV_ReadPackets(void)
 			SV_SendBan();
 			continue;
 		}
+
+		bool pass = g_RehldsHookchains.m_PreprocessPacket.callChain(NET_GetPacketPreprocessor, net_message.data, net_message.cursize, net_from);
+		if (!pass)
+			continue;
 
 		if (*(uint32 *)net_message.data == 0xFFFFFFFF)
 		{
