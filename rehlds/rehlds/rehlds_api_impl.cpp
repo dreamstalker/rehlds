@@ -81,6 +81,10 @@ void EXT_FUNC MSG_EndBitWriting_api(sizebuf_t *buf) {
 	MSG_EndBitWriting(buf);
 }
 
+cvar_t* EXT_FUNC GetCvarVars_api() {
+	return cvar_vars;
+}
+
 CRehldsServerStatic g_RehldsServerStatic;
 CRehldsServerData g_RehldsServerData;
 CRehldsHookchains g_RehldsHookchains;
@@ -115,7 +119,8 @@ RehldsFuncs_t g_RehldsApiFuncs =
 	&MSG_WriteBits_api,
 	&MSG_WriteBitVec3Coord_api,
 	&MSG_EndBitWriting_api,
-	&SZ_GetSpace
+	&SZ_GetSpace,
+	&GetCvarVars_api
 };
 
 sizebuf_t* EXT_FUNC GetNetMessage_api()
