@@ -154,7 +154,7 @@ void setupToolchain(NativeBinarySpec b) {
                 '_unlink': 'unlink',
                 '_vsnprintf': 'vsnprintf',
         ])
-        cfg.compilerOptions.args '-Qoption,cpp,--treat_func_as_string_literal_cpp'
+        cfg.compilerOptions.args '-Qoption,cpp,--treat_func_as_string_literal_cpp', '-fvisibility=hidden', '-fvisibility-inlines-hidden', '-s', '-g0', '-fno-rtti'
         cfg.projectLibpath(project, '/lib/linux32')
         cfg.extraLibs 'rt', 'dl', 'm', 'steam_api'
     }
