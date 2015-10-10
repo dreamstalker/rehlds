@@ -1831,7 +1831,7 @@ typedef struct challenge_s
 	int time;
 } challenge_t;
 
-challenge_t g_rg_sv_challenges[1024];
+challenge_t g_rg_sv_challenges[MAX_CHALLENGES];
 #ifdef REHLDS_OPT_PEDANTIC
 int g_oldest_challenge = 0;
 #endif
@@ -2418,25 +2418,17 @@ void SVC_Ping(void)
 	NET_SendPacket(NS_SERVER, sizeof(data), data, net_from);
 }
 
-/* <a78d3> ../engine/sv_main.c:3208 */
-void SVC_GetChallenge(void)
+int SV_GetChallenge(netadr_t& adr)
 {
 	int i;
 #ifndef REHLDS_OPT_PEDANTIC
 	int oldest = 0;
 	int oldestTime = INT_MAX;
 #endif
-	char data[1024];
-	qboolean steam = FALSE;
-
-	if (Cmd_Argc() == 2 && !Q_stricmp(Cmd_Argv(1), "steam"))
-	{
-		steam = TRUE;
-	}
 
 	for (i = 0; i < MAX_CHALLENGES; i++)
 	{
-		if (NET_CompareBaseAdr(net_from, g_rg_sv_challenges[i].adr))
+		if (NET_CompareBaseAdr(adr, g_rg_sv_challenges[i].adr))
 			break;
 #ifndef REHLDS_OPT_PEDANTIC
 		if (g_rg_sv_challenges[i].time < oldestTime)
@@ -2446,7 +2438,7 @@ void SVC_GetChallenge(void)
 		}
 #endif
 	}
-	
+
 	if (i == MAX_CHALLENGES)
 	{
 #ifdef REHLDS_OPT_PEDANTIC
@@ -2464,32 +2456,39 @@ void SVC_GetChallenge(void)
 #else // REHLDS_FIXES
 		g_rg_sv_challenges[i].challenge = (RandomLong(0, 36863) << 16) | (RandomLong(0, 65535));
 #endif // REHLDS_FIXES
-		g_rg_sv_challenges[i].adr = net_from;
+		g_rg_sv_challenges[i].adr = adr;
 		g_rg_sv_challenges[i].time = (int)realtime;
 	}
+
+	return g_rg_sv_challenges[i].challenge;
+}
+
+/* <a78d3> ../engine/sv_main.c:3208 */
+void SVC_GetChallenge(void)
+{
+	char data[1024];
+	qboolean steam = (Cmd_Argc() == 2 && !Q_stricmp(Cmd_Argv(1), "steam"));
+	int challenge = SV_GetChallenge(net_from);
+
 	if (steam)
-		Q_snprintf(data, sizeof(data), "\xFF\xFF\xFF\xFF%c00000000 %u 3 %I64i %d\n", S2C_CHALLENGE, g_rg_sv_challenges[i].challenge, Steam_GSGetSteamID(), Steam_GSBSecure());
+		Q_snprintf(data, sizeof(data), "\xFF\xFF\xFF\xFF%c00000000 %u 3 %I64i %d\n", S2C_CHALLENGE, challenge, Steam_GSGetSteamID(), Steam_GSBSecure());
 	else
 	{
 		Con_DPrintf("Server requiring authentication\n");
-		Q_snprintf(data, sizeof(data), "\xFF\xFF\xFF\xFF%c00000000 %u 2\n", S2C_CHALLENGE, g_rg_sv_challenges[i].challenge);
+		Q_snprintf(data, sizeof(data), "\xFF\xFF\xFF\xFF%c00000000 %u 2\n", S2C_CHALLENGE, challenge);
 	}
 
 	// Give 3-rd party plugins a chance to modify challenge response
-	g_RehldsHookchains.m_SVC_GetChallenge_mod.callChain(NULL, data, g_rg_sv_challenges[i].challenge);
+	g_RehldsHookchains.m_SVC_GetChallenge_mod.callChain(NULL, data, challenge);
 	NET_SendPacket(NS_SERVER, Q_strlen(data) + 1, data, net_from);
 }
 
 /* <a794c> ../engine/sv_main.c:3292 */
 void SVC_ServiceChallenge(void)
 {
-	int i;
-#ifndef REHLDS_OPT_PEDANTIC
-	int oldest = 0;
-	int oldestTime = INT_MAX;
-#endif
 	char data[128];
 	const char *type;
+	int challenge;
 
 	if (Cmd_Argc() != 2)
 		return;
@@ -2501,40 +2500,9 @@ void SVC_ServiceChallenge(void)
 	if (!type[0] || Q_stricmp(type, "rcon"))
 		return;
 
-	for (i = 0; i < MAX_CHALLENGES; i++)
-	{
-		if (NET_CompareBaseAdr(net_from, g_rg_sv_challenges[i].adr))
-			break;
+	challenge = SV_GetChallenge(net_from);
 
-#ifndef REHLDS_OPT_PEDANTIC
-		if (g_rg_sv_challenges[i].time < oldestTime)
-		{
-			oldestTime = g_rg_sv_challenges[i].time;
-			oldest = i;
-		}
-#endif
-	}
-	if (i == MAX_CHALLENGES) // no challenge for ip
-	{
-#ifdef REHLDS_OPT_PEDANTIC
-		// oldest challenge is always next after last generated
-		i = g_oldest_challenge++;
-
-		if(g_oldest_challenge >= MAX_CHALLENGES)
-			g_oldest_challenge = 0;
-#else
-		i = oldest;
-#endif
-		// generate new challenge number
-#ifdef REHLDS_FIXES
-		g_rg_sv_challenges[i].challenge = (RandomLong(0, 0x7fff) << 16) | (RandomLong(0, 0xffff));
-#else // REHLDS_FIXES
-		g_rg_sv_challenges[i].challenge = (RandomLong(0, 36863) << 16) | (RandomLong(0, 65535));
-#endif // REHLDS_FIXES
-		g_rg_sv_challenges[i].adr = net_from;
-		g_rg_sv_challenges[i].time = (int)realtime;
-	}
-	Q_snprintf(data, sizeof(data), "%c%c%c%cchallenge %s %u\n", 255, 255, 255, 255, type, g_rg_sv_challenges[i].challenge);
+	Q_snprintf(data, sizeof(data), "%c%c%c%cchallenge %s %u\n", 255, 255, 255, 255, type, challenge);
 
 	NET_SendPacket(NS_SERVER, Q_strlen(data) + 1, data, net_from);
 }

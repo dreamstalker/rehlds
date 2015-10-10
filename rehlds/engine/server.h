@@ -40,6 +40,11 @@
 #define MAX_NAME				32
 #define MAX_LIGHTSTYLES			64
 #define MAX_PACKET_ENTITIES		256
+#ifdef REHLDS_OPT_PEDANTIC
+#define MAX_CHALLENGES			64
+#else
+#define MAX_CHALLENGES			1024
+#endif
 
 #include "custom_int.h"
 #include "crc.h"
@@ -573,7 +578,7 @@ extern int numipfilters;
 extern userfilter_t userfilters[32768];
 extern int numuserfilters;
 
-extern challenge_t g_rg_sv_challenges[1024];
+extern challenge_t g_rg_sv_challenges[MAX_CHALLENGES];
 
 
 #ifdef HOOK_ENGINE
@@ -647,6 +652,7 @@ int SV_FindEmptySlot(netadr_t *adr, int *pslot, client_t ** ppClient);
 void SV_ConnectClient(void);
 void SV_ConnectClient_internal(void);
 void SVC_Ping(void);
+int SV_GetChallenge(netadr_t& adr);
 void SVC_GetChallenge(void);
 void SVC_ServiceChallenge(void);
 void SV_ResetModInfo(void);
