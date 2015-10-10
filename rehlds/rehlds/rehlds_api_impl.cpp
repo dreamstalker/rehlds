@@ -120,7 +120,8 @@ RehldsFuncs_t g_RehldsApiFuncs =
 	&MSG_WriteBitVec3Coord_api,
 	&MSG_EndBitWriting_api,
 	&SZ_GetSpace,
-	&GetCvarVars_api
+	&GetCvarVars_api,
+	&SV_GetChallenge
 };
 
 sizebuf_t* EXT_FUNC GetNetMessage_api()
