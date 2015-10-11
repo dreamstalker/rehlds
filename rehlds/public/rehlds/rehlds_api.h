@@ -210,7 +210,7 @@ struct RehldsFuncs_t {
 	void(*MSG_EndBitWriting)(sizebuf_t *buf);
 	void*(*SZ_GetSpace)(sizebuf_t *buf, int length);
 	cvar_t*(*GetCvarVars)();
-	int (*SV_GetChallenge)(netadr_t& adr);
+	int (*SV_GetChallenge)(const netadr_t& adr);
 };
 
 class IRehldsApi {

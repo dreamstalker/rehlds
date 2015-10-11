@@ -314,7 +314,7 @@ qboolean NET_IsReservedAdr(netadr_t& a)
 }
 
 /* <d3352> ../engine/net_ws.c:332 */
-qboolean NET_CompareBaseAdr(netadr_t& a, netadr_t& b)
+qboolean NET_CompareBaseAdr(const netadr_t& a, const netadr_t& b)
 {
 	if (a.type != b.type)
 	{

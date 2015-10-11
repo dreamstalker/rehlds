@@ -234,7 +234,7 @@ NOXREF short unsigned int NET_HostToNetShort(short unsigned int us_in);
 qboolean NET_CompareAdr(netadr_t& a, netadr_t& b);
 qboolean NET_CompareClassBAdr(netadr_t& a, netadr_t& b);
 qboolean NET_IsReservedAdr(netadr_t& a);
-qboolean NET_CompareBaseAdr(netadr_t& a, netadr_t& b);
+qboolean NET_CompareBaseAdr(const netadr_t& a, const netadr_t& b);
 char *NET_AdrToString(const netadr_t& a);
 char *NET_BaseAdrToString(netadr_t& a);
 qboolean NET_StringToSockaddr(const char *s, struct sockaddr *sadr);
