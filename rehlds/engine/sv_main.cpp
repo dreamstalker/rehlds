@@ -194,7 +194,11 @@ cvar_t max_queries_window = { "max_queries_window", "60", FCVAR_SERVER | FCVAR_P
 cvar_t sv_logblocks = { "sv_logblocks", "0", FCVAR_SERVER, 0.0f, NULL };
 cvar_t sv_downloadurl = { "sv_downloadurl", "", FCVAR_PROTECTED, 0.0f, NULL };
 cvar_t sv_allow_dlfile = { "sv_allow_dlfile", "1", 0, 0.0f, NULL };
-cvar_t sv_version = { "sv_version", "", 0, 0.0f, NULL };
+#ifdef REHLDS_FIXES
+cvar_t sv_version = { "sv_version", "", FCVAR_SERVER, 0.0f, NULL };
+#else
+cvar_t sv_version = {"sv_version", "", 0, 0.0f, NULL};
+#endif
 
 cvar_t sv_rcon_minfailures = { "sv_rcon_minfailures", "5", 0, 0.0f, NULL };
 cvar_t sv_rcon_maxfailures = { "sv_rcon_maxfailures", "10", 0, 0.0f, NULL };
@@ -2418,7 +2422,7 @@ void SVC_Ping(void)
 	NET_SendPacket(NS_SERVER, sizeof(data), data, net_from);
 }
 
-int SV_GetChallenge(netadr_t& adr)
+int SV_GetChallenge(const netadr_t& adr)
 {
 	int i;
 #ifndef REHLDS_OPT_PEDANTIC

@@ -652,7 +652,7 @@ int SV_FindEmptySlot(netadr_t *adr, int *pslot, client_t ** ppClient);
 void SV_ConnectClient(void);
 void SV_ConnectClient_internal(void);
 void SVC_Ping(void);
-int SV_GetChallenge(netadr_t& adr);
+int SV_GetChallenge(const netadr_t& adr);
 void SVC_GetChallenge(void);
 void SVC_ServiceChallenge(void);
 void SV_ResetModInfo(void);

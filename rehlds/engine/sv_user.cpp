@@ -1404,12 +1404,23 @@ void SV_RestoreMove(client_t *_host_client)
 /* <bf8bd> ../engine/sv_user.c:1736 */
 void SV_ParseStringCommand(client_t *pSenderClient)
 {
+	//check string commands rate for this player
+#ifdef REHLDS_FIXES
+	g_StringCommandsRateLimiter.StringCommandIssued(pSenderClient - g_psvs.clients);
+
+	if (!pSenderClient->active) {
+		return; //return if player was kicked
+	}
+#endif
+
 	char *s = MSG_ReadString();
 	int ret = SV_ValidateClientCommand(s);
 	switch (ret)
 	{
 	case 0:
+#ifndef REHLDS_OPT_PEDANTIC
 		if (Q_strlen(s) > 127)
+#endif
 		{
 			s[127] = 0;
 		}
