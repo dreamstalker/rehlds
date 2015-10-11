@@ -1408,7 +1408,7 @@ void SV_ParseStringCommand(client_t *pSenderClient)
 #ifdef REHLDS_FIXES
 	g_StringCommandsRateLimiter.StringCommandIssued(pSenderClient - g_psvs.clients);
 
-	if (!pSenderClient->active) {
+	if (!pSenderClient->connected) {
 		return; //return if player was kicked
 	}
 #endif
@@ -1582,7 +1582,7 @@ void SV_ParseMove(client_t *pSenderClient)
 	}
 	g_MoveCommandRateLimiter.MoveCommandsIssued(host_client - g_psvs.clients, numCmdsToIssue);
 	
-	if (!host_client->active) {
+	if (!host_client->connected) {
 		return; //return if player was kicked
 	}
 #endif
