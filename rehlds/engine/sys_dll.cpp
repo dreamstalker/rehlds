@@ -1387,12 +1387,11 @@ void Con_SafePrintf(const char *fmt, ...)
 /* <8e00b> ../engine/sys_dll.c:2459 */
 #if defined(REHLDS_FIXES) && defined(REHLDS_FLIGHT_REC)
 // Always print debug logs to the flight recorder
-void Con_DPrintf(const char *fmt, ...)
+void EXT_FUNC Con_DPrintf(const char *fmt, ...)
 {
-	va_list argptr;
-
-	va_start(argptr, fmt);
 	char Dest[4096];
+	va_list argptr;
+	va_start(argptr, fmt);
 	Q_vsnprintf(Dest, sizeof(Dest), fmt, argptr);
 	va_end(argptr);
 
@@ -1405,7 +1404,7 @@ void Con_DPrintf(const char *fmt, ...)
 		if (con_debuglog)
 			Con_DebugLog("qconsole.log", "%s", Dest);
 #else
-		vfprintf(stdout, "%s", Dest);
+		vfprintf(stdout, fmt, argptr);
 		fflush(stdout);
 #endif // _WIN32
 	}
@@ -1413,7 +1412,7 @@ void Con_DPrintf(const char *fmt, ...)
 
 #else //defined(REHLDS_FIXES) and defined(REHLDS_FLIGHT_REC)
 
-void  EXT_FUNC Con_DPrintf(const char *fmt, ...)
+void EXT_FUNC Con_DPrintf(const char *fmt, ...)
 {
 	va_list argptr;
 
@@ -1434,4 +1433,5 @@ void  EXT_FUNC Con_DPrintf(const char *fmt, ...)
 	}
 	va_end(argptr);
 }
-#endif //defined(REHLDS_FIXES) and defined(REHLDS_FLIGHT_REC)
+
+#endif // defined(REHLDS_FIXES) and defined(REHLDS_FLIGHT_REC)
