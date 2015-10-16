@@ -114,10 +114,23 @@ decodeFinishedMaybeCESU8:
 	goto decodeFinished;
 }
 
+bool Q_iswprint(uchar16 c)
+{
+#ifdef _WIN32
+	return iswprint(c) != 0;
+#else
+	// TODO: implement me
+	// check it out if it is unprintable characters
+
+#endif // _WIN32
+
+	return true;
+}
+
 int __cdecl Q_IsUnprintableW(uchar16 c)
 {
 #ifdef REHLDS_FIXES
-	if (!iswprint(c))
+	if (!Q_iswprint(c))
 		return 1;
 #endif // REHLDS_FIXES
 

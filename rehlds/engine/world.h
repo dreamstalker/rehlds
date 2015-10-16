@@ -87,6 +87,8 @@ extern box_planes_t box_planes;
 extern beam_planes_t beam_planes;
 extern areanode_t sv_areanodes[32];
 extern int sv_numareanodes;
+
+extern cvar_t sv_force_ent_intersection;
 /*
 hull_t                     box_hull;
 hull_t                     beam_hull;
