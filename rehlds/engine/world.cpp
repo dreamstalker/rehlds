@@ -36,6 +36,7 @@ beam_planes_t beam_planes;
 areanode_t sv_areanodes[32];
 int sv_numareanodes;
 
+cvar_t sv_force_ent_intersection = { "sv_force_ent_intersection", "0", 0, 0.0f, NULL };
 
 /* <ca50b> ../engine/world.c:48 */
 void ClearLink(link_t *l)
@@ -1219,7 +1220,8 @@ void SV_ClipToLinks(areanode_t *node, moveclip_t *clip)
 			&& clip->boxmaxs[0] >= touch->v.absmin[0]
 			&& clip->boxmaxs[1] >= touch->v.absmin[1]
 			&& clip->boxmaxs[2] >= touch->v.absmin[2]
-			&& (touch->v.solid == SOLID_SLIDEBOX || SV_CheckSphereIntersection(touch, clip->start, clip->end))
+			&& ((touch->v.solid == SOLID_SLIDEBOX && sv_force_ent_intersection.string[0] == '0')
+				|| SV_CheckSphereIntersection(touch, clip->start, clip->end))
 			&& (!clip->passedict || clip->passedict->v.size[0] == 0.0f || touch->v.size[0] != 0.0f))
 		{
 			if (clip->trace.allsolid)

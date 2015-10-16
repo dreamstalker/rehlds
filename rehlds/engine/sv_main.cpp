@@ -7059,8 +7059,9 @@ void SV_Init(void)
 	Cvar_RegisterVariable(&sv_downloadurl);
 	Cvar_RegisterVariable(&sv_version);
 	Cvar_RegisterVariable(&sv_allow_dlfile);
-
-	for (int i = 0; i < 512; i++)
+	Cvar_RegisterVariable(&sv_force_ent_intersection);
+	
+	for (int i = 0; i < ARRAYSIZE(localmodels); i++)
 	{
 		Q_snprintf(localmodels[i], 5u, "*%i", i);
 	}
