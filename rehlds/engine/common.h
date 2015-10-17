@@ -117,26 +117,26 @@ extern int loadsize;
 #define _strlwr(p) for (int i = 0; p[i] != 0; i++) p[i] = tolower(p[i]);
 #endif
 
-#define Q_memset memset
-#define Q_memcpy memcpy
-#define Q_memmove memmove
-#define Q_strlen strlen
-#define Q_memcmp memcmp
-#define Q_strcpy strcpy
+#define Q_memset A_memset
+#define Q_memcpy A_memcpy
+#define Q_memmove A_memmove
+#define Q_strlen A_strlen
+#define Q_memcmp A_memcmp
+#define Q_strcpy A_strcpy
 #define Q_strncpy strncpy
 #define Q_strrchr strrchr
-#define Q_strcat strcat
+#define Q_strcat A_strcat
 #define Q_strncat strncat
-#define Q_strcmp strcmp
+#define Q_strcmp A_strcmp
 #define Q_strncmp strncmp
 //#define Q_strcasecmp _stricmp		// Use Q_stricmp
 //#define Q_strncasecmp _strnicmp	// Use Q_strnicmp
-#define Q_stricmp _stricmp
+#define Q_stricmp A_stricmp
 #define Q_strnicmp _strnicmp
-#define Q_strstr strstr
+#define Q_strstr A_strstr
 #define Q_strchr strchr
 #define Q_strrchr strrchr
-#define Q_strlwr _strlwr
+#define Q_strlwr A_strtolower
 #define Q_sprintf sprintf
 #define Q_snprintf _snprintf
 #define Q_atoi atoi

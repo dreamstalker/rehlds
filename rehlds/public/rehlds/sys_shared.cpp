@@ -42,14 +42,9 @@ cpuinfo_t cpuinfo;
 
 void Sys_CheckCpuInstructionsSupport(void)
 {
-	unsigned int cpuid_data[4];
+	int cpuid_data[4];
 
-	// eax = 1, ecx = 0
-#if defined(__GNUC__)
-	__get_cpuid(0x1, &cpuid_data[0], &cpuid_data[1], &cpuid_data[2], &cpuid_data[3]);
-#else //__GNUC__
-	__cpuidex((int*)cpuid_data, 1, 0);
-#endif //__GNUC__
+	cpuid_ex(cpuid_data, 1, 0);
 
 	cpuinfo.sse3 = (cpuid_data[2] & SSE3_FLAG) ? 1 : 0; // ecx
 	cpuinfo.ssse3 = (cpuid_data[2] & SSSE3_FLAG) ? 1 : 0;
@@ -57,12 +52,7 @@ void Sys_CheckCpuInstructionsSupport(void)
 	cpuinfo.sse4_2 = (cpuid_data[2] & SSE4_2_FLAG) ? 1 : 0;
 	cpuinfo.avx = (cpuid_data[2] & AVX_FLAG) ? 1 : 0;
 
-	// eax = 7, ecx = 0
-#if defined(__GNUC__)
-	__get_cpuid(0x7, &cpuid_data[0], &cpuid_data[1], &cpuid_data[2], &cpuid_data[3]);
-#else //__GNUC__
-	__cpuidex((int*)cpuid_data, 7, 0);
-#endif //__GNUC__
+	cpuid_ex(cpuid_data, 7, 0);
 
 	cpuinfo.avx2 = (cpuid_data[1] & AVX2_FLAG) ? 1 : 0; // ebx
 }

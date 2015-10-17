@@ -1,9 +1,9 @@
 #include "precompiled.h"
 
 cvar_t sv_rehlds_movecmdrate_max_avg = { "sv_rehlds_movecmdrate_max_avg", "750", 0, 750.0f, NULL };
-cvar_t sv_rehlds_movecmdrate_max_burst = { "sv_rehlds_movecmdrate_max_burst", "3500", 0, 3500.0f, NULL };
-cvar_t sv_rehlds_stringcmdrate_max_avg = {"sv_rehlds_stringcmdrate_max_avg", "32", 0, 32.0f, NULL};
-cvar_t sv_rehlds_stringcmdrate_max_burst = {"sv_rehlds_stringcmdrate_max_burst", "80", 0, 80.0f, NULL};
+cvar_t sv_rehlds_movecmdrate_max_burst = { "sv_rehlds_movecmdrate_max_burst", "1125", 0, 1125.0f, NULL };
+cvar_t sv_rehlds_stringcmdrate_max_avg = {"sv_rehlds_stringcmdrate_max_avg", "64", 0, 32.0f, NULL};
+cvar_t sv_rehlds_stringcmdrate_max_burst = {"sv_rehlds_stringcmdrate_max_burst", "96", 0, 80.0f, NULL};
 
 CMoveCommandRateLimiter g_MoveCommandRateLimiter;
 CStringCommandsRateLimiter g_StringCommandsRateLimiter;
