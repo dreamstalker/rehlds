@@ -134,7 +134,9 @@ void setupToolchain(NativeBinarySpec b) {
         if (!rehldsFixes) {
             cfg.compilerOptions.floatingPointModel = FloatingPointModel.PRECISE
             cfg.compilerOptions.enhancedInstructionsSet = EnhancedInstructionsSet.DISABLED
-        }
+        } else {
+			cfg.compilerOptions.args '/Oi', '/GF', '/GR-'
+		}
         if (swdsLib) {
             cfg.linkerOptions.randomizedBaseAddress = false
             cfg.linkerOptions.baseAddress = '0x4970000'
@@ -154,7 +156,7 @@ void setupToolchain(NativeBinarySpec b) {
                 '_unlink': 'unlink',
                 '_vsnprintf': 'vsnprintf',
         ])
-        cfg.compilerOptions.args '-Qoption,cpp,--treat_func_as_string_literal_cpp'
+        cfg.compilerOptions.args '-Qoption,cpp,--treat_func_as_string_literal_cpp', '-fno-rtti'
         cfg.projectLibpath(project, '/lib/linux32')
         cfg.extraLibs 'rt', 'dl', 'm', 'steam_api'
     }

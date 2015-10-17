@@ -28,7 +28,7 @@
 #pragma once
 #include "hookchains.h"
 
-#define MAX_HOOKS_IN_CHAIN 63
+#define MAX_HOOKS_IN_CHAIN 19
 
 // Implementation for chains in modules
 template<typename t_ret, typename ...t_args>
