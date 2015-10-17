@@ -424,6 +424,25 @@ bool SuckOutClassname(char *szInputStream, edict_t *pEdict)
 		szInputStream = COM_Parse(szInputStream);
 	}
 
+#ifdef REHLDS_FIXES
+	if (pEdict == g_psv.edicts)
+	{
+		kvd.szClassName = NULL;
+		kvd.szKeyName = "classname";
+		kvd.szValue = "worldspawn";
+		kvd.fHandled = FALSE;
+
+		gEntityInterface.pfnKeyValue(pEdict, &kvd);
+
+		if (kvd.fHandled == FALSE)
+		{
+			Host_Error(__FUNCTION__ ": parse error");
+		}
+
+		return true;
+	}
+#endif
+
 	// classname not found
 	return false;
 }
