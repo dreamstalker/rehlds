@@ -6440,7 +6440,7 @@ void SV_FailDownload(const char *filename)
 //-----------------------------------------------------------------------------
 // Finds a string in another string with a case insensitive test
 //-----------------------------------------------------------------------------
-const char *Q_stristr(const char *pStr, const char *pSearch)
+/*const char *Q_stristr(const char *pStr, const char *pSearch)
 {
 	if (!pStr || !pSearch)
 		return NULL;
@@ -6478,7 +6478,7 @@ const char *Q_stristr(const char *pStr, const char *pSearch)
 	}
 
 	return NULL;
-}
+}*/
 
 /* <aa4f4> ../engine/sv_main.c:8736 */
 qboolean IsSafeFileToDownload(const char *filename)
@@ -6516,21 +6516,21 @@ qboolean IsSafeFileToDownload(const char *filename)
 		|| first != last
 		|| !first
 		|| Q_strlen(first) != 4
-		|| Q_stristr(lwrfilename, ".cfg")
-		|| Q_stristr(lwrfilename, ".lst")
-		|| Q_stristr(lwrfilename, ".exe")
-		|| Q_stristr(lwrfilename, ".vbs")
-		|| Q_stristr(lwrfilename, ".com")
-		|| Q_stristr(lwrfilename, ".bat")
-		|| Q_stristr(lwrfilename, ".dll")
-		|| Q_stristr(lwrfilename, ".ini")
-		|| Q_stristr(lwrfilename, ".log")
-		|| Q_stristr(lwrfilename, "halflife.wad")
-		|| Q_stristr(lwrfilename, "pak0.pak")
-		|| Q_stristr(lwrfilename, "xeno.wad")
-		|| Q_stristr(lwrfilename, ".so")
-		|| Q_stristr(lwrfilename, ".dylib")
-		|| Q_stristr(lwrfilename, ".sys"))
+		|| Q_strstr(lwrfilename, ".cfg")
+		|| Q_strstr(lwrfilename, ".lst")
+		|| Q_strstr(lwrfilename, ".exe")
+		|| Q_strstr(lwrfilename, ".vbs")
+		|| Q_strstr(lwrfilename, ".com")
+		|| Q_strstr(lwrfilename, ".bat")
+		|| Q_strstr(lwrfilename, ".dll")
+		|| Q_strstr(lwrfilename, ".ini")
+		|| Q_strstr(lwrfilename, ".log")
+		|| Q_strstr(lwrfilename, "halflife.wad")
+		|| Q_strstr(lwrfilename, "pak0.pak")
+		|| Q_strstr(lwrfilename, "xeno.wad")
+		|| Q_strstr(lwrfilename, ".so")
+		|| Q_strstr(lwrfilename, ".dylib")
+		|| Q_strstr(lwrfilename, ".sys"))
 	{
 		return FALSE;
 	}

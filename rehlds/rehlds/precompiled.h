@@ -5,6 +5,7 @@
 #include "osconfig.h"
 
 #include "archtypes.h"
+#include "asmlib.h"
 #include "mathlib.h"
 
 #include "sys_shared.h"

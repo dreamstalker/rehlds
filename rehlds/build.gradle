@@ -142,7 +142,7 @@ void setupToolchain(NativeBinarySpec b) {
             cfg.linkerOptions.baseAddress = '0x4970000'
         }
         cfg.projectLibpath(project, '/lib')
-        cfg.extraLibs 'steam_api.lib', 'psapi.lib', 'ws2_32.lib', 'kernel32.lib', 'user32.lib', 'advapi32.lib'
+        cfg.extraLibs 'steam_api.lib', 'psapi.lib', 'ws2_32.lib', 'kernel32.lib', 'user32.lib', 'advapi32.lib', 'libacof32.lib'
     } else if (cfg instanceof GccToolchainConfig) {
         cfg.compilerOptions.pchConfig = new GccToolchainConfig.PrecompilerHeaderOptions(
                 enabled: true,
@@ -158,7 +158,7 @@ void setupToolchain(NativeBinarySpec b) {
         ])
         cfg.compilerOptions.args '-Qoption,cpp,--treat_func_as_string_literal_cpp', '-fno-rtti'
         cfg.projectLibpath(project, '/lib/linux32')
-        cfg.extraLibs 'rt', 'dl', 'm', 'steam_api'
+        cfg.extraLibs 'rt', 'dl', 'm', 'steam_api', 'aelf32'
     }
 
     if (!unitTestExecutable && !swdsLib) {
