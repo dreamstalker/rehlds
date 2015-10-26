@@ -1301,7 +1301,7 @@ void SV_SendResources(sizebuf_t *msg)
 	resource_t *r = g_psv.resourcelist;
 	for (int i = 0; i < g_psv.num_resources; i++, r++)
 	{
-		MSG_WriteBits(r->type, t_generic);
+		MSG_WriteBits(r->type, 4);
 		MSG_WriteBitString(r->szFileName);
 		MSG_WriteBits(r->nIndex, 12);
 		MSG_WriteBits(r->nDownloadSize, 24);
