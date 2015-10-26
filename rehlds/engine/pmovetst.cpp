@@ -286,7 +286,7 @@ int _PM_TestPlayerPosition(vec_t *pos, pmtrace_t *ptrace, int(*pfnIgnore)(physen
 	int numhulls;
 	vec3_t test;
 
-	tr = PM_PlayerTrace(pmove->origin, pmove->origin, 0, -1);
+	tr = PM_PlayerTrace(pmove->origin, pmove->origin, PM_NORMAL, -1);
 	if (ptrace)
 		Q_memcpy(ptrace, &tr, sizeof(tr));
 
@@ -394,7 +394,7 @@ pmtrace_t _PM_PlayerTrace(vec_t *start, vec_t *end, int traceFlags, int numphyse
 	for (int i = 0; i < numphysent; i++)
 	{
 		physent_t* pe = &physents[i];
-		if (i > 0 && (traceFlags & FL_CLIENT))
+		if (i > 0 && (traceFlags & PM_WORLD_ONLY))
 			break;
 
 		if (pfnIgnore)
@@ -408,7 +408,7 @@ pmtrace_t _PM_PlayerTrace(vec_t *start, vec_t *end, int traceFlags, int numphyse
 				continue;
 		}
 
-		if ((pe->model && !pe->solid && pe->skin) || ((traceFlags & FL_CONVEYOR) && pe->rendermode))
+		if ((pe->model && !pe->solid && pe->skin) || ((traceFlags & PM_GLASS_IGNORE) && pe->rendermode))
 			continue;
 
 
@@ -445,11 +445,11 @@ pmtrace_t _PM_PlayerTrace(vec_t *start, vec_t *end, int traceFlags, int numphyse
 			hull = NULL;
 			if (pe->studiomodel)
 			{
-				if (traceFlags & FL_FLY)
+				if (traceFlags & PM_STUDIO_IGNORE)
 					continue;
 
 
-				if (pe->studiomodel->type == mod_studio && (pe->studiomodel->flags & 0x200 || (pmove->usehull == 2 && !(traceFlags & FL_SWIM))))
+				if (pe->studiomodel->type == mod_studio && (pe->studiomodel->flags & 0x200 || (pmove->usehull == 2 && !(traceFlags & PM_STUDIO_BOX))))
 				{
 					hull = PM_HullForStudioModel(pe->studiomodel, offset, pe->frame, pe->sequence, pe->angles, pe->origin, pe->controller, pe->blending, &pNumHulls);
 				}
@@ -574,7 +574,7 @@ pmtrace_t _PM_PlayerTrace(vec_t *start, vec_t *end, int traceFlags, int numphyse
 /* <6f237> ../engine/pmovetst.c:787 */
 pmtrace_t EXT_FUNC PM_PlayerTrace(vec_t *start, vec_t *end, int traceFlags, int ignore_pe)
 {
-	pmtrace_t tr = _PM_PlayerTrace(start, end, traceFlags, pmove->numphysent, pmove->physents, ignore_pe, 0);
+	pmtrace_t tr = _PM_PlayerTrace(start, end, traceFlags, pmove->numphysent, pmove->physents, ignore_pe, NULL);
 	return tr;
 }
 
@@ -599,11 +599,11 @@ struct pmtrace_s* EXT_FUNC PM_TraceLine(float *start, float *end, int flags, int
 	if (flags)
 	{
 		if (flags == 1)
-			tr = _PM_PlayerTrace(start, end, 0, pmove->numvisent, pmove->visents, ignore_pe, 0);
+			tr = _PM_PlayerTrace(start, end, PM_NORMAL, pmove->numvisent, pmove->visents, ignore_pe, NULL);
 	}
 	else
 	{
-		tr = _PM_PlayerTrace(start, end, 0, pmove->numphysent, pmove->physents, ignore_pe, 0);
+		tr = _PM_PlayerTrace(start, end, PM_NORMAL, pmove->numphysent, pmove->physents, ignore_pe, NULL);
 	}
 	pmove->usehull = oldhull;
 	return &tr;
@@ -619,11 +619,11 @@ struct pmtrace_s* EXT_FUNC PM_TraceLineEx(float *start, float *end, int flags, i
 	pmove->usehull = usehull;
 	if (flags)
 	{
-		tr = _PM_PlayerTrace(start, end, 0, pmove->numvisent, pmove->visents, -1, pfnIgnore);		
+		tr = _PM_PlayerTrace(start, end, PM_NORMAL, pmove->numvisent, pmove->visents, -1, pfnIgnore);		
 	}
 	else
 	{
-		tr = PM_PlayerTraceEx(start, end, 0, pfnIgnore);
+		tr = PM_PlayerTraceEx(start, end, PM_NORMAL, pfnIgnore);
 	}
 	pmove->usehull = oldhull;
 	return &tr;

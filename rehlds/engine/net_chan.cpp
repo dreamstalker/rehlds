@@ -768,7 +768,7 @@ qboolean Netchan_Process(netchan_t *chan)
 			}
 		}
 
-		if (!Netchan_Validate(chan, frag_message, fragid, frag_offset, frag_offset))
+		if (!Netchan_Validate(chan, frag_message, fragid, frag_offset, frag_length))
 			return FALSE;
 	}
 
