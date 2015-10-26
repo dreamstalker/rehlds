@@ -668,7 +668,7 @@ qboolean Netchan_Validate(netchan_t *chan, qboolean *frag_message, unsigned int 
 		// fragment overlaps next stream's fragment or placed after it
 		for (int j = i + 1; j < MAX_STREAMS; j++)
 		{
-			if (frag_end > frag_offset[j]) // don't add msg_readcount for comparison
+			if (frag_end > frag_offset[j] && frag_message[j]) // don't add msg_readcount for comparison
 				return FALSE;
 		}
 #endif // REHLDS_FIXES
