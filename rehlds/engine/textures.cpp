@@ -80,7 +80,7 @@ int lump_sorter(const void *lump1, const void *lump2)
 {
 	const texlumpinfo_t *plump1 = (const texlumpinfo_t *)lump1;
 	const texlumpinfo_t *plump2 = (const texlumpinfo_t *)lump2;
-	return strcmp(plump1->lump.name, plump2->lump.name);
+	return Q_strcmp(plump1->lump.name, plump2->lump.name);
 }
 
 /* <c6153> ../engine/textures.c:72 */
@@ -106,7 +106,7 @@ qboolean TEX_InitFromWad(char *path)
 
 	Q_strncpy(szTmpPath, path, 1022);
 	szTmpPath[1022] = 0;
-	if (!strchr(szTmpPath, ';'))
+	if (!Q_strchr(szTmpPath, ';'))
 		Q_strcat(szTmpPath, ";");
 	for (pszWadFile = strtok(szTmpPath, ";"); pszWadFile; pszWadFile = strtok(NULL, ";"))
 	{

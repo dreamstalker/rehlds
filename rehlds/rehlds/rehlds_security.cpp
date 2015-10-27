@@ -1,16 +1,16 @@
 #include "precompiled.h"
 
 cvar_t sv_rehlds_movecmdrate_max_avg = { "sv_rehlds_movecmdrate_max_avg", "750", 0, 750.0f, NULL };
-cvar_t sv_rehlds_movecmdrate_max_burst = { "sv_rehlds_movecmdrate_max_burst", "1125", 0, 1125.0f, NULL };
-cvar_t sv_rehlds_stringcmdrate_max_avg = {"sv_rehlds_stringcmdrate_max_avg", "64", 0, 32.0f, NULL};
-cvar_t sv_rehlds_stringcmdrate_max_burst = {"sv_rehlds_stringcmdrate_max_burst", "96", 0, 80.0f, NULL};
+cvar_t sv_rehlds_movecmdrate_max_burst = { "sv_rehlds_movecmdrate_max_burst", "1500", 0, 1500.0f, NULL };
+cvar_t sv_rehlds_stringcmdrate_max_avg = {"sv_rehlds_stringcmdrate_max_avg", "64", 0, 64.0f, NULL};
+cvar_t sv_rehlds_stringcmdrate_max_burst = {"sv_rehlds_stringcmdrate_max_burst", "128", 0, 128.0f, NULL};
 
 CMoveCommandRateLimiter g_MoveCommandRateLimiter;
 CStringCommandsRateLimiter g_StringCommandsRateLimiter;
 
 CMoveCommandRateLimiter::CMoveCommandRateLimiter() {
-	memset(m_AverageMoveCmdRate, 0, sizeof(m_AverageMoveCmdRate));
-	memset(m_CurrentMoveCmds, 0, sizeof(m_CurrentMoveCmds));
+	Q_memset(m_AverageMoveCmdRate, 0, sizeof(m_AverageMoveCmdRate));
+	Q_memset(m_CurrentMoveCmds, 0, sizeof(m_CurrentMoveCmds));
 	m_LastCheckTime = 0.0;
 }
 
@@ -74,8 +74,8 @@ void CMoveCommandRateLimiter::CheckAverageRate(unsigned int clientId) {
 }
 
 CStringCommandsRateLimiter::CStringCommandsRateLimiter() {
-	memset(m_AverageStringCmdRate, 0, sizeof(m_AverageStringCmdRate));
-	memset(m_CurrentStringCmds, 0, sizeof(m_CurrentStringCmds));
+	Q_memset(m_AverageStringCmdRate, 0, sizeof(m_AverageStringCmdRate));
+	Q_memset(m_CurrentStringCmds, 0, sizeof(m_CurrentStringCmds));
 	m_LastCheckTime = 0.0;
 }
 

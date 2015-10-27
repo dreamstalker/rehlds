@@ -1136,7 +1136,7 @@ NOXREF void Cache_Print_Models_And_Totals(void)
 	//pack names into the array.
 	for (cd = cache_head.next; cd != &cache_head; cd = cd->next)
 	{
-		if (strstr(cd->name,".mdl"))
+		if (Q_strstr(cd->name,".mdl"))
 			sortarray[i++] = cd;
 	}
 
@@ -1177,7 +1177,7 @@ NOXREF void Cache_Print_Sounds_And_Totals(void)
 	//pack names into the array.
 	for (cd = cache_head.next; cd != &cache_head; cd = cd->next)
 	{
-		if (strstr(cd->name,".wav"))
+		if (Q_strstr(cd->name,".wav"))
 			sortarray[i++] = cd;
 	}
 

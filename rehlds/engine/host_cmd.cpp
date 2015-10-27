@@ -256,13 +256,13 @@ void Host_Motd_f(void)
 			buf[length] = 0;
 			char* now = buf;
 			Con_Printf("motd:");
-			next = strchr(now, '\n');
+			next = Q_strchr(now, '\n');
 			while (next != NULL)
 			{
 				*next = 0;
 				Con_Printf("%s\n", now);
 				now = next + 1;
-				next = strchr(now, '\n');
+				next = Q_strchr(now, '\n');
 			}
 
 			Con_Printf("%s\n", now);
@@ -283,7 +283,7 @@ void Host_Motd_Write_f(void)
 	if (!g_psv.active || cmd_source != src_command || g_pcls.state)
 		return;
 
-	if (!IsSafeFileToDownload(motdfile.string) || !strstr(motdfile.string, ".txt"))
+	if (!IsSafeFileToDownload(motdfile.string) || !Q_strstr(motdfile.string, ".txt"))
 	{
 		Con_Printf("Invalid motdfile name (%s)\n", motdfile.string);
 		return;
@@ -840,7 +840,7 @@ void Host_Map(qboolean bIsDemo, char *mapstring, char *mapName, qboolean loadGam
 			{
 				Q_strcpy(g_pcls.spawnparms, "");
 				for (i = 0; i < Cmd_Argc(); i++)
-					Q_strncat(g_pcls.spawnparms, Cmd_Argv(i), sizeof(g_pcls.spawnparms) - strlen(g_pcls.spawnparms) - 1);
+					Q_strncat(g_pcls.spawnparms, Cmd_Argv(i), sizeof(g_pcls.spawnparms) - Q_strlen(g_pcls.spawnparms) - 1);
 			}
 		}
 		if (sv_gpNewUserMsgs)
@@ -2317,7 +2317,7 @@ void Host_ClearSaveDirectory(void)
 	const char *pfn;
 
 	Q_snprintf(szName, sizeof(szName), "%s", Host_SaveGameDirectory());
-	Q_strncat(szName, "*.HL?", sizeof(szName) - strlen(szName) - 1);
+	Q_strncat(szName, "*.HL?", sizeof(szName) - Q_strlen(szName) - 1);
 	COM_FixSlashes(szName);
 
 	if (Sys_FindFirstPathID(szName, "GAMECONFIG") != NULL)
@@ -2326,7 +2326,7 @@ void Host_ClearSaveDirectory(void)
 		Q_snprintf(szName, sizeof(szName), "%s", Host_SaveGameDirectory());
 		COM_FixSlashes(szName);
 		FS_CreateDirHierarchy(szName, "GAMECONFIG");
-		Q_strncat(szName, "*.HL?", sizeof(szName) - strlen(szName) - 1);
+		Q_strncat(szName, "*.HL?", sizeof(szName) - Q_strlen(szName) - 1);
 
 		for (pfn = Sys_FindFirstPathID(szName, "GAMECONFIG"); pfn; pfn = Sys_FindNext(NULL))
 		{

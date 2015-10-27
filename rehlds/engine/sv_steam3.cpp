@@ -279,7 +279,7 @@ void CSteam3Server::Activate()
 		usSteamPort = 26900;
 		argSteamPort = COM_CheckParm("-sport");
 		if (argSteamPort > 0)
-			usSteamPort = atoi(com_argv[argSteamPort + 1]);
+			usSteamPort = Q_atoi(com_argv[argSteamPort + 1]);
 		eSMode = eServerModeAuthenticationAndSecure;
 		if (net_local_adr.type == NA_IP)
 			unIP = ntohl(*(u_long *)&net_local_adr.ip[0]);

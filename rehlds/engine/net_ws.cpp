@@ -472,7 +472,7 @@ qboolean NET_StringToSockaddr(const char *s, struct sockaddr *sadr)
 		if (*colon == ':')
 		{
 			*colon = 0;
-			val = atoi(colon + 1);
+			val = Q_atoi(colon + 1);
 			((sockaddr_in *)sadr)->sin_port = htons(val);
 		}
 		colon++;
@@ -2047,12 +2047,12 @@ void NET_Init(void)
 
 	int port = COM_CheckParm("-port");
 	if (port)
-		Cvar_SetValue("hostport", atof(com_argv[port + 1]));
+		Cvar_SetValue("hostport", Q_atof(com_argv[port + 1]));
 	
 	int clockwindow_ = COM_CheckParm("-clockwindow");
 	if (clockwindow_)
-		Cvar_SetValue("clockwindow", atof(com_argv[clockwindow_ + 1]));
-	
+		Cvar_SetValue("clockwindow", Q_atof(com_argv[clockwindow_ + 1]));
+
 	net_message.data = (byte *)&net_message_buffer;
 	net_message.maxsize = sizeof(net_message_buffer);
 	net_message.flags = 0;

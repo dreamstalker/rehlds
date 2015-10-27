@@ -196,14 +196,14 @@ void CheckLiblistForFallbackDir(const char *pGameDir, bool bLanguage, const char
 		szLine[511] = 0;
 		if (!Q_strnicmp(szLine, "fallback_dir", Q_strlen("fallback_dir")))
 		{
-			start = strchr(szLine, '"');
+			start = Q_strchr(szLine, '"');
 			if (!start)
 			{
 				FS_Close(hFile);
 				return;
 			}
 
-			end = strchr(start + 1, '"');
+			end = Q_strchr(start + 1, '"');
 			if (!end)
 			{
 				FS_Close(hFile);
@@ -336,7 +336,7 @@ int FileSystem_SetGameDirectory(const char *pDefaultDir, const char *pGameDir)
 	CRehldsPlatformHolder::get()->SteamAPI_SetBreakpadAppID(GetGameAppID());
 
 	bool bEnableHDPack = BEnabledHDAddon();
-	bool bLanguage = (strlen(language) != 0 && Q_stricmp(language, "english")) ? true : false;
+	bool bLanguage = (Q_strlen(language) != 0 && Q_stricmp(language, "english")) ? true : false;
 
 	if (!pGameDir)
 		pGameDir = pDefaultDir;
@@ -478,7 +478,7 @@ int FileSystem_AddFallbackGameDir(const char *pGameDir)
 	language[ARRAYSIZE(language) - 1] = 0;
 #endif
 
-	if (strlen(language) != 0 && Q_stricmp(language, "english"))
+	if (Q_strlen(language) != 0 && Q_stricmp(language, "english"))
 	{
 		char temp[MAX_PATH];
 		Q_sprintf(temp, "%s/%s_%s", GetBaseDirectory(), pGameDir, language);

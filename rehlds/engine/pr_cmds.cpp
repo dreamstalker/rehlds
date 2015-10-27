@@ -1538,7 +1538,7 @@ int EXT_FUNC PF_precache_generic_I(char *s)
 int EXT_FUNC PF_IsMapValid_I(char *mapname)
 {
 	char cBuf[260];
-	if (!mapname || strlen(mapname) == 0)
+	if (!mapname || Q_strlen(mapname) == 0)
 		return 0;
 
 	
@@ -2777,7 +2777,7 @@ NOXREF void QueryClientCvarValueCmd2(void)
 		Con_Printf("%s <player name> <cvar> <requestID>", Cmd_Argv(0));
 		return;
 	}
-	requestID = atoi(Cmd_Argv(3));
+	requestID = Q_atoi(Cmd_Argv(3));
 	for (i = 0; i < g_psvs.maxclients; i++)
 	{
 		cl = &g_psvs.clients[i];

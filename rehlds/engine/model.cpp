@@ -493,7 +493,7 @@ void Mod_LoadTextures(lump_t *l)
 		loadmodel->textures[i] = tx;
 
 		Q_memcpy(tx->name, mt->name, sizeof(tx->name));
-		if (strchr(tx->name, '~'))
+		if (Q_strchr(tx->name, '~'))
 			tx->name[2] = ' ';
 
 		tx->width = mt->width;

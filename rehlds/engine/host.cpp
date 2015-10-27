@@ -692,7 +692,7 @@ qboolean Host_FilterTime(float time)
 			command_line_ticrate = COM_CheckParm("-sys_ticrate");
 
 		if (command_line_ticrate > 0)
-			fps = atof(com_argv[command_line_ticrate + 1]);
+			fps = Q_atof(com_argv[command_line_ticrate + 1]);
 		else
 			fps = sys_ticrate.value;
 

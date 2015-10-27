@@ -21,7 +21,7 @@
 
 AbstractHookChainRegistry::AbstractHookChainRegistry()
 {
-	memset(m_Hooks, 0, sizeof(m_Hooks));
+	Q_memset(m_Hooks, 0, sizeof(m_Hooks));
 	m_NumHooks = 0;
 }
 
@@ -39,7 +39,7 @@ void AbstractHookChainRegistry::removeHook(void* hookFunc) {
 	for (int i = 0; i < m_NumHooks; i++) {
 		if (hookFunc == m_Hooks[i]) {
 			if(--m_NumHooks != i)
-				memmove(&m_Hooks[i], &m_Hooks[i + 1], (m_NumHooks - i) * sizeof(m_Hooks[0]));
+				Q_memmove(&m_Hooks[i], &m_Hooks[i + 1], (m_NumHooks - i) * sizeof(m_Hooks[0]));
 
 			return;
 		}
