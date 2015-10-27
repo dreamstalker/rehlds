@@ -3,12 +3,12 @@
 class CStringPoolMap : public CStaticMap<const char*, char*, 8, 2048> {
 protected:
 	virtual uint32 hash(const char* const &val) {
-		unsigned int len = strlen(val);
+		unsigned int len = Q_strlen(val);
 		return crc32c((const uint8*)val, len);
 	}
 
 	virtual bool equals(const char* const &val1, const char* const &val2) {
-		return !strcmp(val1, val2);
+		return !Q_strcmp(val1, val2);
 	}
 
 public:
@@ -37,7 +37,7 @@ void Ed_StrPool_Reset() {
 
 char* Ed_StrPool_Alloc(const char* origStr) {
 	char str[2048];
-	unsigned int len = strlen(origStr) + 1;
+	unsigned int len = Q_strlen(origStr) + 1;
 
 	if (len >= ARRAYSIZE(str)) {
 		Sys_Error(__FUNCTION__ ": Too long string allocated: %s", origStr);
@@ -60,7 +60,7 @@ char* Ed_StrPool_Alloc(const char* origStr) {
 	}
 
 	*new_p = 0;
-	len = strlen(str) + 1;
+	len = Q_strlen(str) + 1;
 
 	auto node = g_EdStringPool.get(str);
 	if (node) {

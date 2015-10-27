@@ -350,7 +350,7 @@ void Sys_InitMemory(void)
 
 	i = COM_CheckParm("-heapsize");
 	if (i && i < Cmd_Argc() - 1)
-		host_parms.memsize = atoi(Cmd_Argv(i + 1)) * 1024;
+		host_parms.memsize = Q_atoi(Cmd_Argv(i + 1)) * 1024;
 
 #ifdef _WIN32
 	MEMORYSTATUS lpBuffer;
@@ -706,7 +706,7 @@ bool CDedicatedServerAPI::Init_noVirt(char *basedir, char *cmdline, CreateInterf
 #else
 	Q_strcpy(this->m_OrigCmd, cmdline);
 #endif
-	if (!strstr(cmdline, "-nobreakpad"))
+	if (!Q_strstr(cmdline, "-nobreakpad"))
 	{
 		CRehldsPlatformHolder::get()->SteamAPI_UseBreakpadCrashHandler(va("%d", build_number()), "Aug  8 2013", "11:17:26", 0, 0, 0);
 	}

@@ -28,7 +28,7 @@ CRehldsFlightRecorder::CRehldsFlightRecorder() {
 	//initialize meta region header
 	char* metaPos = (char*)m_MetaRegion;
 	const char* metaSignature = "REHLDS_FLIGHTREC_META";
-	metaPos += sprintf(metaPos, "%s%s%s:", metaSignature, metaSignature, metaSignature);
+	metaPos += Q_sprintf(metaPos, "%s%s%s:", metaSignature, metaSignature, metaSignature);
 
 	m_pMetaHeader = (meta_header*)metaPos;
 	metaPos += sizeof(meta_header);
@@ -42,7 +42,7 @@ CRehldsFlightRecorder::CRehldsFlightRecorder() {
 	//initialize data region header
 	char* dataPos = (char*)m_DataRegion;
 	const char* dataSignature = "REHLDS_FLIGHTREC_DATA";
-	dataPos += sprintf(dataPos, "%s%s%s:", dataSignature, dataSignature, dataSignature);
+	dataPos += Q_sprintf(dataPos, "%s%s%s:", dataSignature, dataSignature, dataSignature);
 
 	m_pDataHeader = (data_header*)dataPos;
 	dataPos += sizeof(data_header);
@@ -84,7 +84,7 @@ void CRehldsFlightRecorder::MoveToStart() {
 		m_pDataHeader->prevItrLastPos = m_pRecorderState->wpos;
 		m_pRecorderState->wpos = 0;
 	} else {
-		memcpy(m_DataRegionPtr, m_DataRegionPtr + m_pRecorderState->lastMsgBeginPos, m_pRecorderState->wpos - m_pRecorderState->lastMsgBeginPos);
+		Q_memcpy(m_DataRegionPtr, m_DataRegionPtr + m_pRecorderState->lastMsgBeginPos, m_pRecorderState->wpos - m_pRecorderState->lastMsgBeginPos);
 		m_pRecorderState->wpos -= m_pRecorderState->lastMsgBeginPos;
 		m_pDataHeader->prevItrLastPos = m_pRecorderState->lastMsgBeginPos;
 		m_pRecorderState->lastMsgBeginPos = 0;
@@ -157,12 +157,12 @@ void CRehldsFlightRecorder::WriteBuffer(const void* data, unsigned int len) {
 		MoveToStart();
 	}
 
-	memcpy(m_DataRegionPtr + m_pRecorderState->wpos, data, len);
+	Q_memcpy(m_DataRegionPtr + m_pRecorderState->wpos, data, len);
 	m_pRecorderState->wpos += len;
 }
 
 void CRehldsFlightRecorder::WriteString(const char* s) {
-	WriteBuffer(s, strlen(s) + 1);
+	WriteBuffer(s, Q_strlen(s) + 1);
 }
 
 void CRehldsFlightRecorder::WriteInt8(int8 v) {

@@ -135,7 +135,6 @@ extern int loadsize;
 #define Q_strnicmp _strnicmp
 #define Q_strstr A_strstr
 #define Q_strchr strchr
-#define Q_strrchr strrchr
 #define Q_strlwr A_strtolower
 #define Q_sprintf sprintf
 #define Q_snprintf _snprintf

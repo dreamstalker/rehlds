@@ -190,7 +190,7 @@ NOXREF int ParseFloats(const char *pText, float *pFloat, int count)
 
 		if (pTemp)
 		{
-			pFloat[index] = (float)atof(pTemp);
+			pFloat[index] = (float)Q_atof(pTemp);
 			count--;
 			index++;
 		}

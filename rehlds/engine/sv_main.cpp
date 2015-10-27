@@ -2082,8 +2082,8 @@ int SV_CheckUserInfo(netadr_t *adr, char *userinfo, qboolean bIsReconnecting, in
 		}
 	}
 
-	i = strlen(userinfo);
-	if (i <= 4 || strstr(userinfo, "\\\\") || userinfo[i - 1] == '\\')
+	i = Q_strlen(userinfo);
+	if (i <= 4 || Q_strstr(userinfo, "\\\\") || userinfo[i - 1] == '\\')
 	{
 		SV_RejectConnection(adr, "Unknown HLTV client type.\n");
 
@@ -2098,7 +2098,12 @@ int SV_CheckUserInfo(netadr_t *adr, char *userinfo, qboolean bIsReconnecting, in
 
 	for (pChar = newname; *pChar; pChar++)
 	{
-		if (*pChar == '%' || *pChar == '&')
+		if (*pChar == '%'
+			|| *pChar == '&'
+#ifdef REHLDS_FIXES
+			|| (*pChar == '+' && (isdigit(pChar[1]) || isalpha(pChar[1])))
+#endif // REHLDS_FIXES			
+			)
 			*pChar = ' ';
 	}
 
@@ -3326,7 +3331,7 @@ void SV_Rcon(netadr_t *net_from_)
 	{
 		if (invalid == 2)
 			Con_Printf("Bad rcon_password.\n");
-		else if (strlen(rcon_password.string) == 0)
+		else if (Q_strlen(rcon_password.string) == 0)
 			Con_Printf("Bad rcon_password.\nNo password set for this server.\n");
 		else
 			Con_Printf("Bad rcon_password.\n");
@@ -3508,7 +3513,7 @@ qboolean SV_FilterPacket(void)
 		else
 		{
 			if (i < numipfilters - 1)
-				memmove(curFilter, &curFilter[1], sizeof(ipfilter_t) * (numipfilters - i - 1));
+				Q_memmove(curFilter, &curFilter[1], sizeof(ipfilter_t) * (numipfilters - i - 1));
 
 			--numipfilters;
 		}
@@ -3520,7 +3525,7 @@ qboolean SV_FilterPacket(void)
 void SV_SendBan(void)
 {
 	char szMessage[64];
-	_snprintf(szMessage, sizeof(szMessage), "You have been banned from this server.\n");
+	Q_snprintf(szMessage, sizeof(szMessage), "You have been banned from this server.\n");
 
 	SZ_Clear(&net_message);
 
@@ -4588,7 +4593,7 @@ void SV_UpdateToReliableMessages(void)
 
 #ifdef REHLDS_FIXES
 		// skip update in this frame if would overflow
-		if (client->sendinfo && client->sendinfo_time <= realtime && ( 1 + 1 + 4 + ( int )strlen( client->userinfo ) + 1 + 16 + g_psv.reliable_datagram.cursize <= g_psv.reliable_datagram.maxsize ) )
+		if (client->sendinfo && client->sendinfo_time <= realtime && ( 1 + 1 + 4 + ( int )Q_strlen( client->userinfo ) + 1 + 16 + g_psv.reliable_datagram.cursize <= g_psv.reliable_datagram.maxsize ) )
 #else // REHLDS_FIXES
 		if (client->sendinfo && client->sendinfo_time <= realtime)
 #endif // REHLDS_FIXES
@@ -4794,7 +4799,12 @@ void SV_ExtractFromUserinfo(client_t *cl)
 
 	for (char *p = rawname; *p; p++)
 	{
-		if (*p == '%' || *p == '&')
+		if (*p == '%'
+			|| *p == '&'
+#ifdef REHLDS_FIXES
+			|| (*p == '+' && (isdigit(p[1]) || isalpha(p[1])))
+#endif // REHLDS_FIXES				
+			)
 			*p = ' ';
 	}
 
@@ -6090,14 +6100,14 @@ void Host_Kick_f(void)
 			unsigned int dataLen = 0;
 			for (int i = 1; i < argsStartNum; i++)
 			{
-				dataLen += strlen(Cmd_Argv(i)) + 1;
+				dataLen += Q_strlen(Cmd_Argv(i)) + 1;
 			}
 
 			if (isSteam)
 				dataLen -= 4;
 
 			p = Cmd_Args();
-			if (dataLen <= strlen(p))
+			if (dataLen <= Q_strlen(p))
 			{
 				const char *message = dataLen + p;
 				if (message)
@@ -6163,7 +6173,7 @@ void SV_RemoveId_f(void)
 	{
 		if (!Q_strnicmp(idstring, "STEAM_", 6) || !Q_strnicmp(idstring, "VALVE_", 6))
 		{
-			_snprintf(idstring, 0x3Fu, "%s:%s:%s", Cmd_Argv(1), Cmd_Argv(3), Cmd_Argv(5));
+			Q_snprintf(idstring, 0x3Fu, "%s:%s:%s", Cmd_Argv(1), Cmd_Argv(3), Cmd_Argv(5));
 			idstring[63] = 0;
 		}
 		
@@ -6188,7 +6198,7 @@ void SV_RemoveId_f(void)
 void SV_WriteId_f(void)
 {
 	char name[MAX_PATH];
-	_snprintf(name, MAX_PATH, "%s", bannedcfgfile.string);
+	Q_snprintf(name, MAX_PATH, "%s", bannedcfgfile.string);
 	Con_Printf("Writing %s.\n", name);
 
 	FILE *f = FS_Open(name, "wt");
@@ -6383,7 +6393,7 @@ void SV_KickPlayer(int nPlayerSlot, int nReason)
 		&rgchT[1],
 		"\n********************************************\nYou have been automatically disconnected\nfrom this secure server because an illegal\ncheat was detected on your computer.\nRepeat violators may be permanently banned\nfrom all secure servers.\n\nFor help cleaning your system of cheats, visit:\nhttp://www.counter-strike.net/cheat.html\n********************************************\n\n"
 	);
-	Netchan_Transmit(&g_psvs.clients[nPlayerSlot].netchan, strlen(rgchT) + 1, (byte *)rgchT);
+	Netchan_Transmit(&g_psvs.clients[nPlayerSlot].netchan, Q_strlen(rgchT) + 1, (byte *)rgchT);
 
 	Q_sprintf(rgchT, "%s was automatically disconnected\nfrom this secure server.\n", client->name);
 	for (int i = 0; i < g_psvs.maxclients; i++)

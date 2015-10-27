@@ -615,7 +615,7 @@ void Netchan_CheckForCompletion(netchan_t *chan, int stream, int intotalbuffers)
 			if (chan->sock == NS_MULTICAST)
 			{
 				char szCommand[32];
-				_snprintf(szCommand, sizeof(szCommand), "listen %s\n", NET_AdrToString(chan->remote_address));
+				Q_snprintf(szCommand, sizeof(szCommand), "listen %s\n", NET_AdrToString(chan->remote_address));
 				Cbuf_AddText(szCommand);
 				return;
 			}
@@ -1616,7 +1616,7 @@ qboolean Netchan_CopyFileFragments(netchan_t *chan)
 			Q_strncpy(filedir, filename, sizeof(filedir));
 #endif // REHLDS_CHECKS
 			COM_FixSlashes(filedir);
-			pszFileName = strrchr(filedir, '\\');
+			pszFileName = Q_strrchr(filedir, '\\');
 			if (pszFileName)
 			{
 				*pszFileName = 0;

@@ -342,13 +342,13 @@ void FS_Rename(const char *originalName, const char *newName)
 	if (FS_GetLocalPath(originalName, localPath, ARRAYSIZE(localPath)))
 	{
 		Q_strcpy(newPath, localPath);
-		cut = strstr(newPath, originalName);
+		cut = Q_strstr(newPath, originalName);
 
 		if (cut)
 		{
 			*cut = 0;
 #ifdef REHLDS_CHECKS
-			Q_strncat(newPath, newName, ARRAYSIZE(newPath) - strlen(newPath));
+			Q_strncat(newPath, newName, ARRAYSIZE(newPath) - Q_strlen(newPath));
 			newPath[ARRAYSIZE(newPath) - 1] = 0;
 #else
 			Q_strcat(newPath, newName);
