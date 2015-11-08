@@ -191,6 +191,14 @@ sizebuf_t* EXT_FUNC CRehldsServerData::GetReliableDatagram() {
 	return &g_psv.reliable_datagram;
 }
 
+void EXT_FUNC CRehldsServerData::SetConsistencyNum(int num) {
+	g_psv.num_consistency = num;
+}
+
+int EXT_FUNC CRehldsServerData::GetConsistencyNum() {
+	return g_psv.num_consistency;
+}
+
 void Rehlds_Interfaces_FreeClients() 
 {
 	if (g_GameClients == NULL)

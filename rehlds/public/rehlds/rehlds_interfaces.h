@@ -113,4 +113,6 @@ public:
 	virtual sizebuf_t* GetReliableDatagram() = 0;
 
 	virtual void SetModelName(const char* modelname) = 0;
+	virtual void SetConsistencyNum(int num) = 0;
+	virtual int GetConsistencyNum() = 0;
 };

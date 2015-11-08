@@ -121,7 +121,8 @@ RehldsFuncs_t g_RehldsApiFuncs =
 	&MSG_EndBitWriting_api,
 	&SZ_GetSpace,
 	&GetCvarVars_api,
-	&SV_GetChallenge
+	&SV_GetChallenge,
+	&SV_AddResource
 };
 
 sizebuf_t* EXT_FUNC GetNetMessage_api()
@@ -259,8 +260,8 @@ IRehldsHookRegistry_SV_WriteFullClientUpdate* CRehldsHookchains::SV_WriteFullCli
 	return &m_SV_WriteFullClientUpdate;
 }
 
-IRehldsHookRegistry_GenericFileConsistencyResponce* CRehldsHookchains::GenericFileConsistencyResponce() {
-	return &m_GenericFileConsistencyResponce;
+IRehldsHookRegistry_SV_CheckConsistencyResponce* CRehldsHookchains::SV_CheckConsistencyResponce() {
+	return &m_SV_CheckConsistencyResponce;
 }
 
 int EXT_FUNC CRehldsApi::GetMajorVersion()
