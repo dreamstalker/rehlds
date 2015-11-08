@@ -40,6 +40,8 @@
 #define MAX_NAME				32
 #define MAX_LIGHTSTYLES			64
 #define MAX_PACKET_ENTITIES		256
+#define MAX_RESOURCE_LIST		1280
+#define MAX_CONSISTENCY_LIST		512
 #ifdef REHLDS_OPT_PEDANTIC
 #define MAX_CHALLENGES			64
 #else
@@ -129,9 +131,9 @@ typedef struct server_s
 	struct model_s *worldmodel;
 	CRC32_t worldmapCRC;
 	unsigned char clientdllmd5[16];
-	resource_t resourcelist[1280];
+	resource_t resourcelist[MAX_RESOURCE_LIST];
 	int num_resources;
-	consistency_t consistency_list[512];
+	consistency_t consistency_list[MAX_CONSISTENCY_LIST];
 	int num_consistency;
 	const char *model_precache[HL_MODEL_MAX];
 	struct model_s *models[HL_MODEL_MAX];

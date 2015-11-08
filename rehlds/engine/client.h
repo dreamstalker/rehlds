@@ -193,7 +193,7 @@ typedef struct client_state_s
 	int max_edicts;
 	resource_t resourcesonhand;
 	resource_t resourcesneeded;
-	resource_t resourcelist[1280];
+	resource_t resourcelist[MAX_RESOURCE_LIST];
 	int num_resources;
 	qboolean need_force_consistency_response;
 	char serverinfo[512];
@@ -236,7 +236,7 @@ typedef struct client_state_s
 	model_t *model_precache[HL_MODEL_MAX];
 	int model_precache_count;
 	sfx_s *sound_precache[HL_SOUND_MAX];
-	consistency_t consistency_list[512];
+	consistency_t consistency_list[MAX_CONSISTENCY_LIST];
 	int num_consistency;
 	int highentity;
 	char levelname[40];

@@ -211,7 +211,7 @@ void SV_ParseConsistencyResponse(client_t *pSenderClient)
 	{
 		msg_badread = 1;
 		Con_Printf("SV_ParseConsistencyResponse:  %s:%s sent bad file data\n", host_client->name, NET_AdrToString(host_client->netchan.remote_address));
-		SV_DropClient(host_client, 0, "Bad file data");
+		SV_DropClient(host_client, FALSE, "Bad file data");
 		return;
 	}
 
@@ -226,7 +226,7 @@ void SV_ParseConsistencyResponse(client_t *pSenderClient)
 			if (dropmessage[0])
 				SV_ClientPrintf("%s", dropmessage);
 
-			SV_DropClient(host_client, 0, "Bad file %s", g_psv.resourcelist[c - 1].szFileName); // only filename. reason was printed in console if exists.
+			SV_DropClient(host_client, FALSE, "Bad file %s", g_psv.resourcelist[c - 1].szFileName); // only filename. reason was printed in console if exists.
 		}
 #else // REHLDS_FIXES
 		if (gEntityInterface.pfnInconsistentFile(host_client->edict, g_psv.resourcelist[c - 1].szFileName, dropmessage))
@@ -234,7 +234,7 @@ void SV_ParseConsistencyResponse(client_t *pSenderClient)
 			if (Q_strlen(dropmessage) > 0)
 				SV_ClientPrintf("%s", dropmessage);
 
-			SV_DropClient(host_client, 0, "Bad file %s", dropmessage);
+			SV_DropClient(host_client, FALSE, "Bad file %s", dropmessage);
 		}
 #endif // REHLDS_FIXES
 
@@ -1515,7 +1515,7 @@ void SV_ParseMove(client_t *pSenderClient)
 	if (totalcmds < 0 || totalcmds >= 63)
 	{
 		Con_Printf("SV_ReadClientMessage: too many cmds %i sent for %s/%s\n", totalcmds, host_client->name, NET_AdrToString(host_client->netchan.remote_address));
-		SV_DropClient(host_client, 0, "CMD_MAXBACKUP hit");
+		SV_DropClient(host_client, FALSE, "CMD_MAXBACKUP hit");
 		msg_badread = 1;
 		return;
 	}
@@ -1630,7 +1630,7 @@ void SV_ParseVoiceData(client_t *cl)
 	if (nDataLength > sizeof(chReceived))
 	{
 		Con_DPrintf("SV_ParseVoiceData: invalid incoming packet.\n");
-		SV_DropClient(cl, 0, "Invalid voice data\n");
+		SV_DropClient(cl, FALSE, "Invalid voice data\n");
 		return;
 	}
 	
@@ -1701,7 +1701,7 @@ void EXT_FUNC SV_HandleClientMessage_api(IGameClient* client, int8 opcode) {
 	if (opcode < clc_bad || opcode > clc_cvarvalue2)
 	{
 		Con_Printf("SV_ReadClientMessage: unknown command char (%d)\n", opcode);
-		SV_DropClient(cl, 0, "Bad command character in client command");
+		SV_DropClient(cl, FALSE, "Bad command character in client command");
 		return;
 	}
 
