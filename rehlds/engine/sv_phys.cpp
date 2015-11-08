@@ -125,7 +125,7 @@ qboolean SV_RunThink(edict_t *ent)
 {
 	float thinktime;
 
-	if (!(ent->v.flags & FL_SPECTATOR))
+	if (!(ent->v.flags & FL_KILLME))
 	{
 		thinktime = ent->v.nextthink;
 		if (thinktime <= 0.0 || thinktime > g_psv.time + host_frametime)
@@ -143,7 +143,7 @@ qboolean SV_RunThink(edict_t *ent)
 		gEntityInterface.pfnThink(ent);
 	}
 
-	if (ent->v.flags & FL_SPECTATOR)
+	if (ent->v.flags & FL_KILLME)
 	{
 		ED_Free(ent);
 	}
