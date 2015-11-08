@@ -4915,7 +4915,7 @@ int SV_ModelIndex(const char *name)
 }
 
 /* <a9992> ../engine/sv_main.c:6529 */
-void SV_AddResource(resourcetype_t type, const char *name, int size, unsigned char flags, int index)
+void EXT_FUNC SV_AddResource(resourcetype_t type, const char *name, int size, unsigned char flags, int index)
 {
 	resource_t *r;
 	if (g_psv.num_resources >= MAX_RESOURCE_LIST)

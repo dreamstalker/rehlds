@@ -135,9 +135,9 @@ typedef IVoidHookChainRegistryImpl<edict_t *, int, const char *, float, float, i
 typedef IVoidHookChainImpl<IGameClient *, char *, size_t, sizebuf_t *, IGameClient *> CRehldsHook_SV_WriteFullClientUpdate;
 typedef IVoidHookChainRegistryImpl<IGameClient *, char *, size_t, sizebuf_t *, IGameClient *> CRehldsHookRegistry_SV_WriteFullClientUpdate;
 
-//SV_WriteFullClientUpdate hook
-typedef IVoidHookChainImpl<IGameClient *, resource_t *, uint32> CRehldsHook_GenericFileConsistencyResponce;
-typedef IVoidHookChainRegistryImpl<IGameClient *, resource_t *, uint32> CRehldsHookRegistry_GenericFileConsistencyResponce;
+//SV_CheckConsistencyResponce hook
+typedef IHookChainImpl<bool, IGameClient *, resource_t *, uint32> CRehldsHook_SV_CheckConsistencyResponce;
+typedef IHookChainRegistryImpl<bool, IGameClient *, resource_t *, uint32> CRehldsHookRegistry_SV_CheckConsistencyResponce;
 
 class CRehldsHookchains : public IRehldsHookchains {
 public:
@@ -167,7 +167,7 @@ public:
 	CRehldsHookRegistry_PF_Remove_I m_PF_Remove_I;
 	CRehldsHookRegistry_PF_BuildSoundMsg_I m_PF_BuildSoundMsg_I;
 	CRehldsHookRegistry_SV_WriteFullClientUpdate m_SV_WriteFullClientUpdate;
-	CRehldsHookRegistry_GenericFileConsistencyResponce m_GenericFileConsistencyResponce;
+	CRehldsHookRegistry_SV_CheckConsistencyResponce m_SV_CheckConsistencyResponce;
 
 public:
 	virtual IRehldsHookRegistry_Steam_NotifyClientConnect* Steam_NotifyClientConnect();
@@ -196,7 +196,7 @@ public:
 	virtual IRehldsHookRegistry_PF_Remove_I* PF_Remove_I();
 	virtual IRehldsHookRegistry_PF_BuildSoundMsg_I* PF_BuildSoundMsg_I();
 	virtual IRehldsHookRegistry_SV_WriteFullClientUpdate* SV_WriteFullClientUpdate();
-	virtual IRehldsHookRegistry_GenericFileConsistencyResponce* GenericFileConsistencyResponce();
+	virtual IRehldsHookRegistry_SV_CheckConsistencyResponce* SV_CheckConsistencyResponce();
 };
 
 extern CRehldsHookchains g_RehldsHookchains;

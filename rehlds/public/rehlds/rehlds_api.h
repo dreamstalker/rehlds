@@ -141,9 +141,9 @@ typedef IVoidHookChainRegistry<edict_t *, int, const char *, float, float, int, 
 typedef IVoidHookChain<IGameClient *, char *, size_t, sizebuf_t *, IGameClient *> IRehldsHook_SV_WriteFullClientUpdate;
 typedef IVoidHookChainRegistry<IGameClient *, char *, size_t, sizebuf_t *, IGameClient *> IRehldsHookRegistry_SV_WriteFullClientUpdate;
 
-//SV_GenericFileConsistencyResponce hook
-typedef IVoidHookChain<IGameClient *, resource_t *, uint32> IRehldsHook_GenericFileConsistencyResponce;
-typedef IVoidHookChainRegistry<IGameClient *, resource_t *, uint32> IRehldsHookRegistry_GenericFileConsistencyResponce;
+//SV_CheckConsistencyResponce hook
+typedef IHookChain<bool, IGameClient *, resource_t *, uint32> IRehldsHook_SV_CheckConsistencyResponce;
+typedef IHookChainRegistry<bool, IGameClient *, resource_t *, uint32> IRehldsHookRegistry_SV_CheckConsistencyResponce;
 
 class IRehldsHookchains {
 public:
@@ -175,7 +175,7 @@ public:
 	virtual IRehldsHookRegistry_PF_Remove_I* PF_Remove_I() = 0;
 	virtual IRehldsHookRegistry_PF_BuildSoundMsg_I* PF_BuildSoundMsg_I() = 0;
 	virtual IRehldsHookRegistry_SV_WriteFullClientUpdate* SV_WriteFullClientUpdate() = 0;
-	virtual IRehldsHookRegistry_GenericFileConsistencyResponce* GenericFileConsistencyResponce() = 0;
+	virtual IRehldsHookRegistry_SV_CheckConsistencyResponce* SV_CheckConsistencyResponce() = 0;
 };
 
 struct RehldsFuncs_t {
@@ -211,6 +211,7 @@ struct RehldsFuncs_t {
 	void*(*SZ_GetSpace)(sizebuf_t *buf, int length);
 	cvar_t*(*GetCvarVars)();
 	int (*SV_GetChallenge)(const netadr_t& adr);
+	void (*SV_AddResource)(resourcetype_t type, const char *name, int size, unsigned char flags, int index);
 };
 
 class IRehldsApi {

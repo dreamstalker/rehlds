@@ -99,6 +99,8 @@ public:
 	virtual sizebuf_t* GetReliableDatagram();
 
 	virtual void SetModelName(const char* modelname);
+	virtual void SetConsistencyNum(int num);
+	virtual int GetConsistencyNum();
 };
 
 extern CGameClient** g_GameClients;
