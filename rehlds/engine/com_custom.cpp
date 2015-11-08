@@ -90,31 +90,31 @@ qboolean COM_CreateCustomization(customization_t *pListHead, resource_t *pResour
 	customization_t *pCust;                                      //    91
 	qboolean bError;                                              //    92
 
-	bError = 0;
+	bError = FALSE;
 	if (pCustomization)
-		*pCustomization = 0;
+		*pCustomization = NULL;
 	pCust = (customization_t *)Mem_ZeroMalloc(sizeof(customization_t));
 
 	Q_memcpy(&pCust->resource, pResource, sizeof(pCust->resource));
 	if (pResource->nDownloadSize <= 0)
 	{
-		bError = 1;
+		bError = TRUE;
 		goto CustomizationError;
 	}
 
-	pCust->bInUse = 1;
+	pCust->bInUse = TRUE;
 
-	if (flags & 1)
+	if (flags & FCUST_FROMHPAK)
 	{
-		if (!HPAK_GetDataPointer("custom.hpk", pResource, (uint8**)&pCust->pBuffer, 0))
+		if (!HPAK_GetDataPointer("custom.hpk", pResource, (uint8**)&pCust->pBuffer, NULL))
 		{
-			bError = 1;
+			bError = TRUE;
 			goto CustomizationError;
 		}
 	}
 	else
 	{
-		pCust->pBuffer = COM_LoadFile(pResource->szFileName, 5, 0);
+		pCust->pBuffer = COM_LoadFile(pResource->szFileName, 5, NULL);
 	}
 
 	if ((pCust->resource.ucFlags & RES_CUSTOM) && pCust->resource.type == t_decal)
@@ -122,13 +122,13 @@ qboolean COM_CreateCustomization(customization_t *pListHead, resource_t *pResour
 		pCust->resource.playernum = playernumber;
 		if (!CustomDecal_Validate(pCust->pBuffer, pResource->nDownloadSize))
 		{
-			bError = 1;
+			bError = TRUE;
 			goto CustomizationError;
 		}
 
-		if (!(flags & 4))
+		if (!(flags & RES_CUSTOM))
 		{
-			cachewad_t * pWad = (cachewad_t *)Mem_ZeroMalloc(0x2Cu);
+			cachewad_t * pWad = (cachewad_t *)Mem_ZeroMalloc(sizeof(cachewad_t));
 			pCust->pInfo = pWad;
 			if (pResource->nDownloadSize >= 1024 && pResource->nDownloadSize <= 20480)
 			{
@@ -141,16 +141,16 @@ qboolean COM_CreateCustomization(customization_t *pListHead, resource_t *pResour
 					if (nLumps)
 						*nLumps = pWad->lumpCount;
 
-					pCust->bTranslated = 1;
+					pCust->bTranslated = TRUE;
 					pCust->nUserData1 = 0;
 					pCust->nUserData2 = pWad->lumpCount;
-					if (flags & 2)
+					if (flags & FCUST_WIPEDATA)
 					{
 						Mem_Free(pWad->name);
 						Mem_Free(pWad->cache);
 						Mem_Free(pWad->lumps);
 						Mem_Free(pCust->pInfo);
-						pCust->pInfo = 0;
+						pCust->pInfo = NULL;
 					}
 				}
 			}
@@ -173,7 +173,7 @@ CustomizationError:
 		pCust->pNext = pListHead->pNext;
 		pListHead->pNext = pCust;
 	}
-	return bError == 0;
+	return bError == FALSE;
 }
 
 /* <9b41> ../engine/com_custom.c:229 */

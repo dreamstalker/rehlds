@@ -1676,7 +1676,7 @@ void SV_Spawn_f(void)
 		SZ_Write(&msg, g_psv.signon.data, g_psv.signon.cursize);
 		SV_WriteSpawn(&msg);
 		SV_WriteVoiceCodec(&msg);
-		Netchan_CreateFragments(1, &host_client->netchan, &msg);
+		Netchan_CreateFragments(TRUE, &host_client->netchan, &msg);
 		Netchan_FragSend(&host_client->netchan);
 	}
 	else
@@ -2408,7 +2408,7 @@ void EXT_FUNC SV_ConnectClient_internal(void)
 	SV_ExtractFromUserinfo(host_client);
 	Info_SetValueForStarKey(host_client->userinfo, "*sid", va("%lld", host_client->network_userid.m_SteamID), MAX_INFO_STRING);
 
-	host_client->datagram.flags = 1;
+	host_client->datagram.flags = SIZEBUF_ALLOW_OVERFLOW;
 	host_client->datagram.data = (byte *)host_client->datagram_buf;
 	host_client->datagram.maxsize = sizeof(host_client->datagram_buf);
 	host_client->datagram.buffername = host_client->name;
@@ -2427,7 +2427,7 @@ void SVC_Ping(void)
 	NET_SendPacket(NS_SERVER, sizeof(data), data, net_from);
 }
 
-int SV_GetChallenge(const netadr_t& adr)
+int EXT_FUNC SV_GetChallenge(const netadr_t& adr)
 {
 	int i;
 #ifndef REHLDS_OPT_PEDANTIC
@@ -2787,7 +2787,7 @@ NOXREF void SVC_InfoString(void)
 
 	info[0] = 0;
 
-    if (*sv_password.string)
+	if (*sv_password.string)
 		iHasPW = Q_stricmp(sv_password.string, "none") != 0;
 
 	Info_SetValueForKey(info, "protocol", va("%i", PROTOCOL_VERSION), sizeof(info));
@@ -3262,7 +3262,7 @@ void SV_AddFailedRcon(netadr_t *adr)
 /* <a61f6> ../engine/sv_main.c:4364 */
 qboolean SV_CheckRconFailure(netadr_t *adr)
 {
-	for (int i = 0; i < 32; i++)
+	for (int i = 0; i < MAX_RCON_FAILURES_STORAGE; i++)
 	{
 		rcon_failure_t *r = &g_rgRconFailures[i];
 		if (NET_CompareAdr(*adr, r->adr))
@@ -3495,7 +3495,7 @@ void SV_ProcessFile(client_t *cl, char *filename)
 		pList = pList->pNext;
 	}
 
-	if (!COM_CreateCustomization(&cl->customdata, resource, -1, 7, NULL, NULL))
+	if (!COM_CreateCustomization(&cl->customdata, resource, -1, (FCUST_FROMHPAK | FCUST_WIPEDATA | RES_CUSTOM), NULL, NULL))
 		Con_Printf("Error parsing custom decal from %s\n", cl->name);
 }
 
@@ -4235,7 +4235,7 @@ int SV_CreatePacketEntities(sv_delta_t type, client_t *client, packet_entities_t
 			FALSE,
 			custom,
 			&numbase,
-			from == 0,
+			from == NULL,
 			0);
 
 		entity_state_t *baseline_ = &g_psv.baselines[newindex];
@@ -4259,7 +4259,7 @@ int SV_CreatePacketEntities(sv_delta_t type, client_t *client, packet_entities_t
 				_mm_prefetch((const char*)baseline_, _MM_HINT_T0);
 				_mm_prefetch(((const char*)baseline_) + 64, _MM_HINT_T0);
 				if (offset)
-					SV_SetCallback(newindex, 0, custom, &numbase, 1, offset);
+					SV_SetCallback(newindex, FALSE, custom, &numbase, TRUE, offset);
 
 				// fix for https://github.com/dreamstalker/rehlds/issues/24
 #ifdef REHLDS_FIXES
@@ -4323,16 +4323,16 @@ qboolean SV_ShouldUpdatePing(client_t *client)
 	if (client->proxy)
 	{
 		if (realtime < client->nextping)
-			return 0;
+			return FALSE;
 
 		client->nextping = realtime + 2.0;
-		return 1;
+		return TRUE;
 	}
 
 	//useless call
 	//SV_CalcPing(client);
 
-	return client->lastcmd.buttons & 0x8000;
+	return client->lastcmd.buttons & IN_SCORE;
 }
 
 /* <a9109> ../engine/sv_main.c:5734 */
@@ -4441,7 +4441,6 @@ void SV_EmitPings(client_t *client, sizebuf_t *msg)
 /* <a947b> ../engine/sv_main.c:5878 */
 void SV_WriteEntitiesToClient(client_t *client, sizebuf_t *msg)
 {
-	
 	client_frame_t *frame = &client->frames[SV_UPDATE_MASK & client->netchan.outgoing_sequence];
 
 	unsigned char *pvs = NULL;
@@ -4919,7 +4918,7 @@ int SV_ModelIndex(const char *name)
 void SV_AddResource(resourcetype_t type, const char *name, int size, unsigned char flags, int index)
 {
 	resource_t *r;
-	if (g_psv.num_resources >= 1280)
+	if (g_psv.num_resources >= MAX_RESOURCE_LIST)
 		Sys_Error("Too many resources on server.");
 
 	r = &g_psv.resourcelist[g_psv.num_resources++];
@@ -5010,7 +5009,7 @@ void SV_CreateResourceList(void)
 		else
 			nSize = 0;
 
-		SV_AddResource(t_generic, *s, nSize, 1, i);
+		SV_AddResource(t_generic, *s, nSize, RES_FATALIFMISSING, i);
 	}
 #ifdef REHLDS_CHECKS
 	for (i = 1, s = &g_psv.sound_precache[1]; i < HL_SOUND_MAX && *s != NULL; i++, s++)
@@ -5023,7 +5022,7 @@ void SV_CreateResourceList(void)
 			if (!ffirstsent)
 			{
 				ffirstsent = 1;
-				SV_AddResource(t_sound, "!", 0, 1, i);
+				SV_AddResource(t_sound, "!", 0, RES_FATALIFMISSING, i);
 			}
 		}
 		else
@@ -5056,7 +5055,7 @@ void SV_CreateResourceList(void)
 		if (!ep->filename)
 			break;
 
-		SV_AddResource(t_eventscript, (char *)ep->filename, ep->filesize, 1, i);
+		SV_AddResource(t_eventscript, (char *)ep->filename, ep->filesize, RES_FATALIFMISSING, i);
 	}
 }
 
@@ -5109,7 +5108,7 @@ void SV_PropagateCustomizations(void)
 				MSG_WriteByte(&host_client->netchan.message, pResource->ucFlags);
 				if (pResource->ucFlags & RES_CUSTOM)
 				{
-					SZ_Write(&host_client->netchan.message, pResource->rgucMD5_hash, 16);
+					SZ_Write(&host_client->netchan.message, pResource->rgucMD5_hash, sizeof(pResource->rgucMD5_hash));
 				}
 			}
 
@@ -5181,10 +5180,12 @@ void SV_CreateBaseline(void)
 			{
 				player = SV_IsPlayerIndex(entnum);
 				g_psv.baselines[entnum].number = entnum;
-				g_psv.baselines[entnum].entityType = 1;
 
+				// set entity type
 				if (svent->v.flags & FL_CUSTOMENTITY)
-					g_psv.baselines[entnum].entityType = 2;
+					g_psv.baselines[entnum].entityType = ENTITY_BEAM;
+				else
+					g_psv.baselines[entnum].entityType = ENTITY_NORMAL;
 
 				__invokeValvesBuggedCreateBaseline((void *)gEntityInterface.pfnCreateBaseline, player, entnum, &(g_psv.baselines[entnum]), svent, sv_playermodel, player_mins[0], player_maxs[0]);
 				sv_lastnum = entnum;
@@ -5201,7 +5202,7 @@ void SV_CreateBaseline(void)
 		{
 			MSG_WriteBits(entnum, 11);
 			MSG_WriteBits(g_psv.baselines[entnum].entityType, 2);
-			custom = ~g_psv.baselines[entnum].entityType & 1;
+			custom = ~g_psv.baselines[entnum].entityType & ENTITY_NORMAL;
 			if (custom)
 				pDelta = g_pcustomentitydelta;
 			else
@@ -5790,12 +5791,12 @@ USERID_t *SV_StringToUserID(const char *str)
 	if (Q_strnicmp(str, "STEAM_", 6))
 	{
 		Q_strncpy(szTemp, pszUserID, sizeof(szTemp) - 1);
-		id.idtype = 2;
+		id.idtype = AUTH_IDTYPE_VALVE;
 	}
 	else
 	{
 		Q_strncpy(szTemp, pszUserID, sizeof(szTemp) - 1);
-		id.idtype = 1;
+		id.idtype = AUTH_IDTYPE_STEAM;
 	}
 	szTemp[127] = 0;
 	id.m_SteamID = Steam_StringToSteamID(szTemp);
@@ -6126,7 +6127,7 @@ void Host_Kick_f(void)
 
 		SV_ClientPrintf("Kicked by %s\n", who);
 		Log_Printf("Kick: \"%s<%i><%s><>\" was kicked by \"%s\"\n", host_client->name, host_client->userid, SV_GetClientIDString(host_client), who);
-		SV_DropClient(host_client, 0, "Kicked");
+		SV_DropClient(host_client, FALSE, "Kicked");
 	}
 	host_client = save;
 }
@@ -6143,7 +6144,8 @@ void SV_RemoveId_f(void)
 	}
 
 	Q_strncpy(idstring, Cmd_Argv(1), sizeof(idstring) - 1);
-	idstring[63] = 0;
+	idstring[sizeof(idstring) - 1] = 0;
+
 	if (!idstring[0])
 	{
 		Con_Printf(__FUNCTION__ ":  Id string is empty!\n");
@@ -6173,8 +6175,10 @@ void SV_RemoveId_f(void)
 	{
 		if (!Q_strnicmp(idstring, "STEAM_", 6) || !Q_strnicmp(idstring, "VALVE_", 6))
 		{
-			Q_snprintf(idstring, 0x3Fu, "%s:%s:%s", Cmd_Argv(1), Cmd_Argv(3), Cmd_Argv(5));
+			Q_snprintf(idstring, sizeof(idstring) - 1, "%s:%s:%s", Cmd_Argv(1), Cmd_Argv(3), Cmd_Argv(5));
+#ifndef REHLDS_FIXES
 			idstring[63] = 0;
+#endif // REHLDS_FIXES
 		}
 		
 		for (int i = 0; i < numuserfilters; i++)
@@ -6605,7 +6609,7 @@ void SV_BeginFileDownload_f(void)
 #ifdef REHLDS_FIXES
 		if (pbuf && size)
 		{
-			Netchan_CreateFileFragmentsFromBuffer(1, &host_client->netchan, name, pbuf, size);
+			Netchan_CreateFileFragmentsFromBuffer(TRUE, &host_client->netchan, name, pbuf, size);
 			Netchan_FragSend(&host_client->netchan);
 		}
 		// Mem_Free pbuf even if size is zero
@@ -6616,7 +6620,7 @@ void SV_BeginFileDownload_f(void)
 #else // REHLDS_FIXES
 		if (pbuf && size)
 		{
-			Netchan_CreateFileFragmentsFromBuffer(1, &host_client->netchan, name, pbuf, size);
+			Netchan_CreateFileFragmentsFromBuffer(TRUE, &host_client->netchan, name, pbuf, size);
 			Netchan_FragSend(&host_client->netchan);
 			Mem_Free((void *)pbuf);
 		}
