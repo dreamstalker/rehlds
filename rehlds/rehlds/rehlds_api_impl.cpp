@@ -264,6 +264,10 @@ IRehldsHookRegistry_SV_CheckConsistencyResponce* CRehldsHookchains::SV_CheckCons
 	return &m_SV_CheckConsistencyResponce;
 }
 
+IRehldsHookRegistry_SV_DropClient* CRehldsHookchains::SV_DropClient() {
+	return &m_SV_DropClient;
+}
+
 int EXT_FUNC CRehldsApi::GetMajorVersion()
 {
 	return REHLDS_API_VERSION_MAJOR;

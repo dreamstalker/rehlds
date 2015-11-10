@@ -139,6 +139,10 @@ typedef IVoidHookChainRegistryImpl<IGameClient *, char *, size_t, sizebuf_t *, I
 typedef IHookChainImpl<bool, IGameClient *, resource_t *, uint32> CRehldsHook_SV_CheckConsistencyResponce;
 typedef IHookChainRegistryImpl<bool, IGameClient *, resource_t *, uint32> CRehldsHookRegistry_SV_CheckConsistencyResponce;
 
+//SV_DropClient hook
+typedef IVoidHookChainImpl<IGameClient*, bool, const char*> CRehldsHook_SV_DropClient;
+typedef IVoidHookChainRegistryImpl<IGameClient*, bool, const char*> CRehldsHookRegistry_SV_DropClient;
+
 class CRehldsHookchains : public IRehldsHookchains {
 public:
 	CRehldsHookRegistry_Steam_NotifyClientConnect m_Steam_NotifyClientConnect;
@@ -168,6 +172,7 @@ public:
 	CRehldsHookRegistry_PF_BuildSoundMsg_I m_PF_BuildSoundMsg_I;
 	CRehldsHookRegistry_SV_WriteFullClientUpdate m_SV_WriteFullClientUpdate;
 	CRehldsHookRegistry_SV_CheckConsistencyResponce m_SV_CheckConsistencyResponce;
+	CRehldsHookRegistry_SV_DropClient m_SV_DropClient;
 
 public:
 	virtual IRehldsHookRegistry_Steam_NotifyClientConnect* Steam_NotifyClientConnect();
@@ -197,6 +202,7 @@ public:
 	virtual IRehldsHookRegistry_PF_BuildSoundMsg_I* PF_BuildSoundMsg_I();
 	virtual IRehldsHookRegistry_SV_WriteFullClientUpdate* SV_WriteFullClientUpdate();
 	virtual IRehldsHookRegistry_SV_CheckConsistencyResponce* SV_CheckConsistencyResponce();
+	virtual	IRehldsHookRegistry_SV_DropClient* SV_DropClient();
 };
 
 extern CRehldsHookchains g_RehldsHookchains;
