@@ -442,39 +442,43 @@ void Host_ClientCommands(const char *fmt, ...)
 	va_end(argptr);
 }
 
+void EXT_FUNC SV_DropClient_hook(IGameClient* cl, bool crash, const char *string)
+{
+	SV_DropClient_internal(cl->GetClient(), crash ? TRUE : FALSE, string);
+}
+
 void EXT_FUNC SV_DropClient_api(IGameClient* cl, bool crash, const char* fmt, ...)
 {
 	char buf[1024];
 	va_list argptr;
+
 	va_start(argptr, fmt);
-
-	Q_vsnprintf(buf, ARRAYSIZE(buf) - 1, fmt, (va_list)argptr);
+	Q_vsnprintf(buf, ARRAYSIZE(buf) - 1, fmt, argptr);
 	va_end(argptr);
-	buf[ARRAYSIZE(buf) - 1] = 0;
 
-	SV_DropClient(cl->GetClient(), crash ? TRUE : FALSE, "%s", buf);
+	g_RehldsHookchains.m_SV_DropClient.callChain(SV_DropClient_hook, cl, crash, buf);
 }
 
-/* <35f4e> ../engine/host.c:673 */
 void SV_DropClient(client_t *cl, qboolean crash, const char *fmt, ...)
 {
-	int i;
-	char string[1024];
-	unsigned char final[512];
-	float connection_time;
+	char buf[1024];
 	va_list argptr;
 
 	va_start(argptr, fmt);
-	i = 0;
-
-#ifdef REHLDS_CHECKS
-	Q_vsnprintf(string, sizeof(string) - 1, fmt, (va_list)argptr);
-	string[sizeof(string) - 1] = 0;
-#else
-	Q_vsnprintf(string, sizeof(string), fmt, (va_list)argptr);
-#endif // REHLDS_CHECKS
-
+	Q_vsnprintf(buf, ARRAYSIZE(buf) - 1, fmt, argptr);
 	va_end(argptr);
+
+	g_RehldsHookchains.m_SV_DropClient.callChain(SV_DropClient_hook, GetRehldsApiClient(cl), crash != FALSE, buf);
+}
+
+/* <35f4e> ../engine/host.c:673 */
+void SV_DropClient_internal(client_t *cl, qboolean crash, const char *string)
+{
+	int i;
+	unsigned char final[512];
+	float connection_time;
+
+	i = 0;
 
 	if (!crash)
 	{

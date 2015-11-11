@@ -136,6 +136,7 @@ void SV_BroadcastPrintf(const char *fmt, ...);
 void Host_ClientCommands(const char *fmt, ...);
 void SV_DropClient_api(IGameClient* cl, bool crash, const char* fmt, ...);
 void SV_DropClient(client_t *cl, qboolean crash, const char *fmt, ...);
+void SV_DropClient_internal(client_t *cl, qboolean crash, const char *string);
 void Host_ClearClients(qboolean bFramesOnly);
 void Host_ShutdownServer(qboolean crash);
 void SV_ClearClientStates(void);

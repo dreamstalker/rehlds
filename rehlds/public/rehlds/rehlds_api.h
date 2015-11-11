@@ -145,6 +145,10 @@ typedef IVoidHookChainRegistry<IGameClient *, char *, size_t, sizebuf_t *, IGame
 typedef IHookChain<bool, IGameClient *, resource_t *, uint32> IRehldsHook_SV_CheckConsistencyResponce;
 typedef IHookChainRegistry<bool, IGameClient *, resource_t *, uint32> IRehldsHookRegistry_SV_CheckConsistencyResponce;
 
+//SV_DropClient hook
+typedef IVoidHookChain<IGameClient*, bool, const char*> IRehldsHook_SV_DropClient;
+typedef IVoidHookChainRegistry<IGameClient*, bool, const char*> IRehldsHookRegistry_SV_DropClient;
+
 class IRehldsHookchains {
 public:
 	virtual ~IRehldsHookchains() { }
@@ -176,6 +180,7 @@ public:
 	virtual IRehldsHookRegistry_PF_BuildSoundMsg_I* PF_BuildSoundMsg_I() = 0;
 	virtual IRehldsHookRegistry_SV_WriteFullClientUpdate* SV_WriteFullClientUpdate() = 0;
 	virtual IRehldsHookRegistry_SV_CheckConsistencyResponce* SV_CheckConsistencyResponce() = 0;
+	virtual IRehldsHookRegistry_SV_DropClient* SV_DropClient() = 0;
 };
 
 struct RehldsFuncs_t {
