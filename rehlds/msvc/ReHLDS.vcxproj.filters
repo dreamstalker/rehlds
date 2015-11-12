@@ -1065,6 +1065,9 @@
     <ClInclude Include="..\rehlds\rehlds_security.h">
       <Filter>rehlds</Filter>
     </ClInclude>
+    <ClInclude Include="..\common\qlimits.h">
+      <Filter>common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\linux\appversion.sh">

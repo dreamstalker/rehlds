@@ -199,6 +199,14 @@ int EXT_FUNC CRehldsServerData::GetConsistencyNum() {
 	return g_psv.num_consistency;
 }
 
+int EXT_FUNC CRehldsServerData::GetResourcesNum() {
+	return g_psv.num_resources;
+}
+
+int EXT_FUNC CRehldsServerData::GetDecalNameNum() {
+	return sv_decalnamecount;
+}
+
 void Rehlds_Interfaces_FreeClients() 
 {
 	if (g_GameClients == NULL)

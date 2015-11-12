@@ -61,7 +61,7 @@ server_t g_psv;
 
 rehlds_server_t g_rehlds_sv;
 
-decalname_t sv_decalnames[512];
+decalname_t sv_decalnames[MAX_BASE_DECALS];
 int sv_decalnamecount;
 
 UserMsg *sv_gpNewUserMsgs;
@@ -79,12 +79,12 @@ delta_t *g_peventdelta;
 
 int gPacketSuppressed;
 
-char localinfo[MAX_INFO_STRING * 128];
-char localmodels[512][5];
+char localinfo[MAX_LOCALINFO];
+char localmodels[MAX_MODELS][5];
 
-ipfilter_t ipfilters[32768];
+ipfilter_t ipfilters[MAX_IPFILTERS];
 int numipfilters;
-userfilter_t userfilters[32768];
+userfilter_t userfilters[MAX_USERFILTERS];
 int numuserfilters;
 
 
@@ -117,8 +117,8 @@ qboolean allow_cheats;
 #ifndef HOOK_ENGINE
 
 char *gNullString = "";
-int SV_UPDATE_BACKUP = 8;
-int SV_UPDATE_MASK = 7;
+int SV_UPDATE_BACKUP = SINGLEPLAYER_BACKUP;
+int SV_UPDATE_MASK = (SINGLEPLAYER_BACKUP - 1);
 int giNextUserMsg = 64;
 
 cvar_t sv_lan = { "sv_lan", "0", 0, 0.0f, NULL };
@@ -847,7 +847,7 @@ qboolean SV_BuildSoundMsg(edict_t *entity, int channel, const char *sample, int 
 	if (field_mask & SND_FL_ATTENUATION)
 		MSG_WriteBits((uint32)(attenuation * 64.0f), 8);
 	MSG_WriteBits(channel, 3);
-	MSG_WriteBits(ent, 11);
+	MSG_WriteBits(ent, MAX_EDICT_BITS);
 	MSG_WriteBits(sound_num, (field_mask & SND_FL_LARGE_INDEX) ? 16 : 8);
 	MSG_WriteBitVec3Coord(origin);
 	if (field_mask & SND_FL_PITCH)
@@ -2531,7 +2531,7 @@ void SV_ResetModInfo(void)
 	Q_memset(&gmodinfo, 0, sizeof(modinfo_t));
 	gmodinfo.version = 1;
 	gmodinfo.svonly = TRUE;
-	gmodinfo.num_edicts = MAX_EDICTS;
+	gmodinfo.num_edicts = NUM_EDICTS;
 
 	Q_snprintf(szDllListFile, sizeof(szDllListFile), "%s", "liblist.gam");
 	hLibListFile = FS_Open(szDllListFile, "rb");
@@ -5328,8 +5328,13 @@ void SetCStrikeFlags(void)
 	}
 }
 
-/* <a9f01> ../engine/sv_main.c:7107 */
 void SV_ActivateServer(int runPhysics)
+{
+	g_RehldsHookchains.m_SV_ActivateServer.callChain(SV_ActivateServer_internal, runPhysics);
+}
+
+/* <a9f01> ../engine/sv_main.c:7107 */
+void EXT_FUNC SV_ActivateServer_internal(int runPhysics)
 {
 	int i;
 	unsigned char data[NET_MAX_PAYLOAD];
@@ -5511,8 +5516,8 @@ int SV_SpawnServer(qboolean bIsDemo, char *server, char *startspot)
 	for (i = 0; i < g_psvs.maxclientslimit; i++, cl++)
 		SV_ClearFrames(&cl->frames);
 
-	SV_UPDATE_BACKUP = g_psvs.maxclients != 1 ? 64 : 8;
-	SV_UPDATE_MASK = g_psvs.maxclients != 1 ? 63 : 7;
+	SV_UPDATE_BACKUP = (g_psvs.maxclients == 1) ? SINGLEPLAYER_BACKUP : MULTIPLAYER_BACKUP;
+	SV_UPDATE_MASK = (SV_UPDATE_BACKUP - 1);
 
 	SV_AllocClientFrames();
 	Q_memset(&g_psv, 0, sizeof(server_t));
@@ -7075,9 +7080,9 @@ void SV_Init(void)
 	Cvar_RegisterVariable(&sv_allow_dlfile);
 	Cvar_RegisterVariable(&sv_force_ent_intersection);
 	
-	for (int i = 0; i < ARRAYSIZE(localmodels); i++)
+	for (int i = 0; i < MAX_MODELS; i++)
 	{
-		Q_snprintf(localmodels[i], 5u, "*%i", i);
+		Q_snprintf(localmodels[i], sizeof(localmodels[i]), "*%i", i);
 	}
 
 	g_psvs.isSecure = FALSE;

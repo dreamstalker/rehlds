@@ -34,6 +34,13 @@
 
 #include "userid.h"
 
+#ifdef REHLDS_FIXES
+#define MAX_IPFILTERS		4096
+#define MAX_USERFILTERS		4096
+#else
+#define MAX_IPFILTERS		32768
+#define MAX_USERFILTERS		32768
+#endif // REHLDS_FIXES
 
 /* <a05ba> ../engine/filter.h:12 */
 typedef struct ipfilter_s

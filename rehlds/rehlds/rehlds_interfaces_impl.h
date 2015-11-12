@@ -101,6 +101,8 @@ public:
 	virtual void SetModelName(const char* modelname);
 	virtual void SetConsistencyNum(int num);
 	virtual int GetConsistencyNum();
+	virtual int GetResourcesNum();
+	virtual int GetDecalNameNum();
 };
 
 extern CGameClient** g_GameClients;

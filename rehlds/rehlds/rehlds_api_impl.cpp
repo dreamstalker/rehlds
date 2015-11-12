@@ -268,6 +268,10 @@ IRehldsHookRegistry_SV_DropClient* CRehldsHookchains::SV_DropClient() {
 	return &m_SV_DropClient;
 }
 
+IRehldsHookRegistry_SV_ActivateServer* CRehldsHookchains::SV_ActivateServer() {
+	return &m_SV_ActivateServer;
+}
+
 int EXT_FUNC CRehldsApi::GetMajorVersion()
 {
 	return REHLDS_API_VERSION_MAJOR;
