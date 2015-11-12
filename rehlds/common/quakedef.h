@@ -30,6 +30,9 @@
 /* <19039> ../common/quakedef.h:29 */
 typedef int BOOL; /* size: 4 */
 
+// user message
+#define MAX_USER_MSG_DATA 192
+
 /* <627f> ../common/quakedef.h:137 */
 //moved to com_model.h
 //typedef struct cache_user_s

@@ -19,6 +19,18 @@
 #pragma once
 #endif
 
+// Max # of clients allowed in a server.
+#define MAX_CLIENTS				32
+
+// How many bits to use to encode an edict.
+#define MAX_EDICT_BITS				11			// # of bits needed to represent max edicts
+// Max # of edicts in a level (2048)
+#define MAX_EDICTS					(1<<MAX_EDICT_BITS)
+
+// How many data slots to use when in multiplayer (must be power of 2)
+#define MULTIPLAYER_BACKUP			64
+// Same for single player
+#define SINGLEPLAYER_BACKUP			8
 //
 // Constants shared by the engine and dlls
 // This header file included by engine files and DLL files.

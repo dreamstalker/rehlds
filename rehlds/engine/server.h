@@ -35,18 +35,9 @@
 #include "maintypes.h"
 
 // TODO: I think this defines must be in /common/
-#define MAX_CLIENTS				32
-#define MAX_EDICTS				900
+#define NUM_EDICTS				900
 #define MAX_NAME				32
-#define MAX_LIGHTSTYLES			64
 #define MAX_PACKET_ENTITIES		256
-#define MAX_RESOURCE_LIST		1280
-#define MAX_CONSISTENCY_LIST		512
-#ifdef REHLDS_OPT_PEDANTIC
-#define MAX_CHALLENGES			64
-#else
-#define MAX_CHALLENGES			1024
-#endif
 
 #include "custom_int.h"
 #include "crc.h"
@@ -470,7 +461,7 @@ extern cvar_t lservercfgfile;
 extern cvar_t logsdir;
 extern cvar_t bannedcfgfile;
 
-extern decalname_t sv_decalnames[512];
+extern decalname_t sv_decalnames[MAX_BASE_DECALS];
 extern int sv_decalnamecount;
 
 extern UserMsg *sv_gpNewUserMsgs;
@@ -572,12 +563,12 @@ extern unsigned char fatpas[1024];
 
 extern int gPacketSuppressed;
 
-extern char localinfo[MAX_INFO_STRING * 128];
-extern char localmodels[512][5];
+extern char localinfo[MAX_LOCALINFO];
+extern char localmodels[MAX_MODELS][5];
 
-extern ipfilter_t ipfilters[32768];
+extern ipfilter_t ipfilters[MAX_IPFILTERS];
 extern int numipfilters;
-extern userfilter_t userfilters[32768];
+extern userfilter_t userfilters[MAX_USERFILTERS];
 extern int numuserfilters;
 
 extern challenge_t g_rg_sv_challenges[MAX_CHALLENGES];
@@ -730,6 +721,7 @@ void SV_BuildReconnect(sizebuf_t *msg);
 NOXREF void SV_ReconnectAllClients(void);
 void SetCStrikeFlags(void);
 void SV_ActivateServer(int runPhysics);
+void SV_ActivateServer_internal(int runPhysics);
 void SV_ServerShutdown(void);
 int SV_SpawnServer(qboolean bIsDemo, char *server, char *startspot);
 void SV_LoadEntities(void);

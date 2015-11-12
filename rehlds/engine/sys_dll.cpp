@@ -76,7 +76,7 @@ qboolean g_bPrintingKeepAliveDots;
 qboolean gHasMMXTechnology;
 #endif // _WIN32
 //volatile int sys_checksum;
-//char *argv[50];
+//char *argv[MAX_NUM_ARGVS];
 qboolean con_debuglog;
 
 #ifdef REHLDS_FIXES

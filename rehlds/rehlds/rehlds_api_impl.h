@@ -143,6 +143,10 @@ typedef IHookChainRegistryImpl<bool, IGameClient *, resource_t *, uint32> CRehld
 typedef IVoidHookChainImpl<IGameClient*, bool, const char*> CRehldsHook_SV_DropClient;
 typedef IVoidHookChainRegistryImpl<IGameClient*, bool, const char*> CRehldsHookRegistry_SV_DropClient;
 
+//SV_ActivateServer hook
+typedef IVoidHookChainImpl<int> CRehldsHook_SV_ActivateServer;
+typedef IVoidHookChainRegistryImpl<int> CRehldsHookRegistry_SV_ActivateServer;
+
 class CRehldsHookchains : public IRehldsHookchains {
 public:
 	CRehldsHookRegistry_Steam_NotifyClientConnect m_Steam_NotifyClientConnect;
@@ -173,6 +177,7 @@ public:
 	CRehldsHookRegistry_SV_WriteFullClientUpdate m_SV_WriteFullClientUpdate;
 	CRehldsHookRegistry_SV_CheckConsistencyResponce m_SV_CheckConsistencyResponce;
 	CRehldsHookRegistry_SV_DropClient m_SV_DropClient;
+	CRehldsHookRegistry_SV_ActivateServer m_SV_ActivateServer;
 
 public:
 	virtual IRehldsHookRegistry_Steam_NotifyClientConnect* Steam_NotifyClientConnect();
@@ -203,6 +208,7 @@ public:
 	virtual IRehldsHookRegistry_SV_WriteFullClientUpdate* SV_WriteFullClientUpdate();
 	virtual IRehldsHookRegistry_SV_CheckConsistencyResponce* SV_CheckConsistencyResponce();
 	virtual	IRehldsHookRegistry_SV_DropClient* SV_DropClient();
+	virtual	IRehldsHookRegistry_SV_ActivateServer* SV_ActivateServer();
 };
 
 extern CRehldsHookchains g_RehldsHookchains;

@@ -2163,12 +2163,14 @@ void EXT_FUNC PF_MessageEnd_I(void)
 		if (pUserMsg->iSize == -1)
 		{
 			MsgIsVarLength = 1;
-			if (gMsgBuffer.cursize > 192)
+
+			// Limit packet sizes
+			if (gMsgBuffer.cursize > MAX_USER_MSG_DATA)
 				Host_Error(
 					"PF_MessageEnd_I:  Refusing to send user message %s of %i bytes to client, user message size limit is %i bytes\n",
 					pUserMsg->szName,
 					gMsgBuffer.cursize,
-					192
+					MAX_USER_MSG_DATA
 				);
 		}
 		else

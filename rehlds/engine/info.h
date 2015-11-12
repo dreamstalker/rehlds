@@ -42,6 +42,11 @@
 
 #define INFO_MAX_BUFFER_VALUES 4
 
+#ifdef REHLDS_FIXES
+#define MAX_LOCALINFO 4096
+#else
+#define MAX_LOCALINFO MAX_INFO_STRING * 128
+#endif // REHLDS_FIXES
 
 const char *Info_ValueForKey(const char *s, const char *key);
 void Info_RemoveKey(char *s, const char *key);

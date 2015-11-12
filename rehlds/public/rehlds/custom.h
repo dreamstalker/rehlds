@@ -18,6 +18,7 @@
 #include "const.h"
 
 #define MAX_QPATH 64    // Must match value in quakedefs.h
+#define MAX_RESOURCE_LIST	1280
 
 /////////////////
 // Customization

@@ -149,6 +149,10 @@ typedef IHookChainRegistry<bool, IGameClient *, resource_t *, uint32> IRehldsHoo
 typedef IVoidHookChain<IGameClient*, bool, const char*> IRehldsHook_SV_DropClient;
 typedef IVoidHookChainRegistry<IGameClient*, bool, const char*> IRehldsHookRegistry_SV_DropClient;
 
+//SV_ActivateServer hook
+typedef IVoidHookChain<int> IRehldsHook_SV_ActivateServer;
+typedef IVoidHookChainRegistry<int> IRehldsHookRegistry_SV_ActivateServer;
+
 class IRehldsHookchains {
 public:
 	virtual ~IRehldsHookchains() { }
@@ -181,6 +185,7 @@ public:
 	virtual IRehldsHookRegistry_SV_WriteFullClientUpdate* SV_WriteFullClientUpdate() = 0;
 	virtual IRehldsHookRegistry_SV_CheckConsistencyResponce* SV_CheckConsistencyResponce() = 0;
 	virtual IRehldsHookRegistry_SV_DropClient* SV_DropClient() = 0;
+	virtual IRehldsHookRegistry_SV_ActivateServer* SV_ActivateServer() = 0;
 };
 
 struct RehldsFuncs_t {

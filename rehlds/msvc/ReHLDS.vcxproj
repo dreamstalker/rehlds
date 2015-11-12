@@ -343,6 +343,7 @@
     <ClInclude Include="..\common\pmtrace.h" />
     <ClInclude Include="..\common\port.h" />
     <ClInclude Include="..\common\qfont.h" />
+    <ClInclude Include="..\common\qlimits.h" />
     <ClInclude Include="..\common\quakedef.h" />
     <ClInclude Include="..\common\ref_params.h" />
     <ClInclude Include="..\common\r_efx.h" />

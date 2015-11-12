@@ -32,6 +32,7 @@
 #pragma once
 #endif
 
+#define MAX_CONSISTENCY_LIST	512
 
 /* <7508> ../engine/consistency.h:9 */
 typedef struct consistency_s

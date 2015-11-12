@@ -43,7 +43,11 @@
 // MAX_CHALLENGES is made large to prevent a denial
 //  of service attack that could cycle all of them
 //  out before legitimate users connected
-#define	MAX_CHALLENGES			1024
+#ifdef REHLDS_OPT_PEDANTIC
+#define MAX_CHALLENGES			64
+#else
+#define MAX_CHALLENGES			1024
+#endif // REHLDS_OPT_PEDANTIC
 
 // Client connection is initiated by requesting a challenge value
 //  the server sends this value back
