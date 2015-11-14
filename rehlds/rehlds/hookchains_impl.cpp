@@ -38,8 +38,13 @@ void AbstractHookChainRegistry::removeHook(void* hookFunc) {
 	// erase hook
 	for (int i = 0; i < m_NumHooks; i++) {
 		if (hookFunc == m_Hooks[i]) {
-			if(--m_NumHooks != i)
+			if (--m_NumHooks != i)
+			{
 				Q_memmove(&m_Hooks[i], &m_Hooks[i + 1], (m_NumHooks - i) * sizeof(m_Hooks[0]));
+				m_Hooks[m_NumHooks] = NULL;
+			}
+			else
+				m_Hooks[i] = NULL;
 
 			return;
 		}
