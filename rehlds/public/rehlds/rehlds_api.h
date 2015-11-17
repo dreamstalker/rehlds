@@ -141,9 +141,9 @@ typedef IVoidHookChainRegistry<edict_t *, int, const char *, float, float, int, 
 typedef IVoidHookChain<IGameClient *, char *, size_t, sizebuf_t *, IGameClient *> IRehldsHook_SV_WriteFullClientUpdate;
 typedef IVoidHookChainRegistry<IGameClient *, char *, size_t, sizebuf_t *, IGameClient *> IRehldsHookRegistry_SV_WriteFullClientUpdate;
 
-//SV_CheckConsistencyResponce hook
-typedef IHookChain<bool, IGameClient *, resource_t *, uint32> IRehldsHook_SV_CheckConsistencyResponce;
-typedef IHookChainRegistry<bool, IGameClient *, resource_t *, uint32> IRehldsHookRegistry_SV_CheckConsistencyResponce;
+//SV_CheckConsistencyResponse hook
+typedef IHookChain<bool, IGameClient *, resource_t *, uint32> IRehldsHook_SV_CheckConsistencyResponse;
+typedef IHookChainRegistry<bool, IGameClient *, resource_t *, uint32> IRehldsHookRegistry_SV_CheckConsistencyResponse;
 
 //SV_DropClient hook
 typedef IVoidHookChain<IGameClient*, bool, const char*> IRehldsHook_SV_DropClient;
@@ -183,7 +183,7 @@ public:
 	virtual IRehldsHookRegistry_PF_Remove_I* PF_Remove_I() = 0;
 	virtual IRehldsHookRegistry_PF_BuildSoundMsg_I* PF_BuildSoundMsg_I() = 0;
 	virtual IRehldsHookRegistry_SV_WriteFullClientUpdate* SV_WriteFullClientUpdate() = 0;
-	virtual IRehldsHookRegistry_SV_CheckConsistencyResponce* SV_CheckConsistencyResponce() = 0;
+	virtual IRehldsHookRegistry_SV_CheckConsistencyResponse* SV_CheckConsistencyResponse() = 0;
 	virtual IRehldsHookRegistry_SV_DropClient* SV_DropClient() = 0;
 	virtual IRehldsHookRegistry_SV_ActivateServer* SV_ActivateServer() = 0;
 };
