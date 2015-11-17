@@ -106,7 +106,7 @@ clc_func_t sv_clcfuncs[12];
 
 #endif //HOOK_ENGINE
 
-bool EXT_FUNC SV_CheckConsistencyResponce_API(IGameClient *client, resource_t *res, uint32 hash) {
+bool EXT_FUNC SV_CheckConsistencyResponse_API(IGameClient *client, resource_t *res, uint32 hash) {
 	return (hash != *(uint32 *)&res->rgucMD5_hash[0]);
 }
 
@@ -147,7 +147,7 @@ void SV_ParseConsistencyResponse(client_t *pSenderClient)
 		if (!Q_memcmp(resbuffer, nullbuffer, sizeof(resbuffer)))
 		{
 			uint32 hash = MSG_ReadBits(32);
-			if (g_RehldsHookchains.m_SV_CheckConsistencyResponce.callChain(SV_CheckConsistencyResponce_API, GetRehldsApiClient(pSenderClient), r, hash))
+			if (g_RehldsHookchains.m_SV_CheckConsistencyResponse.callChain(SV_CheckConsistencyResponse_API, GetRehldsApiClient(pSenderClient), r, hash))
 				c = idx + 1;
 		}
 		else

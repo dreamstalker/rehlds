@@ -135,9 +135,9 @@ typedef IVoidHookChainRegistryImpl<edict_t *, int, const char *, float, float, i
 typedef IVoidHookChainImpl<IGameClient *, char *, size_t, sizebuf_t *, IGameClient *> CRehldsHook_SV_WriteFullClientUpdate;
 typedef IVoidHookChainRegistryImpl<IGameClient *, char *, size_t, sizebuf_t *, IGameClient *> CRehldsHookRegistry_SV_WriteFullClientUpdate;
 
-//SV_CheckConsistencyResponce hook
-typedef IHookChainImpl<bool, IGameClient *, resource_t *, uint32> CRehldsHook_SV_CheckConsistencyResponce;
-typedef IHookChainRegistryImpl<bool, IGameClient *, resource_t *, uint32> CRehldsHookRegistry_SV_CheckConsistencyResponce;
+//SV_CheckConsistencyResponse hook
+typedef IHookChainImpl<bool, IGameClient *, resource_t *, uint32> CRehldsHook_SV_CheckConsistencyResponse;
+typedef IHookChainRegistryImpl<bool, IGameClient *, resource_t *, uint32> CRehldsHookRegistry_SV_CheckConsistencyResponse;
 
 //SV_DropClient hook
 typedef IVoidHookChainImpl<IGameClient*, bool, const char*> CRehldsHook_SV_DropClient;
@@ -175,7 +175,7 @@ public:
 	CRehldsHookRegistry_PF_Remove_I m_PF_Remove_I;
 	CRehldsHookRegistry_PF_BuildSoundMsg_I m_PF_BuildSoundMsg_I;
 	CRehldsHookRegistry_SV_WriteFullClientUpdate m_SV_WriteFullClientUpdate;
-	CRehldsHookRegistry_SV_CheckConsistencyResponce m_SV_CheckConsistencyResponce;
+	CRehldsHookRegistry_SV_CheckConsistencyResponse m_SV_CheckConsistencyResponse;
 	CRehldsHookRegistry_SV_DropClient m_SV_DropClient;
 	CRehldsHookRegistry_SV_ActivateServer m_SV_ActivateServer;
 
@@ -206,7 +206,7 @@ public:
 	virtual IRehldsHookRegistry_PF_Remove_I* PF_Remove_I();
 	virtual IRehldsHookRegistry_PF_BuildSoundMsg_I* PF_BuildSoundMsg_I();
 	virtual IRehldsHookRegistry_SV_WriteFullClientUpdate* SV_WriteFullClientUpdate();
-	virtual IRehldsHookRegistry_SV_CheckConsistencyResponce* SV_CheckConsistencyResponce();
+	virtual IRehldsHookRegistry_SV_CheckConsistencyResponse* SV_CheckConsistencyResponse();
 	virtual	IRehldsHookRegistry_SV_DropClient* SV_DropClient();
 	virtual	IRehldsHookRegistry_SV_ActivateServer* SV_ActivateServer();
 };

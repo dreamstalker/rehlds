@@ -260,8 +260,8 @@ IRehldsHookRegistry_SV_WriteFullClientUpdate* CRehldsHookchains::SV_WriteFullCli
 	return &m_SV_WriteFullClientUpdate;
 }
 
-IRehldsHookRegistry_SV_CheckConsistencyResponce* CRehldsHookchains::SV_CheckConsistencyResponce() {
-	return &m_SV_CheckConsistencyResponce;
+IRehldsHookRegistry_SV_CheckConsistencyResponse* CRehldsHookchains::SV_CheckConsistencyResponse() {
+	return &m_SV_CheckConsistencyResponse;
 }
 
 IRehldsHookRegistry_SV_DropClient* CRehldsHookchains::SV_DropClient() {
