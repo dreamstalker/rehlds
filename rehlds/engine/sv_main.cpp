@@ -4945,7 +4945,12 @@ void SV_CreateGenericResources(void)
 	if (buffer == NULL)
 		return;
 
-	data = buffer;
+	// skip bytes BOM signature
+	if ((byte)buffer[0] == 0xEFu && (byte)buffer[1] == 0xBBu && (byte)buffer[2] == 0xBFu)
+		data = &buffer[3];
+	else
+		data = buffer;
+
 	Con_DPrintf("Precaching from %s\n", filename);
 	Con_DPrintf("----------------------------------\n");
 	g_psv.num_generic_names = 0;
