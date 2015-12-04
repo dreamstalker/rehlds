@@ -279,7 +279,7 @@ model_t *Mod_LoadModel(model_t *mod, qboolean crash, qboolean trackCRC)
 	if (COM_CheckParm("-steam") && mod->name[0] == '/')
 	{
 		char* p = mod->name;
-		while (*(p++) == '/')
+		while (*(++p) == '/')
 			;
 
 		Q_strncpy(tmpName, p, sizeof(tmpName) - 1);
