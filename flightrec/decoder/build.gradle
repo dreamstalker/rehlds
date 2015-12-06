@@ -1,4 +1,5 @@
 apply plugin: 'java'
+apply plugin: 'groovy'
 
 group = 'org.rehlds.flightrec'
 version = rootProject.version
@@ -11,6 +12,7 @@ repositories {
 }
 
 dependencies {
+    testCompile 'org.codehaus.groovy:groovy-all:2.4.5'
     testCompile "junit:junit:4.12"
     compile project(':flightrec/decoder_api')
 }

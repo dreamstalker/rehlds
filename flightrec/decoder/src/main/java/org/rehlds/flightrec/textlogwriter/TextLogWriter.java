@@ -55,7 +55,10 @@ public class TextLogWriter {
     }
 
     String escapeString(String s) {
-        return s.replace("\"", "\\\"").replace("'", "\\'");
+        return s.replace("\"", "\\\"")
+                .replace("'", "\\'")
+                .replace("\n", "\\n")
+                .replace("\r", "\\r");
     }
 
     String generateIndent() {
@@ -144,7 +147,7 @@ public class TextLogWriter {
         if (node.enterMsg != null) {
             writeMessage(node.enterMsg);
         } else {
-            writer.write(generateIndent() + ">> [Unknown]");
+            writer.write(generateIndent() + ">> [Unknown]\n");
         }
 
         indent++;
@@ -154,7 +157,7 @@ public class TextLogWriter {
         if (node.leaveMsg != null) {
             writeMessage(node.leaveMsg);
         } else {
-            writer.write(generateIndent() + "<< [Unknown]");
+            writer.write(generateIndent() + "<< [Unknown]\n");
         }
     }
 

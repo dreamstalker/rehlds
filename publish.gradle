@@ -65,10 +65,7 @@ task publishPrepareFiles {
         println flightRecJarTask.class.name
         File flightRecJarFile = flightRecJarTask.archivePath
         project.file('publish/publishRoot/flighrec').mkdirs()
-        copy {
-            from flightRecJarFile
-            into 'publish/publishRoot/flighrec'
-        }
+        GradleCppUtils.copyFile(flightRecJarFile, project.file('publish/publishRoot/flighrec/decoder.jar'), false)
         copy {
             from new File(project(':flightrec/decoder').projectDir, 'pub')
             into 'publish/publishRoot/flighrec'

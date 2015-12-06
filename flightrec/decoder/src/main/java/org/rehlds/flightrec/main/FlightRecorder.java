@@ -46,17 +46,17 @@ public class FlightRecorder {
         FileScanResult scanResult = FlightRecFileScanner.scan(f);
 
         System.out.println("Dump file scan results: ");
-        for (HeaderScanResult metaHeader : scanResult.metaHeaders) {
-            System.out.print("\tMeta header @ 0x" + Long.toHexString(metaHeader.pos) + "; valid: " + (metaHeader.error == null));
-            if (metaHeader.error != null) {
-                System.out.print("; error: " + metaHeader.error);
+        for (HeaderScanResult hdr : scanResult.metaHeaders) {
+            System.out.print(String.format("\tMeta header @ 0x%08X; len=%d; version=%d; valid=%s", hdr.pos, hdr.len, hdr.version, "" + (hdr.error == null)));
+            if (hdr.error != null) {
+                System.out.print("; error: " + hdr.error);
             }
             System.out.println();
         }
-        for (HeaderScanResult dataHeader : scanResult.dataHeaders) {
-            System.out.print("\tData header @ 0x" + Long.toHexString(dataHeader.pos) + "; valid: " + (dataHeader.error == null));
-            if (dataHeader.error != null) {
-                System.out.print("; error: " + dataHeader.error);
+        for (HeaderScanResult hdr : scanResult.dataHeaders) {
+            System.out.print(String.format("\tData header @ 0x%08X; len=%d; version=%d; valid=%s", hdr.pos, hdr.len, hdr.version, "" + (hdr.error == null)));
+            if (hdr.error != null) {
+                System.out.print("; error: " + hdr.error);
             }
             System.out.println();
         }
@@ -133,6 +133,7 @@ public class FlightRecorder {
             return false;
         }
 
+        System.out.println("Read " + messages.size() + " messages from '" + cfg.dumpFile.getAbsolutePath() + "'");
         LogTreeNodeComplex treeRootNode = buildTree(messages);
         if (treeRootNode == null) {
             return false;

@@ -17,7 +17,8 @@ public class FlightLogTreeBuilder {
 
     void handleLeaveMessage(FlightrecMessage msg) {
         if (currentNode == rootNode) {
-            rootNode = new LogTreeNodeComplex(null, null, msg);
+            currentNode.leaveMsg = msg;
+            rootNode = new LogTreeNodeComplex(null, null, null);
             rootNode.addChild(currentNode);
             currentNode.setParent(rootNode);
             currentNode = rootNode;
