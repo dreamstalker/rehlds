@@ -1187,7 +1187,7 @@ void EXT_FUNC AlertMessage(ALERT_TYPE atype, const char *szFmt, ...)
 		}
 		int iLen = Q_strlen(szOut);
 		Q_vsnprintf(&szOut[iLen], sizeof(szOut) - iLen, szFmt, argptr);
-		Con_Printf("%s\n", szOut);
+		Con_Printf("%s", szOut);
 	}
 	va_end(argptr);
 }

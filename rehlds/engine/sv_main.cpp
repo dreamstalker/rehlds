@@ -4653,11 +4653,11 @@ void SV_UpdateToReliableMessages(void)
 	{
 		client = &g_psvs.clients[i];
 
-		if (!client->fakeclient && client->active)
-		{
-			//Fix for the "server failed to transmit file 'AY&SY..." bug
-			//https://github.com/dreamstalker/rehlds/issues/38
+		//Fix for the "server failed to transmit file 'AY&SY..." bug
+		//https://github.com/dreamstalker/rehlds/issues/38
 #ifdef REHLDS_FIXES
+		if (!client->fakeclient && (client->active || client->connected))
+		{
 			if (!svReliableCompressed && g_psv.reliable_datagram.cursize + client->netchan.message.cursize < client->netchan.message.maxsize)
 			{
 				SZ_Write(&client->netchan.message, g_psv.reliable_datagram.data, g_psv.reliable_datagram.cursize);
@@ -4668,6 +4668,8 @@ void SV_UpdateToReliableMessages(void)
 				svReliableCompressed = true;
 			}
 #else
+		if (!client->fakeclient && client->active)
+		{
 			if (g_psv.reliable_datagram.cursize + client->netchan.message.cursize < client->netchan.message.maxsize)
 			{
 				SZ_Write(&client->netchan.message, g_psv.reliable_datagram.data, g_psv.reliable_datagram.cursize);
