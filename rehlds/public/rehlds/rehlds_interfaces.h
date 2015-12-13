@@ -67,7 +67,7 @@ public:
 	virtual bool IsConnected() = 0;
 	virtual void SetConnected(bool connected) = 0;
 
-	virtual uint32 GetVoiceStreams(int id) = 0;
+	virtual uint32 GetVoiceStream(int stream_id) = 0;
 	virtual void SetLastVoiceTime(double time) = 0;
 	virtual double GetLastVoiceTime() = 0;
 	virtual bool GetLoopback() = 0;

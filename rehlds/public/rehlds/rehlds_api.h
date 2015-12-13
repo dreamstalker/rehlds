@@ -35,7 +35,7 @@
 #include "model.h"
 
 #define REHLDS_API_VERSION_MAJOR 2
-#define REHLDS_API_VERSION_MINOR 3
+#define REHLDS_API_VERSION_MINOR 4
 
 //Steam_NotifyClientConnect hook
 typedef IHookChain<qboolean, IGameClient*, const void*, unsigned int> IRehldsHook_Steam_NotifyClientConnect;
@@ -233,6 +233,8 @@ struct RehldsFuncs_t {
 	void(*MSG_WriteByte)(sizebuf_t *sb, int c);
 	void(*MSG_WriteShort)(sizebuf_t *sb, int c);
 	void(*MSG_WriteString)(sizebuf_t *sb, const char *s);
+	void*(*GetPluginApi)(const char *name);
+	void(*RegisterPluginApi)(const char *name, void *impl);
 };
 
 class IRehldsApi {
