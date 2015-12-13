@@ -27,6 +27,26 @@
 */
 #include "precompiled.h"
 
+struct plugin_api_t
+{
+	char name[32];
+	void *impl;
+};
+
+std::vector<plugin_api_t *> g_PluginApis;
+
+plugin_api_t* FindPluginApiByName(const char *name) {
+	for (auto it = g_PluginApis.begin(), end = g_PluginApis.end(); it != end; ++it) {
+		auto api = *it;
+
+		if (!strcmp(api->name, name)) {
+			return api;
+		}
+	}
+
+	return NULL;
+}
+
 char* EXT_FUNC GetClientFallback_api() {
 	return com_clientfallback;
 }
@@ -109,6 +129,23 @@ cvar_t* EXT_FUNC GetCvarVars_api() {
 	return cvar_vars;
 }
 
+void* EXT_FUNC Rehlds_GetPluginApi(const char *name) {
+	auto api = FindPluginApiByName(name);
+	return api ? api->impl : NULL;
+}
+
+void EXT_FUNC Rehlds_RegisterPluginApi(const char *name, void *impl) {
+	auto api = FindPluginApiByName(name);
+
+	if (!api) {
+		api = new plugin_api_t;
+		strncpy(api->name, name, sizeof api->name - 1);
+		g_PluginApis.push_back(api);
+	}
+
+	api->impl = impl;
+}
+
 CRehldsServerStatic g_RehldsServerStatic;
 CRehldsServerData g_RehldsServerData;
 CRehldsHookchains g_RehldsHookchains;
@@ -152,7 +189,9 @@ RehldsFuncs_t g_RehldsApiFuncs =
 	&MSG_WriteBuf_api,
 	&MSG_WriteByte_api,
 	&MSG_WriteShort_api,
-	&MSG_WriteString_api
+	&MSG_WriteString_api,
+	&Rehlds_GetPluginApi,
+	&Rehlds_RegisterPluginApi
 };
 
 sizebuf_t* EXT_FUNC GetNetMessage_api()

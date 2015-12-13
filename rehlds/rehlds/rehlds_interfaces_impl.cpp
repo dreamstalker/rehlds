@@ -70,8 +70,10 @@ void EXT_FUNC CGameClient::SetConnected(bool connected) {
 	m_pClient->connected = connected ? 1 : 0;
 }
 
-uint32 EXT_FUNC CGameClient::GetVoiceStreams(int id) {
-	return m_pClient->m_VoiceStreams[id >> 5];
+uint32 EXT_FUNC CGameClient::GetVoiceStream(int stream_id) {
+	if (stream_id >= 0 && stream_id < ARRAYSIZE(m_pClient->m_VoiceStreams))
+		return m_pClient->m_VoiceStreams[stream_id];
+	return 0;
 }
 
 void EXT_FUNC CGameClient::SetLastVoiceTime(double time) {
