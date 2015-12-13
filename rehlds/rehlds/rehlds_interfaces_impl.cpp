@@ -74,6 +74,10 @@ uint32 EXT_FUNC CGameClient::GetVoiceStreams(int id) {
 	return m_pClient->m_VoiceStreams[id >> 5];
 }
 
+void EXT_FUNC CGameClient::SetLastVoiceTime(double time) {
+	m_pClient->m_lastvoicetime = time;
+}
+
 double EXT_FUNC CGameClient::GetLastVoiceTime() {
 	return m_pClient->m_lastvoicetime;
 }
