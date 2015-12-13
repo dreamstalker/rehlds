@@ -73,6 +73,30 @@ void EXT_FUNC MSG_WriteBits_api(uint32 data, int numbits) {
 	MSG_WriteBits(data, numbits);
 }
 
+int EXT_FUNC MSG_ReadShort_api() {
+	return MSG_ReadShort();
+}
+
+int EXT_FUNC MSG_ReadBuf_api(int iSize, void *pbuf) {
+	return MSG_ReadBuf(iSize, pbuf);
+}
+
+void EXT_FUNC MSG_WriteBuf_api(sizebuf_t *sb, int iSize, void *buf) {
+	MSG_WriteBuf(sb, iSize, buf);
+}
+
+void EXT_FUNC MSG_WriteByte_api(sizebuf_t *sb, int c) {
+	MSG_WriteByte(sb, c);
+}
+
+void EXT_FUNC MSG_WriteShort_api(sizebuf_t *sb, int c) {
+	MSG_WriteShort(sb, c);
+}
+
+void EXT_FUNC MSG_WriteString_api(sizebuf_t *sb, const char *s) {
+	MSG_WriteString(sb, s);
+}
+
 void EXT_FUNC MSG_WriteBitVec3Coord_api(const vec3_t fa) {
 	MSG_WriteBitVec3Coord(fa);
 }
@@ -122,7 +146,13 @@ RehldsFuncs_t g_RehldsApiFuncs =
 	&SZ_GetSpace,
 	&GetCvarVars_api,
 	&SV_GetChallenge,
-	&SV_AddResource
+	&SV_AddResource,
+	&MSG_ReadShort_api,
+	&MSG_ReadBuf_api,
+	&MSG_WriteBuf_api,
+	&MSG_WriteByte_api,
+	&MSG_WriteShort_api,
+	&MSG_WriteString_api
 };
 
 sizebuf_t* EXT_FUNC GetNetMessage_api()
@@ -270,6 +300,10 @@ IRehldsHookRegistry_SV_DropClient* CRehldsHookchains::SV_DropClient() {
 
 IRehldsHookRegistry_SV_ActivateServer* CRehldsHookchains::SV_ActivateServer() {
 	return &m_SV_ActivateServer;
+}
+
+IRehldsHookRegistry_SV_WriteVoiceCodec* CRehldsHookchains::SV_WriteVoiceCodec() {
+	return &m_SV_WriteVoiceCodec;
 }
 
 int EXT_FUNC CRehldsApi::GetMajorVersion()

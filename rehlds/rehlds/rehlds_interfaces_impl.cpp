@@ -63,11 +63,23 @@ void EXT_FUNC CGameClient::SetSpawned(bool spawned)
 }
 
 bool EXT_FUNC CGameClient::IsConnected() {
-	return m_pClient->connected != 0;;
+	return m_pClient->connected != 0;
 }
 
 void EXT_FUNC CGameClient::SetConnected(bool connected) {
 	m_pClient->connected = connected ? 1 : 0;
+}
+
+uint32 EXT_FUNC CGameClient::GetVoiceStreams(int id) {
+	return m_pClient->m_VoiceStreams[id >> 5];
+}
+
+double EXT_FUNC CGameClient::GetLastVoiceTime() {
+	return m_pClient->m_lastvoicetime;
+}
+
+bool EXT_FUNC CGameClient::GetLoopback() {
+	return m_pClient->m_bLoopback != 0;
 }
 
 INetChan* EXT_FUNC CGameClient::GetNetChan()
@@ -205,6 +217,10 @@ int EXT_FUNC CRehldsServerData::GetResourcesNum() {
 
 int EXT_FUNC CRehldsServerData::GetDecalNameNum() {
 	return sv_decalnamecount;
+}
+
+double EXT_FUNC CRehldsServerData::GetTime() {
+	return g_psv.time;
 }
 
 void Rehlds_Interfaces_FreeClients() 
