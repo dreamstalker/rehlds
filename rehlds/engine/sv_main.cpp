@@ -5124,8 +5124,13 @@ void SV_PropagateCustomizations(void)
 	}
 }
 
-/* <a9cdb> ../engine/sv_main.c:6850 */
 void SV_WriteVoiceCodec(sizebuf_t *pBuf)
+{
+	g_RehldsHookchains.m_SV_WriteVoiceCodec.callChain(SV_WriteVoiceCodec_internal, pBuf);
+}
+
+/* <a9cdb> ../engine/sv_main.c:6850 */
+void EXT_FUNC SV_WriteVoiceCodec_internal(sizebuf_t *pBuf)
 {
 	MSG_WriteByte(pBuf, svc_voiceinit);
 	MSG_WriteString(pBuf, "");

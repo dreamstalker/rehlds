@@ -35,7 +35,7 @@
 #include "model.h"
 
 #define REHLDS_API_VERSION_MAJOR 2
-#define REHLDS_API_VERSION_MINOR 2
+#define REHLDS_API_VERSION_MINOR 3
 
 //Steam_NotifyClientConnect hook
 typedef IHookChain<qboolean, IGameClient*, const void*, unsigned int> IRehldsHook_Steam_NotifyClientConnect;
@@ -153,6 +153,10 @@ typedef IVoidHookChainRegistry<IGameClient*, bool, const char*> IRehldsHookRegis
 typedef IVoidHookChain<int> IRehldsHook_SV_ActivateServer;
 typedef IVoidHookChainRegistry<int> IRehldsHookRegistry_SV_ActivateServer;
 
+//SV_WriteVoiceCodec hook
+typedef IVoidHookChain<sizebuf_t *> IRehldsHook_SV_WriteVoiceCodec;
+typedef IVoidHookChainRegistry<sizebuf_t *> IRehldsHookRegistry_SV_WriteVoiceCodec;
+
 class IRehldsHookchains {
 public:
 	virtual ~IRehldsHookchains() { }
@@ -186,6 +190,7 @@ public:
 	virtual IRehldsHookRegistry_SV_CheckConsistencyResponse* SV_CheckConsistencyResponse() = 0;
 	virtual IRehldsHookRegistry_SV_DropClient* SV_DropClient() = 0;
 	virtual IRehldsHookRegistry_SV_ActivateServer* SV_ActivateServer() = 0;
+	virtual IRehldsHookRegistry_SV_WriteVoiceCodec* SV_WriteVoiceCodec() = 0;
 };
 
 struct RehldsFuncs_t {
@@ -222,6 +227,12 @@ struct RehldsFuncs_t {
 	cvar_t*(*GetCvarVars)();
 	int (*SV_GetChallenge)(const netadr_t& adr);
 	void (*SV_AddResource)(resourcetype_t type, const char *name, int size, unsigned char flags, int index);
+	int(*MSG_ReadShort)(void);
+	int(*MSG_ReadBuf)(int iSize, void *pbuf);
+	void(*MSG_WriteBuf)(sizebuf_t *sb, int iSize, void *buf);
+	void(*MSG_WriteByte)(sizebuf_t *sb, int c);
+	void(*MSG_WriteShort)(sizebuf_t *sb, int c);
+	void(*MSG_WriteString)(sizebuf_t *sb, const char *s);
 };
 
 class IRehldsApi {

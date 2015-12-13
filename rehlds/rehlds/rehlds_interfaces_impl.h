@@ -76,6 +76,9 @@ public:
 	virtual bool IsConnected();
 	virtual void SetConnected(bool connected);
 
+	virtual uint32 GetVoiceStreams(int id);
+	virtual double GetLastVoiceTime();
+	virtual bool GetLoopback();
 
 	virtual client_t* GetClient();
 };
@@ -103,6 +106,8 @@ public:
 	virtual int GetConsistencyNum();
 	virtual int GetResourcesNum();
 	virtual int GetDecalNameNum();
+
+	virtual double GetTime();
 };
 
 extern CGameClient** g_GameClients;
