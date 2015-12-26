@@ -35,7 +35,7 @@
 #include "model.h"
 
 #define REHLDS_API_VERSION_MAJOR 2
-#define REHLDS_API_VERSION_MINOR 4
+#define REHLDS_API_VERSION_MINOR 5
 
 //Steam_NotifyClientConnect hook
 typedef IHookChain<qboolean, IGameClient*, const void*, unsigned int> IRehldsHook_Steam_NotifyClientConnect;
@@ -157,6 +157,10 @@ typedef IVoidHookChainRegistry<int> IRehldsHookRegistry_SV_ActivateServer;
 typedef IVoidHookChain<sizebuf_t *> IRehldsHook_SV_WriteVoiceCodec;
 typedef IVoidHookChainRegistry<sizebuf_t *> IRehldsHookRegistry_SV_WriteVoiceCodec;
 
+//Steam_GSGetSteamID hook
+typedef IHookChain<uint64> IRehldsHook_Steam_GSGetSteamID;
+typedef IHookChainRegistry<uint64> IRehldsHookRegistry_Steam_GSGetSteamID;
+
 class IRehldsHookchains {
 public:
 	virtual ~IRehldsHookchains() { }
@@ -191,6 +195,7 @@ public:
 	virtual IRehldsHookRegistry_SV_DropClient* SV_DropClient() = 0;
 	virtual IRehldsHookRegistry_SV_ActivateServer* SV_ActivateServer() = 0;
 	virtual IRehldsHookRegistry_SV_WriteVoiceCodec* SV_WriteVoiceCodec() = 0;
+	virtual IRehldsHookRegistry_Steam_GSGetSteamID* Steam_GSGetSteamID() = 0;
 };
 
 struct RehldsFuncs_t {
