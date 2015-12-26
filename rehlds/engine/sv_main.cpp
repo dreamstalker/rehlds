@@ -2480,7 +2480,7 @@ void SVC_GetChallenge(void)
 	int challenge = SV_GetChallenge(net_from);
 
 	if (steam)
-		Q_snprintf(data, sizeof(data), "\xFF\xFF\xFF\xFF%c00000000 %u 3 %lld %d\n", S2C_CHALLENGE, challenge, Steam_GSGetSteamID(), Steam_GSBSecure());
+		Q_snprintf(data, sizeof(data), "\xFF\xFF\xFF\xFF%c00000000 %u 3 %lld %d\n", S2C_CHALLENGE, challenge, g_RehldsHookchains.m_Steam_GSGetSteamID.callChain(Steam_GSGetSteamID), Steam_GSBSecure());
 	else
 	{
 		Con_DPrintf("Server requiring authentication\n");

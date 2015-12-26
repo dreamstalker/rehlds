@@ -151,6 +151,10 @@ typedef IVoidHookChainRegistryImpl<int> CRehldsHookRegistry_SV_ActivateServer;
 typedef IVoidHookChainImpl<sizebuf_t *> CRehldsHook_SV_WriteVoiceCodec;
 typedef IVoidHookChainRegistryImpl<sizebuf_t *> CRehldsHookRegistry_SV_WriteVoiceCodec;
 
+//Steam_GSGetSteamID hook
+typedef IHookChainImpl<uint64> CRehldsHook_Steam_GSGetSteamID;
+typedef IHookChainRegistryImpl<uint64> CRehldsHookRegistry_Steam_GSGetSteamID;
+
 class CRehldsHookchains : public IRehldsHookchains {
 public:
 	CRehldsHookRegistry_Steam_NotifyClientConnect m_Steam_NotifyClientConnect;
@@ -183,6 +187,7 @@ public:
 	CRehldsHookRegistry_SV_DropClient m_SV_DropClient;
 	CRehldsHookRegistry_SV_ActivateServer m_SV_ActivateServer;
 	CRehldsHookRegistry_SV_WriteVoiceCodec m_SV_WriteVoiceCodec;
+	CRehldsHookRegistry_Steam_GSGetSteamID m_Steam_GSGetSteamID;
 
 public:
 	virtual IRehldsHookRegistry_Steam_NotifyClientConnect* Steam_NotifyClientConnect();
@@ -215,6 +220,7 @@ public:
 	virtual	IRehldsHookRegistry_SV_DropClient* SV_DropClient();
 	virtual	IRehldsHookRegistry_SV_ActivateServer* SV_ActivateServer();
 	virtual	IRehldsHookRegistry_SV_WriteVoiceCodec* SV_WriteVoiceCodec();
+	virtual CRehldsHookRegistry_Steam_GSGetSteamID* Steam_GSGetSteamID();
 };
 
 extern CRehldsHookchains g_RehldsHookchains;
