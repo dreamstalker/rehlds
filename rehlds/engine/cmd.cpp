@@ -949,7 +949,7 @@ void EXT_FUNC Cmd_ExecuteString_internal(const char* cmdName, cmd_source_t src, 
 	cmd_function_t *cmd = cmd_functions;
 	while (cmd)
 	{
-		if (!Q_stricmp(cmd_argv[0], cmd->name))
+		if (!Q_stricmp(cmdName, cmd->name))
 		{
 			cmd->function();
 
@@ -968,7 +968,7 @@ void EXT_FUNC Cmd_ExecuteString_internal(const char* cmdName, cmd_source_t src, 
 	cmdalias_t *a = cmd_alias;
 	while (a)
 	{
-		if (!Q_stricmp(cmd_argv[0], a->name))
+		if (!Q_stricmp(cmdName, a->name))
 		{
 
 			Cbuf_InsertText(a->value);
@@ -979,10 +979,15 @@ void EXT_FUNC Cmd_ExecuteString_internal(const char* cmdName, cmd_source_t src, 
 	}
 
 	// Search in cvars
-	if (!Cvar_Command() && g_pcls.state >= ca_connected)
+	if (!Cvar_Command())
 	{
 		// Send to a server if nothing processed locally and connected
-		Cmd_ForwardToServer();
+		if (g_pcls.state >= ca_connected)
+			Cmd_ForwardToServer();
+#ifdef REHLDS_FIXES
+		else if (sv_echo_unknown_cmd.string[0] == '2' || (sv_echo_unknown_cmd.string[1] == '1' && src == src_command))
+			Con_Printf("unknown command \"%s\"\n", cmdName);
+#endif
 	}
 }
 

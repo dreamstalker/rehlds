@@ -196,6 +196,7 @@ cvar_t sv_downloadurl = { "sv_downloadurl", "", FCVAR_PROTECTED, 0.0f, NULL };
 cvar_t sv_allow_dlfile = { "sv_allow_dlfile", "1", 0, 0.0f, NULL };
 #ifdef REHLDS_FIXES
 cvar_t sv_version = { "sv_version", "", FCVAR_SERVER, 0.0f, NULL };
+cvar_t sv_echo_unknown_cmd = { "sv_echo_unknown_cmd", "0", 0, 0.0f, NULL };
 #else
 cvar_t sv_version = {"sv_version", "", 0, 0.0f, NULL};
 #endif
@@ -7091,6 +7092,9 @@ void SV_Init(void)
 	Cvar_RegisterVariable(&sv_version);
 	Cvar_RegisterVariable(&sv_allow_dlfile);
 	Cvar_RegisterVariable(&sv_force_ent_intersection);
+#ifdef REHLDS_FIXES
+	Cvar_RegisterVariable(&sv_echo_unknown_cmd);
+#endif
 	
 	for (int i = 0; i < MAX_MODELS; i++)
 	{

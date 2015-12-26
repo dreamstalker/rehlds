@@ -522,6 +522,9 @@ extern cvar_t sv_logblocks;
 extern cvar_t sv_downloadurl;
 extern cvar_t sv_allow_dlfile;
 extern cvar_t sv_version;
+#ifdef REHLDS_FIXES
+extern cvar_t sv_echo_unknown_cmd;
+#endif
 extern int sv_playermodel;
 
 extern char outputbuf[MAX_ROUTEABLE_PACKET];
