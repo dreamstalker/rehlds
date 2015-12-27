@@ -985,7 +985,7 @@ void EXT_FUNC Cmd_ExecuteString_internal(const char* cmdName, cmd_source_t src, 
 		if (g_pcls.state >= ca_connected)
 			Cmd_ForwardToServer();
 #ifdef REHLDS_FIXES
-		else if (sv_echo_unknown_cmd.string[0] == '2' || (sv_echo_unknown_cmd.string[1] == '1' && src == src_command))
+		else if (sv_echo_unknown_cmd.string[0] == '1' && src == src_command)
 			Con_Printf("unknown command \"%s\"\n", cmdName);
 #endif
 	}
