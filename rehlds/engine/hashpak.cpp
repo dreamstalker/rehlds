@@ -821,7 +821,7 @@ void HPAK_CreatePak(char *pakname, struct resource_s *pResource, void *pData, Fi
 	}
 
 	Q_memset(&hash_pack_header, 0, sizeof(hash_pack_header_t));
-	Q_strncpy(hash_pack_header.szFileStamp, "HPAK", sizeof(hash_pack_header.szFileStamp));
+	Q_memcpy(hash_pack_header.szFileStamp, "HPAK", sizeof(hash_pack_header.szFileStamp));
 
 	hash_pack_header.version = HASHPAK_VERSION;
 	hash_pack_header.nDirectoryOffset = 0;

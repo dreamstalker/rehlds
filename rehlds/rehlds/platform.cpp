@@ -16,10 +16,17 @@ void CRehldsPlatformHolder::set(IReHLDSPlatform* p) {
 
 CSimplePlatform::CSimplePlatform() {
 #ifdef _WIN32
-	HMODULE wsock = LoadLibraryA("wsock32.dll");
+	wsock = LoadLibraryA("wsock32.dll");
 	setsockopt_v11 = (setsockopt_proto)GetProcAddress(wsock, "setsockopt");
 	if (setsockopt_v11 == NULL)
 		rehlds_syserror("%s: setsockopt_v11 not found", __FUNCTION__);
+#endif
+}
+
+CSimplePlatform::~CSimplePlatform()
+{
+#ifdef _WIN32
+	FreeLibrary(wsock);
 #endif
 }
 

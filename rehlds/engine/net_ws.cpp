@@ -889,7 +889,7 @@ qboolean NET_GetLong(unsigned char *pData, int size, int *outSize)
 			Con_Printf("<-- Split packet restart %i count %i seq\n", gNetSplit.splitCount, sequenceNumber);
 	}
 
-	int packetPayloadSize = size - sizeof(SPLITPACKET);
+	unsigned int packetPayloadSize = size - sizeof(SPLITPACKET);
 	if (gNetSplitFlags[packetNumber] == sequenceNumber)
 	{
 		Con_Printf(	"NET_GetLong:  Ignoring duplicated split packet %i of %i ( %i bytes )\n",
