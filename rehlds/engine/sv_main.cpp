@@ -1514,6 +1514,10 @@ void SV_WriteSpawn(sizebuf_t *msg)
 	host_client->connected			= TRUE;
 	host_client->fully_connected	= FALSE;
 
+#ifdef REHLDS_FIXES
+	g_GameClients[host_client - g_psvs.clients]->SetSpawnedOnce(true);
+#endif // REHLDS_FIXES
+
 	NotifyDedicatedServerUI("UpdatePlayers");
 }
 
@@ -2399,6 +2403,10 @@ void EXT_FUNC SV_ConnectClient_internal(void)
 	host_client->connected = TRUE;
 	host_client->uploading = FALSE;
 	host_client->fully_connected = FALSE;
+
+#ifdef REHLDS_FIXES
+	g_GameClients[host_client - g_psvs.clients]->SetSpawnedOnce(false);
+#endif // REHLDS_FIXES
 
 	bIsSecure = Steam_GSBSecure();
 	Netchan_OutOfBandPrint(NS_SERVER, adr, "%c %i \"%s\" %i %i", 66, host_client->userid, NET_AdrToString(host_client->netchan.remote_address), bIsSecure, build_number());
@@ -4657,7 +4665,7 @@ void SV_UpdateToReliableMessages(void)
 		//Fix for the "server failed to transmit file 'AY&SY..." bug
 		//https://github.com/dreamstalker/rehlds/issues/38
 #ifdef REHLDS_FIXES
-		if (!client->fakeclient && (client->active || client->connected))
+		if (!client->fakeclient && (client->active || g_GameClients[i]->GetSpawnedOnce()))
 		{
 			if (!svReliableCompressed && g_psv.reliable_datagram.cursize + client->netchan.message.cursize < client->netchan.message.maxsize)
 			{
