@@ -52,6 +52,10 @@ private:
 	client_t* m_pClient;
 	CNetChan m_NetChan;
 
+	// added this field to handle a bug with hanging clients in scoreboard after a map change.
+	// we would also use the field client_t:connected, but actually can't because there is a bug in CS client when server sends TeamScore
+	// and client is not yet initialized ScoreBoard which leads to memory corruption in the client.
+	bool m_bSpawnedOnce;
 public:
 	CGameClient(int id, client_t* cl);
 
@@ -82,6 +86,10 @@ public:
 	virtual bool GetLoopback();
 
 	virtual client_t* GetClient();
+
+public:
+	bool GetSpawnedOnce() const { return m_bSpawnedOnce; }
+	void SetSpawnedOnce(bool spawned) { m_bSpawnedOnce = spawned; }
 };
 
 class CRehldsServerStatic : public IRehldsServerStatic {
