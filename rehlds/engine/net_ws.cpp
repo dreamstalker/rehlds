@@ -1055,7 +1055,7 @@ qboolean NET_QueuePacket(netsrc_t sock)
 }
 
 /* <d3e26> ../engine/net_ws.c:1145 */
-int NET_Sleep_Timeout(void)
+int EXT_FUNC NET_Sleep_Timeout(void)
 {
 	fd_set fdset;
 	struct timeval tv;
@@ -1107,7 +1107,7 @@ int NET_Sleep_Timeout(void)
 	}
 
 	tv.tv_sec = 0;
-	tv.tv_usec = 1000 * 1000 / fps;
+	tv.tv_usec = 1000 * 1000 / fps; // hmm
 	if (tv.tv_usec == 0)
 		tv.tv_usec = 1;
 
@@ -1123,6 +1123,40 @@ int NET_Sleep_Timeout(void)
 		--numFrames;
 		return res;
 	}
+}
+
+DLL_EXPORT int EXT_FUNC NET_Sleep_Timeout_New(unsigned int usec)
+{
+	int number = 0;
+	fd_set fdset;
+	FD_ZERO(&fdset);
+
+	for (int i = 0; i < ARRAYSIZE(ip_sockets); i++)
+	{
+		int sock = ip_sockets[i];
+
+		if (sock > INVALID_SOCKET)
+			FD_SET(sock, &fdset);
+
+#ifndef _WIN32
+		if (number < sock)
+			number = sock;
+
+#else // _WIN32
+		sock = ipx_sockets[i];
+
+		if (sock > INVALID_SOCKET)
+			FD_SET(sock, &fdset);
+#endif // _WIN32
+	}
+
+	struct timeval tv;
+	tv.tv_sec = 0;
+	tv.tv_usec = usec;
+	if (tv.tv_usec == 0)
+		tv.tv_usec = 1;
+
+	return select(number + 1, &fdset, 0, 0, &tv);
 }
 
 /* <d3f09> ../engine/net_ws.c:1211 */

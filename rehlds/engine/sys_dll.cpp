@@ -544,18 +544,20 @@ void Sys_Quit(void)
 double EXT_FUNC Sys_FloatTime(void)
 {
 	unsigned int currentTime;
-	int savedOldTime;
 	LARGE_INTEGER PerformanceCount;
-
-	static bool s_NeedInit = true;
 	static unsigned int s_oldTime = 0;
-	static int s_timeNotChangedCounter = 0;
 
 	if (!g_PerfCounterInitialized)
 		return 1.0;
 
+#ifndef REHLDS_FIXES
+	int savedOldTime;
+	static bool s_NeedInit = true;
+	static int s_timeNotChangedCounter = 0;
+
 	EnterCriticalSection(&g_PerfCounterMutex);
-	Sys_FPUCW_Push_Prec64();
+	Sys_FPUCW_Push_Prec64(); // we don't use fpu
+#endif
 
 	CRehldsPlatformHolder::get()->QueryPerfCounter(&PerformanceCount);
 	if (g_PerfCounterShiftRightAmount)
@@ -563,6 +565,14 @@ double EXT_FUNC Sys_FloatTime(void)
 	else
 		currentTime = PerformanceCount.LowPart;
 
+#ifdef REHLDS_FIXES
+	if (currentTime != s_oldTime)
+	{
+		if (s_oldTime)
+			g_CurrentTime += double(currentTime - s_oldTime) * g_PerfCounterSlice;
+		s_oldTime = currentTime;
+	}
+#else // REHLDS_FIXES
 	if (!s_NeedInit)
 	{
 		savedOldTime = s_oldTime;
@@ -576,7 +586,7 @@ double EXT_FUNC Sys_FloatTime(void)
 			g_CurrentTime = g_CurrentTime + (double)(currentTime - savedOldTime) * g_PerfCounterSlice;
 			if (g_CurrentTime == g_StartTime)
 			{
-				if (s_timeNotChangedCounter >= 100000)
+				if (s_timeNotChangedCounter >= 100000) // always 0
 				{
 					g_CurrentTime = g_CurrentTime + 1.0;
 					s_timeNotChangedCounter = 0;
@@ -586,7 +596,7 @@ double EXT_FUNC Sys_FloatTime(void)
 			{
 				s_timeNotChangedCounter = 0;
 			}
-			g_StartTime = g_CurrentTime;
+			g_StartTime = g_CurrentTime; // wtf
 		}
 	}
 	else
@@ -597,6 +607,7 @@ double EXT_FUNC Sys_FloatTime(void)
 
 	Sys_FPUCW_Pop_Prec64();
 	LeaveCriticalSection(&g_PerfCounterMutex);
+#endif
 	return g_CurrentTime;
 }
 

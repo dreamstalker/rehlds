@@ -132,6 +132,8 @@
 	#define _MAX_FNAME NAME_MAX
 	#define MAX_PATH 260
 
+	#define INVALID_SOCKET (-1)
+
 	typedef void *HWND;
 
 	typedef unsigned long DWORD;
