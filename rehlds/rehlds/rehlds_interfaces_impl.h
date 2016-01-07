@@ -117,6 +117,8 @@ public:
 	virtual int GetDecalNameNum();
 
 	virtual double GetTime();
+	virtual void SetResourcesNum(int num);
+	virtual struct resource_s *GetResource(int index);
 };
 
 extern CGameClient** g_GameClients;

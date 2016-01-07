@@ -230,6 +230,14 @@ double EXT_FUNC CRehldsServerData::GetTime() {
 	return g_psv.time;
 }
 
+void EXT_FUNC CRehldsServerData::SetResourcesNum(int num) {
+	g_psv.num_resources = num;
+}
+
+struct resource_s *EXT_FUNC CRehldsServerData::GetResource(int index) {
+	return &g_psv.resourcelist[index];
+}
+
 void Rehlds_Interfaces_FreeClients() 
 {
 	if (g_GameClients == NULL)
