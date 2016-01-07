@@ -123,4 +123,6 @@ public:
 	virtual int GetDecalNameNum() = 0;
 
 	virtual double GetTime() = 0;
+	virtual void SetResourcesNum(int num) = 0;
+	virtual struct resource_s *GetResource(int index) = 0;
 };
