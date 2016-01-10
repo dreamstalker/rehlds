@@ -4862,7 +4862,7 @@ void SV_ExtractFromUserinfo(client_t *cl)
 	if (val[0] != 0)
 	{
 		i = Q_atoi(val);
-		cl->netchan.rate = clamp(i, MIN_RATE, MAX_RATE);
+		cl->netchan.rate = clamp(float(i), MIN_RATE, MAX_RATE);
 	}
 
 	val = Info_ValueForKey(userinfo, "topcolor");

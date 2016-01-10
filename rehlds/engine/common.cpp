@@ -265,15 +265,7 @@ float (*LittleFloat)(float l);
 
 int LongSwap(int l)
 {
-	/*byte b1, b2, b3, b4;
-
-	b1 = l & 0xFF;
-	b2 = (l >> 8) & 0xFF;
-	b3 = (l >> 16) & 0xFF;
-	b4 = (l >> 24) & 0xFF;
-
-	return ((int)b1 << 24) + ((int)b2 << 16) + ((int)b3 << 8) + b4;*/
-	return _byteswap_ulong(l);
+	return bswap(l);
 }
 
 int LongNoSwap(int l)
@@ -283,16 +275,7 @@ int LongNoSwap(int l)
 
 short ShortSwap(short l)
 {
-#ifdef _WIN32
-	return _byteswap_ushort(l); // xchg
-#else
-	byte b1, b2;
-
-	b1 = l & 0xFF;
-	b2 = (l >> 8) & 0xFF;
-
-	return (b1 << 8) + b2;
-#endif
+	return bswap(l);
 }
 
 short ShortNoSwap(short l)
@@ -315,8 +298,9 @@ float FloatSwap(float f)
 	dat2.b[3] = dat1.b[0];
 
 	return dat2.f;*/
-	unsigned long u = _byteswap_ulong(*(unsigned long *)&f);
-	return *(float *)&u;
+	//unsigned long u = bswap(*(unsigned long *)&f);
+	//return *(float *)&u;
+	return bswap(f);
 }
 
 float FloatNoSwap(float f)
@@ -2632,62 +2616,62 @@ void COM_Munge2(unsigned char *data, int len, int seq)
 	unsigned int *end;
 	unsigned int mSeq;
 
-	mSeq = _byteswap_ulong(~seq) ^ seq;
+	mSeq = bswap(~seq) ^ seq;
 	len /= 4;
 	end = (unsigned int *)data + (len & ~15);
 
 	for (pc = (unsigned int *)data; pc < end; pc += 16)
 	{
-		pc[0]  = _byteswap_ulong(pc[0])  ^ mSeq ^ 0xFFFFE7A5;
-		pc[1]  = _byteswap_ulong(pc[1])  ^ mSeq ^ 0xBFEFFFE5;
-		pc[2]  = _byteswap_ulong(pc[2])  ^ mSeq ^ 0xFFBFEFFF;
-		pc[3]  = _byteswap_ulong(pc[3])  ^ mSeq ^ 0xBFEFBFED;
-		pc[4]  = _byteswap_ulong(pc[4])  ^ mSeq ^ 0xBFAFEFBF;
-		pc[5]  = _byteswap_ulong(pc[5])  ^ mSeq ^ 0xFFBFAFEF;
-		pc[6]  = _byteswap_ulong(pc[6])  ^ mSeq ^ 0xFFEFBFAD;
-		pc[7]  = _byteswap_ulong(pc[7])  ^ mSeq ^ 0xFFFFEFBF;
-		pc[8]  = _byteswap_ulong(pc[8])  ^ mSeq ^ 0xFFEFF7EF;
-		pc[9]  = _byteswap_ulong(pc[9])  ^ mSeq ^ 0xBFEFE7F5;
-		pc[10] = _byteswap_ulong(pc[10]) ^ mSeq ^ 0xBFBFE7E5;
-		pc[11] = _byteswap_ulong(pc[11]) ^ mSeq ^ 0xFFAFB7E7;
-		pc[12] = _byteswap_ulong(pc[12]) ^ mSeq ^ 0xBFFFAFB5;
-		pc[13] = _byteswap_ulong(pc[13]) ^ mSeq ^ 0xBFAFFFAF;
-		pc[14] = _byteswap_ulong(pc[14]) ^ mSeq ^ 0xFFAFA7FF;
-		pc[15] = _byteswap_ulong(pc[15]) ^ mSeq ^ 0xFFEFA7A5;
+		pc[0]  = bswap(pc[0])  ^ mSeq ^ 0xFFFFE7A5;
+		pc[1]  = bswap(pc[1])  ^ mSeq ^ 0xBFEFFFE5;
+		pc[2]  = bswap(pc[2])  ^ mSeq ^ 0xFFBFEFFF;
+		pc[3]  = bswap(pc[3])  ^ mSeq ^ 0xBFEFBFED;
+		pc[4]  = bswap(pc[4])  ^ mSeq ^ 0xBFAFEFBF;
+		pc[5]  = bswap(pc[5])  ^ mSeq ^ 0xFFBFAFEF;
+		pc[6]  = bswap(pc[6])  ^ mSeq ^ 0xFFEFBFAD;
+		pc[7]  = bswap(pc[7])  ^ mSeq ^ 0xFFFFEFBF;
+		pc[8]  = bswap(pc[8])  ^ mSeq ^ 0xFFEFF7EF;
+		pc[9]  = bswap(pc[9])  ^ mSeq ^ 0xBFEFE7F5;
+		pc[10] = bswap(pc[10]) ^ mSeq ^ 0xBFBFE7E5;
+		pc[11] = bswap(pc[11]) ^ mSeq ^ 0xFFAFB7E7;
+		pc[12] = bswap(pc[12]) ^ mSeq ^ 0xBFFFAFB5;
+		pc[13] = bswap(pc[13]) ^ mSeq ^ 0xBFAFFFAF;
+		pc[14] = bswap(pc[14]) ^ mSeq ^ 0xFFAFA7FF;
+		pc[15] = bswap(pc[15]) ^ mSeq ^ 0xFFEFA7A5;
 	}
 
 	switch(len & 15)
 	{
 	case 15:
-		pc[14] = _byteswap_ulong(pc[14]) ^ mSeq ^ 0xFFAFA7FF;
+		pc[14] = bswap(pc[14]) ^ mSeq ^ 0xFFAFA7FF;
 	case 14:
-		pc[13] = _byteswap_ulong(pc[13]) ^ mSeq ^ 0xBFAFFFAF;
+		pc[13] = bswap(pc[13]) ^ mSeq ^ 0xBFAFFFAF;
 	case 13:
-		pc[12] = _byteswap_ulong(pc[12]) ^ mSeq ^ 0xBFFFAFB5;
+		pc[12] = bswap(pc[12]) ^ mSeq ^ 0xBFFFAFB5;
 	case 12:
-		pc[11] = _byteswap_ulong(pc[11]) ^ mSeq ^ 0xFFAFB7E7;
+		pc[11] = bswap(pc[11]) ^ mSeq ^ 0xFFAFB7E7;
 	case 11:
-		pc[10] = _byteswap_ulong(pc[10]) ^ mSeq ^ 0xBFBFE7E5;
+		pc[10] = bswap(pc[10]) ^ mSeq ^ 0xBFBFE7E5;
 	case 10:
-		pc[9] = _byteswap_ulong(pc[9])   ^ mSeq ^ 0xBFEFE7F5;
+		pc[9] = bswap(pc[9])   ^ mSeq ^ 0xBFEFE7F5;
 	case 9:
-		pc[8] = _byteswap_ulong(pc[8])   ^ mSeq ^ 0xFFEFF7EF;
+		pc[8] = bswap(pc[8])   ^ mSeq ^ 0xFFEFF7EF;
 	case 8:
-		pc[7] = _byteswap_ulong(pc[7])   ^ mSeq ^ 0xFFFFEFBF;
+		pc[7] = bswap(pc[7])   ^ mSeq ^ 0xFFFFEFBF;
 	case 7:
-		pc[6] = _byteswap_ulong(pc[6])   ^ mSeq ^ 0xFFEFBFAD;
+		pc[6] = bswap(pc[6])   ^ mSeq ^ 0xFFEFBFAD;
 	case 6:
-		pc[5] = _byteswap_ulong(pc[5])   ^ mSeq ^ 0xFFBFAFEF;
+		pc[5] = bswap(pc[5])   ^ mSeq ^ 0xFFBFAFEF;
 	case 5:
-		pc[4] = _byteswap_ulong(pc[4])   ^ mSeq ^ 0xBFAFEFBF;
+		pc[4] = bswap(pc[4])   ^ mSeq ^ 0xBFAFEFBF;
 	case 4:
-		pc[3] = _byteswap_ulong(pc[3])   ^ mSeq ^ 0xBFEFBFED;
+		pc[3] = bswap(pc[3])   ^ mSeq ^ 0xBFEFBFED;
 	case 3:
-		pc[2] = _byteswap_ulong(pc[2])   ^ mSeq ^ 0xFFBFEFFF;
+		pc[2] = bswap(pc[2])   ^ mSeq ^ 0xFFBFEFFF;
 	case 2:
-		pc[1] = _byteswap_ulong(pc[1])   ^ mSeq ^ 0xBFEFFFE5;
+		pc[1] = bswap(pc[1])   ^ mSeq ^ 0xBFEFFFE5;
 	case 1:
-		pc[0] = _byteswap_ulong(pc[0])   ^ mSeq ^ 0xFFFFE7A5;
+		pc[0] = bswap(pc[0])   ^ mSeq ^ 0xFFFFE7A5;
 	}
 }
 #else // REHLDS_FIXES
@@ -2731,62 +2715,62 @@ void COM_UnMunge2(unsigned char *data, int len, int seq)
 	unsigned int *end;
 	unsigned int mSeq;
 
-	mSeq = _byteswap_ulong(~seq) ^ seq;
+	mSeq = bswap(~seq) ^ seq;
 	len /= 4;
 	end = (unsigned int *)data + (len & ~15);
 
 	for (pc = (unsigned int *)data; pc < end; pc += 16)
 	{
-		pc[0]  = _byteswap_ulong(pc[0]  ^ mSeq ^ 0xFFFFE7A5);
-		pc[1]  = _byteswap_ulong(pc[1]  ^ mSeq ^ 0xBFEFFFE5);
-		pc[2]  = _byteswap_ulong(pc[2]  ^ mSeq ^ 0xFFBFEFFF);
-		pc[3]  = _byteswap_ulong(pc[3]  ^ mSeq ^ 0xBFEFBFED);
-		pc[4]  = _byteswap_ulong(pc[4]  ^ mSeq ^ 0xBFAFEFBF);
-		pc[5]  = _byteswap_ulong(pc[5]  ^ mSeq ^ 0xFFBFAFEF);
-		pc[6]  = _byteswap_ulong(pc[6]  ^ mSeq ^ 0xFFEFBFAD);
-		pc[7]  = _byteswap_ulong(pc[7]  ^ mSeq ^ 0xFFFFEFBF);
-		pc[8]  = _byteswap_ulong(pc[8]  ^ mSeq ^ 0xFFEFF7EF);
-		pc[9]  = _byteswap_ulong(pc[9]  ^ mSeq ^ 0xBFEFE7F5);
-		pc[10] = _byteswap_ulong(pc[10] ^ mSeq ^ 0xBFBFE7E5);
-		pc[11] = _byteswap_ulong(pc[11] ^ mSeq ^ 0xFFAFB7E7);
-		pc[12] = _byteswap_ulong(pc[12] ^ mSeq ^ 0xBFFFAFB5);
-		pc[13] = _byteswap_ulong(pc[13] ^ mSeq ^ 0xBFAFFFAF);
-		pc[14] = _byteswap_ulong(pc[14] ^ mSeq ^ 0xFFAFA7FF);
-		pc[15] = _byteswap_ulong(pc[15] ^ mSeq ^ 0xFFEFA7A5);
+		pc[0]  = bswap(pc[0]  ^ mSeq ^ 0xFFFFE7A5);
+		pc[1]  = bswap(pc[1]  ^ mSeq ^ 0xBFEFFFE5);
+		pc[2]  = bswap(pc[2]  ^ mSeq ^ 0xFFBFEFFF);
+		pc[3]  = bswap(pc[3]  ^ mSeq ^ 0xBFEFBFED);
+		pc[4]  = bswap(pc[4]  ^ mSeq ^ 0xBFAFEFBF);
+		pc[5]  = bswap(pc[5]  ^ mSeq ^ 0xFFBFAFEF);
+		pc[6]  = bswap(pc[6]  ^ mSeq ^ 0xFFEFBFAD);
+		pc[7]  = bswap(pc[7]  ^ mSeq ^ 0xFFFFEFBF);
+		pc[8]  = bswap(pc[8]  ^ mSeq ^ 0xFFEFF7EF);
+		pc[9]  = bswap(pc[9]  ^ mSeq ^ 0xBFEFE7F5);
+		pc[10] = bswap(pc[10] ^ mSeq ^ 0xBFBFE7E5);
+		pc[11] = bswap(pc[11] ^ mSeq ^ 0xFFAFB7E7);
+		pc[12] = bswap(pc[12] ^ mSeq ^ 0xBFFFAFB5);
+		pc[13] = bswap(pc[13] ^ mSeq ^ 0xBFAFFFAF);
+		pc[14] = bswap(pc[14] ^ mSeq ^ 0xFFAFA7FF);
+		pc[15] = bswap(pc[15] ^ mSeq ^ 0xFFEFA7A5);
 	}
 
 	switch(len & 15)
 	{
 	case 15:
-		pc[14] = _byteswap_ulong(pc[14] ^ mSeq ^ 0xFFAFA7FF);
+		pc[14] = bswap(pc[14] ^ mSeq ^ 0xFFAFA7FF);
 	case 14:
-		pc[13] = _byteswap_ulong(pc[13] ^ mSeq ^ 0xBFAFFFAF);
+		pc[13] = bswap(pc[13] ^ mSeq ^ 0xBFAFFFAF);
 	case 13:
-		pc[12] = _byteswap_ulong(pc[12] ^ mSeq ^ 0xBFFFAFB5);
+		pc[12] = bswap(pc[12] ^ mSeq ^ 0xBFFFAFB5);
 	case 12:
-		pc[11] = _byteswap_ulong(pc[11] ^ mSeq ^ 0xFFAFB7E7);
+		pc[11] = bswap(pc[11] ^ mSeq ^ 0xFFAFB7E7);
 	case 11:
-		pc[10] = _byteswap_ulong(pc[10] ^ mSeq ^ 0xBFBFE7E5);
+		pc[10] = bswap(pc[10] ^ mSeq ^ 0xBFBFE7E5);
 	case 10:
-		pc[9] = _byteswap_ulong(pc[9]   ^ mSeq ^ 0xBFEFE7F5);
+		pc[9] = bswap(pc[9]   ^ mSeq ^ 0xBFEFE7F5);
 	case 9:
-		pc[8] = _byteswap_ulong(pc[8]   ^ mSeq ^ 0xFFEFF7EF);
+		pc[8] = bswap(pc[8]   ^ mSeq ^ 0xFFEFF7EF);
 	case 8:
-		pc[7] = _byteswap_ulong(pc[7]   ^ mSeq ^ 0xFFFFEFBF);
+		pc[7] = bswap(pc[7]   ^ mSeq ^ 0xFFFFEFBF);
 	case 7:
-		pc[6] = _byteswap_ulong(pc[6]   ^ mSeq ^ 0xFFEFBFAD);
+		pc[6] = bswap(pc[6]   ^ mSeq ^ 0xFFEFBFAD);
 	case 6:
-		pc[5] = _byteswap_ulong(pc[5]   ^ mSeq ^ 0xFFBFAFEF);
+		pc[5] = bswap(pc[5]   ^ mSeq ^ 0xFFBFAFEF);
 	case 5:
-		pc[4] = _byteswap_ulong(pc[4]   ^ mSeq ^ 0xBFAFEFBF);
+		pc[4] = bswap(pc[4]   ^ mSeq ^ 0xBFAFEFBF);
 	case 4:
-		pc[3] = _byteswap_ulong(pc[3]   ^ mSeq ^ 0xBFEFBFED);
+		pc[3] = bswap(pc[3]   ^ mSeq ^ 0xBFEFBFED);
 	case 3:
-		pc[2] = _byteswap_ulong(pc[2]   ^ mSeq ^ 0xFFBFEFFF);
+		pc[2] = bswap(pc[2]   ^ mSeq ^ 0xFFBFEFFF);
 	case 2:
-		pc[1] = _byteswap_ulong(pc[1]   ^ mSeq ^ 0xBFEFFFE5);
+		pc[1] = bswap(pc[1]   ^ mSeq ^ 0xBFEFFFE5);
 	case 1:
-		pc[0] = _byteswap_ulong(pc[0]   ^ mSeq ^ 0xFFFFE7A5);
+		pc[0] = bswap(pc[0]   ^ mSeq ^ 0xFFFFE7A5);
 	}
 }
 #else // REHLDS_FIXES
