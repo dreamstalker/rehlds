@@ -1,7 +1,7 @@
 #include "precompiled.h"
 
-cvar_t sv_rehlds_movecmdrate_max_avg = { "sv_rehlds_movecmdrate_max_avg", "300", 0, 300.0f, NULL };
-cvar_t sv_rehlds_movecmdrate_max_burst = { "sv_rehlds_movecmdrate_max_burst", "1500", 0, 1500.0f, NULL };
+cvar_t sv_rehlds_movecmdrate_max_avg = { "sv_rehlds_movecmdrate_max_avg", "400", 0, 400.0f, NULL };
+cvar_t sv_rehlds_movecmdrate_max_burst = { "sv_rehlds_movecmdrate_max_burst", "2500", 0, 2500.0f, NULL };
 cvar_t sv_rehlds_stringcmdrate_max_avg = {"sv_rehlds_stringcmdrate_max_avg", "80", 0, 80.0f, NULL};
 cvar_t sv_rehlds_stringcmdrate_max_burst = {"sv_rehlds_stringcmdrate_max_burst", "400", 0, 400.0f, NULL};
 

@@ -1553,12 +1553,9 @@ void SV_ParseMove(client_t *pSenderClient)
 	host_client->packet_loss = packet_loss;
 	if (!g_psv.paused && (g_psvs.maxclients > 1 || !key_dest) && !(sv_player->v.flags & FL_FROZEN))
 	{
-#ifndef REHLDS_FIXES
-		// dup and more correct in SV_RunCmd
 		sv_player->v.v_angle[0] = cmds[0].viewangles[0];
 		sv_player->v.v_angle[1] = cmds[0].viewangles[1];
 		sv_player->v.v_angle[2] = cmds[0].viewangles[2];
-#endif
 	}
 	else
 	{
