@@ -1370,7 +1370,7 @@ int NET_SendLong(netsrc_t sock, int s, const char *buf, int len, int flags, cons
 
 		while (len > 0)
 		{
-			size = min(SPLIT_SIZE, len);
+			size = min(int(SPLIT_SIZE), len);
 
 			pPacket->packetID = (packetNumber << 4) + packetCount;
 

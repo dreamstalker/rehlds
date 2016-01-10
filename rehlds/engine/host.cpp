@@ -531,6 +531,10 @@ void SV_DropClient_internal(client_t *cl, qboolean crash, const char *string)
 	Q_memset(cl->userinfo, 0, sizeof(cl->userinfo));
 	Q_memset(cl->physinfo, 0, sizeof(cl->physinfo));
 
+#ifdef REHLDS_FIXES
+	g_GameClients[host_client - g_psvs.clients]->SetSpawnedOnce(false);
+#endif // REHLDS_FIXES
+
 	SV_FullClientUpdate(cl, &g_psv.reliable_datagram);
 
 	NotifyDedicatedServerUI("UpdatePlayers");

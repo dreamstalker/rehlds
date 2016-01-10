@@ -166,8 +166,6 @@
 
 	#define WSAENOPROTOOPT ENOPROTOOPT
 
-	inline unsigned long _byteswap_ulong(unsigned long val) { return _bswap(val); }
-
 	#ifndef FALSE
 	#define FALSE	0
 	#endif

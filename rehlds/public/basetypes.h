@@ -44,6 +44,7 @@
 #define PAD_NUMBER(number, boundary) \
 	( ((number) + ((boundary)-1)) / (boundary) ) * (boundary)
 
+#ifndef MATHLIB_H
 // In case this ever changes
 #define M_PI			3.14159265358979323846
 
@@ -54,19 +55,7 @@
 #ifndef max
 #define max(a,b)  (((a) > (b)) ? (a) : (b))
 #endif
-
-#ifdef __cplusplus
-template<typename T>
-inline T clamp2(T const &val, T const &minVal, T const &maxVal) //renamed to clamp2 to avoid conflicts with clamp defined in mathlib
-{
-	if (val < minVal)
-		return minVal;
-	else if (val > maxVal)
-		return maxVal;
-	else
-		return val;
-}
-#endif
+#endif // MATHLIB_H
 
 #ifndef FALSE
 #define FALSE 0
