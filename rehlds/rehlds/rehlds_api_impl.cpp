@@ -191,7 +191,8 @@ RehldsFuncs_t g_RehldsApiFuncs =
 	&MSG_WriteShort_api,
 	&MSG_WriteString_api,
 	&Rehlds_GetPluginApi,
-	&Rehlds_RegisterPluginApi
+	&Rehlds_RegisterPluginApi,
+	&SV_FileInConsistencyList
 };
 
 sizebuf_t* EXT_FUNC GetNetMessage_api()
@@ -347,6 +348,10 @@ IRehldsHookRegistry_SV_WriteVoiceCodec* CRehldsHookchains::SV_WriteVoiceCodec() 
 
 CRehldsHookRegistry_Steam_GSGetSteamID* CRehldsHookchains::Steam_GSGetSteamID() {
 	return &m_Steam_GSGetSteamID;
+}
+
+CRehldsHookRegistry_SV_TransferConsistencyInfo* CRehldsHookchains::SV_TransferConsistencyInfo() {
+	return &m_SV_TransferConsistencyInfo;
 }
 
 int EXT_FUNC CRehldsApi::GetMajorVersion()

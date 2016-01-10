@@ -161,6 +161,10 @@ typedef IVoidHookChainRegistry<sizebuf_t *> IRehldsHookRegistry_SV_WriteVoiceCod
 typedef IHookChain<uint64> IRehldsHook_Steam_GSGetSteamID;
 typedef IHookChainRegistry<uint64> IRehldsHookRegistry_Steam_GSGetSteamID;
 
+//SV_TransferConsistencyInfo hook
+typedef IHookChain<int> IRehldsHook_SV_TransferConsistencyInfo;
+typedef IHookChainRegistry<int> IRehldsHookRegistry_SV_TransferConsistencyInfo;
+
 class IRehldsHookchains {
 public:
 	virtual ~IRehldsHookchains() { }
@@ -196,6 +200,7 @@ public:
 	virtual IRehldsHookRegistry_SV_ActivateServer* SV_ActivateServer() = 0;
 	virtual IRehldsHookRegistry_SV_WriteVoiceCodec* SV_WriteVoiceCodec() = 0;
 	virtual IRehldsHookRegistry_Steam_GSGetSteamID* Steam_GSGetSteamID() = 0;
+	virtual IRehldsHookRegistry_SV_TransferConsistencyInfo* SV_TransferConsistencyInfo() = 0;
 };
 
 struct RehldsFuncs_t {
@@ -240,6 +245,7 @@ struct RehldsFuncs_t {
 	void(*MSG_WriteString)(sizebuf_t *sb, const char *s);
 	void*(*GetPluginApi)(const char *name);
 	void(*RegisterPluginApi)(const char *name, void *impl);
+	qboolean(*SV_FileInConsistencyList)(const char *filename, struct consistency_s **ppconsist);
 };
 
 class IRehldsApi {

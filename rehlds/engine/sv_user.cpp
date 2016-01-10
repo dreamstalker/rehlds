@@ -247,7 +247,7 @@ void SV_ParseConsistencyResponse(client_t *pSenderClient)
 }
 
 /* <bf937> ../engine/sv_user.c:267 */
-qboolean SV_FileInConsistencyList(const char *filename, consistency_t **ppconsist)
+qboolean EXT_FUNC SV_FileInConsistencyList(const char *filename, consistency_t **ppconsist)
 {
 	for (int i = 0; i < ARRAYSIZE(g_psv.consistency_list); i++)
 	{
@@ -267,6 +267,11 @@ qboolean SV_FileInConsistencyList(const char *filename, consistency_t **ppconsis
 
 /* <bf9a8> ../engine/sv_user.c:298 */
 int SV_TransferConsistencyInfo(void)
+{
+	return g_RehldsHookchains.m_SV_TransferConsistencyInfo.callChain(SV_TransferConsistencyInfo_internal);
+}
+
+int EXT_FUNC SV_TransferConsistencyInfo_internal(void)
 {
 	consistency_t *pc;
 
