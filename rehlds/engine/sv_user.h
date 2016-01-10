@@ -120,6 +120,7 @@ extern qboolean nofind;
 void SV_ParseConsistencyResponse(client_t *pSenderClient);
 qboolean SV_FileInConsistencyList(const char *filename, consistency_t **ppconsist);
 int SV_TransferConsistencyInfo(void);
+int SV_TransferConsistencyInfo_internal(void);
 void SV_SendConsistencyList(sizebuf_t *msg);
 void SV_PreRunCmd(void);
 void SV_CopyEdictToPhysent(physent_t *pe, int e, edict_t *check);
