@@ -16,7 +16,7 @@ struct deltajit_field {
 
 struct deltajit_memblock_field {
 	deltajit_field* field;
-	uint16 mask;
+	uint16 mask; // one bit for each memblock byte
 	bool first;
 	bool last;
 };
