@@ -1637,6 +1637,16 @@ int NET_IPSocket(char *net_interface, int port, qboolean multicast)
 #endif // _WIN32
 		Con_DPrintf("WARNING: UDP_OpenSocket: port %d setsockopt IP_MULTICAST_LOOP: %s\n", port, NET_ErrorString(err));
 	}
+
+#if defined __linux__ && defined REHLDS_FIXES
+	i = IP_PMTUDISC_DONT;
+	if (setsockopt(newsocket, IPPROTO_IP, IP_MTU_DISCOVER, (char *)&i, sizeof(i)) == SOCKET_ERROR)
+	{
+		err = errno;
+		Con_Printf("WARNING: UDP_OpenSocket: port %d  setsockopt IP_MTU_DISCOVER: %s\n", port, NET_ErrorString(err));
+	}
+#endif
+
 	return newsocket;
 }
 
