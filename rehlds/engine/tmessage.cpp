@@ -224,12 +224,12 @@ void TrimSpace(const char *source, char *dest)
 
 	if (length <= 0)
 	{
-		dest[0] = 0;
+		dest[0] = '\0';
 	}
 	else
 	{
-		Q_strncpy(dest, &source[start], length);
-		dest[length] = 0;
+		Q_memmove(dest, &source[start], length);
+		dest[length] = '\0';
 	}
 }
 

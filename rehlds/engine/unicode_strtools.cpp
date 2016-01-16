@@ -624,12 +624,13 @@ template<
 >
 int Q_UnicodeConvertT(const T_IN* pIn, T_OUT *pOut, int nOutBytes, enum EStringConvertErrorPolicy ePolicy)
 {
+	if (nOutBytes == 0)
+		return 0;
+
 	int nOut = 0;
 	if (pOut)
 	{
-		int nMaxOut = nOutBytes / sizeof(T_OUT) - 1;
-		if (nMaxOut <= 0)
-			return 0;
+		int nMaxOut = nOutBytes / sizeof(T_OUT) - 1; // print symbols count
 
 		while (*pIn)
 		{
@@ -742,7 +743,7 @@ qboolean Q_StripUnprintableAndSpace(char *pch)
 
 	int cch = Q_strlen(pch);
 	int cubDest = (cch + 1) * sizeof(uchar16);
-	uchar16 *pwch_alloced = (uchar16*)malloc(cubDest);
+	uchar16 *pwch_alloced = (uchar16*)alloca(cubDest);
 	bStrippedAny = false;
 	bStrippedWhitespace = false;
 	int cwch = (unsigned int)Q_UTF8ToUTF16(pch, (uchar16 *)pwch_alloced, cubDest, _STRINGCONVERTFLAG_ASSERT) >> 1;
@@ -751,6 +752,5 @@ qboolean Q_StripUnprintableAndSpace(char *pch)
 	if (bStrippedWhitespace || bStrippedAny)
 		Q_UTF16ToUTF8(pwch, pch, cch, STRINGCONVERT_ASSERT_REPLACE);
 
-	free(pwch_alloced);
 	return bStrippedAny;
 }

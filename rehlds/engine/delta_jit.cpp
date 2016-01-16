@@ -321,7 +321,8 @@ void CDeltaCheckJIT::iterateStrings(deltajitdata_t *jitdesc)
 		pushed_size += 8;
 	}
 
-	add(esp, pushed_size);
+	if (pushed_size)
+		add(esp, pushed_size);
 }
 
 class CDeltaClearMarkFieldsJIT : public jitasm::function<int, CDeltaClearMarkFieldsJIT, void*, void*, void*, void*>
@@ -380,60 +381,36 @@ void CDeltaClearMarkFieldsJIT::calculateBytecount() {
 	mov(eax, dword_ptr[ebx + delta_markbits_offset]);
 	xor_(edx, edx);
 
-	// 0-7
+	// bits 0-7
 	test(al, al);
 	setnz(dl);
 
-	// 8-15
-	if (jitdesc->numFields > 7)
-	{
-		mov(esi, 2);
-		test(ah, ah);
-		cmovnz(edx, esi);
-	}
+	for (size_t i = 1; i < DELTAJIT_MAX_FIELDS / 8; i++) {
+		const int byteid = i & 3;
 
-	// 16-23
-	if (jitdesc->numFields > 15)
-	{
-		mov(ecx, 3);
-		test(eax, 0xFF0000);
-		cmovnz(edx, ecx);
-	}
+		if (byteid == 0)
+			mov(eax, dword_ptr[ebx + delta_markbits_offset + i]);
 
-	// 24-31
-	if (jitdesc->numFields > 23)
-	{
-		mov(esi, 4);
-		test(eax, 0xFF000000);
-		cmovnz(edx, esi);
-	}
+		auto reg = (i & 1) ? ecx : esi;
+		auto prev = (i & 1) ? esi : ecx;
 
-	if (jitdesc->numFields > 31)
-	{
-		mov(eax, dword_ptr[ebx + delta_markbits_offset + 4]);
+		if (jitdesc->numFields > i * 8 - 1) {
+			mov(reg, i + 1);
+			if(i != 1) cmovnz(edx, prev);
 
-		// 32-39
-		mov(ecx, 5);
-		test(al, al);
-		cmovnz(edx, ecx);
-
-		// 40-47
-		if (jitdesc->numFields > 39)
-		{
-			mov(esi, 6);
-			test(ah, ah);
-			cmovnz(edx, esi);
+			switch (byteid) {
+			case 0: test(al, al); break;
+			case 1: test(ah, ah); break;
+			default: test(eax, 0xFF << (byteid * 8));
+			}
 		}
-
-		// 48-55
-		if (jitdesc->numFields > 47)
-		{
-			mov(ecx, 7);
-			test(eax, 0xFF0000);
-			cmovnz(edx, ecx);
+		else if (jitdesc->numFields > unsigned(i * 8 - 9)) {
+			cmovnz(edx, prev);
+			break;
 		}
-
-		// maxfields is 56
+	}
+	if (jitdesc->numFields > DELTAJIT_MAX_FIELDS - 9) {
+		cmovnz(edx, (DELTAJIT_MAX_FIELDS / 8 & 1) ? esi : ecx);
 	}
 
 	size_t delta_masksize_offset = offsetof(CDeltaJit, markedFieldsMaskSize);
@@ -513,7 +490,7 @@ CDeltaClearMarkFieldsJIT::Result CDeltaClearMarkFieldsJIT::main(Addr src, Addr d
 	CUniqueLabel no_markedbits("no_markedbits");
 	CUniqueLabel calculated("calculated");
 
-	test(edi, edi);
+	//test(edi, edi); // flags are already set
 	jz(no_markedbits);
 		calculateBytecount();
 		jmp(calculated);

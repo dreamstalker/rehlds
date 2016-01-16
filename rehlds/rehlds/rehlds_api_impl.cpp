@@ -345,8 +345,12 @@ IRehldsHookRegistry_SV_WriteVoiceCodec* CRehldsHookchains::SV_WriteVoiceCodec() 
 	return &m_SV_WriteVoiceCodec;
 }
 
-CRehldsHookRegistry_Steam_GSGetSteamID* CRehldsHookchains::Steam_GSGetSteamID() {
+IRehldsHookRegistry_Steam_GSGetSteamID* CRehldsHookchains::Steam_GSGetSteamID() {
 	return &m_Steam_GSGetSteamID;
+}
+
+IRehldsHookRegistry_Steam_GSBUpdateUserData* CRehldsHookchains::Steam_GSBUpdateUserData() {
+	return &m_Steam_GSBUpdateUserData;
 }
 
 int EXT_FUNC CRehldsApi::GetMajorVersion()
