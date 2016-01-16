@@ -159,6 +159,10 @@ typedef IHookChainRegistryImpl<uint64> CRehldsHookRegistry_Steam_GSGetSteamID;
 typedef IHookChainImpl<int> CRehldsHook_SV_TransferConsistencyInfo;
 typedef IHookChainRegistryImpl<int> CRehldsHookRegistry_SV_TransferConsistencyInfo;
 
+//Steam_GSBUpdateUserData hook
+typedef IHookChainImpl<bool, uint64, const char *, uint32> CRehldsHook_Steam_GSBUpdateUserData;
+typedef IHookChainRegistryImpl<bool, uint64, const char *, uint32> CRehldsHookRegistry_Steam_GSBUpdateUserData;
+
 class CRehldsHookchains : public IRehldsHookchains {
 public:
 	CRehldsHookRegistry_Steam_NotifyClientConnect m_Steam_NotifyClientConnect;
@@ -193,6 +197,7 @@ public:
 	CRehldsHookRegistry_SV_WriteVoiceCodec m_SV_WriteVoiceCodec;
 	CRehldsHookRegistry_Steam_GSGetSteamID m_Steam_GSGetSteamID;
 	CRehldsHookRegistry_SV_TransferConsistencyInfo m_SV_TransferConsistencyInfo;
+	CRehldsHookRegistry_Steam_GSBUpdateUserData m_Steam_GSBUpdateUserData;
 
 public:
 	virtual IRehldsHookRegistry_Steam_NotifyClientConnect* Steam_NotifyClientConnect();
@@ -225,7 +230,8 @@ public:
 	virtual	IRehldsHookRegistry_SV_DropClient* SV_DropClient();
 	virtual	IRehldsHookRegistry_SV_ActivateServer* SV_ActivateServer();
 	virtual	IRehldsHookRegistry_SV_WriteVoiceCodec* SV_WriteVoiceCodec();
-	virtual CRehldsHookRegistry_Steam_GSGetSteamID* Steam_GSGetSteamID();
+	virtual IRehldsHookRegistry_Steam_GSGetSteamID* Steam_GSGetSteamID();
+	virtual IRehldsHookRegistry_Steam_GSBUpdateUserData* Steam_GSBUpdateUserData();
 	virtual CRehldsHookRegistry_SV_TransferConsistencyInfo* SV_TransferConsistencyInfo();
 };
 

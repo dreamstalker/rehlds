@@ -2411,7 +2411,11 @@ void EXT_FUNC SV_ConnectClient_internal(void)
 	bIsSecure = Steam_GSBSecure();
 	Netchan_OutOfBandPrint(NS_SERVER, adr, "%c %i \"%s\" %i %i", 66, host_client->userid, NET_AdrToString(host_client->netchan.remote_address), bIsSecure, build_number());
 	Log_Printf("\"%s<%i><%s><>\" connected, address \"%s\"\n", name, host_client->userid, SV_GetClientIDString(host_client), NET_AdrToString(host_client->netchan.remote_address));
+#ifdef REHLDS_FIXES
+	Q_strncpy(host_client->userinfo, userinfo, MAX_INFO_STRING - 1);
+#else
 	Q_strncpy(host_client->userinfo, userinfo, MAX_INFO_STRING);
+#endif
 	host_client->userinfo[MAX_INFO_STRING - 1] = 0;
 
 	SV_ExtractFromUserinfo(host_client);
@@ -4799,15 +4803,13 @@ void SV_ExtractFromUserinfo(client_t *cl)
 	const char *val;
 	int i;
 	char newname[MAX_NAME];
-	char rawname[MAX_NAME];
-
 	char *userinfo = cl->userinfo;
 
 	val = Info_ValueForKey(userinfo, "name");
-	Q_strncpy(rawname, val, sizeof(rawname) - 1);
-	rawname[sizeof(rawname) - 1] = 0;
+	Q_strncpy(newname, val, sizeof(newname) - 1);
+	newname[sizeof(newname) - 1] = '\0';
 
-	for (char *p = rawname; *p; p++)
+	for (char *p = newname; *p; p++)
 	{
 		if (*p == '%'
 			|| *p == '&'
@@ -4819,10 +4821,9 @@ void SV_ExtractFromUserinfo(client_t *cl)
 	}
 
 #ifdef REHLDS_FIXES
-	Q_strcpy(newname, rawname);
 	Q_StripUnprintableAndSpace(newname);
 #else // REHLDS_FIXES
-	TrimSpace(rawname, newname);
+	TrimSpace(newname, newname);
 #endif // REHLDS_FIXES
 
 	if (!Q_UnicodeValidate(newname))
@@ -4831,9 +4832,9 @@ void SV_ExtractFromUserinfo(client_t *cl)
 	}
 
 	// Fix name to not start with '#', so it will not resemble userid
-	for (char *p = rawname; *p == '#'; p++) *p = ' ';
+	for (char *p = newname; *p == '#'; p++) *p = ' ';
 
-	if (newname[0] == 0 || !Q_stricmp(newname, "console")
+	if (newname[0] == '\0' || !Q_stricmp(newname, "console")
 #ifdef REHLDS_FIXES
 		|| Q_strstr(newname, "..") != NULL)
 #else // REHLDS_FIXES
@@ -4854,7 +4855,7 @@ void SV_ExtractFromUserinfo(client_t *cl)
 
 	val = Info_ValueForKey(userinfo, "name");
 	Q_strncpy(cl->name, val, sizeof(cl->name) - 1);
-	cl->name[sizeof(cl->name) - 1] = 0;
+	cl->name[sizeof(cl->name) - 1] = '\0';
 
 	ISteamGameServer_BUpdateUserData(cl->network_userid.m_SteamID, cl->name, 0);
 

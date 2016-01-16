@@ -467,7 +467,11 @@ void CSteam3Server::RunFrame()
 			if (!cl->active)
 				continue;
 
-			CRehldsPlatformHolder::get()->SteamGameServer()->BUpdateUserData(CSteamID(cl->network_userid.m_SteamID), cl->name, cl->edict->v.frags);
+#ifdef REHLDS_FIXES
+			ISteamGameServer_BUpdateUserData(cl->network_userid.m_SteamID, cl->name, cl->edict->v.frags);
+#else
+			CRehldsPlatformHolder::get()->SteamGameServer()->BUpdateUserData(cl->network_userid.m_SteamID, cl->name, cl->edict->v.frags);
+#endif
 		}
 
 		if (CRehldsPlatformHolder::get()->SteamGameServer()->WasRestartRequested())
@@ -647,6 +651,11 @@ uint64 ISteamGameServer_CreateUnauthenticatedUserConnection(void)
 	return CRehldsPlatformHolder::get()->SteamGameServer()->CreateUnauthenticatedUserConnection().ConvertToUint64();
 }
 
+bool Steam_GSBUpdateUserData(uint64 steamIDUser, const char *pchPlayerName, uint32 uScore)
+{
+	return CRehldsPlatformHolder::get()->SteamGameServer()->BUpdateUserData(steamIDUser, pchPlayerName, uScore);
+}
+
 /* <f10a4> ../engine/sv_steam3.cpp:559 */
 bool ISteamGameServer_BUpdateUserData(uint64 steamid, const char *netname, uint32 score)
 {
@@ -655,7 +664,7 @@ bool ISteamGameServer_BUpdateUserData(uint64 steamid, const char *netname, uint3
 		return false;
 	}
 
-	return CRehldsPlatformHolder::get()->SteamGameServer()->BUpdateUserData(steamid, netname, score);
+	return g_RehldsHookchains.m_Steam_GSBUpdateUserData.callChain(Steam_GSBUpdateUserData, steamid, netname, score);
 }
 
 /* <f10ef> ../engine/sv_steam3.cpp:566 */
