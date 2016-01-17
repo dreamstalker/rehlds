@@ -231,8 +231,8 @@ public:
 	virtual	IRehldsHookRegistry_SV_ActivateServer* SV_ActivateServer();
 	virtual	IRehldsHookRegistry_SV_WriteVoiceCodec* SV_WriteVoiceCodec();
 	virtual IRehldsHookRegistry_Steam_GSGetSteamID* Steam_GSGetSteamID();
+	virtual IRehldsHookRegistry_SV_TransferConsistencyInfo* SV_TransferConsistencyInfo();
 	virtual IRehldsHookRegistry_Steam_GSBUpdateUserData* Steam_GSBUpdateUserData();
-	virtual CRehldsHookRegistry_SV_TransferConsistencyInfo* SV_TransferConsistencyInfo();
 };
 
 extern CRehldsHookchains g_RehldsHookchains;

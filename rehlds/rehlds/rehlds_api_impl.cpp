@@ -350,7 +350,7 @@ IRehldsHookRegistry_Steam_GSGetSteamID* CRehldsHookchains::Steam_GSGetSteamID() 
 	return &m_Steam_GSGetSteamID;
 }
 
-CRehldsHookRegistry_SV_TransferConsistencyInfo* CRehldsHookchains::SV_TransferConsistencyInfo() {
+IRehldsHookRegistry_SV_TransferConsistencyInfo* CRehldsHookchains::SV_TransferConsistencyInfo() {
 	return &m_SV_TransferConsistencyInfo;
 }
 

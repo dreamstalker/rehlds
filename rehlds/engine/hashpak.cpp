@@ -361,11 +361,15 @@ void HPAK_AddLump(qboolean bUseQueue, char *pakname, struct resource_s *pResourc
 		if (Q_memcmp(pResource->rgucMD5_hash, olddirectory.p_rgEntries[i].resource.rgucMD5_hash, 16) >= 0)
 		{
 			pNewEntry = &newdirectory.p_rgEntries[i];
+#ifndef REHLDS_FIXES
 			while (i < olddirectory.nEntries)
 			{
-				Q_memcpy(&newdirectory.p_rgEntries[i + 1], &olddirectory.p_rgEntries[i + 1], sizeof(hash_pack_entry_t));
+				Q_memcpy(&newdirectory.p_rgEntries[i + 1], &olddirectory.p_rgEntries[i], sizeof(hash_pack_entry_t));
 				i++;
 			}
+#else
+			Q_memcpy(&newdirectory.p_rgEntries[i + 1], &olddirectory.p_rgEntries[i], (olddirectory.nEntries - i) * sizeof(hash_pack_entry_t));
+#endif
 			break;
 		}
 	}
