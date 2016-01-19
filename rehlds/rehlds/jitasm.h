@@ -1443,6 +1443,9 @@ namespace compiler {
 }
 
 /// jitasm frontend
+#ifndef _WIN32
+#pragma inline-max-per-routine(0)
+#endif
 struct Frontend
 {
 	typedef jitasm::Addr	Addr;
@@ -1726,9 +1729,15 @@ struct Frontend
 		return codebuff_.GetCodeSize();
 	}
 
-	void AppendInstr(InstrID id, uint32 opcode, uint32 encoding_flag, const detail::Opd& opd1 = detail::Opd(), const detail::Opd& opd2 = detail::Opd(), const detail::Opd& opd3 = detail::Opd(), const detail::Opd& opd4 = detail::Opd(), const detail::Opd& opd5 = detail::Opd(), const detail::Opd& opd6 = detail::Opd())
+	void _AppendInstr(InstrID id, uint32 opcode, uint32 encoding_flag, const detail::Opd& opd1, const detail::Opd& opd2, const detail::Opd& opd3, const detail::Opd& opd4, const detail::Opd& opd5, const detail::Opd& opd6)
 	{
 		instrs_.push_back(Instr(id, opcode, encoding_flag, opd1, opd2, opd3, opd4, opd5, opd6));
+	}
+
+	void AppendInstr(InstrID id, uint32 opcode, uint32 encoding_flag, const detail::Opd& opd1 = detail::Opd(), const detail::Opd& opd2 = detail::Opd(), const detail::Opd& opd3 = detail::Opd(), const detail::Opd& opd4 = detail::Opd(), const detail::Opd& opd5 = detail::Opd(), const detail::Opd& opd6 = detail::Opd())
+	{
+		#pragma noinline
+		_AppendInstr(id, opcode, encoding_flag, opd1, opd2, opd3, opd4, opd5, opd6);
 	}
 
 	void AppendJmp(size_t label_id)
