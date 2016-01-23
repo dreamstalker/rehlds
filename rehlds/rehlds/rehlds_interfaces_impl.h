@@ -35,6 +35,9 @@ class CNetChan : public INetChan
 private:
 	netchan_t* m_pNetChan;
 
+#ifdef REHLDS_FIXES
+	uint8_t m_messageBuffer[NET_MAX_PAYLOAD];
+#endif
 public:
 	CNetChan(netchan_t* chan);
 
@@ -42,6 +45,11 @@ public:
 	virtual sizebuf_t* GetMessageBuf();
 
 	virtual netchan_t* GetChan();
+
+public:
+#ifdef REHLDS_FIXES
+	uint8_t* GetExtendedMessageBuffer() { return m_messageBuffer; };
+#endif
 };
 
 
@@ -90,6 +98,9 @@ public:
 public:
 	bool GetSpawnedOnce() const { return m_bSpawnedOnce; }
 	void SetSpawnedOnce(bool spawned) { m_bSpawnedOnce = spawned; }
+#ifdef REHLDS_FIXES
+	uint8_t* GetExtendedMessageBuffer() { return m_NetChan.GetExtendedMessageBuffer(); };
+#endif
 };
 
 class CRehldsServerStatic : public IRehldsServerStatic {

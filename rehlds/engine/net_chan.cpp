@@ -214,8 +214,18 @@ void Netchan_Setup(netsrc_t socketnumber, netchan_t *chan, netadr_t adr, int pla
 	chan->connect_time = (float)realtime;
 
 	chan->message.buffername = "netchan->message";
-	chan->message.data = chan->message_buf;
-	chan->message.maxsize = sizeof(chan->message_buf);
+#ifdef REHLDS_FIXES
+	if (player_slot != -1)
+	{
+		chan->message.data = g_GameClients[player_slot]->GetExtendedMessageBuffer();
+		chan->message.maxsize = NET_MAX_PAYLOAD;
+	}
+	else
+#endif
+	{
+		chan->message.data = chan->message_buf;
+		chan->message.maxsize = sizeof(chan->message_buf);
+	}
 #ifdef REHLDS_FIXES
 	chan->message.cursize = 0;
 #endif // REHLDS_FIXES
@@ -326,6 +336,14 @@ void Netchan_Transmit(netchan_t *chan, int length, byte *data)
 		int		 send_from_frag[MAX_STREAMS] = { 0, 0 };
 		int		 send_from_regular = 0;
 
+#ifdef REHLDS_FIXES
+		if (chan->message.cursize > MAX_MSGLEN)
+		{
+			Netchan_CreateFragments_(chan == &g_pcls.netchan ? 1 : 0, chan, &chan->message);
+			SZ_Clear(&chan->message);
+		}
+#endif
+
 		// If we have data in the waiting list(s) and we have cleared the current queue(s), then 
 		//  push the waitlist(s) into the current queue(s)
 		Netchan_FragSend(chan);
@@ -380,7 +398,11 @@ void Netchan_Transmit(netchan_t *chan, int length, byte *data)
 		}
 
 		if (send_from_regular) {
+#ifdef REHLDS_FIXES
+			Q_memcpy(chan->reliable_buf, chan->message.data, chan->message.cursize);
+#else
 			Q_memcpy(chan->reliable_buf, chan->message_buf, chan->message.cursize);
+#endif
 			chan->reliable_length = chan->message.cursize;
 			SZ_Clear(&chan->message);
 
