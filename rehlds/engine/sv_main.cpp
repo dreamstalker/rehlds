@@ -5583,8 +5583,13 @@ int SV_SpawnServer(qboolean bIsDemo, char *server, char *startspot)
 	g_psv.datagram.cursize = 0;
 
 	g_psv.reliable_datagram.buffername = "Server Reliable Datagram";
+#ifdef REHLDS_FIXES
+	g_psv.reliable_datagram.data = g_rehlds_sv.reliableDatagramBuffer;
+	g_psv.reliable_datagram.maxsize = sizeof(g_rehlds_sv.reliableDatagramBuffer);
+#else
 	g_psv.reliable_datagram.data = g_psv.reliable_datagram_buf;
 	g_psv.reliable_datagram.maxsize = sizeof(g_psv.reliable_datagram_buf);
+#endif
 	g_psv.reliable_datagram.cursize = 0;
 
 	g_psv.spectator.buffername = "Server Spectator Buffer";
@@ -5596,8 +5601,13 @@ int SV_SpawnServer(qboolean bIsDemo, char *server, char *startspot)
 	g_psv.multicast.maxsize = sizeof(g_psv.multicast_buf);
 
 	g_psv.signon.buffername = "Server Signon Buffer";
+#ifdef REHLDS_FIXES
+	g_psv.signon.data = g_rehlds_sv.signonData;
+	g_psv.signon.maxsize = sizeof(g_rehlds_sv.signonData);
+#else
 	g_psv.signon.data = g_psv.signon_data;
 	g_psv.signon.maxsize = sizeof(g_psv.signon_data);
+#endif
 	g_psv.signon.cursize = 0;
 	
 	g_psv.num_edicts = g_psvs.maxclients + 1;

@@ -157,7 +157,6 @@ typedef struct server_s
 
 
 struct rehlds_server_t {
-
 	//map for sv.model_precache (for faster resolving of model index by its name)
 #if defined(REHLDS_FIXES)
 	CStringKeyStaticMap<int, 7, HL_MODEL_MAX * 2> modelsMap; //case-sensitive keys for better performance
@@ -165,6 +164,11 @@ struct rehlds_server_t {
 	CICaseStringKeyStaticMap<int, 7, HL_MODEL_MAX * 2> modelsMap; //use case-insensitive keys to conform original engine's behavior
 #endif
 
+#ifdef REHLDS_FIXES
+	// Extended net buffers
+	uint8_t reliableDatagramBuffer[NET_MAX_PAYLOAD];
+	uint8_t signonData[NET_MAX_PAYLOAD];
+#endif
 };
 
 
