@@ -72,8 +72,8 @@ typedef IHookChainImpl<qboolean, IGameClient*> CRehldsHook_Steam_NotifyBotConnec
 typedef IHookChainRegistryImpl<qboolean, IGameClient*> CRehldsHookRegistry_Steam_NotifyBotConnect;
 
 //SerializeSteamId
-typedef IVoidHookChainImpl<USERID_t*> CRehldsHook_SerializeSteamId;
-typedef IVoidHookChainRegistryImpl<USERID_t*> CRehldsHookRegistry_SerializeSteamId;
+typedef IVoidHookChainImpl<USERID_t*, USERID_t*> CRehldsHook_SerializeSteamId;
+typedef IVoidHookChainRegistryImpl<USERID_t*, USERID_t*> CRehldsHookRegistry_SerializeSteamId;
 
 //SV_CompareUserID hook
 typedef IHookChainImpl<qboolean, USERID_t*, USERID_t*> CRehldsHook_SV_CompareUserID;
