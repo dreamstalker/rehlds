@@ -2067,6 +2067,38 @@ int SV_CheckForDuplicateNames(char *userinfo, qboolean bIsReconnecting, int nExc
 	return changed;
 }
 
+#ifdef REHLDS_FIXES
+void SV_ReplaceSpecialCharactersInName(char *newname, const char *oldname)
+{
+	size_t remainChars = MAX_NAME - 1;
+	size_t n = 0;
+	for (const char *s = oldname; *s != '\0' && remainChars; s++)
+	{
+		if (*s == '#' ||
+		    *s == '%' ||
+		    *s == '&' ||
+		    (n && newname[n-1] == '+' && (isdigit(*s) || isalpha(*s))))
+		{
+			if (remainChars < 3)
+				break;
+
+			// http://unicode-table.com/blocks/halfwidth-and-fullwidth-forms/
+			newname[n++] = 0xEF;
+			newname[n++] = 0xBC | (((*s - 0x20) & 0x40) >> 6);
+			newname[n++] = 0x80 + ((*s - 0x20) & 0x3F);
+
+			remainChars -= 3;
+		}
+		else
+		{
+			newname[n++] = *s;
+			remainChars--;
+		}
+	}
+	newname[n] = '\0';
+}
+#endif
+
 /* <a76d2> ../engine/sv_main.c:2710 */
 int SV_CheckUserInfo(netadr_t *adr, char *userinfo, qboolean bIsReconnecting, int nReconnectSlot, char *name)
 {
@@ -2098,6 +2130,9 @@ int SV_CheckUserInfo(netadr_t *adr, char *userinfo, qboolean bIsReconnecting, in
 	Info_RemoveKey(userinfo, "password");
 
 	s = Info_ValueForKey(userinfo, "name");
+#ifdef REHLDS_FIXES
+	SV_ReplaceSpecialCharactersInName(newname, s);
+#else // REHLDS_FIXES
 	Q_strncpy(newname, s, sizeof(newname) - 1);
 	newname[sizeof(newname) - 1] = '\0';
 
@@ -2105,12 +2140,10 @@ int SV_CheckUserInfo(netadr_t *adr, char *userinfo, qboolean bIsReconnecting, in
 	{
 		if (*pChar == '%'
 			|| *pChar == '&'
-#ifdef REHLDS_FIXES
-			|| (*pChar == '+' && (isdigit(pChar[1]) || isalpha(pChar[1])))
-#endif // REHLDS_FIXES			
 			)
 			*pChar = ' ';
 	}
+#endif // REHLDS_FIXES
 
 #ifdef REHLDS_FIXES
 	Q_strcpy(name, newname);
@@ -2124,10 +2157,12 @@ int SV_CheckUserInfo(netadr_t *adr, char *userinfo, qboolean bIsReconnecting, in
 		Q_UnicodeRepair(name);
 	}
 
+#ifndef REHLDS_FIXES
 	for (pChar = newname; *pChar == '#'; pChar++)
 	{
 		*pChar = ' ';
 	}
+#endif
 
 	if (name[0] == 0 || !Q_stricmp(name, "console") || Q_strstr(name, "..") != NULL)
 	{
@@ -4806,22 +4841,23 @@ void SV_ExtractFromUserinfo(client_t *cl)
 	char *userinfo = cl->userinfo;
 
 	val = Info_ValueForKey(userinfo, "name");
+#ifdef REHLDS_FIXES
+	SV_ReplaceSpecialCharactersInName(newname, val);
+#else // REHLDS_FIXES
 	Q_strncpy(newname, val, sizeof(newname) - 1);
 	newname[sizeof(newname) - 1] = '\0';
 
 	for (char *p = newname; *p; p++)
 	{
 		if (*p == '%'
-			|| *p == '&'
-#ifdef REHLDS_FIXES
-			|| (*p == '+' && (isdigit(p[1]) || isalpha(p[1])))
-#endif // REHLDS_FIXES				
+			|| *p == '&'	
 			)
 			*p = ' ';
 	}
 
 	// Fix name to not start with '#', so it will not resemble userid
 	for (char *p = newname; *p == '#'; p++) *p = ' ';
+#endif // REHLDS_FIXES
 
 #ifdef REHLDS_FIXES
 	Q_StripUnprintableAndSpace(newname);
