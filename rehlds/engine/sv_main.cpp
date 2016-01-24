@@ -4820,6 +4820,9 @@ void SV_ExtractFromUserinfo(client_t *cl)
 			*p = ' ';
 	}
 
+	// Fix name to not start with '#', so it will not resemble userid
+	for (char *p = newname; *p == '#'; p++) *p = ' ';
+
 #ifdef REHLDS_FIXES
 	Q_StripUnprintableAndSpace(newname);
 #else // REHLDS_FIXES
@@ -4830,9 +4833,6 @@ void SV_ExtractFromUserinfo(client_t *cl)
 	{
 		Q_UnicodeRepair(newname);
 	}
-
-	// Fix name to not start with '#', so it will not resemble userid
-	for (char *p = newname; *p == '#'; p++) *p = ' ';
 
 	if (newname[0] == '\0' || !Q_stricmp(newname, "console")
 #ifdef REHLDS_FIXES
@@ -5841,6 +5841,11 @@ USERID_t *SV_StringToUserID(const char *str)
 	return &id;
 }
 
+void SV_SerializeSteamid(USERID_t* id, USERID_t* serialized)
+{
+	*serialized = *id;
+}
+
 /* <ab410> ../engine/sv_main.c:7799 */
 void SV_BanId_f(void)
 {
@@ -5953,10 +5958,8 @@ void SV_BanId_f(void)
 	userfilters[i].banTime = banTime;
 	userfilters[i].banEndTime = (banTime == 0.0f) ? 0.0f : banTime * 60.0f + realtime;
 
-	Q_memcpy(&userfilters[i].userid, id, sizeof(USERID_t));
-
 	// give 3-rd party plugins a chance to serialize ID
-	g_RehldsHookchains.m_SerializeSteamId.callChain(NULL, &userfilters[i].userid);
+	g_RehldsHookchains.m_SerializeSteamId.callChain(SV_SerializeSteamid, id, &userfilters[i].userid);
 
 	if (banTime == 0.0f)
 		Q_sprintf(szreason, "permanently");

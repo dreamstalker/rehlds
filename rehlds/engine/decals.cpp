@@ -544,10 +544,14 @@ void Decal_Init(void)
 	char pszPathID[2][15] = { "DEFAULTGAME", "GAME" };
 
 	Draw_DecalShutdown();
-	for (i = 0; i < 2; i++)
+	for (i = 0; i < ARRAYSIZE(pszPathID); i++)
 	{
 		hfile = FS_OpenPathID("decals.wad", "rb", pszPathID[i]);
+#ifdef REHLDS_FIXES
+		if (i == ARRAYSIZE(pszPathID) - 1 && !hfile)
+#else
 		if (i == 0 && !hfile)
+#endif
 			Sys_Error("Couldn't find '%s' in \"%s\" search path\n", "decals.wad", pszPathID[i]);
 
 		filesize = FS_Size(hfile);
@@ -567,8 +571,8 @@ void Decal_Init(void)
 	for (i = 0; i < sv_decalnamecount; i++)
 	{
 		Q_memset(&sv_decalnames[i], 0, sizeof(decalname_t));
-		Q_strncpy(sv_decalnames[i].name, Draw_DecalName(i), 15);
-		sv_decalnames[i].name[15] = 0;
+		Q_strncpy(sv_decalnames[i].name, Draw_DecalName(i), sizeof sv_decalnames[i].name - 1);
+		sv_decalnames[i].name[sizeof sv_decalnames[i].name - 1] = 0;
 	}
 }
 
