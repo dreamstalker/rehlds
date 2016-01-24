@@ -548,7 +548,10 @@ void Decal_Init(void)
 	{
 		hfile = FS_OpenPathID("decals.wad", "rb", pszPathID[i]);
 #ifdef REHLDS_FIXES
-		if (i == ARRAYSIZE(pszPathID) - 1 && !hfile)
+		if (!hfile)
+			if (i < ARRAYSIZE(pszPathID) - 1)
+				continue;
+			else
 #else
 		if (i == 0 && !hfile)
 #endif
