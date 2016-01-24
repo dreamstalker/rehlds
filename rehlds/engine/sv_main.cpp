@@ -2103,7 +2103,6 @@ void SV_ReplaceSpecialCharactersInName(char *newname, const char *oldname)
 int SV_CheckUserInfo(netadr_t *adr, char *userinfo, qboolean bIsReconnecting, int nReconnectSlot, char *name)
 {
 	const char *s;
-	char *pChar;
 	char newname[MAX_NAME];
 	int proxies;
 	int i;
@@ -2136,7 +2135,7 @@ int SV_CheckUserInfo(netadr_t *adr, char *userinfo, qboolean bIsReconnecting, in
 	Q_strncpy(newname, s, sizeof(newname) - 1);
 	newname[sizeof(newname) - 1] = '\0';
 
-	for (pChar = newname; *pChar; pChar++)
+	for (char* pChar = newname; *pChar; pChar++)
 	{
 		if (*pChar == '%'
 			|| *pChar == '&'
@@ -2158,7 +2157,7 @@ int SV_CheckUserInfo(netadr_t *adr, char *userinfo, qboolean bIsReconnecting, in
 	}
 
 #ifndef REHLDS_FIXES
-	for (pChar = newname; *pChar == '#'; pChar++)
+	for (char* pChar = newname; *pChar == '#'; pChar++)
 	{
 		*pChar = ' ';
 	}
@@ -6211,16 +6210,19 @@ void Host_Kick_f(void)
 /* <aafa6> ../engine/sv_main.c:8237 */
 void SV_RemoveId_f(void)
 {
-	char idstring[64];
-
 	if (Cmd_Argc() != 2 && Cmd_Argc() != 6)
 	{
 		Con_Printf("Usage:  removeid <uniqueid | #slotnumber>\n");
 		return;
 	}
-
+	
+#ifdef REHLDS_FIXES
+	const char* idstring = Cmd_Args();
+#else
+	char idstring[64];
 	Q_strncpy(idstring, Cmd_Argv(1), sizeof(idstring) - 1);
 	idstring[sizeof(idstring) - 1] = 0;
+#endif
 
 	if (!idstring[0])
 	{
@@ -6249,20 +6251,22 @@ void SV_RemoveId_f(void)
 	}
 	else
 	{
+#ifdef REHLDS_FIXES
+		idstring = SV_GetIDString(SV_StringToUserID(idstring));
+#else
 		if (!Q_strnicmp(idstring, "STEAM_", 6) || !Q_strnicmp(idstring, "VALVE_", 6))
 		{
 			Q_snprintf(idstring, sizeof(idstring) - 1, "%s:%s:%s", Cmd_Argv(1), Cmd_Argv(3), Cmd_Argv(5));
-#ifndef REHLDS_FIXES
 			idstring[63] = 0;
-#endif // REHLDS_FIXES
 		}
+#endif // REHLDS_FIXES
 		
 		for (int i = 0; i < numuserfilters; i++)
 		{
 			if (!Q_stricmp(SV_GetIDString(&userfilters[i].userid), idstring))
 			{
 				if (i + 1 < numuserfilters)
-					Q_memcpy(&userfilters[i], &userfilters[i + 1], (numuserfilters - (i + 1)) * sizeof(userfilter_t));
+					Q_memmove(&userfilters[i], &userfilters[i + 1], (numuserfilters - (i + 1)) * sizeof(userfilter_t));
 
 				numuserfilters--;
 				Con_Printf("UserID filter removed for %s\n", idstring);
@@ -6393,7 +6397,7 @@ void SV_RemoveIP_f(void)
 		if (ipfilters[i].mask == f.mask && ipfilters[i].compare.u32 == f.compare.u32)
 		{
 			if (i + 1 < numipfilters)
-				Q_memcpy(&ipfilters[i], &ipfilters[i + 1], (numipfilters - (i + 1)) * sizeof(ipfilter_t));
+				Q_memmove(&ipfilters[i], &ipfilters[i + 1], (numipfilters - (i + 1)) * sizeof(ipfilter_t));
 			numipfilters--;
 			ipfilters[numipfilters].banTime = 0.0f;
 			ipfilters[numipfilters].banEndTime = 0.0f;
