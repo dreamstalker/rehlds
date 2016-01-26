@@ -2850,7 +2850,7 @@ int hudCheckParm(char *parm, char **ppnext)
 }
 
 /* <7afa4> ../engine/pr_cmds.c:3532 */
-int EngCheckParm(const char *pchCmdLineToken, char **pchNextVal)
+int EXT_FUNC EngCheckParm(const char *pchCmdLineToken, char **pchNextVal)
 {
 	return hudCheckParm((char*)pchCmdLineToken, pchNextVal);
 }

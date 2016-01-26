@@ -196,7 +196,8 @@ enginefuncs_t g_engfuncsExportedToDlls = {
 	ProcessTutorMessageDecayBuffer,
 	ConstructTutorMessageDecayBuffer,
 	ResetTutorMessageDecayData,
-	QueryClientCvarValue, QueryClientCvarValue2
+	QueryClientCvarValue, QueryClientCvarValue2,
+	EngCheckParm
 };
 
 #else //HOOK_ENGINE
