@@ -1463,6 +1463,12 @@ void SV_WriteSpawn(sizebuf_t *msg)
 		gGlobalVariables.time = g_psv.time;
 		gEntityInterface.pfnClientPutInServer(sv_player);
 		g_psv.state = ss_active;
+
+#ifdef REHLDS_FIXES
+		// Client was kicked in ClientPutInServer
+		if (!host_client->connected)
+			return;
+#endif // REHLDS_FIXES
 	}
 
 #ifndef REHLDS_FIXES
@@ -1680,6 +1686,13 @@ void SV_Spawn_f(void)
 	{
 		SZ_Write(&msg, g_psv.signon.data, g_psv.signon.cursize);
 		SV_WriteSpawn(&msg);
+
+#ifdef REHLDS_FIXES
+		// Client was kicked in ClientPutInServer
+		if (!host_client->connected)
+			return;
+#endif // REHLDS_FIXES
+
 		SV_WriteVoiceCodec(&msg);
 		Netchan_CreateFragments(TRUE, &host_client->netchan, &msg);
 		Netchan_FragSend(&host_client->netchan);
