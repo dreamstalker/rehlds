@@ -1481,7 +1481,11 @@ int EXT_FUNC PF_precache_model_I(const char *s)
 							if (pSeqGroup->name[0] == '\0')
 								continue;
 
-							PF_precache_generic_I(pSeqGroup->name);
+							char seqGroupName[MAX_QPATH];
+							Q_strcpy(seqGroupName, pSeqGroup->name);
+							ForwardSlashes(seqGroupName);
+
+							PF_precache_generic_I(seqGroupName);
 						}
 					}
 				}
