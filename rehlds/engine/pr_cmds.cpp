@@ -1419,6 +1419,32 @@ void EXT_FUNC EV_SV_Playback(int flags, int clientindex, short unsigned int even
 	EV_Playback(flags,pEdict, eventindex, delay, origin, angles, fparam1, fparam2, iparam1, iparam2, bparam1, bparam2);
 }
 
+#ifdef REHLDS_FIXES
+int SV_LookupModelIndex(const char *name)
+{
+	if (!name || !name[0])
+		return 0;
+
+#ifdef REHLDS_OPT_PEDANTIC
+	auto node = g_rehlds_sv.modelsMap.get(name);
+	if (node) {
+		return node->val;
+	}
+#else // REHLDS_OPT_PEDANTIC
+	for (int i = 0; i < HL_MODEL_MAX; i++)
+	{
+		if (!g_psv.model_precache[i])
+			break;
+
+		if (!Q_stricmp(g_psv.model_precache[i], name))
+			return i;
+	};
+#endif // REHLDS_OPT_PEDANTIC
+
+	return 0;
+}
+#endif // REHLDS_FIXES
+
 /* <799da> ../engine/pr_cmds.c:1849 */
 int EXT_FUNC PF_precache_model_I(const char *s)
 {
@@ -1498,6 +1524,15 @@ int EXT_FUNC PF_precache_generic_I(char *s)
 
 	if (PR_IsEmptyString(s))
 		Host_Error("PF_precache_generic_I: Bad string '%s'", s);
+
+#ifdef REHLDS_FIXES
+	size_t soundPrefixLength = sizeof("sound/") - 1;
+	bool isSoundPrefixed = !Q_strnicmp(s, "sound/", soundPrefixLength);
+
+	if ((isSoundPrefixed && SV_LookupSoundIndex(&s[soundPrefixLength])) ||
+	    SV_LookupModelIndex(s))
+		return 0;
+#endif // REHLDS_FIXES
 
 	if (g_psv.state == ss_loading)
 	{
