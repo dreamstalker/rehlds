@@ -627,7 +627,11 @@ void EXT_FUNC Cmd_TokenizeString(char *text)
 	while (true)
 	{
 		// Skip whitespace up to a \n
+#ifdef REHLDS_FIXES
+		while (*text && (uint8_t)*text <= ' ' && *text != '\n')
+#else // REHLDS_FIXES
 		while (*text && *text <= ' ' && *text != '\n')
+#endif // REHLDS_FIXES
 		{
 			++text;
 		}
