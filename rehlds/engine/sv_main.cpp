@@ -6059,6 +6059,42 @@ void SV_BanId_f(void)
 	host_client = save;
 }
 
+#ifdef REHLDS_FIXES
+void ReplaceEscapeSequences(char *str)
+{
+	size_t len = 0;
+	for (size_t i = 0; str[i] != '\0'; i++)
+	{
+		if (str[i] == '\\')
+		{
+			switch (str[++i])
+			{
+			case 't':
+				str[len++] = '\t';
+				break;
+			case 'n':
+				str[len++] = '\n';
+				break;
+			case '\\':
+				str[len++] = '\\';
+				break;
+			// TODO: or ignore it?
+			default:
+				str[len++] = '\\';
+				str[len++] = str[i];
+				break;
+			}
+		}
+		else
+		{
+			str[len++] = str[i];
+		}
+	}
+
+	str[len] = '\0';
+}
+#endif // REHLDS_FIXES
+
 /* <ab1ec> ../engine/sv_main.c:8040 */
 void Host_Kick_f(void)
 {
@@ -6201,6 +6237,13 @@ void Host_Kick_f(void)
 				const char *message = dataLen + p;
 				if (message)
 				{
+#ifdef REHLDS_FIXES
+					char reason[256];
+					Q_strncpy(reason, message, sizeof(reason) - 1);
+					reason[sizeof(reason) - 1] = '\0';
+					ReplaceEscapeSequences(reason);
+					message = reason;
+#endif // REHLDS_FIXES
 					SV_ClientPrintf("Kicked by %s: %s\n", who, message);
 					Log_Printf(
 						"Kick: \"%s<%i><%s><>\" was kicked by \"%s\" (message \"%s\")\n",
