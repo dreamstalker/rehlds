@@ -1684,6 +1684,14 @@ void SV_Spawn_f(void)
 
 	if (g_pcls.demoplayback || Q_atoi(Cmd_Argv(1)) == g_psvs.spawncount)
 	{
+#ifdef REHLDS_FIXES
+		if (host_client->has_force_unmodified)
+		{
+			SV_DropClient(host_client, false, "You didn't send consistency response");
+			return;
+		}
+#endif // REHLDS_FIXES
+
 		SZ_Write(&msg, g_psv.signon.data, g_psv.signon.cursize);
 		SV_WriteSpawn(&msg);
 
