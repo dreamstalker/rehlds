@@ -674,7 +674,11 @@ void MSG_WriteSBits(int data, int numbits)
 
 void MSG_WriteBitString(const char *p)
 {
+#ifdef REHLDS_FIXES
+	const uint8_t *pch = (uint8_t *)p;
+#else // REHLDS_FIXES
 	char *pch = (char *)p;
+#endif // REHLDS_FIXES
 
 	while (*pch)
 	{
