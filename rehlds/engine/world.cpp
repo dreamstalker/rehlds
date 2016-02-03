@@ -1220,7 +1220,11 @@ void SV_ClipToLinks(areanode_t *node, moveclip_t *clip)
 			&& clip->boxmaxs[0] >= touch->v.absmin[0]
 			&& clip->boxmaxs[1] >= touch->v.absmin[1]
 			&& clip->boxmaxs[2] >= touch->v.absmin[2]
+#ifdef REHLDS_FIXES
 			&& ((touch->v.solid == SOLID_SLIDEBOX && sv_force_ent_intersection.string[0] == '0')
+#else // REHLDS_FIXES
+			&& (touch->v.solid == SOLID_SLIDEBOX
+#endif // REHLDS_FIXES
 				|| SV_CheckSphereIntersection(touch, clip->start, clip->end))
 			&& (!clip->passedict || clip->passedict->v.size[0] == 0.0f || touch->v.size[0] != 0.0f))
 		{

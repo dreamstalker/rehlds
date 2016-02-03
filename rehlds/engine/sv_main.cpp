@@ -7217,8 +7217,8 @@ void SV_Init(void)
 	Cvar_RegisterVariable(&sv_downloadurl);
 	Cvar_RegisterVariable(&sv_version);
 	Cvar_RegisterVariable(&sv_allow_dlfile);
-	Cvar_RegisterVariable(&sv_force_ent_intersection);
 #ifdef REHLDS_FIXES
+	Cvar_RegisterVariable(&sv_force_ent_intersection);
 	Cvar_RegisterVariable(&sv_echo_unknown_cmd);
 #endif
 	
