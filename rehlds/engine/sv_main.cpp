@@ -146,6 +146,9 @@ cvar_t servercfgfile = { "servercfgfile", "server.cfg", 0, 0.0f, NULL };
 cvar_t lservercfgfile = { "lservercfgfile", "listenserver.cfg", 0, 0.0f, NULL };
 cvar_t logsdir = { "logsdir", "logs", 0, 0.0f, NULL };
 cvar_t bannedcfgfile = { "bannedcfgfile", "banned.cfg", 0, 0.0f, NULL };
+#ifdef REHLDS_FIXES
+cvar_t listipcfgfile = { "listipcfgfile", "listip.cfg", 0, 0.0f, nullptr };
+#endif
 
 int g_userid = 1;
 
@@ -6499,7 +6502,11 @@ void SV_ListIP_f(void)
 void SV_WriteIP_f(void)
 {
 	char name[MAX_PATH];
+#ifdef REHLDS_FIXES
+	Q_snprintf(name, MAX_PATH, "%s", listipcfgfile.string);
+#else
 	Q_snprintf(name, MAX_PATH, "listip.cfg");
+#endif
 	Con_Printf("Writing %s.\n", name);
 
 	FILE *f = FS_Open(name, "wb");
@@ -7204,6 +7211,9 @@ void SV_Init(void)
 	Cvar_RegisterVariable(&lservercfgfile);
 	Cvar_RegisterVariable(&logsdir);
 	Cvar_RegisterVariable(&bannedcfgfile);
+#ifdef REHLDS_FIXES
+	Cvar_RegisterVariable(&listipcfgfile);
+#endif
 	Cvar_RegisterVariable(&sv_rcon_minfailures);
 	Cvar_RegisterVariable(&sv_rcon_maxfailures);
 	Cvar_RegisterVariable(&sv_rcon_minfailuretime);
