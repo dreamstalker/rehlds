@@ -6,6 +6,7 @@
 
 #include "archtypes.h"
 #include "asmlib.h"
+#include "sse_mathfun.h"
 #include "mathlib.h"
 
 #include "sys_shared.h"

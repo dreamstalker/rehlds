@@ -77,6 +77,7 @@
     <ClCompile Include="..\engine\public_amalgamation.cpp" />
     <ClCompile Include="..\engine\r_studio.cpp" />
     <ClCompile Include="..\engine\snd_null.cpp" />
+    <ClCompile Include="..\engine\sse_mathfun.cpp" />
     <ClCompile Include="..\engine\sv_log.cpp" />
     <ClCompile Include="..\engine\sv_main.cpp" />
     <ClCompile Include="..\engine\sv_move.cpp" />
@@ -440,6 +441,7 @@
     <ClInclude Include="..\engine\server.h" />
     <ClInclude Include="..\engine\server_static.h" />
     <ClInclude Include="..\engine\sound.h" />
+    <ClInclude Include="..\engine\sse_mathfun.h" />
     <ClInclude Include="..\engine\studio_rehlds.h" />
     <ClInclude Include="..\engine\sv_log.h" />
     <ClInclude Include="..\engine\sv_move.h" />

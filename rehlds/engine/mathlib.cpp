@@ -28,6 +28,9 @@
 
 #include "precompiled.h"
 
+// Intrisics guide: https://software.intel.com/sites/landingpage/IntrinsicsGuide/
+// Shufps calculator: http://wurstcaptures.untergrund.net/assembler_tricks.html
+
 vec3_t vec3_origin;
 //int nanmask;
 //short int new_cw;
@@ -36,6 +39,7 @@ vec3_t vec3_origin;
 
 // aligned vec4_t
 typedef ALIGN16 vec4_t avec4_t;
+typedef ALIGN16 int aivec4_t[4];
 
 // conversion multiplier
 const avec4_t deg2rad =
@@ -46,8 +50,24 @@ const avec4_t deg2rad =
 	M_PI / 180.f
 };
 
+const aivec4_t negmask[4] =
+{
+	0x80000000,
+	0x80000000,
+	0x80000000,
+	0x80000000
+};
+
+const aivec4_t negmask_1001 =
+{
+	0x80000000,
+	0,
+	0,
+	0x80000000
+};
+
 // save 4d xmm to 3d vector. we can't optimize many simple vector3 functions because saving back to 3d is slow.
-void xmm2vec(vec_t *v, const __m128 m)
+static inline void xmm2vec(vec_t *v, const __m128 m)
 {
 	_mm_store_ss(v, m);
 	_mm_storel_pi((__m64*)(v + 1), _mm_shuffle_ps(m, m, _MM_SHUFFLE(3, 2, 2, 1)));
@@ -145,6 +165,53 @@ void EXT_FUNC AngleVectors_ext(const vec_t *angles, vec_t *forward, vec_t *right
 	AngleVectors(angles, forward, right, up);
 }
 
+#ifdef REHLDS_FIXES
+// parallel SSE version
+void AngleVectors(const vec_t *angles, vec_t *forward, vec_t *right, vec_t *up)
+{
+#ifndef SWDS
+	g_engdstAddrs.pfnAngleVectors(&angles, &forward, &right, &up);
+#endif // SWDS
+
+	__m128 s, c;
+	sincos_ps(_mm_mul_ps(_mm_loadu_ps(angles), _mm_load_ps(deg2rad)), &s, &c);
+
+	__m128 m1 = _mm_shuffle_ps(c, s, 0x90); // [cp][cp][sy][sr]
+	__m128 m2 = _mm_shuffle_ps(c, c, 0x09); // [cy][cr][cp][cp]
+	__m128 cp_mults = _mm_mul_ps(m1, m2); // [cp * cy][cp * cr][cp * sy][cp * sr];
+
+	m1 = _mm_shuffle_ps(c, s, 0x15); // [cy][cy][sy][sp]
+	m2 = _mm_shuffle_ps(s, c, 0xA0); // [sp][sp][cr][cr]
+	m1 = _mm_shuffle_ps(m1, m1, 0xC8); // [cy][sy][cy][sp]
+
+	__m128 m3 = _mm_shuffle_ps(s, s, 0x4A); // [sr][sr][sp][sy];
+	m3 = _mm_mul_ps(m3, _mm_mul_ps(m1, m2)); // [sp*cy*sr][sp*sy*sr][cr*cy*sp][cr*sp*sy]
+
+	m2 = _mm_shuffle_ps(s, c, 0x65); // [sy][sy][cr][cy]
+	m1 = _mm_shuffle_ps(c, s, 0xA6); // [cr][cy][sr][sr]
+	m2 = _mm_shuffle_ps(m2, m2, 0xD8); // [sy][cr][sy][cy]
+	m1 = _mm_xor_ps(m1, _mm_load_ps((float *)&negmask_1001)); // [-cr][cy][sr][-sr]
+	m1 = _mm_mul_ps(m1, m2); // [-cr*sy][cy*cr][sr*sy][-sr*cy]
+
+	m3 = _mm_add_ps(m3, m1);
+
+	if (forward)
+	{
+		_mm_storel_pi((__m64 *)forward, _mm_shuffle_ps(cp_mults, cp_mults, 0x08));
+		forward[2] = -s.m128_f32[PITCH];
+	}
+	if (right)
+	{
+		__m128 r = _mm_shuffle_ps(m3, cp_mults, 0xF4); // [m3(0)][m3(1)][cp(3)][cp(3)]
+		xmm2vec(right, _mm_xor_ps(r, _mm_load_ps((float *)&negmask)));
+	}
+	if (up)
+	{
+		_mm_storel_pi((__m64 *)up, _mm_shuffle_ps(m3, m3, 0x0E));
+		up[2] = cp_mults.m128_f32[1];
+	}
+}
+#else // REHLDS_FIXES
 /* <47067> ../engine/mathlib.c:267 */
 void AngleVectors(const vec_t *angles, vec_t *forward, vec_t *right, vec_t *up)
 {
@@ -154,18 +221,6 @@ void AngleVectors(const vec_t *angles, vec_t *forward, vec_t *right, vec_t *up)
 	g_engdstAddrs.pfnAngleVectors(&angles, &forward, &right, &up);
 #endif // SWDS
 
-#ifdef REHLDS_FIXES
-	// convert to radians
-	avec4_t rad_angles;
-	_mm_store_ps(rad_angles, _mm_mul_ps(_mm_loadu_ps(angles), _mm_load_ps(deg2rad)));
-
-	sy = sin(rad_angles[YAW]);
-	cy = cos(rad_angles[YAW]);
-	sp = sin(rad_angles[PITCH]);
-	cp = cos(rad_angles[PITCH]);
-	sr = sin(rad_angles[ROLL]);
-	cr = cos(rad_angles[ROLL]);
-#else
 	float angle;
 	angle = (float)(angles[YAW] * (M_PI * 2 / 360));
 	sy = sin(angle);
@@ -176,7 +231,6 @@ void AngleVectors(const vec_t *angles, vec_t *forward, vec_t *right, vec_t *up)
 	angle = (float)(angles[ROLL] * (M_PI * 2 / 360));
 	sr = sin(angle);
 	cr = cos(angle);
-#endif
 
 	if (forward)
 	{
@@ -197,7 +251,56 @@ void AngleVectors(const vec_t *angles, vec_t *forward, vec_t *right, vec_t *up)
 		up[2] = cr*cp;
 	}
 }
+#endif // REHLDS_FIXES
 
+#ifdef REHLDS_FIXES
+// parallel SSE version
+void AngleVectorsTranspose(const vec_t *angles, vec_t *forward, vec_t *right, vec_t *up)
+{
+#ifndef SWDS
+	g_engdstAddrs.pfnAngleVectors(&angles, &forward, &right, &up);
+#endif // SWDS
+
+	__m128 s, c;
+	sincos_ps(_mm_mul_ps(_mm_loadu_ps(angles), _mm_load_ps(deg2rad)), &s, &c);
+
+	__m128 m1 = _mm_shuffle_ps(c, s, 0x90); // [cp][cp][sy][sr]
+	__m128 m2 = _mm_shuffle_ps(c, c, 0x09); // [cy][cr][cp][cp]
+	__m128 cp_mults = _mm_mul_ps(m1, m2); // [cp * cy][cp * cr][cp * sy][cp * sr];
+
+	m1 = _mm_shuffle_ps(s, s, 0x50); // [sp][sp][sy][sy]
+	m2 = _mm_shuffle_ps(c, s, 0x05); // [cy][cy][sp][sp]
+
+	__m128 m3 = _mm_shuffle_ps(s, c, 0xAA); // [sr][sr][cr][cr]
+	m1 = _mm_mul_ps(m1, m2);
+	m3 = _mm_shuffle_ps(m3, m3, 0xD8); // [sr][cr][sr][cr]
+	m3 = _mm_mul_ps(m3, m1); // [sp*cy*sr][sp*cy*cr][sy*sp*sr][sy*sp*cr]
+
+	m2 = _mm_shuffle_ps(c, s, 0xA6); // [cr][cy][sr][sr]
+	m1 = _mm_shuffle_ps(s, c, 0x65); // [sy][sy][cr][cy]
+	m2 = _mm_shuffle_ps(m2, m2, 0xD8); // [cr][sr][cy][sr]
+	m1 = _mm_xor_ps(m1, _mm_load_ps((float *)&negmask_1001)); // [-cr][cy][sr][-sr]
+	m1 = _mm_mul_ps(m1, m2); // [-cr*sy][sr*sy][cy*cr][-sr*cy]
+
+	m3 = _mm_add_ps(m3, m1);
+
+	if (forward)
+	{
+		forward[0] = cp_mults.m128_f32[0];
+		_mm_storel_pi((__m64*)(forward + 1), m3); // (sr*sp*cy + cr*-sy);
+	}
+	if (right)
+	{
+		right[0] = cp_mults.m128_f32[2];
+		_mm_storel_pi((__m64*)(right + 1), _mm_shuffle_ps(m3, m3, 0x0E));
+	}
+	if (up)
+	{
+		up[0] = -s.m128_f32[PITCH];
+		_mm_storel_pi((__m64 *)&up[1], _mm_shuffle_ps(cp_mults, cp_mults, 0x07));
+	}
+}
+#else // REHLDS_FIXES
 /* <4712e> ../engine/mathlib.c:304 */
 void AngleVectorsTranspose(const vec_t *angles, vec_t *forward, vec_t *right, vec_t *up)
 {
@@ -246,6 +349,7 @@ void AngleVectorsTranspose(const vec_t *angles, vec_t *forward, vec_t *right, ve
 		up[2] = cr*cp;
 	}
 }
+#endif
 
 /* <471e9> ../engine/mathlib.c:340 */
 void AngleMatrix(const vec_t *angles, float(*matrix)[4])
