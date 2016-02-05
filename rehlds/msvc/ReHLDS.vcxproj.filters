@@ -346,6 +346,9 @@
     <ClCompile Include="..\rehlds\rehlds_security.cpp">
       <Filter>rehlds</Filter>
     </ClCompile>
+    <ClCompile Include="..\engine\sse_mathfun.cpp">
+      <Filter>engine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\hookers\memory.h">
@@ -1067,6 +1070,9 @@
     </ClInclude>
     <ClInclude Include="..\common\qlimits.h">
       <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\sse_mathfun.h">
+      <Filter>engine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
