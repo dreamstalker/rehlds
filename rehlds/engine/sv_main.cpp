@@ -5821,6 +5821,157 @@ int EXT_FUNC RegUserMsg(const char *pszName, int iSize)
 	return pNewMsg->iMsg;
 }
 
+#ifdef REHLDS_FIXES
+uint32_t CIDRToMask(int cidr)
+{
+	return htonl(0xFFFFFFFFull << (32 - cidr));
+}
+
+uint32_t IPToMask(uint32_t ipaddress)
+{
+	union
+	{
+		uint32_t u32;
+		uint8_t octets[4];
+	} compare;
+	compare.u32 = ipaddress;
+
+	uint32_t mask = 0xFFFFFFFF;
+
+	for (int i = 3; i != -1; i--)
+	{
+		if (compare.octets[i])
+			break;
+
+		mask >>= 8;
+	}
+
+	return mask;
+}
+
+bool CanBeWrittenWithoutCIDR(const ipfilter_t &f)
+{
+	return f.cidr == -1;
+}
+
+void FilterToString(const ipfilter_t &f, char *s)
+{
+	const uint8* b = f.compare.octets;
+
+	if (CanBeWrittenWithoutCIDR(f))
+		Q_sprintf(s, "%i.%i.%i.%i", b[0], b[1], b[2], b[3]);
+	else
+		Q_sprintf(s, "%i.%i.%i.%i/%i", b[0], b[1], b[2], b[3], f.cidr);
+}
+
+bool IsFilterIncludesAnotherFilter(const ipfilter_t &f, const ipfilter_t &f2)
+{
+	return f2.mask >= f.mask
+	    && (f2.compare.u32 & f.mask) == f.compare.u32;
+}
+
+qboolean StringToFilter(const char *s, ipfilter_t *f)
+{
+	if (s[0] == '\0')
+	{
+		Con_Printf("Bad filter address: empty string\n");
+		return false;
+	}
+
+	bool expectOnlyDigit = true;
+	bool hasCIDR = false;
+	size_t numberCount = 1;
+	int num = 0;
+	f->compare.u32 = 0;
+
+	for (size_t i = 0; s[i] != '\0'; i++)
+	{
+		if (s[i] >= '0' && s[i] <= '9')
+		{
+			num *= 10;
+			num += s[i] - '0';
+
+			if (hasCIDR)
+			{
+				if (num < 0 || num > 32)
+				{
+					Con_Printf("Bad filter address: invalid CIDR, got %d\n", num);
+					return false;
+				}
+
+				f->cidr = num;
+			}
+			else
+			{
+				if (num < 0 || num > 255)
+				{
+					Con_Printf("Bad filter address: invalid octet, got %d\n", num);
+					return false;
+				}
+
+				f->compare.octets[numberCount - 1] = (uint8_t)num;
+			}
+
+			expectOnlyDigit = false;
+
+			continue;
+		}
+
+		// We expect only digit
+		if (expectOnlyDigit)
+		{
+			Con_Printf("Bad filter address: expected digit, but got '%c'\n", s[i]);
+			return false;
+		}
+		// Last number
+		if (hasCIDR)
+		{
+			Con_Printf("Bad filter address: expected end of string or digit, but got '%c'\n", s[i]);
+			return false;
+		}
+		if (numberCount == 4 && s[i] != '/')
+		{
+			Con_Printf("Bad filter address: expected slash delimiter, but got '%c'\n", s[i]);
+			return false;
+		}
+		if (numberCount != 4 && s[i] != '.' && s[i] != '/')
+		{
+			Con_Printf("Bad filter address: expected dot or slash delimiter, but got '%c'\n", s[i]);
+			return false;
+		}
+
+		numberCount++;
+
+		num = 0;
+
+		if (s[i] == '/')
+			hasCIDR = true;
+
+		expectOnlyDigit = true;
+	}
+	if (expectOnlyDigit)
+	{
+		Con_Printf("Bad filter address: expected digit, but got end of string\n");
+		return false;
+	}
+
+	if (hasCIDR)
+	{
+		f->mask = CIDRToMask(f->cidr);
+		f->compare.u32 &= f->mask;
+		if (f->cidr % 8 == 0
+		 && f->mask == IPToMask(f->compare.u32))
+			f->cidr = -1;
+	}
+	else
+	{
+		f->mask = IPToMask(f->compare.u32);
+		f->cidr = -1;
+	}
+
+	return true;
+}
+#else // REHLDS_FIXES
 /* <aa23b> ../engine/sv_main.c:7717 */
 qboolean StringToFilter(const char *s, ipfilter_t *f)
 {
@@ -5836,17 +5987,8 @@ qboolean StringToFilter(const char *s, ipfilter_t *f)
 			break;
 
 		int j = 0;
-#ifdef REHLDS_FIXES
-		//check num for overflow
-		while (*cc >= '0' && *cc <= '9' && j < sizeof(num))
-			num[j++] = *(cc++);
-
-		if (j >= sizeof(num)) 
-			break;
-#else // REHLDS_FIXES
 		while (*cc >= '0' && *cc <= '9')
 			num[j++] = *(cc++);
-#endif // REHLDS_FIXES
 
 		num[j] = 0;
 		b[i] = Q_atoi(num);
@@ -5867,6 +6009,7 @@ qboolean StringToFilter(const char *s, ipfilter_t *f)
 	Con_Printf("Bad filter address: %s\n", cc);
 	return FALSE;
 }
+#endif // REHLDS_FIXES
 
 /* <aa365> ../engine/sv_main.c:7765 */
 USERID_t *SV_StringToUserID(const char *str)
@@ -6398,9 +6541,33 @@ void SV_AddIP_f(void)
 {
 	if (Cmd_Argc() != 3)
 	{
+#ifdef REHLDS_FIXES
+		Con_Printf("Usage: addip <minutes> <ipaddress>\n\
+       addip <minutes> <ipaddress/CIDR>\n\
+Use 0 minutes for permanent\n\
+ipaddress A.B.C.D/24 is equivalent to A.B.C.0 and A.B.C\n");
+#else // REHLDS_FIXES
 		Con_Printf("Usage: addip <minutes> <ipaddress>\nUse 0 minutes for permanent\n");
+#endif // REHLDS_FIXES
 		return;
 	}
+
+#ifdef REHLDS_FIXES
+	const char *strBanTime = Cmd_Argv(1);
+	size_t dotCount = 0;
+
+	for (size_t i = 0; strBanTime[i] != '\0'; i++)
+	{
+		if (strBanTime[i] == '.')
+			dotCount++;
+	}
+
+	if (dotCount > 1)
+	{
+		Con_Printf("Invalid ban time! May be you mixed up ip address and ban time?\nUsage: addip <minutes> <ipaddress>\nUse 0 minutes for permanent\n");
+		return;
+	}
+#endif // REHLDS_FIXES
 
 	float banTime = Q_atof(Cmd_Argv(1));
 	ipfilter_t tempFilter;
@@ -6417,6 +6584,9 @@ void SV_AddIP_f(void)
 		{
 			ipfilters[i].banTime = banTime;
 			ipfilters[i].banEndTime = (banTime == 0.0f) ? 0.0f : banTime * 60.0f + realtime;
+#ifdef REHLDS_FIXES
+			ipfilters[i].cidr = tempFilter.cidr;
+#endif // REHLDS_FIXES
 			return;
 		}
 	}
@@ -6435,6 +6605,9 @@ void SV_AddIP_f(void)
 	ipfilters[i].compare = tempFilter.compare;
 	ipfilters[i].banEndTime = (banTime == 0.0f) ? 0.0f : banTime * 60.0f + realtime;
 	ipfilters[i].mask = tempFilter.mask;
+#ifdef REHLDS_FIXES
+	ipfilters[i].cidr = tempFilter.cidr;
+#endif // REHLDS_FIXES
 
 	for (int i = 0; i < g_psvs.maxclients; i++)
 	{
@@ -6454,14 +6627,44 @@ void SV_AddIP_f(void)
 /* <aa2c1> ../engine/sv_main.c:8470 */
 void SV_RemoveIP_f(void)
 {
+#ifdef REHLDS_FIXES
+	int argCount = Cmd_Argc();
+	if (argCount != 2 && argCount != 3)
+	{
+		Con_Printf("Usage: removeip <ipaddress> {removeAll}\n\
+       removeip <ipaddress/CIDR> {removeAll}\n\
+Use removeAll to delete all ip filters which ipaddress or ipaddress/CIDR includes\n");
+
+		return;
+	}
+#endif // REHLDS_FIXES
+
 	ipfilter_t f;
 
 	if (!StringToFilter(Cmd_Argv(1), &f))
+	{
+#ifdef REHLDS_FIXES
+		Con_Printf("Invalid IP address\n\
+Usage: removeip <ipaddress> {removeAll}\n\
+       removeip <ipaddress/CIDR> {removeAll}\n\
+Use removeAll to delete all ip filters which ipaddress or ipaddress/CIDR includes\n");
+#endif // REHLDS_FIXES
+
 		return;
+	}
+
+#ifdef REHLDS_FIXES
+	bool found = false;
+#endif // REHLDS_FIXES
 
 	for (int i = 0; i < numipfilters; i++)
 	{
+#ifdef REHLDS_FIXES
+		if ((argCount == 2 && ipfilters[i].mask == f.mask && ipfilters[i].compare.u32 == f.compare.u32)
+		 || (argCount == 3 && IsFilterIncludesAnotherFilter(f, ipfilters[i])))
+#else // REHLDS_FIXES
 		if (ipfilters[i].mask == f.mask && ipfilters[i].compare.u32 == f.compare.u32)
+#endif // REHLDS_FIXES
 		{
 			if (i + 1 < numipfilters)
 				Q_memmove(&ipfilters[i], &ipfilters[i + 1], (numipfilters - (i + 1)) * sizeof(ipfilter_t));
@@ -6470,12 +6673,27 @@ void SV_RemoveIP_f(void)
 			ipfilters[numipfilters].banEndTime = 0.0f;
 			ipfilters[numipfilters].compare.u32 = 0;
 			ipfilters[numipfilters].mask = 0;
+#ifdef REHLDS_FIXES
+			found = true;
+			--i;
+
+			if (argCount == 2)
+				break;
+#else // REHLDS_FIXES
 			Con_Printf("IP filter removed.\n");
 
 			return;
+#endif // REHLDS_FIXES
 		}
 	}
-	Con_Printf("removeip: couldn't find %s.\n", Cmd_Argv(1));
+#ifdef REHLDS_FIXES
+	if (found)
+		Con_Printf("IP filter removed.\n");
+	else
+#endif // REHLDS_FIXES
+	{
+		Con_Printf("removeip: couldn't find %s.\n", Cmd_Argv(1));
+	}
 }
 
 /* <a62ca> ../engine/sv_main.c:8507 */
@@ -6487,14 +6705,49 @@ void SV_ListIP_f(void)
 		return;
 	}
 
-	Con_Printf("IP filter list:\n");
+#ifdef REHLDS_FIXES
+	bool isNew = Cmd_Argc() == 2;
+	bool searchByFilter = isNew && isdigit(Cmd_Argv(1)[0]);
+	ipfilter_t filter;
+	
+	if (searchByFilter)
+	{
+		if (!StringToFilter(Cmd_Argv(1), &filter))
+			return;
+
+		Con_Printf("IP filter list for %s:\n", Cmd_Argv(1));
+	}
+	else
+#endif // REHLDS_FIXES
+	{
+		Con_Printf("IP filter list:\n");
+	}
+
 	for (int i = 0; i < numipfilters; i++)
 	{
 		uint8* b = ipfilters[i].compare.octets;
-		if (ipfilters[i].banTime == 0.0f) 
-			Con_Printf("%3i.%3i.%3i.%3i : permanent\n", b[0], b[1], b[2], b[3]);
-		else
-			Con_Printf("%3i.%3i.%3i.%3i : %.3f min\n", b[0], b[1], b[2], b[3], ipfilters[i].banTime);
+#ifdef REHLDS_FIXES
+		if (isNew)
+		{
+			if (!searchByFilter || IsFilterIncludesAnotherFilter(filter, ipfilters[i]))
+			{
+				char strFilter[32];
+				FilterToString(ipfilters[i], strFilter);
+
+				if (ipfilters[i].banTime == 0.0f)
+					Con_Printf("%-18s : permanent\n", strFilter);
+				else
+					Con_Printf("%-18s : %g min\n", strFilter, ipfilters[i].banTime);
+			}
+		}
+		else if (CanBeWrittenWithoutCIDR(ipfilters[i]))
+#endif // REHLDS_FIXES
+		{
+			if (ipfilters[i].banTime == 0.0f)
+				Con_Printf("%3i.%3i.%3i.%3i : permanent\n", b[0], b[1], b[2], b[3]);
+			else
+				Con_Printf("%3i.%3i.%3i.%3i : %.3f min\n", b[0], b[1], b[2], b[3], ipfilters[i].banTime);
+		}
 	}
 }
 
@@ -6521,8 +6774,15 @@ void SV_WriteIP_f(void)
 		if (ipfilters[i].banTime != 0.0f)
 			continue;
 
+#ifdef REHLDS_FIXES
+		char strFilter[32];
+		FilterToString(ipfilters[i], strFilter);
+
+		FS_FPrintf(f, "addip 0 %s\n", strFilter);
+#else // REHLDS_FIXES
 		uint8 *b = ipfilters[i].compare.octets;
 		FS_FPrintf(f, "addip 0.0 %i.%i.%i.%i\n", b[0], b[1], b[2], b[3]);
+#endif // REHLDS_FIXES
 	}
 	FS_Close(f);
 }
