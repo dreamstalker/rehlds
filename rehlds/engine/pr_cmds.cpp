@@ -1473,10 +1473,12 @@ int EXT_FUNC PF_precache_model_I(const char *s)
 
 						PF_precache_model_I(textureModelName);
 					}
-					if (pStudioHeader->numseqgroups)
+					// 0 seqgroup is reserved for sequences in this model
+					if (pStudioHeader->numseqgroups > 1)
 					{
 						mstudioseqgroup_t *pSeqGroup = (mstudioseqgroup_t *)((uint8_t *)pStudioHeader + pStudioHeader->seqgroupindex);
-						for (int i = 0; i < pStudioHeader->numseqgroups; i++, pSeqGroup++)
+						++pSeqGroup;
+						for (int i = 1; i < pStudioHeader->numseqgroups; i++, pSeqGroup++)
 						{
 							if (pSeqGroup->name[0] == '\0')
 								continue;
