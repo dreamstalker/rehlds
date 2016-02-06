@@ -235,7 +235,11 @@ void EXT_FUNC CRehldsServerData::SetResourcesNum(int num) {
 }
 
 struct resource_s *EXT_FUNC CRehldsServerData::GetResource(int index) {
+#ifdef REHLDS_FIXES
+	return &g_rehlds_sv.resources[index];
+#else // REHLDS_FIXES
 	return &g_psv.resourcelist[index];
+#endif // REHLDS_FIXES
 }
 
 void Rehlds_Interfaces_FreeClients() 
