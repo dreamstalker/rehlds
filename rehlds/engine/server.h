@@ -531,6 +531,7 @@ extern cvar_t sv_allow_dlfile;
 extern cvar_t sv_version;
 #ifdef REHLDS_FIXES
 extern cvar_t sv_echo_unknown_cmd;
+extern cvar_t sv_auto_precache_sounds_in_models;
 #endif
 extern int sv_playermodel;
 

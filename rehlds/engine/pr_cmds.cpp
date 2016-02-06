@@ -1482,41 +1482,6 @@ int EXT_FUNC PF_precache_model_I(const char *s)
 				if (!iOptional)
 					g_psv.model_precache_flags[i] |= 1u;
 
-#ifdef REHLDS_FIXES
-				if (g_psv.models[i]->type == mod_studio)
-				{
-					studiohdr_t *pStudioHeader = (studiohdr_t *)Mod_Extradata(g_psv.models[i]);
-
-					size_t modelNameLength = Q_strlen(s);
-					if (!pStudioHeader->textureindex && modelNameLength < MAX_QPATH - 1)
-					{
-						char textureModelName[MAX_QPATH];
-						Q_strcpy(textureModelName, s);
-
-						size_t modelExtensionLength = sizeof(".mdl") - 1;
-						char *modelExtension = &textureModelName[modelNameLength - modelExtensionLength];
-						Q_strcpy(modelExtension, "T.mdl");
-
-						PF_precache_model_I(textureModelName);
-					}
-					if (pStudioHeader->numseqgroups)
-					{
-						mstudioseqgroup_t *pSeqGroup = (mstudioseqgroup_t *)((uint8_t *)pStudioHeader + pStudioHeader->seqgroupindex);
-						for (int i = 0; i < pStudioHeader->numseqgroups; i++, pSeqGroup++)
-						{
-							if (pSeqGroup->name[0] == '\0')
-								continue;
-
-							char seqGroupName[MAX_QPATH];
-							Q_strcpy(seqGroupName, pSeqGroup->name);
-							ForwardSlashes(seqGroupName);
-
-							PF_precache_generic_I(seqGroupName);
-						}
-					}
-				}
-#endif // REHLDS_FIXES
-
 				return i;
 			}
 

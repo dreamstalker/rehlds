@@ -200,6 +200,7 @@ cvar_t sv_allow_dlfile = { "sv_allow_dlfile", "1", 0, 0.0f, NULL };
 #ifdef REHLDS_FIXES
 cvar_t sv_version = { "sv_version", "", FCVAR_SERVER, 0.0f, NULL };
 cvar_t sv_echo_unknown_cmd = { "sv_echo_unknown_cmd", "0", 0, 0.0f, NULL };
+cvar_t sv_auto_precache_sounds_in_models = { "sv_auto_precache_sounds_in_models", "0", 0, 0.0f, nullptr };
 #else
 cvar_t sv_version = {"sv_version", "", 0, 0.0f, NULL};
 #endif
@@ -5409,6 +5410,83 @@ void SetCStrikeFlags(void)
 	}
 }
 
+#ifdef REHLDS_FIXES
+void PrecacheModelTexture(const char *s, studiohdr_t *pStudioHeader)
+{
+	if (pStudioHeader->textureindex)
+		return;
+
+	size_t modelNameLength = Q_strlen(s);
+	if (modelNameLength >= MAX_QPATH - 1)
+		return;
+	
+	char textureModelName[MAX_QPATH];
+	Q_strcpy(textureModelName, s);
+
+	size_t modelExtensionLength = sizeof(".mdl") - 1;
+	char *modelExtension = &textureModelName[modelNameLength - modelExtensionLength];
+	Q_strcpy(modelExtension, "T.mdl");
+
+	// Use generic, because model max count is 512...
+	PF_precache_generic_I(textureModelName);
+}
+
+void PrecacheModelSeqGroups(studiohdr_t *pStudioHeader)
+{
+	// 0 seqgroup is reserved for sequences in this model
+	if (pStudioHeader->numseqgroups <= 1)
+		return;
+
+	mstudioseqgroup_t *pSeqGroup = (mstudioseqgroup_t *)((uint8_t *)pStudioHeader + pStudioHeader->seqgroupindex);
+	for (int i = 1; i < pStudioHeader->numseqgroups; i++)
+	{
+		if (pSeqGroup[i].name[0] == '\0')
+			continue;
+
+		char seqGroupName[MAX_QPATH];
+		Q_strcpy(seqGroupName, pSeqGroup[i].name);
+
+		ForwardSlashes(seqGroupName);
+		PF_precache_generic_I(seqGroupName);
+	}
+}
+
+void PrecacheModelSounds(studiohdr_t *pStudioHeader)
+{
+	mstudioseqdesc_t *pSeqDesc = (mstudioseqdesc_t *)((uintptr_t)pStudioHeader + pStudioHeader->seqindex);
+	for (int index = 0; index < pStudioHeader->numseq; index++)
+	{
+		mstudioevent_t *pEvent = (mstudioevent_t *)((uintptr_t)pStudioHeader + pSeqDesc[index].eventindex);
+		for (int i = 0; i < pSeqDesc[index].numevents; i++)
+		{
+			if (pEvent[i].event != 5004)
+				continue;
+			if (pEvent[i].options[0] == '\0')
+				continue;
+
+			PF_precache_generic_I(va("sound/%s", pEvent[i].options));
+		}
+	}
+}
+
+void PrecacheModelSpecifiedFiles()
+{
+	const char **s = &g_psv.model_precache[1];
+	for (size_t i = 1; i < ARRAYSIZE(g_psv.model_precache) && *s != nullptr; i++, s++)
+	{
+		if (g_psv.models[i]->type != mod_studio)
+			continue;
+
+		studiohdr_t *pStudioHeader = (studiohdr_t *)Mod_Extradata(g_psv.models[i]);
+
+		PrecacheModelTexture(*s, pStudioHeader);
+		PrecacheModelSeqGroups(pStudioHeader);
+		if (sv_auto_precache_sounds_in_models.value)
+			PrecacheModelSounds(pStudioHeader);
+	}
+}
+#endif
+
 void SV_ActivateServer(int runPhysics)
 {
 	g_RehldsHookchains.m_SV_ActivateServer.callChain(SV_ActivateServer_internal, runPhysics);
@@ -5438,6 +5516,10 @@ void EXT_FUNC SV_ActivateServer_internal(int runPhysics)
 	gEntityInterface.pfnServerActivate(g_psv.edicts, g_psv.num_edicts, g_psvs.maxclients);
 	Steam_Activate();
 	ContinueLoadingProgressBar("Server", 9, 0.0f);
+#ifdef REHLDS_FIXES
+	// Precache after all models and sounds is precached, because we use PrecacheGeneric, which checks is that resource already precached as model or sound
+	PrecacheModelSpecifiedFiles();
+#endif
 	SV_CreateGenericResources();
 	g_psv.active = TRUE;
 	g_psv.state = ss_active;
@@ -7230,6 +7312,7 @@ void SV_Init(void)
 #ifdef REHLDS_FIXES
 	Cvar_RegisterVariable(&sv_force_ent_intersection);
 	Cvar_RegisterVariable(&sv_echo_unknown_cmd);
+	Cvar_RegisterVariable(&sv_auto_precache_sounds_in_models);
 #endif
 	
 	for (int i = 0; i < MAX_MODELS; i++)
