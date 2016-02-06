@@ -4,9 +4,6 @@
 #include <iostream>
 
 TEST(AngleVectorsTest, MathLib, 1000) {
-	Sys_CheckCpuInstructionsSupport();
-	CHECK_WARNING_OUT("SSE4.1 Support", cpuinfo.sse4_1);
-
 	struct testdata_t {
 		vec3_t angles;
 		vec3_t forward, right, up;
@@ -17,33 +14,26 @@ TEST(AngleVectorsTest, MathLib, 1000) {
 			{ { 106.0f, 142.0f, 62.0f }, { 0.21721f, -0.16970f, -0.96126f }, { 0.95785f, -0.15259f, 0.24337f }, { 0.18798f, 0.97361f, -0.12940f } }
 	};
 
-	for (int sse = 0; sse <= 1; sse++) {
-		vec3_t forward, right, up;
+	vec3_t forward, right, up;
 
-		for (int i = 0; i < ARRAYSIZE(testdata); i++) {
-			AngleVectors(testdata[i].angles, forward, right, up);
+	for (int i = 0; i < ARRAYSIZE(testdata); i++) {
+		AngleVectors(testdata[i].angles, forward, right, up);
 
-			DOUBLES_EQUAL("forward[0] mismatch", testdata[i].forward[0], forward[0], 0.00001);
-			DOUBLES_EQUAL("forward[1] mismatch", testdata[i].forward[1], forward[1], 0.00001);
-			DOUBLES_EQUAL("forward[2] mismatch", testdata[i].forward[2], forward[2], 0.00001);
+		DOUBLES_EQUAL("forward[0] mismatch", testdata[i].forward[0], forward[0], 0.00001);
+		DOUBLES_EQUAL("forward[1] mismatch", testdata[i].forward[1], forward[1], 0.00001);
+		DOUBLES_EQUAL("forward[2] mismatch", testdata[i].forward[2], forward[2], 0.00001);
 
-			DOUBLES_EQUAL("right[0] mismatch", testdata[i].right[0], right[0], 0.00001);
-			DOUBLES_EQUAL("right[1] mismatch", testdata[i].right[1], right[1], 0.00001);
-			DOUBLES_EQUAL("right[2] mismatch", testdata[i].right[2], right[2], 0.00001);
+		DOUBLES_EQUAL("right[0] mismatch", testdata[i].right[0], right[0], 0.00001);
+		DOUBLES_EQUAL("right[1] mismatch", testdata[i].right[1], right[1], 0.00001);
+		DOUBLES_EQUAL("right[2] mismatch", testdata[i].right[2], right[2], 0.00001);
 
-			DOUBLES_EQUAL("up[0] mismatch", testdata[i].up[0], up[0], 0.00001);
-			DOUBLES_EQUAL("up[1] mismatch", testdata[i].up[1], up[1], 0.00001);
-			DOUBLES_EQUAL("up[2] mismatch", testdata[i].up[2], up[2], 0.00001);
-		}
-
-		cpuinfo.sse4_1 = 0;
+		DOUBLES_EQUAL("up[0] mismatch", testdata[i].up[0], up[0], 0.00001);
+		DOUBLES_EQUAL("up[1] mismatch", testdata[i].up[1], up[1], 0.00001);
+		DOUBLES_EQUAL("up[2] mismatch", testdata[i].up[2], up[2], 0.00001);
 	}
 }
 
 TEST(AngleVectorsTransposeTest, MathLib, 1000) {
-	Sys_CheckCpuInstructionsSupport();
-	CHECK_WARNING_OUT("SSE4.1 Support", cpuinfo.sse4_1);
-
 	struct testdata_t {
 		vec3_t angles;
 		vec3_t forward, right, up;
@@ -54,33 +44,26 @@ TEST(AngleVectorsTransposeTest, MathLib, 1000) {
 			{ { 106.0f, 142.0f, 62.0f }, { 0.21721f, -0.95785f, 0.18798f }, { -0.16970f, 0.15259f, 0.97361f }, { -0.96126f, -0.24337f, -0.12940f } }
 	};
 
-	for (int sse = 0; sse <= 1; sse++) {
-		vec3_t forward, right, up;
+	vec3_t forward, right, up;
 
-		for (int i = 0; i < ARRAYSIZE(testdata); i++) {
-			AngleVectorsTranspose(testdata[i].angles, forward, right, up);
+	for (int i = 0; i < ARRAYSIZE(testdata); i++) {
+		AngleVectorsTranspose(testdata[i].angles, forward, right, up);
 
-			DOUBLES_EQUAL("forward[0] mismatch", testdata[i].forward[0], forward[0], 0.00001);
-			DOUBLES_EQUAL("forward[1] mismatch", testdata[i].forward[1], forward[1], 0.00001);
-			DOUBLES_EQUAL("forward[2] mismatch", testdata[i].forward[2], forward[2], 0.00001);
+		DOUBLES_EQUAL("forward[0] mismatch", testdata[i].forward[0], forward[0], 0.00001);
+		DOUBLES_EQUAL("forward[1] mismatch", testdata[i].forward[1], forward[1], 0.00001);
+		DOUBLES_EQUAL("forward[2] mismatch", testdata[i].forward[2], forward[2], 0.00001);
 
-			DOUBLES_EQUAL("right[0] mismatch", testdata[i].right[0], right[0], 0.00001);
-			DOUBLES_EQUAL("right[1] mismatch", testdata[i].right[1], right[1], 0.00001);
-			DOUBLES_EQUAL("right[2] mismatch", testdata[i].right[2], right[2], 0.00001);
+		DOUBLES_EQUAL("right[0] mismatch", testdata[i].right[0], right[0], 0.00001);
+		DOUBLES_EQUAL("right[1] mismatch", testdata[i].right[1], right[1], 0.00001);
+		DOUBLES_EQUAL("right[2] mismatch", testdata[i].right[2], right[2], 0.00001);
 
-			DOUBLES_EQUAL("up[0] mismatch", testdata[i].up[0], up[0], 0.00001);
-			DOUBLES_EQUAL("up[1] mismatch", testdata[i].up[1], up[1], 0.00001);
-			DOUBLES_EQUAL("up[2] mismatch", testdata[i].up[2], up[2], 0.00001);
-		}
-
-		cpuinfo.sse4_1 = 0;
+		DOUBLES_EQUAL("up[0] mismatch", testdata[i].up[0], up[0], 0.00001);
+		DOUBLES_EQUAL("up[1] mismatch", testdata[i].up[1], up[1], 0.00001);
+		DOUBLES_EQUAL("up[2] mismatch", testdata[i].up[2], up[2], 0.00001);
 	}
 }
 
 TEST(AngleMatrixTest, MathLib, 1000) {
-	Sys_CheckCpuInstructionsSupport();
-	CHECK_WARNING_OUT("SSE4.1 Support", cpuinfo.sse4_1);
-
 	struct testdata_t {
 		vec3_t angles;
 		vec_t matrix0[4];
@@ -93,29 +76,25 @@ TEST(AngleMatrixTest, MathLib, 1000) {
 			{ { 106.0f, 142.0f, 62.0f }, { 0.21721f, -0.95785f, 0.18798f, 0.0f }, { -0.16970f, 0.15259f, 0.97361f, 0.0f }, { -0.96126f, -0.24337f, -0.12940f, 0.0f } }
 	};
 
-	for (int sse = 0; sse <= 1; sse++) {
-		float rotation_matrix[3][4];
+	float rotation_matrix[3][4];
 
-		for (int i = 0; i < ARRAYSIZE(testdata); i++) {
-			AngleMatrix(testdata[i].angles, rotation_matrix);
+	for (int i = 0; i < ARRAYSIZE(testdata); i++) {
+		AngleMatrix(testdata[i].angles, rotation_matrix);
 
-			DOUBLES_EQUAL("rotationmatrix[0][0] mismatch", testdata[i].matrix0[0], rotation_matrix[0][0], 0.00001);
-			DOUBLES_EQUAL("rotationmatrix[0][1] mismatch", testdata[i].matrix0[1], rotation_matrix[0][1], 0.00001);
-			DOUBLES_EQUAL("rotationmatrix[0][2] mismatch", testdata[i].matrix0[2], rotation_matrix[0][2], 0.00001);
-			DOUBLES_EQUAL("rotationmatrix[0][3] mismatch", testdata[i].matrix0[3], rotation_matrix[0][3], 0.00001);
+		DOUBLES_EQUAL("rotationmatrix[0][0] mismatch", testdata[i].matrix0[0], rotation_matrix[0][0], 0.00001);
+		DOUBLES_EQUAL("rotationmatrix[0][1] mismatch", testdata[i].matrix0[1], rotation_matrix[0][1], 0.00001);
+		DOUBLES_EQUAL("rotationmatrix[0][2] mismatch", testdata[i].matrix0[2], rotation_matrix[0][2], 0.00001);
+		DOUBLES_EQUAL("rotationmatrix[0][3] mismatch", testdata[i].matrix0[3], rotation_matrix[0][3], 0.00001);
 
-			DOUBLES_EQUAL("rotationmatrix[1][0] mismatch", testdata[i].matrix1[0], rotation_matrix[1][0], 0.00001);
-			DOUBLES_EQUAL("rotationmatrix[1][1] mismatch", testdata[i].matrix1[1], rotation_matrix[1][1], 0.00001);
-			DOUBLES_EQUAL("rotationmatrix[1][2] mismatch", testdata[i].matrix1[2], rotation_matrix[1][2], 0.00001);
-			DOUBLES_EQUAL("rotationmatrix[1][3] mismatch", testdata[i].matrix1[3], rotation_matrix[1][3], 0.00001);
+		DOUBLES_EQUAL("rotationmatrix[1][0] mismatch", testdata[i].matrix1[0], rotation_matrix[1][0], 0.00001);
+		DOUBLES_EQUAL("rotationmatrix[1][1] mismatch", testdata[i].matrix1[1], rotation_matrix[1][1], 0.00001);
+		DOUBLES_EQUAL("rotationmatrix[1][2] mismatch", testdata[i].matrix1[2], rotation_matrix[1][2], 0.00001);
+		DOUBLES_EQUAL("rotationmatrix[1][3] mismatch", testdata[i].matrix1[3], rotation_matrix[1][3], 0.00001);
 
-			DOUBLES_EQUAL("rotationmatrix[2][0] mismatch", testdata[i].matrix2[0], rotation_matrix[2][0], 0.00001);
-			DOUBLES_EQUAL("rotationmatrix[2][1] mismatch", testdata[i].matrix2[1], rotation_matrix[2][1], 0.00001);
-			DOUBLES_EQUAL("rotationmatrix[2][2] mismatch", testdata[i].matrix2[2], rotation_matrix[2][2], 0.00001);
-			DOUBLES_EQUAL("rotationmatrix[2][3] mismatch", testdata[i].matrix2[3], rotation_matrix[2][3], 0.00001);
-		}
-
-		cpuinfo.sse4_1 = 0;
+		DOUBLES_EQUAL("rotationmatrix[2][0] mismatch", testdata[i].matrix2[0], rotation_matrix[2][0], 0.00001);
+		DOUBLES_EQUAL("rotationmatrix[2][1] mismatch", testdata[i].matrix2[1], rotation_matrix[2][1], 0.00001);
+		DOUBLES_EQUAL("rotationmatrix[2][2] mismatch", testdata[i].matrix2[2], rotation_matrix[2][2], 0.00001);
+		DOUBLES_EQUAL("rotationmatrix[2][3] mismatch", testdata[i].matrix2[3], rotation_matrix[2][3], 0.00001);
 	}
 }
 
@@ -146,9 +125,6 @@ TEST(DotProductTest, MathLib, 1000) {
 }
 
 TEST(CrossProductTest, MathLib, 1000) {
-	Sys_CheckCpuInstructionsSupport();
-	CHECK_WARNING_OUT("SSE4.1 Support", cpuinfo.sse4_1);
-
 	struct testdata_t {
 		vec3_t v1;
 		vec3_t v2;
@@ -160,18 +136,14 @@ TEST(CrossProductTest, MathLib, 1000) {
 			{ { -16.1f, -0.09f, 1.2f }, { 8.2f, 1.2f, -6.66f }, { -0.84060f, -97.38600f, -18.58200f } },
 	};
 
-	for (int sse = 0; sse <= 1; sse++) {
-		vec3_t res;
+	vec3_t res;
 
-		for (int i = 0; i < ARRAYSIZE(testdata); i++) {
-			CrossProduct(testdata[i].v1, testdata[i].v2, res);
+	for (int i = 0; i < ARRAYSIZE(testdata); i++) {
+		CrossProduct(testdata[i].v1, testdata[i].v2, res);
 
-			DOUBLES_EQUAL("CrossProduct[0] mismatch", testdata[i].res[0], res[0], 0.00001);
-			DOUBLES_EQUAL("CrossProduct[1] mismatch", testdata[i].res[1], res[1], 0.00001);
-			DOUBLES_EQUAL("CrossProduct[2] mismatch", testdata[i].res[2], res[2], 0.00001);
-		}
-
-		cpuinfo.sse4_1 = 0;
+		DOUBLES_EQUAL("CrossProduct[0] mismatch", testdata[i].res[0], res[0], 0.00001);
+		DOUBLES_EQUAL("CrossProduct[1] mismatch", testdata[i].res[1], res[1], 0.00001);
+		DOUBLES_EQUAL("CrossProduct[2] mismatch", testdata[i].res[2], res[2], 0.00001);
 	}
 }
 

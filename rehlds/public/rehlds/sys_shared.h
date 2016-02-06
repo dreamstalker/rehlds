@@ -31,7 +31,7 @@
 
 typedef struct cpuinfo_s
 {
-	uint8 sse3, ssse3, sse4_1, sse4_2, avx, avx2;
+	uint8 sse3, ssse3, sse4_1, sse4_2, avx, avx2, popcnt;
 } cpuinfo_t;
 
 extern cpuinfo_t cpuinfo;

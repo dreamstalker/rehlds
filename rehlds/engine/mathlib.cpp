@@ -340,10 +340,6 @@ void AngleVectors(const vec_t *angles, vec_t *forward, vec_t *right, vec_t *up)
 // parallel SSE version
 void AngleVectorsTranspose(const vec_t *angles, vec_t *forward, vec_t *right, vec_t *up)
 {
-#ifndef SWDS
-	g_engdstAddrs.pfnAngleVectors(&angles, &forward, &right, &up);
-#endif // SWDS
-
 	__m128 s, c;
 	sincos_ps(_mm_mul_ps(_mm_loadu_ps(angles), _mm_load_ps(deg2rad)), &s, &c);
 
@@ -425,10 +421,6 @@ void AngleVectorsTranspose(const vec_t *angles, vec_t *forward, vec_t *right, ve
 // parallel SSE version
 void AngleMatrix(const vec_t *angles, float(*matrix)[4])
 {
-#ifndef SWDS
-	g_engdstAddrs.pfnAngleVectors(&angles, &forward, &right, &up);
-#endif // SWDS
-
 	__m128 s, c;
 	sincos_ps(_mm_mul_ps(_mm_loadu_ps(angles), _mm_load_ps(deg2rad)), &s, &c);
 
@@ -547,31 +539,27 @@ NOBODY void InterpolateAngles(float *start, float *end, float *output, float fra
 //}
 
 /* <47495> ../engine/mathlib.c:457 */
-//#ifndef REHLDS_FIXES
-
-//#else
 void VectorTransform(const vec_t *in1, float *in2, vec_t *out)
 {
 	out[0] = _DotProduct(in1, in2 + 0) + in2[3];
 	out[1] = _DotProduct(in1, in2 + 4) + in2[7];
 	out[2] = _DotProduct(in1, in2 + 8) + in2[11];
 }
-//#endif
 
 /* <474dc> ../engine/mathlib.c:465 */
 int VectorCompare(const vec_t *v1, const vec_t *v2)
 {
-#ifdef REHLDS_FIXES
-	__m128 cmp = _mm_cmpneq_ss(_mm_loadu_ps(v1), _mm_loadu_ps(v2));
-	return !(_mm_movemask_epi8(*(__m128i *)&cmp) & 0xFFFFFF);
-#else
+#ifdef REHLDS_OPT_PEDANTIC
+	__m128 cmp = _mm_cmpneq_ps(_mm_loadu_ps(v1), _mm_loadu_ps(v2));
+	return !(_mm_movemask_epi8(*(__m128i *)&cmp) & 0xFFF);
+#else // REHLDS_OPT_PEDANTIC
 	for (int i = 0; i < 3; i++)
 	{
 		if (v1[i] != v2[i]) return 0;
 	}
 
 	return 1;
-#endif
+#endif // REHLDS_OPT_PEDANTIC
 }
 
 #ifdef REHLDS_FIXES
@@ -775,7 +763,7 @@ NOBODY void R_ConcatRotations(float *in1, float *in2, float *out);
 
 /* <47a04> ../engine/mathlib.c:660 */
 #ifdef REHLDS_FIXES
-void NOINLINE R_ConcatTransforms(float in1[3][4], float in2[3][4], float out[3][4])
+void R_ConcatTransforms(float in1[3][4], float in2[3][4], float out[3][4])
 {
 	for (size_t i = 0; i < 3; i++)
 	{
