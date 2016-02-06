@@ -731,20 +731,20 @@ qboolean Steam_NotifyBotConnect_internal(client_t *cl)
 
 void EXT_FUNC Steam_NotifyClientDisconnect_api(IGameClient* cl)
 {
-	Steam_NotifyClientDisconnect_internal(cl->GetClient());
+	g_RehldsHookchains.m_Steam_NotifyClientDisconnect.callChain(Steam_NotifyClientDisconnect_internal, cl);
 }
 
 void Steam_NotifyClientDisconnect(client_t *cl)
 {
-	g_RehldsHookchains.m_Steam_NotifyClientDisconnect.callChain(Steam_NotifyClientDisconnect_api, GetRehldsApiClient(cl));
+	Steam_NotifyClientDisconnect_api(GetRehldsApiClient(cl));
 }
 
 /* <f191f> ../engine/sv_steam3.cpp:934 */
-void Steam_NotifyClientDisconnect_internal(client_t *cl)
+void Steam_NotifyClientDisconnect_internal(IGameClient* cl)
 {
 	if (Steam3Server())
 	{
-		Steam3Server()->NotifyClientDisconnect(cl);
+		Steam3Server()->NotifyClientDisconnect(cl->GetClient());
 	}
 }
 

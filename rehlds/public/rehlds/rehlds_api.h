@@ -35,7 +35,7 @@
 #include "model.h"
 
 #define REHLDS_API_VERSION_MAJOR 2
-#define REHLDS_API_VERSION_MINOR 7
+#define REHLDS_API_VERSION_MINOR 8
 
 //Steam_NotifyClientConnect hook
 typedef IHookChain<qboolean, IGameClient*, const void*, unsigned int> IRehldsHook_Steam_NotifyClientConnect;
@@ -251,6 +251,8 @@ struct RehldsFuncs_t {
 	void*(*GetPluginApi)(const char *name);
 	void(*RegisterPluginApi)(const char *name, void *impl);
 	qboolean(*SV_FileInConsistencyList)(const char *filename, struct consistency_s **ppconsist);
+	qboolean(*Steam_NotifyClientConnect_api)(IGameClient *cl, const void *pvSteam2Key, unsigned int ucbSteam2Key);
+	void(*Steam_NotifyClientDisconnect)(IGameClient* cl);
 };
 
 class IRehldsApi {
