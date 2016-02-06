@@ -1301,14 +1301,18 @@ void SV_SendResources(sizebuf_t *msg)
 
 	MSG_WriteByte(msg, svc_resourcelist);
 	MSG_StartBitWriting(msg);
-	MSG_WriteBits(g_psv.num_resources, 12);
+	MSG_WriteBits(g_psv.num_resources, RESOURCE_INDEX_BITS);
 
+#ifdef REHLDS_FIXES
+	resource_t *r = g_rehlds_sv.resources;
+#else // REHLDS_FIXES
 	resource_t *r = g_psv.resourcelist;
+#endif
 	for (int i = 0; i < g_psv.num_resources; i++, r++)
 	{
 		MSG_WriteBits(r->type, 4);
 		MSG_WriteBitString(r->szFileName);
-		MSG_WriteBits(r->nIndex, 12);
+		MSG_WriteBits(r->nIndex, RESOURCE_INDEX_BITS);
 		MSG_WriteBits(r->nDownloadSize, 24);
 		MSG_WriteBits(r->ucFlags & (RES_WASMISSING | RES_FATALIFMISSING), 3);
 
@@ -4990,10 +4994,20 @@ int SV_ModelIndex(const char *name)
 void EXT_FUNC SV_AddResource(resourcetype_t type, const char *name, int size, unsigned char flags, int index)
 {
 	resource_t *r;
+#ifdef REHLDS_FIXES
+	if (g_psv.num_resources >= ARRAYSIZE(g_rehlds_sv.resources))
+#else // REHLDS_FIXES
 	if (g_psv.num_resources >= MAX_RESOURCE_LIST)
+#endif // REHLDS_FIXES
+	{
 		Sys_Error("Too many resources on server.");
+	}
 
+#ifdef REHLDS_FIXES
+	r = &g_rehlds_sv.resources[g_psv.num_resources++];
+#else // REHLDS_FIXES
 	r = &g_psv.resourcelist[g_psv.num_resources++];
+#endif
 	r->type = type;
 	Q_strncpy(r->szFileName, name, sizeof(r->szFileName) - 1);
 	r->szFileName[sizeof(r->szFileName) - 1] = 0;
@@ -5055,10 +5069,17 @@ void SV_CreateGenericResources(void)
 			Con_Printf("Can't precache .dll files:  %s\n", com_token);
 		else
 		{
+			// In fixed version of PrecacheGeneric we don't need local copy
+#ifdef REHLDS_FIXES
+			PF_precache_generic_I(com_token);
+			Con_DPrintf("  %s\n", com_token);
+			g_psv.num_generic_names++;
+#else // REHLDS_FIXES
 			Q_strncpy(g_psv.generic_precache_names[g_psv.num_generic_names], com_token, sizeof(g_psv.generic_precache_names[g_psv.num_generic_names]) - 1);
 			g_psv.generic_precache_names[g_psv.num_generic_names][sizeof(g_psv.generic_precache_names[g_psv.num_generic_names]) - 1] = 0;
 			PF_precache_generic_I(g_psv.generic_precache_names[g_psv.num_generic_names]);
 			Con_DPrintf("  %s\n", g_psv.generic_precache_names[g_psv.num_generic_names++]);
+#endif // REHLDS_FIXES
 		}
 	}
 	Con_DPrintf("----------------------------------\n");
@@ -5075,6 +5096,19 @@ void SV_CreateResourceList(void)
 	event_t *ep;
 
 	g_psv.num_resources = 0;
+
+#ifdef REHLDS_FIXES
+	// Generic resources can be indexed from 0, because client ignores resourceIndex for generic resources
+	for (size_t i = 0; i < g_rehlds_sv.precachedGenericResourceCount; i++)
+	{
+		if (g_psvs.maxclients > 1)
+			nSize = FS_FileSize(g_rehlds_sv.precachedGenericResourceNames[i]);
+		else
+			nSize = 0;
+
+		SV_AddResource(t_generic, g_rehlds_sv.precachedGenericResourceNames[i], nSize, RES_FATALIFMISSING, i);
+	}
+#else // REHLDS_FIXES
 #ifdef REHLDS_CHECKS
 	for (i = 1, s = &g_psv.generic_precache[1]; i < HL_GENERIC_MAX && *s != NULL; i++, s++)
 #else // REHLDS_CHECKS
@@ -5088,6 +5122,8 @@ void SV_CreateResourceList(void)
 
 		SV_AddResource(t_generic, *s, nSize, RES_FATALIFMISSING, i);
 	}
+#endif // REHLDS_FIXES
+
 #ifdef REHLDS_CHECKS
 	for (i = 1, s = &g_psv.sound_precache[1]; i < HL_SOUND_MAX && *s != NULL; i++, s++)
 #else // REHLDS_CHECKS
@@ -5487,6 +5523,29 @@ void PrecacheModelSpecifiedFiles()
 }
 #endif
 
+#ifdef REHLDS_FIXES
+void MoveCheckedResourcesToFirstPositions()
+{
+	resource_t *pResources = g_rehlds_sv.resources;
+	size_t j = 0;
+	for (size_t i = 0; i < (size_t)g_psv.num_resources; i++)
+	{
+		if (!(pResources[i].ucFlags & RES_CHECKFILE))
+			continue;
+		if (i == j)
+		{
+			j++;
+			continue;
+		}
+
+		resource_t temp = pResources[i];
+		pResources[i] = pResources[j];
+		pResources[j] = temp;
+		j++;
+	}
+}
+#endif // REHLDS_FIXES
+
 void SV_ActivateServer(int runPhysics)
 {
 	g_RehldsHookchains.m_SV_ActivateServer.callChain(SV_ActivateServer_internal, runPhysics);
@@ -5548,6 +5607,9 @@ void EXT_FUNC SV_ActivateServer_internal(int runPhysics)
 	SV_CreateBaseline();
 	SV_CreateResourceList();
 	g_psv.num_consistency = SV_TransferConsistencyInfo();
+#ifdef REHLDS_FIXES
+	MoveCheckedResourcesToFirstPositions();
+#endif // REHLDS_FIXES
 	for (i = 0, cl = g_psvs.clients; i < g_psvs.maxclients; cl++, i++)
 	{
 		if (!cl->fakeclient && (cl->active || cl->connected))
@@ -5688,6 +5750,9 @@ int SV_SpawnServer(qboolean bIsDemo, char *server, char *startspot)
 #ifdef REHLDS_OPT_PEDANTIC
 	g_rehlds_sv.modelsMap.clear();
 #endif
+#ifdef REHLDS_FIXES
+	g_rehlds_sv.precachedGenericResourceCount = 0;
+#endif // REHLDS_FIXES
 
 	Q_strncpy(g_psv.oldname, oldname, sizeof(oldname) - 1);
 	g_psv.oldname[sizeof(oldname) - 1] = 0;
@@ -5820,7 +5885,9 @@ int SV_SpawnServer(qboolean bIsDemo, char *server, char *startspot)
 
 	g_psv.sound_precache[0] = pr_strings;
 	g_psv.model_precache[0] = pr_strings;
+#ifndef REHLDS_FIXES
 	g_psv.generic_precache[0] = pr_strings;
+#endif // REHLDS_FIXES
 
 	for (i = 1; i < g_psv.worldmodel->numsubmodels; i++)
 	{

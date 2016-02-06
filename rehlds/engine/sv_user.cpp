@@ -136,8 +136,12 @@ void SV_ParseConsistencyResponse(client_t *pSenderClient)
 			break;
 		}
 
+#ifdef REHLDS_FIXES
+		resource_t *r = &g_rehlds_sv.resources[idx];
+#else // REHLDS_FIXES
 		resource_t *r = &g_psv.resourcelist[idx];
-		if (!(g_psv.resourcelist[idx].ucFlags & RES_CHECKFILE))
+#endif // REHLDS_FIXES
+		if (!(r->ucFlags & RES_CHECKFILE))
 		{
 			c = -1;
 			break;
@@ -223,12 +227,12 @@ void SV_ParseConsistencyResponse(client_t *pSenderClient)
 #ifdef REHLDS_FIXES
 		dropmessage[0] = '\0';
 
-		if (gEntityInterface.pfnInconsistentFile(host_client->edict, g_psv.resourcelist[c - 1].szFileName, dropmessage))
+		if (gEntityInterface.pfnInconsistentFile(host_client->edict, g_rehlds_sv.resources[c - 1].szFileName, dropmessage))
 		{
 			if (dropmessage[0])
 				SV_ClientPrintf("%s", dropmessage);
 
-			SV_DropClient(host_client, FALSE, "Bad file %s", g_psv.resourcelist[c - 1].szFileName); // only filename. reason was printed in console if exists.
+			SV_DropClient(host_client, FALSE, "Bad file %s", g_rehlds_sv.resources[c - 1].szFileName); // only filename. reason was printed in console if exists.
 		}
 #else // REHLDS_FIXES
 		if (gEntityInterface.pfnInconsistentFile(host_client->edict, g_psv.resourcelist[c - 1].szFileName, dropmessage))
@@ -278,7 +282,11 @@ int EXT_FUNC SV_TransferConsistencyInfo_internal(void)
 	int c = 0;
 	for (int i = 0; i < g_psv.num_resources; i++)
 	{
+#ifdef REHLDS_FIXES
+		resource_t *r = &g_rehlds_sv.resources[i];
+#else // REHLDS_FIXES
 		resource_t *r = &g_psv.resourcelist[i];
+#endif // REHLDS_FIXES
 		if (r->ucFlags == (RES_CUSTOM | RES_REQUESTED | RES_UNK_6) || (r->ucFlags & RES_CHECKFILE))
 			continue;
 
@@ -345,7 +353,11 @@ void SV_SendConsistencyList(sizebuf_t *msg)
 
 	int delta = 0;
 	int lastcheck = 0;
+#ifdef REHLDS_FIXES
+	resource_t *r = g_rehlds_sv.resources;
+#else // REHLDS_FIXES
 	resource_t *r = g_psv.resourcelist;
+#endif // REHLDS_FIXES
 
 	MSG_WriteBits(1, 1);
 

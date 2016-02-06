@@ -1516,6 +1516,7 @@ int EXT_FUNC PF_precache_model_I(const char *s)
 	}
 }
 
+#ifdef REHLDS_FIXES
 /* <79a3f> ../engine/pr_cmds.c:1903 */
 int EXT_FUNC PF_precache_generic_I(char *s)
 // TODO: Call to Con_Printf is replaced with Host_Error in 6153
@@ -1526,14 +1527,51 @@ int EXT_FUNC PF_precache_generic_I(char *s)
 	if (PR_IsEmptyString(s))
 		Host_Error("PF_precache_generic_I: Bad string '%s'", s);
 
-#ifdef REHLDS_FIXES
-	size_t soundPrefixLength = sizeof("sound/") - 1;
-	bool isSoundPrefixed = !Q_strnicmp(s, "sound/", soundPrefixLength);
+	char resName[MAX_QPATH];
+	Q_strncpy(resName, s, sizeof(resName));
+	resName[sizeof(resName) - 1] = '\0';
+	ForwardSlashes(resName);
 
-	if ((isSoundPrefixed && SV_LookupSoundIndex(&s[soundPrefixLength])) ||
-	    SV_LookupModelIndex(s))
+	size_t soundPrefixLength = sizeof("sound/") - 1;
+	bool isSoundPrefixed = !Q_strnicmp(resName, "sound/", soundPrefixLength);
+
+	// TODO: check sound with index 0?
+	// UPD: no, not need, because engine do this: g_psv.sound_precache[0] = pr_strings;
+	if ((isSoundPrefixed && SV_LookupSoundIndex(&resName[soundPrefixLength])) ||
+		SV_LookupModelIndex(resName))
 		return 0;
-#endif // REHLDS_FIXES
+
+	size_t resCount = g_rehlds_sv.precachedGenericResourceCount;
+	for (size_t i = 0; i < resCount; i++)
+	{
+		if (!Q_stricmp(g_rehlds_sv.precachedGenericResourceNames[i], resName))
+			return i;
+	}
+
+	if (g_psv.state != ss_loading)
+		Host_Error("PF_precache_generic_I: '%s' Precache can only be done in spawn functions", resName);
+	
+	if (resCount >= ARRAYSIZE(g_rehlds_sv.precachedGenericResourceNames))
+		Host_Error(
+			"PF_precache_generic_I: Generic item '%s' failed to precache because the item count is over the %d limit.\n\
+Reduce the number of brush models and/or regular models in the map to correct this.",
+			resName,
+			ARRAYSIZE(g_rehlds_sv.precachedGenericResourceNames));
+
+	Q_strcpy(g_rehlds_sv.precachedGenericResourceNames[resCount], resName);
+
+	return g_rehlds_sv.precachedGenericResourceCount++;
+}
+#else // REHLDS_FIXES
+/* <79a3f> ../engine/pr_cmds.c:1903 */
+int EXT_FUNC PF_precache_generic_I(char *s)
+// TODO: Call to Con_Printf is replaced with Host_Error in 6153
+{
+	if (!s)
+		Host_Error("PF_precache_generic_I: NULL pointer");
+
+	if (PR_IsEmptyString(s))
+		Host_Error("PF_precache_generic_I: Bad string '%s'", s);
 
 	if (g_psv.state == ss_loading)
 	{
@@ -1541,12 +1579,7 @@ int EXT_FUNC PF_precache_generic_I(char *s)
 		{
 			if (!g_psv.generic_precache[i])
 			{
-#ifdef REHLDS_FIXES
-				// For more information, see EV_Precache
-				g_psv.generic_precache[i] = ED_NewString(s);
-#else
 				g_psv.generic_precache[i] = s;
-#endif // REHLDS_FIXES
 				return i;
 			}
 
@@ -1567,8 +1600,8 @@ int EXT_FUNC PF_precache_generic_I(char *s)
 		}
 		Host_Error("PF_precache_generic_I: '%s' Precache can only be done in spawn functions", s);
 	}
-
 }
+#endif // REHLDS_FIXES
 
 /* <79a93> ../engine/pr_cmds.c:1944 */
 int EXT_FUNC PF_IsMapValid_I(char *mapname)

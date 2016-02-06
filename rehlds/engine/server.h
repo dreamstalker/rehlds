@@ -81,6 +81,10 @@
 #define MSG_FL_PAS				BIT(2)	// Send to PAS
 #define MSG_FL_ONE				BIT(7)	// Send to single client
 
+#define RESOURCE_INDEX_BITS 12
+#ifdef REHLDS_FIXES
+#define RESOURCE_MAX_COUNT  (1 << RESOURCE_INDEX_BITS)
+#endif // REHLDS_FIXES
 
 #define HL_SOUND_MAX 512
 #define HL_SOUND_HASHLOOKUP_SIZE (HL_SOUND_MAX * 2 - 1)
@@ -168,6 +172,11 @@ struct rehlds_server_t {
 	// Extended net buffers
 	uint8_t reliableDatagramBuffer[NET_MAX_PAYLOAD];
 	uint8_t signonData[NET_MAX_PAYLOAD];
+
+	// Extended resource list
+	resource_t resources[RESOURCE_MAX_COUNT];
+	char precachedGenericResourceNames[RESOURCE_MAX_COUNT][MAX_QPATH];
+	size_t precachedGenericResourceCount;
 #endif
 };
 
