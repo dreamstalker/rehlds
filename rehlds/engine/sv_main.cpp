@@ -5001,6 +5001,68 @@ void EXT_FUNC SV_AddResource(resourcetype_t type, const char *name, int size, un
 	r->nIndex = index;
 }
 
+#ifdef REHLDS_FIXES
+void PrecacheMapSpecifiedResources()
+{
+	if (sv_skyname.string[0])
+	{
+		// TODO: what to do if these files only on fastdl? add cvar onlytga?
+		if (FS_FileExists(va("gfx/env/%sbk.tga", sv_skyname.string)))
+		{
+			PF_precache_generic_I(va("gfx/env/%sbk.tga", sv_skyname.string));
+			PF_precache_generic_I(va("gfx/env/%sdn.tga", sv_skyname.string));
+			PF_precache_generic_I(va("gfx/env/%sft.tga", sv_skyname.string));
+			PF_precache_generic_I(va("gfx/env/%slf.tga", sv_skyname.string));
+			PF_precache_generic_I(va("gfx/env/%srt.tga", sv_skyname.string));
+			PF_precache_generic_I(va("gfx/env/%sup.tga", sv_skyname.string));
+		}
+		else
+		{
+			PF_precache_generic_I(va("gfx/env/%sbk.bmp", sv_skyname.string));
+			PF_precache_generic_I(va("gfx/env/%sdn.bmp", sv_skyname.string));
+			PF_precache_generic_I(va("gfx/env/%sft.bmp", sv_skyname.string));
+			PF_precache_generic_I(va("gfx/env/%slf.bmp", sv_skyname.string));
+			PF_precache_generic_I(va("gfx/env/%srt.bmp", sv_skyname.string));
+			PF_precache_generic_I(va("gfx/env/%sup.bmp", sv_skyname.string));
+		}
+	}
+
+	// TODO: or this is not-engine and this better do by gamedll or .res?
+	if (FS_FileExists(va("overviews/%s.txt", g_psv.name)))
+	{
+		PF_precache_generic_I(va("overviews/%s.txt", g_psv.name));
+		// TODO: what about .tga?
+		PF_precache_generic_I(va("overviews/%s.bmp", g_psv.name));
+	}
+
+	// TODO: or this is not-engine and this better do by gamedll or .res?
+	if (FS_FileExists(va("maps/%s.txt", g_psv.name)))
+		PF_precache_generic_I(va("maps/%s.txt", g_psv.name));
+
+	// TODO: or this is not-engine and this better do by gamedll or .res?
+	if (FS_FileExists(va("maps/%s_detail.txt", g_psv.name)))
+		PF_precache_generic_I(va("maps/%s_detail.txt", g_psv.name));
+
+	char tempPath[1024];
+	Q_strncpy(tempPath, wadpath, sizeof(tempPath) - 2);
+	tempPath[sizeof(tempPath) - 2] = 0;
+	if (!Q_strchr(tempPath, ';'))
+		Q_strcat(tempPath, ";");
+
+	for (char *token = strtok(tempPath, ";"); token != nullptr; token = strtok(nullptr, ";"))
+	{
+		char wadName[MAX_QPATH];
+		COM_FileBase(token, wadName);
+
+		if (Q_strstr(wadName, "pldecal") || Q_strstr(wadName, "tempdecal"))
+			continue;
+
+		COM_DefaultExtension(wadName, ".wad");
+		PF_precache_generic_I(wadName);
+	}
+}
+#endif // REHLDS_FIXES
+
 /* <a99d9> ../engine/sv_main.c:6557 */
 void SV_CreateGenericResources(void)
 {
@@ -5439,6 +5501,9 @@ void EXT_FUNC SV_ActivateServer_internal(int runPhysics)
 	Steam_Activate();
 	ContinueLoadingProgressBar("Server", 9, 0.0f);
 	SV_CreateGenericResources();
+#ifdef REHLDS_FIXES
+	PrecacheMapSpecifiedResources();
+#endif
 	g_psv.active = TRUE;
 	g_psv.state = ss_active;
 	ContinueLoadingProgressBar("Server", 10, 0.0f);
