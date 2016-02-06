@@ -340,10 +340,6 @@ void AngleVectors(const vec_t *angles, vec_t *forward, vec_t *right, vec_t *up)
 // parallel SSE version
 void AngleVectorsTranspose(const vec_t *angles, vec_t *forward, vec_t *right, vec_t *up)
 {
-#ifndef SWDS
-	g_engdstAddrs.pfnAngleVectors(&angles, &forward, &right, &up);
-#endif // SWDS
-
 	__m128 s, c;
 	sincos_ps(_mm_mul_ps(_mm_loadu_ps(angles), _mm_load_ps(deg2rad)), &s, &c);
 
@@ -425,10 +421,6 @@ void AngleVectorsTranspose(const vec_t *angles, vec_t *forward, vec_t *right, ve
 // parallel SSE version
 void AngleMatrix(const vec_t *angles, float(*matrix)[4])
 {
-#ifndef SWDS
-	g_engdstAddrs.pfnAngleVectors(&angles, &forward, &right, &up);
-#endif // SWDS
-
 	__m128 s, c;
 	sincos_ps(_mm_mul_ps(_mm_loadu_ps(angles), _mm_load_ps(deg2rad)), &s, &c);
 
