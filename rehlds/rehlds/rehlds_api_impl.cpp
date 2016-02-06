@@ -192,7 +192,9 @@ RehldsFuncs_t g_RehldsApiFuncs =
 	&MSG_WriteString_api,
 	&Rehlds_GetPluginApi,
 	&Rehlds_RegisterPluginApi,
-	&SV_FileInConsistencyList
+	&SV_FileInConsistencyList,
+	&Steam_NotifyClientConnect_api,
+	&Steam_NotifyClientDisconnect_api
 };
 
 sizebuf_t* EXT_FUNC GetNetMessage_api()
