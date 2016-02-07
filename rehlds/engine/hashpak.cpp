@@ -850,7 +850,7 @@ void HPAK_CreatePak(char *pakname, struct resource_s *pResource, void *pData, Fi
 
 	curpos = FS_Tell(fp);
 	FS_Write(&hash_pack_dir.nEntries, 4, 1, fp);
-	FS_Write(&hash_pack_dir.p_rgEntries, sizeof(hash_pack_entry_t), 1, fp);
+	FS_Write(hash_pack_dir.p_rgEntries, sizeof(hash_pack_entry_t), 1, fp);
 
 	if (hash_pack_dir.p_rgEntries)
 	{

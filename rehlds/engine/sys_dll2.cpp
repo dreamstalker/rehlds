@@ -651,7 +651,7 @@ NOXREF int BuildMapCycleListHints(char **hints)
 	if (length)
 	{
 		pFileList = (char *)malloc(length);
-		if (pFileList && FS_Read(pFileList, length, 0, pFile) != 1)
+		if (pFileList && FS_Read(pFileList, length, 1, pFile) != 1)
 		{
 			while (1)
 			{

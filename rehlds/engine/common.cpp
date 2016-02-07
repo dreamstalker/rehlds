@@ -2167,8 +2167,8 @@ void COM_CopyFileChunk(FileHandle_t dst, FileHandle_t src, int nSize)
 
 	while (copysize > COM_COPY_CHUNK_SIZE)
 	{
-		FS_Read(copybuf, 1, COM_COPY_CHUNK_SIZE, src);
-		FS_Write(copybuf, 1, COM_COPY_CHUNK_SIZE, dst);
+		FS_Read(copybuf, COM_COPY_CHUNK_SIZE, 1, src);
+		FS_Write(copybuf, COM_COPY_CHUNK_SIZE, 1, dst);
 		copysize -= COM_COPY_CHUNK_SIZE;
 	}
 

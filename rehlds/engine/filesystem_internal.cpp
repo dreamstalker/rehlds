@@ -156,13 +156,21 @@ int FS_EndOfFile(FileHandle_t file)
 /* <25fa9> ../engine/filesystem_internal.cpp:131 */
 int FS_Read(void *pOutput, int size, int count, FileHandle_t file)
 {
+#ifdef REHLDS_FIXES
+	return g_pFileSystem->Read(pOutput, size * count, file);
+#else // REHLDS_FIXES
 	return g_pFileSystem->Read(pOutput, size, file);
+#endif // REHLDS_FIXES
 }
 
 /* <2641e> ../engine/filesystem_internal.cpp:138 */
 int FS_Write(const void *pInput, int size, int count, FileHandle_t file)
 {
+#ifdef REHLDS_FIXES
+	return g_pFileSystem->Write(pInput, size * count, file);
+#else // REHLDS_FIXES
 	return g_pFileSystem->Write(pInput, size, file);
+#endif // REHLDS_FIXES
 }
 
 /* <26479> ../engine/filesystem_internal.cpp:145 */
