@@ -5043,22 +5043,30 @@ void PrecacheMapSpecifiedResources()
 	if (FS_FileExists(va("maps/%s_detail.txt", g_psv.name)))
 		PF_precache_generic_I(va("maps/%s_detail.txt", g_psv.name));
 
-	char tempPath[1024];
-	Q_strncpy(tempPath, wadpath, sizeof(tempPath) - 2);
-	tempPath[sizeof(tempPath) - 2] = 0;
-	if (!Q_strchr(tempPath, ';'))
-		Q_strcat(tempPath, ";");
-
-	for (char *token = strtok(tempPath, ";"); token != nullptr; token = strtok(nullptr, ";"))
+	if (wadpath != nullptr)
 	{
-		char wadName[MAX_QPATH];
-		COM_FileBase(token, wadName);
+		char tempPath[1024];
+		Q_strncpy(tempPath, wadpath, sizeof(tempPath) - 2);
+		tempPath[sizeof(tempPath) - 2] = 0;
+		if (!Q_strchr(tempPath, ';'))
+			Q_strcat(tempPath, ";");
 
-		if (Q_strstr(wadName, "pldecal") || Q_strstr(wadName, "tempdecal"))
-			continue;
+		for (char *token = strtok(tempPath, ";"); token != nullptr; token = strtok(nullptr, ";"))
+		{
+			char wadName[MAX_QPATH];
+			COM_FileBase(token, wadName);
+			COM_DefaultExtension(wadName, ".wad");
 
-		COM_DefaultExtension(wadName, ".wad");
-		PF_precache_generic_I(wadName);
+			if (!FS_FileExists(wadName)
+			 || !Q_stricmp(wadName, "pldecal.wad")
+			 || !Q_stricmp(wadName, "tempdecal.wad")
+			 || !Q_stricmp(wadName, "halflife.wad")
+			 || !Q_stricmp(wadName, "xeno.wad")
+			 || !Q_stricmp(wadName, "decals.wad"))
+				continue;
+
+			PF_precache_generic_I(wadName);
+		}
 	}
 }
 #endif // REHLDS_FIXES
