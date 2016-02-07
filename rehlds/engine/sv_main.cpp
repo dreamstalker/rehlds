@@ -2106,7 +2106,7 @@ void SV_ReplaceSpecialCharactersInName(char *newname, const char *oldname)
 		if (*s == '#' ||
 		    *s == '%' ||
 		    *s == '&' ||
-		    (n && newname[n-1] == '+' && (isdigit(*s) || isalpha(*s))))
+		    (n && newname[n-1] == '+' && (signed char)*s > 0 && isalnum(*s)))
 		{
 			if (remainChars < 3)
 				break;
@@ -6430,7 +6430,11 @@ void SV_BanId_f(void)
 					);
 			}
 			SV_ClientPrintf("You have been kicked and banned %s by the server op.\n", szreason);
+#ifdef REHLDS_FIXES
+			SV_DropClient(host_client, FALSE, "Kicked and banned %s", szreason);
+#else // REHLDS_FIXES
 			SV_DropClient(host_client, FALSE, "Kicked and banned");
+#endif // REHLDS_FIXES
 			break;
 		}
 	}
@@ -6833,6 +6837,14 @@ ipaddress A.B.C.D/24 is equivalent to A.B.C.0 and A.B.C\n");
 	ipfilters[i].cidr = tempFilter.cidr;
 #endif // REHLDS_FIXES
 
+#ifdef REHLDS_FIXES
+	char reason[32];
+	if (banTime == 0.0f)
+		Q_strcpy(reason, "permanently");
+	else
+		Q_sprintf(reason, "for %g minutes", banTime);
+#endif // REHLDS_FIXES
+
 	for (int i = 0; i < g_psvs.maxclients; i++)
 	{
 		host_client = &g_psvs.clients[i];
@@ -6842,8 +6854,13 @@ ipaddress A.B.C.D/24 is equivalent to A.B.C.0 and A.B.C\n");
 		Q_memcpy(&net_from, &host_client->netchan.remote_address, sizeof(net_from));
 		if (SV_FilterPacket())
 		{
+#ifdef REHLDS_FIXES
+			SV_ClientPrintf("The server operator has added you to banned list %s\n", reason);
+			SV_DropClient(host_client, 0, "Added to banned list %s", reason);
+#else // REHLDS_FIXES
 			SV_ClientPrintf("The server operator has added you to banned list\n");
-			SV_DropClient(host_client, 0, "Added to banned list");;
+			SV_DropClient(host_client, 0, "Added to banned list");
+#endif // REHLDS_FIXES
 		}
 	}
 }
