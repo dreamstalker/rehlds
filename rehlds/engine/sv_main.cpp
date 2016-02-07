@@ -5019,29 +5019,41 @@ void EXT_FUNC SV_AddResource(resourcetype_t type, const char *name, int size, un
 }
 
 #ifdef REHLDS_FIXES
+bool PrecacheSky()
+{
+	// TODO: what to do if these files only on fastdl? add cvar onlytga?
+	if (FS_FileExists(va("gfx/env/%sbk.tga", sv_skyname.string)))
+	{
+		PF_precache_generic_I(va("gfx/env/%sbk.tga", sv_skyname.string));
+		PF_precache_generic_I(va("gfx/env/%sdn.tga", sv_skyname.string));
+		PF_precache_generic_I(va("gfx/env/%sft.tga", sv_skyname.string));
+		PF_precache_generic_I(va("gfx/env/%slf.tga", sv_skyname.string));
+		PF_precache_generic_I(va("gfx/env/%srt.tga", sv_skyname.string));
+		PF_precache_generic_I(va("gfx/env/%sup.tga", sv_skyname.string));
+
+		return true;
+	}
+	else if (FS_FileExists(va("gfx/env/%sbk.bmp", sv_skyname.string)))
+	{
+		PF_precache_generic_I(va("gfx/env/%sbk.bmp", sv_skyname.string));
+		PF_precache_generic_I(va("gfx/env/%sdn.bmp", sv_skyname.string));
+		PF_precache_generic_I(va("gfx/env/%sft.bmp", sv_skyname.string));
+		PF_precache_generic_I(va("gfx/env/%slf.bmp", sv_skyname.string));
+		PF_precache_generic_I(va("gfx/env/%srt.bmp", sv_skyname.string));
+		PF_precache_generic_I(va("gfx/env/%sup.bmp", sv_skyname.string));
+
+		return true;
+	}
+
+	return false;
+}
+
 void PrecacheMapSpecifiedResources()
 {
-	if (sv_skyname.string[0])
+	if (sv_skyname.string[0] == '\0' || !PrecacheSky())
 	{
-		// TODO: what to do if these files only on fastdl? add cvar onlytga?
-		if (FS_FileExists(va("gfx/env/%sbk.tga", sv_skyname.string)))
-		{
-			PF_precache_generic_I(va("gfx/env/%sbk.tga", sv_skyname.string));
-			PF_precache_generic_I(va("gfx/env/%sdn.tga", sv_skyname.string));
-			PF_precache_generic_I(va("gfx/env/%sft.tga", sv_skyname.string));
-			PF_precache_generic_I(va("gfx/env/%slf.tga", sv_skyname.string));
-			PF_precache_generic_I(va("gfx/env/%srt.tga", sv_skyname.string));
-			PF_precache_generic_I(va("gfx/env/%sup.tga", sv_skyname.string));
-		}
-		else
-		{
-			PF_precache_generic_I(va("gfx/env/%sbk.bmp", sv_skyname.string));
-			PF_precache_generic_I(va("gfx/env/%sdn.bmp", sv_skyname.string));
-			PF_precache_generic_I(va("gfx/env/%sft.bmp", sv_skyname.string));
-			PF_precache_generic_I(va("gfx/env/%slf.bmp", sv_skyname.string));
-			PF_precache_generic_I(va("gfx/env/%srt.bmp", sv_skyname.string));
-			PF_precache_generic_I(va("gfx/env/%sup.bmp", sv_skyname.string));
-		}
+		Cvar_Set(sv_skyname.name, "desert");
+		PrecacheSky();
 	}
 
 	// TODO: or this is not-engine and this better do by gamedll or .res?
