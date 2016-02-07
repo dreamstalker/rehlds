@@ -5004,6 +5004,8 @@ void EXT_FUNC SV_AddResource(resourcetype_t type, const char *name, int size, un
 
 #ifdef REHLDS_FIXES
 	r = &g_rehlds_sv.resources[g_psv.num_resources++];
+
+	Q_memset(r, 0, sizeof(*r));
 #else // REHLDS_FIXES
 	r = &g_psv.resourcelist[g_psv.num_resources++];
 #endif
