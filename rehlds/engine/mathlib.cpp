@@ -93,10 +93,10 @@ void BOPS_Error(void)
 	Sys_Error("BoxOnPlaneSide:  Bad signbits");
 }
 
-#ifdef REHLDS_FIXES
+#ifdef REHLDS_OPT_PEDANTIC
 int BoxOnPlaneSide(vec_t *emins, vec_t *emaxs, mplane_t *p)
 {
-	float	dist1, dist2;
+	double	dist1, dist2;
 	int		sides = 0;
 
 	__m128 emin = _mm_loadu_ps(emins);
@@ -123,16 +123,16 @@ int BoxOnPlaneSide(vec_t *emins, vec_t *emaxs, mplane_t *p)
 		d2[1] = emaxs[1];
 		break;
 	case 3:
-		_mm_store_ps(d1, emax);
-		_mm_store_ps(d2, emin);
-		d1[2] = emins[2];
-		d2[2] = emaxs[2];
-		break;
-	case 4:
 		_mm_store_ps(d1, emin);
 		_mm_store_ps(d2, emax);
 		d1[2] = emaxs[2];
 		d2[2] = emins[2];
+		break;
+	case 4:
+		_mm_store_ps(d1, emax);
+		_mm_store_ps(d2, emin);
+		d1[2] = emins[2];
+		d2[2] = emaxs[2];
 		break;
 	case 5:
 		_mm_store_ps(d1, emin);
