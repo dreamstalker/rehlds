@@ -76,8 +76,16 @@ qboolean SV_CheckFile(sizebuf_t *msg, char *filename)
 
 #endif // REHLDS_FIXES
 
-	MSG_WriteByte(msg, svc_stufftext);
-	MSG_WriteString(msg, va("upload \"!MD5%s\"\n", MD5_Print(p.rgucMD5_hash)));
+#ifdef REHLDS_FIXES
+	// While client is connecting he always send too small fragments (128 bytes)
+	// But if client is fully connected he send fragments with cl_dlmax size
+	// So, send upload in SV_SendEnts_f
+	if (!sv_delayed_spray_upload.value)
+#endif // REHLDS_FIXES
+	{
+		MSG_WriteByte(msg, svc_stufftext);
+		MSG_WriteString(msg, va("upload \"!MD5%s\"\n", MD5_Print(p.rgucMD5_hash)));
+	}
 
 	return FALSE;
 }
