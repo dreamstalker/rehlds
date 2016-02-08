@@ -2139,10 +2139,10 @@ int SV_CheckUserInfo(netadr_t *adr, char *userinfo, qboolean bIsReconnecting, in
 
 	if (!NET_IsLocalAddress(*adr))
 	{
-		if (sv_password.string[0] != 0 && Q_stricmp(sv_password.string, "none"))
-		{
-			const char* password = Info_ValueForKey(userinfo, "password");
+		const char* password = Info_ValueForKey(userinfo, "password");
 
+		if (sv_password.string[0] != '\0' && Q_stricmp(sv_password.string, "none") && Q_strcmp(sv_password.string, password))
+		{
 #ifdef REHLDS_FIXES
 			if (password[0] == '\0')
 			{
@@ -2150,9 +2150,7 @@ int SV_CheckUserInfo(netadr_t *adr, char *userinfo, qboolean bIsReconnecting, in
 				SV_RejectConnection(adr, "No password set. Clean your userinfo.\n");
 			}
 			else
-#endif
-
-			if (Q_strcmp(sv_password.string, password))
+#endif // REHLDS_FIXES
 			{
 				Con_Printf("%s:  password failed\n", NET_AdrToString(*adr));
 				SV_RejectConnectionForPassword(adr);
