@@ -1837,6 +1837,12 @@ void SV_SendEnts_f(void)
 						// TODO: all this is already checked earlier
 						if (res->ucFlags & RES_WASMISSING && res->type == t_decal && res->ucFlags & RES_CUSTOM)
 						{
+							if (sv_rehlds_force_dlmax.value)
+							{
+								MSG_WriteByte(&host_client->netchan.message, svc_stufftext);
+								MSG_WriteString(&host_client->netchan.message, va("cl_dlmax %i\n", FRAGMENT_MAX_SIZE));
+							}
+
 							MSG_WriteByte(&host_client->netchan.message, svc_stufftext);
 							MSG_WriteString(&host_client->netchan.message, va("upload !MD5%s\n", MD5_Print(res->rgucMD5_hash)));
 						}

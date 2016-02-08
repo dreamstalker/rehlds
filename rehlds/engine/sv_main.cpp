@@ -202,6 +202,7 @@ cvar_t sv_version = { "sv_version", "", FCVAR_SERVER, 0.0f, NULL };
 cvar_t sv_echo_unknown_cmd = { "sv_echo_unknown_cmd", "0", 0, 0.0f, NULL };
 cvar_t sv_auto_precache_sounds_in_models = { "sv_auto_precache_sounds_in_models", "0", 0, 0.0f, nullptr };
 cvar_t sv_delayed_spray_upload = { "sv_delayed_spray_upload", "0", 0, 0.0f, nullptr };
+cvar_t sv_rehlds_force_dlmax = { "sv_rehlds_force_dlmax", "0", 0, 0.0f, nullptr };
 #else
 cvar_t sv_version = {"sv_version", "", 0, 0.0f, NULL};
 #endif
@@ -1777,17 +1778,21 @@ void SV_RejectConnectionForPassword(netadr_t *adr)
 /* <a5bce> ../engine/sv_main.c:2230 */
 int SV_GetFragmentSize(void *state)
 {
-	int size = 1024;
+	int size = FRAGMENT_S2C_MAX_SIZE;
 	client_t *cl = (client_t *)state;
 
+#ifdef REHLDS_FIXES
+	if (cl->active && cl->spawned && cl->connected && cl->fully_connected && !sv_rehlds_force_dlmax.value)
+#else // REHLDS_FIXES
 	if (cl->active && cl->spawned && cl->connected && cl->fully_connected)
+#endif // REHLDS_FIXES
 	{
-		size = 256;
+		size = FRAGMENT_S2C_MIN_SIZE;
 		const char *val = Info_ValueForKey(cl->userinfo, "cl_dlmax");
 		if (val[0] != 0)
 		{
 			size = Q_atoi( val );
-			size = clamp(size, 256, 1024);
+			size = clamp(size, FRAGMENT_S2C_MIN_SIZE, FRAGMENT_S2C_MAX_SIZE);
 		}
 	}
 
@@ -7758,6 +7763,7 @@ void SV_Init(void)
 	Cvar_RegisterVariable(&sv_echo_unknown_cmd);
 	Cvar_RegisterVariable(&sv_auto_precache_sounds_in_models);
 	Cvar_RegisterVariable(&sv_delayed_spray_upload);
+	Cvar_RegisterVariable(&sv_rehlds_force_dlmax);
 #endif
 	
 	for (int i = 0; i < MAX_MODELS; i++)

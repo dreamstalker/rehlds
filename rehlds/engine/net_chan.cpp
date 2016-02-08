@@ -675,10 +675,15 @@ qboolean Netchan_Validate(netchan_t *chan, qboolean *frag_message, unsigned int 
 		}
 #else // REHLDS_FIXES
 		// total fragments should be <= MAX_FRAGMENTS and current fragment can't be > total fragments
-		if (FRAG_GETCOUNT(fragid[i]) > MAX_FRAGMENTS || FRAG_GETID(fragid[i]) > FRAG_GETCOUNT(fragid[i]))
+		if (i == FRAG_NORMAL_STREAM && FRAG_GETCOUNT(fragid[i]) > MAX_NORMAL_FRAGMENTS)
 			return FALSE;
-
-		if ((size_t)frag_length[i] > FRAGMENT_SIZE || (size_t)frag_offset[i] > NET_MAX_PAYLOAD - 1)
+		if (i == FRAG_FILE_STREAM && FRAG_GETCOUNT(fragid[i]) > MAX_FILE_FRAGMENTS)
+			return FALSE;
+		if (FRAG_GETID(fragid[i]) > FRAG_GETCOUNT(fragid[i]))
+			return FALSE;
+		if (!frag_length[i])
+			return FALSE;
+		if ((size_t)frag_length[i] > FRAGMENT_MAX_SIZE || (size_t)frag_offset[i] > NET_MAX_PAYLOAD - 1)
 			return FALSE;
 
 		int frag_end = frag_offset[i] + frag_length[i];
@@ -1006,7 +1011,7 @@ fragbuf_t *Netchan_AllocFragbuf(void)
 	buf->bufferid = 0;
 	buf->frag_message.cursize = 0;
 	buf->frag_message.data = buf->frag_message_buf;
-	buf->frag_message.maxsize = FRAGMENT_SIZE;
+	buf->frag_message.maxsize = sizeof(buf->frag_message_buf);
 	buf->frag_message.buffername = "Frag Buffer Alloc'd";
 	buf->next = 0;
 
@@ -1067,12 +1072,7 @@ void Netchan_CreateFragments_(qboolean server, netchan_t *chan, sizebuf_t *msg)
 		}
 	}
 
-#ifdef REHLDS_FIXES
-	chunksize = clamp(chan->pfnNetchan_Blocksize(chan->connection_status), 64, 1200);
-#else
 	chunksize = chan->pfnNetchan_Blocksize(chan->connection_status);
-#endif // REHLDS_FIXES
-	
 
 	wait = (fragbufwaiting_t *)Mem_ZeroMalloc(sizeof(fragbufwaiting_t));
 
@@ -1144,7 +1144,7 @@ void Netchan_CreateFileFragmentsFromBuffer(qboolean server, netchan_t *chan, con
 	unsigned int size;
 	fragbufwaiting_t *wait;
 
-	if (!uncompressed_size == 0)
+	if (!uncompressed_size)
 		return;
 
 	bufferid = 1;
