@@ -201,6 +201,7 @@ cvar_t sv_allow_dlfile = { "sv_allow_dlfile", "1", 0, 0.0f, NULL };
 cvar_t sv_version = { "sv_version", "", FCVAR_SERVER, 0.0f, NULL };
 cvar_t sv_echo_unknown_cmd = { "sv_echo_unknown_cmd", "0", 0, 0.0f, NULL };
 cvar_t sv_auto_precache_sounds_in_models = { "sv_auto_precache_sounds_in_models", "0", 0, 0.0f, nullptr };
+cvar_t sv_delayed_spray_upload = { "sv_delayed_spray_upload", "0", 0, 0.0f, nullptr };
 #else
 cvar_t sv_version = {"sv_version", "", 0, 0.0f, NULL};
 #endif
@@ -7758,6 +7759,7 @@ void SV_Init(void)
 	Cvar_RegisterVariable(&sv_force_ent_intersection);
 	Cvar_RegisterVariable(&sv_echo_unknown_cmd);
 	Cvar_RegisterVariable(&sv_auto_precache_sounds_in_models);
+	Cvar_RegisterVariable(&sv_delayed_spray_upload);
 #endif
 	
 	for (int i = 0; i < MAX_MODELS; i++)

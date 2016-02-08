@@ -1824,7 +1824,26 @@ void SV_SendEnts_f(void)
 		if (host_client->active && host_client->spawned)
 		{
 			if (host_client->connected)
+			{
 				host_client->fully_connected = 1;
+
+#ifdef REHLDS_FIXES
+				// See SV_CheckFile function
+				if (sv_delayed_spray_upload.value)
+				{
+					resource_t *res = host_client->resourcesneeded.pNext;
+					if (res != &host_client->resourcesneeded)
+					{
+						// TODO: all this is already checked earlier
+						if (res->ucFlags & RES_WASMISSING && res->type == t_decal && res->ucFlags & RES_CUSTOM)
+						{
+							MSG_WriteByte(&host_client->netchan.message, svc_stufftext);
+							MSG_WriteString(&host_client->netchan.message, va("upload !MD5%s\n", MD5_Print(res->rgucMD5_hash)));
+						}
+					}
+				}
+#endif // REHLDS_FIXES
+			}
 		}
 	}
 }
