@@ -28,6 +28,9 @@
 
 #include "precompiled.h"
 
+// Intrisics guide: https://software.intel.com/sites/landingpage/IntrinsicsGuide/
+// Shufps calculator: http://wurstcaptures.untergrund.net/assembler_tricks.html
+
 vec3_t vec3_origin;
 //int nanmask;
 //short int new_cw;
@@ -36,6 +39,7 @@ vec3_t vec3_origin;
 
 // aligned vec4_t
 typedef ALIGN16 vec4_t avec4_t;
+typedef ALIGN16 int aivec4_t[4];
 
 // conversion multiplier
 const avec4_t deg2rad =
@@ -46,11 +50,35 @@ const avec4_t deg2rad =
 	M_PI / 180.f
 };
 
-// save 4d xmm to 3d vector. we can't optimize many simple vector3 functions because saving back to 3d is slow.
-void xmm2vec(vec_t *v, const __m128 m)
+const aivec4_t negmask[4] =
 {
-	_mm_store_ss(v, m);
-	_mm_storel_pi((__m64*)(v + 1), _mm_shuffle_ps(m, m, _MM_SHUFFLE(3, 2, 2, 1)));
+	0x80000000,
+	0x80000000,
+	0x80000000,
+	0x80000000
+};
+
+const aivec4_t negmask_1001 =
+{
+	0x80000000,
+	0,
+	0,
+	0x80000000
+};
+
+const aivec4_t negmask_0010 =
+{
+	0,
+	0,
+	0x80000000,
+	0
+};
+
+// save 4d xmm to 3d vector. we can't optimize many simple vector3 functions because saving back to 3d is slow.
+static inline void xmm2vec(vec_t *v, const __m128 m)
+{
+	_mm_storel_pi((__m64*)v, m);
+	_mm_store_ss(v + 2, _mm_shuffle_ps(m, m, 0x02));
 }
 
 /* <46ebf> ../engine/mathlib.c:14 */
@@ -65,6 +93,80 @@ void BOPS_Error(void)
 	Sys_Error("BoxOnPlaneSide:  Bad signbits");
 }
 
+#ifdef REHLDS_OPT_PEDANTIC
+int BoxOnPlaneSide(vec_t *emins, vec_t *emaxs, mplane_t *p)
+{
+	double	dist1, dist2;
+	int		sides = 0;
+
+	__m128 emin = _mm_loadu_ps(emins);
+	__m128 emax = _mm_loadu_ps(emaxs);;
+	avec4_t d1, d2;
+
+	// general case
+	switch (p->signbits)
+	{
+	case 0:
+		_mm_store_ps(d1, emax);
+		_mm_store_ps(d2, emin);
+		break;
+	case 1:
+		_mm_store_ps(d1, emax);
+		_mm_store_ps(d2, emin);
+		d1[0] = emins[0];
+		d2[0] = emaxs[0];
+		break;
+	case 2:
+		_mm_store_ps(d1, emax);
+		_mm_store_ps(d2, emin);
+		d1[1] = emins[1];
+		d2[1] = emaxs[1];
+		break;
+	case 3:
+		_mm_store_ps(d1, emin);
+		_mm_store_ps(d2, emax);
+		d1[2] = emaxs[2];
+		d2[2] = emins[2];
+		break;
+	case 4:
+		_mm_store_ps(d1, emax);
+		_mm_store_ps(d2, emin);
+		d1[2] = emins[2];
+		d2[2] = emaxs[2];
+		break;
+	case 5:
+		_mm_store_ps(d1, emin);
+		_mm_store_ps(d2, emax);
+		d1[1] = emaxs[1];
+		d2[1] = emins[1];
+		break;
+	case 6:
+		_mm_store_ps(d1, emin);
+		_mm_store_ps(d2, emax);
+		d1[0] = emaxs[0];
+		d2[0] = emins[0];
+		break;
+	case 7:
+		_mm_store_ps(d1, emin);
+		_mm_store_ps(d2, emax);
+		break;
+	default:
+		BOPS_Error();
+		dist1 = dist2 = 0.0;
+		break;
+	}
+
+	dist1 = _DotProduct(p->normal, d1);
+	dist2 = _DotProduct(p->normal, d2);
+
+	if (dist1 >= p->dist)
+		sides = 1;
+	if (dist2 < p->dist)
+		sides |= 2;
+
+	return sides;
+}
+#else
 /* <46f05> ../engine/mathlib.c:48 */
 int BoxOnPlaneSide(vec_t *emins, vec_t *emaxs, mplane_t *p)
 {
@@ -125,6 +227,7 @@ int BoxOnPlaneSide(vec_t *emins, vec_t *emaxs, mplane_t *p)
 
 	return sides;
 }
+#endif
 
 /* <46f8d> ../engine/mathlib.c:157 */
 NOBODY int InvertMatrix(const float *m, float *out);
@@ -145,6 +248,53 @@ void EXT_FUNC AngleVectors_ext(const vec_t *angles, vec_t *forward, vec_t *right
 	AngleVectors(angles, forward, right, up);
 }
 
+#ifdef REHLDS_FIXES
+// parallel SSE version
+void AngleVectors(const vec_t *angles, vec_t *forward, vec_t *right, vec_t *up)
+{
+#ifndef SWDS
+	g_engdstAddrs.pfnAngleVectors(&angles, &forward, &right, &up);
+#endif // SWDS
+
+	__m128 s, c;
+	sincos_ps(_mm_mul_ps(_mm_loadu_ps(angles), _mm_load_ps(deg2rad)), &s, &c);
+
+	__m128 m1 = _mm_shuffle_ps(c, s, 0x90); // [cp][cp][sy][sr]
+	__m128 m2 = _mm_shuffle_ps(c, c, 0x09); // [cy][cr][cp][cp]
+	__m128 cp_mults = _mm_mul_ps(m1, m2); // [cp * cy][cp * cr][cp * sy][cp * sr];
+
+	m1 = _mm_shuffle_ps(c, s, 0x15); // [cy][cy][sy][sp]
+	m2 = _mm_shuffle_ps(s, c, 0xA0); // [sp][sp][cr][cr]
+	m1 = _mm_shuffle_ps(m1, m1, 0xC8); // [cy][sy][cy][sp]
+
+	__m128 m3 = _mm_shuffle_ps(s, s, 0x4A); // [sr][sr][sp][sy];
+	m3 = _mm_mul_ps(m3, _mm_mul_ps(m1, m2)); // [sp*cy*sr][sp*sy*sr][cr*cy*sp][cr*sp*sy]
+
+	m2 = _mm_shuffle_ps(s, c, 0x65); // [sy][sy][cr][cy]
+	m1 = _mm_shuffle_ps(c, s, 0xA6); // [cr][cy][sr][sr]
+	m2 = _mm_shuffle_ps(m2, m2, 0xD8); // [sy][cr][sy][cy]
+	m1 = _mm_xor_ps(m1, _mm_load_ps((float *)&negmask_1001)); // [-cr][cy][sr][-sr]
+	m1 = _mm_mul_ps(m1, m2); // [-cr*sy][cy*cr][sr*sy][-sr*cy]
+
+	m3 = _mm_add_ps(m3, m1);
+
+	if (forward)
+	{
+		_mm_storel_pi((__m64 *)forward, _mm_shuffle_ps(cp_mults, cp_mults, 0x08));
+		forward[2] = -_mm_cvtss_f32(s);
+	}
+	if (right)
+	{
+		__m128 r = _mm_shuffle_ps(m3, cp_mults, 0xF4); // [m3(0)][m3(1)][cp(3)][cp(3)]
+		xmm2vec(right, _mm_xor_ps(r, _mm_load_ps((float *)&negmask)));
+	}
+	if (up)
+	{
+		_mm_storel_pi((__m64 *)up, _mm_shuffle_ps(m3, m3, 0x0E));
+		up[2] = _mm_cvtss_f32(_mm_shuffle_ps(cp_mults, cp_mults, 0x01));
+	}
+}
+#else // REHLDS_FIXES
 /* <47067> ../engine/mathlib.c:267 */
 void AngleVectors(const vec_t *angles, vec_t *forward, vec_t *right, vec_t *up)
 {
@@ -154,18 +304,6 @@ void AngleVectors(const vec_t *angles, vec_t *forward, vec_t *right, vec_t *up)
 	g_engdstAddrs.pfnAngleVectors(&angles, &forward, &right, &up);
 #endif // SWDS
 
-#ifdef REHLDS_FIXES
-	// convert to radians
-	avec4_t rad_angles;
-	_mm_store_ps(rad_angles, _mm_mul_ps(_mm_loadu_ps(angles), _mm_load_ps(deg2rad)));
-
-	sy = sin(rad_angles[YAW]);
-	cy = cos(rad_angles[YAW]);
-	sp = sin(rad_angles[PITCH]);
-	cp = cos(rad_angles[PITCH]);
-	sr = sin(rad_angles[ROLL]);
-	cr = cos(rad_angles[ROLL]);
-#else
 	float angle;
 	angle = (float)(angles[YAW] * (M_PI * 2 / 360));
 	sy = sin(angle);
@@ -176,7 +314,6 @@ void AngleVectors(const vec_t *angles, vec_t *forward, vec_t *right, vec_t *up)
 	angle = (float)(angles[ROLL] * (M_PI * 2 / 360));
 	sr = sin(angle);
 	cr = cos(angle);
-#endif
 
 	if (forward)
 	{
@@ -197,24 +334,57 @@ void AngleVectors(const vec_t *angles, vec_t *forward, vec_t *right, vec_t *up)
 		up[2] = cr*cp;
 	}
 }
+#endif // REHLDS_FIXES
 
+#ifdef REHLDS_FIXES
+// parallel SSE version
+void AngleVectorsTranspose(const vec_t *angles, vec_t *forward, vec_t *right, vec_t *up)
+{
+	__m128 s, c;
+	sincos_ps(_mm_mul_ps(_mm_loadu_ps(angles), _mm_load_ps(deg2rad)), &s, &c);
+
+	__m128 m1 = _mm_shuffle_ps(c, s, 0x90); // [cp][cp][sy][sr]
+	__m128 m2 = _mm_shuffle_ps(c, c, 0x09); // [cy][cr][cp][cp]
+	__m128 cp_mults = _mm_mul_ps(m1, m2); // [cp * cy][cp * cr][cp * sy][cp * sr];
+
+	m1 = _mm_shuffle_ps(s, s, 0x50); // [sp][sp][sy][sy]
+	m2 = _mm_shuffle_ps(c, s, 0x05); // [cy][cy][sp][sp]
+
+	__m128 m3 = _mm_shuffle_ps(s, c, 0xAA); // [sr][sr][cr][cr]
+	m1 = _mm_mul_ps(m1, m2);
+	m3 = _mm_shuffle_ps(m3, m3, 0xD8); // [sr][cr][sr][cr]
+	m3 = _mm_mul_ps(m3, m1); // [sp*cy*sr][sp*cy*cr][sy*sp*sr][sy*sp*cr]
+
+	m2 = _mm_shuffle_ps(c, s, 0xA6); // [cr][cy][sr][sr]
+	m1 = _mm_shuffle_ps(s, c, 0x65); // [sy][sy][cr][cy]
+	m2 = _mm_shuffle_ps(m2, m2, 0xD8); // [cr][sr][cy][sr]
+	m1 = _mm_xor_ps(m1, _mm_load_ps((float *)&negmask_1001)); // [-cr][cy][sr][-sr]
+	m1 = _mm_mul_ps(m1, m2); // [-cr*sy][sr*sy][cy*cr][-sr*cy]
+
+	m3 = _mm_add_ps(m3, m1);
+
+	if (forward)
+	{
+		forward[0] = _mm_cvtss_f32(cp_mults);
+		_mm_storel_pi((__m64*)(forward + 1), m3); // (sr*sp*cy + cr*-sy);
+	}
+	if (right)
+	{
+		right[0] = _mm_cvtss_f32(_mm_shuffle_ps(cp_mults, cp_mults, 0x02));
+		_mm_storel_pi((__m64*)(right + 1), _mm_shuffle_ps(m3, m3, 0x0E));
+	}
+	if (up)
+	{
+		up[0] = -_mm_cvtss_f32(s);
+		_mm_storel_pi((__m64 *)&up[1], _mm_shuffle_ps(cp_mults, cp_mults, 0x07));
+	}
+}
+#else // REHLDS_FIXES
 /* <4712e> ../engine/mathlib.c:304 */
 void AngleVectorsTranspose(const vec_t *angles, vec_t *forward, vec_t *right, vec_t *up)
 {
 	float		sr, sp, sy, cr, cp, cy;
 
-#ifdef REHLDS_FIXES
-	// convert to radians
-	avec4_t rad_angles;
-	_mm_store_ps(rad_angles, _mm_mul_ps(_mm_loadu_ps(angles), _mm_load_ps(deg2rad)));
-
-	sy = sin(rad_angles[YAW]);
-	cy = cos(rad_angles[YAW]);
-	sp = sin(rad_angles[PITCH]);
-	cp = cos(rad_angles[PITCH]);
-	sr = sin(rad_angles[ROLL]);
-	cr = cos(rad_angles[ROLL]);
-#else
 	float angle;
 	angle = (float)(angles[YAW] * (M_PI * 2 / 360));
 	sy = sin(angle);
@@ -225,7 +395,6 @@ void AngleVectorsTranspose(const vec_t *angles, vec_t *forward, vec_t *right, ve
 	angle = (float)(angles[ROLL] * (M_PI * 2 / 360));
 	sr = sin(angle);
 	cr = cos(angle);
-#endif
 
 	if (forward)
 	{
@@ -246,24 +415,71 @@ void AngleVectorsTranspose(const vec_t *angles, vec_t *forward, vec_t *right, ve
 		up[2] = cr*cp;
 	}
 }
+#endif
 
+#ifdef REHLDS_FIXES
+// parallel SSE version
+void AngleMatrix(const vec_t *angles, float(*matrix)[4])
+{
+	__m128 s, c;
+	sincos_ps(_mm_mul_ps(_mm_loadu_ps(angles), _mm_load_ps(deg2rad)), &s, &c);
+
+	/*
+	matrix[0][1] = sr * sp * cy - cr * sy;
+	matrix[1][1] = sr * sp * sy + cr * cy;
+	matrix[0][2] = cr * sp * cy + sr * sy;
+	matrix[1][2] = cr * sp * sy - sr * cy;
+	*/
+	__m128 m1;
+	__m128 m2 = _mm_shuffle_ps(s, c, 0x00); // [sp][sp][cp][cp]
+	__m128 m3 = _mm_shuffle_ps(c, s, 0x55); // [cy][cy][sy][sy]
+
+	m1 = _mm_shuffle_ps(s, c, 0xAA);   // [sr][sr][cr][cr]
+	m2 = _mm_shuffle_ps(m2, m2, 0x00); // [sp][sp][sp][sp]
+	m3 = _mm_shuffle_ps(m3, m3, 0xD8); // [cy][sy][cy][sy]
+
+	m2 = _mm_mul_ps(m2, _mm_mul_ps(m1, m3)); // m1*m2*m3
+
+	m1 = _mm_shuffle_ps(m1, m1, 0x1B); // [cr][cr][sr][sr]
+	m3 = _mm_shuffle_ps(m3, m3, 0xB1); // [sy][cy][sy][cy]
+	m3 = _mm_xor_ps(m3, _mm_load_ps((float *)&negmask_1001));
+	m3 = _mm_mul_ps(m3, m1);
+
+	m2 = _mm_add_ps(m2, m3);
+
+	/*
+	matrix[0][0] = cp * cy;
+	matrix[1][0] = cp * sy;
+	matrix[2][1] = sr * cp;
+	matrix[2][2] = cr * cp;
+	*/
+	m1 = _mm_shuffle_ps(s, c, 0x29); // [sy][sr][cr][cp]
+	c = _mm_shuffle_ps(c, c, 0x40);  // [cp][cp][cp][cy]
+	m1 = _mm_mul_ps(m1, c);
+
+	// matrix[0]
+	m3 = _mm_shuffle_ps(m2, m2, 0xE1);
+	_mm_storeu_ps(&matrix[0][0], m3);
+	matrix[0][0] = _mm_cvtss_f32(_mm_shuffle_ps(m1, m1, 0x03));
+	*(int *)&matrix[0][3] = 0;
+
+	// matrix[1]
+	m2 = _mm_shuffle_ps(m2, m2, 0xB4);
+	_mm_storeu_ps(&matrix[1][0], m2);
+	matrix[1][0] = _mm_cvtss_f32(m1);
+	*(int *)&matrix[1][3] = 0;
+
+	// matrix[2]
+	_mm_storeu_ps(&matrix[2][0], m1);
+	matrix[2][0] = -_mm_cvtss_f32(s);
+	*(int *)&matrix[2][3] = 0;
+}
+#else // REHLDS_FIXES
 /* <471e9> ../engine/mathlib.c:340 */
 void AngleMatrix(const vec_t *angles, float(*matrix)[4])
 {
 	float		sr, sp, sy, cr, cp, cy;
 
-#ifdef REHLDS_FIXES
-	// convert to radians
-	avec4_t rad_angles;
-	_mm_store_ps(rad_angles, _mm_mul_ps(_mm_loadu_ps(angles), _mm_load_ps(deg2rad)));
-
-	sy = sin(rad_angles[ROLL]);
-	cy = cos(rad_angles[ROLL]);
-	sp = sin(rad_angles[YAW]);
-	cp = cos(rad_angles[YAW]);
-	sr = sin(rad_angles[PITCH]);
-	cr = cos(rad_angles[PITCH]);
-#else
 	float angle;
 	angle = (float)(angles[ROLL] * (M_PI * 2 / 360));
 	sy = sin(angle);
@@ -274,29 +490,23 @@ void AngleMatrix(const vec_t *angles, float(*matrix)[4])
 	angle = (float)(angles[PITCH] * (M_PI * 2 / 360));
 	sr = sin(angle);
 	cr = cos(angle);
-#endif
-
-	float tmp1, tmp2;
 
 	matrix[0][0] = cr * cp;
-	matrix[1][0] = cr * sp;
-	matrix[2][0] = -sr;
-
-	tmp1 = sy * sr;
-	matrix[0][1] = tmp1 * cp - cy * sp;
-	matrix[1][1] = tmp1 * sp + cy * cp;
-	matrix[2][1] = sy * cr;
-
-	tmp2 = cy * sr;
-	matrix[0][2] = tmp2 * cp + sy * sp;
-	matrix[1][2] = tmp2 * sp - sy * cp;
-	matrix[2][2] = cy * cr;
-
+	matrix[0][1] = sy * sr * cp - cy * sp;
+	matrix[0][2] = cy * sr * cp + sy * sp;
 	matrix[0][3] = 0.0f;
+
+	matrix[1][0] = cr * sp;
+	matrix[1][1] = sy * sr * sp + cy * cp;
+	matrix[1][2] = cy * sr * sp - sy * cp;
 	matrix[1][3] = 0.0f;
+
+	matrix[2][0] = -sr;
+	matrix[2][1] = sy * cr;
+	matrix[2][2] = cy * cr;
 	matrix[2][3] = 0.0f;
-	
 }
+#endif // REHLDS_FIXES
 
 /* <4729e> ../engine/mathlib.c:370 */
 NOBODY void AngleIMatrix(const vec_t *angles, float *matrix);
@@ -331,22 +541,33 @@ NOBODY void InterpolateAngles(float *start, float *end, float *output, float fra
 /* <47495> ../engine/mathlib.c:457 */
 void VectorTransform(const vec_t *in1, float *in2, vec_t *out)
 {
-	out[0] = in2[1] * in1[1] + in2[2] * in1[2] + in1[0] * in2[0] + in2[3];
-	out[1] = in2[4] * in1[0] + in2[5] * in1[1] + in2[6] * in1[2] + in2[7];
-	out[2] = in2[8] * in1[0] + in2[9] * in1[1] + in2[10] * in1[2] + in2[11];
+	out[0] = _DotProduct(in1, in2 + 0) + in2[3];
+	out[1] = _DotProduct(in1, in2 + 4) + in2[7];
+	out[2] = _DotProduct(in1, in2 + 8) + in2[11];
 }
 
 /* <474dc> ../engine/mathlib.c:465 */
 int VectorCompare(const vec_t *v1, const vec_t *v2)
 {
+#ifdef REHLDS_OPT_PEDANTIC
+	__m128 cmp = _mm_cmpneq_ps(_mm_loadu_ps(v1), _mm_loadu_ps(v2));
+	return !(_mm_movemask_epi8(*(__m128i *)&cmp) & 0xFFF);
+#else // REHLDS_OPT_PEDANTIC
 	for (int i = 0; i < 3; i++)
 	{
 		if (v1[i] != v2[i]) return 0;
 	}
 
 	return 1;
+#endif // REHLDS_OPT_PEDANTIC
 }
 
+#ifdef REHLDS_FIXES
+void VectorMA(const vec_t *veca, float scale, const vec_t *vecm, vec_t *out)
+{
+	xmm2vec(out, _mm_add_ps(_mm_mul_ps(_mm_set_ps1(scale), _mm_loadu_ps(vecm)), _mm_loadu_ps(veca)));
+}
+#else
 /* <47524> ../engine/mathlib.c:476 */
 void VectorMA(const vec_t *veca, float scale, const vec_t *vecm, vec_t *out)
 {
@@ -354,6 +575,7 @@ void VectorMA(const vec_t *veca, float scale, const vec_t *vecm, vec_t *out)
 	out[1] = scale * vecm[1] + veca[1];
 	out[2] = scale * vecm[2] + veca[2];
 }
+#endif
 
 #ifndef REHLDS_FIXES
 /* <4757a> ../engine/mathlib.c:484 */
@@ -384,9 +606,9 @@ NOBODY void _VectorSubtract(vec_t *veca, vec_t *vecb, vec_t *out);
 /* <475fb> ../engine/mathlib.c:496 */
 void _VectorAdd(vec_t *veca, vec_t *vecb, vec_t *out)
 {
-	for (int i = 0; i < 3; i++) {
-		out[i] = veca[i] + vecb[i];
-	}
+	out[0] = veca[0] + vecb[0];
+	out[1] = veca[1] + vecb[1];
+	out[2] = veca[2] + vecb[2];
 }
 
 /* <47642> ../engine/mathlib.c:503 */
@@ -418,6 +640,7 @@ float Length(const vec_t *v)
 	// based on dot product
 	if (cpuinfo.sse4_1)
 		return _mm_cvtss_f32(_mm_sqrt_ss(_mm_dp_ps(_mm_loadu_ps(v), _mm_loadu_ps(v), 0x71)));
+	return sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
 #endif // REHLDS_FIXES
 
 	float length;
@@ -447,10 +670,10 @@ float VectorNormalize(vec3_t v)
 	float	length, ilength;
 
 #ifdef REHLDS_FIXES
-	length = Length(v);
+	length = Length(v); // rsqrt is very inaccurate :(
 #else // REHLDS_FIXES
 	length = v[0] * v[0] + v[1] * v[1] + v[2] * v[2];
-	length = sqrt(length);		// FIXME
+	length = sqrt(length);
 #endif // REHLDS_FIXES
 
 	if (length)
@@ -539,6 +762,19 @@ NOBODY void R_ConcatRotations(float *in1, float *in2, float *out);
 //}
 
 /* <47a04> ../engine/mathlib.c:660 */
+#ifdef REHLDS_FIXES
+void R_ConcatTransforms(float in1[3][4], float in2[3][4], float out[3][4])
+{
+	for (size_t i = 0; i < 3; i++)
+	{
+		__m128 a1 = _mm_mul_ps(_mm_set_ps1(in1[i][0]), _mm_loadu_ps(in2[0]));
+		__m128 a2 = _mm_mul_ps(_mm_set_ps1(in1[i][1]), _mm_loadu_ps(in2[1]));
+		__m128 a3 = _mm_mul_ps(_mm_set_ps1(in1[i][2]), _mm_loadu_ps(in2[2]));
+		_mm_storeu_ps(out[i], _mm_add_ps(a1, _mm_add_ps(a2, a3)));
+		out[i][3] += in1[i][3];
+	}
+}
+#else // REHLDS_FIXES
 void R_ConcatTransforms(float in1[3][4], float in2[3][4], float out[3][4])
 {
 	out[0][0] = in1[0][0] * in2[0][0] + in1[0][1] * in2[1][0] + in1[0][2] * in2[2][0];
@@ -554,6 +790,7 @@ void R_ConcatTransforms(float in1[3][4], float in2[3][4], float out[3][4])
 	out[2][2] = in1[2][0] * in2[0][2] + in1[2][1] * in2[1][2] + in1[2][2] * in2[2][2];
 	out[2][3] = in1[2][0] * in2[0][3] + in1[2][1] * in2[1][3] + in1[2][2] * in2[2][3] + in1[2][3];
 }
+#endif // REHLDS_FIXES
 
 /* <47a4b> ../engine/mathlib.c:699 */
 NOBODY void FloorDivMod(double numer, double denom, int *quotient, int *rem);

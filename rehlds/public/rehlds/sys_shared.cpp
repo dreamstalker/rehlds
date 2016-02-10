@@ -35,6 +35,7 @@
 #define SSSE3_FLAG		(1<<9)
 #define SSE4_1_FLAG		(1<<19)
 #define SSE4_2_FLAG		(1<<20)
+#define POPCNT_FLAG		(1<<23)
 #define AVX_FLAG		(1<<28)
 #define AVX2_FLAG		(1<<5)
 
@@ -56,6 +57,7 @@ void Sys_CheckCpuInstructionsSupport(void)
 	cpuinfo.ssse3 = (cpuid_data[2] & SSSE3_FLAG) ? 1 : 0;
 	cpuinfo.sse4_1 = (cpuid_data[2] & SSE4_1_FLAG) ? 1 : 0;
 	cpuinfo.sse4_2 = (cpuid_data[2] & SSE4_2_FLAG) ? 1 : 0;
+	cpuinfo.popcnt = (cpuid_data[2] & POPCNT_FLAG) ? 1 : 0;
 	cpuinfo.avx = (cpuid_data[2] & AVX_FLAG) ? 1 : 0;
 
 #if defined ASMLIB_H
