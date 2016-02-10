@@ -248,13 +248,26 @@ typedef struct flow_s
 	float avgkbytespersec;
 } flow_t;
 
-// Size of fragmentation buffer internal buffers
-#define FRAGMENT_SIZE 1400
+#define FRAGMENT_C2S_MIN_SIZE 16
+#define FRAGMENT_S2C_MIN_SIZE 256
+#define FRAGMENT_S2C_MAX_SIZE 1024
+#define CLIENT_FRAGMENT_SIZE_ONCONNECT 128
+#define CUSTOMIZATION_MAX_SIZE 20480
 
 #ifndef REHLDS_FIXES
+// Size of fragmentation buffer internal buffers
+#define FRAGMENT_MAX_SIZE 1400
+
 #define MAX_FRAGMENTS 25000
 #else
-#define MAX_FRAGMENTS (NET_MAX_PAYLOAD / FRAGMENT_SIZE) // should be enough for any send buf
+#define FRAGMENT_MAX_SIZE 1024
+
+// Client sends normal fragments only while connecting
+#define MAX_NORMAL_FRAGMENTS (NET_MAX_PAYLOAD / CLIENT_FRAGMENT_SIZE_ONCONNECT)
+
+// While client is connecting it sending fragments with minimal size, also it transfers sprays with minimal fragments...
+// But with sv_delayed_spray_upload it sends with cl_dlmax fragment size
+#define MAX_FILE_FRAGMENTS (CUSTOMIZATION_MAX_SIZE / FRAGMENT_C2S_MIN_SIZE)
 #endif
 
 #define UDP_HEADER_SIZE 28
@@ -278,7 +291,7 @@ typedef struct fragbuf_s
 	// Message buffer where raw data is stored
 	sizebuf_t frag_message;
 	// The actual data sits here
-	byte frag_message_buf[FRAGMENT_SIZE];
+	byte frag_message_buf[FRAGMENT_MAX_SIZE];
 	// Is this a file buffer?
 	qboolean isfile;
 	// Is this file buffer from memory ( custom decal, etc. ).
