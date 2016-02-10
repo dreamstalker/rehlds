@@ -6,7 +6,7 @@ Rehlds is a result of reverse engineering of original HLDS (build 6152/6153) usi
 
 Along with reverse engineering, a lot of defects and (potential) bugs were found and fixed
 
-At this moment rehlds is not mature enough to use in production environment, however, during internal 3-day test on Windows on customized server (metamod + amxmodx + plugins) no issues were found
+You can try play on one of the servers that using rehlds: http://www.gametracker.com/search/?search_by=server_variable&search_by2=sv_version
 
 ## Goals of the project
 <ul>
@@ -15,9 +15,10 @@ At this moment rehlds is not mature enough to use in production environment, how
 </ul>
 
 ## How can use it?
-Rehlds is fully compatible with official HLDS. All you have to do is to download rehlds binaries and replace original swds.dll/engine_i486.so
+Rehlds is fully compatible with latest official HLDS downloaded by steamcmd. All you have to do is to download rehlds binaries and replace original swds.dll/engine_i486.so. For windows you can also copy a swds.pdb file with a debug information.
+<br /><b>Warning!</b> Rehlds is not compatible with an old 5xxx or below platforms downloaded by hldsupdatetool.
 
-Compiled binaries are available here: http://nexus.rehlds.org/nexus/content/repositories/rehlds-releases/rehlds/rehlds/0.1/rehlds-0.1.zip
+Compiled binaries are available here: http://nexus.rehlds.org/nexus/content/repositories/rehlds-snapshots/rehlds/rehlds/0.2-SNAPSHOT/
 
 Archive's bin directory contains 2 subdirectories, 'bugfixed' and 'pure'
 <ul>
@@ -26,6 +27,21 @@ Archive's bin directory contains 2 subdirectories, 'bugfixed' and 'pure'
 </ul>
 
 <b>Warning!</b> Rehlds is not binary compatible with original hlds since it's compiled with compilers other than ones used for original hlds. This means that plugins that do binary code analysis (Orpheu for example) probably will not work with rehlds.
+
+## Configuring
+Bugfixed version of rehlds contains an additional cvars:
+<ul>
+<li>listipcfgfile <filename> // File for permanent ip bans. Default: listip.cfg
+<li>sv_auto_precache_sounds_in_models <1|0> // Automatically precache sounds attached to models. Deault: 0
+<li>sv_delayed_spray_upload <1|0> // Upload custom sprays after entering the game instead of when connecting. It increases upload speed. Default: 0
+<li>sv_echo_unknown_cmd <1|0> // Echo in the console when trying execute an uncknown command. Default: 0
+<li>sv_force_ent_intersection <1|0> // In a 3-rd party plugins used to force colliding of SOLID_SLIDEBOX entities. Default: 0
+<li>sv_rehlds_force_dlmax <1|0> // Force a client's cl_dlmax cvar to 1024. It avoids an excessive packets fragmentation. Default: 0
+<li>sv_rehlds_movecmdrate_max_avg // Max average level of 'move' cmds for ban. Default: 400
+<li>sv_rehlds_movecmdrate_max_burst // Max burst level of 'move' cmds for ban. Default: 2500
+<li>sv_rehlds_stringcmdrate_max_avg // Max average level of 'string' cmds for ban. Default: 80
+<li>sv_rehlds_stringcmdrate_max_burst // Max burst level of 'string' cmds for ban. Default: 400
+</ul>
 
 ## Build instructions
 There are several software requirements for building rehlds:
@@ -61,7 +77,7 @@ On Windows:
 On Linux:
 <pre>./gradlew --max-workers=1 clean buildRelease</pre>
 
-Compiled binaries will be placed in the build/binaries/ directory
+Compiled binaries will be placed in the rehlds/build/binaries/ directory
 
 ## How can I help the project?
 Just install it on your game server and report problems you faced
