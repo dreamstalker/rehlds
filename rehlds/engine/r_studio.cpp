@@ -908,12 +908,21 @@ void EXT_FUNC AnimationAutomove(const edict_t *pEdict, float flTime)
 /* <8411a> ../engine/r_studio.c:1329 */
 void EXT_FUNC GetBonePosition(const edict_t *pEdict, int iBone, float *rgflOrigin, float *rgflAngles)
 {
-	pstudiohdr = (studiohdr_t *)Mod_Extradata(g_psv.models[pEdict->v.modelindex]);
+	vec3_t angles;
+#ifdef REHLDS_FIXES
+	angles[0] = -pEdict->v.angles[0];
+	angles[1] = pEdict->v.angles[1];
+	angles[2] = pEdict->v.angles[2];
+#else
+	angles[0] = pEdict->v.angles[0];
+	angles[1] = pEdict->v.angles[1];
+	angles[2] = pEdict->v.angles[2];
+#endif
 	g_pSvBlendingAPI->SV_StudioSetupBones(
 		g_psv.models[pEdict->v.modelindex],
 		pEdict->v.frame,
 		pEdict->v.sequence,
-		pEdict->v.angles,
+		angles,
 		pEdict->v.origin,
 		pEdict->v.controller,
 		pEdict->v.blending,
