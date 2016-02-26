@@ -5086,34 +5086,40 @@ void PrecacheMapSpecifiedResources()
 	if (FS_FileExists(va("maps/%s.txt", g_psv.name)))
 		PF_precache_generic_I(va("maps/%s.txt", g_psv.name));
 
-	// TODO: or this is not-engine and this better do by gamedll or .res?
-	if (FS_FileExists(va("maps/%s_detail.txt", g_psv.name)))
-		PF_precache_generic_I(va("maps/%s_detail.txt", g_psv.name));
-
-	if (wadpath != nullptr)
+	char *detailTextureInfoFileName = va("maps/%s_detail.txt", g_psv.name);
+	if (FS_FileExists(detailTextureInfoFileName))
 	{
-		char tempPath[1024];
-		Q_strncpy(tempPath, wadpath, sizeof(tempPath) - 2);
-		tempPath[sizeof(tempPath) - 2] = 0;
-		if (!Q_strchr(tempPath, ';'))
-			Q_strcat(tempPath, ";");
+		PF_precache_generic_I(detailTextureInfoFileName);
 
-		for (char *token = strtok(tempPath, ";"); token != nullptr; token = strtok(nullptr, ";"))
+		char *buffer = (char *)COM_LoadFileForMe(detailTextureInfoFileName, nullptr);
+		char *pos = buffer;
+		while (true)
 		{
-			char wadName[MAX_QPATH];
-			COM_FileBase(token, wadName);
-			COM_DefaultExtension(wadName, ".wad");
+			// Get texture name
+			pos = COM_Parse(pos);
 
-			if (!FS_FileExists(wadName)
-			 || !Q_stricmp(wadName, "pldecal.wad")
-			 || !Q_stricmp(wadName, "tempdecal.wad")
-			 || !Q_stricmp(wadName, "halflife.wad")
-			 || !Q_stricmp(wadName, "xeno.wad")
-			 || !Q_stricmp(wadName, "decals.wad"))
-				continue;
+			if (com_token[0] == '\0')
+				break;
 
-			PF_precache_generic_I(wadName);
+			// Skip '{' in texture name (COM_Parse read one symbol '{' as full token)
+			if (com_token[0] == '{')
+				pos = COM_Parse(pos);
+
+			// Get detail texture filename
+			pos = COM_Parse(pos);
+
+			char *detailTextureFileName = va("gfx/%s.tga", com_token);
+			if (FS_FileExists(detailTextureFileName))
+				PF_precache_generic_I(detailTextureFileName);
+			else
+				Con_Printf("WARNING: detail texture '%s' for map '%s' not found!\n", detailTextureFileName, g_psv.name);
+
+			// Skip hscale and vscale
+			pos = COM_Parse(pos);
+			pos = COM_Parse(pos);
 		}
+
+		COM_FreeFile(buffer);
 	}
 }
 #endif // REHLDS_FIXES
