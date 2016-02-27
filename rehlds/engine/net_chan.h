@@ -87,6 +87,9 @@ void Netchan_CreateFragments_(qboolean server, netchan_t *chan, sizebuf_t *msg);
 void Netchan_CreateFragments(qboolean server, netchan_t *chan, sizebuf_t *msg);
 void Netchan_CreateFileFragmentsFromBuffer(qboolean server, netchan_t *chan, const char *filename, unsigned char *uncompressed_pbuf, int uncompressed_size);
 int Netchan_CreateFileFragments(qboolean server, netchan_t *chan, const char *filename);
+#ifdef REHLDS_FIXES
+int Netchan_CreateFileFragments_(qboolean server, netchan_t *chan, const char *filename);
+#endif // REHLDS_FIXES
 void Netchan_FlushIncoming(netchan_t *chan, int stream);
 qboolean Netchan_CopyNormalFragments(netchan_t *chan);
 qboolean Netchan_CopyFileFragments(netchan_t *chan);
