@@ -263,7 +263,7 @@ qboolean Info_IsKeyImportant(const char *key)
 		return true;
 	if (!Q_strcmp(key, "topcolor"))
 		return true;
-	if (!Q_strcmp(key, "botomcolor"))
+	if (!Q_strcmp(key, "bottomcolor"))
 		return true;
 	if (!Q_strcmp(key, "cl_updaterate"))
 		return true;

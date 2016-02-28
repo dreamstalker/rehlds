@@ -346,42 +346,39 @@ NOXREF void Sys_ShutdownArgv(void)
 void Sys_InitMemory(void)
 {
 	int i;
-	//bool bDidDefault;//unsued?
 
 	i = COM_CheckParm("-heapsize");
-	if (i && i < Cmd_Argc() - 1)
-		host_parms.memsize = Q_atoi(Cmd_Argv(i + 1)) * 1024;
+	if (i && i < com_argc - 1)
+		host_parms.memsize = Q_atoi(com_argv[i + 1]) * 1024;
 
-#ifdef _WIN32
-	MEMORYSTATUS lpBuffer;
 	if (host_parms.memsize < MINIMUM_WIN_MEMORY)
 	{
+#ifdef _WIN32
+		MEMORYSTATUS lpBuffer;
 		lpBuffer.dwLength = sizeof(MEMORYSTATUS);
 		GlobalMemoryStatus(&lpBuffer);
 
 		if (lpBuffer.dwTotalPhys)
 		{
 			if (lpBuffer.dwTotalPhys < FIFTEEN_MB)
-				Sys_Error("Available memory less than 15MB!!! %i", i);
+				Sys_Error("Available memory less than 15MB!!! %i", host_parms.memsize);
 
 			host_parms.memsize = (int)(lpBuffer.dwTotalPhys >> 1);
-			if ((signed int)host_parms.memsize < MINIMUM_WIN_MEMORY)
+			if (host_parms.memsize < MINIMUM_WIN_MEMORY)
 				host_parms.memsize = MINIMUM_WIN_MEMORY;
 		}
 		else
-			host_parms.memsize = 0x8000000;
+			host_parms.memsize = MAXIMUM_WIN_MEMORY;
 
 		if (g_bIsDedicatedServer)
-			host_parms.memsize = MAXIMUM_DEDICATED_MEMORY;
-	}
+			host_parms.memsize = DEFAULT_MEMORY;
 #else
-	if ((signed int)host_parms.memsize <= 0xDFFFFFu)
-		host_parms.memsize = MAXIMUM_DEDICATED_MEMORY;
-
+		host_parms.memsize = DEFAULT_MEMORY;
 #endif // _WIN32
+	}
 
-	if ((signed int)host_parms.memsize > 0x8000000)
-		host_parms.memsize = 0x8000000;
+	if (host_parms.memsize > MAXIMUM_DEDICATED_MEMORY)
+		host_parms.memsize = MAXIMUM_DEDICATED_MEMORY;
 
 	if (COM_CheckParm("-minmemory"))
 		host_parms.memsize = MINIMUM_WIN_MEMORY;
@@ -392,7 +389,7 @@ void Sys_InitMemory(void)
 #endif // _WIN32
 
 	if (!host_parms.membase)
-		Sys_Error("Unable to allocate %.2f MB\n", (float)(host_parms.memsize) / (1024.0f * 1024.0f));
+		Sys_Error("Unable to allocate %.2f MB\n", (float)host_parms.memsize / (1024.0f * 1024.0f));
 }
 
 /* <906c2> ../engine/sys_dll2.cpp:626 */

@@ -43,8 +43,9 @@
 #define FIFTEEN_MB			(15 * 1024 * 1024)
 #define MINIMUM_WIN_MEMORY		0x0e00000
 #define WARNING_MEMORY			0x0200000
-#define MAXIMUM_WIN_MEMORY		0x2800000 // Ask for 40 MB max
-#define MAXIMUM_DEDICATED_MEMORY	0x2800000 // Ask for 40 MB max
+#define MAXIMUM_WIN_MEMORY		0x8000000 // Ask for 128 MB max
+#define MAXIMUM_DEDICATED_MEMORY	0x8000000 // Ask for 128 MB max
+#define DEFAULT_MEMORY			0x2800000
 
 #ifdef HOOK_ENGINE
 #define dedicated_ (*pdedicated)
