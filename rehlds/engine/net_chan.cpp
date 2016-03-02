@@ -950,6 +950,37 @@ void Netchan_FragSend(netchan_t *chan)
 
 		chan->waitlist[i] = wait->next;
 
+#ifdef REHLDS_FIXES
+		if (wait->fragbufs->isfile && !wait->fragbufs->isbuffer && !wait->fragbufs->size)
+		{
+			if (!Netchan_CreateFileFragments_(true, chan, wait->fragbufs->filename))
+			{
+				Mem_Free(wait);
+
+				continue;
+			}
+
+			fragbufwaiting_t *prev = nullptr;
+			while (true) {
+				if (!chan->waitlist[i]->next)
+					break;
+
+				prev = chan->waitlist[i];
+				chan->waitlist[i] = chan->waitlist[i]->next;
+			}
+
+			if (prev)
+				prev->next = nullptr;
+
+			auto oldWait = wait;
+			wait = chan->waitlist[i];
+
+			chan->waitlist[i] = oldWait->next;
+
+			Mem_Free(oldWait);
+		}
+#endif // REHLDS_FIXES
+
 		wait->next = NULL;
 
 		// Copy in to fragbuf
@@ -1236,6 +1267,45 @@ void Netchan_CreateFileFragmentsFromBuffer(qboolean server, netchan_t *chan, con
 
 /* <66564> ../engine/net_chan.c:1500 */
 int Netchan_CreateFileFragments(qboolean server, netchan_t *chan, const char *filename)
+#ifdef REHLDS_FIXES
+{
+	if (!server)
+		return Netchan_CreateFileFragments_(server, chan, filename);
+
+	if (!FS_FileExists(filename))
+		return FALSE;
+	if (FS_FileSize(filename) > sv_filetransfermaxsize.value)
+		return FALSE;
+
+	auto wait = (fragbufwaiting_t *)Mem_ZeroMalloc(0xCu);
+
+	auto buf = Netchan_AllocFragbuf();
+	buf->bufferid = 1;
+	buf->isbuffer = false;
+	buf->isfile = true;
+	Q_strncpy(buf->filename, filename, sizeof(buf->filename));
+	buf->filename[sizeof(buf->filename) - 1] = '\0';
+
+	Netchan_AddFragbufToTail(wait, buf);
+
+	if (!chan->waitlist[FRAG_FILE_STREAM])
+	{
+		chan->waitlist[FRAG_FILE_STREAM] = wait;
+	}
+	else
+	{
+		auto p = chan->waitlist[FRAG_FILE_STREAM];
+		while (p->next)
+			p = p->next;
+
+		p->next = wait;
+	}
+
+	return TRUE;
+}
+
+int Netchan_CreateFileFragments_(qboolean server, netchan_t *chan, const char *filename)
+#endif // REHLDS_FIXES
 {
 	int chunksize;
 	int compressedFileTime;
@@ -1335,7 +1405,11 @@ int Netchan_CreateFileFragments(qboolean server, netchan_t *chan, const char *fi
 			Mem_Free(wait);
 			if (server)
 			{
+#ifdef REHLDS_FIXES
+				SV_DropClient(&g_psvs.clients[chan->player_slot - 1], 0, "Malloc problem");
+#else // REHLDS_FIXES
 				SV_DropClient(host_client, 0, "Malloc problem");
+#endif // REHLDS_FIXES
 				return 0;
 			}
 			else
