@@ -253,7 +253,6 @@ qboolean NET_LagPacket(qboolean newdata, netsrc_t sock, netadr_t *from, sizebuf_
 void NET_FlushSocket(netsrc_t sock);
 qboolean NET_GetLong(unsigned char *pData, int size, int *outSize);
 qboolean NET_QueuePacket(netsrc_t sock);
-int NET_Sleep_Timeout(void);
 int NET_Sleep(void);
 void NET_StartThread(void);
 void NET_StopThread(void);
