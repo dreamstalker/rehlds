@@ -360,6 +360,10 @@ IRehldsHookRegistry_Steam_GSBUpdateUserData* CRehldsHookchains::Steam_GSBUpdateU
 	return &m_Steam_GSBUpdateUserData;
 }
 
+IRehldsHookRegistry_Cvar_DirectSet* CRehldsHookchains::Cvar_DirectSet() {
+	return &m_Cvar_DirectSet;
+}
+
 int EXT_FUNC CRehldsApi::GetMajorVersion()
 {
 	return REHLDS_API_VERSION_MAJOR;

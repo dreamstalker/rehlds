@@ -163,6 +163,10 @@ typedef IHookChainRegistryImpl<int> CRehldsHookRegistry_SV_TransferConsistencyIn
 typedef IHookChainImpl<bool, uint64, const char *, uint32> CRehldsHook_Steam_GSBUpdateUserData;
 typedef IHookChainRegistryImpl<bool, uint64, const char *, uint32> CRehldsHookRegistry_Steam_GSBUpdateUserData;
 
+//Cvar_DirectSet hook
+typedef IVoidHookChainImpl<struct cvar_s *, const char *> CRehldsHook_Cvar_DirectSet;
+typedef IVoidHookChainRegistryImpl<struct cvar_s *, const char *> CRehldsHookRegistry_Cvar_DirectSet;
+
 class CRehldsHookchains : public IRehldsHookchains {
 public:
 	CRehldsHookRegistry_Steam_NotifyClientConnect m_Steam_NotifyClientConnect;
@@ -198,6 +202,7 @@ public:
 	CRehldsHookRegistry_Steam_GSGetSteamID m_Steam_GSGetSteamID;
 	CRehldsHookRegistry_SV_TransferConsistencyInfo m_SV_TransferConsistencyInfo;
 	CRehldsHookRegistry_Steam_GSBUpdateUserData m_Steam_GSBUpdateUserData;
+	CRehldsHookRegistry_Cvar_DirectSet m_Cvar_DirectSet;
 
 public:
 	virtual IRehldsHookRegistry_Steam_NotifyClientConnect* Steam_NotifyClientConnect();
@@ -233,6 +238,7 @@ public:
 	virtual IRehldsHookRegistry_Steam_GSGetSteamID* Steam_GSGetSteamID();
 	virtual IRehldsHookRegistry_SV_TransferConsistencyInfo* SV_TransferConsistencyInfo();
 	virtual IRehldsHookRegistry_Steam_GSBUpdateUserData* Steam_GSBUpdateUserData();
+	virtual IRehldsHookRegistry_Cvar_DirectSet* Cvar_DirectSet();
 };
 
 extern CRehldsHookchains g_RehldsHookchains;

@@ -186,7 +186,7 @@ NOXREF const char *Cvar_CompleteVariable(const char *search, int forward)
 }
 
 /* <18805> ../engine/cvar.c:198 */
-void Cvar_DirectSet(struct cvar_s *var, const char *value)
+void EXT_FUNC Cvar_DirectSet_internal(struct cvar_s *var, const char *value)
 {
 	if (!var || !value)
 	{
@@ -308,6 +308,11 @@ void Cvar_DirectSet(struct cvar_s *var, const char *value)
 	var->string = (char *)Z_Malloc(Q_strlen(pszValue) + 1);
 	Q_strcpy(var->string, pszValue);
 	var->value = (float)Q_atof(var->string);
+}
+
+void Cvar_DirectSet(struct cvar_s *var, const char *value)
+{
+	g_RehldsHookchains.m_Cvar_DirectSet.callChain(Cvar_DirectSet_internal, var, value);
 }
 
 /* <188e9> ../engine/cvar.c:347 */
