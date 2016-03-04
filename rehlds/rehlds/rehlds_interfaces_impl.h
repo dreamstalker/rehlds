@@ -92,6 +92,7 @@ public:
 	virtual void SetLastVoiceTime(double time);
 	virtual double GetLastVoiceTime();
 	virtual bool GetLoopback();
+	virtual struct usercmd_s *GetLastCmd();
 
 	virtual client_t* GetClient();
 

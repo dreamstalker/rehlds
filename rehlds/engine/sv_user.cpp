@@ -1464,8 +1464,18 @@ void SV_ParseDelta(client_t *pSenderClient)
 	host_client->delta_sequence = MSG_ReadByte();
 }
 
-/* <c03df> ../engine/sv_user.c:1790 */
+void EXT_FUNC SV_EstablishTimeBase_mod(IGameClient *cl, usercmd_t *cmds, int dropped, int numbackup, int numcmds)
+{
+	SV_EstablishTimeBase_internal(cl->GetClient(), cmds, dropped, numbackup, numcmds);
+}
+
 void SV_EstablishTimeBase(client_t *cl, usercmd_t *cmds, int dropped, int numbackup, int numcmds)
+{
+	return g_RehldsHookchains.m_SV_EstablishTimeBase.callChain(SV_EstablishTimeBase_mod, GetRehldsApiClient(cl), cmds, dropped, numbackup, numcmds);
+}
+
+/* <c03df> ../engine/sv_user.c:1790 */
+void SV_EstablishTimeBase_internal(client_t *cl, usercmd_t *cmds, int dropped, int numbackup, int numcmds)
 {
 	int cmdnum;
 	double runcmd_time;

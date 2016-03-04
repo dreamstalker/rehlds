@@ -364,6 +364,10 @@ IRehldsHookRegistry_Cvar_DirectSet* CRehldsHookchains::Cvar_DirectSet() {
 	return &m_Cvar_DirectSet;
 }
 
+IRehldsHookRegistry_SV_EstablishTimeBase* CRehldsHookchains::SV_EstablishTimeBase() {
+	return &m_SV_EstablishTimeBase;
+}
+
 int EXT_FUNC CRehldsApi::GetMajorVersion()
 {
 	return REHLDS_API_VERSION_MAJOR;

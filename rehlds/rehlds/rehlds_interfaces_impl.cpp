@@ -43,6 +43,11 @@ int EXT_FUNC CGameClient::GetId()
 	return m_Id;
 }
 
+struct usercmd_s* EXT_FUNC CGameClient::GetLastCmd()
+{
+	return &m_pClient->lastcmd;
+}
+
 bool EXT_FUNC CGameClient::IsActive()
 {
 	return m_pClient->active != 0;
