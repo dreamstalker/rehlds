@@ -146,9 +146,6 @@ cvar_t servercfgfile = { "servercfgfile", "server.cfg", 0, 0.0f, NULL };
 cvar_t lservercfgfile = { "lservercfgfile", "listenserver.cfg", 0, 0.0f, NULL };
 cvar_t logsdir = { "logsdir", "logs", 0, 0.0f, NULL };
 cvar_t bannedcfgfile = { "bannedcfgfile", "banned.cfg", 0, 0.0f, NULL };
-#ifdef REHLDS_FIXES
-cvar_t listipcfgfile = { "listipcfgfile", "listip.cfg", 0, 0.0f, nullptr };
-#endif
 
 int g_userid = 1;
 
@@ -199,10 +196,6 @@ cvar_t sv_downloadurl = { "sv_downloadurl", "", FCVAR_PROTECTED, 0.0f, NULL };
 cvar_t sv_allow_dlfile = { "sv_allow_dlfile", "1", 0, 0.0f, NULL };
 #ifdef REHLDS_FIXES
 cvar_t sv_version = { "sv_version", "", FCVAR_SERVER, 0.0f, NULL };
-cvar_t sv_echo_unknown_cmd = { "sv_echo_unknown_cmd", "0", 0, 0.0f, NULL };
-cvar_t sv_auto_precache_sounds_in_models = { "sv_auto_precache_sounds_in_models", "0", 0, 0.0f, nullptr };
-cvar_t sv_delayed_spray_upload = { "sv_delayed_spray_upload", "0", 0, 0.0f, nullptr };
-cvar_t sv_rehlds_force_dlmax = { "sv_rehlds_force_dlmax", "0", 0, 0.0f, nullptr };
 #else
 cvar_t sv_version = {"sv_version", "", 0, 0.0f, NULL};
 #endif
@@ -305,6 +298,13 @@ cvar_t scr_downloading;
 
 #endif //HOOK_ENGINE
 
+#ifdef REHLDS_FIXES
+cvar_t sv_echo_unknown_cmd = { "sv_echo_unknown_cmd", "0", 0, 0.0f, NULL };
+cvar_t sv_auto_precache_sounds_in_models = { "sv_auto_precache_sounds_in_models", "0", 0, 0.0f, nullptr };
+cvar_t sv_delayed_spray_upload = { "sv_delayed_spray_upload", "0", 0, 0.0f, nullptr };
+cvar_t sv_rehlds_force_dlmax = { "sv_rehlds_force_dlmax", "0", 0, 0.0f, nullptr };
+cvar_t listipcfgfile = { "listipcfgfile", "listip.cfg", 0, 0.0f, nullptr };
+#endif
 
 /* <a6492> ../engine/sv_main.c:113 */
 delta_t *SV_LookupDelta(char *name)

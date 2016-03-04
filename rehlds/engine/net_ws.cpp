@@ -54,14 +54,14 @@ unsigned char in_message_buf[NET_MAX_PAYLOAD];
 sizebuf_t in_message;
 netadr_t in_from;
 
-#ifdef REHLDS_FIXES
+#if defined(REHLDS_FIXES) && !defined(HOOK_ENGINE)
 int ip_sockets[3] = {INVALID_SOCKET, INVALID_SOCKET, INVALID_SOCKET};
 #else
 int ip_sockets[3];
 #endif
 
 #ifdef _WIN32
-#ifdef REHLDS_FIXES
+#if defined(REHLDS_FIXES) && !defined(HOOK_ENGINE)
 int ipx_sockets[3] = {INVALID_SOCKET, INVALID_SOCKET, INVALID_SOCKET};
 #else
 int ipx_sockets[3];
