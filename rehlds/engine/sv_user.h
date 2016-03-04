@@ -144,6 +144,7 @@ void SV_RestoreMove(client_t *_host_client);
 void SV_ParseStringCommand(client_t *pSenderClient);
 void SV_ParseDelta(client_t *pSenderClient);
 void SV_EstablishTimeBase(client_t *cl, usercmd_t *cmds, int dropped, int numbackup, int numcmds);
+void SV_EstablishTimeBase_internal(client_t *cl, usercmd_t *cmds, int dropped, int numbackup, int numcmds);
 void SV_ParseMove(client_t *pSenderClient);
 void SV_ParseVoiceData(client_t *cl);
 void SV_IgnoreHLTV(client_t *cl);
