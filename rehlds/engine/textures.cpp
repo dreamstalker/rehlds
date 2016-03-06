@@ -118,6 +118,14 @@ qboolean TEX_InitFromWad(char *path)
 		if (Q_strstr(wadName, "pldecal") || Q_strstr(wadName, "tempdecal"))
 			continue;
 
+#ifdef REHLDS_FIXES
+		if (g_psv.active
+		 && Q_stricmp(wadPath, "halflife.wad")
+		 && Q_stricmp(wadPath, "xeno.wad")
+		 && Q_stricmp(wadPath, "decals.wad"))
+			PF_precache_generic_I(wadPath);
+#endif // REHLDS_FIXES
+
 		texfile = FS_Open(wadPath, "rb");
 		texfiles[nTexFiles++] = texfile;
 		if (!texfile)
