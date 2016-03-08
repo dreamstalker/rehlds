@@ -848,8 +848,8 @@ void DLL_SetModKey(modinfo_t *pinfo, char *pkey, char *pvalue)
 	else if (!Q_stricmp(pkey, "edicts"))
 	{
 		pinfo->num_edicts = Q_atoi(pvalue);
-		if (pinfo->num_edicts < 900)
-			pinfo->num_edicts = 900;
+		if (pinfo->num_edicts < NUM_EDICTS)
+			pinfo->num_edicts = NUM_EDICTS;
 	}
 	else if (!Q_stricmp(pkey, "crcclientdll"))
 	{

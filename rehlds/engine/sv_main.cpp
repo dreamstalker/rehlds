@@ -6409,7 +6409,7 @@ void SV_BanId_f(void)
 
 	if (i >= numuserfilters)
 	{
-		if (numuserfilters >= 32768)
+		if (numuserfilters >= MAX_USERFILTERS)
 		{
 			Con_Printf(__FUNCTION__ ":  User filter list is full\n");
 			return;
@@ -6855,7 +6855,7 @@ ipaddress A.B.C.D/24 is equivalent to A.B.C.0 and A.B.C\n");
 		}
 	}
 
-	if (numipfilters >= 32768)
+	if (numipfilters >= MAX_IPFILTERS)
 	{
 		Con_Printf("IP filter list is full\n");
 		return;
