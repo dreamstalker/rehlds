@@ -35,7 +35,7 @@
 #include "model.h"
 
 #define REHLDS_API_VERSION_MAJOR 2
-#define REHLDS_API_VERSION_MINOR 10
+#define REHLDS_API_VERSION_MINOR 11
 
 //Steam_NotifyClientConnect hook
 typedef IHookChain<qboolean, IGameClient*, const void*, unsigned int> IRehldsHook_Steam_NotifyClientConnect;
@@ -177,6 +177,10 @@ typedef IVoidHookChainRegistry<struct cvar_s *, const char *> IRehldsHookRegistr
 typedef IVoidHookChain<IGameClient *, usercmd_t *, int, int, int> IRehldsHook_SV_EstablishTimeBase;
 typedef IVoidHookChainRegistry<IGameClient *, usercmd_t *, int, int, int> IRehldsHookRegistry_SV_EstablishTimeBase;
 
+//SV_Spawn_f hook
+typedef IVoidHookChain<> IRehldsHook_SV_Spawn_f;
+typedef IVoidHookChainRegistry<> IRehldsHookRegistry_SV_Spawn_f;
+
 class IRehldsHookchains {
 public:
 	virtual ~IRehldsHookchains() { }
@@ -216,6 +220,7 @@ public:
 	virtual IRehldsHookRegistry_Steam_GSBUpdateUserData* Steam_GSBUpdateUserData() = 0;
 	virtual IRehldsHookRegistry_Cvar_DirectSet* Cvar_DirectSet() = 0;
 	virtual IRehldsHookRegistry_SV_EstablishTimeBase* SV_EstablishTimeBase() = 0;
+	virtual IRehldsHookRegistry_SV_Spawn_f* SV_Spawn_f() = 0;
 };
 
 struct RehldsFuncs_t {

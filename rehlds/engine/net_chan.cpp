@@ -846,7 +846,7 @@ qboolean Netchan_Process(netchan_t *chan)
 	{
 		// Make sure we actually could have ack'd this message
 #ifdef REHLDS_FIXES
-		if (sequence_ack >= chan->last_reliable_sequence)
+		if (sequence_ack >= (unsigned)chan->last_reliable_sequence)
 #else // REHLDS_FIXES
 		if (chan->incoming_acknowledged + 1 >= chan->last_reliable_sequence)
 #endif // REHLDS_FIXES
