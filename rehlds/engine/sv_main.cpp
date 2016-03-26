@@ -1663,8 +1663,13 @@ void SV_SendRes_f(void)
 	}
 }
 
-/* <a8922> ../engine/sv_main.c:2096 */
 void SV_Spawn_f(void)
+{
+	g_RehldsHookchains.m_SV_Spawn_f.callChain(SV_Spawn_f_internal);
+}
+
+/* <a8922> ../engine/sv_main.c:2096 */
+void EXT_FUNC SV_Spawn_f_internal(void)
 {
 	unsigned char data[NET_MAX_PAYLOAD];
 	sizebuf_t msg;
@@ -2118,7 +2123,7 @@ void SV_ReplaceSpecialCharactersInName(char *newname, const char *oldname)
 				break;
 
 			// http://unicode-table.com/blocks/halfwidth-and-fullwidth-forms/
-			newname[n++] = 0xEF;
+			newname[n++] = char(0xEF);
 			newname[n++] = 0xBC | (((*s - 0x20) & 0x40) >> 6);
 			newname[n++] = 0x80 + ((*s - 0x20) & 0x3F);
 

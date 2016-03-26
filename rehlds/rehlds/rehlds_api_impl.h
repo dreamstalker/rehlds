@@ -171,6 +171,10 @@ typedef IVoidHookChainRegistryImpl<struct cvar_s *, const char *> CRehldsHookReg
 typedef IVoidHookChainImpl<IGameClient *, usercmd_t *, int, int, int> CRehldsHook_SV_EstablishTimeBase;
 typedef IVoidHookChainRegistryImpl<IGameClient *, usercmd_t *, int, int, int> CRehldsHookRegistry_SV_EstablishTimeBase;
 
+//SV_Spawn_f hook
+typedef IVoidHookChainImpl<> CRehldsHook_SV_Spawn_f;
+typedef IVoidHookChainRegistryImpl<> CRehldsHookRegistry_SV_Spawn_f;
+
 class CRehldsHookchains : public IRehldsHookchains {
 public:
 	CRehldsHookRegistry_Steam_NotifyClientConnect m_Steam_NotifyClientConnect;
@@ -208,6 +212,7 @@ public:
 	CRehldsHookRegistry_Steam_GSBUpdateUserData m_Steam_GSBUpdateUserData;
 	CRehldsHookRegistry_Cvar_DirectSet m_Cvar_DirectSet;
 	CRehldsHookRegistry_SV_EstablishTimeBase m_SV_EstablishTimeBase;
+	CRehldsHookRegistry_SV_Spawn_f m_SV_Spawn_f;
 
 public:
 	virtual IRehldsHookRegistry_Steam_NotifyClientConnect* Steam_NotifyClientConnect();
@@ -245,6 +250,7 @@ public:
 	virtual IRehldsHookRegistry_Steam_GSBUpdateUserData* Steam_GSBUpdateUserData();
 	virtual IRehldsHookRegistry_Cvar_DirectSet* Cvar_DirectSet();
 	virtual IRehldsHookRegistry_SV_EstablishTimeBase* SV_EstablishTimeBase();
+	virtual	IRehldsHookRegistry_SV_Spawn_f* SV_Spawn_f();
 };
 
 extern CRehldsHookchains g_RehldsHookchains;

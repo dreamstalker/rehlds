@@ -644,6 +644,7 @@ void SV_SendUserReg(sizebuf_t *msg);
 void SV_New_f(void);
 void SV_SendRes_f(void);
 void SV_Spawn_f(void);
+void SV_Spawn_f_internal(void);
 void SV_CheckUpdateRate(double *rate);
 void SV_RejectConnection(netadr_t *adr, char *fmt, ...);
 void SV_RejectConnectionForPassword(netadr_t *adr);
