@@ -940,10 +940,9 @@ void SV_RunCmd(usercmd_t *ucmd, int random_seed)
 		sv_player->v.v_angle[0] = pmove->angles[0];
 		sv_player->v.v_angle[1] = pmove->angles[1];
 		sv_player->v.v_angle[2] = pmove->angles[2];
-		sv_player->v.angles[0] = pmove->angles[0];
+		sv_player->v.angles[0] = float(-pmove->angles[0] / 3.0);
 		sv_player->v.angles[1] = pmove->angles[1];
 		sv_player->v.angles[2] = pmove->angles[2];
-		sv_player->v.angles[0] = float(-pmove->angles[0] / 3.0);
 	}
 	sv_player->v.bInDuck = pmove->bInDuck;
 	sv_player->v.flDuckTime = (int)pmove->flDuckTime;
