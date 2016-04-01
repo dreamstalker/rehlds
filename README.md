@@ -1,5 +1,6 @@
 # Rehlds
 Reverse-engineered (and bugfixed) HLDS
+[![Build Status](http://teamcity.rehlds.org/app/rest/builds/buildType:(id:Rehlds_Publish)/statusIcon)](http://teamcity.rehlds.org/viewType.html?buildTypeId=Rehlds_Publish&guest=1)
 
 ## What is this?
 Rehlds is a result of reverse engineering of original HLDS (build 6152/6153) using DWARF debug info embedded into linux version of HLDS, engine_i486.so
