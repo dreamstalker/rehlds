@@ -150,7 +150,11 @@ void EXT_FUNC PF_setmodel_I(edict_t *e, const char *m)
 		{
 			e->v.modelindex = i;
 			model_t *mod = g_psv.models[i];
+#ifdef REHLDS_FIXES
+			e->v.model = *check - pr_strings;
+#else // REHLDS_FIXES
 			e->v.model = m - pr_strings;
+#endif // REHLDS_FIXES
 			if (mod)
 			{
 				SetMinMaxSize(e, mod->mins, mod->maxs, 1);
