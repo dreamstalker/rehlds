@@ -304,6 +304,7 @@ cvar_t sv_auto_precache_sounds_in_models = { "sv_auto_precache_sounds_in_models"
 cvar_t sv_delayed_spray_upload = { "sv_delayed_spray_upload", "0", 0, 0.0f, nullptr };
 cvar_t sv_rehlds_force_dlmax = { "sv_rehlds_force_dlmax", "0", 0, 0.0f, nullptr };
 cvar_t listipcfgfile = { "listipcfgfile", "listip.cfg", 0, 0.0f, nullptr };
+cvar_t sv_rehlds_hull_centering = { "sv_rehlds_hull_centering", "0", 0, 0.0f, nullptr };
 #endif
 
 /* <a6492> ../engine/sv_main.c:113 */
@@ -7775,6 +7776,7 @@ void SV_Init(void)
 	Cvar_RegisterVariable(&sv_auto_precache_sounds_in_models);
 	Cvar_RegisterVariable(&sv_delayed_spray_upload);
 	Cvar_RegisterVariable(&sv_rehlds_force_dlmax);
+	Cvar_RegisterVariable(&sv_rehlds_hull_centering);
 #endif
 	
 	for (int i = 0; i < MAX_MODELS; i++)
