@@ -190,8 +190,23 @@ struct hull_s *SV_HullForBsp(edict_t *ent, const vec_t *mins, const vec_t *maxs,
 			else
 				hull = &model->hulls[3];
 		}
+// TODO: add cvar for this?
+#ifdef REHLDS_FIXES
+		if (   sv_rehlds_hull_centering.value
+		    && mins[0] + maxs[0] == 0.0f)
+			offset[0] = 0.0f;
+		else
+			offset[0] = hull->clip_mins[0] - mins[0];
+		
+		if (   sv_rehlds_hull_centering.value
+		    && mins[1] + maxs[1] == 0.0f)
+			offset[1] = 0.0f;
+		else
+			offset[1] = hull->clip_mins[1] - mins[1];
+#else // REHLDS_FIXES
 		offset[0] = hull->clip_mins[0] - mins[0];
 		offset[1] = hull->clip_mins[1] - mins[1];
+#endif // REHLDS_FIXES
 		offset[2] = hull->clip_mins[2] - mins[2];
 	}
 	else
