@@ -135,7 +135,7 @@ void setupToolchain(NativeBinarySpec b) {
             cfg.compilerOptions.floatingPointModel = FloatingPointModel.PRECISE
             cfg.compilerOptions.enhancedInstructionsSet = EnhancedInstructionsSet.DISABLED
         } else {
-			cfg.compilerOptions.args '/Oi', '/GF', '/GR-'
+			cfg.compilerOptions.args '/Oi', '/GF', '/GR-', '/GS-'
 		}
         if (swdsLib) {
             cfg.linkerOptions.randomizedBaseAddress = false

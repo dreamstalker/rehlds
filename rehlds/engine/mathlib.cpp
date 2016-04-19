@@ -75,10 +75,38 @@ const aivec4_t negmask_0010 =
 };
 
 // save 4d xmm to 3d vector. we can't optimize many simple vector3 functions because saving back to 3d is slow.
-static inline void xmm2vec(vec_t *v, const __m128 m)
+inline void xmm2vec(vec_t *v, const __m128 m)
 {
 	_mm_storel_pi((__m64*)v, m);
 	_mm_store_ss(v + 2, _mm_shuffle_ps(m, m, 0x02));
+}
+
+inline __m128 dotProduct3D(__m128 v1, __m128 v2)
+{
+	if (cpuinfo.sse4_1)
+		return _mm_dp_ps(v1, v2, 0x71);
+	__m128 v = _mm_mul_ps(v1, v2);
+	return _mm_add_ps(_mm_movehl_ps(v, v), _mm_hadd_ps(v, v)); // SSE3
+}
+
+inline __m128 crossProduct3D(__m128 a, __m128 b)
+{
+	__m128 tmp1 = _mm_mul_ps(a, _mm_shuffle_ps(b, b, _MM_SHUFFLE(3, 0, 2, 1)));
+	__m128 tmp2 = _mm_mul_ps(b, _mm_shuffle_ps(a, a, _MM_SHUFFLE(3, 0, 2, 1)));
+	__m128 m = _mm_sub_ps(tmp1, tmp2);
+
+	return _mm_shuffle_ps(m, m, _MM_SHUFFLE(3, 0, 2, 1));
+}
+
+inline __m128 length3D(__m128 v)
+{
+	return _mm_sqrt_ps(dotProduct3D(v, v));
+}
+
+inline __m128 length2D(__m128 v)
+{
+	v = _mm_mul_ps(v, v);
+	return _mm_sqrt_ps(_mm_hadd_ps(v, v)); // hadd = SSE3
 }
 
 /* <46ebf> ../engine/mathlib.c:14 */
@@ -551,7 +579,7 @@ int VectorCompare(const vec_t *v1, const vec_t *v2)
 {
 #ifdef REHLDS_OPT_PEDANTIC
 	__m128 cmp = _mm_cmpneq_ps(_mm_loadu_ps(v1), _mm_loadu_ps(v2));
-	return !(_mm_movemask_epi8(*(__m128i *)&cmp) & 0xFFF);
+	return !(_mm_movemask_ps(cmp) & (1|2|4));
 #else // REHLDS_OPT_PEDANTIC
 	for (int i = 0; i < 3; i++)
 	{
@@ -591,10 +619,8 @@ float _DotProduct(const vec_t *v1, const vec_t *v2)
 	// _mm_dp_ps - dot product
 	// 0x71 = 0b01110001 - mask for multiplying operands and result
 	// dpps isn't binary compatible with separate sse2 instructions (max difference is about 0.0002f, but usually < 0.00001f)
-	if (cpuinfo.sse4_1)
-		return _mm_cvtss_f32(_mm_dp_ps(_mm_loadu_ps(v1), _mm_loadu_ps(v2), 0x71));
 
-	return v1[0] * v2[0] + v1[1] * v2[1] + v1[2] * v2[2];
+	return _mm_cvtss_f32(dotProduct3D(_mm_loadu_ps(v1), _mm_loadu_ps(v2)));
 }
 #endif // REHLDS_FIXES
 
@@ -620,12 +646,7 @@ NOBODY void _VectorCopy(vec_t *in, vec_t *out);
 void CrossProduct(const vec_t *v1, const vec_t *v2, vec_t *cross)
 {
 #ifdef REHLDS_FIXES
-	__m128 a = _mm_loadu_ps(v1), b = _mm_loadu_ps(v2);
-	__m128 tmp1 = _mm_mul_ps(a, _mm_shuffle_ps(b, b, _MM_SHUFFLE(3, 0, 2, 1)));
-	__m128 tmp2 = _mm_mul_ps(b, _mm_shuffle_ps(a, a, _MM_SHUFFLE(3, 0, 2, 1)));
-	__m128 m = _mm_sub_ps(tmp1, tmp2);
-
-	xmm2vec(cross, _mm_shuffle_ps(m, m, _MM_SHUFFLE(3, 0, 2, 1)));
+	xmm2vec(cross, crossProduct3D(_mm_loadu_ps(v1), _mm_loadu_ps(v2)));
 #else // REHLDS_FIXES
 	cross[0] = v1[1] * v2[2] - v1[2] * v2[1];
 	cross[1] = v1[2] * v2[0] - v1[0] * v2[2];
@@ -637,10 +658,7 @@ void CrossProduct(const vec_t *v1, const vec_t *v2, vec_t *cross)
 float Length(const vec_t *v)
 {
 #ifdef REHLDS_FIXES
-	// based on dot product
-	if (cpuinfo.sse4_1)
-		return _mm_cvtss_f32(_mm_sqrt_ss(_mm_dp_ps(_mm_loadu_ps(v), _mm_loadu_ps(v), 0x71)));
-	return sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
+	return _mm_cvtss_f32(length3D(_mm_loadu_ps(v)));
 #endif // REHLDS_FIXES
 
 	float length;
@@ -650,18 +668,16 @@ float Length(const vec_t *v)
 	{
 		length = v[i] * v[i] + length;
 	}
-	return sqrt(length);
+	return Q_sqrt(length);
 }
 
 float Length2D(const vec_t *v)
 {
 #ifdef REHLDS_FIXES
-	// based on dot product
-	if (cpuinfo.sse4_1)
-		return _mm_cvtss_f32(_mm_sqrt_ss(_mm_dp_ps(_mm_loadu_ps(v), _mm_loadu_ps(v), 0x31))); // 0b00110001
+	return _mm_cvtss_f32(length2D(_mm_loadu_ps(v)));
 #endif // REHLDS_FIXES
 
-	return sqrt(v[0] * v[0] + v[1] * v[1]);
+	return Q_sqrt(v[0] * v[0] + v[1] * v[1]);
 }
 
 /* <47722> ../engine/mathlib.c:532 */
@@ -673,7 +689,7 @@ float VectorNormalize(vec3_t v)
 	length = Length(v); // rsqrt is very inaccurate :(
 #else // REHLDS_FIXES
 	length = v[0] * v[0] + v[1] * v[1] + v[2] * v[2];
-	length = sqrt(length);
+	length = Q_sqrt(length);
 #endif // REHLDS_FIXES
 
 	if (length)
@@ -742,7 +758,7 @@ void VectorAngles(const vec_t *forward, vec_t *angles)
 #ifdef REHLDS_FIXES
 		length = Length2D(forward);
 #else // REHLDS_FIXES
-		length = sqrt((double)(forward[0] * forward[0] + forward[1] * forward[1]));
+		length = Q_sqrt((double)(forward[0] * forward[0] + forward[1] * forward[1]));
 #endif // REHLDS_FIXES
 
 		pitch = atan2((double)forward[2], (double)length) * 180.0 / M_PI;

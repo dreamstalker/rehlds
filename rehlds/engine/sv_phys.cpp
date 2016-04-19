@@ -1305,7 +1305,7 @@ void SV_Physics_Step(edict_t *ent)
 		ent->v.flags &= ~FL_ONGROUND;
 		if (wasonground && (ent->v.health > 0.0 || SV_CheckBottom(ent)))
 		{
-			float speed = (float)sqrt((long double)(ent->v.velocity[0] * ent->v.velocity[0] + ent->v.velocity[1] * ent->v.velocity[1]));
+			float speed = (float)Q_sqrt((long double)(ent->v.velocity[0] * ent->v.velocity[0] + ent->v.velocity[1] * ent->v.velocity[1]));
 			if (speed  != 0.0)
 			{
 				float friction = sv_friction.value * ent->v.friction;
