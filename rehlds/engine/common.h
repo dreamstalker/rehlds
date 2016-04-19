@@ -141,6 +141,7 @@ extern int loadsize;
 #define Q_snprintf _snprintf
 #define Q_atoi atoi
 #define Q_atof atof
+#define Q_sqrt M_sqrt
 //#define Q_strtoull strtoull
 //#define Q_FileNameCmp FileNameCmp
 #define Q_vsnprintf _vsnprintf
@@ -168,6 +169,7 @@ extern int loadsize;
 #define Q_snprintf _snprintf
 #define Q_atoi atoi
 #define Q_atof atof
+#define Q_sqrt sqrt
 //#define Q_strtoull strtoull
 //#define Q_FileNameCmp FileNameCmp
 #define Q_vsnprintf _vsnprintf

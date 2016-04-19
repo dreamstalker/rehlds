@@ -56,6 +56,28 @@ static const int nanmask = 0x7F800000;
 
 #define IS_NAN(fvar) ((*reinterpret_cast<int*>(&(fvar)) & nanmask) == nanmask)
 
+inline double M_sqrt(int value) {
+	return sqrt(value);
+}
+
+inline float M_sqrt(float value) {
+	return _mm_cvtss_f32(_mm_sqrt_ss(_mm_load_ss(&value)));
+}
+
+inline double M_sqrt(double value) {
+	double ret;
+	auto v = _mm_load_sd(&value);
+	_mm_store_pd(&ret, _mm_sqrt_sd(v, v));
+	return ret;
+}
+
+inline double M_sqrt(long double value)
+{
+	double ret;
+	auto v = _mm_load_sd((double *)&value);
+	_mm_store_pd(&ret, _mm_sqrt_sd(v, v));
+	return ret;
+}
 
 float anglemod(float a);
 void BOPS_Error(void);
