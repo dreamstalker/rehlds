@@ -103,7 +103,11 @@ typedef void * HINSTANCE;
 #endif
 
 // Used to step into the debugger
+#if defined _MSC_VER || defined __INTEL_COMPILER
 #define  DebuggerBreak()  __asm { int 3 }
+#else
+#define  DebuggerBreak()  asm volatile ("int 3")
+#endif
 
 // C functions for external declarations that call the appropriate C++ methods
 #ifndef EXPORT
@@ -263,21 +267,39 @@ inline T DWordSwapC(T dw)
 template <typename T>
 inline T WordSwapAsm(T w)
 {
+#if defined _MSC_VER || defined __INTEL_COMPILER
 	__asm
 	{
-		mov ax, w
-			xchg al, ah
+		mov ax, w;
+		xchg al, ah;
 	}
+#else
+	asm volatile (
+		"movw %%ax, %0\n\t"
+		"xchgb %%al, %%ah\n\t"
+		::
+		"m" (w)
+		);
+#endif
 }
 
 template <typename T>
 inline T DWordSwapAsm(T dw)
 {
+#if defined _MSC_VER || defined __INTEL_COMPILER
 	__asm
 	{
-		mov eax, dw
-			bswap eax
+		mov eax, dw;
+		bswap eax;
 	}
+#else
+	asm volatile (
+		"movl %%eax, %0\n\t"
+		"bswapl %%eax\n\t"
+		::
+		"m" (dw)
+		);
+#endif
 }
 
 #pragma warning(pop)

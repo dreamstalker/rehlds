@@ -470,11 +470,15 @@ qboolean SV_IsPlayerIndex(int index)
 	return (index >= 1 && index <= g_psvs.maxclients);
 }
 
-qboolean __declspec(naked) SV_IsPlayerIndex_wrapped(int index)
+#if defined _MSC_VER || defined __INTEL_COMPILER
+__declspec(naked)
+#endif
+qboolean SV_IsPlayerIndex_wrapped(int index)
 {
 	// Original SV_IsPlayerIndex in swds.dll doesn't modify ecx nor edx.
 	// During the compilation of original swds.dll compiler was assuming that these registers wouldn't be modified during call to SV_IsPlayerIndex().
 	// This is not true for code produced by msvc2013 (which uses ecx even in Release config). That's why we need a wrapper here that preserves ecx and edx before call to reversed SV_IsPlayerIndex().
+#if defined _MSC_VER || defined __INTEL_COMPILER
 	__asm
 	{
 		mov eax, dword ptr[esp + 4];
@@ -487,6 +491,20 @@ qboolean __declspec(naked) SV_IsPlayerIndex_wrapped(int index)
 		pop ecx;
 		retn;
 	}
+#else
+	asm volatile (
+		"pushl %%ecx\n\t"
+		"pushl %%edx\n\t"
+		"pushl %0\n\t"
+		"call $SV_IsPlayerIndex\n\t"
+		"addl %%esp, $4\n\t"
+		"popl %%edx\n\t"
+		"popl %%ecx\n\t"
+		"retn"
+		::
+		"g" (index)
+		);
+#endif
 }
 
 /* <a6717> ../engine/sv_main.c:514 */
@@ -5371,6 +5389,7 @@ void EXT_FUNC SV_WriteVoiceCodec_internal(sizebuf_t *pBuf)
  */
 void __invokeValvesBuggedCreateBaseline(void* func, int player, int eindex, struct entity_state_s *baseline, struct edict_s *entity, int playermodelindex, vec_t* pmins, vec_t* pmaxs)
 {
+#if defined _MSC_VER || defined __INTEL_COMPILER
 	__asm {
 		mov ecx, func
 		push 0
@@ -5387,6 +5406,35 @@ void __invokeValvesBuggedCreateBaseline(void* func, int player, int eindex, stru
 		call ecx
 		add esp, 0x2C
 	}
+#else
+	asm volatile (
+		"movl %%ecx, %0\n\t"
+		"pushl $0\n\t"
+		"pushl $1\n\t"
+		"pushl $0\n\t"
+		"pushl $0\n\t"
+		"pushl %1\n\t"
+		"pushl %2\n\t"
+		"pushl %3\n\t"
+		"pushl %4\n\t"
+		"pushl %5\n\t"
+		"pushl %6\n\t"
+		"pushl %7\n\t"
+		"call *%%ecx\n\t"
+		"addl %%esp, $0x2C"
+		::
+		"g" (func),
+		"g" (pmaxs),
+		"g" (pmins),
+		"g" (playermodelindex),
+		"g" (entity),
+		"g" (baseline),
+		"g" (eindex),
+		"g" (player)
+		:
+		"ecx"
+		);
+#endif
 }
 
 /* <a9cf9> ../engine/sv_main.c:6866 */

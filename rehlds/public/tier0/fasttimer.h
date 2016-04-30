@@ -246,6 +246,7 @@ inline void CCycleCount::Init(float initTimeMsec)
 inline void CCycleCount::Sample()
 {
 	unsigned long* pSample = (unsigned long *)&m_Int64;
+#if defined _MSC_VER || defined __INTEL_COMPILER
 	__asm
 	{
 		// force the cpu to synchronize the instruction queue
@@ -253,11 +254,23 @@ inline void CCycleCount::Sample()
 		//cpuid
 		//cpuid
 		//cpuid
-		mov		ecx, pSample
-			rdtsc
-			mov[ecx], eax
-			mov[ecx + 4], edx
+		mov ecx, pSample;
+		rdtsc;
+		mov [ecx], eax;
+		mov [ecx + 4], edx;
 	}
+#else
+	asm volatile (
+		"movl %%ecx, %0\n\t"
+		"rdtsc\n\t"
+		"mov (%%ecx), %%eax\n\t"
+		"mov $4(%%ecx), %%edx"
+		::
+		"r" (pSample)
+		:
+		"eax", "ecx", "edx"
+		);
+#endif
 }
 
 
