@@ -719,6 +719,7 @@ void SV_WriteDeltaHeader(int num, qboolean remove, qboolean custom, int *numbase
 void SV_InvokeCallback(void);
 int SV_FindBestBaseline(int index, entity_state_t ** baseline, entity_state_t *to, int num, qboolean custom);
 int SV_CreatePacketEntities(sv_delta_t type, client_t *client, packet_entities_t *to, sizebuf_t *msg);
+int SV_CreatePacketEntities_internal(sv_delta_t type, client_t *client, packet_entities_t *to, sizebuf_t *msg);
 void SV_EmitPacketEntities(client_t *client, packet_entities_t *to, sizebuf_t *msg);
 qboolean SV_ShouldUpdatePing(client_t *client);
 NOXREF qboolean SV_HasEventsInQueue(client_t *client);

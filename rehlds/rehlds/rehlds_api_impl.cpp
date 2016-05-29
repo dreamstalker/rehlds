@@ -372,6 +372,10 @@ IRehldsHookRegistry_SV_Spawn_f* CRehldsHookchains::SV_Spawn_f() {
 	return &m_SV_Spawn_f;
 }
 
+IRehldsHookRegistry_SV_CreatePacketEntities* CRehldsHookchains::SV_CreatePacketEntities() {
+	return &m_SV_CreatePacketEntities;
+}
+
 int EXT_FUNC CRehldsApi::GetMajorVersion()
 {
 	return REHLDS_API_VERSION_MAJOR;

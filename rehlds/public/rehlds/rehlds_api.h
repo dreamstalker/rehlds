@@ -181,6 +181,10 @@ typedef IVoidHookChainRegistry<IGameClient *, usercmd_t *, int, int, int> IRehld
 typedef IVoidHookChain<> IRehldsHook_SV_Spawn_f;
 typedef IVoidHookChainRegistry<> IRehldsHookRegistry_SV_Spawn_f;
 
+//SV_CreatePacketEntities hook
+typedef IHookChain<int, enum sv_delta_s, IGameClient *, struct packet_entities_s *, struct sizebuf_s *> IRehldsHook_SV_CreatePacketEntities;
+typedef IHookChainRegistry<int, enum sv_delta_s, IGameClient *, struct packet_entities_s *, struct sizebuf_s *> IRehldsHookRegistry_SV_CreatePacketEntities;
+
 class IRehldsHookchains {
 public:
 	virtual ~IRehldsHookchains() { }
@@ -221,6 +225,7 @@ public:
 	virtual IRehldsHookRegistry_Cvar_DirectSet* Cvar_DirectSet() = 0;
 	virtual IRehldsHookRegistry_SV_EstablishTimeBase* SV_EstablishTimeBase() = 0;
 	virtual IRehldsHookRegistry_SV_Spawn_f* SV_Spawn_f() = 0;
+	virtual IRehldsHookRegistry_SV_CreatePacketEntities* SV_CreatePacketEntities() = 0;
 };
 
 struct RehldsFuncs_t {

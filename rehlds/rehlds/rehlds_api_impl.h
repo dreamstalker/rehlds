@@ -175,6 +175,10 @@ typedef IVoidHookChainRegistryImpl<IGameClient *, usercmd_t *, int, int, int> CR
 typedef IVoidHookChainImpl<> CRehldsHook_SV_Spawn_f;
 typedef IVoidHookChainRegistryImpl<> CRehldsHookRegistry_SV_Spawn_f;
 
+//SV_CreatePacketEntities hook
+typedef IHookChainImpl<int, sv_delta_t, IGameClient *, packet_entities_t *, sizebuf_t *> CRehldsHook_SV_CreatePacketEntities;
+typedef IHookChainRegistryImpl<int, sv_delta_t, IGameClient *, packet_entities_t *, sizebuf_t *> CRehldsHookRegistry_SV_CreatePacketEntities;
+
 class CRehldsHookchains : public IRehldsHookchains {
 public:
 	CRehldsHookRegistry_Steam_NotifyClientConnect m_Steam_NotifyClientConnect;
@@ -213,6 +217,7 @@ public:
 	CRehldsHookRegistry_Cvar_DirectSet m_Cvar_DirectSet;
 	CRehldsHookRegistry_SV_EstablishTimeBase m_SV_EstablishTimeBase;
 	CRehldsHookRegistry_SV_Spawn_f m_SV_Spawn_f;
+	CRehldsHookRegistry_SV_CreatePacketEntities m_SV_CreatePacketEntities;
 
 public:
 	virtual IRehldsHookRegistry_Steam_NotifyClientConnect* Steam_NotifyClientConnect();
@@ -251,6 +256,7 @@ public:
 	virtual IRehldsHookRegistry_Cvar_DirectSet* Cvar_DirectSet();
 	virtual IRehldsHookRegistry_SV_EstablishTimeBase* SV_EstablishTimeBase();
 	virtual	IRehldsHookRegistry_SV_Spawn_f* SV_Spawn_f();
+	virtual	IRehldsHookRegistry_SV_CreatePacketEntities* SV_CreatePacketEntities();
 };
 
 extern CRehldsHookchains g_RehldsHookchains;
