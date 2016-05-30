@@ -199,6 +199,11 @@ const char* EXT_FUNC CRehldsServerData::GetName() {
 	return g_psv.name;
 }
 
+void EXT_FUNC CRehldsServerData::SetName(const char* name) {
+	Q_strncpy(g_psv.name, name, ARRAYSIZE(g_psv.name) - 1);
+	g_psv.name[ARRAYSIZE(g_psv.name) - 1] = '\0';
+}
+
 uint32 EXT_FUNC CRehldsServerData::GetWorldmapCrc() {
 	return g_psv.worldmapCRC;
 }
@@ -284,4 +289,12 @@ IGameClient* GetRehldsApiClient(client_t* cl)
 	}
 
 	return g_GameClients[idx];
+}
+
+ISteamGameServer* EXT_FUNC CRehldsServerData::GetSteamGameServer() {
+	return ::SteamGameServer();
+}
+
+netadr_t* EXT_FUNC CRehldsServerData::GetNetFrom() {
+	return &net_from;
 }

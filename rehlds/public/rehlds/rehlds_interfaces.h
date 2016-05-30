@@ -126,4 +126,7 @@ public:
 	virtual double GetTime() = 0;
 	virtual void SetResourcesNum(int num) = 0;
 	virtual struct resource_s *GetResource(int index) = 0;
+	virtual void SetName(const char* name) = 0;
+	virtual class ISteamGameServer *GetSteamGameServer() = 0;
+	virtual struct netadr_s *GetNetFrom() = 0;
 };

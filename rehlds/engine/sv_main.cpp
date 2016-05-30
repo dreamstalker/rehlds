@@ -2385,7 +2385,7 @@ void EXT_FUNC SV_ConnectClient_internal(void)
 		Steam_NotifyClientDisconnect(client);
 		if ((client->active || client->spawned) && client->edict)
 			gEntityInterface.pfnClientDisconnect(client->edict);
-	
+
 		Con_Printf("%s:reconnect\n", NET_AdrToString(adr));
 	}
 	else
@@ -2468,7 +2468,7 @@ void EXT_FUNC SV_ConnectClient_internal(void)
 	if (g_modfuncs.m_pfnConnectClient)
 		g_modfuncs.m_pfnConnectClient(nClientSlot);
 
-	Netchan_Setup(NS_SERVER, &host_client->netchan,	adr, client - g_psvs.clients, client, SV_GetFragmentSize);
+	Netchan_Setup(NS_SERVER, &host_client->netchan, adr, client - g_psvs.clients, client, SV_GetFragmentSize);
 	host_client->next_messageinterval = 5.0;
 	host_client->next_messagetime = realtime + 0.05;
 	host_client->delta_sequence = -1;
@@ -4241,8 +4241,18 @@ int SV_FindBestBaseline(int index, entity_state_t ** baseline, entity_state_t *t
 	return index - bestfound;
 }
 
-/* <a8e01> ../engine/sv_main.c:5525 */
+int EXT_FUNC SV_CreatePacketEntities_api(sv_delta_t type, IGameClient *client, packet_entities_t *to, sizebuf_t *msg)
+{
+	return SV_CreatePacketEntities_internal(type, client->GetClient(), to, msg);
+}
+
 int SV_CreatePacketEntities(sv_delta_t type, client_t *client, packet_entities_t *to, sizebuf_t *msg)
+{
+	return g_RehldsHookchains.m_SV_CreatePacketEntities.callChain(SV_CreatePacketEntities_api, type, GetRehldsApiClient(client), to, msg);
+}
+
+/* <a8e01> ../engine/sv_main.c:5525 */
+int SV_CreatePacketEntities_internal(sv_delta_t type, client_t *client, packet_entities_t *to, sizebuf_t *msg)
 {
 	packet_entities_t *from;
 	int oldindex;
