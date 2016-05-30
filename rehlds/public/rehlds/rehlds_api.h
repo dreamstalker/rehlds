@@ -174,8 +174,8 @@ typedef IVoidHookChain<struct cvar_s *, const char *> IRehldsHook_Cvar_DirectSet
 typedef IVoidHookChainRegistry<struct cvar_s *, const char *> IRehldsHookRegistry_Cvar_DirectSet;
 
 //SV_EstablishTimeBase hook
-typedef IVoidHookChain<IGameClient *, struct usercmd_t *, int, int, int> IRehldsHook_SV_EstablishTimeBase;
-typedef IVoidHookChainRegistry<IGameClient *, struct usercmd_t *, int, int, int> IRehldsHookRegistry_SV_EstablishTimeBase;
+typedef IVoidHookChain<IGameClient *, usercmd_t *, int, int, int> IRehldsHook_SV_EstablishTimeBase;
+typedef IVoidHookChainRegistry<IGameClient *, usercmd_t *, int, int, int> IRehldsHookRegistry_SV_EstablishTimeBase;
 
 //SV_Spawn_f hook
 typedef IVoidHookChain<> IRehldsHook_SV_Spawn_f;
