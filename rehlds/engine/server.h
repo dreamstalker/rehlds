@@ -544,6 +544,7 @@ extern cvar_t sv_auto_precache_sounds_in_models;
 extern cvar_t sv_delayed_spray_upload;
 extern cvar_t sv_rehlds_force_dlmax;
 extern cvar_t sv_rehlds_hull_centering;
+extern cvar_t sv_rcon_condebug;
 #endif
 extern int sv_playermodel;
 

@@ -36,8 +36,10 @@ Bugfixed version of rehlds contains an additional cvars:
 <li>sv_auto_precache_sounds_in_models <1|0> // Automatically precache sounds attached to models. Deault: 0
 <li>sv_delayed_spray_upload <1|0> // Upload custom sprays after entering the game instead of when connecting. It increases upload speed. Default: 0
 <li>sv_echo_unknown_cmd <1|0> // Echo in the console when trying execute an uncknown command. Default: 0
+<li>sv_rcon_condebug <1|0> // Print rcon debug in the console. Default: 1
 <li>sv_force_ent_intersection <1|0> // In a 3-rd party plugins used to force colliding of SOLID_SLIDEBOX entities. Default: 0
 <li>sv_rehlds_force_dlmax <1|0> // Force a client's cl_dlmax cvar to 1024. It avoids an excessive packets fragmentation. Default: 0
+<li>sv_rehlds_hull_centering <1|0> // Use center of hull instead of corner. Default: 0
 <li>sv_rehlds_movecmdrate_max_avg // Max average level of 'move' cmds for ban. Default: 400
 <li>sv_rehlds_movecmdrate_max_burst // Max burst level of 'move' cmds for ban. Default: 2500
 <li>sv_rehlds_stringcmdrate_max_avg // Max average level of 'string' cmds for ban. Default: 80

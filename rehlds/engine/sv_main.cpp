@@ -305,6 +305,7 @@ cvar_t sv_delayed_spray_upload = { "sv_delayed_spray_upload", "0", 0, 0.0f, null
 cvar_t sv_rehlds_force_dlmax = { "sv_rehlds_force_dlmax", "0", 0, 0.0f, nullptr };
 cvar_t listipcfgfile = { "listipcfgfile", "listip.cfg", 0, 0.0f, nullptr };
 cvar_t sv_rehlds_hull_centering = { "sv_rehlds_hull_centering", "0", 0, 0.0f, nullptr };
+cvar_t sv_rcon_condebug = { "sv_rcon_condebug", "1", 0, 1.0f, nullptr };
 #endif
 
 /* <a6492> ../engine/sv_main.c:113 */
@@ -3386,7 +3387,11 @@ int SV_Rcon_Validate(void)
 
 	if (SV_CheckRconFailure(&net_from))
 	{
-		Con_Printf("Banning %s for rcon hacking attempts\n", NET_AdrToString(net_from));
+#ifdef REHLDS_FIXES
+		if (sv_rcon_condebug.value > 0.0f)
+#endif
+			Con_Printf("Banning %s for rcon hacking attempts\n", NET_AdrToString(net_from));
+
 		Cbuf_AddText(va("addip %i %s\n", (int)sv_rcon_banpenalty.value, NET_BaseAdrToString(net_from)));
 		return 3;
 	}
@@ -3415,19 +3420,29 @@ void SV_Rcon(netadr_t *net_from_)
 
 	Q_memcpy(remaining, &net_message.data[Q_strlen("rcon")], len);
 	remaining[len] = 0;
-	if (invalid)
+
+#ifndef REHLDS_FIXES
+	bool bConDebug = true;
+#else
+	bool bConDebug = (sv_rcon_condebug.value > 0.0f);
+#endif
+
+	if (bConDebug)
 	{
-		Con_Printf("Bad Rcon from %s:\n%s\n", NET_AdrToString(*net_from_), remaining);
-		Log_Printf("Bad Rcon: \"%s\" from \"%s\"\n", remaining, NET_AdrToString(*net_from_));
-	}
-	else
-	{
-		Con_Printf("Rcon from %s:\n%s\n", NET_AdrToString(*net_from_), remaining);
-		Log_Printf("Rcon: \"%s\" from \"%s\"\n", remaining, NET_AdrToString(*net_from_));
+		if (invalid)
+		{
+			Con_Printf("Bad Rcon from %s:\n%s\n", NET_AdrToString(*net_from_), remaining);
+			Log_Printf("Bad Rcon: \"%s\" from \"%s\"\n", remaining, NET_AdrToString(*net_from_));
+		}
+		else
+		{
+			Con_Printf("Rcon from %s:\n%s\n", NET_AdrToString(*net_from_), remaining);
+			Log_Printf("Rcon: \"%s\" from \"%s\"\n", remaining, NET_AdrToString(*net_from_));
+		}
 	}
 
 	SV_BeginRedirect(RD_PACKET, net_from_);
-	if (invalid)
+	if (bConDebug && invalid)
 	{
 		if (invalid == 2)
 			Con_Printf("Bad rcon_password.\n");
@@ -3442,7 +3457,8 @@ void SV_Rcon(netadr_t *net_from_)
 	char *data = COM_Parse(COM_Parse(COM_Parse(remaining)));
 	if (!data)
 	{
-		Con_Printf("Empty rcon\n");
+		if (bConDebug)
+			Con_Printf("Empty rcon\n");
 
 #ifdef REHLDS_FIXES
 		//missing SV_EndRedirect()
@@ -7787,6 +7803,7 @@ void SV_Init(void)
 	Cvar_RegisterVariable(&sv_delayed_spray_upload);
 	Cvar_RegisterVariable(&sv_rehlds_force_dlmax);
 	Cvar_RegisterVariable(&sv_rehlds_hull_centering);
+	Cvar_RegisterVariable(&sv_rcon_condebug);
 #endif
 	
 	for (int i = 0; i < MAX_MODELS; i++)

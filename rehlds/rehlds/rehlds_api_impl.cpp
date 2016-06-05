@@ -129,6 +129,10 @@ cvar_t* EXT_FUNC GetCvarVars_api() {
 	return cvar_vars;
 }
 
+void EXT_FUNC SV_StartSound_api(int recipients, edict_t *entity, int channel, const char *sample, int volume, float attenuation, int flags, int pitch) {
+	SV_StartSound(recipients, entity, channel, sample, volume, attenuation, flags, pitch);
+}
+
 void* EXT_FUNC Rehlds_GetPluginApi(const char *name) {
 	auto api = FindPluginApiByName(name);
 	return api ? api->impl : NULL;
@@ -194,8 +198,76 @@ RehldsFuncs_t g_RehldsApiFuncs =
 	&Rehlds_RegisterPluginApi,
 	&SV_FileInConsistencyList,
 	&Steam_NotifyClientConnect_api,
-	&Steam_NotifyClientDisconnect_api
+	&Steam_NotifyClientDisconnect_api,
+	&SV_StartSound_api,
+	&SV_EmitSound2_api
 };
+
+bool EXT_FUNC SV_EmitSound2_internal(edict_t *entity, IGameClient *pReceiver, int channel, const char *sample, float volume, float attenuation, int flags, int pitch, int emitFlags, const float *pOrigin)
+{
+	bool bSendPAS = (channel != CHAN_STATIC && !(flags & SND_FL_STOP) && !(emitFlags & SND_EMIT2_NOPAS));
+	vec3_t origin = {0, 0, 0};
+
+	if (entity && entity != g_psv.edicts)
+	{
+		for (int i = 0; i < 3; ++i)
+			origin[i] = (entity->v.maxs[i] + entity->v.mins[i]) * 0.5f + entity->v.origin[i];
+	}
+	// only worldspawn
+	else if (pOrigin != nullptr)
+	{
+		for (int i = 0; i < 3; ++i)
+			origin[i] = pOrigin[i];
+	}
+
+	// spawn sound of the entity for everyone clients
+	if (!pReceiver)
+	{
+		if (!SV_BuildSoundMsg(entity, channel, sample, (int)(volume * 255.0f), attenuation, flags, pitch, origin, &g_psv.multicast))
+			return false;
+
+		int msg_destination = MSG_FL_NONE;
+		if (emitFlags & SND_EMIT2_INVOKER) {
+			msg_destination = MSG_FL_ONE;
+		}
+
+		if (bSendPAS)
+		{
+			SV_Multicast(entity, origin, msg_destination | MSG_FL_PAS, FALSE);
+		}
+		else
+		{
+			SV_Multicast(entity, origin, msg_destination | MSG_FL_BROADCAST, TRUE);
+		}
+		return true;
+	}
+
+	sizebuf_t *pBuffer;
+	client_t *receiver = pReceiver->GetClient();
+
+	if (bSendPAS && receiver->edict != entity) // if the sound for myself, then do not check PAS.
+	{
+		int leafnum = SV_PointLeafnum(origin);
+		if (!SV_ValidClientMulticast(receiver, leafnum, MSG_FL_PAS))
+			return false;
+
+		pBuffer = &receiver->datagram;
+	}
+	else
+	{
+		// reliable
+		pBuffer = &receiver->netchan.message;
+	}
+
+	// send to one client
+	SV_BuildSoundMsg(entity, channel, sample, (int)(volume * 255.0f), attenuation, flags, pitch, origin, pBuffer);
+	return true;
+}
+
+bool EXT_FUNC SV_EmitSound2_api(edict_t *entity, IGameClient *receiver, int channel, const char *sample, float volume, float attenuation, int flags, int pitch, int emitFlags, const float *pOrigin)
+{
+	return g_RehldsHookchains.m_SV_EmitSound2.callChain(SV_EmitSound2_internal, entity, receiver, channel, sample, volume, attenuation, flags, pitch, emitFlags, pOrigin);
+}
 
 sizebuf_t* EXT_FUNC GetNetMessage_api()
 {
@@ -374,6 +446,10 @@ IRehldsHookRegistry_SV_Spawn_f* CRehldsHookchains::SV_Spawn_f() {
 
 IRehldsHookRegistry_SV_CreatePacketEntities* CRehldsHookchains::SV_CreatePacketEntities() {
 	return &m_SV_CreatePacketEntities;
+}
+
+IRehldsHookRegistry_SV_EmitSound2* CRehldsHookchains::SV_EmitSound2() {
+	return &m_SV_EmitSound2;
 }
 
 int EXT_FUNC CRehldsApi::GetMajorVersion()

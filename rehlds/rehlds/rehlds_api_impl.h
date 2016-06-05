@@ -179,6 +179,10 @@ typedef IVoidHookChainRegistryImpl<> CRehldsHookRegistry_SV_Spawn_f;
 typedef IHookChainImpl<int, sv_delta_t, IGameClient *, packet_entities_t *, sizebuf_t *> CRehldsHook_SV_CreatePacketEntities;
 typedef IHookChainRegistryImpl<int, sv_delta_t, IGameClient *, packet_entities_t *, sizebuf_t *> CRehldsHookRegistry_SV_CreatePacketEntities;
 
+//SV_EmitSound2 hook
+typedef IHookChainImpl<bool, edict_t *, IGameClient *, int, const char*, float, float, int, int, int, const float*> CRehldsHook_SV_EmitSound2;
+typedef IHookChainRegistryImpl<bool, edict_t *, IGameClient *, int, const char*, float, float, int, int, int, const float*> CRehldsHookRegistry_SV_EmitSound2;
+
 class CRehldsHookchains : public IRehldsHookchains {
 public:
 	CRehldsHookRegistry_Steam_NotifyClientConnect m_Steam_NotifyClientConnect;
@@ -218,6 +222,7 @@ public:
 	CRehldsHookRegistry_SV_EstablishTimeBase m_SV_EstablishTimeBase;
 	CRehldsHookRegistry_SV_Spawn_f m_SV_Spawn_f;
 	CRehldsHookRegistry_SV_CreatePacketEntities m_SV_CreatePacketEntities;
+	CRehldsHookRegistry_SV_EmitSound2 m_SV_EmitSound2;
 
 public:
 	virtual IRehldsHookRegistry_Steam_NotifyClientConnect* Steam_NotifyClientConnect();
@@ -257,6 +262,7 @@ public:
 	virtual IRehldsHookRegistry_SV_EstablishTimeBase* SV_EstablishTimeBase();
 	virtual	IRehldsHookRegistry_SV_Spawn_f* SV_Spawn_f();
 	virtual	IRehldsHookRegistry_SV_CreatePacketEntities* SV_CreatePacketEntities();
+	virtual	IRehldsHookRegistry_SV_EmitSound2* SV_EmitSound2();
 };
 
 extern CRehldsHookchains g_RehldsHookchains;
@@ -279,3 +285,5 @@ public:
 extern sizebuf_t* GetNetMessage_api();
 extern IGameClient* GetHostClient_api();
 extern int* GetMsgReadCount_api();
+
+bool SV_EmitSound2_api(edict_t *entity, IGameClient *receiver, int channel, const char *sample, float volume, float attenuation, int fFlags, int pitch, int emitFlags, const float *pOrigin);
