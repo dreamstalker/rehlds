@@ -1341,7 +1341,13 @@ void EXT_FUNC Con_Printf(const char *fmt, ...)
 	FR_Log("REHLDS_CON", Dest);
 #endif
 
-	Sys_Printf("%s", Dest);
+#ifdef REHLDS_FIXES
+	if (sv_redirected == RD_NONE || sv_rcon_condebug.value > 0.0f)
+#endif
+	{
+		Sys_Printf("%s", Dest);
+	}
+
 	if (sv_redirected)
 	{
 		if ((Q_strlen(outputbuf) + Q_strlen(Dest)) > sizeof(outputbuf) - 1)
