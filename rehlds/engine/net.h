@@ -53,6 +53,9 @@
 //  the server sends this value back
 #define S2C_CHALLENGE			'A'	// + challenge value
 
+// Send a userid, client remote address, is this server secure and engine build number
+#define S2C_CONNECTION          'B'
+
 // HLMaster rejected a server's connection because the server needs to be updated
 #define M2S_REQUESTRESTART		'O'
 

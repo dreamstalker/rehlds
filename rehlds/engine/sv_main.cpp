@@ -2497,7 +2497,7 @@ void EXT_FUNC SV_ConnectClient_internal(void)
 #endif // REHLDS_FIXES
 
 	bIsSecure = Steam_GSBSecure();
-	Netchan_OutOfBandPrint(NS_SERVER, adr, "%c %i \"%s\" %i %i", 66, host_client->userid, NET_AdrToString(host_client->netchan.remote_address), bIsSecure, build_number());
+	Netchan_OutOfBandPrint(NS_SERVER, adr, "%c %i \"%s\" %i %i", S2C_CONNECTION, host_client->userid, NET_AdrToString(host_client->netchan.remote_address), bIsSecure, build_number());
 	Log_Printf("\"%s<%i><%s><>\" connected, address \"%s\"\n", name, host_client->userid, SV_GetClientIDString(host_client), NET_AdrToString(host_client->netchan.remote_address));
 #ifdef REHLDS_FIXES
 	Q_strncpy(host_client->userinfo, userinfo, MAX_INFO_STRING - 1);
@@ -4692,6 +4692,14 @@ qboolean SV_SendClientDatagram(client_t *client)
 	return TRUE;
 }
 
+void SV_UpdateUserInfo(client_t *pClient)
+{
+	pClient->sendinfo = FALSE;
+	pClient->sendinfo_time = realtime + 1.0;
+	SV_ExtractFromUserinfo(pClient);
+	SV_FullClientUpdate(pClient, &g_psv.reliable_datagram);
+}
+
 /* <a981c> ../engine/sv_main.c:6062 */
 void SV_UpdateToReliableMessages(void)
 {
@@ -4715,10 +4723,7 @@ void SV_UpdateToReliableMessages(void)
 		if (client->sendinfo && client->sendinfo_time <= realtime)
 #endif // REHLDS_FIXES
 		{
-			client->sendinfo = FALSE;
-			client->sendinfo_time = realtime + 1.0;
-			SV_ExtractFromUserinfo(client);
-			SV_FullClientUpdate(client, &g_psv.reliable_datagram);
+			SV_UpdateUserInfo(client);
 		}
 
 		if (!client->fakeclient && (client->active || client->connected))
