@@ -35,7 +35,7 @@
 #include "model.h"
 
 #define REHLDS_API_VERSION_MAJOR 2
-#define REHLDS_API_VERSION_MINOR 12
+#define REHLDS_API_VERSION_MINOR 13
 
 //Steam_NotifyClientConnect hook
 typedef IHookChain<qboolean, IGameClient*, const void*, unsigned int> IRehldsHook_Steam_NotifyClientConnect;
@@ -280,6 +280,7 @@ struct RehldsFuncs_t {
 	void(*Steam_NotifyClientDisconnect)(IGameClient* cl);
 	void(*SV_StartSound)(int recipients, edict_t *entity, int channel, const char *sample, int volume, float attenuation, int flags, int pitch);
 	bool(*SV_EmitSound2)(edict_t *entity, IGameClient *receiver, int channel, const char *sample, float volume, float attenuation, int flags, int pitch, int emitFlags, const float *pOrigin);
+	void (* SV_UpdateUserInfo)(IGameClient *pGameClient);
 };
 
 class IRehldsApi {

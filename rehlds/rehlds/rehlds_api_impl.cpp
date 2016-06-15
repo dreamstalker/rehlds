@@ -133,6 +133,10 @@ void EXT_FUNC SV_StartSound_api(int recipients, edict_t *entity, int channel, co
 	SV_StartSound(recipients, entity, channel, sample, volume, attenuation, flags, pitch);
 }
 
+void EXT_FUNC SV_UpdateUserInfo_api(IGameClient *pGameClient) {
+	SV_UpdateUserInfo(pGameClient->GetClient());
+}
+
 void* EXT_FUNC Rehlds_GetPluginApi(const char *name) {
 	auto api = FindPluginApiByName(name);
 	return api ? api->impl : NULL;
@@ -200,7 +204,8 @@ RehldsFuncs_t g_RehldsApiFuncs =
 	&Steam_NotifyClientConnect_api,
 	&Steam_NotifyClientDisconnect_api,
 	&SV_StartSound_api,
-	&SV_EmitSound2_api
+	&SV_EmitSound2_api,
+	&SV_UpdateUserInfo_api
 };
 
 bool EXT_FUNC SV_EmitSound2_internal(edict_t *entity, IGameClient *pReceiver, int channel, const char *sample, float volume, float attenuation, int flags, int pitch, int emitFlags, const float *pOrigin)

@@ -730,6 +730,7 @@ void SV_EmitPings(client_t *client, sizebuf_t *msg);
 void SV_WriteEntitiesToClient(client_t *client, sizebuf_t *msg);
 void SV_CleanupEnts(void);
 qboolean SV_SendClientDatagram(client_t *client);
+void SV_UpdateUserInfo(client_t *pClient);
 void SV_UpdateToReliableMessages(void);
 void SV_SkipUpdates(void);
 void SV_SendClientMessages(void);
