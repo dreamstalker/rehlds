@@ -331,6 +331,23 @@ task buildRelease {
     }
 }
 
+task buildFixes {
+	dependsOn binaries.withType(SharedLibraryBinarySpec).matching {
+		SharedLibraryBinarySpec blib -> blib.buildable && blib.buildType.name == 'release' && blib.flavor.name == 'rehldsFixes' && blib.component.name == 'rehlds_swds_engine'
+	}
+}
+
+gradle.taskGraph.whenReady { graph ->
+	if (!graph.hasTask(buildFixes)) {
+		return;
+	}
+
+	// skip all tasks with the matched substrings in the name like "test"
+	def tasks = graph.getAllTasks();
+	tasks.findAll { it.name.toLowerCase().contains("test") }.each { task ->
+		task.enabled = false;
+	}
+}
 
 task prepareDevEnvTests {
     def rehldsTests = new File(project.projectDir, '_dev/testDemos')
