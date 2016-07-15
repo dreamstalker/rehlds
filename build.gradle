@@ -1,5 +1,6 @@
 import versioning.GitVersioner
 import versioning.RehldsVersionInfo
+import org.joda.time.DateTime
 
 apply plugin: 'maven-publish'
 apply from: 'shared.gradle'
@@ -14,14 +15,8 @@ idea {
 }
 
 def gitInfo = GitVersioner.versionForDir(project.rootDir)
-if (!gitInfo) {
-    throw new RuntimeException('Running outside git repository')
-}
-
-
-
 RehldsVersionInfo versionInfo
-if (gitInfo.tag && gitInfo.tag[0] == 'v') {
+if (gitInfo && gitInfo.tag && gitInfo.tag[0] == 'v') {
     def m = gitInfo.tag =~ /^v(\d+)\.(\d+)(\.(\d+))?$/
     if (!m.find()) {
         throw new RuntimeException("Invalid git version tag name ${gitInfo.tag}")
@@ -38,7 +33,7 @@ if (gitInfo.tag && gitInfo.tag[0] == 'v') {
             majorVersion: project.majorVersion as int,
             minorVersion: project.minorVersion as int,
             suffix: 'SNAPSHOT',
-            lastCommitDate: gitInfo.lastCommitDate
+            lastCommitDate: gitInfo ? gitInfo.lastCommitDate : new DateTime()
     )
 }
 
