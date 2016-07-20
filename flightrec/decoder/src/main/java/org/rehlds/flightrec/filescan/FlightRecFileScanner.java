@@ -62,7 +62,7 @@ public class FlightRecFileScanner {
         }
 
         long endPos = file.getFilePointer() - size + pos + allocSize;
-        if (endPos >= file.length()) {
+        if (endPos > file.length()) {
             resList.add(new HeaderScanResult(file.getFilePointer() - size + pos, allocSize, false, "Regions partially lays outside the file", version));
             return;
         }
