@@ -254,7 +254,7 @@ void SV_ClearResourceList(resource_t *pList)
 {
 	resource_t *p, *n;
 
-	for( p = list->pNext; p || p == list; p = n )
+	for( p = pList->pNext; p || p == pList; p = n )
 	{
 		n = p->pNext;
 
