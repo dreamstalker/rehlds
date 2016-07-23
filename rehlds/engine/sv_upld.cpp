@@ -33,7 +33,7 @@
 // Checks MD5 of the resource against local cache and returns TRUE if resource was found or if downloads are disabled. Otherwise, if resource was requested from the player, it returns FALSE.
 qboolean SV_CheckFile(sizebuf_t *msg, char *filename)
 {
-	resource_t p = { 0 };
+	resource_t p = { };
 	
 #ifdef REHLDS_FIXES
 
@@ -401,7 +401,12 @@ void SV_ParseResourceList(client_t *pSenderClient)
 
 	total = MSG_ReadShort();
 
+#ifdef REHLDS_FIXES
 	SV_ClearResourceLists( host_client );
+#else // REHLDS_FIXES
+	SV_ClearResourceList( &host_client->resourcesneeded );
+	SV_ClearResourceList( &host_client->resourcesonhand );
+#endif // REHLDS_FIXES
 
 #ifdef REHLDS_FIXES
 	if (total > 1) // client uses only one custom resource (spray decal)
@@ -436,7 +441,12 @@ void SV_ParseResourceList(client_t *pSenderClient)
 #endif // REHLDS_FIXES
 			resource->nDownloadSize > 1024 * 1024 * 1024)	// FIXME: Are they gone crazy??!
 		{
+#ifdef REHLDS_FIXES
 			SV_ClearResourceLists( host_client );
+#else // REHLDS_FIXES
+			SV_ClearResourceList( &host_client->resourcesneeded );
+			SV_ClearResourceList( &host_client->resourcesonhand );
+#endif // REHLDS_FIXES		
 			return;
 		}
 
@@ -497,7 +507,12 @@ void SV_ParseResourceList(client_t *pSenderClient)
 
 			if (bytestodownload > sv_max_upload.value * 1024 * 1024)
 			{
-				SV_ClearResourceLists(host_client);
+#ifdef REHLDS_FIXES
+				SV_ClearResourceLists( host_client );
+#else // REHLDS_FIXES
+				SV_ClearResourceList( &host_client->resourcesneeded );
+				SV_ClearResourceList( &host_client->resourcesonhand );
+#endif //REHLDS_FIXES
 				return;
 			}
 
