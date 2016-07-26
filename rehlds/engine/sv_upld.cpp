@@ -33,10 +33,8 @@
 // Checks MD5 of the resource against local cache and returns TRUE if resource was found or if downloads are disabled. Otherwise, if resource was requested from the player, it returns FALSE.
 qboolean SV_CheckFile(sizebuf_t *msg, char *filename)
 {
-	resource_t p;
-
-	Q_memset(&p, 0, sizeof(p));
-
+	resource_t p = { };
+	
 #ifdef REHLDS_FIXES
 
 	// FIXED: First, check for allowed downloads, then try to lookup, this is faster if downloads aren't enabled
@@ -116,8 +114,7 @@ void SV_CreateCustomizationList(client_t *pHost)
 	pHost->customdata.pNext = NULL;
 #endif // REHLDS_FIXES
 
-	pResource = pHost->resourcesonhand.pNext;
-	while (pResource != &pHost->resourcesonhand)
+	for( pResource = pHost->resourcesonhand.pNext; pResource != &pHost->resourcesonhand; pResource = pResource->pNext )
 	{
 		// TODO: Check if we need to filter resources here based on type (t_decal) and flags (RES_CUSTOM)
 
@@ -154,8 +151,6 @@ void SV_CreateCustomizationList(client_t *pHost)
 					Con_Printf("Ignoring invalid custom decal from %s\n", pHost->name);
 			}
 		}
-
-		pResource = pResource->pNext;
 	}
 }
 
@@ -259,18 +254,14 @@ void SV_ClearResourceList(resource_t *pList)
 {
 	resource_t *p, *n;
 
-	p = pList->pNext;
-	while (p != NULL)
+	for( p = pList->pNext; p && p != pList; p = n )
 	{
-		if (p == pList)
-			break;
-
 		n = p->pNext;
+
 		SV_RemoveFromResourceList(p);
 		Mem_Free(p);
-
-		p = n;
 	}
+
 
 	pList->pPrev = pList;
 	pList->pNext = pList;
@@ -362,8 +353,7 @@ void SV_BatchUploadRequest(client_t *cl)
 	resource_t *p, *n;
 	char filename[MAX_PATH];
 
-	p = cl->resourcesneeded.pNext;
-	while (p != &cl->resourcesneeded)
+	for( p = cl->resourcesneeded.pNext; p != &cl->resourcesneeded; p = n )
 	{
 		n = p->pNext;
 
@@ -387,8 +377,6 @@ void SV_BatchUploadRequest(client_t *cl)
 				SV_MoveToOnHandList(p);
 			}
 		}
-
-		p = n;
 	}
 }
 
@@ -413,8 +401,12 @@ void SV_ParseResourceList(client_t *pSenderClient)
 
 	total = MSG_ReadShort();
 
-	SV_ClearResourceList(&host_client->resourcesneeded);
-	SV_ClearResourceList(&host_client->resourcesonhand);
+#ifdef REHLDS_FIXES
+	SV_ClearResourceLists( host_client );
+#else // REHLDS_FIXES
+	SV_ClearResourceList( &host_client->resourcesneeded );
+	SV_ClearResourceList( &host_client->resourcesonhand );
+#endif // REHLDS_FIXES
 
 #ifdef REHLDS_FIXES
 	if (total > 1) // client uses only one custom resource (spray decal)
@@ -449,8 +441,12 @@ void SV_ParseResourceList(client_t *pSenderClient)
 #endif // REHLDS_FIXES
 			resource->nDownloadSize > 1024 * 1024 * 1024)	// FIXME: Are they gone crazy??!
 		{
-			SV_ClearResourceList(&host_client->resourcesneeded);
-			SV_ClearResourceList(&host_client->resourcesonhand);
+#ifdef REHLDS_FIXES
+			SV_ClearResourceLists( host_client );
+#else // REHLDS_FIXES
+			SV_ClearResourceList( &host_client->resourcesneeded );
+			SV_ClearResourceList( &host_client->resourcesonhand );
+#endif // REHLDS_FIXES		
 			return;
 		}
 
@@ -470,6 +466,7 @@ void SV_ParseResourceList(client_t *pSenderClient)
 #endif // REHLDS_FIXES
 		{
 			Con_DPrintf("Custom resources total %.2fK\n", total / 1024.0f);
+#ifndef REHLDS_FIXES // because client can send only decals, why there is need to check other types?
 			if (ri.info[t_model].size)
 			{
 				total = ri.info[t_model].size;
@@ -480,10 +477,13 @@ void SV_ParseResourceList(client_t *pSenderClient)
 				total = ri.info[t_sound].size;
 				Con_DPrintf("  Sounds:  %.2fK\n", total / 1024.0f);
 			}
-			if (ri.info[t_decal].size)
+			if (ri.info[t_decal].size) 
 			{
+#endif // REHLDS_FIXES
+			// this check is useless, because presence of decals was checked before.
 				total = ri.info[t_decal].size;
 				Con_DPrintf("  Decals:  %.2fK\n", total / 1024.0f);
+#ifndef REHLDS_FIXES
 			}
 			if (ri.info[t_skin].size)
 			{
@@ -500,14 +500,19 @@ void SV_ParseResourceList(client_t *pSenderClient)
 				total = ri.info[t_eventscript].size;
 				Con_DPrintf("  Events  :  %.2fK\n", total / 1024.0f);
 			}
+#endif // REHLDS_FIXES
 			Con_DPrintf("----------------------\n");
 
 			int bytestodownload = SV_EstimateNeededResources();
 
 			if (bytestodownload > sv_max_upload.value * 1024 * 1024)
 			{
-				SV_ClearResourceList(&host_client->resourcesneeded);
-				SV_ClearResourceList(&host_client->resourcesonhand);
+#ifdef REHLDS_FIXES
+				SV_ClearResourceLists( host_client );
+#else // REHLDS_FIXES
+				SV_ClearResourceList( &host_client->resourcesneeded );
+				SV_ClearResourceList( &host_client->resourcesonhand );
+#endif //REHLDS_FIXES
 				return;
 			}
 
