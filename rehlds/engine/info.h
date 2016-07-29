@@ -57,5 +57,8 @@ void Info_SetValueForStarKey(char *s, const char *key, const char *value, int ma
 void Info_SetValueForKey(char *s, const char *key, const char *value, int maxsize);
 void Info_Print(const char *s);
 qboolean Info_IsValid(const char *s);
+#ifdef REHLDS_FIXES
+void Info_CollectFields(char *destInfo, const char *srcInfo, const char *collectedKeysOfFields);
+#endif
 
 #endif // INFO__H

@@ -618,3 +618,51 @@ qboolean Info_IsValid(const char *s)
 
 	return FALSE;
 }
+
+#ifdef REHLDS_FIXES
+void Info_CollectFields(char *destInfo, const char *srcInfo, const char *collectedKeysOfFields)
+{
+	char keys[MAX_INFO_STRING];
+	Q_strcpy(keys, collectedKeysOfFields);
+
+	size_t userInfoLength = 0;
+	for (const char *key = strtok(keys, "\\"); key; key = strtok(nullptr, "\\"))
+	{
+		const char *value = Info_ValueForKey(srcInfo, key);
+
+		if (value[0] == '\0')
+			continue;
+
+		// Integer fields
+		if (!Q_strcmp(key, "*hltv")
+		 || !Q_strcmp(key, "bottomcolor")
+		 || !Q_strcmp(key, "topcolor"))
+		{
+			int intValue = Q_atoi(value);
+
+			if (!intValue)
+				continue;
+
+			destInfo[userInfoLength++] = '\\';
+			Q_strcpy(&destInfo[userInfoLength], key);
+			userInfoLength += Q_strlen(key);
+
+			destInfo[userInfoLength++] = '\\';
+			userInfoLength += Q_sprintf(&destInfo[userInfoLength], "%d", intValue);
+		}
+		// String fields
+		else
+		{
+			destInfo[userInfoLength++] = '\\';
+			Q_strcpy(&destInfo[userInfoLength], key);
+			userInfoLength += Q_strlen(key);
+
+			destInfo[userInfoLength++] = '\\';
+			Q_strcpy(&destInfo[userInfoLength], value);
+			userInfoLength += Q_strlen(value);
+		}
+
+	}
+	destInfo[userInfoLength] = '\0';
+}
+#endif

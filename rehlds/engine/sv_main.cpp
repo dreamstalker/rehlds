@@ -306,6 +306,7 @@ cvar_t sv_rehlds_force_dlmax = { "sv_rehlds_force_dlmax", "0", 0, 0.0f, nullptr 
 cvar_t listipcfgfile = { "listipcfgfile", "listip.cfg", 0, 0.0f, nullptr };
 cvar_t sv_rehlds_hull_centering = { "sv_rehlds_hull_centering", "0", 0, 0.0f, nullptr };
 cvar_t sv_rcon_condebug = { "sv_rcon_condebug", "1", 0, 1.0f, nullptr };
+cvar_t sv_rehlds_userinfo_transmitted_fields = { "sv_rehlds_userinfo_transmitted_fields", "", 0, 0.0f, nullptr };
 #endif
 
 /* <a6492> ../engine/sv_main.c:113 */
@@ -3829,9 +3830,18 @@ void SV_FullClientUpdate(client_t *cl, sizebuf_t *sb)
 {
 	char info[MAX_INFO_STRING];
 
-	Q_strncpy(info, cl->userinfo, sizeof(info) - 1);
-	info[sizeof(info) - 1] = 0;
-	Info_RemovePrefixedKeys(info, '_');
+#ifdef REHLDS_FIXES
+	if (sv_rehlds_userinfo_transmitted_fields.string[0] != '\0')
+	{
+		Info_CollectFields(info, cl->userinfo, sv_rehlds_userinfo_transmitted_fields.string);
+	}
+	else
+#endif // REHLDS_FIXES
+	{
+		Q_strncpy(info, cl->userinfo, sizeof(info) - 1);
+		info[sizeof(info) - 1] = 0;
+		Info_RemovePrefixedKeys(info, '_');
+	}
 
 	g_RehldsHookchains.m_SV_WriteFullClientUpdate.callChain(SV_WriteFullClientUpdate_internal, GetRehldsApiClient(cl), info, MAX_INFO_STRING, sb, GetRehldsApiClient((sb == &g_psv.reliable_datagram) ? NULL : host_client));
 }
@@ -7801,6 +7811,7 @@ void SV_Init(void)
 	Cvar_RegisterVariable(&sv_rehlds_force_dlmax);
 	Cvar_RegisterVariable(&sv_rehlds_hull_centering);
 	Cvar_RegisterVariable(&sv_rcon_condebug);
+	Cvar_RegisterVariable(&sv_rehlds_userinfo_transmitted_fields);
 #endif
 	
 	for (int i = 0; i < MAX_MODELS; i++)
