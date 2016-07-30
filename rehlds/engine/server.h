@@ -545,6 +545,7 @@ extern cvar_t sv_delayed_spray_upload;
 extern cvar_t sv_rehlds_force_dlmax;
 extern cvar_t sv_rehlds_hull_centering;
 extern cvar_t sv_rcon_condebug;
+extern cvar_t sv_rehlds_userinfo_transmitted_fields;
 #endif
 extern int sv_playermodel;
 
