@@ -176,6 +176,11 @@ void SV_Impact(edict_t *e1, edict_t *e2, trace_t *ptrace)
 	{
 		SV_SetGlobalTrace(ptrace);
 		gEntityInterface.pfnTouch(e1, e2);
+
+#ifdef REHLDS_FIXES
+		if ((e1->v.flags & FL_KILLME) || (e2->v.flags & FL_KILLME))
+			return;
+#endif // REHLDS_FIXES
 	}
 	if (e2->v.solid)
 	{
@@ -784,7 +789,11 @@ void SV_Physics_Pusher(edict_t *ent)
 			ent->v.angles[i] = fmod(ent->v.angles[i], 3600.0f);
 	}
 
-	if (thinktime > oldltime && ((ent->v.flags & FL_ALWAYSTHINK) || thinktime <= ent->v.ltime))
+	if (thinktime > oldltime && ((ent->v.flags & FL_ALWAYSTHINK) || thinktime <= ent->v.ltime)
+#ifdef REHLDS_FIXES
+	 && !(ent->v.flags & FL_KILLME)
+#endif // REHLDS_FIXES
+	)
 	{
 		ent->v.nextthink = 0;
 		gGlobalVariables.time = (float) g_psv.time;
