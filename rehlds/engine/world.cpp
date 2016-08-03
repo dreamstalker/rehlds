@@ -349,6 +349,11 @@ void SV_TouchLinks(edict_t *ent, areanode_t *node)
 			}
 		}
 
+#ifdef REHLDS_FIXES
+		if ((ent->v.flags & FL_KILLME) || (touch->v.flags & FL_KILLME))
+			continue;
+#endif // REHLDS_FIXES
+
 		if (touch->v.solid == SOLID_TRIGGER
 			&& ent->v.absmin[0] <= touch->v.absmax[0]
 			&& ent->v.absmin[1] <= touch->v.absmax[1]
