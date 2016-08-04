@@ -570,7 +570,6 @@ void Host_Status_f(void)
 	qboolean bConnectedToSteam3;
 	const char *pchConnectionString = "";
 	const char *pchSteamUniverse = "";
-	char szfile[260];
 
 	if (cmd_source == src_command)
 	{
@@ -583,12 +582,15 @@ void Host_Status_f(void)
 		}
 	}
 
+#ifndef REHLDS_FIXES // Remove Useless Stuff
+	char szfile[260];
 	if (Cmd_Argc() == 2 && !Q_stricmp(Cmd_Argv(1), "log"))
 	{
 		log = TRUE;
 		Q_snprintf(szfile, sizeof(szfile), "%s", "status.log");
 		_unlink(szfile);
 	}
+#endif // REHLDS_FIXES
 
 	Host_Status_Printf(conprint, log, "hostname:  %s\n", Cvar_VariableString("hostname"));
 

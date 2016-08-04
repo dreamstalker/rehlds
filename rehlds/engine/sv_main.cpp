@@ -1690,6 +1690,14 @@ void EXT_FUNC SV_Spawn_f_internal(void)
 		return;
 	}
 
+#ifdef REHLDS_FIXES
+	// Is already spawn
+	if (host_client->spawned)
+	{
+		return;
+	}
+#endif // REHLDS_FIXES
+
 	host_client->crcValue = Q_atoi(Cmd_Argv(2));
 
 	COM_UnMunge2((unsigned char *)&host_client->crcValue, 4, (-1 - g_psvs.spawncount) & 0xFF);

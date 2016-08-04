@@ -53,7 +53,11 @@ qboolean nofind;
 */
 #ifndef HOOK_ENGINE
 
+#if defined(SWDS) && defined(REHLDS_FIXES)
+command_t clcommands[] = { "status", "name", "kill", "pause", "spawn", "new", "sendres", "dropclient", "kick", "ping", "dlfile", "setinfo", "sendents", "fullupdate", "setpause", "unpause", NULL };
+#else
 command_t clcommands[23] = { "status", "god", "notarget", "fly", "name", "noclip", "kill", "pause", "spawn", "new", "sendres", "dropclient", "kick", "ping", "dlfile", "nextdl", "setinfo", "showinfo", "sendents", "fullupdate", "setpause", "unpause", NULL };
+#endif
 
 cvar_t sv_edgefriction = { "edgefriction", "2", FCVAR_SERVER, 0.0f, NULL };
 cvar_t sv_maxspeed = { "sv_maxspeed", "320", FCVAR_SERVER, 0.0f, NULL };
@@ -1817,7 +1821,12 @@ void SV_ShowServerinfo_f(void)
 	}
 	else
 	{
+#ifdef REHLDS_FIXES
+		// fix print message client console
+		SV_ClientPrintf(Info_Serverinfo());
+#else
 		Info_Print(Info_Serverinfo());
+#endif // REHLDS_FIXES
 	}
 }
 
