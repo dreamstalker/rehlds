@@ -1060,7 +1060,11 @@ qboolean NET_QueuePacket(netsrc_t sock)
 		}
 		else
 		{
+#ifdef REHLDS_FIXES
+			Con_DPrintf("Invalid split packet length %i\n", in_message.cursize);
+#else
 			Con_Printf("Invalid split packet length %i\n", in_message.cursize);
+#endif
 			return FALSE;
 		}
 	}

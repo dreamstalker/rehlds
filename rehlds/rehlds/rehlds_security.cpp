@@ -1,14 +1,14 @@
 #include "precompiled.h"
 
-cvar_t sv_rehlds_movecmdrate_max_avg = { "sv_rehlds_movecmdrate_max_avg", "400", 0, 400.0f, NULL };
-cvar_t sv_rehlds_movecmdrate_max_burst = { "sv_rehlds_movecmdrate_max_burst", "2500", 0, 2500.0f, NULL };
-cvar_t sv_rehlds_stringcmdrate_max_avg = {"sv_rehlds_stringcmdrate_max_avg", "80", 0, 80.0f, NULL};
-cvar_t sv_rehlds_stringcmdrate_max_burst = {"sv_rehlds_stringcmdrate_max_burst", "400", 0, 400.0f, NULL};
+cvar_t sv_rehlds_movecmdrate_max_avg = { "sv_rehlds_movecmdrate_max_avg", "1800", 0, 1800.0f, NULL };
+cvar_t sv_rehlds_movecmdrate_max_burst = { "sv_rehlds_movecmdrate_max_burst", "5500", 0, 5500.0f, NULL };
+cvar_t sv_rehlds_stringcmdrate_max_avg = { "sv_rehlds_stringcmdrate_max_avg", "250", 0, 250.0f, NULL };
+cvar_t sv_rehlds_stringcmdrate_max_burst = { "sv_rehlds_stringcmdrate_max_burst", "500", 0, 500.0f, NULL };
 
 cvar_t sv_rehlds_movecmdrate_avg_punish = { "sv_rehlds_movecmdrate_avg_punish", "5", 0, 5.0f, NULL };
 cvar_t sv_rehlds_movecmdrate_burst_punish = { "sv_rehlds_movecmdrate_burst_punish", "5", 0, 5.0f, NULL };
-cvar_t sv_rehlds_stringcmdrate_avg_punish = {"sv_rehlds_stringcmdrate_avg_punish", "5", 0, 5.0f, NULL};
-cvar_t sv_rehlds_stringcmdrate_burst_punish = {"sv_rehlds_stringcmdrate_burst_punish", "5", 0, 5.0f, NULL};
+cvar_t sv_rehlds_stringcmdrate_avg_punish = { "sv_rehlds_stringcmdrate_avg_punish", "5", 0, 5.0f, NULL };
+cvar_t sv_rehlds_stringcmdrate_burst_punish = { "sv_rehlds_stringcmdrate_burst_punish", "5", 0, 5.0f, NULL };
 
 CMoveCommandRateLimiter g_MoveCommandRateLimiter;
 CStringCommandsRateLimiter g_StringCommandsRateLimiter;
@@ -62,9 +62,12 @@ void CMoveCommandRateLimiter::CheckBurstRate(unsigned int clientId) {
 	}
 	if ((m_CurrentMoveCmds[clientId] / dt) > sv_rehlds_movecmdrate_max_burst.value) {
 		if(sv_rehlds_movecmdrate_burst_punish.value < 0) {
+			Con_DPrintf("%s Kicked for move commands flooding (burst) (%.1f)\n", cl->name, (m_CurrentMoveCmds[clientId] / dt));
 			SV_DropClient(cl, false, "Kicked for move commands flooding (burst)");
 		}
-		else {
+		else
+		{
+			Con_DPrintf("%s Banned for move commands flooding (burst) (%.1f)\n", cl->name, (m_CurrentMoveCmds[clientId] / dt));
 			Cbuf_AddText(va("addip %.1f %s\n", sv_rehlds_movecmdrate_burst_punish.value, NET_BaseAdrToString(cl->netchan.remote_address)));
 			SV_DropClient(cl, false, "Banned for move commands flooding (burst)");
 		}
@@ -76,12 +79,15 @@ void CMoveCommandRateLimiter::CheckAverageRate(unsigned int clientId) {
 	if (!cl->active || sv_rehlds_movecmdrate_max_burst.value <= 0.0f) {
 		return;
 	}
-
+	
 	if (m_AverageMoveCmdRate[clientId] > sv_rehlds_movecmdrate_max_avg.value) {
 		if(sv_rehlds_movecmdrate_avg_punish.value < 0) {
+			Con_DPrintf("%s Kicked for move commands flooding (Avg) (%.1f)\n", cl->name, m_AverageMoveCmdRate[clientId]);
 			SV_DropClient(cl, false, "Kicked for move commands flooding (Avg)");
 		}
-		else {
+		else
+		{
+			Con_DPrintf("%s Banned for move commands flooding (Avg) (%.1f)\n", cl->name, m_AverageMoveCmdRate[clientId]);
 			Cbuf_AddText(va("addip %.1f %s\n", sv_rehlds_movecmdrate_avg_punish.value, NET_BaseAdrToString(cl->netchan.remote_address)));
 			SV_DropClient(cl, false, "Banned for move commands flooding (Avg)");
 		}
@@ -137,9 +143,12 @@ void CStringCommandsRateLimiter::CheckBurstRate(unsigned int clientId) {
 	}
 	if ((m_CurrentStringCmds[clientId] / dt) > sv_rehlds_stringcmdrate_max_burst.value) {
 		if(sv_rehlds_stringcmdrate_burst_punish.value < 0) {
+			Con_DPrintf("%s Kicked for string commands flooding (burst) (%.1f)\n", cl->name, (m_CurrentStringCmds[clientId] / dt));
 			SV_DropClient(cl, false, "Kicked for string commands flooding (burst)");
 		}
-		else {
+		else
+		{
+			Con_DPrintf("%s Banned for string commands flooding (burst) (%.1f)\n", cl->name, (m_CurrentStringCmds[clientId] / dt));
 			Cbuf_AddText(va("addip %.1f %s\n", sv_rehlds_stringcmdrate_burst_punish.value, NET_BaseAdrToString(cl->netchan.remote_address)));
 			SV_DropClient(cl, false, "Banned for string commands flooding (burst)");
 		}
@@ -154,9 +163,12 @@ void CStringCommandsRateLimiter::CheckAverageRate(unsigned int clientId) {
 
 	if (m_AverageStringCmdRate[clientId] > sv_rehlds_stringcmdrate_max_avg.value) {
 		if(sv_rehlds_stringcmdrate_avg_punish.value < 0) {
+			Con_DPrintf("%s Kicked for string commands flooding (Avg) (%.1f)\n", cl->name, m_AverageStringCmdRate[clientId]);
 			SV_DropClient(cl, false, "Kicked for string commands flooding (Avg)");
 		}
-		else {
+		else
+		{
+			Con_DPrintf("%s Banned for string commands flooding (Avg) (%.1f)\n", cl->name, m_AverageStringCmdRate[clientId]);
 			Cbuf_AddText(va("addip %.1f %s\n", sv_rehlds_stringcmdrate_avg_punish.value, NET_BaseAdrToString(cl->netchan.remote_address)));
 			SV_DropClient(cl, false, "Banned for string commands flooding (Avg)");
 		}
@@ -169,6 +181,11 @@ void Rehlds_Security_Init() {
 	Cvar_RegisterVariable(&sv_rehlds_movecmdrate_max_burst);
 	Cvar_RegisterVariable(&sv_rehlds_stringcmdrate_max_avg);
 	Cvar_RegisterVariable(&sv_rehlds_stringcmdrate_max_burst);
+
+	Cvar_RegisterVariable(&sv_rehlds_movecmdrate_avg_punish);
+	Cvar_RegisterVariable(&sv_rehlds_movecmdrate_burst_punish);
+	Cvar_RegisterVariable(&sv_rehlds_stringcmdrate_avg_punish);
+	Cvar_RegisterVariable(&sv_rehlds_stringcmdrate_burst_punish);
 #endif
 }
 
