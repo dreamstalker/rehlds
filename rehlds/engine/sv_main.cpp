@@ -6761,11 +6761,15 @@ void SV_RemoveId_f(void)
 		}
 		slot--;
 
-		USERID_t id;
-		Q_memcpy(&id, &userfilters[slot].userid, sizeof(id));
+		USERID_t id = userfilters[slot].userid;
 
+#ifdef REHLDS_FIXES
+		// memmove must support zero num
+		Q_memmove(&userfilters[slot], &userfilters[slot + 1], (numuserfilters - (slot + 1)) * sizeof(userfilter_t));
+#else // REHLDS_FIXES
 		if (slot + 1 < numuserfilters)
 			Q_memcpy(&userfilters[slot], &userfilters[slot + 1], (numuserfilters - (slot + 1)) * sizeof(userfilter_t));
+#endif // REHLDS_FIXES
 		
 		numuserfilters--;
 		Con_Printf("UserID filter removed for %s, id %s\n", idstring, SV_GetIDString(&id));
@@ -6773,7 +6777,9 @@ void SV_RemoveId_f(void)
 	else
 	{
 #ifdef REHLDS_FIXES
-		idstring = SV_GetIDString(SV_StringToUserID(idstring));
+		// Wanna use Mem_Strdup, but it is a heap allocation and need properly free (after Con_Printf and before return, in two places)
+		char _idstring[64]; // TODO: create a constant for 64 magic number
+		idstring = Q_strcpy(_idstring, SV_GetIDString(SV_StringToUserID(idstring)));
 #else
 		if (!Q_strnicmp(idstring, "STEAM_", 6) || !Q_strnicmp(idstring, "VALVE_", 6))
 		{
@@ -6786,8 +6792,13 @@ void SV_RemoveId_f(void)
 		{
 			if (!Q_stricmp(SV_GetIDString(&userfilters[i].userid), idstring))
 			{
+#ifdef REHLDS_FIXES
+				// memmove must support zero num
+				Q_memmove(&userfilters[i], &userfilters[i + 1], (numuserfilters - (i + 1)) * sizeof(userfilter_t));
+#else // REHLDS_FIXES
 				if (i + 1 < numuserfilters)
-					Q_memmove(&userfilters[i], &userfilters[i + 1], (numuserfilters - (i + 1)) * sizeof(userfilter_t));
+					Q_memcpy(&userfilters[i], &userfilters[i + 1], (numuserfilters - (i + 1)) * sizeof(userfilter_t));
+#endif // REHLDS_FIXES
 
 				numuserfilters--;
 				Con_Printf("UserID filter removed for %s\n", idstring);
@@ -6838,11 +6849,11 @@ void SV_ListId_f(void)
 	{
 		if (userfilters[i].banTime == 0.0f)
 		{
-			Con_Printf("%i %s : permanent\n", i, SV_GetIDString(&userfilters[i].userid));
+			Con_Printf("%i %s : permanent\n", i+1, SV_GetIDString(&userfilters[i].userid));
 		}
 		else
 		{
-			Con_Printf("%i %s : %.3f min\n", i, SV_GetIDString(&userfilters[i].userid), userfilters[i].banTime);
+			Con_Printf("%i %s : %.3f min\n", i+1, SV_GetIDString(&userfilters[i].userid), userfilters[i].banTime);
 		}
 	}
 }
