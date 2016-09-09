@@ -434,11 +434,19 @@ void R_StudioCalcBonePosition(int frame, float s, mstudiobone_t *pbone, mstudioa
 				// and there's more data in the span
 				if (panimvalue->num.valid > k + 1)
 				{
+#ifdef REHLDS_FIXES
+					pos[j] += ((long double)panimvalue[k + 1].value * (1.0f - s) + s * (long double)panimvalue[k + 2].value) * pbone->scale[j];
+#else // REHLDS_FIXES
 					pos[j] += (panimvalue[k + 1].value * (1.0f - s) + s * panimvalue[k + 2].value) * pbone->scale[j];
+#endif // REHLDS_FIXES
 				}
 				else
 				{
+#ifdef REHLDS_FIXES
+					pos[j] += (long double)panimvalue[k + 1].value * pbone->scale[j];
+#else // REHLDS_FIXES
 					pos[j] += panimvalue[k + 1].value * pbone->scale[j];
+#endif // REHLDS_FIXES
 				}
 			}
 			else
@@ -446,11 +454,19 @@ void R_StudioCalcBonePosition(int frame, float s, mstudiobone_t *pbone, mstudioa
 				// are we at the end of the repeating values section and there's another section with data?
 				if (panimvalue->num.total <= k + 1)
 				{
+#ifdef REHLDS_FIXES
+					pos[j] += ((long double)panimvalue[panimvalue->num.valid].value * (1.0f - s) + s * (long double)panimvalue[panimvalue->num.valid + 2].value) * pbone->scale[j];
+#else // REHLDS_FIXES
 					pos[j] += (panimvalue[panimvalue->num.valid].value * (1.0f - s) + s * panimvalue[panimvalue->num.valid + 2].value) * pbone->scale[j];
+#endif // REHLDS_FIXES
 				}
 				else
 				{
+#ifdef REHLDS_FIXES
+					pos[j] += (long double)panimvalue[panimvalue->num.valid].value * pbone->scale[j];
+#else // REHLDS_FIXES
 					pos[j] += panimvalue[panimvalue->num.valid].value * pbone->scale[j];
+#endif // REHLDS_FIXES
 				}
 			}
 		}
