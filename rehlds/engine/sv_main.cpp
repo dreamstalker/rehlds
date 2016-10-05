@@ -2297,7 +2297,7 @@ void EXT_FUNC SV_ConnectClient_internal(void)
 {
 	client_t *client;
 	netadr_t adr;
-	int nClientSlot;
+	int nClientSlot = 0;
 #ifdef REHLDS_FIXES
 	char userinfo[MAX_INFO_STRING];
 #else
@@ -2367,11 +2367,23 @@ void EXT_FUNC SV_ConnectClient_internal(void)
 		for (nClientSlot = 0; nClientSlot < g_psvs.maxclients; nClientSlot++)
 		{
 			client = &g_psvs.clients[nClientSlot];
+#ifndef REHLDS_FIXES
 			if (NET_CompareAdr(adr, client->netchan.remote_address))
 			{
 				reconnect = TRUE;
 				break;
 			}
+#else // REHLDS_FIXES
+			auto isTimedOut = [](client_t* cl)
+			{
+				return realtime - cl->netchan.last_received > 10.0;
+			};
+
+			if (NET_CompareBaseAdr(adr, client->netchan.remote_address) && (adr.port == client->netchan.remote_address.port || isTimedOut(client))) {
+				reconnect = TRUE;
+				break;
+			}
+#endif // REHLDS_FIXES
 		}
 	}
 	
