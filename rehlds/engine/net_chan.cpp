@@ -38,13 +38,13 @@ char gDownloadFile[256];
 */
 #ifndef HOOK_ENGINE
 
-cvar_t net_log = { "net_log", "0", 0, 0.0f, NULL };
-cvar_t net_showpackets = { "net_showpackets", "0", 0, 0.0f, NULL };
-cvar_t net_showdrop = { "net_showdrop", "0", 0, 0.0f, NULL };
-cvar_t net_drawslider = { "net_drawslider", "0", 0, 0.0f, NULL };
-cvar_t net_chokeloopback = { "net_chokeloop", "0", 0, 0.0f, NULL };
-cvar_t sv_filetransfercompression = { "sv_filetransfercompression", "1", 0, 0.0f, NULL };
-cvar_t sv_filetransfermaxsize = { "sv_filetransfermaxsize", "10485760", 0, 0.0f, NULL };
+cvar_t net_log = { "net_log", "0", 0, 0.0f, nullptr};
+cvar_t net_showpackets = { "net_showpackets", "0", 0, 0.0f, nullptr};
+cvar_t net_showdrop = { "net_showdrop", "0", 0, 0.0f, nullptr};
+cvar_t net_drawslider = { "net_drawslider", "0", 0, 0.0f, nullptr};
+cvar_t net_chokeloopback = { "net_chokeloop", "0", 0, 0.0f, nullptr};
+cvar_t sv_filetransfercompression = { "sv_filetransfercompression", "1", 0, 0.0f, nullptr};
+cvar_t sv_filetransfermaxsize = { "sv_filetransfermaxsize", "10485760", 0, 0.0f, nullptr};
 
 #else //HOOK_ENGINE
 
@@ -63,7 +63,7 @@ void Netchan_UnlinkFragment(fragbuf_t *buf, fragbuf_t **list)
 {
 	fragbuf_t *search;
 
-	if (list == NULL)
+	if (list == nullptr)
 	{
 		Con_Printf(__FUNCTION__ ": Asked to unlink fragment from empty list, ignored\n");
 		return;
@@ -144,7 +144,7 @@ void Netchan_ClearFragbufs(fragbuf_t **ppbuf)
 		Mem_Free(buf);
 		buf = n;
 	}
-	*ppbuf = NULL;
+	*ppbuf = nullptr;
 }
 
 /* <65810> ../engine/net_chan.c:220 */
@@ -161,7 +161,7 @@ void Netchan_ClearFragments(netchan_t *chan)
 			Mem_Free(wait);
 			wait = next;
 		}
-		chan->waitlist[i] = NULL;
+		chan->waitlist[i] = nullptr;
 
 		Netchan_ClearFragbufs(&chan->fragbufs[i]);
 		Netchan_FlushIncoming(chan, i);
@@ -195,7 +195,7 @@ void Netchan_Clear(netchan_t *chan)
 	if (chan->tempbuffer)
 	{
 		Mem_Free(chan->tempbuffer);
-		chan->tempbuffer = NULL;
+		chan->tempbuffer = nullptr;
 	}
 	chan->tempbuffersize = 0;
 }
@@ -537,9 +537,8 @@ void Netchan_Transmit(netchan_t *chan, int length, byte *data)
 	// Deal with packets that are too small for some networks
 	if (sb_send.cursize < 16)	// Packet too small for some networks
 	{
-		int i;
 		// Go ahead and pad a full 16 extra bytes -- this only happens during authentication / signon
-		for (i = sb_send.cursize; i < 16; i++)
+		for (int i = sb_send.cursize; i < 16; i++)
 		{
 			// Note that the server can parse svc_nop, too.
 			MSG_WriteByte(&sb_send, svc_nop);
@@ -601,7 +600,7 @@ fragbuf_t *Netchan_FindBufferById(fragbuf_t **pplist, int id, qboolean allocate)
 	}
 
 	if (!allocate)
-		return NULL;
+		return nullptr;
 
 	// Create new entry
 	pnewbuf = Netchan_AllocFragbuf();
@@ -981,7 +980,7 @@ void Netchan_FragSend(netchan_t *chan)
 		}
 #endif // REHLDS_FIXES
 
-		wait->next = NULL;
+		wait->next = nullptr;
 
 		// Copy in to fragbuf
 		chan->fragbufs[i] = wait->fragbufs;
@@ -999,7 +998,7 @@ void Netchan_AddBufferToList(fragbuf_t **pplist, fragbuf_t *pbuf)
 	fragbuf_t *pprev, *n;
 	int		id1, id2;
 
-	pbuf->next = NULL;
+	pbuf->next = nullptr;
 
 	if (!pplist)
 		return;
@@ -1044,7 +1043,7 @@ fragbuf_t *Netchan_AllocFragbuf(void)
 	buf->frag_message.data = buf->frag_message_buf;
 	buf->frag_message.maxsize = sizeof(buf->frag_message_buf);
 	buf->frag_message.buffername = "Frag Buffer Alloc'd";
-	buf->next = 0;
+	buf->next = nullptr;
 
 	return buf;
 }
@@ -1054,7 +1053,7 @@ void Netchan_AddFragbufToTail(fragbufwaiting_t *wait, fragbuf_t *buf)
 {
 	fragbuf_t *p;
 
-	buf->next = 0;
+	buf->next = nullptr;
 	wait->fragbufcount++;
 
 	p = wait->fragbufs;
@@ -1475,7 +1474,7 @@ void Netchan_FlushIncoming(netchan_t *chan, int stream)
 		p = n;
 	};
 
-	chan->incomingbufs[stream] = NULL;
+	chan->incomingbufs[stream] = nullptr;
 	chan->incomingready[stream] = FALSE;
 }
 
@@ -1527,8 +1526,8 @@ qboolean Netchan_CopyNormalFragments(netchan_t *chan)
 
 		SZ_Clear(&net_message);
 
-		chan->incomingbufs[FRAG_NORMAL_STREAM] = NULL;
-		chan->incomingready[FRAG_NORMAL_STREAM] = false;
+		chan->incomingbufs[FRAG_NORMAL_STREAM] = nullptr;
+		chan->incomingready[FRAG_NORMAL_STREAM] = FALSE;
 
 		return FALSE;
 	}
@@ -1543,8 +1542,8 @@ qboolean Netchan_CopyNormalFragments(netchan_t *chan)
 		net_message.cursize = uncompressedSize;
 	}
 
-	chan->incomingbufs[FRAG_NORMAL_STREAM] = NULL;
-	chan->incomingready[FRAG_NORMAL_STREAM] = false;
+	chan->incomingbufs[FRAG_NORMAL_STREAM] = nullptr;
+	chan->incomingready[FRAG_NORMAL_STREAM] = FALSE;
 
 	return TRUE;
 }
@@ -1617,8 +1616,8 @@ qboolean Netchan_CopyFileFragments(netchan_t *chan)
 		Netchan_FlushIncoming(chan, 1);
 		return FALSE;
 	}
-
-	if (g_pcls.state != ca_dedicated && filename[0] != '!')
+	// This prohibits to write files to FS on server
+	if (g_pcls.state == ca_dedicated && filename[0] != '!')
 	{
 		Con_Printf("File fragment received with bad path, ignoring (2)\n");
 		Netchan_FlushIncoming(chan, 1);
@@ -1699,58 +1698,51 @@ qboolean Netchan_CopyFileFragments(netchan_t *chan)
 	}
 	else
 	{
-
-#ifdef REHLDS_FIXES
-		//Don't allow to write files to FS on server
-		if (chan == &g_pcls.netchan)
-#endif // REHLDS_FIXES
-		{
-			char filedir[MAX_PATH];
-			char *pszFileName;
-			FileHandle_t handle;
+		char filedir[MAX_PATH];
+		char *pszFileName;
+		FileHandle_t handle;
 
 #ifdef REHLDS_CHECKS
-			Q_strncpy(filedir, filename, sizeof(filedir) - 1);
-			filedir[sizeof(filedir) - 1] = 0;
+		Q_strncpy(filedir, filename, sizeof(filedir) - 1);
+		filedir[sizeof(filedir) - 1] = 0;
 #else
-			Q_strncpy(filedir, filename, sizeof(filedir));
+		Q_strncpy(filedir, filename, sizeof(filedir));
 #endif // REHLDS_CHECKS
-			COM_FixSlashes(filedir);
-			pszFileName = Q_strrchr(filedir, '\\');
-			if (pszFileName)
-			{
-				*pszFileName = 0;
+		COM_FixSlashes(filedir);
+		pszFileName = Q_strrchr(filedir, '\\');
+		if (pszFileName)
+		{
+			*pszFileName = 0;
 
 #ifdef REHLDS_FIXES
-				FS_CreateDirHierarchy(filedir, "GAMEDOWNLOAD");
-#endif
-			}
-
-#ifndef REHLDS_FIXES
 			FS_CreateDirHierarchy(filedir, "GAMEDOWNLOAD");
 #endif
-			handle = FS_OpenPathID(filename, "wb", "GAMEDOWNLOAD");
-			if (!handle)
-			{
-				Con_Printf("File open failed %s\n", filename);
-				Netchan_FlushIncoming(chan, 1);
+		}
+
+#ifndef REHLDS_FIXES
+		FS_CreateDirHierarchy(filedir, "GAMEDOWNLOAD");
+#endif
+		handle = FS_OpenPathID(filename, "wb", "GAMEDOWNLOAD");
+		if (!handle)
+		{
+			Con_Printf("File open failed %s\n", filename);
+			Netchan_FlushIncoming(chan, 1);
 
 #ifdef REHLDS_FIXES
-				Mem_Free(buffer);
+			Mem_Free(buffer);
 #endif
-				return FALSE;
-			}
-
-			Sys_Printf("COM_WriteFile: %s\n", filename);
-			FS_Write(buffer, pos, 1, handle);
-			FS_Close(handle);
+			return FALSE;
 		}
+
+		Sys_Printf("COM_WriteFile: %s\n", filename);
+		FS_Write(buffer, pos, 1, handle);
+		FS_Close(handle);
 
 		Mem_Free(buffer);
 	}
 	SZ_Clear(&net_message);
-	chan->incomingbufs[FRAG_FILE_STREAM] = 0;
-	chan->incomingready[FRAG_FILE_STREAM] = 0;
+	chan->incomingbufs[FRAG_FILE_STREAM] = nullptr;
+	chan->incomingready[FRAG_FILE_STREAM] = FALSE;
 	msg_readcount = 0;
 	return TRUE;
 }
