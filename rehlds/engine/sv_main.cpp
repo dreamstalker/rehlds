@@ -1624,8 +1624,12 @@ void SV_New_f(void)
 	if (!gEntityInterface.pfnClientConnect(ent, szName, szAddress, szRejectReason))
 	{
 		// Reject the connection and drop the client.
+#ifdef REHLDS_FIXES
+		SV_ClientPrintf("%s\n", szRejectReason);
+#else // REHLDS_FIXES
 		MSG_WriteByte(&host_client->netchan.message, svc_stufftext);
 		MSG_WriteString(&host_client->netchan.message, va("echo %s\n", szRejectReason));
+#endif // REHLDS_FIXES
 		SV_DropClient(host_client, FALSE, "Server refused connection because:  %s", szRejectReason);
 		return;
 	}
@@ -3504,11 +3508,7 @@ void SV_ConnectionlessPacket(void)
 	}
 	else if (c[0] == A2A_ACK && (c[1] == 0 || c[1] == '\n'))
 	{
-#ifdef REHLDS_FIXES
-		Con_DPrintf("A2A_ACK from %s\n", NET_AdrToString(net_from));
-#else // REHLDS_FIXES
-		Con_Printf("A2A_ACK from %s\n", NET_AdrToString(net_from));
-#endif // REHLDS_FIXES
+		Con_NetPrintf("A2A_ACK from %s\n", NET_AdrToString(net_from));
 	}
 	else if (c[0] == A2A_GETCHALLENGE || c[0] == A2S_INFO || c[0] == A2S_PLAYER || c[0] == A2S_RULES ||
 		c[0] == S2A_LOGSTRING || c[0] == M2S_REQUESTRESTART || c[0] == M2A_CHALLENGE)

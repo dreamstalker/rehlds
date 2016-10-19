@@ -1778,7 +1778,12 @@ void SV_ExecuteClientMessage(client_t *cl)
 	{
 		if (msg_badread)
 		{
+#ifdef REHLDS_FIXES
+			Con_Printf("SV_ReadClientMessage: badread on %s\n", host_client->name);
+			SV_ClientPrintf("Badread\n");
+#else // REHLDS_FIXES
 			Con_Printf("SV_ReadClientMessage: badread\n");
+#endif // REHLDS_FIXES
 			return;
 		}
 
