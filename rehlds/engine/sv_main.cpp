@@ -4607,7 +4607,17 @@ void SV_UpdateUserInfo(client_t *pClient)
 	pClient->sendinfo = FALSE;
 	pClient->sendinfo_time = realtime + 1.0;
 	SV_ExtractFromUserinfo(pClient);
+#ifdef REHLDS_FIXES
+	for (int i = 0; i < g_psvs.maxclients; i++)
+	{
+		if (!g_psvs.clients[i].connected)
+			continue;
+
+		SV_FullClientUpdate(pClient, &g_psvs.clients[i].netchan.message);
+	}
+#else // REHLDS_FIXES
 	SV_FullClientUpdate(pClient, &g_psv.reliable_datagram);
+#endif // REHLDS_FIXES
 }
 
 void SV_UpdateToReliableMessages(void)

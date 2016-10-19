@@ -2171,26 +2171,47 @@ void EXT_FUNC PF_MessageEnd_I(void)
 				);
 		}
 	}
-
-	sizebuf_t * pBuffer = WriteDest_Parm(gMsgDest);
-	if ((!gMsgDest && gMsgBuffer.cursize + pBuffer->cursize > pBuffer->maxsize) || !pBuffer->data)
-		return;
-
-	if (gMsgType > svc_startofusermessages && (gMsgDest == MSG_ONE || gMsgDest == MSG_ONE_UNRELIABLE))
+#ifdef REHLDS_FIXES
+	auto writer = [MsgIsVarLength]
+#endif
 	{
-		int entnum = NUM_FOR_EDICT((const edict_t *)gMsgEntity);
-		if (entnum < 1 || entnum > g_psvs.maxclients)
-			Host_Error("WriteDest_Parm: not a client");
-
-		client_t* client = &g_psvs.clients[entnum - 1];
-		if (client->fakeclient || !client->hasusrmsgs || (!client->active && !client->spawned))
+		sizebuf_t * pBuffer = WriteDest_Parm(gMsgDest);
+		if ((gMsgDest == MSG_BROADCAST && gMsgBuffer.cursize + pBuffer->cursize > pBuffer->maxsize) || !pBuffer->data)
 			return;
-	}
 
-	MSG_WriteByte(pBuffer, gMsgType);
-	if (MsgIsVarLength)
-		MSG_WriteByte(pBuffer, gMsgBuffer.cursize);
-	MSG_WriteBuf(pBuffer, gMsgBuffer.cursize, gMsgBuffer.data);
+		if (gMsgType > svc_startofusermessages && (gMsgDest == MSG_ONE || gMsgDest == MSG_ONE_UNRELIABLE))
+		{
+			int entnum = NUM_FOR_EDICT((const edict_t *)gMsgEntity);
+			if (entnum < 1 || entnum > g_psvs.maxclients)
+				Host_Error("WriteDest_Parm: not a client");
+
+			client_t* client = &g_psvs.clients[entnum - 1];
+			if (client->fakeclient || !client->hasusrmsgs || (!client->active && !client->spawned))
+				return;
+		}
+
+		MSG_WriteByte(pBuffer, gMsgType);
+		if (MsgIsVarLength)
+			MSG_WriteByte(pBuffer, gMsgBuffer.cursize);
+		MSG_WriteBuf(pBuffer, gMsgBuffer.cursize, gMsgBuffer.data);
+	}
+#ifdef REHLDS_FIXES
+	;
+
+	if (gMsgDest == MSG_ALL) {
+		gMsgDest = MSG_ONE;
+		for (int i = 0; i < g_psvs.maxclients; i++) {
+			gMsgEntity = g_psvs.clients[i].edict;
+			if (gMsgEntity == nullptr)
+				continue;
+			if (FBitSet(gMsgEntity->v.flags, FL_FAKECLIENT))
+				continue;
+			writer();
+		}
+	} else {
+		writer();
+	}
+#endif
 
 	switch (gMsgDest)
 	{
