@@ -881,7 +881,7 @@ qboolean NET_GetLong(unsigned char *pData, int size, int *outSize)
 
 	if (packetNumber >= NET_WS_MAX_FRAGMENTS || packetCount > NET_WS_MAX_FRAGMENTS)
 	{
-		Con_Printf("Malformed packet number (%i/%i)\n", packetNumber + 1, packetCount);
+		Con_NetPrintf("Malformed packet number (%i/%i)\n", packetNumber + 1, packetCount);
 		return FALSE;
 	}
 	if (gNetSplit.currentSequence == -1 || sequenceNumber != gNetSplit.currentSequence)
@@ -904,7 +904,7 @@ qboolean NET_GetLong(unsigned char *pData, int size, int *outSize)
 	unsigned int packetPayloadSize = size - sizeof(SPLITPACKET);
 	if (gNetSplitFlags[packetNumber] == sequenceNumber)
 	{
-		Con_Printf(	"NET_GetLong:  Ignoring duplicated split packet %i of %i ( %i bytes )\n",
+		Con_NetPrintf(	"NET_GetLong:  Ignoring duplicated split packet %i of %i ( %i bytes )\n",
 			packetNumber + 1, packetCount, packetPayloadSize
 		);
 	}
@@ -925,7 +925,7 @@ qboolean NET_GetLong(unsigned char *pData, int size, int *outSize)
 
 		if (SPLIT_SIZE * packetNumber + packetPayloadSize > MAX_UDP_PACKET)
 		{
-			Con_Printf("Malformed packet size (%i, %i)\n", SPLIT_SIZE * packetNumber, packetPayloadSize);
+			Con_NetPrintf("Malformed packet size (%i, %i)\n", SPLIT_SIZE * packetNumber, packetPayloadSize);
 #ifdef REHLDS_FIXES
 			gNetSplit.currentSequence = -1;
 #endif
@@ -944,7 +944,7 @@ qboolean NET_GetLong(unsigned char *pData, int size, int *outSize)
 		{
 			if (gNetSplitFlags[i] != gNetSplit.currentSequence)
 			{
-				Con_Printf(
+				Con_NetPrintf(
 					"Split packet without all %i parts, part %i had wrong sequence %i/%i\n",
 					packetCount,
 					i + 1,
@@ -970,7 +970,7 @@ qboolean NET_GetLong(unsigned char *pData, int size, int *outSize)
 #ifdef REHLDS_FIXES
 		*outSize = 0;
 #endif
-		Con_Printf("Split packet too large! %d bytes\n", gNetSplit.totalSize);
+		Con_NetPrintf("Split packet too large! %d bytes\n", gNetSplit.totalSize);
 		return FALSE;
 	}
 }
@@ -1044,7 +1044,7 @@ qboolean NET_QueuePacket(netsrc_t sock)
 		if (ret != MAX_UDP_PACKET)
 			break;
 
-		Con_Printf("NET_QueuePacket:  Oversize packet from %s\n", NET_AdrToString(in_from));
+		Con_NetPrintf("NET_QueuePacket:  Oversize packet from %s\n", NET_AdrToString(in_from));
 	}
 
 	if (ret == -1 || ret == MAX_UDP_PACKET) {
@@ -1060,11 +1060,7 @@ qboolean NET_QueuePacket(netsrc_t sock)
 		}
 		else
 		{
-#ifdef REHLDS_FIXES
-			Con_DPrintf("Invalid split packet length %i\n", in_message.cursize);
-#else
-			Con_Printf("Invalid split packet length %i\n", in_message.cursize);
-#endif
+			Con_NetPrintf("Invalid split packet length %i\n", in_message.cursize);
 			return FALSE;
 		}
 	}

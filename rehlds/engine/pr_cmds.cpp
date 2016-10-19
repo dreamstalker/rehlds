@@ -207,7 +207,11 @@ void EXT_FUNC PF_sprint(char *s, int entnum)
 	client_t* client = &g_psvs.clients[entnum - 1];
 	if (!client->fakeclient)
 	{
+#ifdef REHLDS_FIXES
+		MSG_WriteByte(&client->netchan.message, svc_print);
+#else // REHLDS_FIXES
 		MSG_WriteChar(&client->netchan.message, svc_print);
+#endif // REHLDS_FIXES
 		MSG_WriteString(&client->netchan.message, s);
 	}
 }

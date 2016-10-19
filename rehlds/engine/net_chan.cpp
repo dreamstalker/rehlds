@@ -1522,7 +1522,14 @@ qboolean Netchan_CopyNormalFragments(netchan_t *chan)
 #ifdef REHLDS_FIXES
 	if (overflowed)
 	{
-		Con_Printf("Netchan_CopyNormalFragments:  Overflowed\n");
+		if (chan->player_slot == 0)
+		{
+			Con_Printf("Netchan_CopyNormalFragments: Incoming overflowed\n");
+		}
+		else
+		{
+			Con_Printf("Netchan_CopyNormalFragments: Incoming overflowed from %s\n", g_psvs.clients[chan->player_slot - 1].name);
+		}
 
 		SZ_Clear(&net_message);
 
@@ -1589,6 +1596,9 @@ qboolean Netchan_CopyFileFragments(netchan_t *chan)
 	uncompressedSize = (unsigned int)MSG_ReadLong();
 
 #ifdef REHLDS_FIXES
+	// TODO: this condition is invalid for server->client
+	// TODO: add console message for client
+	// TODO: add client name to message
 	if (uncompressedSize > 1024 * 64) {
 		Con_Printf("Received too large file (size=%u)\nFlushing input queue\n", uncompressedSize);
 		Netchan_FlushIncoming(chan, 1);

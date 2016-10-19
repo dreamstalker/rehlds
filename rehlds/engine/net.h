@@ -404,4 +404,10 @@ typedef struct netchan_s
 	flow_t flow[MAX_FLOWS];
 } netchan_t;
 
+#ifdef REHLDS_FIXES
+#define Con_NetPrintf Con_DPrintf
+#else // REHLDS_FIXES
+#define Con_NetPrintf Con_Printf
+#endif // REHLDS_FIXES
+
 #endif // GS_NET_H
