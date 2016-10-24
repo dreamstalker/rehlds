@@ -276,7 +276,7 @@ void Host_Motd_f(void)
 /* <3d5d4> ../engine/host_cmd.c:335 */
 void Host_Motd_Write_f(void)
 {
-	char newFile[2048];
+	char newFile[2048] = "";
 	unsigned int i;
 	FileHandle_t pFile;
 
@@ -295,18 +295,22 @@ void Host_Motd_Write_f(void)
 		return;
 	}
 
-	Q_strncpy(newFile, Cmd_Args(), ARRAYSIZE(newFile));
 #ifdef REHLDS_FIXES
-	newFile[ARRAYSIZE(newFile) - 1] = 0;
+	if (Cmd_Args()) {
+		Q_strncpy(newFile, Cmd_Args(), ARRAYSIZE(newFile) - 1);
+		newFile[ARRAYSIZE(newFile) - 1] = '\0';
+	}
+#else // REHLDS_FIXES
+	Q_strncpy(newFile, Cmd_Args(), ARRAYSIZE(newFile));
 #endif // REHLDS_FIXES
 
-	for (i = 0; i < Q_strlen(newFile); i++)
+	auto len = Q_strlen(newFile);
+	for (i = 0; i < len; i++)
 	{
 		if (newFile[i] == '\\' && newFile[i + 1] == 'n')
 		{
 			newFile[i] = '\n';
-			Q_strncpy(&newFile[i + 1], &newFile[i + 2], min(sizeof(newFile) - 1, Q_strlen(newFile) + 1));
-			newFile[sizeof(newFile) - 1] = 0;
+			Q_memmove(&newFile[i + 1], &newFile[i + 2], Q_strlen(&newFile[i + 2]) + 1);
 		}
 	}
 	FS_Write(newFile, Q_strlen(newFile), 1, pFile);
