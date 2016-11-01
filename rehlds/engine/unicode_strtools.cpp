@@ -440,6 +440,7 @@ bool Q_IsMeanSpaceW(uchar16 wch)
 	case 0x2029:   // PARAGRAPH SEPARATOR
 	case 0x202F:   // NARROW NO-BREAK SPACE
 	case 0x2060:   // word joiner
+	case 0x3000:   // IDEOGRAPHIC SPACE
 	case 0xFEFF:   // ZERO-WIDTH NO BREAK SPACE
 	case 0xFFFC:   // OBJECT REPLACEMENT CHARACTER
 		bIsMean = true;
