@@ -34,7 +34,7 @@
 #include "interface.h"
 #include "model.h"
 
-#define REHLDS_API_VERSION_MAJOR 2
+#define REHLDS_API_VERSION_MAJOR 3
 #define REHLDS_API_VERSION_MINOR 13
 
 //Steam_NotifyClientConnect hook

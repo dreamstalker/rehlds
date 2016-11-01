@@ -48,14 +48,25 @@ public:
 	virtual void callOriginal(t_args... args) = 0;
 };
 
+// Specifies priorities for hooks call order in the chain.
+// For equal priorities first registered hook will be called first.
+enum HookChainPriority : int
+{
+	HC_PRIORITY_UNINTERRUPTABLE = 255,  // Hook will be called before other hooks.
+	HC_PRIORITY_HIGH = 192,             // Hook will be called before hooks with default priority.
+	HC_PRIORITY_DEFAULT = 128,          // Default hook call priority.
+	HC_PRIORITY_MEDIUM = 64,            // Hook will be called after hooks with default priority.
+	HC_PRIORITY_LOW = 0,                // Hook will be called after all other hooks.
+};
+
 // Hook chain registry(for hooks [un]registration)
 template<typename t_ret, typename ...t_args>
 class IHookChainRegistry {
 public:
 	typedef t_ret(*hookfunc_t)(IHookChain<t_ret, t_args...>*, t_args...);
 
-	virtual void registerHook(hookfunc_t hook) = 0;
-	virtual void unregisterHook(hookfunc_t hook) = 0;
+	virtual void registerHook(hookfunc_t hook, int pri = HC_PRIORITY_DEFAULT) = 0;
+	virtual void unregisterHook(hookfunc_t hook, int pri = HC_PRIORITY_DEFAULT) = 0;
 };
 
 // Hook chain registry(for hooks [un]registration)
@@ -64,6 +75,6 @@ class IVoidHookChainRegistry {
 public:
 	typedef void(*hookfunc_t)(IVoidHookChain<t_args...>*, t_args...);
 
-	virtual void registerHook(hookfunc_t hook) = 0;
-	virtual void unregisterHook(hookfunc_t hook) = 0;
+	virtual void registerHook(hookfunc_t hook, int pri = HC_PRIORITY_DEFAULT) = 0;
+	virtual void unregisterHook(hookfunc_t hook, int pri = HC_PRIORITY_DEFAULT) = 0;
 };

@@ -25,28 +25,57 @@ AbstractHookChainRegistry::AbstractHookChainRegistry()
 	m_NumHooks = 0;
 }
 
-void AbstractHookChainRegistry::addHook(void* hookFunc) {
+void AbstractHookChainRegistry::addHook(void* hookFunc, int priority) {
 	if (m_NumHooks >= MAX_HOOKS_IN_CHAIN) {
 		rehlds_syserror("MAX_HOOKS_IN_CHAIN limit hit");
 	}
 
-	m_Hooks[m_NumHooks++] = hookFunc;
+	for (int i = 0; i < MAX_HOOKS_IN_CHAIN; i++)
+	{
+		if (m_Hooks[i] && priority <= m_Priorities[i])
+			continue;
+
+		auto swapHookFunc = m_Hooks[i];
+		auto swapPriority = m_Priorities[i];
+
+		m_Hooks[i] = hookFunc;
+		m_Priorities[i] = priority;
+
+		hookFunc = swapHookFunc;
+		priority = swapPriority;
+	}
+
+	m_NumHooks++;
 }
 
-void AbstractHookChainRegistry::removeHook(void* hookFunc) {
+void AbstractHookChainRegistry::removeHook(void* hookFunc, int priority) {
 
-	// erase hook
-	for (int i = 0; i < m_NumHooks; i++) {
-		if (hookFunc == m_Hooks[i]) {
-			if (--m_NumHooks != i)
-			{
-				Q_memmove(&m_Hooks[i], &m_Hooks[i + 1], (m_NumHooks - i) * sizeof(m_Hooks[0]));
-				m_Hooks[m_NumHooks] = NULL;
-			}
-			else
-				m_Hooks[i] = NULL;
+	int bestMatch = -1;
 
-			return;
+	// Search for matching hook func address and priority or at least address match
+	for (int i = 0; i < m_NumHooks; i++)
+	{
+		if (hookFunc == m_Hooks[i])
+		{
+			bestMatch = i;
+			if (m_Priorities[i] == priority)
+				break;
 		}
+	}
+
+	if (bestMatch >= 0)
+	{
+		// erase hook
+		--m_NumHooks;
+
+		if (m_NumHooks != bestMatch)
+		{
+			Q_memmove(&m_Hooks[bestMatch], &m_Hooks[bestMatch + 1], (m_NumHooks - bestMatch) * sizeof(m_Hooks[0]));
+			Q_memmove(&m_Priorities[bestMatch], &m_Priorities[bestMatch + 1], (m_NumHooks - bestMatch) * sizeof(m_Priorities[0]));
+
+			m_Hooks[m_NumHooks] = NULL;
+		}
+		else
+			m_Hooks[bestMatch] = NULL;
 	}
 }

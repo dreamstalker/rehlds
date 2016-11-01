@@ -36,11 +36,9 @@ struct plugin_api_t
 std::vector<plugin_api_t *> g_PluginApis;
 
 plugin_api_t* FindPluginApiByName(const char *name) {
-	for (auto it = g_PluginApis.begin(), end = g_PluginApis.end(); it != end; ++it) {
-		auto api = *it;
-
-		if (!strcmp(api->name, name)) {
-			return api;
+	for (auto pl : g_PluginApis) {
+		if (!strcmp(pl->name, name)) {
+			return pl;
 		}
 	}
 
@@ -147,7 +145,9 @@ void EXT_FUNC Rehlds_RegisterPluginApi(const char *name, void *impl) {
 
 	if (!api) {
 		api = new plugin_api_t;
-		strncpy(api->name, name, sizeof api->name - 1);
+		Q_strncpy(api->name, name, sizeof api->name - 1);
+		api->name[sizeof api->name - 1] = '\0';
+
 		g_PluginApis.push_back(api);
 	}
 
