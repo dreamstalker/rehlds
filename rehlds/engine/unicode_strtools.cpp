@@ -543,8 +543,6 @@ char *Q_UnicodeAdvance(char *pUTF8, int nChars)
 	return pUTF8;
 }
 
-
-
 /* <f4a0d> ../engine/unicode_strtools.cpp:717 */
 qboolean V_UTF8ToUChar32(const char *pUTF8_, uchar32 *uValueOut)
 {
@@ -724,11 +722,10 @@ int Q_UTF8ToUTF16(const char *pUTF8, uchar16 *pUTF16, int cubDestSizeInBytes, en
 	return Q_UnicodeConvertT<char, uchar16, true, Q_UTF8ToUChar32, Q_UChar32ToUTF16Len, Q_UChar32ToUTF16>(pUTF8, pUTF16, cubDestSizeInBytes, ePolicy);
 }
 
-int Q_UTF16ToUTF8(const uchar16 *pUTF16, char *pUTF8, int cubDestSizeInBytes, enum EStringConvertErrorPolicy ePolicy) /* linkage=_Z13Q_UTF16ToUTF8PKtPci25EStringConvertErrorPolicy */
+int Q_UTF16ToUTF8(const uchar16 *pUTF16, char *pUTF8, int cubDestSizeInBytes, enum EStringConvertErrorPolicy ePolicy)
 {
 	return Q_UnicodeConvertT<uchar16, char, true, Q_UTF16ToUChar32, Q_UChar32ToUTF8Len, Q_UChar32ToUTF8>(pUTF16, pUTF8, cubDestSizeInBytes, ePolicy);
 }
-
 
 /* <f4a63> ../engine/unicode_strtools.cpp:724 */
 int Q_UnicodeRepair(char *pUTF8)

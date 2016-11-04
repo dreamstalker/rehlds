@@ -36,11 +36,9 @@ struct plugin_api_t
 std::vector<plugin_api_t *> g_PluginApis;
 
 plugin_api_t* FindPluginApiByName(const char *name) {
-	for (auto it = g_PluginApis.begin(), end = g_PluginApis.end(); it != end; ++it) {
-		auto api = *it;
-
-		if (!strcmp(api->name, name)) {
-			return api;
+	for (auto pl : g_PluginApis) {
+		if (!strcmp(pl->name, name)) {
+			return pl;
 		}
 	}
 
@@ -142,12 +140,18 @@ void* EXT_FUNC Rehlds_GetPluginApi(const char *name) {
 	return api ? api->impl : NULL;
 }
 
+bool EXT_FUNC StripUnprintableAndSpace_api(char *pch) {
+	return Q_StripUnprintableAndSpace(pch) != FALSE;
+}
+
 void EXT_FUNC Rehlds_RegisterPluginApi(const char *name, void *impl) {
 	auto api = FindPluginApiByName(name);
 
 	if (!api) {
 		api = new plugin_api_t;
-		strncpy(api->name, name, sizeof api->name - 1);
+		Q_strncpy(api->name, name, sizeof api->name - 1);
+		api->name[sizeof api->name - 1] = '\0';
+
 		g_PluginApis.push_back(api);
 	}
 
@@ -205,7 +209,8 @@ RehldsFuncs_t g_RehldsApiFuncs =
 	&Steam_NotifyClientDisconnect_api,
 	&SV_StartSound_api,
 	&SV_EmitSound2_api,
-	&SV_UpdateUserInfo_api
+	&SV_UpdateUserInfo_api,
+	&StripUnprintableAndSpace_api
 };
 
 bool EXT_FUNC SV_EmitSound2_internal(edict_t *entity, IGameClient *pReceiver, int channel, const char *sample, float volume, float attenuation, int flags, int pitch, int emitFlags, const float *pOrigin)

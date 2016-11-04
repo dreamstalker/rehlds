@@ -53,7 +53,7 @@ enum EStringConvertErrorPolicy {
 	STRINGCONVERT_ASSERT_REPLACE = 4,
 	STRINGCONVERT_ASSERT_SKIP = 5,
 	STRINGCONVERT_ASSERT_FAIL = 6,
-}; /* size: 4 */
+};
 
 qboolean Q_IsValidUChar32(uchar32 uVal);
 int Q_UTF8ToUChar32(const char *pUTF8_, uchar32 &uValueOut, bool &bErrorOut);
