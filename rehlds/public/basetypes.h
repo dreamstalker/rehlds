@@ -1,4 +1,4 @@
-//========= Copyright © 1996-2001, Valve LLC, All rights reserved. ============
+//========= Copyright  1996-2001, Valve LLC, All rights reserved. ============
 //
 // Purpose: 
 //
@@ -69,8 +69,6 @@ typedef unsigned long ULONG;
 typedef unsigned char BYTE;
 typedef unsigned char byte;
 typedef unsigned short word;
-
-#include "string_t.h"
 
 typedef float vec_t;
 
