@@ -1,6 +1,7 @@
 import gradlecpp.RehldsPlayTestPlugin
 import gradlecpp.RehldsPlayTestTask
 import gradlecpp.VelocityUtils
+
 import org.doomedsociety.gradlecpp.GradleCppUtils
 import org.doomedsociety.gradlecpp.LazyNativeDepSet
 import org.doomedsociety.gradlecpp.cfg.ToolchainConfig
@@ -386,22 +387,29 @@ tasks.clean.doLast {
 
 task generateAppVersion {
     RehldsVersionInfo verInfo = (RehldsVersionInfo) rootProject.rehldsVersionInfo
+
     def tplFile = project.file('version/appversion.vm')
     def renderedFile = project.file('version/appversion.h')
 
+    // check to up-to-date
     inputs.file tplFile
     inputs.file project.file('gradle.properties')
     outputs.file renderedFile
-    inputs.property('version', verInfo.asMavenVersion())
-    inputs.property('lastCommitDate', verInfo.lastCommitDate.toString())
+
+    // this will ensure that this task is redone when the versions change
+    inputs.property('version', rootProject.version)
+    inputs.property('commitDate', verInfo.asCommitDate())
 
     doLast {
+
         def templateCtx = [
-                verInfo       : verInfo
+                verInfo : verInfo
         ]
 
         def content = VelocityUtils.renderTemplate(tplFile, templateCtx)
         renderedFile.delete()
         renderedFile.write(content, 'utf-8')
+
+        println 'The current ReHLDS maven version is ' + rootProject.version + ', url: (' + verInfo.commitURL + '' + verInfo.commitSHA + ')';
     }
 }

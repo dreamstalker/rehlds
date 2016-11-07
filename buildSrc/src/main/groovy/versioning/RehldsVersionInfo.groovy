@@ -3,6 +3,7 @@ package versioning
 import groovy.transform.CompileStatic
 import groovy.transform.ToString
 import groovy.transform.TypeChecked
+import org.joda.time.format.DateTimeFormat
 import org.joda.time.DateTime
 
 @CompileStatic @TypeChecked
@@ -13,23 +14,43 @@ class RehldsVersionInfo {
     Integer maintenanceVersion
     String suffix
 
-    DateTime lastCommitDate
+    boolean  localChanges
+    DateTime commitDate
+    String   commitSHA
+    String   commitURL
+    Integer  commitCount
 
-    String format(String versionSeparator, String suffixSeparator, boolean includeSuffix) {
+    String asMavenVersion() {
         StringBuilder sb = new StringBuilder()
-        sb.append(majorVersion).append(versionSeparator).append(minorVersion)
+        sb.append(majorVersion).append('.' + minorVersion);
         if (maintenanceVersion != null) {
-            sb.append(versionSeparator).append(maintenanceVersion)
+            sb.append('.' + maintenanceVersion);
         }
 
-        if (suffix && includeSuffix) {
-            sb.append(suffixSeparator).append(suffix)
+        if (commitCount != null) {
+            sb.append('.' + commitCount)
+        }
+
+        if (suffix) {
+            sb.append('-' + suffix)
+        }
+
+        // do mark for this build like a modified version
+        if (localChanges) {
+            sb.append('+m');
         }
 
         return sb.toString()
     }
+    String asCommitDate() {
+        String pattern = "MMM  d yyyy";
+        if (commitDate.getDayOfMonth() >= 10) {
+            pattern = "MMM d yyyy";
+        }
 
-    String asMavenVersion() {
-        format('.', '-', true)
+        return DateTimeFormat.forPattern(pattern).withLocale(Locale.ENGLISH).print(commitDate);
+    }
+    String asCommitTime() {
+        return DateTimeFormat.forPattern('HH:mm:ss').withLocale(Locale.ENGLISH).print(commitDate);
     }
 }

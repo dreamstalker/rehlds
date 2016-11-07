@@ -3,7 +3,6 @@ package gradlecpp
 import org.apache.velocity.Template
 import org.apache.velocity.VelocityContext
 import org.apache.velocity.app.Velocity
-import org.joda.time.format.DateTimeFormat
 
 class VelocityUtils {
 
@@ -26,10 +25,7 @@ class VelocityUtils {
             throw new RuntimeException("Failed to load velocity template ${tplFile.absolutePath}: not found")
         }
 
-
         def velocityContext = new VelocityContext(ctx)
-        velocityContext.put("_DateTimeFormat", DateTimeFormat)
-
         def sw = new StringWriter()
         tpl.merge(velocityContext, sw)
 

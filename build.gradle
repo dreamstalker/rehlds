@@ -26,14 +26,22 @@ if (gitInfo && gitInfo.tag && gitInfo.tag[0] == 'v') {
             majorVersion: m.group(1) as int,
             minorVersion: m.group(2) as int,
             maintenanceVersion: m.group(4) ? (m.group(4) as int) : null,
-            lastCommitDate: gitInfo.lastCommitDate
+            localChanges: gitInfo.localChanges,
+            commitDate: gitInfo.commitDate,
+            commitSHA: gitInfo.commitSHA,
+            commitURL: gitInfo.commitURL
     )
 } else {
     versionInfo = new RehldsVersionInfo(
             majorVersion: project.majorVersion as int,
             minorVersion: project.minorVersion as int,
-            suffix: 'SNAPSHOT',
-            lastCommitDate: gitInfo ? gitInfo.lastCommitDate : new DateTime()
+            maintenanceVersion: project.maintenanceVersion as int,
+            suffix: 'dev',
+            localChanges: gitInfo ? gitInfo.localChanges : true,
+            commitDate: gitInfo ? gitInfo.commitDate : new DateTime(),
+            commitSHA: gitInfo ? gitInfo.commitSHA : "",
+            commitURL: gitInfo ? gitInfo.commitURL : "",
+            commitCount: gitInfo ? (gitInfo.commitCount as int) : null
     )
 }
 

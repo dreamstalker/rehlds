@@ -7,14 +7,12 @@
 //
 
 // Version defines
-\#define VERSION_MAJOR ${verInfo.majorVersion}
-\#define VERSION_MINOR ${verInfo.minorVersion}
+\#define APP_VERSION "$verInfo.asMavenVersion()"
 
-\#define APP_VERSION_D ${verInfo.format('.', '-', true)}
-\#define APP_VERSION_STRD "${verInfo.format('.', '-', true)}"
+\#define APP_COMMIT_DATE "$verInfo.asCommitDate()"
+\#define APP_COMMIT_TIME "$verInfo.asCommitTime()"
 
-#set ( $commitYMD = $_DateTimeFormat.forPattern('yyyy-MM-dd').print($verInfo.lastCommitDate) )
-
-\#define APP_VERSION_YMD_STR "${commitYMD}"
+\#define APP_COMMIT_SHA "$verInfo.commitSHA"
+\#define APP_COMMIT_URL "$verInfo.commitURL"
 
 #endif //__APPVERSION_H__

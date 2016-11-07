@@ -1123,20 +1123,12 @@ void Host_Version(void)
 	if (g_pcls.state != ca_dedicated)
 	{
 		Con_DPrintf("Protocol version %i\nExe version %s (%s)\n", PROTOCOL_VERSION, gpszVersionString, gpszProductString);
-#ifdef REHLDS_FIXES
-		Con_DPrintf("Exe build: " __TIME__ " " __DATE__ " (%i)\n", build_number());
-#else
-		Con_DPrintf("Exe build: 13:14:09 Aug 29 2013 (%i)\n", build_number());
-#endif // REHLDS_FIXES
+		Con_DPrintf("Exe build: " __BUILD_TIME__ " " __BUILD_DATE__ " (%i)\n", build_number());
 	}
 	else
 	{
 		Con_Printf("Protocol version %i\nExe version %s (%s)\n", PROTOCOL_VERSION, gpszVersionString, gpszProductString);
-#ifdef REHLDS_FIXES
-		Con_Printf("Exe build: " __TIME__ " " __DATE__ " (%i)\n", build_number());
-#else
-		Con_Printf("Exe build: 13:14:09 Aug 29 2013 (%i)\n", build_number());
-#endif // REHLDS_FIXES
+		Con_Printf("Exe build: " __BUILD_TIME__ " " __BUILD_DATE__ " (%i)\n", build_number());
 	}
 }
 

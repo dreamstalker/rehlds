@@ -2432,16 +2432,15 @@ void Host_Changelevel2_f(void)
 void Host_Version_f(void)
 {
 	Con_Printf("Protocol version %i\nExe version %s (%s)\n", PROTOCOL_VERSION, gpszVersionString, gpszProductString);
+
 #ifdef REHLDS_FIXES
-	Con_Printf("Exe build: " __TIME__ " " __DATE__ " (%i)\n", build_number());
-#else // REHLDS_FIXES
-	#ifdef _WIN32
-	Con_Printf("Exe build: 11:17:24 Aug  8 2013 (%i)\n", build_number());
-	#else // _WIN32
-	Con_Printf("Exe build: 10:03:21 Aug  8 2013 (%i)\n", build_number());
-	#endif // _WIN32
-#endif // REHLDS_FIXES
-	Con_Printf("ReHLDS API version %i.%i\n", REHLDS_API_VERSION_MAJOR, REHLDS_API_VERSION_MINOR);
+	Con_Printf("ReHLDS version: " APP_VERSION "\n");
+	Con_Printf("Build date: " __BUILD_TIME__ " " __BUILD_DATE__ " (%i)\n", build_number());
+	Con_Printf("Build from: "APP_COMMIT_URL APP_COMMIT_SHA"\n");
+#else
+	Con_Printf("Exe build: " __BUILD_TIME__ " " __BUILD_DATE__ " (%i)\n", build_number());
+#endif
+
 }
 
 /* <3d516> ../engine/host_cmd.c:3382 */
