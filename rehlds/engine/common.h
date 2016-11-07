@@ -42,10 +42,10 @@
 	#define __BUILD_TIME__ "13:14:09"
 	#define __BUILD_DATE__ "Aug 29 2013"
 #endif
-#else
+#else // REHLDS_FIXES
 	#define __BUILD_TIME__ APP_COMMIT_TIME
 	#define __BUILD_DATE__ APP_COMMIT_DATE
-#endif
+#endif // REHLDS_FIXES
 
 #ifdef HOOK_ENGINE
 #define serverinfo (*pserverinfo)
