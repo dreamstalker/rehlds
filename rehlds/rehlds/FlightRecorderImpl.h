@@ -79,7 +79,7 @@ private:
 	template<typename T>
 	void WritePrimitive(T v) {
 		if (m_pRecorderState->curMessage == 0) {
-			rehlds_syserror("%s: Could not write, invalid state", __FUNCTION__);
+			Sys_Error(__FUNCTION__ ": Could not write, invalid state");
 		}
 
 		CheckSize(sizeof(T));

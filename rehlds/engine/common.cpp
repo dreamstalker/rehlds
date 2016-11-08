@@ -810,9 +810,11 @@ uint32 MSG_ReadBits(int numbits)
 {
 	uint32 result;
 
+#ifdef REHLDS_FIXES
 	if (numbits > 32) {
-		rehlds_syserror("%s: invalid numbits %d\n", __FUNCTION__, numbits);
+		Sys_Error(__FUNCTION__ ": invalid numbits %d\n", numbits);
 	}
+#endif // REHLDS_FIXES
 
 	if (msg_badread)
 	{
@@ -2122,12 +2124,17 @@ unsigned char* EXT_FUNC COM_LoadFile(const char *path, int usehunk, int *pLength
 		break;
 
 	default:
+#ifdef REHLDS_FIXES
+		FS_Close(hFile);
+#endif
 		Sys_Error(__FUNCTION__ ": bad usehunk");
 	}
 
 	if (!buf)
 	{
+#ifdef REHLDS_FIXES
 		FS_Close(hFile);
+#endif
 		Sys_Error(__FUNCTION__ ": not enough space for %s", path);
 	}
 
@@ -2197,7 +2204,12 @@ NOXREF unsigned char *COM_LoadFileLimit(char *path, int pos, int cbmax, int *pcb
 
 	len = FS_Size(hFile);
 	if (len < pos)
-		Sys_Error("COM_LoadFileLimit: invalid seek position for %s", path);
+	{
+#ifdef REHLDS_FIXES
+		FS_Close(hFile);
+#endif
+		Sys_Error(__FUNCTION__ ": invalid seek position for %s", path);
+	}
 
 	FS_Seek(hFile, pos, FILESYSTEM_SEEK_HEAD);
 
@@ -2215,7 +2227,12 @@ NOXREF unsigned char *COM_LoadFileLimit(char *path, int pos, int cbmax, int *pcb
 	if (!buf)
 	{
 		if (path)
-			Sys_Error("COM_LoadFileLimit: not enough space for %s", path);
+		{
+#ifdef REHLDS_FIXES
+			FS_Close(hFile);
+#endif
+			Sys_Error(__FUNCTION__ ": not enough space for %s", path);
+		}
 
 		FS_Close(hFile);
 		return NULL;

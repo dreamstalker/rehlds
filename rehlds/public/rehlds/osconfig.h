@@ -189,6 +189,4 @@
 
 #define EXT_FUNC FORCE_STACK_ALIGN
 
-extern void __declspec(noreturn) rehlds_syserror(const char* fmt, ...);
-
 #endif // _OSCONFIG_H

@@ -34,7 +34,6 @@ int(*Launcher_MP3subsys_Suspend_Audio)(void);
 void(*Launcher_MP3subsys_Resume_Audio)(void);
 void(*VID_FlipScreen)(void);
 
-
 //double curtime;
 //double lastcurtime;
 //qboolean sc_return_on_enter;
@@ -65,7 +64,6 @@ extensiondll_t g_rgextdll[50];
 int g_iextdllMac;
 modinfo_t gmodinfo;
 qboolean gfBackground;
-//extern jmp_buf host_abortserver;
 //int starttime;
 //qboolean Win32AtLeastV4;
 //int lowshift;
@@ -91,8 +89,6 @@ int g_PerfCounterShiftRightAmount;
 double g_PerfCounterSlice;
 double g_CurrentTime;
 double g_StartTime;
-
-
 
 int g_WinNTOrHigher;
 #endif // _WIN32
@@ -473,6 +469,26 @@ void __declspec(noreturn) Sys_Error(const char *error, ...)
 		gEntityInterface.pfnSys_Error(text);
 
 	Log_Printf("FATAL ERROR (shutting down): %s\n", text);
+
+#ifdef REHLDS_FIXES
+	if (syserror_logfile.string[0] != '\0')
+	{
+		auto pFile = FS_Open(syserror_logfile.string, "a");
+		if (pFile)
+		{
+			tm *today;
+			time_t ltime;
+			char szDate[32];
+
+			time(&ltime);
+			today = localtime(&ltime);
+			strftime(szDate, ARRAYSIZE(szDate) - 1, "L %d/%m/%Y - %H:%M:%S:", today);
+
+			FS_FPrintf(pFile, "%s (map \"%s\") %s\n", szDate, &pr_strings[gGlobalVariables.mapname], text);
+			FS_Close(pFile);
+		}
+	}
+#endif // REHLDS_FIXES
 
 	if (g_bIsDedicatedServer)
 	{

@@ -285,7 +285,7 @@ IGameClient* GetRehldsApiClient(client_t* cl)
 	int idx = cl - g_psvs.clients;
 	if (idx < 0 || idx >= g_psvs.maxclients)
 	{
-		rehlds_syserror(__FUNCTION__": Invalid client index %d", idx);
+		Sys_Error(__FUNCTION__": Invalid client index %d", idx);
 	}
 
 	return g_GameClients[idx];

@@ -1370,7 +1370,8 @@ qboolean SaveGameSlot(const char *pSaveName, const char *pSaveComment)
 		Host_SaveAgeList(pSaveName, 1);
 
 	pFile = FS_OpenPathID(name, "wb", "GAMECONFIG");
-	tag = MAKEID('J','S','A','V');
+
+	tag = SAVEGAME_HEADER;
 	FS_Write(&tag, sizeof(int), 1, pFile);
 	tag = SAVEGAME_VERSION;
 	FS_Write(&tag, sizeof(int), 1, pFile);
@@ -1451,7 +1452,7 @@ int SaveReadHeader(FileHandle_t pFile, GAME_HEADER *pHeader, int readGlobalState
 	SAVERESTOREDATA *pSaveData;
 
 	FS_Read(&tag, sizeof(int), 1, pFile);
-	if (tag != MAKEID('J','S','A','V'))
+	if (tag != SAVEGAME_HEADER)
 	{
 		FS_Close(pFile);
 		return 0;

@@ -78,8 +78,13 @@ void Draw_CacheWadInitFromFile(FileHandle_t hFile, int len, char *name, int cach
 
 	FS_Read(&header, sizeof(wadinfo_t), 1, hFile);
 	if (*(uint32 *)header.identification != MAKEID('W', 'A', 'D', '3'))
+	{
+#ifdef REHLDS_FIXES
+		FS_Close(hFile);
+#endif
 		Sys_Error("Wad file %s doesn't have WAD3 id\n", name);
-	
+	}
+
 	wad->lumps = (lumpinfo_s *)Mem_Malloc(len - header.infotableofs);
 
 	FS_Seek(hFile, header.infotableofs, FILESYSTEM_SEEK_HEAD);

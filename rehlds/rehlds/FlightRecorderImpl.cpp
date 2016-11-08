@@ -22,7 +22,7 @@ CRehldsFlightRecorder::CRehldsFlightRecorder() {
 	m_DataRegion = (uint8*) sys_allocmem(DATA_REGION_SIZE);
 
 	if (!m_MetaRegion || !m_DataRegion) {
-		rehlds_syserror("%s: direct allocation failed", __FUNCTION__);
+		Sys_Error(__FUNCTION__ ": direct allocation failed");
 	}
 
 	//initialize meta region header
@@ -36,7 +36,7 @@ CRehldsFlightRecorder::CRehldsFlightRecorder() {
 	metaPos += sizeof(recorder_state);
 
 	if ((metaPos - (char*)m_MetaRegion) > META_REGION_HEADER) {
-		rehlds_syserror("%s: Meta header overflow", __FUNCTION__);
+		Sys_Error(__FUNCTION__ ": Meta header overflow");
 	}
 
 	//initialize data region header
@@ -48,7 +48,7 @@ CRehldsFlightRecorder::CRehldsFlightRecorder() {
 	dataPos += sizeof(data_header);
 
 	if ((dataPos - (char*)m_pDataHeader) > DATA_REGION_HEADER) {
-		rehlds_syserror("%s: Data header overflow", __FUNCTION__);
+		Sys_Error(__FUNCTION__ ": Data header overflow");
 	}
 
 	InitHeadersContent();
@@ -93,7 +93,7 @@ void CRehldsFlightRecorder::MoveToStart() {
 
 void CRehldsFlightRecorder::StartMessage(uint16 msg, bool entrance) {
 	if (msg == 0 || msg > m_pMetaHeader->numMessages) {
-		rehlds_syserror("%s: Invalid message id %u", __FUNCTION__, msg);
+		Sys_Error(__FUNCTION__ ": Invalid message id %u", msg);
 	}
 
 	if (entrance) {
@@ -101,7 +101,7 @@ void CRehldsFlightRecorder::StartMessage(uint16 msg, bool entrance) {
 	}
 
 	if (m_pRecorderState->curMessage != 0) {
-		rehlds_syserror("%s: overlapping messages", __FUNCTION__);
+		Sys_Error(__FUNCTION__ ": overlapping messages");
 	}
 
 	unsigned int sz = DATA_REGION_MAIN_SIZE - m_pRecorderState->wpos;
@@ -121,7 +121,7 @@ void CRehldsFlightRecorder::EndMessage(uint16 msg, bool entrance) {
 	}
 
 	if (m_pRecorderState->curMessage != msg) {
-		rehlds_syserror("%s: invalid message %u", __FUNCTION__, msg);
+		Sys_Error(__FUNCTION__ ": invalid message %u", msg);
 	}
 
 	unsigned int freeSz = DATA_REGION_MAIN_SIZE - m_pRecorderState->wpos;
@@ -131,7 +131,7 @@ void CRehldsFlightRecorder::EndMessage(uint16 msg, bool entrance) {
 
 	unsigned int msgSize = m_pRecorderState->wpos - m_pRecorderState->lastMsgBeginPos;
 	if (msgSize > MSG_MAX_SIZE) {
-		rehlds_syserror("%s: too big message %u; size%u", __FUNCTION__, msg, msgSize);
+		Sys_Error(__FUNCTION__ ": too big message %u; size %u", msg, msgSize);
 	}
 	*(uint16*)(m_DataRegionPtr + m_pRecorderState->wpos) = msgSize;
 	m_pRecorderState->wpos += 2;
@@ -142,13 +142,13 @@ void CRehldsFlightRecorder::EndMessage(uint16 msg, bool entrance) {
 void CRehldsFlightRecorder::CheckSize(unsigned int wantToWriteLen) {
 	unsigned int msgSize = m_pRecorderState->wpos - m_pRecorderState->lastMsgBeginPos;
 	if (msgSize + wantToWriteLen > MSG_MAX_SIZE) {
-		rehlds_syserror("%s: too big message %u; size%u", __FUNCTION__, m_pRecorderState->curMessage, msgSize);
+		Sys_Error(__FUNCTION__ ": too big message %u; size %u", m_pRecorderState->curMessage, msgSize);
 	}
 }
 
 void CRehldsFlightRecorder::WriteBuffer(const void* data, unsigned int len) {
 	if (m_pRecorderState->curMessage == 0) {
-		rehlds_syserror("%s: Could not write, invalid state", __FUNCTION__);
+		Sys_Error(__FUNCTION__ ": Could not write, invalid state");
 	}
 
 	CheckSize(len);
@@ -207,7 +207,7 @@ void CRehldsFlightRecorder::WriteDouble(double v) {
 
 uint16 CRehldsFlightRecorder::RegisterMessage(const char* module, const char *message, unsigned int version, bool inOut) {
 	if (m_pMetaHeader->numMessages >= MSG_MAX_ID) {
-		rehlds_syserror("%s: can't register message; limit exceeded", __FUNCTION__);
+		Sys_Error(__FUNCTION__ ": can't register message; limit exceeded");
 	}
 
 	uint16 msgId = ++m_pMetaHeader->numMessages;

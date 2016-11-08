@@ -30,7 +30,7 @@ unsigned int DELTAJIT_GetFieldSize(delta_description_t* desc) {
 		return 0;
 
 	default:
-		rehlds_syserror("%s: Unknown delta field type %d", __FUNCTION__, desc->fieldType);
+		Sys_Error(__FUNCTION__ ": Unknown delta field type %d", desc->fieldType);
 		return 0;
 	}
 }
@@ -54,15 +54,13 @@ void DELTAJIT_CreateDescription(delta_t* delta, deltajitdata_t &jitdesc) {
 		numMemBlocks++;
 	}
 
-	//sanity checks & pre-clean
+	// sanity checks & pre-clean
 	if (numMemBlocks > DELTAJIT_MAX_BLOCKS) {
-		rehlds_syserror("%s: numMemBlocks > DELTAJIT_MAX_BLOCKS (%d > %d)", __FUNCTION__, numMemBlocks, DELTAJIT_MAX_BLOCKS);
-		return;
+		Sys_Error(__FUNCTION__ ": numMemBlocks > DELTAJIT_MAX_BLOCKS (%d > %d)", numMemBlocks, DELTAJIT_MAX_BLOCKS);
 	}
 
 	if (delta->fieldCount > DELTAJIT_MAX_FIELDS) {
-		rehlds_syserror("%s: fieldCount > DELTAJIT_MAX_FIELDS (%d > %d)", __FUNCTION__, delta->fieldCount, DELTAJIT_MAX_FIELDS);
-		return;
+		Sys_Error(__FUNCTION__ ": fieldCount > DELTAJIT_MAX_FIELDS (%d > %d)", delta->fieldCount, DELTAJIT_MAX_FIELDS);
 	}
 
 	Q_memset(&jitdesc, 0, sizeof(jitdesc));
@@ -678,8 +676,7 @@ CDeltaJit* DELTAJit_LookupDeltaJit(const char* callsite, delta_t *pFields) {
 #ifndef REHLDS_FIXES
 	// only for testing
 	if (!deltaJit) {
-		rehlds_syserror("%s: JITted delta encoder not found for delta %p", callsite, pFields);
-		return NULL;
+		Sys_Error("%s: JITted delta encoder not found for delta %p", callsite, pFields);
 	}
 #endif // REHLDS_FIXES
 

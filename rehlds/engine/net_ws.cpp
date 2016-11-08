@@ -1502,7 +1502,6 @@ void NET_SendPacket(netsrc_t sock, int length, void *data, const netadr_t& to)
 	else
 	{
 		Sys_Error(__FUNCTION__ ": bad address type");
-		return;
 	}
 
 	NetadrToSockadr(&to, &addr);

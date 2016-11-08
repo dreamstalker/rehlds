@@ -475,6 +475,7 @@ extern cvar_t logsdir;
 extern cvar_t bannedcfgfile;
 #ifdef REHLDS_FIXES
 extern cvar_t listipcfgfile;
+extern cvar_t syserror_logfile;
 #endif
 
 extern decalname_t sv_decalnames[MAX_BASE_DECALS];

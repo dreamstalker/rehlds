@@ -304,6 +304,7 @@ cvar_t sv_auto_precache_sounds_in_models = { "sv_auto_precache_sounds_in_models"
 cvar_t sv_delayed_spray_upload = { "sv_delayed_spray_upload", "0", 0, 0.0f, nullptr };
 cvar_t sv_rehlds_force_dlmax = { "sv_rehlds_force_dlmax", "0", 0, 0.0f, nullptr };
 cvar_t listipcfgfile = { "listipcfgfile", "listip.cfg", 0, 0.0f, nullptr };
+cvar_t syserror_logfile = { "syserror_logfile", "rehlds_error.log", 0, 0.0f, nullptr };
 cvar_t sv_rehlds_hull_centering = { "sv_rehlds_hull_centering", "0", 0, 0.0f, nullptr };
 cvar_t sv_rcon_condebug = { "sv_rcon_condebug", "1", 0, 1.0f, nullptr };
 cvar_t sv_rehlds_userinfo_transmitted_fields = { "sv_rehlds_userinfo_transmitted_fields", "", 0, 0.0f, nullptr };
@@ -1854,7 +1855,6 @@ int EXT_FUNC SV_CheckProtocol_internal(netadr_t *adr, int nProtocol)
 	if (adr == NULL)
 	{
 		Sys_Error(__FUNCTION__ ":  Null address\n");
-		return FALSE;
 	}
 
 	if (nProtocol == PROTOCOL_VERSION)
@@ -7824,6 +7824,7 @@ void SV_Init(void)
 	Cvar_RegisterVariable(&bannedcfgfile);
 #ifdef REHLDS_FIXES
 	Cvar_RegisterVariable(&listipcfgfile);
+	Cvar_RegisterVariable(&syserror_logfile);
 #endif
 	Cvar_RegisterVariable(&sv_rcon_minfailures);
 	Cvar_RegisterVariable(&sv_rcon_maxfailures);
