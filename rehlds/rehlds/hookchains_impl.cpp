@@ -27,12 +27,28 @@ AbstractHookChainRegistry::AbstractHookChainRegistry()
 	m_NumHooks = 0;
 }
 
-void AbstractHookChainRegistry::addHook(void* hookFunc, int priority) {
-	for (int i = 0; i < MAX_HOOKS_IN_CHAIN; i++)
-	{
+bool AbstractHookChainRegistry::findHook(void* hookFunc) const
+{
+	for (auto i = 0; i < m_NumHooks; i++) {
 		if (m_Hooks[i] == hookFunc)
-			return;
+			return true;
+	}
 
+	return false;
+}
+
+void AbstractHookChainRegistry::addHook(void* hookFunc, int priority)
+{
+	if (!hookFunc) {
+		Sys_Error(__FUNCTION__ " Parameter hookFunc can't be a nullptr");
+	}
+
+	if (findHook(hookFunc)) {
+		Sys_Error(__FUNCTION__ " The same handler can't be used twice on the hookchain.");
+	}
+
+	for (auto i = 0; i < MAX_HOOKS_IN_CHAIN; i++)
+	{
 		if (m_Hooks[i] && priority <= m_Priorities[i])
 			continue;
 
@@ -47,7 +63,7 @@ void AbstractHookChainRegistry::addHook(void* hookFunc, int priority) {
 	}
 
 	if (m_NumHooks >= MAX_HOOKS_IN_CHAIN) {
-		rehlds_syserror("MAX_HOOKS_IN_CHAIN limit hit");
+		Sys_Error(__FUNCTION__ " MAX_HOOKS_IN_CHAIN limit hit");
 	}
 
 	m_NumHooks++;
@@ -56,7 +72,7 @@ void AbstractHookChainRegistry::addHook(void* hookFunc, int priority) {
 void AbstractHookChainRegistry::removeHook(void* hookFunc) {
 
 	// erase hook
-	for (int i = 0; i < m_NumHooks; i++)
+	for (auto i = 0; i < m_NumHooks; i++)
 	{
 		if (hookFunc == m_Hooks[i])
 		{

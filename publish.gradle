@@ -128,7 +128,7 @@ if (file('repo_creds.properties').exists()) {
 publishing {
     repositories {
         maven {
-            if (project.version.contains('SNAPSHOT')) {
+            if (project.version.contains('dev')) {
                 url "http://nexus.rehlds.org/nexus/content/repositories/rehlds-snapshots/"
             } else {
                 url "http://nexus.rehlds.org/nexus/content/repositories/rehlds-releases/"

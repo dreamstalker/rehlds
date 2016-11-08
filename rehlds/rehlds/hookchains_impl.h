@@ -92,7 +92,8 @@ public:
 	}
 
 	virtual void callOriginal(t_args... args) {
-		m_OriginalFunc(args...);
+		if (m_OriginalFunc)
+			m_OriginalFunc(args...);
 	}
 
 private:
@@ -108,6 +109,7 @@ protected:
 
 protected:
 	void addHook(void* hookFunc, int priority);
+	bool findHook(void* hookFunc) const;
 	void removeHook(void* hookFunc);
 
 public:
