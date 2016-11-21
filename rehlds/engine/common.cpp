@@ -2280,7 +2280,7 @@ qboolean COM_SetupDirectories(void)
 
 void COM_CheckPrintMap(dheader_t *header, const char *mapname, qboolean bShowOutdated)
 {
-	if (header->version == BSPVERSION)
+	if (header->version == HLBSP_VERSION)
 	{
 		if (!bShowOutdated)
 		{

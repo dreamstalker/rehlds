@@ -33,9 +33,10 @@
 #endif
 
 #include "modelgen.h"
+#include "commonmacros.h"
 
-#define IDSPRITEHEADER	(('P'<<24)+('S'<<16)+('D'<<8)+'I')
-#define SPRITE_VERSION	2
+#define SPRITE_VERSION		2				// Half-Life sprites
+#define IDSPRITEHEADER		MAKEID('I', 'D', 'S', 'P')	// little-endian "IDSP"
 
 typedef enum spriteframetype_e
 {

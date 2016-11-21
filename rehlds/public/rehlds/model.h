@@ -33,14 +33,21 @@
 #include "bspfile.h"
 #include "crc.h"
 #include "com_model.h"
+#include "commonmacros.h"
 
-#define	SURF_PLANEBACK		2
-#define	SURF_DRAWSKY		4
+// header
+#define ALIAS_MODEL_VERSION	0x006
+#define IDPOLYHEADER		MAKEID('I', 'D', 'P', 'O') // little-endian "IDPO"
+
+#define MAX_LBM_HEIGHT		480
+#define MAX_ALIAS_MODEL_VERTS	2000
+
+#define SURF_PLANEBACK		2
+#define SURF_DRAWSKY		4
 #define SURF_DRAWSPRITE		8
 #define SURF_DRAWTURB		0x10
 #define SURF_DRAWTILED		0x20
-#define SURF_DRAWBACKGROUND	0x40 
-#define ALIAS_MODEL_VERSION	0x006
+#define SURF_DRAWBACKGROUND	0x40
 
 #define MAX_MODEL_NAME		64
 #define MIPLEVELS			4
@@ -66,12 +73,24 @@ typedef struct texture_s
 {
 	char			name[16];
 	unsigned		width, height;
+
+#ifndef SWDS
+	int			gl_texturenum;
+	struct msurface_s *	texturechain;
+#endif
+
 	int				anim_total;			// total tenths in sequence ( 0 = no)
 	int				anim_min, anim_max;	// time for this frame min <=time< max
 	struct texture_s *anim_next;		// in the animation sequence
 	struct texture_s *alternate_anims;	// bmodels in frame 1 use these
 	unsigned		offsets[MIPLEVELS];	// four mip maps stored
+
+#ifdef SWDS
 	unsigned		paloffset;
+#else
+	byte *pPal;
+#endif
+
 } texture_t;
 
 typedef struct medge_s
@@ -82,7 +101,7 @@ typedef struct medge_s
 
 typedef struct mtexinfo_s
 {
-	float			vecs[2][4];		// [s/t] unit vectors in world space. 
+	float			vecs[2][4];		// [s/t] unit vectors in world space.
 									// [i][3] is the s/t offset relative to the origin.
 									// s or t = dot(3Dpoint,vecs[i])+vecs[i][3]
 	float			mipadjust;		// ?? mipmap limits for very small surfaces
@@ -284,7 +303,7 @@ typedef struct model_s
 	char			name[MAX_MODEL_NAME];
 
 	int		needload;		// bmodels and sprites don't cache normally
-	
+
 	modtype_t		type;
 	int				numframes;
 	synctype_t		synctype;

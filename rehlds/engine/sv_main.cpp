@@ -303,7 +303,7 @@ cvar_t sv_auto_precache_sounds_in_models = { "sv_auto_precache_sounds_in_models"
 cvar_t sv_delayed_spray_upload = { "sv_delayed_spray_upload", "0", 0, 0.0f, nullptr };
 cvar_t sv_rehlds_force_dlmax = { "sv_rehlds_force_dlmax", "0", 0, 0.0f, nullptr };
 cvar_t listipcfgfile = { "listipcfgfile", "listip.cfg", 0, 0.0f, nullptr };
-cvar_t syserror_logfile = { "syserror_logfile", "rehlds_error.log", 0, 0.0f, nullptr };
+cvar_t syserror_logfile = { "syserror_logfile", "sys_error.log", 0, 0.0f, nullptr };
 cvar_t sv_rehlds_hull_centering = { "sv_rehlds_hull_centering", "0", 0, 0.0f, nullptr };
 cvar_t sv_rcon_condebug = { "sv_rcon_condebug", "1", 0, 1.0f, nullptr };
 cvar_t sv_rehlds_userinfo_transmitted_fields = { "sv_rehlds_userinfo_transmitted_fields", "", 0, 0.0f, nullptr };
@@ -5695,6 +5695,7 @@ void SV_ServerShutdown(void)
 			gEntityInterface.pfnServerDeactivate();
 	}
 }
+
 int SV_SpawnServer(qboolean bIsDemo, char *server, char *startspot)
 {
 	client_t *cl;

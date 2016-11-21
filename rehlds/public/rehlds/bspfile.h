@@ -27,39 +27,42 @@
 */
 #pragma once
 
-#define BSPVERSION			30
+// header
+#define Q1BSP_VERSION		29		// quake1 regular version (beta is 28)
+#define HLBSP_VERSION		30		// half-life regular version
+
 #define MAX_MAP_HULLS		4
 
 #define CONTENTS_ORIGIN		-7		// removed at csg time
 #define CONTENTS_CLIP		-8		// changed to contents_solid
-#define CONTENTS_CURRENT_0		-9
-#define CONTENTS_CURRENT_90		-10
+#define CONTENTS_CURRENT_0	-9
+#define CONTENTS_CURRENT_90	-10
 #define CONTENTS_CURRENT_180	-11
 #define CONTENTS_CURRENT_270	-12
-#define CONTENTS_CURRENT_UP		-13
+#define CONTENTS_CURRENT_UP	-13
 #define CONTENTS_CURRENT_DOWN	-14
 
 #define CONTENTS_TRANSLUCENT	-15
 
-#define	LUMP_ENTITIES	0
+#define	LUMP_ENTITIES		0
 #define	LUMP_PLANES		1
-#define	LUMP_TEXTURES	2
-#define	LUMP_VERTEXES	3
-#define	LUMP_VISIBILITY	4
+#define	LUMP_TEXTURES		2
+#define	LUMP_VERTEXES		3
+#define	LUMP_VISIBILITY		4
 #define	LUMP_NODES		5
-#define	LUMP_TEXINFO	6
+#define	LUMP_TEXINFO		6
 #define	LUMP_FACES		7
-#define	LUMP_LIGHTING	8
-#define	LUMP_CLIPNODES	9
+#define	LUMP_LIGHTING		8
+#define	LUMP_CLIPNODES		9
 #define	LUMP_LEAFS		10
-#define	LUMP_MARKSURFACES 11
+#define	LUMP_MARKSURFACES	11
 #define	LUMP_EDGES		12
-#define	LUMP_SURFEDGES	13
+#define	LUMP_SURFEDGES		13
 #define	LUMP_MODELS		14
 
-#define	HEADER_LUMPS	15
+#define	HEADER_LUMPS		15
 
-typedef struct  lump_s
+typedef struct lump_s
 {
 	int				fileofs;
 	int				filelen;

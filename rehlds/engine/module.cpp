@@ -28,7 +28,6 @@
 
 #include "precompiled.h"
 
-
 // TODO: Implement security module
 cl_enginefunc_dst_t *pg_engdstAddrs;
 

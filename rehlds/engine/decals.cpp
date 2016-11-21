@@ -179,7 +179,7 @@ void Draw_MiptexTexture(cachewad_t *wad, unsigned char *data)
 	u_short nSize;
 	byte *pal;
 
-	if (wad->cacheExtra != 24 + OFFSET_DATAEXTRA_SIZE)
+	if (wad->cacheExtra != DECAL_EXTRASIZE)
 		Sys_Error("Draw_MiptexTexture: Bad cached wad %s\n", wad->name);
 
 	tex = (texture_t *)data;
@@ -545,7 +545,7 @@ void Decal_Init(void)
 		Q_memset(decal_wad_temp, 0, sizeof(cachewad_t));
 
 		Draw_CacheWadInitFromFile(hfile, filesize, "decals.wad", MAX_DECALS, decal_wad_temp);
-		Draw_CacheWadHandler(decal_wad_temp, Draw_MiptexTexture, 24 + OFFSET_DATAEXTRA_SIZE);
+		Draw_CacheWadHandler(decal_wad_temp, Draw_MiptexTexture, DECAL_EXTRASIZE);
 		Decal_MergeInDecals(decal_wad_temp, pszPathID[i]);
 		FS_Close(hfile);
 	}
@@ -584,7 +584,7 @@ qboolean CustomDecal_Init(struct cachewad_s *wad, void *raw, int nFileSize, int 
 	qboolean bret = Draw_CustomCacheWadInit(16, wad, raw, nFileSize);
 	if (bret)
 	{
-		Draw_CacheWadHandler(wad, Draw_MiptexTexture, 24 + OFFSET_DATAEXTRA_SIZE);
+		Draw_CacheWadHandler(wad, Draw_MiptexTexture, DECAL_EXTRASIZE);
 		for (int i = 0; i < wad->lumpCount; i++)
 			Draw_CacheByIndex(wad, i, playernum);
 	}
@@ -707,9 +707,10 @@ qboolean Draw_ValidateCustomLogo(cachewad_t *wad, unsigned char *data, lumpinfo_
 	int pixoffset;
 	int paloffset;
 	int palettesize;
+	int nPalleteCount;
 	int nSize;
 
-	if (wad->cacheExtra != 24 + OFFSET_DATAEXTRA_SIZE)
+	if (wad->cacheExtra != DECAL_EXTRASIZE)
 	{
 		Con_Printf(__FUNCTION__ ": Bad cached wad %s\n", wad->name);
 		return FALSE;
@@ -734,7 +735,7 @@ qboolean Draw_ValidateCustomLogo(cachewad_t *wad, unsigned char *data, lumpinfo_
 	pixoffset = pix + (pix>>2) + (pix>>4) + (pix>>6);
 	paloffset = (pix>>2) + tmp.offsets[0] + pix;
 	palettesize = (pix>>4) + paloffset;
-	nSize = *(u_short *)&data[pixoffset + 64 + OFFSET_DATAEXTRA_SIZE];
+	nPalleteCount = *(u_short *)(data + pixoffset + sizeof(texture_t));
 
 	if (!tex.width || tex.width > 256 || tex.height > 256
 		|| (tmp.offsets[0] + pix != tmp.offsets[1])
@@ -743,17 +744,20 @@ qboolean Draw_ValidateCustomLogo(cachewad_t *wad, unsigned char *data, lumpinfo_
 		Con_Printf(__FUNCTION__ ": Bad cached wad %s\n", wad->name);
 		return FALSE;
 	}
-	if (nSize > 256)
+
+	if (nPalleteCount > 256)
 	{
-		Con_Printf(__FUNCTION__ ": Bad cached wad palette size %i on %s\n", nSize, wad->name);
+		Con_Printf(__FUNCTION__ ": Bad cached wad palette size %i on %s\n", nPalleteCount, wad->name);
 		return FALSE;
 	}
-	nSize = pixoffset + LittleLong(tmp.offsets[0]) + 3 * nSize + 2;
+
+	nSize = pixoffset + LittleLong(tmp.offsets[0]) + 3 * nPalleteCount + 2;
 	if (nSize > lump->disksize)
 	{
 		Con_Printf(__FUNCTION__ ": Bad cached wad %s\n", wad->name);
 		return FALSE;
 	}
+
 	return TRUE;
 }
 

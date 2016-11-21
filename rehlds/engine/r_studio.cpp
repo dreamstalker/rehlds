@@ -672,7 +672,7 @@ hull_t *R_StudioHull(model_t *pModel, float frame, int sequence, const vec_t *an
 		//		const unsigned char *pblending,
 		//		model_t *pModel,
 		//		hull_t *pHulls,
-		//		int numhulls); /* size=0, low_pc=0 */ //   917
+		//		int numhulls);
 	}
 
 	return &studio_hull[0];
@@ -1129,10 +1129,10 @@ int R_GetStudioBounds(const char *filename, float *mins, float *maxs)
 
 	if (pBuffer)
 	{
-		if (LittleLong(*(unsigned int *)pBuffer) == 'TSDI')
+		if (LittleLong(*(unsigned int *)pBuffer) == IDSTUDIOHEADER)
 			iret = R_StudioComputeBounds((unsigned char*)pBuffer, mins, maxs);
 #ifndef REHLDS_FIXES
-		//wrong release memory code
+		// wrong release memory code
 		else
 			COM_FreeFile(pBuffer);
 #endif

@@ -552,9 +552,9 @@ NOBODY void InterpolateAngles(float *start, float *end, float *output, float fra
 //	float ang1;                                                   //   429
 //	float ang2;                                                   //   429
 //	float d;                                                      //   430
-//	NormalizeAngles(float *angles); /* size=0, low_pc=0 */ //   432
-//	NormalizeAngles(float *angles); /* size=0, low_pc=0 */ //   433
-//	NormalizeAngles(float *angles); /* size=0, low_pc=0 */ //   453
+//	NormalizeAngles(float *angles);  //   432
+//	NormalizeAngles(float *angles);  //   433
+//	NormalizeAngles(float *angles);  //   453
 //}
 
 void VectorTransform(const vec_t *in1, float *in2, vec_t *out)

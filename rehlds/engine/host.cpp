@@ -866,8 +866,6 @@ void Host_CheckConnectionFailure(void)
 
 void _Host_Frame(float time)
 {
-
-
 	static double host_times[6];
 	if (setjmp(host_enddemo))
 		return;

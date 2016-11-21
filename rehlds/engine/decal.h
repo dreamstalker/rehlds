@@ -37,16 +37,7 @@
 #include "wad.h"
 
 #define MAX_DECALS				512
-
-/*
-* extradata size to has difference between swds.dll and hw.dll
-* offset to how difference size between them (24 ~ 32) | (64 ~ 72)
-*/
-#ifdef SWDS
-#define OFFSET_DATAEXTRA_SIZE			0
-#else
-#define OFFSET_DATAEXTRA_SIZE			8
-#endif
+#define DECAL_EXTRASIZE				sizeof(texture_t) - sizeof(miptex_t)
 
 typedef struct decalname_s
 {

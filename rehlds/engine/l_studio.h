@@ -34,8 +34,12 @@
 
 #include "maintypes.h"
 #include "studio_rehlds.h"
+#include "commonmacros.h"
 
-#define STUDIO_VERSION 10
+// header
+#define STUDIO_VERSION	10
+#define IDSTUDIOHEADER	MAKEID('I', 'D', 'S', 'T') // little-endian "IDST"
+#define IDSEQGRPHEADER	MAKEID('I', 'D', 'S', 'Q') // little-endian "IDSQ"
 
 #ifdef HOOK_ENGINE
 //#define giTextureSize (*pgiTextureSize)

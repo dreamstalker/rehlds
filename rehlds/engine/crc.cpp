@@ -226,9 +226,9 @@ int CRC_MapFile(CRC32_t *crcvalue, char *pszFileName)
 		return 0;
 	}
 	i = LittleLong(header.version);
-	if (i != BSPVERSION)
+	if (i != HLBSP_VERSION)
 	{
-		Con_Printf("Map [%s] has incorrect BSP version (%i should be %i).\n", pszFileName, i, BSPVERSION);
+		Con_Printf("Map [%s] has incorrect BSP version (%i should be %i).\n", pszFileName, i, HLBSP_VERSION);
 		FS_Close(fp);
 		return 0;
 	}

@@ -28,9 +28,7 @@
 
 #include "precompiled.h"
 
-
 int net_drop;
-
 char gDownloadFile[256];
 
 /*
@@ -692,41 +690,6 @@ qboolean Netchan_Validate(netchan_t *chan, qboolean *frag_message, unsigned int 
 
 qboolean Netchan_Process(netchan_t *chan)
 {
-	//	int i;                                                        //   874
-	//	unsigned int sequence;                                        //   875
-	//	unsigned int sequence_ack;                                    //   875
-	//	unsigned int reliable_ack;                                    //   876
-	//	unsigned int reliable_message;                                //   876
-	//	unsigned int fragid;                                          //   877
-	//	qboolean frag_message;                                        //   878
-	//	int frag_offset;                                              //   879
-	//	int frag_length;                                              //   880
-	//	qboolean message_contains_fragments;                          //   881
-	//	Netchan_Validate(netchan_t *chan,
-	//		qboolean *frag_message,
-	//		unsigned int *fragid,
-	//		int *frag_offset,
-	//		int *frag_length); /* size=0, low_pc=0 */ //   933
-	//	{
-	//		char c;                                               //   946
-	//		int mask;                                             //   947
-	//	}
-	//	{
-	//		int j;                                                //  1038
-	//		unsigned char *src;                                  //  1039
-	//		unsigned char *dst;                                  //  1039
-	//		int len;                                              //  1040
-	//		fragbuf_t *pbuf;                                     //  1041
-	//		int inbufferid;                                       //  1042
-	//		int intotalbuffers;                                   //  1043
-	//		Netchan_FindBufferById(fragbuf_t **pplist,
-	//			int id,
-	//			qboolean allocate); /* size=0, low_pc=0 */ //  1053
-	//		{
-	//			int nbytes;                                   //  1056
-	//		}
-	//	}
-
 	int				i;
 	unsigned int	sequence, sequence_ack;
 	unsigned int	reliable_ack, reliable_message;
@@ -1449,7 +1412,7 @@ void Netchan_FlushIncoming(netchan_t *chan, int stream)
 		n = p->next;
 		Mem_Free(p);
 		p = n;
-	};
+	}
 
 	chan->incomingbufs[stream] = nullptr;
 	chan->incomingready[stream] = FALSE;
@@ -1626,7 +1589,7 @@ qboolean Netchan_CopyFileFragments(netchan_t *chan)
 		if (p == chan->incomingbufs[FRAG_FILE_STREAM])
 			nsize -= msg_readcount;
 		p = p->next;
-	};
+	}
 
 	buffer = (unsigned char*)Mem_ZeroMalloc(nsize + 1);
 	if (!buffer)
@@ -1737,7 +1700,7 @@ NOXREF qboolean Netchan_IsSending(netchan_t *chan)
 	int i;
 	for (i = 0; i < MAX_STREAMS; i++)
 	{
-		if(chan->fragbufs[i])
+		if (chan->fragbufs[i])
 			return TRUE;
 	}
 	return FALSE;
@@ -1748,7 +1711,7 @@ NOXREF qboolean Netchan_IsReceiving(netchan_t *chan)
 	int i;
 	for (i = 0; i < MAX_STREAMS; i++)
 	{
-		if(chan->incomingbufs[i])
+		if (chan->incomingbufs[i])
 			return TRUE;
 	}
 	return FALSE;

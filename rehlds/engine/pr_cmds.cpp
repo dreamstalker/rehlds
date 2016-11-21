@@ -981,7 +981,6 @@ int EXT_FUNC iGetIndex(const char *pszField)
 	IGETINDEX_CHECK_FIELD(globalname);
 
 	return -1;
-
 }
 
 edict_t* EXT_FUNC FindEntityByString(edict_t *pEdictStartSearchAfter, const char *pszField, const char *pszValue)
@@ -1064,7 +1063,7 @@ int EXT_FUNC PF_precache_sound_I(const char *s)
 		for (i = 0; i < HL_SOUND_MAX; i++)
 		{
 			if (g_psv.sound_precache[i] && !Q_stricmp(g_psv.sound_precache[i], s))
-					return i;
+				return i;
 		}
 
 		Host_Error("PF_precache_sound_I: '%s' Precache can only be done in spawn functions", s);

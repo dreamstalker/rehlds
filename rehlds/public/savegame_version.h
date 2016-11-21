@@ -11,6 +11,8 @@
 #pragma once
 #endif
 
+#include "commonmacros.h"
+
 #define SAVEFILE_HEADER		MAKEID('V','A','L','V')		// little-endian "VALV"
 #define SAVEGAME_HEADER		MAKEID('J','S','A','V')		// little-endian "JSAV"
 #define SAVEGAME_VERSION	0x0071				// Version 0.71

@@ -386,7 +386,7 @@ NOBODY int glob_match(char *pattern, char *text);
 //		}
 //	}
 //	glob_match_after_star(char *pattern,
-//				char *text); /* size=0, low_pc=0 */ //   343
+//				char *text);   //   343
 //}
 
 NOXREF void Sys_MakeCodeWriteable(uint32 startaddr, uint32 length)
@@ -742,11 +742,11 @@ NOBODY const char *ConvertNameToLocalPlatform(const char *pchInName);
 //		char *pchClassName;                                  //  1465
 //		char *pchFunctionName;                               //  1466
 //		FindNameInTable(extensiondll_t *pDll,
-//				const char *pName); /* size=0, low_pc=0 */ //  1483
+//				const char *pName);  / //  1483
 //		FindNameInTable(extensiondll_t *pDll,
-//				const char *pName); /* size=0, low_pc=0 */ //  1487
+//				const char *pName);   //  1487
 //		FindNameInTable(extensiondll_t *pDll,
-//				const char *pName); /* size=0, low_pc=0 */ //  1491
+//				const char *pName);   //  1491
 //	}
 //}
 

@@ -33,7 +33,7 @@ Archive's bin directory contains 2 subdirectories, 'bugfixed' and 'pure'
 Bugfixed version of rehlds contains an additional cvars:
 <ul>
 <li>listipcfgfile <filename> // File for permanent ip bans. Default: listip.cfg
-<li>syserror_logfile <filename> // File for the system error log. Default: rehlds_error.log
+<li>syserror_logfile <filename> // File for the system error log. Default: sys_error.log
 <li>sv_auto_precache_sounds_in_models <1|0> // Automatically precache sounds attached to models. Deault: 0
 <li>sv_delayed_spray_upload <1|0> // Upload custom sprays after entering the game instead of when connecting. It increases upload speed. Default: 0
 <li>sv_echo_unknown_cmd <1|0> // Echo in the console when trying execute an uncknown command. Default: 0
