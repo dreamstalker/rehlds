@@ -28,13 +28,11 @@
 
 #include "precompiled.h"
 
-
-/* <b9b44> ../engine/sv_upld.c:51 */
 // Checks MD5 of the resource against local cache and returns TRUE if resource was found or if downloads are disabled. Otherwise, if resource was requested from the player, it returns FALSE.
 qboolean SV_CheckFile(sizebuf_t *msg, char *filename)
 {
 	resource_t p = { };
-	
+
 #ifdef REHLDS_FIXES
 
 	// FIXED: First, check for allowed downloads, then try to lookup, this is faster if downloads aren't enabled
@@ -88,7 +86,6 @@ qboolean SV_CheckFile(sizebuf_t *msg, char *filename)
 	return FALSE;
 }
 
-/* <b9bc1> ../engine/sv_upld.c:93 */
 void SV_ClearResourceLists(client_t *cl)
 {
 	if (!cl)
@@ -100,7 +97,6 @@ void SV_ClearResourceLists(client_t *cl)
 	SV_ClearResourceList(&cl->resourcesonhand);
 }
 
-/* <b9c82> ../engine/sv_upld.c:108 */
 // Reinitializes customizations list. Tries to create customization for each resource in on-hands list.
 void SV_CreateCustomizationList(client_t *pHost)
 {
@@ -154,7 +150,6 @@ void SV_CreateCustomizationList(client_t *pHost)
 	}
 }
 
-/* <b9d0e> ../engine/sv_upld.c:185 */
 // Sends resource to all other players, optionally skipping originating player.
 void SV_Customization(client_t *pPlayer, resource_t *pResource, qboolean bSkipPlayer)
 {
@@ -198,7 +193,6 @@ void SV_Customization(client_t *pPlayer, resource_t *pResource, qboolean bSkipPl
 	}
 }
 
-/* <b9d4e> ../engine/sv_upld.c:241 */
 // Creates customizations list for the current player and sends resources to other players.
 void SV_RegisterResources(void)
 {
@@ -221,7 +215,6 @@ void SV_RegisterResources(void)
 #endif // REHLDS_FIXES
 }
 
-/* <b9db7> ../engine/sv_upld.c:276 */
 void SV_MoveToOnHandList(resource_t *pResource)
 {
 	if (!pResource)
@@ -234,7 +227,6 @@ void SV_MoveToOnHandList(resource_t *pResource)
 	SV_AddToResourceList(pResource, &host_client->resourcesonhand);
 }
 
-/* <b9e30> ../engine/sv_upld.c:296 */
 void SV_AddToResourceList(resource_t *pResource, resource_t *pList)
 {
 	if (pResource->pPrev || pResource->pNext)
@@ -249,7 +241,6 @@ void SV_AddToResourceList(resource_t *pResource, resource_t *pList)
 	pList->pPrev = pResource;
 }
 
-/* <b9e76> ../engine/sv_upld.c:316 */
 void SV_ClearResourceList(resource_t *pList)
 {
 	resource_t *p, *n;
@@ -267,7 +258,6 @@ void SV_ClearResourceList(resource_t *pList)
 	pList->pNext = pList;
 }
 
-/* <b9ec0> ../engine/sv_upld.c:339 */
 void SV_RemoveFromResourceList(resource_t *pResource)
 {
 	pResource->pPrev->pNext = pResource->pNext;
@@ -276,7 +266,6 @@ void SV_RemoveFromResourceList(resource_t *pResource)
 	pResource->pNext = NULL;
 }
 
-/* <b9edd> ../engine/sv_upld.c:355 */
 // For each t_decal and RES_CUSTOM resource the player had shown to us, tries to find it locally or count size required to be downloaded.
 int SV_EstimateNeededResources(void)
 {
@@ -311,7 +300,6 @@ int SV_EstimateNeededResources(void)
 	return size;
 }
 
-/* <b9f72> ../engine/sv_upld.c:391 */
 // This is called each frame to do checks on players if they uploaded all files that where requested from them.
 void SV_RequestMissingResourcesFromClients(void)
 {
@@ -327,7 +315,6 @@ void SV_RequestMissingResourcesFromClients(void)
 	}
 }
 
-/* <b9f53> ../engine/sv_upld.c:406 */
 // Creates customizations list for a player (the current player actually, see the caller) and sends them out to other players when all needed resources are on-hands. Also sends other players customizations to the current player.
 qboolean SV_UploadComplete(client_t *cl)
 {
@@ -346,7 +333,6 @@ qboolean SV_UploadComplete(client_t *cl)
 	return FALSE;
 }
 
-/* <ba03e> ../engine/sv_upld.c:423 */
 // For each resource the player had shown to us, moves it to on-hands list. For t_decal and RES_CUSTOM it tries to find it locally or request resource from the player.
 void SV_BatchUploadRequest(client_t *cl)
 {
@@ -380,7 +366,6 @@ void SV_BatchUploadRequest(client_t *cl)
 	}
 }
 
-/* <b9f44> ../engine/sv_upld.c:467 */
 // This is used to do recurring checks on the current player that he uploaded all resources that where needed.
 qboolean SV_RequestMissingResources(void)
 {
@@ -391,7 +376,6 @@ qboolean SV_RequestMissingResources(void)
 	return FALSE;
 }
 
-/* <ba1d0> ../engine/sv_upld.c:491 */
 void SV_ParseResourceList(client_t *pSenderClient)
 {
 	int i, total;
@@ -402,10 +386,10 @@ void SV_ParseResourceList(client_t *pSenderClient)
 	total = MSG_ReadShort();
 
 #ifdef REHLDS_FIXES
-	SV_ClearResourceLists( host_client );
+	SV_ClearResourceLists(host_client);
 #else // REHLDS_FIXES
-	SV_ClearResourceList( &host_client->resourcesneeded );
-	SV_ClearResourceList( &host_client->resourcesonhand );
+	SV_ClearResourceList(&host_client->resourcesneeded);
+	SV_ClearResourceList(&host_client->resourcesonhand);
 #endif // REHLDS_FIXES
 
 #ifdef REHLDS_FIXES
@@ -446,7 +430,7 @@ void SV_ParseResourceList(client_t *pSenderClient)
 #else // REHLDS_FIXES
 			SV_ClearResourceList( &host_client->resourcesneeded );
 			SV_ClearResourceList( &host_client->resourcesonhand );
-#endif // REHLDS_FIXES		
+#endif // REHLDS_FIXES
 			return;
 		}
 
@@ -477,7 +461,7 @@ void SV_ParseResourceList(client_t *pSenderClient)
 				total = ri.info[t_sound].size;
 				Con_DPrintf("  Sounds:  %.2fK\n", total / 1024.0f);
 			}
-			if (ri.info[t_decal].size) 
+			if (ri.info[t_decal].size)
 			{
 #endif // REHLDS_FIXES
 			// this check is useless, because presence of decals was checked before.

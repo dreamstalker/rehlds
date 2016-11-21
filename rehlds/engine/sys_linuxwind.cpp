@@ -36,11 +36,11 @@
 CGame g_Game;
 IGame *game = &g_Game;
 
-#else //HOOK_ENGINE
+#else // HOOK_ENGINE
 
 IGame *game;
 
-#endif //HOOK_ENGINE
+#endif // HOOK_ENGINE
 
 CGame::CGame()
 {
@@ -184,11 +184,11 @@ void CGame::PlayAVIAndWait_noVirt(const char *aviFile)
 {
 }
 
-void CGame::SetCursorVisible(bool vis)
+void CGame::SetCursorVisible(bool bState)
 {
-	SetCursorVisible_noVirt(vis);
+	SetCursorVisible_noVirt(bState);
 }
 
-void CGame::SetCursorVisible_noVirt(bool vis)
+void CGame::SetCursorVisible_noVirt(bool bState)
 {
 }

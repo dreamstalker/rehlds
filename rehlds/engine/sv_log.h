@@ -34,7 +34,6 @@
 
 #include "maintypes.h"
 
-/* <9a080> ../engine/sv_log.c:23 */
 typedef struct loglist
 {
 	server_log_t log;

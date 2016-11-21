@@ -29,10 +29,7 @@
 
 #include "archtypes.h"
 
-/* <8f1> ../engine/cmd.h:65 */
 typedef void(*xcommand_t)(void);
-
-/* <904> ../engine/cmd.h:71 */
 typedef struct cmd_function_s
 {
 	struct cmd_function_s *next;
@@ -41,7 +38,6 @@ typedef struct cmd_function_s
 	int flags;
 } cmd_function_t;
 
-/* <95a> ../engine/cmd.h:80 */
 typedef enum cmd_source_s
 {
 	src_client = 0,		// came in over a net connection as a clc_stringcmd. host_client will be valid during this state.

@@ -38,21 +38,18 @@ int sv_numareanodes;
 
 cvar_t sv_force_ent_intersection = { "sv_force_ent_intersection", "0", 0, 0.0f, NULL };
 
-/* <ca50b> ../engine/world.c:48 */
 void ClearLink(link_t *l)
 {
 	l->next = l;
 	l->prev = l;
 }
 
-/* <ca41e> ../engine/world.c:53 */
 void RemoveLink(link_t *l)
 {
 	l->next->prev = l->prev;
 	l->prev->next = l->next;
 }
 
-/* <ca452> ../engine/world.c:59 */
 void InsertLinkBefore(link_t *l, link_t *before)
 {
 	l->next = before;
@@ -61,7 +58,6 @@ void InsertLinkBefore(link_t *l, link_t *before)
 	l->prev->next = l;
 }
 
-/* <ca56a> ../engine/world.c:66 */
 NOXREF void InsertLinkAfter(link_t *l, link_t *after)
 {
 	l->prev = after;
@@ -71,7 +67,6 @@ NOXREF void InsertLinkAfter(link_t *l, link_t *after)
 	l->next->prev = l;
 }
 
-/* <ca59d> ../engine/world.c:94 */
 void SV_InitBoxHull(void)
 {
 	box_hull.clipnodes = &box_clipnodes[0];
@@ -93,7 +88,6 @@ void SV_InitBoxHull(void)
 	}
 }
 
-/* <ca3c6> ../engine/world.c:135 */
 hull_t *SV_HullForBox(const vec_t *mins, const vec_t *maxs)
 {
 	box_planes[0].dist = maxs[0];
@@ -105,7 +99,6 @@ hull_t *SV_HullForBox(const vec_t *mins, const vec_t *maxs)
 	return &box_hull;
 }
 
-/* <ca60c> ../engine/world.c:148 */
 NOXREF hull_t *SV_HullForBeam(const vec_t *start, const vec_t *end, const vec_t *size)
 {
 	vec3_t tmp = { 0, 0, 0 };
@@ -162,7 +155,6 @@ NOXREF hull_t *SV_HullForBeam(const vec_t *start, const vec_t *end, const vec_t 
 	return &beam_hull;
 }
 
-/* <ca662> ../engine/world.c:201 */
 struct hull_s *SV_HullForBsp(edict_t *ent, const vec_t *mins, const vec_t *maxs, vec_t *offset)
 {
 	model_t *model;
@@ -192,14 +184,12 @@ struct hull_s *SV_HullForBsp(edict_t *ent, const vec_t *mins, const vec_t *maxs,
 		}
 // TODO: add cvar for this?
 #ifdef REHLDS_FIXES
-		if (   sv_rehlds_hull_centering.value
-		    && mins[0] + maxs[0] == 0.0f)
+		if (sv_rehlds_hull_centering.value && mins[0] + maxs[0] == 0.0f)
 			offset[0] = 0.0f;
 		else
 			offset[0] = hull->clip_mins[0] - mins[0];
-		
-		if (   sv_rehlds_hull_centering.value
-		    && mins[1] + maxs[1] == 0.0f)
+
+		if (sv_rehlds_hull_centering.value && mins[1] + maxs[1] == 0.0f)
 			offset[1] = 0.0f;
 		else
 			offset[1] = hull->clip_mins[1] - mins[1];
@@ -223,7 +213,6 @@ struct hull_s *SV_HullForBsp(edict_t *ent, const vec_t *mins, const vec_t *maxs,
 	return hull;
 }
 
-/* <ca6f1> ../engine/world.c:251 */
 hull_t *SV_HullForEntity(edict_t *ent, const vec_t *mins, const vec_t *maxs, vec_t *offset)
 {
 	vec3_t hullmins;
@@ -249,7 +238,6 @@ hull_t *SV_HullForEntity(edict_t *ent, const vec_t *mins, const vec_t *maxs, vec
 	return SV_HullForBox(hullmins, hullmaxs);
 }
 
-/* <ca793> ../engine/world.c:308 */
 areanode_t *SV_CreateAreaNode(int depth, vec_t *mins, vec_t *maxs)
 {
 	areanode_t *anode;
@@ -301,7 +289,6 @@ areanode_t *SV_CreateAreaNode(int depth, vec_t *mins, vec_t *maxs)
 	return anode;
 }
 
-/* <ca877> ../engine/world.c:353 */
 void SV_ClearWorld(void)
 {
 	SV_InitBoxHull();
@@ -310,7 +297,6 @@ void SV_ClearWorld(void)
 	SV_CreateAreaNode(0, g_psv.worldmodel->mins, g_psv.worldmodel->maxs);
 }
 
-/* <ca8bb> ../engine/world.c:369 */
 void SV_UnlinkEdict(edict_t *ent)
 {
 	if (ent->area.prev)
@@ -321,7 +307,6 @@ void SV_UnlinkEdict(edict_t *ent)
 	}
 }
 
-/* <ca9f5> ../engine/world.c:383 */
 void SV_TouchLinks(edict_t *ent, areanode_t *node)
 {
 	edict_t *touch;
@@ -394,7 +379,6 @@ void SV_TouchLinks(edict_t *ent, areanode_t *node)
 	}
 }
 
-/* <ca8f2> ../engine/world.c:467 */
 #ifndef REHLDS_OPT_PEDANTIC
 void SV_FindTouchedLeafs(edict_t *ent, mnode_t *node, int *topnode)
 {
@@ -538,7 +522,6 @@ void SV_FindTouchedLeafs(edict_t *ent, mnode_t *node, int *topnode)
 }
 #endif // REHLDS_OPT_PEDANTIC
 
-/* <caab0> ../engine/world.c:517 */
 void SV_LinkEdict(edict_t *ent, qboolean touch_triggers)
 {
 	static int iTouchLinkSemaphore = 0;
@@ -614,7 +597,6 @@ void SV_LinkEdict(edict_t *ent, qboolean touch_triggers)
 	}
 }
 
-/* <ca97c> ../engine/world.c:630 */
 int SV_HullPointContents(hull_t *hull, int num, const vec_t *p)
 {
 	dclipnode_t *node;
@@ -638,7 +620,6 @@ int SV_HullPointContents(hull_t *hull, int num, const vec_t *p)
 	return i;
 }
 
-/* <cabb7> ../engine/world.c:663 */
 int SV_LinkContents(areanode_t *node, const vec_t *pos)
 {
 	link_t *l;
@@ -725,7 +706,6 @@ int SV_LinkContents(areanode_t *node, const vec_t *pos)
 	return -1;
 }
 
-/* <cac70> ../engine/world.c:738 */
 int SV_PointContents(const vec_t *p)
 {
 	int cont;
@@ -746,7 +726,6 @@ int SV_PointContents(const vec_t *p)
 	return (entityContents != -1) ? entityContents : cont;
 }
 
-/* <cb289> ../engine/world.c:764 */
 edict_t *SV_TestEntityPosition(edict_t *ent)
 {
 	trace_t trace;
@@ -764,7 +743,6 @@ edict_t *SV_TestEntityPosition(edict_t *ent)
 }
 
 #ifndef REHLDS_OPT_PEDANTIC
-/* <cacbc> ../engine/world.c:804 */
 qboolean SV_RecursiveHullCheck(hull_t *hull, int num, float p1f, float p2f, const vec_t *p1, const vec_t *p2, trace_t *trace)
 {
 	dclipnode_t *node;
@@ -1056,7 +1034,6 @@ qboolean SV_RecursiveHullCheck(hull_t *hull, int num, float p1f, float p2f, cons
 }
 #endif // REHLDS_OPT_PEDANTIC
 
-/* <cadd3> ../engine/world.c:948 */
 void SV_SingleClipMoveToEntity(edict_t *ent, const vec_t *start, const vec_t *mins, const vec_t *maxs, const vec_t *end, trace_t *trace)
 {
 	hull_t *hull;
@@ -1102,7 +1079,7 @@ void SV_SingleClipMoveToEntity(edict_t *ent, const vec_t *start, const vec_t *mi
 		start_l[0] = _DotProduct(forward, temp);
 		start_l[1] = -_DotProduct(right, temp);
 		start_l[2] = _DotProduct(up, temp);
-		
+
 		temp[0] = end_l[0]; temp[1] = end_l[1]; temp[2] = end_l[2];
 		end_l[0] = _DotProduct(forward, temp);
 		end_l[1] = -_DotProduct(right, temp);
@@ -1172,7 +1149,6 @@ void SV_SingleClipMoveToEntity(edict_t *ent, const vec_t *start, const vec_t *mi
 		trace->ent = ent;
 }
 
-/* <caf84> ../engine/world.c:1082 */
 trace_t SV_ClipMoveToEntity(edict_t *ent, const vec_t *start, const vec_t *mins, const vec_t *maxs, const vec_t *end)
 {
 	trace_t goodtrace;
@@ -1181,7 +1157,6 @@ trace_t SV_ClipMoveToEntity(edict_t *ent, const vec_t *start, const vec_t *mins,
 	return goodtrace;
 }
 
-/* <cb027> ../engine/world.c:1148 */
 void SV_ClipToLinks(areanode_t *node, moveclip_t *clip)
 {
 	link_t *l;
@@ -1281,7 +1256,6 @@ void SV_ClipToLinks(areanode_t *node, moveclip_t *clip)
 	}
 }
 
-/* <cb142> ../engine/world.c:1267 */
 void SV_ClipToWorldbrush(areanode_t *node, moveclip_t *clip)
 {
 	link_t *l;
@@ -1330,7 +1304,6 @@ void SV_ClipToWorldbrush(areanode_t *node, moveclip_t *clip)
 	}
 }
 
-/* <cb206> ../engine/world.c:1330 */
 void SV_MoveBounds(const vec_t *start, const vec_t *mins, const vec_t *maxs, const vec_t *end, vec_t *boxmins, vec_t *boxmaxs)
 {
 	for (int i = 0; i < 3; i++)
@@ -1348,7 +1321,6 @@ void SV_MoveBounds(const vec_t *start, const vec_t *mins, const vec_t *maxs, con
 	}
 }
 
-/* <cb391> ../engine/world.c:1364 */
 trace_t SV_MoveNoEnts(const vec_t *start, vec_t *mins, vec_t *maxs, const vec_t *end, int type, edict_t *passedict)
 {
 	moveclip_t clip;
@@ -1392,7 +1364,6 @@ trace_t SV_MoveNoEnts(const vec_t *start, vec_t *mins, vec_t *maxs, const vec_t 
 	return clip.trace;
 }
 
-/* <cb47e> ../engine/world.c:1415 */
 trace_t SV_Move(const vec_t *start, const vec_t *mins, const vec_t *maxs, const vec_t *end, int type, edict_t *passedict, qboolean monsterClipBrush)
 {
 	moveclip_t clip;
@@ -1461,9 +1432,9 @@ void SV_SingleClipMoveToPoint(const vec_t *start, const vec_t *end, trace_t *tra
 
 	if (trace->fraction != 1.0f)
 	{
-		trace->endpos[0] = ( end[0] - start[0] ) * trace->fraction + start[0];
-		trace->endpos[1] = ( end[1] - start[1] ) * trace->fraction + start[1];
-		trace->endpos[2] = ( end[2] - start[2] ) * trace->fraction + start[2];
+		trace->endpos[0] = (end[0] - start[0]) * trace->fraction + start[0];
+		trace->endpos[1] = (end[1] - start[1]) * trace->fraction + start[1];
+		trace->endpos[2] = (end[2] - start[2]) * trace->fraction + start[2];
 	}
 
 	if (trace->fraction < 1.0f || trace->startsolid)

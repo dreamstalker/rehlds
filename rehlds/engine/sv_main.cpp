@@ -28,7 +28,6 @@
 
 #include "precompiled.h"
 
-/* <a5976> ../engine/sv_main.c:96 */
 typedef struct full_packet_entities_s
 {
 	int num_entities;
@@ -111,8 +110,8 @@ int g_bIsCStrike;
 
 qboolean allow_cheats;
 
-/* 
- * Globals initialization 
+/*
+ * Globals initialization
  */
 #ifndef HOOK_ENGINE
 
@@ -310,7 +309,6 @@ cvar_t sv_rcon_condebug = { "sv_rcon_condebug", "1", 0, 1.0f, nullptr };
 cvar_t sv_rehlds_userinfo_transmitted_fields = { "sv_rehlds_userinfo_transmitted_fields", "", 0, 0.0f, nullptr };
 #endif
 
-/* <a6492> ../engine/sv_main.c:113 */
 delta_t *SV_LookupDelta(char *name)
 {
 	delta_info_t *p = g_sv_delta;
@@ -329,7 +327,6 @@ delta_t *SV_LookupDelta(char *name)
 	return NULL;
 }
 
-/* <a64e0> ../engine/sv_main.c:280 */
 NOXREF void SV_DownloadingModules(void)
 {
 	NOXREFCHECK;
@@ -342,7 +339,6 @@ NOXREF void SV_DownloadingModules(void)
 #endif // SWDS
 }
 
-/* <a654c> ../engine/sv_main.c:310 */
 void SV_GatherStatistics(void)
 {
 	int players = 0;
@@ -408,7 +404,6 @@ void SV_GatherStatistics(void)
 		g_psvs.stats.average_session_len = g_psvs.stats.cumulative_sessiontime / g_psvs.stats.num_sessions;
 }
 
-/* <a6628> ../engine/sv_main.c:432 */
 void SV_DeallocateDynamicData(void)
 {
 	if (g_moved_edict)
@@ -419,7 +414,6 @@ void SV_DeallocateDynamicData(void)
 	g_moved_from = NULL;
 }
 
-/* <a6644> ../engine/sv_main.c:450 */
 void SV_ReallocateDynamicData(void)
 {
 	if (!g_psv.max_edicts)
@@ -449,7 +443,6 @@ void SV_ReallocateDynamicData(void)
 	g_moved_from = (vec3_t *)Mem_ZeroMalloc(sizeof(vec3_t) * nSize);
 }
 
-/* <a667f> ../engine/sv_main.c:485 */
 void SV_AllocClientFrames(void)
 {
 	client_t *cl = g_psvs.clients;
@@ -467,7 +460,6 @@ void SV_AllocClientFrames(void)
 	}
 }
 
-/* <a5dbe> ../engine/sv_main.c:500 */
 qboolean SV_IsPlayerIndex(int index)
 {
 	return (index >= 1 && index <= g_psvs.maxclients);
@@ -492,7 +484,6 @@ qboolean __declspec(naked) SV_IsPlayerIndex_wrapped(int index)
 	}
 }
 
-/* <a6717> ../engine/sv_main.c:514 */
 void SV_ClearPacketEntities(client_frame_t *frame)
 {
 	if (frame)
@@ -504,7 +495,6 @@ void SV_ClearPacketEntities(client_frame_t *frame)
 	}
 }
 
-/* <a677e> ../engine/sv_main.c:532 */
 void SV_AllocPacketEntities(client_frame_t *frame, int numents)
 {
 	if (frame)
@@ -529,7 +519,6 @@ void SV_AllocPacketEntities(client_frame_t *frame, int numents)
 	}
 }
 
-/* <a6817> ../engine/sv_main.c:561 */
 void SV_ClearFrames(client_frame_t **frames)
 {
 	client_frame_t *pframe = *frames;
@@ -548,7 +537,6 @@ void SV_ClearFrames(client_frame_t **frames)
 	}
 }
 
-/* <a5e8f> ../engine/sv_main.c:593 */
 void SV_Serverinfo_f(void)
 {
 	if (Cmd_Argc() == 1)
@@ -585,7 +573,6 @@ void SV_Serverinfo_f(void)
 	SV_BroadcastCommand("fullserverinfo \"%s\"\n", Info_Serverinfo());
 }
 
-/* <a5c4a> ../engine/sv_main.c:638 */
 void SV_Localinfo_f(void)
 {
 	if (Cmd_Argc() == 1)
@@ -608,7 +595,6 @@ void SV_Localinfo_f(void)
 	Info_SetValueForKey(localinfo, Cmd_Argv(1), Cmd_Argv(2), MAX_INFO_STRING * 128);
 }
 
-/* <a5c19> ../engine/sv_main.c:672 */
 void SV_User_f(void)
 {
 	if (!g_psv.active)
@@ -643,7 +629,6 @@ void SV_User_f(void)
 	Con_Printf("User not in server.\n");
 }
 
-/* <a6026> ../engine/sv_main.c:721 */
 void SV_Users_f(void)
 {
 	if (!g_psv.active)
@@ -673,11 +658,10 @@ void SV_Users_f(void)
 	Con_Printf("%i users\n", c);
 }
 
-/* <a651b> ../engine/sv_main.c:762 */
 void SV_CountPlayers(int *clients)
 {
 	int count = 0;
-	
+
 	client_s *cl = g_psvs.clients;
 	for (int i = 0; i < g_psvs.maxclients; i++, cl++)
 	{
@@ -688,7 +672,6 @@ void SV_CountPlayers(int *clients)
 	*clients = count;
 }
 
-/* <a68a4> ../engine/sv_main.c:786 */
 void SV_CountProxies(int *proxies)
 {
 	*proxies = 0;
@@ -704,7 +687,6 @@ void SV_CountProxies(int *proxies)
 	}
 }
 
-/* <a6905> ../engine/sv_main.c:810 */
 void SV_FindModelNumbers(void)
 {
 	sv_playermodel = -1;
@@ -725,7 +707,6 @@ void SV_FindModelNumbers(void)
 	}
 }
 
-/* <a693e> ../engine/sv_main.c:841 */
 void SV_StartParticle(const vec_t *org, const vec_t *dir, int color, int count)
 {
 	if (g_psv.datagram.cursize + 16 <= g_psv.datagram.maxsize)
@@ -750,7 +731,6 @@ void SV_StartSound(int recipients, edict_t *entity, int channel, const char *sam
 	g_RehldsHookchains.m_SV_StartSound.callChain(SV_StartSound_internal, recipients, entity, channel, sample, volume, attenuation, fFlags, pitch);
 }
 
-/* <a6df2> ../engine/sv_main.c:887 */
 void EXT_FUNC SV_StartSound_internal(int recipients, edict_t *entity, int channel, const char *sample, int volume, float attenuation, int fFlags, int pitch)
 {
 	vec3_t origin;
@@ -785,7 +765,6 @@ void EXT_FUNC SV_StartSound_internal(int recipients, edict_t *entity, int channe
 	}
 }
 
-/* <a614c> ../engine/sv_main.c:942 */
 qboolean SV_BuildSoundMsg(edict_t *entity, int channel, const char *sample, int volume, float attenuation, int fFlags, int pitch, const float *origin, sizebuf_t *buffer)
 {
 	int sound_num;
@@ -868,7 +847,6 @@ qboolean SV_BuildSoundMsg(edict_t *entity, int channel, const char *sample, int 
 	return TRUE;
 }
 
-/* <a622a> ../engine/sv_main.c:1073 */
 int SV_HashString(const char *string, int iBounds)
 {
 	unsigned int hash = 0;
@@ -882,7 +860,6 @@ int SV_HashString(const char *string, int iBounds)
 	return hash % iBounds;
 }
 
-/* <a6ad2> ../engine/sv_main.c:1087 */
 int EXT_FUNC SV_LookupSoundIndex(const char *sample)
 {
 	int index;
@@ -917,7 +894,6 @@ int EXT_FUNC SV_LookupSoundIndex(const char *sample)
 	return 0;
 }
 
-/* <a6a3b> ../engine/sv_main.c:1136 */
 void SV_BuildHashedSoundLookupTable(void)
 {
 	Q_memset(g_psv.sound_precache_hashedlookup, 0, sizeof(g_psv.sound_precache_hashedlookup));
@@ -933,7 +909,6 @@ void SV_BuildHashedSoundLookupTable(void)
 	g_psv.sound_precache_hashedlookup_built = TRUE;
 }
 
-/* <a6bd9> ../engine/sv_main.c:1151 */
 void SV_AddSampleToHashedLookupTable(const char *pszSample, int iSampleIndex)
 {
 	int starting_index = SV_HashString(pszSample, HL_SOUND_HASHLOOKUP_SIZE);
@@ -953,7 +928,6 @@ void SV_AddSampleToHashedLookupTable(const char *pszSample, int iSampleIndex)
 	g_psv.sound_precache_hashedlookup[index] = iSampleIndex;
 }
 
-/* <a6c7c> ../engine/sv_main.c:1180 */
 qboolean SV_ValidClientMulticast(client_t *client, int soundLeaf, int to)
 {
 	if (Host_IsSinglePlayerGame() || client->proxy)
@@ -999,7 +973,6 @@ qboolean SV_ValidClientMulticast(client_t *client, int soundLeaf, int to)
 	return FALSE;
 }
 
-/* <a6d27> ../engine/sv_main.c:1240 */
 void SV_Multicast(edict_t *ent, vec_t *origin, int to, qboolean reliable)
 {
 	client_t *save = host_client;
@@ -1062,7 +1035,6 @@ void SV_Multicast(edict_t *ent, vec_t *origin, int to, qboolean reliable)
 	host_client = save;
 }
 
-/* <a6f4f> ../engine/sv_main.c:1328 */
 void EXT_FUNC SV_WriteMovevarsToClient(sizebuf_t *message)
 {
 	MSG_WriteByte(message, svc_newmovevars);
@@ -1094,7 +1066,6 @@ void EXT_FUNC SV_WriteMovevarsToClient(sizebuf_t *message)
 	MSG_WriteString(message, movevars.skyName);
 }
 
-/* <a6f79> ../engine/sv_main.c:1365 */
 void EXT_FUNC SV_WriteDeltaDescriptionsToClient(sizebuf_t *msg)
 {
 	int i, c;
@@ -1121,7 +1092,6 @@ void EXT_FUNC SV_WriteDeltaDescriptionsToClient(sizebuf_t *msg)
 	}
 }
 
-/* <a7002> ../engine/sv_main.c:1407 */
 void EXT_FUNC SV_SetMoveVars(void)
 {
 	movevars.entgravity			= 1.0f;
@@ -1154,7 +1124,6 @@ void EXT_FUNC SV_SetMoveVars(void)
 	movevars.skyName[sizeof(movevars.skyName) - 1] = 0;
 }
 
-/* <a7018> ../engine/sv_main.c:1446 */
 void SV_QueryMovevarsChanged(void)
 {
 	if (movevars.entgravity				!= 1.0f
@@ -1205,7 +1174,6 @@ void SV_SendServerinfo(sizebuf_t *msg, client_t *client)
 	g_RehldsHookchains.m_SV_SendServerinfo.callChain(SV_SendServerinfo_mod, msg, GetRehldsApiClient(client));
 }
 
-/* <a7050> ../engine/sv_main.c:1499 */
 void SV_SendServerinfo_internal(sizebuf_t *msg, client_t *client)
 {
 	char message[2048];
@@ -1289,7 +1257,6 @@ void SV_SendServerinfo_internal(sizebuf_t *msg, client_t *client)
 	client->fully_connected = FALSE;
 }
 
-/* <a70eb> ../engine/sv_main.c:1600 */
 void SV_SendResources(sizebuf_t *msg)
 {
 	unsigned char nullbuffer[32];
@@ -1342,7 +1309,6 @@ void SV_SendResources(sizebuf_t *msg)
 	MSG_EndBitWriting(msg);
 }
 
-/* <a717e> ../engine/sv_main.c:1659 */
 void SV_WriteClientdataToMessage(client_t *client, sizebuf_t *msg)
 {
 	edict_t *ent = client->edict;
@@ -1439,7 +1405,6 @@ void SV_WriteClientdataToMessage(client_t *client, sizebuf_t *msg)
 	MSG_EndBitWriting(msg);
 }
 
-/* <a889e> ../engine/sv_main.c:1789 */
 void SV_WriteSpawn(sizebuf_t *msg)
 {
 	int i = 0;
@@ -1541,7 +1506,6 @@ void SV_WriteSpawn(sizebuf_t *msg)
 	NotifyDedicatedServerUI("UpdatePlayers");
 }
 
-/* <a7277> ../engine/sv_main.c:1920 */
 void EXT_FUNC SV_SendUserReg(sizebuf_t *msg)
 {
 	for (UserMsg *pMsg = sv_gpNewUserMsgs; pMsg; pMsg = pMsg->next)
@@ -1556,7 +1520,6 @@ void EXT_FUNC SV_SendUserReg(sizebuf_t *msg)
 	}
 }
 
-/* <a87be> ../engine/sv_main.c:1953 */
 void SV_New_f(void)
 {
 	int i;
@@ -1646,7 +1609,6 @@ void SV_New_f(void)
 	Netchan_FragSend(&host_client->netchan);
 }
 
-/* <a7132> ../engine/sv_main.c:2057 */
 void SV_SendRes_f(void)
 {
 	unsigned char data[NET_MAX_PAYLOAD];
@@ -1676,7 +1638,6 @@ void SV_Spawn_f(void)
 	g_RehldsHookchains.m_SV_Spawn_f.callChain(SV_Spawn_f_internal);
 }
 
-/* <a8922> ../engine/sv_main.c:2096 */
 void EXT_FUNC SV_Spawn_f_internal(void)
 {
 	unsigned char data[NET_MAX_PAYLOAD];
@@ -1742,7 +1703,6 @@ void EXT_FUNC SV_Spawn_f_internal(void)
 	}
 }
 
-/* <a72d8> ../engine/sv_main.c:2148 */
 void SV_CheckUpdateRate(double *rate)
 {
 	if (*rate == 0.0)
@@ -1768,7 +1728,6 @@ void SV_CheckUpdateRate(double *rate)
 	}
 }
 
-/* <a7302> ../engine/sv_main.c:2189 */
 void EXT_FUNC SV_RejectConnection(netadr_t *adr, char *fmt, ...)
 {
 	va_list argptr;
@@ -1785,7 +1744,6 @@ void EXT_FUNC SV_RejectConnection(netadr_t *adr, char *fmt, ...)
 	SZ_Clear(&net_message);
 }
 
-/* <a735c> ../engine/sv_main.c:2213 */
 void SV_RejectConnectionForPassword(netadr_t *adr)
 {
 	SZ_Clear(&net_message);
@@ -1796,7 +1754,6 @@ void SV_RejectConnectionForPassword(netadr_t *adr)
 	SZ_Clear(&net_message);
 }
 
-/* <a5bce> ../engine/sv_main.c:2230 */
 int SV_GetFragmentSize(void *state)
 {
 	int size = FRAGMENT_S2C_MAX_SIZE;
@@ -1820,7 +1777,6 @@ int SV_GetFragmentSize(void *state)
 	return size;
 }
 
-/* <ab01b> ../engine/sv_main.c:2266 */
 qboolean EXT_FUNC SV_FilterUser(USERID_t *userid)
 {
 	int j = numuserfilters;
@@ -1849,7 +1805,6 @@ int SV_CheckProtocol(netadr_t *adr, int nProtocol)
 	return g_RehldsHookchains.m_SV_CheckProtocol.callChain(SV_CheckProtocol_internal, adr, nProtocol);
 }
 
-/* <a7396> ../engine/sv_main.c:2302 */
 int EXT_FUNC SV_CheckProtocol_internal(netadr_t *adr, int nProtocol)
 {
 	if (adr == NULL)
@@ -1887,7 +1842,6 @@ int EXT_FUNC SV_CheckProtocol_internal(netadr_t *adr, int nProtocol)
 	return FALSE;
 }
 
-/* <a5a15> ../engine/sv_main.c:2335 */
 typedef struct challenge_s
 {
 	netadr_t adr;
@@ -1905,7 +1859,6 @@ bool EXT_FUNC SV_CheckChallenge_api(const netadr_t &adr, int nChallengeValue) {
 	return SV_CheckChallenge(&localAdr, nChallengeValue) != 0;
 }
 
-/* <a5c55> ../engine/sv_main.c:2351 */
 int SV_CheckChallenge(netadr_t *adr, int nChallengeValue)
 {
 	if (!adr)
@@ -1913,7 +1866,7 @@ int SV_CheckChallenge(netadr_t *adr, int nChallengeValue)
 
 	if (NET_IsLocalAddress(*adr))
 		return 1;
-	
+
 	for (int i = 0; i < MAX_CHALLENGES; i++)
 	{
 		if (NET_CompareBaseAdr(net_from, g_rg_sv_challenges[i].adr))
@@ -1935,7 +1888,6 @@ int SV_CheckIPRestrictions(netadr_t *adr, int nAuthProtocol)
 	return g_RehldsHookchains.m_SV_CheckIPRestrictions.callChain(SV_CheckIPRestrictions_internal, adr, nAuthProtocol);
 }
 
-/* <a743d> ../engine/sv_main.c:2393 */
 int EXT_FUNC SV_CheckIPRestrictions_internal(netadr_t *adr, int nAuthProtocol)
 {
 	if (sv_lan.value || nAuthProtocol != 3)
@@ -1948,7 +1900,6 @@ int EXT_FUNC SV_CheckIPRestrictions_internal(netadr_t *adr, int nAuthProtocol)
 	return 1;
 }
 
-/* <a748f> ../engine/sv_main.c:2427 */
 int SV_CheckIPConnectionReuse(netadr_t *adr)
 {
 	int count = 0;
@@ -1976,7 +1927,6 @@ int SV_FinishCertificateCheck(netadr_t *adr, int nAuthProtocol, char *szRawCerti
 	return g_RehldsHookchains.m_SV_FinishCertificateCheck.callChain(SV_FinishCertificateCheck_internal, adr, nAuthProtocol, szRawCertificate, userinfo);
 }
 
-/* <a74f4> ../engine/sv_main.c:2461 */
 int EXT_FUNC SV_FinishCertificateCheck_internal(netadr_t *adr, int nAuthProtocol, char *szRawCertificate, char *userinfo)
 {
 	if (nAuthProtocol != 2)
@@ -2012,13 +1962,12 @@ int EXT_FUNC SV_FinishCertificateCheck_internal(netadr_t *adr, int nAuthProtocol
 	return 1;
 }
 
-int SV_CheckKeyInfo(netadr_t *adr, char *protinfo, short unsigned int *port, int *pAuthProtocol, char *pszRaw, char *cdkey)
+int SV_CheckKeyInfo(netadr_t *adr, char *protinfo, unsigned short *port, int *pAuthProtocol, char *pszRaw, char *cdkey)
 {
 	return g_RehldsHookchains.m_SV_CheckKeyInfo.callChain(SV_CheckKeyInfo_internal, adr, protinfo, port, pAuthProtocol, pszRaw, cdkey);
 }
 
-/* <a7584> ../engine/sv_main.c:2527 */
-int EXT_FUNC SV_CheckKeyInfo_internal(netadr_t *adr, char *protinfo, short unsigned int *port, int *pAuthProtocol, char *pszRaw, char *cdkey)
+int EXT_FUNC SV_CheckKeyInfo_internal(netadr_t *adr, char *protinfo, unsigned short *port, int *pAuthProtocol, char *pszRaw, char *cdkey)
 {
 	const char *s = Info_ValueForKey(protinfo, "prot");
 	int nAuthProtocol = Q_atoi(s);
@@ -2057,7 +2006,6 @@ int EXT_FUNC SV_CheckKeyInfo_internal(netadr_t *adr, char *protinfo, short unsig
 	return 1;
 }
 
-/* <aadf7> ../engine/sv_main.c:2590 */
 int SV_CheckForDuplicateSteamID(client_t *client)
 {
 	if (sv_lan.value != 0.0f)
@@ -2080,7 +2028,6 @@ int SV_CheckForDuplicateSteamID(client_t *client)
 	return -1;
 }
 
-/* <a761b> ../engine/sv_main.c:2639 */
 int SV_CheckForDuplicateNames(char *userinfo, qboolean bIsReconnecting, int nExcludeSlot)
 {
 	const char *val;
@@ -2154,7 +2101,6 @@ void SV_ReplaceSpecialCharactersInName(char *newname, const char *oldname)
 }
 #endif
 
-/* <a76d2> ../engine/sv_main.c:2710 */
 int SV_CheckUserInfo(netadr_t *adr, char *userinfo, qboolean bIsReconnecting, int nReconnectSlot, char *name)
 {
 	const char *s;
@@ -2274,7 +2220,6 @@ int SV_CheckUserInfo(netadr_t *adr, char *userinfo, qboolean bIsReconnecting, in
 	}
 }
 
-/* <a77de> ../engine/sv_main.c:2822 */
 int SV_FindEmptySlot(netadr_t *adr, int *pslot, client_t ** ppClient)
 {
 	if (g_psvs.maxclients > 0)
@@ -2305,7 +2250,6 @@ void SV_ConnectClient(void)
 	g_RehldsHookchains.m_SV_ConnectClient.callChain(SV_ConnectClient_internal);
 }
 
-/* <ab6f0> ../engine/sv_main.c:2859 */
 void EXT_FUNC SV_ConnectClient_internal(void)
 {
 	client_t *client;
@@ -2322,7 +2266,7 @@ void EXT_FUNC SV_ConnectClient_internal(void)
 	char name[32];
 	char szRawCertificate[512];
 	int nAuthProtocol;
-	short unsigned int port;
+	unsigned short port;
 	qboolean reconnect;
 	qboolean bIsSecure;
 
@@ -2399,13 +2343,13 @@ void EXT_FUNC SV_ConnectClient_internal(void)
 #endif // REHLDS_FIXES
 		}
 	}
-	
+
 	if (!SV_CheckUserInfo(&adr, userinfo, reconnect, nClientSlot, name))
 		return;
-	
+
 	if (!SV_FinishCertificateCheck(&adr, nAuthProtocol, szRawCertificate, userinfo))
 		return;
-	
+
 	if (reconnect)
 	{
 		Steam_NotifyClientDisconnect(client);
@@ -2490,7 +2434,7 @@ void EXT_FUNC SV_ConnectClient_internal(void)
 	host_client->resourcesonhand.pPrev = &host_client->resourcesonhand;
 	host_client->resourcesonhand.pNext = &host_client->resourcesonhand;
 	host_client->edict = EDICT_NUM(nClientSlot + 1);
-	
+
 	if (g_modfuncs.m_pfnConnectClient)
 		g_modfuncs.m_pfnConnectClient(nClientSlot);
 
@@ -2546,7 +2490,6 @@ void EXT_FUNC SV_ConnectClient_internal(void)
 	g_RehldsHookchains.m_ClientConnected.callChain(NULL, GetRehldsApiClient(host_client));
 }
 
-/* <a78b5> ../engine/sv_main.c:3179 */
 void SVC_Ping(void)
 {
 	char data[6] = "\xff\xff\xff\xffj";
@@ -2598,7 +2541,6 @@ int EXT_FUNC SV_GetChallenge(const netadr_t& adr)
 	return g_rg_sv_challenges[i].challenge;
 }
 
-/* <a78d3> ../engine/sv_main.c:3208 */
 void SVC_GetChallenge(void)
 {
 	char data[1024];
@@ -2618,7 +2560,6 @@ void SVC_GetChallenge(void)
 	NET_SendPacket(NS_SERVER, Q_strlen(data) + 1, data, net_from);
 }
 
-/* <a794c> ../engine/sv_main.c:3292 */
 void SVC_ServiceChallenge(void)
 {
 	char data[128];
@@ -2642,7 +2583,6 @@ void SVC_ServiceChallenge(void)
 	NET_SendPacket(NS_SERVER, Q_strlen(data) + 1, data, net_from);
 }
 
-/* <a7981> ../engine/sv_main.c:3346 */
 void SV_ResetModInfo(void)
 {
 	FileHandle_t hLibListFile;
@@ -2705,7 +2645,6 @@ void SV_ResetModInfo(void)
 	FS_Close(hLibListFile);
 }
 
-/* <a5cfb> ../engine/sv_main.c:3431 */
 int SV_GetFakeClientCount(void)
 {
 	int i;
@@ -2721,7 +2660,6 @@ int SV_GetFakeClientCount(void)
 	return fakeclients;
 }
 
-/* <a7a53> ../engine/sv_main.c:3445 */
 NOXREF qboolean SV_GetModInfo(char *pszInfo, char *pszDL, int *version, int *size, qboolean *svonly, qboolean *cldll, char *pszHLVersion)
 {
 	if (gmodinfo.bIsMod)
@@ -2749,13 +2687,11 @@ NOXREF qboolean SV_GetModInfo(char *pszInfo, char *pszDL, int *version, int *siz
 	return gmodinfo.bIsMod;
 }
 
-/* <a5cdb> ../engine/sv_main.c:3479 */
 NOXREF qboolean RequireValidChallenge(netadr_t* /*adr*/)
 {
 	return sv_enableoldqueries.value == 0.0f;
 }
 
-/* <a7b26> ../engine/sv_main.c:3490 */
 NOXREF qboolean ValidInfoChallenge(netadr_t *adr, const char *nugget)
 {
 	if (nugget && g_psv.active && g_psvs.maxclients > 1)
@@ -2767,7 +2703,6 @@ NOXREF qboolean ValidInfoChallenge(netadr_t *adr, const char *nugget)
 	return FALSE;
 }
 
-/* <a7b79> ../engine/sv_main.c:3510 */
 NOXREF int GetChallengeNr(netadr_t *adr)
 {
 	int oldest = 0;
@@ -2795,7 +2730,6 @@ NOXREF int GetChallengeNr(netadr_t *adr)
 	return g_rg_sv_challenges[i].challenge;
 }
 
-/* <a7bd5> ../engine/sv_main.c:3546 */
 NOXREF qboolean CheckChallengeNr(netadr_t *adr, int nChallengeValue)
 {
 	int i;
@@ -2817,7 +2751,6 @@ NOXREF qboolean CheckChallengeNr(netadr_t *adr, int nChallengeValue)
 	return FALSE;
 }
 
-/* <a7c3a> ../engine/sv_main.c:3589 */
 NOXREF void ReplyServerChallenge(netadr_t *adr)
 {
 	char buffer[16];
@@ -2835,7 +2768,6 @@ NOXREF void ReplyServerChallenge(netadr_t *adr)
 	NET_SendPacket(NS_SERVER, buf.cursize, (char *)buf.data, *adr);
 }
 
-/* <a7c9c> ../engine/sv_main.c:3615 */
 NOXREF qboolean ValidChallenge(netadr_t *adr, int challengeNr)
 {
 	if (!g_psv.active)
@@ -2851,7 +2783,6 @@ NOXREF qboolean ValidChallenge(netadr_t *adr, int challengeNr)
 	return FALSE;
 }
 
-/* <a7d60> ../engine/sv_main.c:3645 */
 NOXREF void SVC_InfoString(void)
 {
 	int i;
@@ -2965,7 +2896,6 @@ NOXREF void SVC_InfoString(void)
 	NET_SendPacket(NS_SERVER, buf.cursize, (char *)buf.data, net_from);
 }
 
-/* <a7e8d> ../engine/sv_main.c:3783 */
 NOXREF void SVC_Info(qboolean bDetailed)
 {
 	int i;
@@ -3070,7 +3000,6 @@ NOXREF void SVC_Info(qboolean bDetailed)
 	NET_SendPacket(NS_SERVER, buf.cursize, (char *)buf.data, net_from);
 }
 
-/* <a5a58> ../engine/sv_main.c:3940 */
 typedef struct entcount_s
 {
 	int entdata;
@@ -3079,7 +3008,6 @@ typedef struct entcount_s
 
 //entcount_t ent_datacounts[32];
 
-/* <a802d> ../engine/sv_main.c:3954 */
 NOXREF void SVC_PlayerInfo(void)
 {
 	int i;
@@ -3128,7 +3056,6 @@ NOXREF void SVC_PlayerInfo(void)
 	NET_SendPacket(NS_SERVER, buf.cursize, (char *)buf.data, net_from);
 }
 
-/* <a80a6> ../engine/sv_main.c:4017 */
 NOXREF void SVC_RuleInfo(void)
 {
 	int nNumRules;
@@ -3177,7 +3104,6 @@ NOXREF void SVC_RuleInfo(void)
 	NET_SendPacket(NS_SERVER, buf.cursize, (char *)buf.data, net_from);
 }
 
-/* <a8112> ../engine/sv_main.c:4083 */
 int SVC_GameDllQuery(const char *s)
 {
 	int len;
@@ -3198,7 +3124,6 @@ int SVC_GameDllQuery(const char *s)
 	return valid;
 }
 
-/* <a817b> ../engine/sv_main.c:4133 */
 void SV_FlushRedirect(void)
 {
 	unsigned char *data;
@@ -3234,14 +3159,12 @@ void SV_FlushRedirect(void)
 	}
 }
 
-/* <a81bf> ../engine/sv_main.c:4184 */
 void SV_EndRedirect(void)
 {
 	SV_FlushRedirect();
 	sv_redirected = RD_NONE;
 }
 
-/* <a81f5> ../engine/sv_main.c:4170 */
 void SV_BeginRedirect(redirect_t rd, netadr_t *addr)
 {
 	Q_memcpy(&sv_redirectto, addr, sizeof(sv_redirectto));
@@ -3252,7 +3175,6 @@ void SV_BeginRedirect(redirect_t rd, netadr_t *addr)
 #define MAX_RCON_FAILURES_STORAGE 32
 #define MAX_RCON_FAILURES 20
 
-/* <a5a8c> ../engine/sv_main.c:4214 */
 typedef struct rcon_failure_s
 {
 	qboolean active;
@@ -3265,13 +3187,11 @@ typedef struct rcon_failure_s
 
 rcon_failure_t g_rgRconFailures[MAX_RCON_FAILURES_STORAGE];
 
-/* <a62b4> ../engine/sv_main.c:4229 */
 void SV_ResetRcon_f(void)
 {
 	Q_memset(g_rgRconFailures, 0, sizeof(g_rgRconFailures));
 }
 
-/* <a822b> ../engine/sv_main.c:4238 */
 void SV_AddFailedRcon(netadr_t *adr)
 {
 	int i;
@@ -3385,7 +3305,6 @@ void SV_AddFailedRcon(netadr_t *adr)
 	}
 }
 
-/* <a61f6> ../engine/sv_main.c:4364 */
 qboolean SV_CheckRconFailure(netadr_t *adr)
 {
 	for (int i = 0; i < MAX_RCON_FAILURES_STORAGE; i++)
@@ -3401,7 +3320,6 @@ qboolean SV_CheckRconFailure(netadr_t *adr)
 	return FALSE;
 }
 
-/* <a82c8> ../engine/sv_main.c:4400 */
 int SV_Rcon_Validate(void)
 {
 	if (Cmd_Argc() < 3 || Q_strlen(rcon_password.string) == 0)
@@ -3419,7 +3337,7 @@ int SV_Rcon_Validate(void)
 
 	if (!SV_CheckChallenge(&net_from, Q_atoi(Cmd_Argv(1))))
 		return 2;
-	
+
 	if (Q_strcmp(Cmd_Argv(2), rcon_password.string))
 	{
 		SV_AddFailedRcon(&net_from);
@@ -3428,7 +3346,6 @@ int SV_Rcon_Validate(void)
 	return 0;
 }
 
-/* <a846e> ../engine/sv_main.c:4452 */
 void SV_Rcon(netadr_t *net_from_)
 {
 	char remaining[512];
@@ -3490,7 +3407,6 @@ void SV_Rcon(netadr_t *net_from_)
 	SV_EndRedirect();
 }
 
-/* <ab901> ../engine/sv_main.c:4564 */
 void SV_ConnectionlessPacket(void)
 {
 	char *args;
@@ -3550,7 +3466,6 @@ void SV_ConnectionlessPacket(void)
 		SVC_GameDllQuery(args);
 }
 
-/* <a8500> ../engine/sv_main.c:4656 */
 void SV_CheckRate(client_t *cl)
 {
 	if (sv_maxrate.value > 0.0f)
@@ -3575,7 +3490,6 @@ void SV_CheckRate(client_t *cl)
 	}
 }
 
-/* <a8538> ../engine/sv_main.c:4675 */
 void SV_ProcessFile(client_t *cl, char *filename)
 {
 	customization_t *pList;
@@ -3632,7 +3546,6 @@ void SV_ProcessFile(client_t *cl, char *filename)
 		Con_Printf("Error parsing custom decal from %s\n", cl->name);
 }
 
-/* <a85d5> ../engine/sv_main.c:4760 */
 qboolean SV_FilterPacket(void)
 {
 	for (int i = numipfilters - 1; i >= 0; i--)
@@ -3654,7 +3567,6 @@ qboolean SV_FilterPacket(void)
 	return sv_filterban.value == 0.0f;
 }
 
-/* <a861b> ../engine/sv_main.c:4796 */
 void SV_SendBan(void)
 {
 	char szMessage[64];
@@ -3675,7 +3587,6 @@ bool EXT_FUNC NET_GetPacketPreprocessor(uint8* data, unsigned int len, const net
 	return true;
 }
 
-/* <ab9af> ../engine/sv_main.c:4818 */
 void SV_ReadPackets(void)
 {
 	while (NET_GetPacket(NS_SERVER))
@@ -3746,17 +3657,6 @@ void SV_ReadPackets(void)
 	}
 }
 
-/* <aba20> ../engine/sv_main.c:4842 */
-//NOBODY int ntohl(void);
-//{
-//}
-
-/* <aba34> ../engine/sv_main.c:4842 */
-//NOBODY int htons(void);
-//{
-//}
-
-/* <a8656> ../engine/sv_main.c:4914 */
 void SV_CheckTimeouts(void)
 {
 	int i;
@@ -3779,7 +3679,6 @@ void SV_CheckTimeouts(void)
 	}
 }
 
-/* <a5d59> ../engine/sv_main.c:4943 */
 int SV_CalcPing(client_t *cl)
 {
 	float ping;
@@ -3849,7 +3748,6 @@ void EXT_FUNC SV_WriteFullClientUpdate_internal(IGameClient *client, char *info,
 	MSG_WriteBuf(sb, sizeof(digest), digest);
 }
 
-/* <a874a> ../engine/sv_main.c:4991 */
 void SV_FullClientUpdate(client_t *cl, sizebuf_t *sb)
 {
 	char info[MAX_INFO_STRING];
@@ -3880,7 +3778,6 @@ void SV_EmitEvents(client_t *cl, packet_entities_t *pack, sizebuf_t *ms)
 	g_RehldsHookchains.m_SV_EmitEvents.callChain(SV_EmitEvents_api, GetRehldsApiClient(cl), pack, ms);
 }
 
-/* <a8995> ../engine/sv_main.c:5027 */
 void SV_EmitEvents_internal(client_t *cl, packet_entities_t *pack, sizebuf_t *msg)
 {
 	int i;
@@ -4028,7 +3925,6 @@ unsigned char fatpvs[1024];
 int fatpasbytes;
 unsigned char fatpas[1024];
 
-/* <a8a7c> ../engine/sv_main.c:5196 */
 void SV_AddToFatPVS(vec_t *org, mnode_t *node)
 {
 	while (node->contents >= 0)
@@ -4060,7 +3956,6 @@ void SV_AddToFatPVS(vec_t *org, mnode_t *node)
 	}
 }
 
-/* <a8af2> ../engine/sv_main.c:5239 */
 unsigned char* EXT_FUNC SV_FatPVS(float *org)
 {
 	fatbytes = (g_psv.worldmodel->numleafs + 31) >> 3;
@@ -4069,7 +3964,6 @@ unsigned char* EXT_FUNC SV_FatPVS(float *org)
 	return fatpvs;
 }
 
-/* <a8b20> ../engine/sv_main.c:5249 */
 void SV_AddToFatPAS(vec_t *org, mnode_t *node)
 {
 	int i;
@@ -4113,7 +4007,6 @@ void SV_AddToFatPAS(vec_t *org, mnode_t *node)
 	}
 }
 
-/* <a8bac> ../engine/sv_main.c:5295 */
 unsigned char* EXT_FUNC SV_FatPAS(float *org)
 {
 	fatpasbytes = (g_psv.worldmodel->numleafs + 31) >> 3;
@@ -4122,21 +4015,18 @@ unsigned char* EXT_FUNC SV_FatPAS(float *org)
 	return fatpas;
 }
 
-/* <a6c4c> ../engine/sv_main.c:5304 */
 int SV_PointLeafnum(vec_t *p)
 {
 	mleaf_t *mleaf = Mod_PointInLeaf(p, g_psv.worldmodel);
 	return mleaf ? (mleaf - g_psv.worldmodel->leafs) : 0;
 }
 
-/* <a5e36> ../engine/sv_main.c:5313 */
 void TRACE_DELTA(char *fmt, ...)
 {
 }
 
 deltacallback_t g_svdeltacallback;
 
-/* <a5dde> ../engine/sv_main.c:5349 */
 void SV_SetCallback(int num, qboolean remove, qboolean custom, int *numbase, qboolean full, int offset)
 {
 	g_svdeltacallback.num = num;
@@ -4149,14 +4039,12 @@ void SV_SetCallback(int num, qboolean remove, qboolean custom, int *numbase, qbo
 	g_svdeltacallback.offset = offset;
 }
 
-/* <a5e53> ../engine/sv_main.c:5361 */
 void SV_SetNewInfo(int newblindex)
 {
 	g_svdeltacallback.newbl = TRUE;
 	g_svdeltacallback.newblindex = newblindex;
 }
 
-/* <a8c81> ../engine/sv_main.c:5367 */
 void SV_WriteDeltaHeader(int num, qboolean remove, qboolean custom, int *numbase, qboolean newbl, int newblindex, qboolean full, int offset)
 {
 	int delta;
@@ -4223,7 +4111,6 @@ void SV_WriteDeltaHeader(int num, qboolean remove, qboolean custom, int *numbase
 	}
 }
 
-/* <a8d24> ../engine/sv_main.c:5445 */
 void SV_InvokeCallback(void)
 {
 	SV_WriteDeltaHeader(
@@ -4238,7 +4125,6 @@ void SV_InvokeCallback(void)
 	);
 }
 
-/* <a8d3a> ../engine/sv_main.c:5467 */
 int SV_FindBestBaseline(int index, entity_state_t ** baseline, entity_state_t *to, int num, qboolean custom)
 {
 	int bestbitnumber;
@@ -4293,7 +4179,6 @@ int SV_CreatePacketEntities(sv_delta_t type, client_t *client, packet_entities_t
 	return g_RehldsHookchains.m_SV_CreatePacketEntities.callChain(SV_CreatePacketEntities_api, type, GetRehldsApiClient(client), to, msg);
 }
 
-/* <a8e01> ../engine/sv_main.c:5525 */
 int SV_CreatePacketEntities_internal(sv_delta_t type, client_t *client, packet_entities_t *to, sizebuf_t *msg)
 {
 	packet_entities_t *from;
@@ -4415,7 +4300,7 @@ int SV_CreatePacketEntities_internal(sv_delta_t type, client_t *client, packet_e
 
 				// fix for https://github.com/dreamstalker/rehlds/issues/24
 #ifdef REHLDS_FIXES
-				if (offset) 
+				if (offset)
 					baselineToIdx = newnum - offset;
 #endif
 			}
@@ -4442,8 +4327,8 @@ int SV_CreatePacketEntities_internal(sv_delta_t type, client_t *client, packet_e
 
 		//Remember changed fields that was marked in original mask, but unmarked by the conditional encoder
 		toBaselinesForceMask[newnum] = diffMask & origMask;
-		
-		
+
+
 #else //REHLDS_FIXES
 		DELTA_WriteDelta(
 			(uint8 *)baseline_,
@@ -4455,7 +4340,7 @@ int SV_CreatePacketEntities_internal(sv_delta_t type, client_t *client, packet_e
 #endif //REHLDS_FIXES
 
 		++newnum;
-		
+
 	}
 
 	MSG_WriteBits(0, 16);
@@ -4463,13 +4348,11 @@ int SV_CreatePacketEntities_internal(sv_delta_t type, client_t *client, packet_e
 	return msg->cursize;
 }
 
-/* <a906b> ../engine/sv_main.c:5685 */
 void SV_EmitPacketEntities(client_t *client, packet_entities_t *to, sizebuf_t *msg)
 {
 	SV_CreatePacketEntities(client->delta_sequence == -1 ? sv_packet_nodelta : sv_packet_delta, client, to, msg);
 }
 
-/* <a90cc> ../engine/sv_main.c:5708 */
 qboolean SV_ShouldUpdatePing(client_t *client)
 {
 	if (client->proxy)
@@ -4487,7 +4370,6 @@ qboolean SV_ShouldUpdatePing(client_t *client)
 	return client->lastcmd.buttons & IN_SCORE;
 }
 
-/* <a9109> ../engine/sv_main.c:5734 */
 NOXREF qboolean SV_HasEventsInQueue(client_t *client)
 {
 	int i;
@@ -4506,7 +4388,6 @@ NOXREF qboolean SV_HasEventsInQueue(client_t *client)
 	return FALSE;
 }
 
-/* <a91c0> ../engine/sv_main.c:5756 */
 void SV_GetNetInfo(client_t *client, int *ping, int *packet_loss)
 {
 	static uint16 lastping[32];
@@ -4524,7 +4405,6 @@ void SV_GetNetInfo(client_t *client, int *ping, int *packet_loss)
 	*packet_loss = lastloss[i];
 }
 
-/* <a92a5> ../engine/sv_main.c:5775 */
 int EXT_FUNC SV_CheckVisibility(edict_t *entity, unsigned char *pset)
 {
 	int leaf;
@@ -4565,7 +4445,6 @@ int EXT_FUNC SV_CheckVisibility(edict_t *entity, unsigned char *pset)
 	}
 }
 
-/* <a9324> ../engine/sv_main.c:5844 */
 void SV_EmitPings(client_t *client, sizebuf_t *msg)
 {
 	int ping;
@@ -4590,7 +4469,6 @@ void SV_EmitPings(client_t *client, sizebuf_t *msg)
 	MSG_EndBitWriting(msg);
 }
 
-/* <a947b> ../engine/sv_main.c:5878 */
 void SV_WriteEntitiesToClient(client_t *client, sizebuf_t *msg)
 {
 	client_frame_t *frame = &client->frames[SV_UPDATE_MASK & client->netchan.outgoing_sequence];
@@ -4602,7 +4480,7 @@ void SV_WriteEntitiesToClient(client_t *client, sizebuf_t *msg)
 
 	packet_entities_t *pack = &frame->entities;
 
-	// for REHLDS_OPT_PEDANTIC: Allocate the MAX_PACKET_ENTITIES ents in the frame's storage 
+	// for REHLDS_OPT_PEDANTIC: Allocate the MAX_PACKET_ENTITIES ents in the frame's storage
 	// This allows us to avoid intermediate 'fullpack' storage
 #ifdef REHLDS_OPT_PEDANTIC
 	SV_AllocPacketEntities(frame, MAX_PACKET_ENTITIES);
@@ -4614,7 +4492,7 @@ void SV_WriteEntitiesToClient(client_t *client, sizebuf_t *msg)
 	fullpack.num_entities = 0;
 	full_packet_entities_t* curPack = &fullpack;
 #endif // REHLDS_OPT_PEDANTIC
-	
+
 	qboolean sendping = SV_ShouldUpdatePing(client);
 	int flags = client->lw != 0;
 
@@ -4669,7 +4547,6 @@ void SV_WriteEntitiesToClient(client_t *client, sizebuf_t *msg)
 		SV_EmitPings(client, msg);
 }
 
-/* <a968b> ../engine/sv_main.c:5981 */
 void SV_CleanupEnts(void)
 {
 	for (int e = 1; e < g_psv.num_edicts; e++)
@@ -4679,7 +4556,6 @@ void SV_CleanupEnts(void)
 	}
 }
 
-/* <a96d8> ../engine/sv_main.c:5999 */
 qboolean SV_SendClientDatagram(client_t *client)
 {
 	unsigned char buf[MAX_DATAGRAM];
@@ -4734,7 +4610,6 @@ void SV_UpdateUserInfo(client_t *pClient)
 	SV_FullClientUpdate(pClient, &g_psv.reliable_datagram);
 }
 
-/* <a981c> ../engine/sv_main.c:6062 */
 void SV_UpdateToReliableMessages(void)
 {
 	int i;
@@ -4867,7 +4742,6 @@ void SV_UpdateToReliableMessages(void)
 	SZ_Clear(&g_psv.spectator);
 }
 
-/* <a9736> ../engine/sv_main.c:6184 */
 void SV_SkipUpdates(void)
 {
 	for (int i = 0; i < g_psvs.maxclients; i++)
@@ -4881,7 +4755,6 @@ void SV_SkipUpdates(void)
 	}
 }
 
-/* <a98aa> ../engine/sv_main.c:6204 */
 void SV_SendClientMessages(void)
 {
 	SV_UpdateToReliableMessages();
@@ -4921,7 +4794,7 @@ void SV_SendClientMessages(void)
 			if (sv_failuretime.value < realtime - cl->netchan.last_received)
 				cl->send_message = FALSE;
 		}
-		
+
 		if (cl->send_message)
 		{
 			if (!Netchan_CanPacket(&cl->netchan))
@@ -4941,7 +4814,6 @@ void SV_SendClientMessages(void)
 	SV_CleanupEnts();
 }
 
-/* <a976e> ../engine/sv_main.c:6307 */
 void SV_ExtractFromUserinfo(client_t *cl)
 {
 	const char *val;
@@ -4959,7 +4831,7 @@ void SV_ExtractFromUserinfo(client_t *cl)
 	for (char *p = newname; *p; p++)
 	{
 		if (*p == '%'
-			|| *p == '&'	
+			|| *p == '&'
 			)
 			*p = ' ';
 	}
@@ -5046,7 +4918,6 @@ void SV_ExtractFromUserinfo(client_t *cl)
 	SV_CheckRate(cl);
 }
 
-/* <a9900> ../engine/sv_main.c:6507 */
 int SV_ModelIndex(const char *name)
 {
 	if (!name || !name[0])
@@ -5071,7 +4942,6 @@ int SV_ModelIndex(const char *name)
 	Sys_Error("SV_ModelIndex: model %s not precached", name);
 }
 
-/* <a9992> ../engine/sv_main.c:6529 */
 void EXT_FUNC SV_AddResource(resourcetype_t type, const char *name, int size, unsigned char flags, int index)
 {
 	resource_t *r;
@@ -5187,7 +5057,6 @@ void PrecacheMapSpecifiedResources()
 }
 #endif // REHLDS_FIXES
 
-/* <a99d9> ../engine/sv_main.c:6557 */
 void SV_CreateGenericResources(void)
 {
 	char filename[MAX_PATH];
@@ -5257,7 +5126,6 @@ void SV_CreateGenericResources(void)
 	COM_FreeFile(buffer);
 }
 
-/* <a9a24> ../engine/sv_main.c:6675 */
 void SV_CreateResourceList(void)
 {
 	char const ** s;
@@ -5343,7 +5211,6 @@ void SV_CreateResourceList(void)
 	}
 }
 
-/* <a9c59> ../engine/sv_main.c:6766 */
 void SV_ClearCaches(void)
 {
 	int i;
@@ -5361,7 +5228,6 @@ void SV_ClearCaches(void)
 	}
 }
 
-/* <a9c82> ../engine/sv_main.c:6790 */
 // Sends customizations from all active players to the current player.
 void SV_PropagateCustomizations(void)
 {
@@ -5406,7 +5272,6 @@ void SV_WriteVoiceCodec(sizebuf_t *pBuf)
 	g_RehldsHookchains.m_SV_WriteVoiceCodec.callChain(SV_WriteVoiceCodec_internal, pBuf);
 }
 
-/* <a9cdb> ../engine/sv_main.c:6850 */
 void EXT_FUNC SV_WriteVoiceCodec_internal(sizebuf_t *pBuf)
 {
 	MSG_WriteByte(pBuf, svc_voiceinit);
@@ -5446,7 +5311,6 @@ void __invokeValvesBuggedCreateBaseline(void* func, int player, int eindex, stru
 	}
 }
 
-/* <a9cf9> ../engine/sv_main.c:6866 */
 void SV_CreateBaseline(void)
 {
 	edict_t *svent;
@@ -5513,7 +5377,6 @@ void SV_CreateBaseline(void)
 	MSG_EndBitWriting(&g_psv.signon);
 }
 
-/* <a9da2> ../engine/sv_main.c:6969 */
 void SV_BroadcastCommand(char *fmt, ...)
 {
 	va_list argptr;
@@ -5549,14 +5412,12 @@ void SV_BroadcastCommand(char *fmt, ...)
 	}
 }
 
-/* <a9e84> ../engine/sv_main.c:7017 */
 void SV_BuildReconnect(sizebuf_t *msg)
 {
 	MSG_WriteByte(msg, svc_stufftext);
 	MSG_WriteString(msg, "reconnect\n");
 }
 
-/* <a9ea2> ../engine/sv_main.c:7032 */
 NOXREF void SV_ReconnectAllClients(void)
 {
 	int i;
@@ -5583,7 +5444,6 @@ NOXREF void SV_ReconnectAllClients(void)
 
 }
 
-/* <a9eeb> ../engine/sv_main.c:7068 */
 void SetCStrikeFlags(void)
 {
 	if (!g_bCS_CZ_Flags_Initialized)	// TODO: Convert these to enum
@@ -5626,7 +5486,7 @@ void PrecacheModelTexture(const char *s, studiohdr_t *pStudioHeader)
 	size_t modelNameLength = Q_strlen(s);
 	if (modelNameLength >= MAX_QPATH - 1)
 		return;
-	
+
 	char textureModelName[MAX_QPATH];
 	Q_strcpy(textureModelName, s);
 
@@ -5722,7 +5582,6 @@ void SV_ActivateServer(int runPhysics)
 	g_RehldsHookchains.m_SV_ActivateServer.callChain(SV_ActivateServer_internal, runPhysics);
 }
 
-/* <a9f01> ../engine/sv_main.c:7107 */
 void EXT_FUNC SV_ActivateServer_internal(int runPhysics)
 {
 	int i;
@@ -5825,7 +5684,6 @@ void EXT_FUNC SV_ActivateServer_internal(int runPhysics)
 	}
 }
 
-/* <a9fdc> ../engine/sv_main.c:7245 */
 void SV_ServerShutdown(void)
 {
 	Steam_NotifyOfLevelChange();
@@ -5837,7 +5695,6 @@ void SV_ServerShutdown(void)
 			gEntityInterface.pfnServerDeactivate();
 	}
 }
-/* <a9ff2> ../engine/sv_main.c:7265 */
 int SV_SpawnServer(qboolean bIsDemo, char *server, char *startspot)
 {
 	client_t *cl;
@@ -5874,7 +5731,7 @@ int SV_SpawnServer(qboolean bIsDemo, char *server, char *startspot)
 	Log_Printf("Loading map \"%s\"\n", server);
 	Log_PrintServerVars();
 	NET_Config((qboolean)(g_psvs.maxclients > 1));
-	
+
 	pszhost = Cvar_VariableString("hostname");
 	if (pszhost && *pszhost == '\0')
 	{
@@ -5910,7 +5767,7 @@ int SV_SpawnServer(qboolean bIsDemo, char *server, char *startspot)
 	Q_strncpy(oldname, g_psv.name, sizeof(oldname) - 1);
 	oldname[sizeof(oldname) - 1] = 0;
 	Host_ClearMemory(FALSE);
-	
+
 	cl = g_psvs.clients;
 	for (i = 0; i < g_psvs.maxclientslimit; i++, cl++)
 		SV_ClearFrames(&cl->frames);
@@ -5989,7 +5846,7 @@ int SV_SpawnServer(qboolean bIsDemo, char *server, char *startspot)
 	g_psv.signon.maxsize = sizeof(g_psv.signon_data);
 #endif
 	g_psv.signon.cursize = 0;
-	
+
 	g_psv.num_edicts = g_psvs.maxclients + 1;
 
 	cl = g_psvs.clients;
@@ -6099,13 +5956,11 @@ int SV_SpawnServer(qboolean bIsDemo, char *server, char *startspot)
 	return 1;
 }
 
-/* <aa169> ../engine/sv_main.c:7586 */
 void SV_LoadEntities(void)
 {
 	ED_LoadFromFile(g_psv.worldmodel->entities);
 }
 
-/* <aa17f> ../engine/sv_main.c:7592 */
 void SV_ClearEntities(void)
 {
 	int i;
@@ -6119,7 +5974,6 @@ void SV_ClearEntities(void)
 			ReleaseEntityDLLFields(pEdict);
 	}
 }
-/* <aa1be> ../engine/sv_main.c:7620 */
 int EXT_FUNC RegUserMsg(const char *pszName, int iSize)
 {
 	if (giNextUserMsg > 255 || !pszName || Q_strlen(pszName) > 11 || iSize > 192)
@@ -6140,7 +5994,7 @@ int EXT_FUNC RegUserMsg(const char *pszName, int iSize)
 	Q_strcpy(pNewMsg->szName, pszName);
 	pNewMsg->next = sv_gpNewUserMsgs;
 	sv_gpNewUserMsgs = pNewMsg;
-	
+
 	return pNewMsg->iMsg;
 }
 
@@ -6295,7 +6149,6 @@ qboolean StringToFilter(const char *s, ipfilter_t *f)
 	return true;
 }
 #else // REHLDS_FIXES
-/* <aa23b> ../engine/sv_main.c:7717 */
 qboolean StringToFilter(const char *s, ipfilter_t *f)
 {
 	char num[128];
@@ -6334,7 +6187,6 @@ qboolean StringToFilter(const char *s, ipfilter_t *f)
 }
 #endif // REHLDS_FIXES
 
-/* <aa365> ../engine/sv_main.c:7765 */
 USERID_t *SV_StringToUserID(const char *str)
 {
 	static USERID_t id;
@@ -6371,7 +6223,6 @@ void SV_SerializeSteamid(USERID_t* id, USERID_t* serialized)
 	*serialized = *id;
 }
 
-/* <ab410> ../engine/sv_main.c:7799 */
 void SV_BanId_f(void)
 {
 	char szreason[256];
@@ -6453,7 +6304,7 @@ void SV_BanId_f(void)
 		}
 		if (id == NULL)
 			id = SV_StringToUserID(idstring);
-		
+
 		if (id == NULL)
 		{
 			Con_Printf(__FUNCTION__ ":  Couldn't resolve uniqueid %s.\n", idstring);
@@ -6576,7 +6427,6 @@ void ReplaceEscapeSequences(char *str)
 }
 #endif // REHLDS_FIXES
 
-/* <ab1ec> ../engine/sv_main.c:8040 */
 void Host_Kick_f(void)
 {
 	const char *p;
@@ -6629,7 +6479,7 @@ void Host_Kick_f(void)
 
 		Q_strncpy(idstring, p, 63);
 		idstring[63] = 0;
-		
+
 		if (!Q_strnicmp(idstring, "STEAM_", 6) || !Q_strnicmp(idstring, "VALVE_", 6))
 		{
 			Q_snprintf(idstring, 63, "%s:%s:%s", p, Cmd_Argv(argsStartNum + 1), Cmd_Argv(argsStartNum + 3));
@@ -6744,7 +6594,6 @@ void Host_Kick_f(void)
 	host_client = save;
 }
 
-/* <aafa6> ../engine/sv_main.c:8237 */
 void SV_RemoveId_f(void)
 {
 	if (Cmd_Argc() != 2 && Cmd_Argc() != 6)
@@ -6752,7 +6601,7 @@ void SV_RemoveId_f(void)
 		Con_Printf("Usage:  removeid <uniqueid | #slotnumber>\n");
 		return;
 	}
-	
+
 #ifdef REHLDS_FIXES
 	const char* idstring = Cmd_Args();
 #else
@@ -6766,7 +6615,7 @@ void SV_RemoveId_f(void)
 		Con_Printf(__FUNCTION__ ":  Id string is empty!\n");
 		return;
 	}
-	
+
 	if (idstring[0] == '#')
 	{
 		int slot = Q_atoi(&idstring[1]);
@@ -6786,7 +6635,7 @@ void SV_RemoveId_f(void)
 		if (slot + 1 < numuserfilters)
 			Q_memcpy(&userfilters[slot], &userfilters[slot + 1], (numuserfilters - (slot + 1)) * sizeof(userfilter_t));
 #endif // REHLDS_FIXES
-		
+
 		numuserfilters--;
 		Con_Printf("UserID filter removed for %s, id %s\n", idstring, SV_GetIDString(&id));
 	}
@@ -6803,7 +6652,7 @@ void SV_RemoveId_f(void)
 			idstring[63] = 0;
 		}
 #endif // REHLDS_FIXES
-		
+
 		for (int i = 0; i < numuserfilters; i++)
 		{
 			if (!Q_stricmp(SV_GetIDString(&userfilters[i].userid), idstring))
@@ -6826,7 +6675,6 @@ void SV_RemoveId_f(void)
 	}
 }
 
-/* <aaf4f> ../engine/sv_main.c:8320 */
 void SV_WriteId_f(void)
 {
 	char name[MAX_PATH];
@@ -6851,7 +6699,6 @@ void SV_WriteId_f(void)
 	FS_Close(f);
 }
 
-/* <aaf26> ../engine/sv_main.c:8358 */
 void SV_ListId_f(void)
 {
 	if (numuserfilters <= 0)
@@ -6859,7 +6706,7 @@ void SV_ListId_f(void)
 		Con_Printf("UserID filter list: empty\n");
 		return;
 	}
-	
+
 	Con_Printf("UserID filter list: %i entries\n", numuserfilters);
 	for (int i = 0; i < numuserfilters; i++)
 	{
@@ -6874,7 +6721,6 @@ void SV_ListId_f(void)
 	}
 }
 
-/* <a5eab> ../engine/sv_main.c:8388 */
 void SV_AddIP_f(void)
 {
 	if (Cmd_Argc() != 3)
@@ -6934,7 +6780,7 @@ ipaddress A.B.C.D/24 is equivalent to A.B.C.0 and A.B.C\n");
 		Con_Printf("IP filter list is full\n");
 		return;
 	}
-	
+
 	++numipfilters;
 	if (banTime < 0.0099999998f)
 		banTime = 0.0f;
@@ -6975,7 +6821,6 @@ ipaddress A.B.C.D/24 is equivalent to A.B.C.0 and A.B.C\n");
 	}
 }
 
-/* <aa2c1> ../engine/sv_main.c:8470 */
 void SV_RemoveIP_f(void)
 {
 #ifdef REHLDS_FIXES
@@ -7047,7 +6892,6 @@ Use removeAll to delete all ip filters which ipaddress or ipaddress/CIDR include
 	}
 }
 
-/* <a62ca> ../engine/sv_main.c:8507 */
 void SV_ListIP_f(void)
 {
 	if (numipfilters <= 0)
@@ -7060,7 +6904,7 @@ void SV_ListIP_f(void)
 	bool isNew = Cmd_Argc() == 2;
 	bool searchByFilter = isNew && isdigit(Cmd_Argv(1)[0]);
 	ipfilter_t filter;
-	
+
 	if (searchByFilter)
 	{
 		if (!StringToFilter(Cmd_Argv(1), &filter))
@@ -7102,7 +6946,6 @@ void SV_ListIP_f(void)
 	}
 }
 
-/* <a6301> ../engine/sv_main.c:8535 */
 void SV_WriteIP_f(void)
 {
 	char name[MAX_PATH];
@@ -7138,7 +6981,6 @@ void SV_WriteIP_f(void)
 	FS_Close(f);
 }
 
-/* <aaeb1> ../engine/sv_main.c:8569 */
 void SV_KickPlayer(int nPlayerSlot, int nReason)
 {
 	if (nPlayerSlot < 0 || nPlayerSlot >= g_psvs.maxclients)
@@ -7152,7 +6994,7 @@ void SV_KickPlayer(int nPlayerSlot, int nReason)
 	Q_memcpy(&id, &client->network_userid, sizeof(id));
 
 	Log_Printf("Secure: \"%s<%i><%s><>\" was detected cheating and dropped from the server.\n", client->name, client->userid, SV_GetIDString(&id), nReason);
-	
+
 	char rgchT[1024];
 	rgchT[0] = svc_print;
 	Q_sprintf(
@@ -7174,7 +7016,6 @@ void SV_KickPlayer(int nPlayerSlot, int nReason)
 	SV_DropClient(&g_psvs.clients[nPlayerSlot], FALSE, "Automatically dropped by cheat detector");
 }
 
-/* <aa3c7> ../engine/sv_main.c:8639 */
 void SV_InactivateClients(void)
 {
 	int i;
@@ -7202,7 +7043,6 @@ void SV_InactivateClients(void)
 	}
 }
 
-/* <a5edd> ../engine/sv_main.c:8676 */
 void SV_FailDownload(const char *filename)
 {
 	if (filename && *filename)
@@ -7212,7 +7052,6 @@ void SV_FailDownload(const char *filename)
 	}
 }
 
-/* <aa437> ../engine/sv_main.c:8686 */
 //-----------------------------------------------------------------------------
 // Finds a string in another string with a case insensitive test
 //-----------------------------------------------------------------------------
@@ -7256,7 +7095,6 @@ void SV_FailDownload(const char *filename)
 	return NULL;
 }*/
 
-/* <aa4f4> ../engine/sv_main.c:8736 */
 qboolean IsSafeFileToDownload(const char *filename)
 {
 	char *first;
@@ -7313,7 +7151,6 @@ qboolean IsSafeFileToDownload(const char *filename)
 	return TRUE;
 }
 
-/* <aa564> ../engine/sv_main.c:8835 */
 void SV_BeginFileDownload_f(void)
 {
 	const char *name;
@@ -7398,7 +7235,6 @@ void SV_BeginFileDownload_f(void)
 #endif // REHLDS_FIXES
 }
 
-/* <aa65c> ../engine/sv_main.c:8942 */
 void SV_SetMaxclients(void)
 {
 	int i;
@@ -7406,7 +7242,7 @@ void SV_SetMaxclients(void)
 
 	for (i = 0, cl = g_psvs.clients; i < g_psvs.maxclientslimit; i++, cl++)
 		SV_ClearFrames(&cl->frames);
-	
+
 	g_psvs.maxclients = 1;
 	i = COM_CheckParm("-maxplayers");
 
@@ -7460,7 +7296,6 @@ void SV_SetMaxclients(void)
 	Rehlds_Interfaces_InitClients();
 }
 
-/* <aa728> ../engine/sv_main.c:9033 */
 void SV_HandleRconPacket(void)
 {
 	MSG_BeginReading();
@@ -7471,7 +7306,7 @@ void SV_HandleRconPacket(void)
 	if (!Q_strcmp(c, "getchallenge"))
 	{
 		SVC_GetChallenge();
-	} 
+	}
 	else if (!Q_stricmp(c, "challenge"))
 	{
 		SVC_ServiceChallenge();
@@ -7482,7 +7317,6 @@ void SV_HandleRconPacket(void)
 	}
 }
 
-/* <aa7b0> ../engine/sv_main.c:9065 */
 void SV_CheckCmdTimes(void)
 {
 	static double lastreset;
@@ -7515,7 +7349,6 @@ void SV_CheckCmdTimes(void)
 	}
 }
 
-/* <aa80a> ../engine/sv_main.c:9122 */
 void SV_CheckForRcon(void)
 {
 	if (g_psv.active || g_pcls.state != ca_dedicated || giActive == DLL_CLOSE || !host_initialized)
@@ -7535,7 +7368,6 @@ void SV_CheckForRcon(void)
 	}
 }
 
-/* <aa8ac> ../engine/sv_main.c:9144 */
 qboolean SV_IsSimulating(void)
 {
 	if (g_psv.paused)
@@ -7550,7 +7382,6 @@ qboolean SV_IsSimulating(void)
 	return FALSE;
 }
 
-/* <aa8fc> ../engine/sv_main.c:9156 */
 void SV_CheckMapDifferences(void)
 {
 	static double lastcheck;
@@ -7573,7 +7404,6 @@ void SV_CheckMapDifferences(void)
 	}
 }
 
-/* <aba46> ../engine/sv_main.c:9191 */
 void SV_Frame(void)
 {
 	if (!g_psv.active)
@@ -7597,7 +7427,6 @@ void SV_Frame(void)
 	Steam_RunFrame();
 }
 
-/* <a81ca> ../engine/sv_main.c:9252 */
 void SV_Drop_f(void)
 {
 	if (cmd_source == src_command)
@@ -7612,7 +7441,6 @@ void SV_Drop_f(void)
 	}
 }
 
-/* <a6270> ../engine/sv_main.c:9265 */
 void SV_RegisterDelta(char *name, char *loadfile)
 {
 	delta_t *pdesc = NULL;
@@ -7631,7 +7459,6 @@ void SV_RegisterDelta(char *name, char *loadfile)
 #endif
 }
 
-/* <aa966> ../engine/sv_main.c:9284 */
 void SV_InitDeltas(void)
 {
 	Con_DPrintf("Initializing deltas\n");
@@ -7678,7 +7505,6 @@ void SV_InitDeltas(void)
 #endif
 }
 
-/* <aac49> ../engine/sv_main.c:9339 */
 void SV_InitEncoders(void)
 {
 	delta_t *pdesc;
@@ -7691,7 +7517,6 @@ void SV_InitEncoders(void)
 	}
 }
 
-/* <aac82> ../engine/sv_main.c:9362 */
 void SV_Init(void)
 {
 #ifdef HOOK_ENGINE
@@ -7849,7 +7674,7 @@ void SV_Init(void)
 	Cvar_RegisterVariable(&sv_rcon_condebug);
 	Cvar_RegisterVariable(&sv_rehlds_userinfo_transmitted_fields);
 #endif
-	
+
 	for (int i = 0; i < MAX_MODELS; i++)
 	{
 		Q_snprintf(localmodels[i], sizeof(localmodels[i]), "*%i", i);
@@ -7873,7 +7698,6 @@ void SV_Init(void)
 	SV_InitDeltas();
 }
 
-/* <aad4b> ../engine/sv_main.c:9558 */
 void SV_Shutdown(void)
 {
 	g_DeltaJitRegistry.Cleanup();
@@ -7898,7 +7722,6 @@ qboolean SV_CompareUserID(USERID_t *id1, USERID_t *id2)
 	return g_RehldsHookchains.m_SV_CompareUserID.callChain(SV_CompareUserID_internal, id1, id2);
 }
 
-/* <a5ef9> ../engine/sv_main.c:9585 */
 qboolean EXT_FUNC SV_CompareUserID_internal(USERID_t *id1, USERID_t *id2)
 {
 	if (id1 == NULL || id2 == NULL)
@@ -7927,7 +7750,6 @@ char* SV_GetIDString(USERID_t *id)
 	return g_RehldsHookchains.m_SV_GetIDString.callChain(SV_GetIDString_internal, id);
 }
 
-/* <aad82> ../engine/sv_main.c:9625 */
 char* EXT_FUNC SV_GetIDString_internal(USERID_t *id)
 {
 	static char idstr[64];
@@ -7984,7 +7806,6 @@ char* EXT_FUNC SV_GetIDString_internal(USERID_t *id)
 	return idstr;
 }
 
-/* <a5f45> ../engine/sv_main.c:9697 */
 char *SV_GetClientIDString(client_t *client)
 {
 	static char idstr[64];
@@ -8010,7 +7831,6 @@ char *SV_GetClientIDString(client_t *client)
 	return idstr;
 }
 
-/* <a5b9a> ../engine/sv_main.c:9719 */
 typedef struct GameToAppIDMapItem_s
 {
 	unsigned int iAppID;
@@ -8031,7 +7851,6 @@ GameToAppIDMapItem_t g_GameToAppIDMap[11] = {
 	0x96, "cstrike_beta",
 };
 
-/* <abae3> ../engine/sv_main.c:9748 */
 int GetGameAppID(void)
 {
 	char arg[260];
@@ -8048,7 +7867,6 @@ int GetGameAppID(void)
 	return 70;
 }
 
-/* <abb2e> ../engine/sv_main.c:9772 */
 qboolean IsGameSubscribed(const char *gameName)
 {
 #ifdef _WIN32
@@ -8066,7 +7884,6 @@ qboolean IsGameSubscribed(const char *gameName)
 #endif
 }
 
-/* <abb5b> ../engine/sv_main.c:9796 */
 NOXREF qboolean BIsValveGame(void)
 {
 	for (int i = 0; i < ARRAYSIZE(g_GameToAppIDMap); i++)

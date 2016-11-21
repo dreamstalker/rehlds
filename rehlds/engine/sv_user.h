@@ -41,7 +41,6 @@
 
 typedef struct command_s command_t;
 
-/* <bf2a3> ../engine/sv_user.c:1311 */
 typedef struct sv_adjusted_positions_s
 {
 	int active;
@@ -56,7 +55,6 @@ typedef struct sv_adjusted_positions_s
 	int temp_org_setflag;
 } sv_adjusted_positions_t;
 
-/* <bf34f> ../engine/sv_user.c:2124 */
 typedef struct clc_func_s
 {
 	unsigned char opcode;
@@ -99,7 +97,6 @@ extern clc_func_t sv_clcfuncs[12];
 #else
 #endif
 
-
 extern float s_LastFullUpdate[33];
 extern cvar_t sv_edgefriction;
 extern cvar_t sv_maxspeed;
@@ -115,7 +112,6 @@ extern cvar_t mp_consistency;
 extern cvar_t sv_voiceenable;
 
 extern qboolean nofind;
-
 
 void SV_ParseConsistencyResponse(client_t *pSenderClient);
 qboolean SV_FileInConsistencyList(const char *filename, consistency_t **ppconsist);

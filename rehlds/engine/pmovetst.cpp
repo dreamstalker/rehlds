@@ -33,15 +33,13 @@ hull_t box_hull_0;
 box_clipnodes_t box_clipnodes_0;
 box_planes_t box_planes_0;
 
-
-/* <6fbe5> ../engine/pmovetst.c:30 */
 float EXT_FUNC PM_TraceModel(physent_t *pEnt, vec_t *start, vec_t *end, trace_t *trace)
 {
-	hull_t *pHull;                                               //    32
-	int saveHull;                                                 //    33
-	vec3_t start_l;                                               //    34
-	vec3_t end_l;                                                 //    34
-	vec3_t offset;                                                //    34
+	hull_t *pHull;
+	int saveHull;
+	vec3_t start_l;
+	vec3_t end_l;
+	vec3_t offset;
 
 	saveHull = pmove->usehull;
 	pmove->usehull = 2;
@@ -58,7 +56,6 @@ float EXT_FUNC PM_TraceModel(physent_t *pEnt, vec_t *start, vec_t *end, trace_t 
 	return trace->fraction;
 }
 
-/* <6f286> ../engine/pmovetst.c:50 */
 void EXT_FUNC PM_GetModelBounds(struct model_s *mod, vec_t *mins, vec_t *maxs)
 {
 	mins[0] = mod->mins[0];
@@ -70,17 +67,13 @@ void EXT_FUNC PM_GetModelBounds(struct model_s *mod, vec_t *mins, vec_t *maxs)
 	maxs[2] = mod->maxs[2];
 }
 
-/* <6f2ca> ../engine/pmovetst.c:57 */
 int EXT_FUNC PM_GetModelType(struct model_s *mod)
 {
 	return mod->type;
 }
 
-/* <6f2f5> ../engine/pmovetst.c:70 */
 void PM_InitBoxHull(void)
 {
-//	int i;                                                        //    72
-//	int side;                                                     //    73
 	box_hull_0.clipnodes = &box_clipnodes_0[0];
 	box_hull_0.planes = &box_planes_0[0];
 	box_hull_0.firstclipnode = 0;
@@ -97,7 +90,6 @@ void PM_InitBoxHull(void)
 	}
 }
 
-/* <6f03c> ../engine/pmovetst.c:105 */
 hull_t *PM_HullForBox(vec_t *mins, vec_t *maxs)
 {
 	box_planes_0[0].dist = maxs[0];
@@ -109,7 +101,6 @@ hull_t *PM_HullForBox(vec_t *mins, vec_t *maxs)
 	return &box_hull_0;
 }
 
-/* <6f34f> ../engine/pmovetst.c:124 */
 int EXT_FUNC PM_HullPointContents(hull_t *hull, int num, vec_t *p)
 {
 	float d;
@@ -140,7 +131,6 @@ int EXT_FUNC PM_HullPointContents(hull_t *hull, int num, vec_t *p)
 	return num;
 }
 
-/* <6f6b2> ../engine/pmovetst.c:171 */
 int PM_LinkContents(vec_t *p, int *pIndex)
 {
 	physent_t *pe;
@@ -165,7 +155,6 @@ int PM_LinkContents(vec_t *p, int *pIndex)
 	return -1;
 }
 
-/* <6f740> ../engine/pmovetst.c:223 */
 int EXT_FUNC PM_PointContents(vec_t *p, int *truecontents)
 {
 #ifndef SWDS
@@ -199,7 +188,6 @@ int EXT_FUNC PM_PointContents(vec_t *p, int *truecontents)
 	return -2;
 }
 
-/* <6f7b0> ../engine/pmovetst.c:265 */
 int PM_WaterEntity(vec_t *p)
 {
 	int cont;
@@ -219,7 +207,6 @@ int PM_WaterEntity(vec_t *p)
 	return PM_LinkContents(p, &entityIndex);
 }
 
-/* <6f813> ../engine/pmovetst.c:299 */
 int EXT_FUNC PM_TruePointContents(vec_t *p)
 {
 	if ((int)pmove->physents[0].model == -208)
@@ -228,10 +215,9 @@ int EXT_FUNC PM_TruePointContents(vec_t *p)
 		return PM_HullPointContents(pmove->physents[0].model->hulls, pmove->physents[0].model->hulls[0].firstclipnode, p);
 }
 
-/* <6f84f> ../engine/pmovetst.c:324 */
 hull_t *PM_HullForStudioModel(model_t *pModel, vec_t *offset, float frame, int sequence, const vec_t *angles, const vec_t *origin, const unsigned char *pcontroller, const unsigned char *pblending, int *pNumHulls)
 {
-	vec3_t size;                                                  //   335
+	vec3_t size;
 
 	size[0] = player_maxs[pmove->usehull][0] - player_mins[pmove->usehull][0];
 	size[1] = player_maxs[pmove->usehull][1] - player_mins[pmove->usehull][1];
@@ -243,7 +229,6 @@ hull_t *PM_HullForStudioModel(model_t *pModel, vec_t *offset, float frame, int s
 	return R_StudioHull(pModel, frame, sequence, angles, origin, size, pcontroller, pblending, pNumHulls, 0, 0);
 }
 
-/* <6fb99> ../engine/pmovetst.c:343 */
 hull_t* EXT_FUNC PM_HullForBsp(physent_t *pe, vec_t *offset)
 {
 	hull_t *hull;
@@ -275,7 +260,6 @@ hull_t* EXT_FUNC PM_HullForBsp(physent_t *pe, vec_t *offset)
 	return hull;
 }
 
-/* <6fc84> ../engine/pmovetst.c:381 */
 int _PM_TestPlayerPosition(vec_t *pos, pmtrace_t *ptrace, int(*pfnIgnore)(physent_t *))
 {
 	hull_t *hull;
@@ -300,7 +284,7 @@ int _PM_TestPlayerPosition(vec_t *pos, pmtrace_t *ptrace, int(*pfnIgnore)(physen
 		offset[1] = pe->origin[1];
 		offset[2] = pe->origin[2];
 		numhulls = 1;
-		
+
 		if (pe->model)
 		{
 			hull = PM_HullForBsp(pe, offset);
@@ -356,19 +340,16 @@ int _PM_TestPlayerPosition(vec_t *pos, pmtrace_t *ptrace, int(*pfnIgnore)(physen
 
 }
 
-/* <6fe2a> ../engine/pmovetst.c:507 */
 int EXT_FUNC PM_TestPlayerPosition(vec_t *pos, pmtrace_t *ptrace)
 {
 	return _PM_TestPlayerPosition(pos, ptrace, 0);
 }
 
-/* <6fe67> ../engine/pmovetst.c:518 */
 int EXT_FUNC PM_TestPlayerPositionEx(vec_t *pos, pmtrace_t *ptrace, int(*pfnIgnore)(physent_t *))
 {
 	return _PM_TestPlayerPosition(pos, ptrace, pfnIgnore);
 }
 
-/* <6f065> ../engine/pmovetst.c:534 */
 pmtrace_t _PM_PlayerTrace(vec_t *start, vec_t *end, int traceFlags, int numphysent, physent_t *physents, int ignore_pe, int(*pfnIgnore)(physent_t *))
 {
 	hull_t *hull;
@@ -571,14 +552,12 @@ pmtrace_t _PM_PlayerTrace(vec_t *start, vec_t *end, int traceFlags, int numphyse
 	return trace;
 }
 
-/* <6f237> ../engine/pmovetst.c:787 */
 pmtrace_t EXT_FUNC PM_PlayerTrace(vec_t *start, vec_t *end, int traceFlags, int ignore_pe)
 {
 	pmtrace_t tr = _PM_PlayerTrace(start, end, traceFlags, pmove->numphysent, pmove->physents, ignore_pe, NULL);
 	return tr;
 }
 
-/* <6f1e8> ../engine/pmovetst.c:794 */
 pmtrace_t EXT_FUNC PM_PlayerTraceEx(vec_t *start, vec_t *end, int traceFlags, int(*pfnIgnore)(physent_t *))
 {
 	pmtrace_t tr = _PM_PlayerTrace(start, end, traceFlags, pmove->numphysent, pmove->physents, -1, pfnIgnore);
@@ -609,17 +588,16 @@ struct pmtrace_s* EXT_FUNC PM_TraceLine(float *start, float *end, int flags, int
 	return &tr;
 }
 
-/* <70238> ../engine/pmovetst.c:824 */
 struct pmtrace_s* EXT_FUNC PM_TraceLineEx(float *start, float *end, int flags, int usehull, int(*pfnIgnore)(physent_t *))
 {
-	int oldhull;                                                  //   826
-	static pmtrace_t tr;                                                 //   827
+	int oldhull;
+	static pmtrace_t tr;
 
 	oldhull = pmove->usehull;
 	pmove->usehull = usehull;
 	if (flags)
 	{
-		tr = _PM_PlayerTrace(start, end, PM_NORMAL, pmove->numvisent, pmove->visents, -1, pfnIgnore);		
+		tr = _PM_PlayerTrace(start, end, PM_NORMAL, pmove->numvisent, pmove->visents, -1, pfnIgnore);
 	}
 	else
 	{
@@ -630,7 +608,6 @@ struct pmtrace_s* EXT_FUNC PM_TraceLineEx(float *start, float *end, int flags, i
 }
 
 #ifndef REHLDS_OPT_PEDANTIC
-/* <6ef4a> ../engine/pmovetst.c:844 */
 qboolean PM_RecursiveHullCheck(hull_t *hull, int num, float p1f, float p2f, const vec_t *p1, const vec_t *p2, pmtrace_t *trace)
 {
 	dclipnode_t *node;

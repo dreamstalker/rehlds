@@ -30,7 +30,6 @@
 
 wadlist_t wads[NUM_WADS];
 
-/* <c6c98> ../engine/wad.c:35 */
 void W_CleanupName(char *in, char *out)
 {
 	int i;
@@ -49,7 +48,6 @@ void W_CleanupName(char *in, char *out)
 		Q_memset(&out[i], 0, 16 - i);
 }
 
-/* <c6d06> ../engine/wad.c:62 */
 int W_LoadWadFile(char *filename)
 {
 	int slot = 0;
@@ -99,7 +97,6 @@ int W_LoadWadFile(char *filename)
 	return slot;
 }
 
-/* <c6c45> ../engine/wad.c:132 */
 lumpinfo_t *W_GetLumpinfo(int wad, char *name, qboolean doerror)
 {
 	int i;
@@ -120,7 +117,6 @@ lumpinfo_t *W_GetLumpinfo(int wad, char *name, qboolean doerror)
 	return NULL;
 }
 
-/* <c6e6e> ../engine/wad.c:152 */
 void *W_GetLumpName(int wad, char *name)
 {
 	lumpinfo_t *lump = W_GetLumpinfo(wad, name, TRUE);
@@ -129,7 +125,6 @@ void *W_GetLumpName(int wad, char *name)
 	return NULL;
 }
 
-/* <c6f2d> ../engine/wad.c:161 */
 NOXREF void *W_GetLumpNum(int wad, int num)
 {
 	lumpinfo_t *lump;
@@ -140,7 +135,6 @@ NOXREF void *W_GetLumpNum(int wad, int num)
 	return (void *)&wads[wad].wad_base[lump->filepos];
 }
 
-/* <c6f87> ../engine/wad.c:173 */
 void W_Shutdown(void)
 {
 	for (int slot = 0; slot < NUM_WADS; slot++)
@@ -153,7 +147,6 @@ void W_Shutdown(void)
 	}
 }
 
-/* <c6c25> ../engine/wad.c:196 */
 void SwapPic(qpic_t *pic)
 {
 	pic->width = LittleLong(pic->width);

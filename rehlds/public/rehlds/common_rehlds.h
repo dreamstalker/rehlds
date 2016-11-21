@@ -47,7 +47,6 @@
 #define COM_COPY_CHUNK_SIZE 1024
 #define COM_MAX_CMD_LINE 256
 
-/* <6ae> ../common/common.h:82 */
 typedef struct sizebuf_s
 {
 	const char *buffername;
@@ -57,7 +56,6 @@ typedef struct sizebuf_s
 	int cursize;
 } sizebuf_t;
 
-/* <270aa> ../common/common.h:297 */
 typedef struct downloadtime_s
 {
 	qboolean bUsed;
@@ -65,7 +63,6 @@ typedef struct downloadtime_s
 	int nBytesRemaining;
 } downloadtime_t;
 
-/* <19fa2> ../common/common.h:303 */
 typedef struct incomingtransfer_s
 {
 	qboolean doneregistering;

@@ -35,12 +35,9 @@
 #include "maintypes.h"
 #include "interface.h"
 
-
-/* <8f7fd> ../public/engine_launcher_api.h:17 */
 class IEngineAPI : public IBaseInterface
 {
 public:
-
 	virtual int Run(void *instance, char *basedir, char *cmdline, char *postRestartCmdLineArgs, CreateInterfaceFn launcherFactory, CreateInterfaceFn filesystemFactory) = 0;
 };
 

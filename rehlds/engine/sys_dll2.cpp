@@ -33,9 +33,6 @@ qboolean g_bIsWin95;
 qboolean g_bIsWin98;
 double g_flLastSteamProgressUpdateTime;
 
-//CEngineAPI __g_CEngineAPI_singleton;
-//InterfaceReg __g_CreateCEngineAPIIEngineAPI_reg;
-
 /*
 * Globals initialization
 */
@@ -45,18 +42,14 @@ char *szCommonPreloads = "multiplayer_preloads";
 char *szReslistsBaseDir = "reslists";
 char *szReslistsExt = ".lst";
 
-#else //HOOK_ENGINE
+#else // HOOK_ENGINE
 
 char *szCommonPreloads;
 char *szReslistsBaseDir;
 char *szReslistsExt;
 
-#endif //HOOK_ENGINE
+#endif // HOOK_ENGINE
 
-//CDedicatedServerAPI __g_CDedicatedServerAPI_singleton;
-//InterfaceReg __g_CreateCDedicatedServerAPIIDedicatedServerAPI_reg
-
-/* <8fce7> ../engine/sys_dll2.cpp:150 */
 const char *GetCurrentSteamAppName(void)
 {
 	if (!Q_stricmp(com_gamedir, "cstrike") || !Q_stricmp(com_gamedir, "cstrike_beta"))
@@ -83,19 +76,16 @@ const char *GetCurrentSteamAppName(void)
 	return "Half-Life";
 }
 
-/* <90345> ../engine/sys_dll2.cpp:184 */
 NOXREF void SetRateRegistrySetting(const char *pchRate)
 {
 	registry->WriteString("rate", pchRate);
 }
 
-/* <9036c> ../engine/sys_dll2.cpp:189 */
 NOXREF const char *GetRateRegistrySetting(const char *pchDef)
 {
 	return registry->ReadString("rate", pchDef);
 }
 
-/* <90397> ../engine/sys_dll2.cpp:198 */
 void EXPORT F(IEngineAPI **api)
 {
 	CreateInterfaceFn fn;
@@ -103,7 +93,6 @@ void EXPORT F(IEngineAPI **api)
 	*api = (IEngineAPI *)fn("VENGINE_LAUNCHER_API_VERSION002", NULL);
 }
 
-/* <903c2> ../engine/sys_dll2.cpp:245 */
 void Sys_GetCDKey(char *pszCDKey, int *nLength, int *bDedicated)
 {
 	char key[65];
@@ -143,12 +132,10 @@ void Sys_GetCDKey(char *pszCDKey, int *nLength, int *bDedicated)
 		*bDedicated = 0;
 }
 
-/* <9049d> ../engine/sys_dll2.cpp:287 */
 NOXREF void Legacy_ErrorMessage(int nLevel, const char *pszErrorMessage)
 {
 }
 
-/* <90286> ../engine/sys_dll2.cpp:291 */
 void Legacy_Sys_Printf(char *fmt, ...)
 {
 	va_list argptr;
@@ -162,17 +149,14 @@ void Legacy_Sys_Printf(char *fmt, ...)
 		dedicated_->Sys_Printf(text);
 }
 
-/* <904d8> ../engine/sys_dll2.cpp:307 */
 NOXREF void Legacy_MP3subsys_Suspend_Audio(void)
 {
 }
 
-/* <904f0> ../engine/sys_dll2.cpp:311 */
 NOXREF void Legacy_MP3subsys_Resume_Audio(void)
 {
 }
 
-/* <90508> ../engine/sys_dll2.cpp:315 */
 void Sys_SetupLegacyAPIs(void)
 {
 #ifndef SWDS
@@ -182,7 +166,6 @@ void Sys_SetupLegacyAPIs(void)
 	Launcher_ConsolePrintf = Legacy_Sys_Printf;
 }
 
-/* <90518> ../engine/sys_dll2.cpp:335 */
 NOXREF int Sys_IsWin95(void)
 {
 #ifdef _WIN32
@@ -193,7 +176,6 @@ NOXREF int Sys_IsWin95(void)
 #endif // _WIN32
 }
 
-/* <90534> ../engine/sys_dll2.cpp:340 */
 NOXREF int Sys_IsWin98(void)
 {
 #ifdef _WIN32
@@ -204,7 +186,6 @@ NOXREF int Sys_IsWin98(void)
 #endif // _WIN32
 }
 
-/* <90550> ../engine/sys_dll2.cpp:348 */
 #ifdef _WIN32
 NOXREF void Sys_CheckOSVersion(void)
 {
@@ -231,7 +212,6 @@ NOXREF void Sys_CheckOSVersion(void)
 }
 #endif // _WIN32
 
-/* <8fd53> ../engine/sys_dll2.cpp:397 */
 void Sys_Init(void)
 {
 #ifndef SWDS
@@ -239,7 +219,6 @@ void Sys_Init(void)
 #endif
 }
 
-/* <8fd7b> ../engine/sys_dll2.cpp:445 */
 void Sys_Shutdown(void)
 {
 #ifndef SWDS
@@ -260,7 +239,6 @@ void Sys_Shutdown(void)
 #endif // _WIN32
 }
 
-/* <90588> ../engine/sys_dll2.cpp:475 */
 void Sys_InitArgv(char *lpCmdLine)
 {
 	static char *argv[MAX_COMMAND_LINE_PARAMS];
@@ -337,12 +315,10 @@ void Sys_InitArgv(char *lpCmdLine)
 	host_parms.argv = com_argv;
 }
 
-/* <8fd20> ../engine/sys_dll2.cpp:514 */
 NOXREF void Sys_ShutdownArgv(void)
 {
 }
 
-/* <9066a> ../engine/sys_dll2.cpp:530 */
 void Sys_InitMemory(void)
 {
 	int i;
@@ -392,7 +368,6 @@ void Sys_InitMemory(void)
 		Sys_Error("Unable to allocate %.2f MB\n", (float)host_parms.memsize / (1024.0f * 1024.0f));
 }
 
-/* <906c2> ../engine/sys_dll2.cpp:626 */
 void Sys_ShutdownMemory(void)
 {
 #ifdef _WIN32
@@ -404,7 +379,6 @@ void Sys_ShutdownMemory(void)
 	host_parms.memsize = 0;
 }
 
-/* <906dd> ../engine/sys_dll2.cpp:644 */
 void Sys_InitLauncherInterface(void)
 {
 #ifdef _WIN32
@@ -419,23 +393,19 @@ void Sys_InitLauncherInterface(void)
 #endif // _WIN32
 }
 
-/* <90702> ../engine/sys_dll2.cpp:666 */
 NOXREF void Sys_ShutdownLauncherInterface(void)
 {
 }
 
-/* <90712> ../engine/sys_dll2.cpp:673 */
 void Sys_InitAuthentication(void)
 {
 	Sys_Printf("STEAM Auth Server\r\n");
 }
 
-/* <8fd71> ../engine/sys_dll2.cpp:678 */
 NOXREF void Sys_ShutdownAuthentication(void)
 {
 }
 
-/* <9073d> ../engine/sys_dll2.cpp:694 */
 void Sys_ShowProgressTicks(char *specialProgressMsg)
 {
 	static bool recursionGuard = false;
@@ -485,7 +455,6 @@ void Sys_ShowProgressTicks(char *specialProgressMsg)
 	}
 }
 
-/* <907de> ../engine/sys_dll2.cpp:748 */
 int Sys_InitGame(char *lpOrgCmdLine, char *pBaseDir, void *pwnd, int bIsDedicated)
 {
 	host_initialized = FALSE;
@@ -560,7 +529,6 @@ int Sys_InitGame(char *lpOrgCmdLine, char *pBaseDir, void *pwnd, int bIsDedicate
 	return 1;
 }
 
-/* <90871> ../engine/sys_dll2.cpp:841 */
 void Sys_ShutdownGame(void)
 {
 	if (!g_bIsDedicatedServer)
@@ -580,7 +548,6 @@ void Sys_ShutdownGame(void)
 	Sys_Shutdown();
 }
 
-/* <9089f> ../engine/sys_dll2.cpp:869 */
 void ClearIOStates(void)
 {
 #ifndef SWDS
@@ -595,20 +562,18 @@ void ClearIOStates(void)
 }
 
 
-/* <8f74a> ../engine/sys_dll2.cpp:982 */
 class CEngineAPI : public IEngineAPI
 {
 public:
-	/* <8f797> ../engine/sys_dll2.cpp:1004 */
+
 	int Run(void *instance, char *basedir, char *cmdline, char *postRestartCmdLineArgs, CreateInterfaceFn launcherFactory, CreateInterfaceFn filesystemFactory)
 	{
 		return 0;
 	}
 };
 
-static CEngineAPI g_CEngineAPI;
+CEngineAPI g_CEngineAPI;
 
-/* <8ff0c> ../engine/sys_dll2.cpp:1034 */
 IBaseInterface *CreateCEngineAPI(void)
 {
 	return &g_CEngineAPI;
@@ -616,8 +581,8 @@ IBaseInterface *CreateCEngineAPI(void)
 
 InterfaceReg g_CreateCEngineAPI = InterfaceReg(CreateCEngineAPI, "VENGINE_LAUNCHER_API_VERSION002");
 
-/* <908b7> ../engine/sys_dll2.cpp:1070 */
-/* Needs rechecking
+// TODO: Needs rechecking
+/*
 NOXREF int BuildMapCycleListHints(char **hints)
 {
 	char szMap[262];
@@ -784,5 +749,5 @@ void CDedicatedServerAPI::UpdateStatus_noVirt(float *fps, int *nActive, int *nMa
 
 EXPOSE_SINGLE_INTERFACE(CDedicatedServerAPI, IDedicatedServerAPI, VENGINE_HLDS_API_VERSION);
 
-#endif //HOOK_ENGINE
+#endif // HOOK_ENGINE
 

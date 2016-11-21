@@ -36,23 +36,15 @@
 #include "net.h"
 #include "utlrbtree.h"
 
-
-/* <e009b> ../engine/ipratelimit.h:5 */
 class CIPRateLimit
 {
 public:
-	/* <e014f> ../engine/ipratelimit.h:8 */
-	CIPRateLimit() { }
+	CIPRateLimit() {}
+	~CIPRateLimit() {}
 
-	/* <e0167> ../engine/ipratelimit.h:9 */
-	~CIPRateLimit() { }
-
-	/* <e0185> ../engine/ipratelimit.h:12 */
-	bool CheckIP(netadr_t adr); /* linkage=_ZN12CIPRateLimit7CheckIPE8netadr_s */
+	bool CheckIP(netadr_t adr);
 
 private:
-
-	/* <e00a7> ../engine/ipratelimit.h:15 */
 	enum
 	{
 		MAX_TREE_SIZE = 512,
@@ -60,27 +52,22 @@ private:
 		FLUSH_TIMEOUT = 120,
 	};
 
-	/* <e00c6> ../engine/ipratelimit.h:18 */
 	typedef struct iprate_s
 	{
-		/* <e00d3> ../engine/ipratelimit.h:17 */
 		typedef int ip_t;
+		ip_t ip;
 
-		ip_t ip;/*     0     4 */
-		long int lastTime;/*     4     4 */
-		int count;/*     8     4 */
-	} iprate_t;/* size: 12 */
+		long lastTime;
+		int count;
+	} iprate_t;
 
 private:
+	class CUtlRBTree<CIPRateLimit::iprate_s, int> m_IPTree;
+	int m_iGlobalCount;
+	long m_lLastTime;
 
-	class CUtlRBTree<CIPRateLimit::iprate_s, int> m_IPTree;/*     0    32 */
-	int m_iGlobalCount;/*    32     4 */
-	long int m_lLastTime;/*    36     4 */
-
-	/* <e01aa> ../engine/ipratelimit.h:25 */
-	bool LessIP(const struct iprate_s  &, const struct iprate_s  &); /* linkage=_ZN12CIPRateLimit6LessIPERKNS_8iprate_sES2_ */
-};/* size: 40 */
-
+	bool LessIP(const struct iprate_s  &, const struct iprate_s  &);
+};
 
 //extern bool (__fastcall *pCIPRateLimit__CheckIP)(CIPRateLimit *obj, int none, netadr_t adr);
 

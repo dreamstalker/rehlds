@@ -38,14 +38,13 @@ LOGLIST_T *firstLog;
 cvar_t mp_logecho = { "mp_logecho", "1", 0, 0.0f, NULL };
 cvar_t mp_logfile = { "mp_logfile", "1", FCVAR_SERVER, 0.0f, NULL };
 
-#else //HOOK_ENGINE
+#else // HOOK_ENGINE
 
 cvar_t mp_logecho;
 cvar_t mp_logfile;
 
-#endif //HOOK_ENGINE
+#endif // HOOK_ENGINE
 
-/* <9a0ba> ../engine/sv_log.c:37 */
 void Log_Printf(const char *fmt, ...)
 {
 	va_list argptr;
@@ -102,7 +101,6 @@ void Log_Printf(const char *fmt, ...)
 	}
 }
 
-/* <9a15f> ../engine/sv_log.c:118 */
 void Log_PrintServerVars(void)
 {
 	cvar_t *var;
@@ -118,7 +116,6 @@ void Log_PrintServerVars(void)
 	Log_Printf("Server cvars end\n");
 }
 
-/* <9a18e> ../engine/sv_log.c:145 */
 void Log_Close(void)
 {
 	if (g_psvs.log.file)
@@ -129,7 +126,6 @@ void Log_Close(void)
 	g_psvs.log.file = NULL;
 }
 
-/* <9a1a9> ../engine/sv_log.c:162 */
 void Log_Open(void)
 {
 	time_t ltime;
@@ -185,7 +181,6 @@ void Log_Open(void)
 	}
 }
 
-/* <9a237> ../engine/sv_log.c:266 */
 void SV_SetLogAddress_f(void)
 {
 	const char *s;
@@ -228,7 +223,6 @@ void SV_SetLogAddress_f(void)
 	Con_Printf("logaddress:  %s\n", NET_AdrToString(adr));
 }
 
-/* <9a28f> ../engine/sv_log.c:321 */
 void SV_AddLogAddress_f(void)
 {
 	const char *s;
@@ -320,7 +314,6 @@ void SV_AddLogAddress_f(void)
 	Con_Printf("logaddress_add:  %s\n", NET_AdrToString(adr));
 }
 
-/* <9a345> ../engine/sv_log.c:439 */
 void SV_DelLogAddress_f(void)
 {
 	const char *s;
@@ -394,7 +387,6 @@ void SV_DelLogAddress_f(void)
 	Con_Printf("deleting:  %s\n", NET_AdrToString(adr));
 }
 
-/* <9a3f1> ../engine/sv_log.c:543 */
 void SV_ServerLog_f(void)
 {
 	if (Cmd_Argc() != 2)
@@ -409,7 +401,7 @@ void SV_ServerLog_f(void)
 	}
 
 	const char *s = Cmd_Argv(1);
-	if (Q_stricmp(s,"off"))
+	if (Q_stricmp(s, "off"))
 	{
 		if (Q_stricmp(s, "on"))
 			Con_Printf("log:  unknown parameter %s, 'on' and 'off' are valid\n", s);

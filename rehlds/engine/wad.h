@@ -34,8 +34,6 @@
 
 #include "maintypes.h"
 
-
-/* <c6abd> ../engine/wad.h:21 */
 typedef struct qpic_s
 {
 	int width;
@@ -43,7 +41,6 @@ typedef struct qpic_s
 	byte data[4];
 } qpic_t;
 
-/* <c6aff> ../engine/wad.h:27 */
 typedef struct wadinfo_s
 {
 	char identification[4];
@@ -51,7 +48,6 @@ typedef struct wadinfo_s
 	int infotableofs;
 } wadinfo_t;
 
-/* <c6b3d> ../engine/wad.h:34 */
 typedef struct lumpinfo_s
 {
 	int filepos;
@@ -64,7 +60,6 @@ typedef struct lumpinfo_s
 	char name[16];
 } lumpinfo_t;
 
-/* <c6bc5> ../engine/wad.c:9 */
 typedef struct wadlist_s
 {
 	qboolean loaded;
@@ -75,8 +70,6 @@ typedef struct wadlist_s
 } wadlist_t;
 
 typedef struct wadlist_s wadlist_t;
-
-/* <c6118> ../engine/wad.h:43 */
 typedef struct lumpinfo_s lumpinfo_t;
 
 #define NUM_WADS 2

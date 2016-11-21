@@ -35,13 +35,11 @@ bool bLowViolenceBuild;
 CSysModule *g_pFileSystemModule;
 CreateInterfaceFn g_FileSystemFactory;
 
-/* <28515> ../engine/filesystem.cpp:66 */
 const char *GetBaseDirectory(void)
 {
 	return s_pBaseDir;
 }
 
-/* <2891f> ../engine/filesystem.cpp:71 */
 NOXREF void *GetFileSystemFactory(void)
 {
 	NOXREFCHECK;
@@ -49,7 +47,6 @@ NOXREF void *GetFileSystemFactory(void)
 	return (void *)g_FileSystemFactory;
 }
 
-/* <28522> ../engine/filesystem.cpp:81 */
 bool FileSystem_LoadDLL(CreateInterfaceFn filesystemFactory)
 {
 	if (!filesystemFactory)
@@ -73,7 +70,6 @@ bool FileSystem_LoadDLL(CreateInterfaceFn filesystemFactory)
 	return false;
 }
 
-/* <2854b> ../engine/filesystem.cpp:119 */
 void FileSystem_UnloadDLL(void)
 {
 	if (g_pFileSystemModule)
@@ -85,7 +81,6 @@ void FileSystem_UnloadDLL(void)
 	}
 }
 
-/* <284fb> ../engine/filesystem.cpp:129 */
 bool BEnabledHDAddon(void)
 {
 	if (COM_CheckParm("-nohdmodels"))
@@ -96,7 +91,6 @@ bool BEnabledHDAddon(void)
 	return (registry->ReadInt("hdmodels", 1) > 0);
 }
 
-/* <28508> ../engine/filesystem.cpp:138 */
 bool BEnableAddonsFolder(void)
 {
 	if (COM_CheckParm("-addons"))
@@ -107,7 +101,6 @@ bool BEnableAddonsFolder(void)
 	return (registry->ReadInt("addons_folder", 0) > 0);
 }
 
-/* <28984> ../engine/filesystem.cpp:148 */
 void Host_SetHDModels_f(void)
 {
 	if (g_pcls.state && Cmd_Argc() == 2)
@@ -123,7 +116,6 @@ void Host_SetHDModels_f(void)
 	}
 }
 
-/* <289d1> ../engine/filesystem.cpp:176 */
 void Host_SetAddonsFolder_f(void)
 {
 	if (g_pcls.state && Cmd_Argc() == 2)
@@ -139,7 +131,6 @@ void Host_SetAddonsFolder_f(void)
 	}
 }
 
-/* <28a1e> ../engine/filesystem.cpp:204 */
 void Host_SetVideoLevel_f(void)
 {
 	if (g_pcls.state && Cmd_Argc() == 2)
@@ -148,13 +139,11 @@ void Host_SetVideoLevel_f(void)
 	}
 }
 
-/* <28a32> ../engine/filesystem.cpp:224 */
 int Host_GetVideoLevel(void)
 {
 	return registry->ReadInt("vid_level", 0);
 }
 
-/* <28a68> ../engine/filesystem.cpp:235 */
 void CheckLiblistForFallbackDir(const char *pGameDir, bool bLanguage, const char *pLanguage, bool bLowViolenceBuild_)
 {
 	char szTemp[512];
@@ -306,7 +295,6 @@ void CheckLiblistForFallbackDir(const char *pGameDir, bool bLanguage, const char
 	FS_Close(hFile);
 }
 
-/* <28deb> ../engine/filesystem.cpp:393 */
 int FileSystem_SetGameDirectory(const char *pDefaultDir, const char *pGameDir)
 {
 	char temp[512];
@@ -467,7 +455,6 @@ int FileSystem_SetGameDirectory(const char *pDefaultDir, const char *pGameDir)
 
 }
 
-/* <28f6a> ../engine/filesystem.cpp:596 */
 int FileSystem_AddFallbackGameDir(const char *pGameDir)
 {
 	char language[128];
@@ -488,7 +475,6 @@ int FileSystem_AddFallbackGameDir(const char *pGameDir)
 	return 1;
 }
 
-/* <28fd7> ../engine/filesystem.cpp:626 */
 int FileSystem_Init(char *basedir, void *voidfilesystemFactory)
 {
 #ifdef REHLDS_CHECKS
@@ -508,16 +494,8 @@ int FileSystem_Init(char *basedir, void *voidfilesystemFactory)
 	return 0;
 }
 
-/* <29057> ../engine/filesystem.cpp:645 */
 void FileSystem_Shutdown(void)
 {
 	FS_RemoveAllSearchPaths();
 	FileSystem_UnloadDLL();
 }
-
-/* <29085> (null):39776 */
-NOBODY void _GLOBAL__sub_I_g_FileSystemFactory(void);
-//{
-//	__static_initialization_and_destruction_0(int __initialize_p,
-//		int __priority); /* size=6582895, low_pc=0 */ //   649
-//}

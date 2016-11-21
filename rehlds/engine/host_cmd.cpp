@@ -28,7 +28,6 @@
 
 #include "precompiled.h"
 
-/* <3d3ff> ../engine/host_cmd.c:4378 */
 typedef int(*SV_BLENDING_INTERFACE_FUNC)(int, struct sv_blending_interface_s **, struct server_studio_api_s *, float *, float *);
 
 vec3_t r_origin;
@@ -43,7 +42,6 @@ qboolean g_bMajorMapChange;
 
 int g_iQuitCommandIssued;
 char *g_pPostRestartCmdLineArgs;
-
 
 /*
 * Globals initialization
@@ -127,13 +125,13 @@ TITLECOMMENT gTitleComments[] =
 	{ "ba_teleport", "#BA_TELEPORTTITLE" },
 	{ "ba_outro", "#BA_OUTRO" }
 };
-TYPEDESCRIPTION gGameHeaderDescription[] = 
+TYPEDESCRIPTION gGameHeaderDescription[] =
 {
 	DEFINE_FIELD(GAME_HEADER, mapCount, FIELD_INTEGER),
 	DEFINE_ARRAY(GAME_HEADER, mapName, FIELD_CHARACTER, 32),
 	DEFINE_ARRAY(GAME_HEADER, comment, FIELD_CHARACTER, 80),
 };
-TYPEDESCRIPTION gSaveHeaderDescription[] = 
+TYPEDESCRIPTION gSaveHeaderDescription[] =
 {
 	DEFINE_FIELD(SAVE_HEADER, skillLevel, FIELD_INTEGER),
 	DEFINE_FIELD(SAVE_HEADER, entityCount, FIELD_INTEGER),
@@ -170,7 +168,7 @@ TYPEDESCRIPTION gLightstyleDescription[] =
 	DEFINE_ARRAY(SAVELIGHTSTYLE, style, FIELD_CHARACTER, MAX_LIGHTSTYLES),
 };
 
-#else //HOOK_ENGINE
+#else // HOOK_ENGINE
 
 int r_dointerp;
 
@@ -187,21 +185,18 @@ TYPEDESCRIPTION gAdjacencyDescription[4];
 TYPEDESCRIPTION gEntityTableDescription[5];
 TYPEDESCRIPTION gLightstyleDescription[2];
 
-#endif //HOOK_ENGINE
+#endif // HOOK_ENGINE
 
-
-/* <3e21d> ../engine/host_cmd.c:192 */
 void SV_GetPlayerHulls(void)
 {
 	int i;
-	//int iResult;//unused?
 	for (i = 0; i < 4; i++)
 	{
 		if (!gEntityInterface.pfnGetHullBounds(i, player_mins[i], player_maxs[i]))
 			break;
 	}
 }
-/* <3e298> ../engine/host_cmd.c:216 */
+
 void Host_InitializeGameDLL(void)
 {
 	Cbuf_Execute();
@@ -226,7 +221,6 @@ void Host_InitializeGameDLL(void)
 	Cbuf_Execute();
 }
 
-/* <3d608> ../engine/host_cmd.c:271 */
 void Host_Motd_f(void)
 {
 	int length;
@@ -273,7 +267,6 @@ void Host_Motd_f(void)
 	FS_Close(pFile);
 }
 
-/* <3d5d4> ../engine/host_cmd.c:335 */
 void Host_Motd_Write_f(void)
 {
 	char newFile[2048] = "";
@@ -318,13 +311,11 @@ void Host_Motd_Write_f(void)
 	Con_Printf("Done.\n");
 }
 
-/* <3e382> ../engine/host_cmd.c:395 */
 int Host_GetStartTime(void)
 {
 	return startTime;
 }
 
-/* <3e39a> ../engine/host_cmd.c:405 */
 void Host_UpdateStats(void)
 {
 	uint32 runticks = 0;
@@ -368,7 +359,7 @@ void Host_UpdateStats(void)
 			runticks = (uint32)(lastcputicks >> 32);
 		}
 
-		cpuPercent = 
+		cpuPercent =
 			(FILETIME_TO_QWORD(UserTime) + FILETIME_TO_QWORD(KernelTime) - lastrunticks)
 				/ (FILETIME_TO_QWORD(SystemTimeAsFileTime)
 					- (double)FILETIME_TO_PAIR(runticks, cputicks));
@@ -447,7 +438,6 @@ void Host_UpdateStats(void)
 #endif // _WIN32
 }
 
-/* <3da03> ../engine/host_cmd.c:580 */
 void GetStatsString(char *buf, int bufSize)
 {
 	long double avgOut = 0.0;
@@ -476,7 +466,6 @@ void GetStatsString(char *buf, int bufSize)
 	buf[bufSize - 1] = 0;
 }
 
-/* <3e059> ../engine/host_cmd.c:613 */
 void Host_Stats_f(void)
 {
 	char stats[512];
@@ -484,7 +473,6 @@ void Host_Stats_f(void)
 	Con_Printf("CPU   In    Out   Uptime  Users   FPS    Players\n%s\n", stats);
 }
 
-/* <3d5c9> ../engine/host_cmd.c:626 */
 void Host_Quit_f(void)
 {
 	if (Cmd_Argc() == 1)
@@ -505,7 +493,6 @@ void Host_Quit_f(void)
 	}
 }
 
-/* <3d5be> ../engine/host_cmd.c:651 */
 void Host_Quit_Restart_f(void)
 {
 	giActive = DLL_RESTART;
@@ -531,7 +518,7 @@ void Host_Quit_Restart_f(void)
 
 	}
 }
-/* <3e511> ../engine/host_cmd.c:700 */
+
 void Host_Status_Printf(qboolean conprint, qboolean log, char *fmt, ...)
 {
 	va_list argptr;
@@ -554,7 +541,6 @@ void Host_Status_Printf(qboolean conprint, qboolean log, char *fmt, ...)
 	}
 }
 
-/* <3e666> ../engine/host_cmd.c:735 */
 void Host_Status_f(void)
 {
 	client_t *client;
@@ -693,7 +679,6 @@ void Host_Status_f(void)
 	Host_Status_Printf(conprint, log, "%i users\n", nClients);
 }
 
-/* <3e594> ../engine/host_cmd.c:923 */
 void Host_Status_Formatted_f(void)
 {
 	client_t *client;
@@ -787,7 +772,6 @@ void Host_Status_Formatted_f(void)
 	Host_Status_Printf(conprint, log, "%i users\n", nClients);
 }
 
-/* <3dc0c> ../engine/host_cmd.c:1219 */
 void Host_Ping_f(void)
 {
 	int i;
@@ -808,7 +792,6 @@ void Host_Ping_f(void)
 	}
 }
 
-/* <3fc89> ../engine/host_cmd.c:1249 */
 void Host_Map(qboolean bIsDemo, char *mapstring, char *mapName, qboolean loadGame)
 {
 	int i;
@@ -868,7 +851,6 @@ void Host_Map(qboolean bIsDemo, char *mapstring, char *mapName, qboolean loadGam
 	}
 }
 
-/* <3ff7f> ../engine/host_cmd.c:1339 */
 void Host_Map_f(void)
 {
 	int i;
@@ -914,7 +896,7 @@ void Host_Map_f(void)
 
 	if (!g_psvs.dll_initialized)
 		Host_InitializeGameDLL();
-	
+
 	int iLen = Q_strlen(name);
 	if (iLen > 4 && !Q_stricmp(&name[iLen - 4], ".bsp"))
 		name[iLen - 4] = 0;
@@ -960,7 +942,6 @@ void Host_Map_f(void)
 		SetCareerAudioState(0);
 }
 
-/* <4004e> ../engine/host_cmd.c:1475 */
 void Host_Career_f(void)
 {
 	if (cmd_source == src_command)
@@ -970,7 +951,6 @@ void Host_Career_f(void)
 	}
 }
 
-/* <3d5a2> ../engine/host_cmd.c:1493 */
 void Host_Maps_f(void)
 {
 	char *pszSubString;
@@ -988,7 +968,6 @@ void Host_Maps_f(void)
 	}
 }
 
-/* <3d56e> ../engine/host_cmd.c:1521 */
 void Host_Changelevel_f(void)
 {
 	char _level[64];
@@ -1035,7 +1014,6 @@ void Host_Changelevel_f(void)
 	SV_ActivateServer(1);
 }
 
-/* <3e7c9> ../engine/host_cmd.c:1581 */
 const char *Host_FindRecentSave(char *pNameBuf)
 {
 	const char *findfn;
@@ -1073,7 +1051,6 @@ const char *Host_FindRecentSave(char *pNameBuf)
 	return found != 0 ? pNameBuf : NULL;
 }
 
-/* <3fc40> ../engine/host_cmd.c:1637 */
 void Host_Restart_f(void)
 {
 	char name[MAX_PATH];
@@ -1093,7 +1070,6 @@ void Host_Restart_f(void)
 	SV_ActivateServer(1);
 }
 
-/* <3d784> ../engine/host_cmd.c:1681 */
 void Host_Reload_f(void)
 {
 	const char *pSaveName;
@@ -1114,7 +1090,6 @@ void Host_Reload_f(void)
 	}
 }
 
-/* <3d552> ../engine/host_cmd.c:1730 */
 void Host_Reconnect_f(void)
 {
 	char cmdString[128];
@@ -1139,7 +1114,6 @@ void Host_Reconnect_f(void)
 	MSG_WriteString(&g_pcls.netchan.message, "new");
 }
 
-/* <3e7a9> ../engine/host_cmd.c:1780 */
 char *Host_SaveGameDirectory(void)
 {
 	static char szDirectory[MAX_PATH];
@@ -1148,7 +1122,6 @@ char *Host_SaveGameDirectory(void)
 	return szDirectory;
 }
 
-/* <3dba5> ../engine/host_cmd.c:1877 */
 void Host_SavegameComment(char *pszBuffer, int iSizeBuffer)
 {
 	int i;
@@ -1173,7 +1146,6 @@ void Host_SavegameComment(char *pszBuffer, int iSizeBuffer)
 	pszBuffer[iSizeBuffer - 1] = 0;
 }
 
-/* <3e8e9> ../engine/host_cmd.c:1909 */
 void Host_SaveAgeList(const char *pName, int count)
 {
 	char newName[MAX_PATH];
@@ -1198,12 +1170,11 @@ void Host_SaveAgeList(const char *pName, int count)
 	}
 }
 
-/* <3e9ba> ../engine/host_cmd.c:1938 */
 int Host_ValidSave(void)
 {
 	if (cmd_source != src_command)
 		return 0;
-	
+
 	if (!g_psv.active)
 	{
 		Con_Printf("Not playing a local game.\n");
@@ -1232,7 +1203,6 @@ int Host_ValidSave(void)
 	return 1;
 }
 
-/* <3da59> ../engine/host_cmd.c:1983 */
 SAVERESTOREDATA *SaveInit(int size)
 {
 	int i;
@@ -1279,7 +1249,6 @@ SAVERESTOREDATA *SaveInit(int size)
 	return pSaveData;
 }
 
-/* <3e17e> ../engine/host_cmd.c:2029 */
 void SaveExit(SAVERESTOREDATA *save)
 {
 	if (save->pTokens)
@@ -1292,7 +1261,6 @@ void SaveExit(SAVERESTOREDATA *save)
 	gGlobalVariables.pSaveData = NULL;
 }
 
-/* <3f65f> ../engine/host_cmd.c:2044 */
 qboolean SaveGameSlot(const char *pSaveName, const char *pSaveComment)
 {
 	char hlPath[256];
@@ -1387,7 +1355,6 @@ qboolean SaveGameSlot(const char *pSaveName, const char *pSaveComment)
 	return TRUE;
 }
 
-/* <3dadd> ../engine/host_cmd.c:2150 */
 void Host_Savegame_f(void)
 {
 	char szComment[80];
@@ -1412,7 +1379,6 @@ void Host_Savegame_f(void)
 	CL_HudMessage("GAMESAVED");
 }
 
-/* <3d704> ../engine/host_cmd.c:2185 */
 void Host_AutoSave_f(void)
 {
 	char szComment[80];
@@ -1427,7 +1393,6 @@ void Host_AutoSave_f(void)
 	}
 }
 
-/* <3f8d1> ../engine/host_cmd.c:2203 */
 qboolean SaveGame(const char *pszSlot, const char *pszComment)
 {
 	qboolean qret;
@@ -1440,7 +1405,6 @@ qboolean SaveGame(const char *pszSlot, const char *pszComment)
 	return qret;
 }
 
-/* <3d658> ../engine/host_cmd.c:2217 */
 int SaveReadHeader(FileHandle_t pFile, GAME_HEADER *pHeader, int readGlobalState)
 {
 	int i;
@@ -1508,7 +1472,6 @@ int SaveReadHeader(FileHandle_t pFile, GAME_HEADER *pHeader, int readGlobalState
 	return 1;
 }
 
-/* <3ea80> ../engine/host_cmd.c:2289 */
 void SaveReadComment(FileHandle_t f, char *name)
 {
 	GAME_HEADER gameHeader;
@@ -1516,7 +1479,6 @@ void SaveReadComment(FileHandle_t f, char *name)
 		Q_strcpy(name, gameHeader.comment);
 }
 
-/* <3d97a> ../engine/host_cmd.c:2302 */
 void Host_Loadgame_f(void)
 {
 	if (cmd_source != src_command)
@@ -1531,7 +1493,6 @@ void Host_Loadgame_f(void)
 		Con_Printf("Error loading saved game\n");
 }
 
-/* <3fe89> ../engine/host_cmd.c:2323 */
 int LoadGame(const char *pName)
 {
 	int iRet;
@@ -1544,7 +1505,6 @@ int LoadGame(const char *pName)
 	return iRet;
 }
 
-/* <3fccf> ../engine/host_cmd.c:2334 */
 int Host_Load(const char *pName)
 {
 	FILE *pFile;
@@ -1615,7 +1575,6 @@ int Host_Load(const char *pName)
 	return 1;
 }
 
-/* <3ed7d> ../engine/host_cmd.c:2439 */
 SAVERESTOREDATA *SaveGamestate(void)
 {
 	char name[256];
@@ -1753,12 +1712,10 @@ SAVERESTOREDATA *SaveGamestate(void)
 	return pSaveData;
 }
 
-/* <3d6e8> ../engine/host_cmd.c:2592 */
 void CL_Save(const char *name)
 {
 }
 
-/* <3eb39> ../engine/host_cmd.c:2623 */
 void EntityInit(edict_t *pEdict, int className)
 {
 	ENTITYINIT pEntityInit;
@@ -1773,7 +1730,6 @@ void EntityInit(edict_t *pEdict, int className)
 		pEntityInit(&pEdict->v);
 }
 
-/* <3eb9c> ../engine/host_cmd.c:2640 */
 SAVERESTOREDATA *LoadSaveData(const char *level)
 {
 	char name[MAX_PATH];
@@ -1859,7 +1815,6 @@ SAVERESTOREDATA *LoadSaveData(const char *level)
 	return pSaveData;
 }
 
-/* <3ec7a> ../engine/host_cmd.c:2724 */
 void ParseSaveTables(SAVERESTOREDATA *pSaveData, SAVE_HEADER *pHeader, int updateGlobals)
 {
 	int i;
@@ -1869,7 +1824,7 @@ void ParseSaveTables(SAVERESTOREDATA *pSaveData, SAVE_HEADER *pHeader, int updat
 		gEntityInterface.pfnSaveReadFields(pSaveData, "ETABLE", &(pSaveData->pTable[i]), gEntityTableDescription, ARRAYSIZE(gEntityTableDescription));
 		pSaveData->pTable[i].pent = NULL;
 	}
-	
+
 	pSaveData->size = 0;
 	pSaveData->pBaseData = pSaveData->pCurrentData;
 	gEntityInterface.pfnSaveReadFields(pSaveData, "Save Header", pHeader, gSaveHeaderDescription, ARRAYSIZE(gSaveHeaderDescription));
@@ -1896,7 +1851,6 @@ void ParseSaveTables(SAVERESTOREDATA *pSaveData, SAVE_HEADER *pHeader, int updat
 	}
 }
 
-/* <3ece6> ../engine/host_cmd.c:2770 */
 void EntityPatchWrite(SAVERESTOREDATA *pSaveData, const char *level)
 {
 	char name[MAX_PATH];
@@ -1924,12 +1878,11 @@ void EntityPatchWrite(SAVERESTOREDATA *pSaveData, const char *level)
 	FS_Close(pFile);
 }
 
-/* <3eed5> ../engine/host_cmd.c:2802 */
 void EntityPatchRead(SAVERESTOREDATA *pSaveData, const char *level)
 {
 	char name[MAX_PATH];
 	FILE *pFile;
-	int i; 
+	int i;
 	int size;
 	int entityId;
 
@@ -1947,7 +1900,6 @@ void EntityPatchRead(SAVERESTOREDATA *pSaveData, const char *level)
 	}
 }
 
-/* <3ef7c> ../engine/host_cmd.c:2826 */
 int LoadGamestate(char *level, int createPlayers)
 {
 	int i;
@@ -1974,7 +1926,7 @@ int LoadGamestate(char *level, int createPlayers)
 	Cvar_SetValue("sv_skyvec_x", header.skyVec_x);
 	Cvar_SetValue("sv_skyvec_y", header.skyVec_y);
 	Cvar_SetValue("sv_skyvec_z", header.skyVec_z);
-	
+
 	for (i = 0; i < pSaveData->tableCount; i++)
 	{
 		pent = NULL;
@@ -2029,7 +1981,6 @@ int LoadGamestate(char *level, int createPlayers)
 	return 1;
 }
 
-/* <3da9b> ../engine/host_cmd.c:2911 */
 int EntryInTable(SAVERESTOREDATA *pSaveData, const char *pMapName, int index)
 {
 	int i;
@@ -2041,7 +1992,6 @@ int EntryInTable(SAVERESTOREDATA *pSaveData, const char *pMapName, int index)
 	return -1;
 }
 
-/* <3f117> ../engine/host_cmd.c:2926 */
 void LandmarkOrigin(SAVERESTOREDATA *pSaveData, vec_t *output, const char *pLandmarkName)
 {
 	int i;
@@ -2060,7 +2010,6 @@ void LandmarkOrigin(SAVERESTOREDATA *pSaveData, vec_t *output, const char *pLand
 	output[2] = 0.0f;
 }
 
-/* <3f18c> ../engine/host_cmd.c:2945 */
 int EntityInSolid(edict_t *pent)
 {
 	vec3_t point;
@@ -2077,7 +2026,6 @@ int EntityInSolid(edict_t *pent)
 	return (SV_PointContents(point) == CONTENTS_SOLID);
 }
 
-/* <3f1de> ../engine/host_cmd.c:2965 */
 int CreateEntityList(SAVERESTOREDATA *pSaveData, int levelMask)
 {
 	int i;
@@ -2158,7 +2106,6 @@ int CreateEntityList(SAVERESTOREDATA *pSaveData, int levelMask)
 	return movedCount;
 }
 
-/* <3f2b7> ../engine/host_cmd.c:3047 */
 void LoadAdjacentEntities(const char *pOldLevel, const char *pLandmarkName)
 {
 	int i;
@@ -2205,7 +2152,7 @@ void LoadAdjacentEntities(const char *pOldLevel, const char *pLandmarkName)
 
 			if (!Q_strcmp(currentLevelData.levelList[i].mapName, pOldLevel))
 				flags |= FENTTABLE_PLAYER;
-			
+
 			index = -1;
 			while (1)
 			{
@@ -2227,7 +2174,6 @@ void LoadAdjacentEntities(const char *pOldLevel, const char *pLandmarkName)
 	gGlobalVariables.pSaveData = NULL;
 }
 
-/* <3f445> ../engine/host_cmd.c:3111 */
 int FileSize(FileHandle_t pFile)
 {
 	if (!pFile)
@@ -2235,7 +2181,6 @@ int FileSize(FileHandle_t pFile)
 	return FS_Size(pFile);
 }
 
-/* <3f482> ../engine/host_cmd.c:3121 */
 void FileCopy(FileHandle_t pOutput, FileHandle_t pInput, int fileSize)
 {
 	char buf[1024];
@@ -2253,7 +2198,6 @@ void FileCopy(FileHandle_t pOutput, FileHandle_t pInput, int fileSize)
 	}
 }
 
-/* <3f50f> ../engine/host_cmd.c:3140 */
 void DirectoryCopy(const char *pPath, FileHandle_t pFile)
 {
 	const char *findfn;
@@ -2278,7 +2222,6 @@ void DirectoryCopy(const char *pPath, FileHandle_t pFile)
 	Sys_FindClose();
 }
 
-/* <3f973> ../engine/host_cmd.c:3167 */
 void DirectoryExtract(FileHandle_t pFile, int fileCount)
 {
 	int i;
@@ -2299,7 +2242,6 @@ void DirectoryExtract(FileHandle_t pFile, int fileCount)
 	}
 }
 
-/* <3f627> ../engine/host_cmd.c:3187 */
 int DirectoryCount(const char *pPath)
 {
 	int count;
@@ -2317,7 +2259,6 @@ int DirectoryCount(const char *pPath)
 	return count;
 }
 
-/* <3fa97> ../engine/host_cmd.c:3209 */
 void Host_ClearSaveDirectory(void)
 {
 	char szName[MAX_PATH];
@@ -2344,7 +2285,6 @@ void Host_ClearSaveDirectory(void)
 	Sys_FindClose();
 }
 
-/* <3fbe0> ../engine/host_cmd.c:3250 */
 void Host_ClearGameState(void)
 {
 	S_StopAllSounds(TRUE);
@@ -2353,7 +2293,6 @@ void Host_ClearGameState(void)
 		gEntityInterface.pfnResetGlobalState();
 }
 
-/* <3d72c> ../engine/host_cmd.c:3262 */
 void Host_Changelevel2_f(void)
 {
 	char level[64];
@@ -2429,7 +2368,6 @@ void Host_Changelevel2_f(void)
 	SV_ActivateServer(0);
 }
 
-/* <3db8f> ../engine/host_cmd.c:3369 */
 void Host_Version_f(void)
 {
 	Con_Printf("Protocol version %i\nExe version %s (%s)\n", PROTOCOL_VERSION, gpszVersionString, gpszProductString);
@@ -2444,7 +2382,6 @@ void Host_Version_f(void)
 
 }
 
-/* <3d516> ../engine/host_cmd.c:3382 */
 void Host_FullInfo_f(void)
 {
 	char key[512];
@@ -2494,13 +2431,11 @@ void Host_FullInfo_f(void)
 	}
 }
 
-/* <400a6> ../engine/host_cmd.c:3433 */
 NOXREF void Host_KillVoice_f(void)
 {
 	Voice_Deinit();
 }
 
-/* <3d50b> ../engine/host_cmd.c:3447 */
 void Host_SetInfo_f(void)
 {
 	if (Cmd_Argc() == 1)
@@ -2523,7 +2458,6 @@ void Host_SetInfo_f(void)
 	host_client->sendinfo = TRUE;
 }
 
-/* <3d82c> ../engine/host_cmd.c:3471 */
 void Host_Say(qboolean teamonly)
 {
 	client_t *client;
@@ -2600,19 +2534,16 @@ void Host_Say(qboolean teamonly)
 	Log_Printf("Server say \"%s\"\n", p);
 }
 
-/* <3e127> ../engine/host_cmd.c:3541 */
 void Host_Say_f(void)
 {
 	Host_Say(FALSE);
 }
 
-/* <3e0d0> ../engine/host_cmd.c:3547 */
 void Host_Say_Team_f(void)
 {
 	Host_Say(TRUE);
 }
 
-/* <3d4b1> ../engine/host_cmd.c:3553 */
 void Host_Tell_f(void)
 {
 	client_t *client;
@@ -2673,7 +2604,6 @@ void Host_Tell_f(void)
 	host_client = save;
 }
 
-/* <3d4a6> ../engine/host_cmd.c:3625 */
 void Host_Kill_f(void)
 {
 	if (cmd_source == src_command)
@@ -2690,7 +2620,6 @@ void Host_Kill_f(void)
 	gEntityInterface.pfnClientKill(sv_player);
 }
 
-/* <3db79> ../engine/host_cmd.c:3647 */
 void Host_TogglePause_f(void)
 {
 	if (cmd_source == src_command)
@@ -2708,12 +2637,11 @@ void Host_TogglePause_f(void)
 		SV_BroadcastPrintf("%s paused the game\n", &pr_strings[sv_player->v.netname]);
 	else
 		SV_BroadcastPrintf("%s unpaused the game\n", &pr_strings[sv_player->v.netname]);
-	
+
 	MSG_WriteByte(&g_psv.reliable_datagram, svc_setpause);
 	MSG_WriteByte(&g_psv.reliable_datagram, g_psv.paused);
 }
 
-/* <3d49b> ../engine/host_cmd.c:3679 */
 void Host_Pause_f(void)
 {
 	// pause only singleplayer when console or main menu opens
@@ -2732,7 +2660,6 @@ void Host_Pause_f(void)
 	MSG_WriteByte(&g_psv.reliable_datagram, g_psv.paused);
 }
 
-/* <3d490> ../engine/host_cmd.c:3707 */
 void Host_Unpause_f(void)
 {
 	// unpause only singleplayer when console or main menu opens
@@ -2751,7 +2678,6 @@ void Host_Unpause_f(void)
 	MSG_WriteByte(&g_psv.reliable_datagram, g_psv.paused);
 }
 
-/* <3db08> ../engine/host_cmd.c:3873 */
 void Host_Interp_f(void)
 {
 	r_dointerp ^= 1;
@@ -2761,13 +2687,12 @@ void Host_Interp_f(void)
 		Con_Printf("Frame Interpolation ON\n");
 }
 
-/* <400f8> ../engine/host_cmd.c:3898 */
 void Host_NextDemo(void)
 {
 	char str[1024];
 	if (g_pcls.demonum == -1)
 		return;
-	
+
 	SCR_BeginLoadingPlaque(FALSE);
 	if (g_pcls.demos[g_pcls.demonum][0])
 	{
@@ -2786,7 +2711,6 @@ void Host_NextDemo(void)
 	g_pcls.demonum = -1;
 }
 
-/* <3d8c4> ../engine/host_cmd.c:3929 */
 void Host_Startdemos_f(void)
 {
 	int i;
@@ -2820,7 +2744,6 @@ void Host_Startdemos_f(void)
 	}
 }
 
-/* <3d8b9> ../engine/host_cmd.c:3972 */
 void Host_Demos_f(void)
 {
 	if (g_pcls.state != ca_dedicated)
@@ -2832,7 +2755,6 @@ void Host_Demos_f(void)
 	}
 }
 
-/* <3d485> ../engine/host_cmd.c:3989 */
 void Host_Stopdemo_f(void)
 {
 	if (g_pcls.state != ca_dedicated)
@@ -2845,7 +2767,6 @@ void Host_Stopdemo_f(void)
 	}
 }
 
-/* <401a6> ../engine/host_cmd.c:4009 */
 NOXREF void Host_EndSection(const char *pszSection)
 {
 	giActive = DLL_PAUSED;
@@ -2868,7 +2789,6 @@ NOXREF void Host_EndSection(const char *pszSection)
 	Cbuf_AddText("\ndisconnect\n");
 }
 
-/* <3db1e> ../engine/host_cmd.c:4050 */
 void Host_Soundfade_f(void)
 {
 	int percent;
@@ -2916,7 +2836,6 @@ void Host_Soundfade_f(void)
 	g_pcls.soundfade.soundFadeInTime = inTime;
 }
 
-/* <3daf2> ../engine/host_cmd.c:4095 */
 void Host_KillServer_f(void)
 {
 	if (g_pcls.state != ca_dedicated)
@@ -2931,7 +2850,6 @@ void Host_KillServer_f(void)
 	}
 }
 
-/* <401d0> ../engine/host_cmd.c:4110 */
 void Host_VoiceRecordStart_f(void)
 {
 	const char *pUncompressedFile = NULL;
@@ -2951,7 +2869,6 @@ void Host_VoiceRecordStart_f(void)
 	Voice_RecordStart(pUncompressedFile, pDecompressedFile, pInputFile);
 }
 
-/* <40225> ../engine/host_cmd.c:4136 */
 void Host_VoiceRecordStop_f(void)
 {
 	if (g_pcls.state != ca_active)
@@ -2964,16 +2881,14 @@ void Host_VoiceRecordStop_f(void)
 	}
 }
 
-/* <4023b> ../engine/host_cmd.c:4230 */
 void Host_Crash_f(void)
 {
 	int *p = NULL;
 	*p = 0xffffffff;
 }
 
-/* <40260> ../engine/host_cmd.c:4242 */
 void Host_InitCommands(void)
-{	
+{
 #ifdef HOOK_ENGINE
 	Cmd_AddCommand("shutdownserver", (xcommand_t)GetOriginalFuncAddrOrDefault("Host_KillServer_f", (void *)Host_KillServer_f));
 	Cmd_AddCommand("soundfade", (xcommand_t)GetOriginalFuncAddrOrDefault("Host_Soundfade_f", (void *)Host_Soundfade_f));
@@ -3092,7 +3007,6 @@ void Host_InitCommands(void)
 	Cvar_RegisterVariable(&voice_inputfromfile);
 }
 
-/* <40276> ../engine/host_cmd.c:4388 */
 void SV_CheckBlendingInterface(void)
 {
 	int i;
@@ -3117,7 +3031,6 @@ void SV_CheckBlendingInterface(void)
 	}
 }
 
-/* <3e266> ../engine/host_cmd.c:4431 */
 void SV_CheckSaveGameCommentInterface(void)
 {
 	int i;

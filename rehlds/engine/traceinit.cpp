@@ -30,7 +30,6 @@
 
 CInitTracker g_InitTracker;
 
-/* <d7ebd> ../engine/traceinit.cpp:56 */
 CInitTracker::CInitTracker(void)
 {
 	for (int l = 0; l < NUM_LISTS; l++)
@@ -40,7 +39,6 @@ CInitTracker::CInitTracker(void)
 	}
 }
 
-/* <d7d90> ../engine/traceinit.cpp:67 */
 CInitTracker::~CInitTracker(void)
 {
 	for (int l = 0; l < NUM_LISTS; l++)
@@ -59,7 +57,6 @@ CInitTracker::~CInitTracker(void)
 	}
 }
 
-/* <d7d31> ../engine/traceinit.cpp:91 */
 void CInitTracker::Init(const char *init, const char *shutdown, int listnum)
 {
 	InitFunc *f = new InitFunc;
@@ -76,7 +73,6 @@ void CInitTracker::Init(const char *init, const char *shutdown, int listnum)
 	m_nNumFuncs[listnum]++;
 }
 
-/* <d7ca7> ../engine/traceinit.cpp:111 */
 void CInitTracker::Shutdown(const char *shutdown, int listnum)
 {
 	int i = 0;
@@ -110,13 +106,11 @@ void CInitTracker::Shutdown(const char *shutdown, int listnum)
 	Sys_Printf("Shutdown function %s not in list!!!\n", shutdown);
 }
 
-/* <d822d> ../engine/traceinit.cpp:158 */
 void TraceInit(const char *i, const char *s, int listnum)
 {
 	g_InitTracker.Init(i, s, listnum);
 }
 
-/* <d7fe7> ../engine/traceinit.cpp:167 */
 void TraceShutdown(const char *s, int listnum)
 {
 	g_InitTracker.Shutdown(s, listnum);

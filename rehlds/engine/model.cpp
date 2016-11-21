@@ -44,8 +44,6 @@ mod_known_info_t mod_known_info[MAX_KNOWN_MODELS];
 #define NL_NEEDS_LOADED	1
 #define NL_UNREFERENCED	2
 
-
-/* <51468> ../engine/model.c:147 */
 void SW_Mod_Init(void)
 {
 #ifndef SWDS
@@ -53,7 +51,6 @@ void SW_Mod_Init(void)
 #endif
 }
 
-/* <52f8d> ../engine/model.c:164 */
 void* EXT_FUNC Mod_Extradata(model_t *mod)
 {
 	void *r;
@@ -84,7 +81,6 @@ void* EXT_FUNC Mod_Extradata(model_t *mod)
 	return mod->cache.data;
 }
 
-/* <5147c> ../engine/model.c:190 */
 mleaf_t *Mod_PointInLeaf(vec_t *p, model_t *model)
 {
 	mnode_t *node;                                               //   192
@@ -111,7 +107,6 @@ mleaf_t *Mod_PointInLeaf(vec_t *p, model_t *model)
 	return (mleaf_t *)node;
 }
 
-/* <514e5> ../engine/model.c:226 */
 void Mod_ClearAll(void)
 {
 	int i;
@@ -127,7 +122,6 @@ void Mod_ClearAll(void)
 	}
 }
 
-/* <5151a> ../engine/model.c:248 */
 void Mod_FillInCRCInfo(qboolean trackCRC, int model_number)
 {
 	mod_known_info_t *p;
@@ -138,7 +132,6 @@ void Mod_FillInCRCInfo(qboolean trackCRC, int model_number)
 	p->initialCRC = 0;
 }
 
-/* <51546> ../engine/model.c:264 */
 model_t *Mod_FindName(qboolean trackCRC, const char *name)
 {
 	model_t *avail;
@@ -185,7 +178,6 @@ model_t *Mod_FindName(qboolean trackCRC, const char *name)
 	return mod;
 }
 
-/* <51615> ../engine/model.c:329 */
 NOXREF qboolean Mod_ValidateCRC(const char *name, CRC32_t crc)
 {
 	model_t *mod;
@@ -202,7 +194,6 @@ NOXREF qboolean Mod_ValidateCRC(const char *name, CRC32_t crc)
 	return TRUE;
 }
 
-/* <5166e> ../engine/model.c:362 */
 NOXREF void Mod_NeedCRC(const char *name, qboolean needCRC)
 {
 	model_t *mod;
@@ -254,7 +245,6 @@ qboolean IsCZPlayerModel(uint32 crc, const char  * filename)
 	return 0;
 }
 
-/* <513ce> ../engine/model.c:394 */
 model_t *Mod_LoadModel(model_t *mod, qboolean crash, qboolean trackCRC)
 {
 	unsigned char *buf;
@@ -318,7 +308,7 @@ model_t *Mod_LoadModel(model_t *mod, qboolean crash, qboolean trackCRC)
 				p->firstCRCDone = 1;
 				p->initialCRC = currentCRC;
 				SetCStrikeFlags();
-					
+
 				if (!IsGameSubscribed("czero") && g_bIsCStrike && IsCZPlayerModel(currentCRC, mod->name) && g_pcls.state)
 				{
 					COM_ExplainDisconnection(TRUE, "Cannot continue with altered model %s, disconnecting.", mod->name);
@@ -360,13 +350,11 @@ model_t *Mod_LoadModel(model_t *mod, qboolean crash, qboolean trackCRC)
 	return mod;
 }
 
-/* <516c5> ../engine/model.c:540 */
 NOXREF void Mod_MarkClient(model_t *pModel)
 {
 	pModel->needload = (NL_NEEDS_LOADED | NL_UNREFERENCED);
 }
 
-/* <52edc> ../engine/model.c:552 */
 model_t *Mod_ForName(const char *name, qboolean crash, qboolean trackCRC)
 {
 	model_t *mod;
@@ -378,7 +366,6 @@ model_t *Mod_ForName(const char *name, qboolean crash, qboolean trackCRC)
 	return Mod_LoadModel(mod, crash, trackCRC);
 }
 
-/* <516ee> ../engine/model.c:589 */
 void Mod_AdInit(void)
 {
 	int i;
@@ -410,7 +397,6 @@ void Mod_AdInit(void)
 	}
 }
 
-/* <51751> ../engine/model.c:621 */
 void Mod_AdSwap(texture_t *src, int pixels, int entries)
 {
 //	int j;                                                        //   623
@@ -420,7 +406,6 @@ void Mod_AdSwap(texture_t *src, int pixels, int entries)
 	Sys_Error(__FUNCTION__ ": Reverse me");
 }
 
-/* <51803> ../engine/model.c:656 */
 void Mod_LoadTextures(lump_t *l)
 {
 	dmiptexlump_t *m;
@@ -454,7 +439,7 @@ void Mod_LoadTextures(lump_t *l)
 	m->_nummiptex = LittleLong(m->_nummiptex);
 	loadmodel->numtextures = m->_nummiptex;
 	loadmodel->textures = (texture_t **)Hunk_AllocName(4 * loadmodel->numtextures, loadname);
-	
+
 	for (int i = 0; i < m->_nummiptex; i++)
 	{
 		m->dataofs[i] = LittleLong(m->dataofs[i]);
@@ -629,7 +614,6 @@ void Mod_LoadTextures(lump_t *l)
 	Con_DPrintf("Texture load: %6.1fms\n", (Sys_FloatTime() - starttime) * 1000.0);
 }
 
-/* <51386> ../engine/model.c:878 */
 void Mod_LoadLighting(lump_t *l)
 {
 	if (l->filelen)
@@ -643,7 +627,6 @@ void Mod_LoadLighting(lump_t *l)
 	}
 }
 
-/* <519f8> ../engine/model.c:895 */
 void Mod_LoadVisibility(lump_t *l)
 {
 	if (!l->filelen)
@@ -655,7 +638,6 @@ void Mod_LoadVisibility(lump_t *l)
 	Q_memcpy(loadmodel->visdata, mod_base + l->fileofs, l->filelen);
 }
 
-/* <513a6> ../engine/model.c:913 */
 void Mod_LoadEntities(lump_t *l)
 {
 	if (!l->filelen)
@@ -690,7 +672,6 @@ void Mod_LoadEntities(lump_t *l)
 
 }
 
-/* <51a67> ../engine/model.c:950 */
 void Mod_LoadVertexes(lump_t *l)
 {
 	dvertex_t	*in;
@@ -714,7 +695,6 @@ void Mod_LoadVertexes(lump_t *l)
 	}
 }
 
-/* <51ad2> ../engine/model.c:978 */
 void Mod_LoadSubmodels(lump_t *l)
 {
 	dmodel_t	*in;
@@ -746,7 +726,6 @@ void Mod_LoadSubmodels(lump_t *l)
 	}
 }
 
-/* <51b45> ../engine/model.c:1014 */
 void Mod_LoadEdges(lump_t *l)
 {
 	dedge_t *in;
@@ -769,7 +748,6 @@ void Mod_LoadEdges(lump_t *l)
 	}
 }
 
-/* <51bb0> ../engine/model.c:1041 */
 void Mod_LoadTexinfo(lump_t *l)
 {
 	texinfo_t *in;
@@ -836,7 +814,6 @@ void Mod_LoadTexinfo(lump_t *l)
 	}
 }
 
-/* <51c59> ../engine/model.c:1109 */
 void CalcSurfaceExtents(msurface_t *s)
 {
 	float	mins[2], maxs[2], val;
@@ -883,7 +860,6 @@ void CalcSurfaceExtents(msurface_t *s)
 	}
 }
 
-/* <51d09> ../engine/model.c:1161 */
 void Mod_LoadFaces(lump_t *l)
 {
 	dface_t		*in;
@@ -966,7 +942,6 @@ void Mod_LoadFaces(lump_t *l)
 	}
 }
 
-/* <51dcc> ../engine/model.c:1262 */
 void Mod_SetParent(mnode_t *node, mnode_t *parent)
 {
 	node->parent = parent;
@@ -976,7 +951,6 @@ void Mod_SetParent(mnode_t *node, mnode_t *parent)
 	Mod_SetParent(node->children[1], node);
 }
 
-/* <51f0a> ../engine/model.c:1276 */
 void Mod_LoadNodes(lump_t *l)
 {
 	int			i, j, count, p;
@@ -1019,7 +993,6 @@ void Mod_LoadNodes(lump_t *l)
 	Mod_SetParent(loadmodel->nodes, NULL);	// sets nodes and leafs
 }
 
-/* <51f91> ../engine/model.c:1324 */
 void Mod_LoadLeafs(lump_t *l)
 {
 	dleaf_t 	*in;
@@ -1062,7 +1035,6 @@ void Mod_LoadLeafs(lump_t *l)
 	}
 }
 
-/* <52018> ../engine/model.c:1373 */
 void Mod_LoadClipnodes(lump_t *l)
 {
 	dclipnode_t *in, *out;
@@ -1122,7 +1094,6 @@ void Mod_LoadClipnodes(lump_t *l)
 	}
 }
 
-/* <52093> ../engine/model.c:1439 */
 void Mod_MakeHull0(void)
 {
 	mnode_t		*in, *child;
@@ -1155,7 +1126,6 @@ void Mod_MakeHull0(void)
 	}
 }
 
-/* <52119> ../engine/model.c:1476 */
 void Mod_LoadMarksurfaces(lump_t *l)
 {
 	int		i, j, count;
@@ -1180,7 +1150,6 @@ void Mod_LoadMarksurfaces(lump_t *l)
 	}
 }
 
-/* <5218c> ../engine/model.c:1505 */
 void Mod_LoadSurfedges(lump_t *l)
 {
 	int		i, count;
@@ -1199,7 +1168,6 @@ void Mod_LoadSurfedges(lump_t *l)
 		out[i] = LittleLong(in[i]);
 }
 
-/* <52215> ../engine/model.c:1528 */
 void Mod_LoadPlanes(lump_t *l)
 {
 	int			i, j;
@@ -1233,7 +1201,6 @@ void Mod_LoadPlanes(lump_t *l)
 	}
 }
 
-/* <5229e> ../engine/model.c:1566 */
 float RadiusFromBounds(vec_t *mins, vec_t *maxs)
 {
 	int		i;
@@ -1247,12 +1214,11 @@ float RadiusFromBounds(vec_t *mins, vec_t *maxs)
 	return Length(corner);
 }
 
-void Mod_LoadBrushModel(model_t *mod, void *buffer) 
+void Mod_LoadBrushModel(model_t *mod, void *buffer)
 {
 	g_RehldsHookchains.m_Mod_LoadBrushModel.callChain(&Mod_LoadBrushModel_internal, mod, buffer);
 }
 
-/* <52314> ../engine/model.c:1584 */
 void EXT_FUNC Mod_LoadBrushModel_internal(model_t *mod, void *buffer)
 {
 	dmodel_t *bm;
@@ -1323,7 +1289,7 @@ void EXT_FUNC Mod_LoadBrushModel_internal(model_t *mod, void *buffer)
 
 		mod->radius = RadiusFromBounds(mod->mins, mod->maxs);
 		mod->numleafs = bm->visleafs;
-	
+
 		if (i < mod->numsubmodels - 1)
 		{
 			Q_snprintf(name, 10, "*%i", i + 1);
@@ -1337,7 +1303,6 @@ void EXT_FUNC Mod_LoadBrushModel_internal(model_t *mod, void *buffer)
 	}
 }
 
-/* <5255d> ../engine/model.c:1695 */
 NOXREF void *Mod_LoadAliasFrame(void *pin, int *pframeindex, int numv, trivertx_t *pbboxmin, trivertx_t *pbboxmax, aliashdr_t *pheader, char *name)
 {
 	trivertx_t *pframe;
@@ -1371,7 +1336,6 @@ NOXREF void *Mod_LoadAliasFrame(void *pin, int *pframeindex, int numv, trivertx_
 	return (void *)&pinframe[numv];
 }
 
-/* <52656> ../engine/model.c:1743 */
 NOXREF void *Mod_LoadAliasGroup(void *pin, int *pframeindex, int numv, trivertx_t *pbboxmin, trivertx_t *pbboxmax, aliashdr_t *pheader, char *name)
 {
 	daliasgroup_t *pingroup;
@@ -1418,7 +1382,6 @@ NOXREF void *Mod_LoadAliasGroup(void *pin, int *pframeindex, int numv, trivertx_
 	return ptemp;
 }
 
-/* <5275d> ../engine/model.c:1808 */
 NOXREF void *Mod_LoadAliasSkin(void *pin, int *pskinindex, int skinsize, aliashdr_t *pheader)
 {
 	unsigned char *pskin;
@@ -1438,7 +1401,6 @@ NOXREF void *Mod_LoadAliasSkin(void *pin, int *pskinindex, int skinsize, aliashd
 	return (void *)&pinskin[skinsize];
 }
 
-/* <52812> ../engine/model.c:1844 */
 NOXREF void *Mod_LoadAliasSkinGroup(void *pin, int *pskinindex, int skinsize, aliashdr_t *pheader)
 {
 	daliasskingroup_t *pinskingroup;
@@ -1478,7 +1440,6 @@ NOXREF void *Mod_LoadAliasSkinGroup(void *pin, int *pskinindex, int skinsize, al
 	return ptemp;
 }
 
-/* <52936> ../engine/model.c:1900 */
 NOXREF void Mod_LoadAliasModel(model_t *mod, void *buffer)
 {
 	int i;
@@ -1654,7 +1615,6 @@ NOXREF void Mod_LoadAliasModel(model_t *mod, void *buffer)
 	}
 }
 
-/* <52b76> ../engine/model.c:2150 */
 void *Mod_LoadSpriteFrame(void *pin, mspriteframe_t **ppframe)
 {
 	dspriteframe_t		*pinframe;
@@ -1708,7 +1668,6 @@ void *Mod_LoadSpriteFrame(void *pin, mspriteframe_t **ppframe)
 	return (void *)((byte *)pinframe + sizeof(dspriteframe_t) + size);
 }
 
-/* <52c36> ../engine/model.c:2204 */
 void *Mod_LoadSpriteGroup(void *pin, mspriteframe_t **ppframe)
 {
 	dspritegroup_t		*pingroup;
@@ -1753,7 +1712,6 @@ void *Mod_LoadSpriteGroup(void *pin, mspriteframe_t **ppframe)
 	return ptemp;
 }
 
-/* <52cf2> ../engine/model.c:2256 */
 void Mod_LoadSpriteModel(model_t *mod, void *buffer)
 {
 	int					i;
@@ -1837,7 +1795,6 @@ void Mod_LoadSpriteModel(model_t *mod, void *buffer)
 	mod->type = mod_sprite;
 }
 
-/* <5300a> ../engine/model.c:2360 */
 NOXREF void Mod_UnloadSpriteTextures(model_t *pModel)
 {
 	if (!pModel)
@@ -1861,7 +1818,6 @@ NOXREF void Mod_UnloadSpriteTextures(model_t *pModel)
 	}
 }
 
-/* <53033> ../engine/model.c:2376 */
 void Mod_Print(void)
 {
 	int i;
@@ -1878,7 +1834,6 @@ void Mod_Print(void)
 	}
 }
 
-/* <5306c> ../engine/model.c:2399 */
 NOXREF void Mod_ChangeGame(void)
 {
 	int i;

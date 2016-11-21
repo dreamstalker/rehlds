@@ -27,18 +27,15 @@
 */
 #pragma once
 
-/* <19039> ../common/quakedef.h:29 */
-typedef int BOOL; /* size: 4 */
+typedef int BOOL;
 
 // user message
 #define MAX_USER_MSG_DATA 192
 
-/* <627f> ../common/quakedef.h:137 */
 //moved to com_model.h
 //typedef struct cache_user_s
 //{
 //	void *data;
 //} cache_user_t;
 
-/* <4313b> ../common/quakedef.h:162 */
 typedef int (*pfnUserMsgHook)(const char *, int, void *);

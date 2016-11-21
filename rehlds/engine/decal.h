@@ -48,14 +48,12 @@
 #define OFFSET_DATAEXTRA_SIZE			8
 #endif
 
-/* <1fb9e> ../engine/decal.h:33 */
 typedef struct decalname_s
 {
 	char name[16];
 	unsigned char ucFlags;
 } decalname_t;
 
-/* <1fc17> ../engine/decals.c:449 */
 typedef struct lumplist_s
 {
 	lumpinfo_t *lump;
@@ -110,4 +108,5 @@ qboolean Draw_ValidateCustomLogo(cachewad_t *wad, unsigned char *data, lumpinfo_
 qboolean Draw_CacheLoadFromCustom(char *clean, cachewad_t *wad, void *raw, int rawsize, cachepic_t *pic);
 NOXREF int Draw_CacheIndex(cachewad_t *wad, char *path);
 NOXREF int Draw_CacheFindIndex(cachewad_t *wad, char *path);
+
 #endif // DECAL_H

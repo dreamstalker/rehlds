@@ -28,8 +28,6 @@
 
 #include "precompiled.h"
 
-
-/* <99d0> ../engine/com_custom.c:19 */
 void COM_ClearCustomizationList(customization_t *pHead, qboolean bCleanDecals)
 {
 	customization_s *pCurrent, *pNext;
@@ -84,7 +82,6 @@ void COM_ClearCustomizationList(customization_t *pHead, qboolean bCleanDecals)
 	pHead->pNext = NULL;
 }
 
-/* <9a75> ../engine/com_custom.c:88 */
 qboolean COM_CreateCustomization(customization_t *pListHead, resource_t *pResource, int playernumber, int flags, customization_t **pCustomization, int *nLumps)
 {
 	customization_t *pCust;                                      //    91
@@ -176,7 +173,6 @@ CustomizationError:
 	return bError == FALSE;
 }
 
-/* <9b41> ../engine/com_custom.c:229 */
 int COM_SizeofResourceList(resource_t *pList, resourceinfo_t *ri)
 {
 	resource_t *p;

@@ -34,8 +34,6 @@
 
 #include "entity_state.h"
 
-
-/* <138fb> ../engine/delta_packet.h:39 */
 typedef struct packet_entities_s
 {
 	int num_entities;

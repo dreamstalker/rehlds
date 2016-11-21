@@ -139,15 +139,15 @@
 
 typedef enum svc_commands_e
 {
-	svc_bad,			//0
-	svc_nop,			//1
-	svc_disconnect,		//2
-	svc_event,			//3
-	svc_version,		//4
-	svc_setview,		//5
-	svc_sound,			//6
-	svc_time,			//7
-	svc_print,			//8
+	svc_bad,
+	svc_nop,
+	svc_disconnect,
+	svc_event,
+	svc_version,
+	svc_setview,
+	svc_sound,
+	svc_time,
+	svc_print,
 	svc_stufftext,
 	svc_setangle,
 	svc_serverinfo,
@@ -219,13 +219,11 @@ typedef enum clc_commands_e
 	clc_endoflist = 255,
 } clc_commands_t;
 
-
 #define MAX_FLOWS 2
 
 #define FLOW_OUTGOING 0
 #define FLOW_INCOMING 1
 
-/* <e41> ../engine/net.h:91 */
 // Message data
 typedef struct flowstats_s
 {
@@ -237,7 +235,6 @@ typedef struct flowstats_s
 
 #define MAX_LATENT 32
 
-/* <e71> ../engine/net.h:101 */
 typedef struct flow_s
 {
 	// Data for last MAX_LATENT messages
@@ -283,7 +280,6 @@ typedef struct flow_s
 #define FRAG_GETID(fragid)		( ( fragid >> 16 ) & 0xffff )
 #define FRAG_GETCOUNT(fragid)	( fragid & 0xffff )
 
-/* <ee0> ../engine/net.h:124 */
 // Generic fragment structure
 typedef struct fragbuf_s
 {
@@ -308,7 +304,6 @@ typedef struct fragbuf_s
 	int size;
 } fragbuf_t;
 
-/* <fb3> ../engine/net.h:149 */
 // Waiting list of fragbuf chains
 typedef struct fragbufwaiting_s
 {
@@ -320,7 +315,6 @@ typedef struct fragbufwaiting_s
 	fragbuf_t *fragbufs;
 } fragbufwaiting_t;
 
-/* <1001> ../engine/net.h:160 */
 // Network Connection Channel
 typedef struct netchan_s
 {
@@ -344,7 +338,7 @@ typedef struct netchan_s
 
 	// Sequencing variables
 	//
-	// Increasing count of sequence numbers 
+	// Increasing count of sequence numbers
 	int incoming_sequence;
 	// # of last outgoing message that has been ack'd.
 	int incoming_acknowledged;

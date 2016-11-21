@@ -34,10 +34,9 @@
 
 #define MAX_CONSISTENCY_LIST	512
 
-/* <7508> ../engine/consistency.h:9 */
 typedef struct consistency_s
 {
-	char * filename;
+	char *filename;
 	int issound;
 	int orig_index;
 	int value;

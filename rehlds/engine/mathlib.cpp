@@ -109,13 +109,11 @@ inline __m128 length2D(__m128 v)
 	return _mm_sqrt_ps(_mm_hadd_ps(v, v)); // hadd = SSE3
 }
 
-/* <46ebf> ../engine/mathlib.c:14 */
 float anglemod(float a)
 {
 	return (360.0 / 65536) * ((int)(a*(65536 / 360.0)) & 65535);
 }
 
-/* <46eea> ../engine/mathlib.c:33 */
 void BOPS_Error(void)
 {
 	Sys_Error("BoxOnPlaneSide:  Bad signbits");
@@ -195,7 +193,7 @@ int BoxOnPlaneSide(vec_t *emins, vec_t *emaxs, mplane_t *p)
 	return sides;
 }
 #else
-/* <46f05> ../engine/mathlib.c:48 */
+
 int BoxOnPlaneSide(vec_t *emins, vec_t *emaxs, mplane_t *p)
 {
 #if (1)
@@ -257,7 +255,6 @@ int BoxOnPlaneSide(vec_t *emins, vec_t *emaxs, mplane_t *p)
 }
 #endif
 
-/* <46f8d> ../engine/mathlib.c:157 */
 NOBODY int InvertMatrix(const float *m, float *out);
 //{
 //	float wtmp;                                                   //   159
@@ -323,7 +320,6 @@ void AngleVectors(const vec_t *angles, vec_t *forward, vec_t *right, vec_t *up)
 	}
 }
 #else // REHLDS_FIXES
-/* <47067> ../engine/mathlib.c:267 */
 void AngleVectors(const vec_t *angles, vec_t *forward, vec_t *right, vec_t *up)
 {
 	float		sr, sp, sy, cr, cp, cy;
@@ -408,7 +404,6 @@ void AngleVectorsTranspose(const vec_t *angles, vec_t *forward, vec_t *right, ve
 	}
 }
 #else // REHLDS_FIXES
-/* <4712e> ../engine/mathlib.c:304 */
 void AngleVectorsTranspose(const vec_t *angles, vec_t *forward, vec_t *right, vec_t *up)
 {
 	float		sr, sp, sy, cr, cp, cy;
@@ -503,7 +498,6 @@ void AngleMatrix(const vec_t *angles, float(*matrix)[4])
 	*(int *)&matrix[2][3] = 0;
 }
 #else // REHLDS_FIXES
-/* <471e9> ../engine/mathlib.c:340 */
 void AngleMatrix(const vec_t *angles, float(*matrix)[4])
 {
 	float		sr, sp, sy, cr, cp, cy;
@@ -536,7 +530,6 @@ void AngleMatrix(const vec_t *angles, float(*matrix)[4])
 }
 #endif // REHLDS_FIXES
 
-/* <4729e> ../engine/mathlib.c:370 */
 NOBODY void AngleIMatrix(const vec_t *angles, float *matrix);
 //{
 //	float angle;                                                  //   372
@@ -548,13 +541,11 @@ NOBODY void AngleIMatrix(const vec_t *angles, float *matrix);
 //	float cy;                                                     //   373
 //}
 
-/* <4733d> ../engine/mathlib.c:400 */
 NOBODY void NormalizeAngles(float *angles);
 //{
 //	int i;                                                        //   402
 //}
 
-/* <47389> ../engine/mathlib.c:426 */
 NOBODY void InterpolateAngles(float *start, float *end, float *output, float frac);
 //{
 //	int i;                                                        //   428
@@ -566,7 +557,6 @@ NOBODY void InterpolateAngles(float *start, float *end, float *output, float fra
 //	NormalizeAngles(float *angles); /* size=0, low_pc=0 */ //   453
 //}
 
-/* <47495> ../engine/mathlib.c:457 */
 void VectorTransform(const vec_t *in1, float *in2, vec_t *out)
 {
 	out[0] = _DotProduct(in1, in2 + 0) + in2[3];
@@ -574,7 +564,6 @@ void VectorTransform(const vec_t *in1, float *in2, vec_t *out)
 	out[2] = _DotProduct(in1, in2 + 8) + in2[11];
 }
 
-/* <474dc> ../engine/mathlib.c:465 */
 int VectorCompare(const vec_t *v1, const vec_t *v2)
 {
 #ifdef REHLDS_OPT_PEDANTIC
@@ -596,7 +585,6 @@ void VectorMA(const vec_t *veca, float scale, const vec_t *vecm, vec_t *out)
 	xmm2vec(out, _mm_add_ps(_mm_mul_ps(_mm_set_ps1(scale), _mm_loadu_ps(vecm)), _mm_loadu_ps(veca)));
 }
 #else
-/* <47524> ../engine/mathlib.c:476 */
 void VectorMA(const vec_t *veca, float scale, const vec_t *vecm, vec_t *out)
 {
 	out[0] = scale * vecm[0] + veca[0];
@@ -606,7 +594,6 @@ void VectorMA(const vec_t *veca, float scale, const vec_t *vecm, vec_t *out)
 #endif
 
 #ifndef REHLDS_FIXES
-/* <4757a> ../engine/mathlib.c:484 */
 long double _DotProduct(const vec_t *v1, const vec_t *v2)
 {
 	return v1[0] * v2[0] + v1[1] * v2[1] + v1[2] * v2[2];
@@ -624,12 +611,10 @@ float _DotProduct(const vec_t *v1, const vec_t *v2)
 }
 #endif // REHLDS_FIXES
 
-/* <475b4> ../engine/mathlib.c:489 */
 NOBODY void _VectorSubtract(vec_t *veca, vec_t *vecb, vec_t *out);
 //{
 //}
 
-/* <475fb> ../engine/mathlib.c:496 */
 void _VectorAdd(vec_t *veca, vec_t *vecb, vec_t *out)
 {
 	out[0] = veca[0] + vecb[0];
@@ -637,12 +622,10 @@ void _VectorAdd(vec_t *veca, vec_t *vecb, vec_t *out)
 	out[2] = veca[2] + vecb[2];
 }
 
-/* <47642> ../engine/mathlib.c:503 */
 NOBODY void _VectorCopy(vec_t *in, vec_t *out);
 //{
 //}
 
-/* <47679> ../engine/mathlib.c:510 */
 void CrossProduct(const vec_t *v1, const vec_t *v2, vec_t *cross)
 {
 #ifdef REHLDS_FIXES
@@ -654,7 +637,6 @@ void CrossProduct(const vec_t *v1, const vec_t *v2, vec_t *cross)
 #endif // REHLDS_FIXES
 }
 
-/* <476d8> ../engine/mathlib.c:519 */
 float Length(const vec_t *v)
 {
 #ifdef REHLDS_FIXES
@@ -680,7 +662,6 @@ float Length2D(const vec_t *v)
 	return Q_sqrt(v[0] * v[0] + v[1] * v[1]);
 }
 
-/* <47722> ../engine/mathlib.c:532 */
 float VectorNormalize(vec3_t v)
 {
 	float	length, ilength;
@@ -703,12 +684,10 @@ float VectorNormalize(vec3_t v)
 	return length;
 }
 
-/* <47788> ../engine/mathlib.c:551 */
 NOBODY void VectorInverse(vec_t *v);
 //{
 //}
 
-/* <477af> ../engine/mathlib.c:558 */
 void VectorScale(const vec_t *in, float scale, vec_t *out)
 {
 	out[0] = scale * in[0];
@@ -716,13 +695,11 @@ void VectorScale(const vec_t *in, float scale, vec_t *out)
 	out[2] = scale * in[2];
 }
 
-/* <477f5> ../engine/mathlib.c:566 */
 NOBODY int Q_log2(int val);
 //{
 //	int answer;                                                   //   568
 //}
 
-/* <47833> ../engine/mathlib.c:574 */
 NOBODY void VectorMatrix(vec_t *forward, vec_t *right, vec_t *up);
 //{
 //	vec3_t tmp;                                                   //   576
@@ -736,7 +713,6 @@ NOBODY void VectorMatrix(vec_t *forward, vec_t *right, vec_t *up);
 //	VectorNormalize(vec_t *v); /* size=0, low_pc=0 */ //   593
 //}
 
-/* <4794e> ../engine/mathlib.c:597 */
 void VectorAngles(const vec_t *forward, vec_t *angles)
 {
 	float	length, yaw, pitch;
@@ -771,13 +747,11 @@ void VectorAngles(const vec_t *forward, vec_t *angles)
 	angles[2] = 0;
 }
 
-/* <479b7> ../engine/mathlib.c:632 */
 NOBODY void R_ConcatRotations(float *in1, float *in2, float *out);
 //{
 //
 //}
 
-/* <47a04> ../engine/mathlib.c:660 */
 #ifdef REHLDS_FIXES
 void R_ConcatTransforms(float in1[3][4], float in2[3][4], float out[3][4])
 {
@@ -808,7 +782,6 @@ void R_ConcatTransforms(float in1[3][4], float in2[3][4], float out[3][4])
 }
 #endif // REHLDS_FIXES
 
-/* <47a4b> ../engine/mathlib.c:699 */
 NOBODY void FloorDivMod(double numer, double denom, int *quotient, int *rem);
 //{
 //	int q;                                                        //   702
@@ -818,12 +791,10 @@ NOBODY void FloorDivMod(double numer, double denom, int *quotient, int *rem);
 //	floor(double __x); /* size=0, low_pc=0 */ //   717
 //}
 
-/* <47b4c> ../engine/mathlib.c:746 */
 NOBODY int GreatestCommonDivisor(int i1, int i2);
 //{
 //}
 
-/* <47b87> ../engine/mathlib.c:775 */
 NOBODY fixed16_t Invert24To16(fixed16_t val);
 //{
 //}

@@ -73,6 +73,5 @@ int FileSystem_SetGameDirectory(const char *pDefaultDir, const char *pGameDir);
 int FileSystem_AddFallbackGameDir(const char *pGameDir);
 int FileSystem_Init(char *basedir, void *voidfilesystemFactory);
 void FileSystem_Shutdown(void); 
-NOBODY void _GLOBAL__sub_I_g_FileSystemFactory(void);
 
 #endif // FILESYSTEM__H

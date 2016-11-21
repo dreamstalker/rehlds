@@ -35,8 +35,6 @@
 #include "maintypes.h"
 #include "model.h"
 
-
-/* <ca280> ../engine/world.h:15 */
 typedef struct areanode_s
 {
 	int axis;
@@ -46,7 +44,6 @@ typedef struct areanode_s
 	link_t solid_edicts;
 } areanode_t;
 
-/* <ca2fb> ../engine/world.c:20 */
 typedef struct moveclip_s	// TODO: Move it to world.cpp someday
 {
 	vec3_t boxmins;
@@ -89,14 +86,6 @@ extern areanode_t sv_areanodes[32];
 extern int sv_numareanodes;
 
 extern cvar_t sv_force_ent_intersection;
-/*
-hull_t                     box_hull;
-hull_t                     beam_hull;
-dclipnode_t                box_clipnodes[6];
-mplane_t                   box_planes[6];
-mplane_t                   beam_planes[6];
-*/
-
 
 void ClearLink(link_t *l);
 void RemoveLink(link_t *l);

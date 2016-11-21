@@ -28,15 +28,12 @@
 
 #include "precompiled.h"
 
-
 #ifdef HOOK_ENGINE
 int (*pCheckIP)(netadr_t adr);
-#endif //HOOK_ENGINE
+#endif // HOOK_ENGINE
 
 class CIPRateLimit rateChecker;
 
-
-/* <e7175> ../engine/ipratelimitWrapper.cpp:6 */
 int CheckIP(netadr_t adr)
 {
 #ifdef HOOK_ENGINE

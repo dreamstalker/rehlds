@@ -288,7 +288,6 @@ static const uint32_t g_isPrintTable[2048] = {
 	0x8FFFF7EE, 0xBFFFFFFF, 0xAFFFFFFE, 0xFFFFFFFF, 0xFFFFFFFF, 0x7FFFFFFF, 0x1CFCFCFC, 0x00000000
 };
 
-/* <f2fc1> ../engine/unicode_strtools.cpp:23 */
 //-----------------------------------------------------------------------------
 // Purpose: determine if a uchar32 represents a valid Unicode code point
 //-----------------------------------------------------------------------------
@@ -299,7 +298,6 @@ qboolean Q_IsValidUChar32(uchar32 uVal)
 	return (uVal < 0x110000u) && ((uVal - 0x00D800u) > 0x7FFu) && ((uVal & 0xFFFFu) < 0xFFFEu) && ((uVal - 0x00FDD0u) > 0x1Fu);
 }
 
-/* <f4251> ../engine/unicode_strtools.cpp:346 */
 // Decode one character from a UTF-8 encoded string. Treats 6-byte CESU-8 sequences
 // as a single character, as if they were a correctly-encoded 4-byte UTF-8 sequence.
 int Q_UTF8ToUChar32(const char *pUTF8_, uchar32 &uValueOut, bool &bErrorOut)
@@ -410,7 +408,7 @@ int __cdecl Q_IsUnprintableW(uchar16 c)
 //			behavior when used in names, web pages, chat windows, etc.
 //
 //			characters in this set are removed from the beginning and/or end of strings
-//			by Q_AggressiveStripPrecedingAndTrailingWhitespaceW() 
+//			by Q_AggressiveStripPrecedingAndTrailingWhitespaceW()
 //-----------------------------------------------------------------------------
 bool Q_IsMeanSpaceW(uchar16 wch)
 {
@@ -502,13 +500,12 @@ uchar16 *__cdecl StripUnprintableWorker(uchar16 *pwch, bool *pStripped)
 		}
 		++rPos;
 	}
-	
+
 	*wPos = 0;
 	*pStripped = rPos != wPos;
 	return pwch;
 }
 
-/* <f45fd> ../engine/unicode_strtools.cpp:423 */
 //-----------------------------------------------------------------------------
 // Purpose: Returns false if UTF-8 string contains invalid sequences.
 //-----------------------------------------------------------------------------
@@ -528,7 +525,6 @@ qboolean Q_UnicodeValidate(const char *pUTF8)
 	return true;
 }
 
-/* <f46d1> ../engine/unicode_strtools.cpp:459 */
 char *Q_UnicodeAdvance(char *pUTF8, int nChars)
 {
 	uchar32 uVal = 0;
@@ -543,7 +539,6 @@ char *Q_UnicodeAdvance(char *pUTF8, int nChars)
 	return pUTF8;
 }
 
-/* <f4a0d> ../engine/unicode_strtools.cpp:717 */
 qboolean V_UTF8ToUChar32(const char *pUTF8_, uchar32 *uValueOut)
 {
 	bool bError = false;
@@ -551,7 +546,6 @@ qboolean V_UTF8ToUChar32(const char *pUTF8_, uchar32 *uValueOut)
 	return bError;
 }
 
-/* <f2fe5> ../engine/unicode_strtools.cpp:137 */
 int Q_UChar32ToUTF8Len(uchar32 uVal) {
 	if (uVal <= 0x7F)
 		return 1;
@@ -562,13 +556,12 @@ int Q_UChar32ToUTF8Len(uchar32 uVal) {
 		return 2;
 }
 
-/* <f3192> ../engine/unicode_strtools.cpp:180 */
 int Q_UChar32ToUTF8(uchar32 uVal, char * pUTF8Out) {
 	if (uVal <= 0x7F)
 	{
 		*pUTF8Out = uVal;
 		return 1;
-	} 
+	}
 	else if (uVal <= 0x7FF)
 			{
 		*pUTF8Out = (uVal >> 6) | 0xC0;
@@ -614,7 +607,7 @@ int __cdecl Q_UChar32ToUTF16(uchar32 uVal, uchar16 *pUTF16Out)
 }
 
 template<
-		typename T_IN, 
+		typename T_IN,
 		typename T_OUT,
 		bool UNK,
 		qboolean(*IN_TO_UCHAR32)(const T_IN *pUTF8, uchar32 &uValueOut, bool &bErrorOut),
@@ -651,10 +644,10 @@ int Q_UnicodeConvertT(const T_IN* pIn, T_OUT *pOut, int nOutBytes, enum EStringC
 					pOut[0] = 0;
 					return 0;
 				}
-				
+
 			}
 		};
-		
+
 		pOut[nOut] = 0;
 	}
 	else
@@ -670,7 +663,7 @@ int Q_UnicodeConvertT(const T_IN* pIn, T_OUT *pOut, int nOutBytes, enum EStringC
 				if (ePolicy & STRINGCONVERT_SKIP)
 				{
 					nOut -= nOutElems;
-				} 
+				}
 				else if (ePolicy & STRINGCONVERT_FAIL)
 				{
 #ifndef REHLDS_FIXES
@@ -679,10 +672,11 @@ int Q_UnicodeConvertT(const T_IN* pIn, T_OUT *pOut, int nOutBytes, enum EStringC
 #endif // REHLDS_FIXES
 					return 0;
 				}
-				
+
 			}
 		}
 	}
+
 	return (nOut + 1) * sizeof(T_OUT);
 }
 
@@ -716,7 +710,6 @@ int __cdecl Q_UTF16ToUChar32(const uchar16 *pUTF16, uchar32 &uValueOut, bool &bE
 	}
 }
 
-/* <f4468> ../engine/unicode_strtools.cpp:246 */
 int Q_UTF8ToUTF16(const char *pUTF8, uchar16 *pUTF16, int cubDestSizeInBytes, enum EStringConvertErrorPolicy ePolicy)
 {
 	return Q_UnicodeConvertT<char, uchar16, true, Q_UTF8ToUChar32, Q_UChar32ToUTF16Len, Q_UChar32ToUTF16>(pUTF8, pUTF16, cubDestSizeInBytes, ePolicy);
@@ -727,13 +720,11 @@ int Q_UTF16ToUTF8(const uchar16 *pUTF16, char *pUTF8, int cubDestSizeInBytes, en
 	return Q_UnicodeConvertT<uchar16, char, true, Q_UTF16ToUChar32, Q_UChar32ToUTF8Len, Q_UChar32ToUTF8>(pUTF16, pUTF8, cubDestSizeInBytes, ePolicy);
 }
 
-/* <f4a63> ../engine/unicode_strtools.cpp:724 */
 int Q_UnicodeRepair(char *pUTF8)
 {
 	return Q_UnicodeConvertT<char, char, true, Q_UTF8ToUChar32, Q_UChar32ToUTF8Len, Q_UChar32ToUTF8>(pUTF8, pUTF8, 65535, STRINGCONVERT_SKIP);
 }
 
-/* <f4800> ../engine/unicode_strtools.cpp:691 */
 qboolean Q_StripUnprintableAndSpace(char *pch)
 {
 	bool bStrippedAny;

@@ -31,15 +31,8 @@
 // NOTE: This file contains a lot of fixes that are not covered by REHLDS_FIXES define.
 // TODO: Most of the Info_ functions can be speedup via removing unneded copy of key and values.
 
-/*
-===============
-Info_ValueForKey
-
-Searches the string for the given
-key and returns the associated value, or an empty string.
-===============
-*/
-/* <40d86> ../engine/info.c:23 */
+// Searches the string for the given
+// key and returns the associated value, or an empty string.
 const char* EXT_FUNC Info_ValueForKey(const char *s, const char *key)
 {
 	// use few (two?) buffers so compares work without stomping on each other
@@ -106,7 +99,6 @@ const char* EXT_FUNC Info_ValueForKey(const char *s, const char *key)
 	return "";
 }
 
-/* <40e38> ../engine/info.c:72 */
 void Info_RemoveKey(char *s, const char *key)
 {
 	char pkey[MAX_KV_LEN];
@@ -184,7 +176,6 @@ void Info_RemoveKey(char *s, const char *key)
 	}
 }
 
-/* <40ecf> ../engine/info.c:136 */
 void Info_RemovePrefixedKeys(char *s, const char prefix)
 {
 	char pkey[MAX_KV_LEN];
@@ -250,7 +241,6 @@ void Info_RemovePrefixedKeys(char *s, const char prefix)
 	}
 }
 
-/* <40d4a> ../engine/info.c:188 */
 qboolean Info_IsKeyImportant(const char *key)
 {
 	if (key[0] == '*')
@@ -282,7 +272,6 @@ qboolean Info_IsKeyImportant(const char *key)
 	return false;
 }
 
-/* <40f88> ../engine/info.c:216 */
 char *Info_FindLargestKey(char *s, int maxsize)
 {
 	static char largest_key[MAX_KV_LEN];
@@ -360,7 +349,6 @@ char *Info_FindLargestKey(char *s, int maxsize)
 	return largest_key;
 }
 
-/* <41063> ../engine/info.c:275 */
 void Info_SetValueForStarKey(char *s, const char *key, const char *value, int maxsize)
 {
 	char newArray[MAX_INFO_STRING];
@@ -466,7 +454,6 @@ void Info_SetValueForStarKey(char *s, const char *key, const char *value, int ma
 	*s = 0;
 }
 
-/* <4113e> ../engine/info.c:361 */
 void Info_SetValueForKey(char *s, const char *key, const char *value, int maxsize)
 {
 	if (key[0] == '*')
@@ -478,7 +465,6 @@ void Info_SetValueForKey(char *s, const char *key, const char *value, int maxsiz
 	Info_SetValueForStarKey(s, key, value, maxsize);
 }
 
-/* <41193> ../engine/info.c:372 */
 void Info_Print(const char *s)
 {
 	char key[MAX_KV_LEN];
@@ -553,7 +539,6 @@ void Info_Print(const char *s)
 	}
 }
 
-/* <4120e> ../engine/info.c:426 */
 qboolean Info_IsValid(const char *s)
 {
 	char key[MAX_KV_LEN];
@@ -665,4 +650,4 @@ void Info_CollectFields(char *destInfo, const char *srcInfo, const char *collect
 	}
 	destInfo[userInfoLength] = '\0';
 }
-#endif
+#endif // REHLDS_FIXES

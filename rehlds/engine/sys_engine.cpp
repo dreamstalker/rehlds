@@ -42,7 +42,6 @@ IEngine *eng;
 
 #endif // HOOK_ENGINE
 
-/* <95a20> ../engine/sys_engine.cpp:145 */
 CEngine::CEngine()
 {
 	m_fFrameTime = 0.0;
@@ -60,12 +59,10 @@ CEngine::CEngine()
 #endif
 }
 
-/* <95a38> ../engine/sys_engine.cpp:164 */
 CEngine::~CEngine()
 {
 }
 
-/* <95a92> ../engine/sys_engine.cpp:171 */
 void CEngine::Unload()
 {
 	Unload_noVirt();
@@ -162,7 +159,6 @@ int CEngine::Frame_noVirt()
 	return m_nDLLState;
 }
 
-/* <96468> ../engine/sys_engine.cpp:274 */
 void CEngine::SetSubState(int iSubState)
 {
 	SetSubState_noVirt(iSubState);
@@ -174,7 +170,6 @@ void CEngine::SetSubState_noVirt(int iSubState)
 		GameSetSubState(iSubState);
 }
 
-/* <96433> ../engine/sys_engine.cpp:286 */
 void CEngine::SetState(int iState)
 {
 	SetState_noVirt(iState);
@@ -186,7 +181,6 @@ void CEngine::SetState_noVirt(int iState)
 	GameSetState(iState);
 }
 
-/* <95ae0> ../engine/sys_engine.cpp:296 */
 int CEngine::GetState()
 {
 	return GetState_noVirt();
@@ -197,7 +191,6 @@ int CEngine::GetState_noVirt()
 	return m_nDLLState;
 }
 
-/* <95b33> ../engine/sys_engine.cpp:305 */
 int CEngine::GetSubState()
 {
 	return GetSubState_noVirt();
@@ -208,7 +201,6 @@ int CEngine::GetSubState_noVirt()
 	return m_nSubState;
 }
 
-/* <95b84> ../engine/sys_engine.cpp:314 */
 double CEngine::GetFrameTime()
 {
 	return GetFrameTime_noVirt();
@@ -219,7 +211,6 @@ double CEngine::GetFrameTime_noVirt()
 	return m_fFrameTime;
 }
 
-/* <95bad> ../engine/sys_engine.cpp:323 */
 double CEngine::GetCurTime()
 {
 	return GetCurTime_noVirt();
@@ -230,7 +221,6 @@ double CEngine::GetCurTime_noVirt()
 	return m_fCurTime;
 }
 
-/* <96348> ../engine/sys_engine.cpp:333 */
 void CEngine::TrapKey_Event(int key, bool down)
 {
 	TrapKey_Event_noVirt(key, down);
@@ -240,7 +230,6 @@ void CEngine::TrapKey_Event_noVirt(int key, bool down)
 {
 }
 
-/* <960ca> ../engine/sys_engine.cpp:356 */
 void CEngine::TrapMouse_Event(int buttons, bool down)
 {
 	TrapMouse_Event_noVirt(buttons, down);
@@ -261,7 +250,6 @@ void CEngine::TrapMouse_Event_noVirt(int buttons, bool down)
 	}
 }
 
-/* <95c34> ../engine/sys_engine.cpp:376 */
 void CEngine::StartTrapMode()
 {
 	StartTrapMode_noVirt();
@@ -276,7 +264,6 @@ void CEngine::StartTrapMode_noVirt()
 	}
 }
 
-/* <95c59> ../engine/sys_engine.cpp:389 */
 bool CEngine::IsTrapping()
 {
 	return IsTrapping_noVirt();
@@ -287,7 +274,6 @@ bool CEngine::IsTrapping_noVirt()
 	return m_bTrapMode;
 }
 
-/* <96100> ../engine/sys_engine.cpp:400 */
 bool CEngine::CheckDoneTrapping(int & buttons, int & key)
 {
 	return CheckDoneTrapping_noVirt(buttons, key);
@@ -312,7 +298,6 @@ bool CEngine::CheckDoneTrapping_noVirt(int & buttons, int & key)
 	}
 }
 
-/* <963d8> ../engine/sys_engine.cpp:419 */
 void CEngine::SetQuitting(int quittype)
 {
 	SetQuitting_noVirt(quittype);
@@ -323,7 +308,6 @@ void CEngine::SetQuitting_noVirt(int quittype)
 	m_nQuitting = quittype;
 }
 
-/* <9640d> ../engine/sys_engine.cpp:427 */
 int CEngine::GetQuitting()
 {
 	return GetQuitting_noVirt();

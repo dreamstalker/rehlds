@@ -28,9 +28,6 @@
 
 #include "precompiled.h"
 
-
-
-
 playermove_t *pmove;
 movevars_t movevars;
 
@@ -60,7 +57,6 @@ vec_t player_maxs[4][3]; // vec_t player_maxs[4][3];
 
 #endif //HOOK_ENGINE
 
-/* <69bcf> ../engine/pmove.c:36 */
 qboolean PM_AddToTouched(pmtrace_t tr, vec_t *impactvelocity)
 {
 	int i;
@@ -90,7 +86,6 @@ qboolean PM_AddToTouched(pmtrace_t tr, vec_t *impactvelocity)
 	return TRUE;
 }
 
-/* <69b96> ../engine/pmove.c:63 */
 void EXT_FUNC PM_StuckTouch(int hitent, pmtrace_t *ptraceresult)
 {
 #ifdef REHLDS_CHECKS
@@ -108,7 +103,6 @@ void EXT_FUNC PM_StuckTouch(int hitent, pmtrace_t *ptraceresult)
 	}
 }
 
-/* <69c7e> ../engine/pmove.c:79 */
 void PM_Init(playermove_t *ppm)
 {
 	PM_InitBoxHull();

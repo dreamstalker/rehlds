@@ -28,19 +28,16 @@
 
 #pragma once
 
-
-
-/* <82286> ../engine/d_local.h:20 */
 typedef struct surfcache_s
 {
 	struct surfcache_s *next;
 	struct surfcache_s **owner;
-	int				lightadj[4];
-	int				dlight;
-	int				size;
-	unsigned		width;
-	unsigned		height;
-	float			mipscale;
+	int lightadj[4];
+	int dlight;
+	int size;
+	unsigned width;
+	unsigned height;
+	float mipscale;
 	struct texture_s *texture;
-	unsigned char	data[4];
+	unsigned char data[4];
 } surfcache_t;

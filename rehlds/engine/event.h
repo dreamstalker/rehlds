@@ -32,14 +32,12 @@
 #pragma once
 #endif
 
-
-/* <75ae> ../engine/event.h:6 */
 typedef struct event_s
 {
-	unsigned short	index;
-	const char		*filename;
-	int				filesize;
-	const char		*pszScript;
+	unsigned short index;
+	const char *filename;
+	int filesize;
+	const char *pszScript;
 } event_t;
 
 #endif // EVENT_H

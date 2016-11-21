@@ -28,7 +28,6 @@
 
 #include "precompiled.h"
 
-/* <bf281> ../engine/sv_user.c:21 */
 typedef struct command_s
 {
 	char *command;
@@ -40,7 +39,6 @@ qboolean g_balreadymoved;
 float s_LastFullUpdate[33];
 
 //cvar_t sv_voicecodec;
-
 //cvar_t sv_voicequality;
 
 edict_t *sv_player;
@@ -89,7 +87,7 @@ clc_func_t sv_clcfuncs[] = {
 		{ clc_endoflist, "End of List", NULL },
 };
 
-#else //HOOK_ENGINE
+#else // HOOK_ENGINE
 
 command_t clcommands[23];
 
@@ -108,13 +106,12 @@ cvar_t sv_voiceenable;
 
 clc_func_t sv_clcfuncs[12];
 
-#endif //HOOK_ENGINE
+#endif // HOOK_ENGINE
 
 bool EXT_FUNC SV_CheckConsistencyResponse_API(IGameClient *client, resource_t *res, uint32 hash) {
 	return (hash != *(uint32 *)&res->rgucMD5_hash[0]);
 }
 
-/* <bf76a> ../engine/sv_user.c:94 */
 void SV_ParseConsistencyResponse(client_t *pSenderClient)
 {
 	vec3_t mins;
@@ -215,7 +212,7 @@ void SV_ParseConsistencyResponse(client_t *pSenderClient)
 
 		++length;
 	}
-	
+
 	MSG_EndBitReading(&net_message);
 	if (c < 0 || length != g_psv.num_consistency)
 	{
@@ -254,7 +251,6 @@ void SV_ParseConsistencyResponse(client_t *pSenderClient)
 	host_client->has_force_unmodified = 0;
 }
 
-/* <bf937> ../engine/sv_user.c:267 */
 qboolean EXT_FUNC SV_FileInConsistencyList(const char *filename, consistency_t **ppconsist)
 {
 	for (int i = 0; i < ARRAYSIZE(g_psv.consistency_list); i++)
@@ -273,7 +269,6 @@ qboolean EXT_FUNC SV_FileInConsistencyList(const char *filename, consistency_t *
 	return 0;
 }
 
-/* <bf9a8> ../engine/sv_user.c:298 */
 int SV_TransferConsistencyInfo(void)
 {
 	return g_RehldsHookchains.m_SV_TransferConsistencyInfo.callChain(SV_TransferConsistencyInfo_internal);
@@ -342,7 +337,6 @@ int EXT_FUNC SV_TransferConsistencyInfo_internal(void)
 	return c;
 }
 
-/* <bfa60> ../engine/sv_user.c:374 */
 void SV_SendConsistencyList(sizebuf_t *msg)
 {
 	host_client->has_force_unmodified = FALSE;
@@ -391,12 +385,10 @@ void SV_SendConsistencyList(sizebuf_t *msg)
 	MSG_WriteBits(0, 1);
 }
 
-/* <bfaca> ../engine/sv_user.c:439 */
 void SV_PreRunCmd(void)
 {
 }
 
-/* <bfb02> ../engine/sv_user.c:450 */
 void SV_CopyEdictToPhysent(physent_t *pe, int e, edict_t *check)
 {
 	model_t *pModel;
@@ -414,7 +406,7 @@ void SV_CopyEdictToPhysent(physent_t *pe, int e, edict_t *check)
 		SV_GetTrueOrigin(e - 1, pe->origin);
 		pe->player = pe->info;
 	}
-	
+
 	pe->angles[0] = check->v.angles[0];
 	pe->angles[1] = check->v.angles[1];
 	pe->angles[2] = check->v.angles[2];
@@ -513,7 +505,6 @@ void SV_CopyEdictToPhysent(physent_t *pe, int e, edict_t *check)
 	pe->vuser4[2] = check->v.vuser4[2];
 }
 
-/* <bfbc4> ../engine/sv_user.c:579 */
 void SV_AddLinksToPM_(areanode_t *node, float *pmove_mins, float *pmove_maxs)
 {
 	struct link_s *l;
@@ -602,7 +593,7 @@ void SV_AddLinksToPM_(areanode_t *node, float *pmove_mins, float *pmove_maxs)
 			}
 			pe = &pmove->moveents[pmove->nummoveent++];
 		}
-		
+
 		Q_memcpy(pe, ve, sizeof(physent_t));
 	}
 
@@ -616,7 +607,6 @@ void SV_AddLinksToPM_(areanode_t *node, float *pmove_mins, float *pmove_maxs)
 	}
 }
 
-/* <bfcc2> ../engine/sv_user.c:712 */
 void SV_AddLinksToPM(areanode_t *node, vec_t *origin)
 {
 	vec3_t pmove_mins;
@@ -624,7 +614,7 @@ void SV_AddLinksToPM(areanode_t *node, vec_t *origin)
 
 	Q_memset(&pmove->physents[0], 0, sizeof(physent_t));
 	Q_memset(&pmove->visents[0], 0, sizeof(physent_t));
-	
+
 	pmove->physents[0].model = g_psv.worldmodel;
 	if (g_psv.worldmodel != NULL)
 	{
@@ -651,14 +641,12 @@ void SV_AddLinksToPM(areanode_t *node, vec_t *origin)
 	SV_AddLinksToPM_(node, pmove_mins, pmove_maxs);
 }
 
-/* <bfd01> ../engine/sv_user.c:758 */
 void SV_PlayerRunPreThink(edict_t *player, float time)
 {
 	gGlobalVariables.time = time;
 	gEntityInterface.pfnPlayerPreThink(player);
 }
 
-/* <bfd26> ../engine/sv_user.c:774 */
 qboolean SV_PlayerRunThink(edict_t *ent, float frametime, double clienttimebase)
 {
 	float thinktime;
@@ -683,7 +671,6 @@ qboolean SV_PlayerRunThink(edict_t *ent, float frametime, double clienttimebase)
 	return ent->free == 0;
 }
 
-/* <bfda1> ../engine/sv_user.c:814 */
 void SV_CheckMovingGround(edict_t *player, float frametime)
 {
 	edict_t *groundentity;
@@ -715,7 +702,6 @@ void SV_CheckMovingGround(edict_t *player, float frametime)
 	player->v.flags &= ~FL_BASEVELOCITY;
 }
 
-/* <bfdea> ../engine/sv_user.c:852 */
 void SV_ConvertPMTrace(trace_t *dest, pmtrace_t *src, edict_t *ent)
 {
 	dest->allsolid = src->allsolid;
@@ -734,7 +720,6 @@ void SV_ConvertPMTrace(trace_t *dest, pmtrace_t *src, edict_t *ent)
 	dest->ent = ent;
 }
 
-/* <bfe17> ../engine/sv_user.c:873 */
 void SV_ForceFullClientsUpdate(void)
 {
 	byte data[9216];
@@ -758,7 +743,6 @@ void SV_ForceFullClientsUpdate(void)
 	Netchan_FragSend(&host_client->netchan);
 }
 
-/* <c023b> ../engine/sv_user.c:918 */
 void SV_RunCmd(usercmd_t *ucmd, int random_seed)
 {
 	usercmd_t cmd = *ucmd;
@@ -1004,11 +988,8 @@ void SV_RunCmd(usercmd_t *ucmd, int random_seed)
 
 	if (!host_client->fakeclient)
 		SV_RestoreMove(host_client);
-
-
 }
 
-/* <bf889> ../engine/sv_user.c:1197 */
 int SV_ValidateClientCommand(char *pszCommand)
 {
 	char *p;
@@ -1026,7 +1007,6 @@ int SV_ValidateClientCommand(char *pszCommand)
 	return 0;
 }
 
-/* <bfeb0> ../engine/sv_user.c:1226 */
 float SV_CalcClientTime(client_t *cl)
 {
 	float minping;
@@ -1062,7 +1042,7 @@ float SV_CalcClientTime(client_t *cl)
 	minping = 9999.0;
 	maxping = -9999.0;
 	ping /= count;
-	
+
 	for (int i = 0; i < (SV_UPDATE_BACKUP <= 4 ? SV_UPDATE_BACKUP : 4); i++)
 	{
 		client_frame_t *frame = &cl->frames[SV_UPDATE_MASK & (cl->netchan.incoming_acknowledged - i)];
@@ -1082,13 +1062,11 @@ float SV_CalcClientTime(client_t *cl)
 	return 0.0f;
 }
 
-/* <bff47> ../engine/sv_user.c:1297 */
 void SV_ComputeLatency(client_t *cl)
 {
 	cl->latency = SV_CalcClientTime(cl);
 }
 
-/* <bf3ae> ../engine/sv_user.c:1339 */
 int SV_UnlagCheckTeleport(vec_t *v1, vec_t *v2)
 {
 	for (int i = 0; i < 3; i++)
@@ -1100,7 +1078,6 @@ int SV_UnlagCheckTeleport(vec_t *v1, vec_t *v2)
 	return 0;
 }
 
-/* <bfada> ../engine/sv_user.c:1361 */
 void SV_GetTrueOrigin(int player, vec_t *origin)
 {
 	if (!host_client->lw || !host_client->lc)
@@ -1112,7 +1089,6 @@ void SV_GetTrueOrigin(int player, vec_t *origin)
 	if (player < 0 || player >= g_psvs.maxclients)
 		return;
 
-
 	if (truepositions[player].active && truepositions[player].needrelink)
 	{
 		origin[0] = truepositions[player].oldorg[0];
@@ -1121,7 +1097,6 @@ void SV_GetTrueOrigin(int player, vec_t *origin)
 	}
 }
 
-/* <bfb8a> ../engine/sv_user.c:1383 */
 void SV_GetTrueMinMax(int player, float **fmin, float **fmax)
 {
 	if (!host_client->lw || !host_client->lc)
@@ -1138,10 +1113,8 @@ void SV_GetTrueMinMax(int player, float **fmin, float **fmax)
 		*fmin = truepositions[player].oldabsmin;
 		*fmax = truepositions[player].oldabsmax;
 	}
-
 }
 
-/* <bf3e2> ../engine/sv_user.c:1406 */
 entity_state_t *SV_FindEntInPack(int index, packet_entities_t *pack)
 {
 	if (pack->num_entities <= 0)
@@ -1156,7 +1129,6 @@ entity_state_t *SV_FindEntInPack(int index, packet_entities_t *pack)
 	return NULL;
 }
 
-/* <c0030> ../engine/sv_user.c:1426 */
 void SV_SetupMove(client_t *_host_client)
 {
 	struct client_s *cl;
@@ -1171,9 +1143,9 @@ void SV_SetupMove(client_t *_host_client)
 	vec3_t origin;
 	vec3_t delta;
 
-	
+
 #ifdef REHLDS_FIXES
-	double targettime; //FP precision fix
+	double targettime; // FP precision fix
 #else
 	float targettime;
 #endif // REHLDS_FIXES
@@ -1222,7 +1194,7 @@ void SV_SetupMove(client_t *_host_client)
 	}
 
 	cl_interptime = _host_client->lastcmd.lerp_msec / 1000.0f;
-	
+
 	if (cl_interptime > 0.1)
 		cl_interptime = 0.1f;
 
@@ -1378,7 +1350,6 @@ void SV_SetupMove(client_t *_host_client)
 	}
 }
 
-/* <c01e6> ../engine/sv_user.c:1670 */
 void SV_RestoreMove(client_t *_host_client)
 {
 	sv_adjusted_positions_t *pos;
@@ -1426,7 +1397,6 @@ void SV_RestoreMove(client_t *_host_client)
 	}
 }
 
-/* <bf8bd> ../engine/sv_user.c:1736 */
 void SV_ParseStringCommand(client_t *pSenderClient)
 {
 	//check string commands rate for this player
@@ -1461,7 +1431,6 @@ void SV_ParseStringCommand(client_t *pSenderClient)
 	}
 }
 
-/* <bf600> ../engine/sv_user.c:1777 */
 void SV_ParseDelta(client_t *pSenderClient)
 {
 	host_client->delta_sequence = MSG_ReadByte();
@@ -1477,7 +1446,6 @@ void SV_EstablishTimeBase(client_t *cl, usercmd_t *cmds, int dropped, int numbac
 	return g_RehldsHookchains.m_SV_EstablishTimeBase.callChain(SV_EstablishTimeBase_mod, GetRehldsApiClient(cl), cmds, dropped, numbackup, numcmds);
 }
 
-/* <c03df> ../engine/sv_user.c:1790 */
 void SV_EstablishTimeBase_internal(client_t *cl, usercmd_t *cmds, int dropped, int numbackup, int numcmds)
 {
 	int cmdnum;
@@ -1492,7 +1460,7 @@ void SV_EstablishTimeBase_internal(client_t *cl, usercmd_t *cmds, int dropped, i
 			cmdnum = dropped - (dropped - numbackup);
 			runcmd_time = (double)cl->lastcmd.msec * (dropped - numbackup) / 1000.0;
 		}
-		
+
 		for (; cmdnum > 0; cmdnum--)
 		{
 			runcmd_time += cmds[cmdnum - 1 + numcmds].msec / 1000.0;
@@ -1507,7 +1475,6 @@ void SV_EstablishTimeBase_internal(client_t *cl, usercmd_t *cmds, int dropped, i
 	cl->svtimebase = host_frametime + g_psv.time - runcmd_time;
 }
 
-/* <bf48b> ../engine/sv_user.c:1835 */
 void SV_ParseMove(client_t *pSenderClient)
 {
 	client_frame_t *frame;
@@ -1533,7 +1500,7 @@ void SV_ParseMove(client_t *pSenderClient)
 
 	frame = &host_client->frames[SV_UPDATE_MASK & host_client->netchan.incoming_acknowledged];
 	Q_memset(&cmdNull, 0, sizeof(cmdNull));
-	
+
 	placeholder = msg_readcount + 1;
 	mlen = MSG_ReadByte();
 	cbchecksum = MSG_ReadByte();
@@ -1554,7 +1521,7 @@ void SV_ParseMove(client_t *pSenderClient)
 		msg_badread = 1;
 		return;
 	}
-	
+
 	usercmd_t* from = &cmdNull;
 	for (int i = totalcmds - 1; i >= 0; i--)
 	{
@@ -1616,7 +1583,7 @@ void SV_ParseMove(client_t *pSenderClient)
 		numCmdsToIssue += net_drop;
 	}
 	g_MoveCommandRateLimiter.MoveCommandsIssued(host_client - g_psvs.clients, numCmdsToIssue);
-	
+
 	if (!host_client->connected) {
 		return; //return if player was kicked
 	}
@@ -1641,7 +1608,7 @@ void SV_ParseMove(client_t *pSenderClient)
 			SV_RunCmd(&cmds[numcmds + net_drop - 1], host_client->netchan.incoming_sequence - (numcmds + net_drop - 1));
 			net_drop--;
 		}
-		
+
 	}
 
 	for (int i = numcmds - 1; i >= 0; i--)
@@ -1666,7 +1633,6 @@ void SV_ParseMove(client_t *pSenderClient)
 		sv_player->v.animtime = float(host_frametime + g_psv.time);
 }
 
-/* <bf6bc> ../engine/sv_user.c:2022 */
 void SV_ParseVoiceData(client_t *cl)
 {
 	char chReceived[4096];
@@ -1678,7 +1644,7 @@ void SV_ParseVoiceData(client_t *cl)
 		SV_DropClient(cl, FALSE, "Invalid voice data\n");
 		return;
 	}
-	
+
 	MSG_ReadBuf(nDataLength, chReceived);
 	cl->m_lastvoicetime = g_psv.time;
 
@@ -1708,12 +1674,10 @@ void SV_ParseVoiceData(client_t *cl)
 	}
 }
 
-/* <bf5d8> ../engine/sv_user.c:2091 */
 void SV_IgnoreHLTV(client_t *cl)
 {
 }
 
-/* <bf62a> ../engine/sv_user.c:2096 */
 void SV_ParseCvarValue(client_t *cl)
 {
 	char *value;
@@ -1724,7 +1688,6 @@ void SV_ParseCvarValue(client_t *cl)
 	Con_DPrintf("Cvar query response: name:%s, value:%s\n", cl->name, value);
 }
 
-/* <bf663> ../engine/sv_user.c:2107 */
 void SV_ParseCvarValue2(client_t *cl)
 {
 	int requestID = MSG_ReadLong();
@@ -1755,7 +1718,6 @@ void EXT_FUNC SV_HandleClientMessage_api(IGameClient* client, int8 opcode) {
 		func(cl);
 }
 
-/* <c05ad> ../engine/sv_user.c:2155 */
 void SV_ExecuteClientMessage(client_t *cl)
 {
 	g_balreadymoved = 0;
@@ -1793,10 +1755,8 @@ void SV_ExecuteClientMessage(client_t *cl)
 
 		g_RehldsHookchains.m_HandleNetCommand.callChain(SV_HandleClientMessage_api, apiClient, c);
 	}
-
 }
 
-/* <c062c> ../engine/sv_user.c:2233 */
 qboolean SV_SetPlayer(int idnum)
 {
 	for (int i = 0; i < g_psvs.maxclients; i++)
@@ -1817,7 +1777,6 @@ qboolean SV_SetPlayer(int idnum)
 	return 0;
 }
 
-/* <c0677> ../engine/sv_user.c:2260 */
 void SV_ShowServerinfo_f(void)
 {
 	if (cmd_source == src_command)
@@ -1835,7 +1794,6 @@ void SV_ShowServerinfo_f(void)
 	}
 }
 
-/* <c068d> ../engine/sv_user.c:2277 */
 void SV_SendEnts_f(void)
 {
 	if (cmd_source == src_command)
@@ -1877,7 +1835,6 @@ void SV_SendEnts_f(void)
 	}
 }
 
-/* <c06a2> ../engine/sv_user.c:2302 */
 void SV_FullUpdate_f(void)
 {
 	int entIndex;

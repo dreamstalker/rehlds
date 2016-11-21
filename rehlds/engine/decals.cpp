@@ -29,7 +29,7 @@
 #include "precompiled.h"
 
 cachewad_t *decal_wad;
-cachewad_t *menu_wad;	// NOXREF
+cachewad_t *menu_wad;	// NOXREF, reference of client-side code
 
 char szCustName[10];
 char decal_names[MAX_DECALS][16];
@@ -37,7 +37,6 @@ char decal_names[MAX_DECALS][16];
 qboolean m_bDrawInitialized;
 qboolean gfCustomBuild;
 
-/* <20209> ../engine/decals.c:37 */
 void Draw_Shutdown(void)
 {
 	if (m_bDrawInitialized)
@@ -50,7 +49,6 @@ void Draw_Shutdown(void)
 	}
 }
 
-/* <201ee> ../engine/decals.c:59 */
 void Draw_DecalShutdown(void)
 {
 	Draw_FreeWad(decal_wad);
@@ -59,7 +57,6 @@ void Draw_DecalShutdown(void)
 	decal_wad = NULL;
 }
 
-/* <1ff6d> ../engine/decals.c:69 */
 void Draw_AllocateCacheSpace(cachewad_t *wad, int cacheMax, int tempWad)
 {
 	int len = sizeof(cachepic_t) * cacheMax;
@@ -70,7 +67,6 @@ void Draw_AllocateCacheSpace(cachewad_t *wad, int cacheMax, int tempWad)
 #endif
 }
 
-/* <1ffa4> ../engine/decals.c:80 */
 void Draw_CacheWadInitFromFile(FileHandle_t hFile, int len, char *name, int cacheMax, cachewad_t *wad)
 {
 	lumpinfo_t *lump_p;
@@ -102,7 +98,6 @@ void Draw_CacheWadInitFromFile(FileHandle_t hFile, int len, char *name, int cach
 	Draw_CacheWadHandler(wad, NULL, 0);
 }
 
-/* <20067> ../engine/decals.c:113 */
 void Draw_CacheWadInit(char *name, int cacheMax, cachewad_t *wad)
 {
 	int len;
@@ -114,7 +109,6 @@ void Draw_CacheWadInit(char *name, int cacheMax, cachewad_t *wad)
 	FS_Close(hFile);
 }
 
-/* <1fd66> ../engine/decals.c:127 */
 qboolean Draw_CustomCacheWadInit(int cacheMax, cachewad_t *wad, void *raw, int nFileSize)
 {
 	lumpinfo_t *lump_p;
@@ -173,7 +167,6 @@ qboolean Draw_CustomCacheWadInit(int cacheMax, cachewad_t *wad, void *raw, int n
 	return TRUE;
 }
 
-/* <1d0f8> ../engine/draw.c:154 */
 void Draw_MiptexTexture(cachewad_t *wad, unsigned char *data)
 {
 	texture_t *tex;
@@ -244,14 +237,12 @@ void Draw_MiptexTexture(cachewad_t *wad, unsigned char *data)
 #endif // SWDS
 }
 
-/* <20165> ../engine/decals.c:218 */
 void Draw_CacheWadHandler(cachewad_t *wad, PFNCACHE fn, int extraDataSize)
 {
 	wad->pfnCacheBuild = fn;
 	wad->cacheExtra = extraDataSize;
 }
 
-/* <20192> ../engine/decals.c:230 */
 void Draw_FreeWad(cachewad_t *pWad)
 {
 	int i;
@@ -300,7 +291,6 @@ void Draw_FreeWad(cachewad_t *pWad)
 	}
 }
 
-/* <2021e> ../engine/decals.c:292 */
 NOXREF void Draw_DecalSetName(int decal, char *name)
 {
 	//Used Host_Frame -> CL_ReadPackets -> CL_ProcessFile -> CL_PrecacheResources -> Draw_DecalSetName
@@ -312,7 +302,6 @@ NOXREF void Draw_DecalSetName(int decal, char *name)
 	decal_names[decal][len] = 0;
 }
 
-/* <20299> ../engine/decals.c:305 */
 NOXREF int Draw_DecalIndex(int id)
 {
 	//Used hw -> CL_Restore
@@ -329,7 +318,6 @@ NOXREF int Draw_DecalIndex(int id)
 	return Draw_CacheIndex(decal_wad, tmp);
 }
 
-/* <1fd08> ../engine/decals.c:324 */
 int Draw_DecalCount(void)
 {
 	if (decal_wad)
@@ -337,7 +325,6 @@ int Draw_DecalCount(void)
 	return 0;
 }
 
-/* <2033e> ../engine/decals.c:336 */
 int Draw_DecalSize(int number)
 {
 	if (decal_wad)
@@ -348,7 +335,6 @@ int Draw_DecalSize(int number)
 	return 0;
 }
 
-/* <1fd17> ../engine/decals.c:347 */
 const char *Draw_DecalName(int number)
 {
 	if (decal_wad)
@@ -359,7 +345,6 @@ const char *Draw_DecalName(int number)
 	return NULL;
 }
 
-/* <20d78> ../engine/decals.c:358 */
 NOXREF texture_t *Draw_DecalTexture(int index)
 {
 	texture_t *retval;
@@ -380,7 +365,6 @@ NOXREF texture_t *Draw_DecalTexture(int index)
 	return retval;
 }
 
-/* <1fdda> ../engine/decals.c:405 */
 int Draw_CacheByIndex(cachewad_t *wad, int nIndex, int playernum)
 {
 	int i;
@@ -402,7 +386,6 @@ int Draw_CacheByIndex(cachewad_t *wad, int nIndex, int playernum)
 	return i;
 }
 
-/* <203d0> ../engine/decals.c:428 */
 NOXREF int Draw_DecalIndexFromName(char *name)
 {
 	char tmpName[16];
@@ -420,7 +403,6 @@ NOXREF int Draw_DecalIndexFromName(char *name)
 	return 0;
 }
 
-/* <2041b> ../engine/decals.c:459 */
 void Decal_ReplaceOrAppendLump(lumplist_t **ppList, lumpinfo_t *lump, qboolean bsecondlump)
 {
 	lumplist_t *p;
@@ -445,7 +427,6 @@ void Decal_ReplaceOrAppendLump(lumplist_t **ppList, lumpinfo_t *lump, qboolean b
 	*ppList = p;
 }
 
-/* <1fcb4> ../engine/decals.c:493 */
 int Decal_CountLumps(lumplist_t *plist)
 {
 	int c = 0;
@@ -458,13 +439,11 @@ int Decal_CountLumps(lumplist_t *plist)
 	return c;
 }
 
-/* <1fce8> ../engine/decals.c:507 */
 int Decal_SizeLumps(lumplist_t *plist)
 {
 	return (sizeof(lumpinfo_t) * Decal_CountLumps(plist));
 }
 
-/* <2050f> ../engine/decals.c:512 */
 void Decal_MergeInDecals(cachewad_t *pwad, const char *pathID)
 {
 	int i;
@@ -539,7 +518,6 @@ void Decal_MergeInDecals(cachewad_t *pwad, const char *pathID)
 	Mem_Free(pwad);
 }
 
-/* <20779> ../engine/decals.c:622 */
 void Decal_Init(void)
 {
 	int i;
@@ -584,7 +562,6 @@ void Decal_Init(void)
 	}
 }
 
-/* <20c56> ../engine/decals.c:673 */
 qboolean CustomDecal_Validate(void *raw, int nFileSize)
 {
 	qboolean bret = FALSE;
@@ -602,7 +579,6 @@ qboolean CustomDecal_Validate(void *raw, int nFileSize)
 	return bret;
 }
 
-/* <1fe34> ../engine/decals.c:694 */
 qboolean CustomDecal_Init(struct cachewad_s *wad, void *raw, int nFileSize, int playernum)
 {
 	qboolean bret = Draw_CustomCacheWadInit(16, wad, raw, nFileSize);
@@ -615,7 +591,6 @@ qboolean CustomDecal_Init(struct cachewad_s *wad, void *raw, int nFileSize, int 
 	return bret;
 }
 
-/* <20964> ../engine/decals.c:717 */
 NOXREF void *Draw_CacheGet(cachewad_t *wad, int index)
 {
 	int i;
@@ -659,7 +634,6 @@ NOXREF void *Draw_CacheGet(cachewad_t *wad, int index)
 	return dat;
 }
 
-/* <20ba5> ../engine/decals.c:778 */
 void *Draw_CustomCacheGet(cachewad_t *wad, void *raw, int rawsize, int index)
 {
 	void *pdata;
@@ -687,7 +661,6 @@ void *Draw_CustomCacheGet(cachewad_t *wad, void *raw, int rawsize, int index)
 	return pdata;
 }
 
-/* <208ab> ../engine/decals.c:822 */
 NOXREF qboolean Draw_CacheReload(cachewad_t *wad, int i, lumpinfo_t *pLump, cachepic_t *pic, char *clean, char *path)
 {
 	int len;
@@ -697,7 +670,7 @@ NOXREF qboolean Draw_CacheReload(cachewad_t *wad, int i, lumpinfo_t *pLump, cach
 
 	if (wad->numpaths < 1)
 		hFile = FS_Open(wad->name, "rb");
-	else 
+	else
 		hFile = FS_OpenPathID(wad->name, "rb", wad->basedirs[wad->lumppathindices[i]]);
 	if (!hFile)
 		return FALSE;
@@ -725,7 +698,6 @@ NOXREF qboolean Draw_CacheReload(cachewad_t *wad, int i, lumpinfo_t *pLump, cach
 	return TRUE;
 }
 
-/* <20a15> ../engine/decals.c:871 */
 qboolean Draw_ValidateCustomLogo(cachewad_t *wad, unsigned char *data, lumpinfo_t *lump)
 {
 	texture_t tex;
@@ -785,7 +757,6 @@ qboolean Draw_ValidateCustomLogo(cachewad_t *wad, unsigned char *data, lumpinfo_
 	return TRUE;
 }
 
-/* <20aec> ../engine/decals.c:942 */
 qboolean Draw_CacheLoadFromCustom(char *clean, cachewad_t *wad, void *raw, int rawsize, cachepic_t *pic)
 {
 	int idx;
@@ -816,14 +787,13 @@ qboolean Draw_CacheLoadFromCustom(char *clean, cachewad_t *wad, void *raw, int r
 		szCustName[6] = 0;
 
 		if (wad->pfnCacheBuild)
-			wad->pfnCacheBuild(wad, buf);		
+			wad->pfnCacheBuild(wad, buf);
 		gfCustomBuild = FALSE;
 		return TRUE;
 	}
 	return FALSE;
 }
 
-/* <20257> ../engine/decals.c:999 */
 NOXREF int Draw_CacheIndex(cachewad_t *wad, char *path)
 {
 	int i;
@@ -845,7 +815,6 @@ NOXREF int Draw_CacheIndex(cachewad_t *wad, char *path)
 	return i;
 }
 
-/* <20e1e> ../engine/decals.c:1025 */
 NOXREF int Draw_CacheFindIndex(cachewad_t *wad, char *path)
 {
 	cachepic_t *pic = wad->cache;

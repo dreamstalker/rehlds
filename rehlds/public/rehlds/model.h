@@ -48,13 +48,11 @@
 #define MAXLIGHTMAPS		4
 #define MAX_KNOWN_MODELS	1024
 
-/* <6816> ../engine/model.h:27 */
 typedef struct mvertex_s
 {
 	vec3_t			position;
 } mvertex_t;
 
-/* <6838> ../engine/model.h:39 */
 typedef struct mplane_s
 {
 	vec3_t			normal;			// surface normal
@@ -64,7 +62,6 @@ typedef struct mplane_s
 	byte			pad[2];
 } mplane_t;
 
-/* <68a6> ../engine/model.h:48 */
 typedef struct texture_s
 {
 	char			name[16];
@@ -77,14 +74,12 @@ typedef struct texture_s
 	unsigned		paloffset;
 } texture_t;
 
-/* <6950> ../engine/model.h:71 */
 typedef struct medge_s
 {
 	unsigned short	v[2];
 	unsigned int	cachededgeoffset;
 } medge_t;
 
-/* <697e> ../engine/model.h:78 */
 typedef struct mtexinfo_s
 {
 	float			vecs[2][4];		// [s/t] unit vectors in world space. 
@@ -96,13 +91,10 @@ typedef struct mtexinfo_s
 } mtexinfo_t;
 #define	TEX_SPECIAL		1		// sky or slime, no lightmap or 256 subdivision
 
-/* <69d0> ../engine/model.h:91 */
 typedef struct msurface_s msurface_t;
-/* <1db66> ../engine/model.h:92 */
 typedef struct decal_s decal_t;
 
 // JAY: Compress this as much as possible
-/* <1db71> ../engine/model.h:96 */
 struct decal_s
 {
 	decal_t			*pnext;			// linked list for each surface
@@ -116,7 +108,6 @@ struct decal_s
 	short			entityIndex;	// Entity this is attached to
 };
 
-/* <69db> ../engine/model.h:118 */
 struct msurface_s
 {
 	int				visframe;		// should be drawn when node is crossed
@@ -148,7 +139,6 @@ struct msurface_s
 	decal_t			*pdecals;
 };
 
-/* <6b6c> ../engine/model.h:149 */
 typedef struct mnode_s
 {
 	// common with leaf
@@ -167,7 +157,6 @@ typedef struct mnode_s
 	unsigned short	numsurfaces;
 } mnode_t;
 
-/* <1dcd4> ../engine/model.h:169 */
 typedef struct mleaf_s
 {
 	// common with node
@@ -188,7 +177,6 @@ typedef struct mleaf_s
 	byte			ambient_sound_level[NUM_AMBIENTS];
 } mleaf_t;
 
-/* <1ddbe> ../engine/model.h:190 */
 typedef struct hull_s
 {
 	dclipnode_t		*clipnodes;
@@ -198,7 +186,6 @@ typedef struct hull_s
 	vec3_t			clip_mins, clip_maxs;
 } hull_t;
 
-/* <4b3fe> ../engine/model.h:210 */
 typedef struct mspriteframe_t
 {
 	int				width;
@@ -208,7 +195,6 @@ typedef struct mspriteframe_t
 	byte			pixels[4];
 } mspriteframe_s;
 
-/* <4b485> ../engine/model.h:219 */
 typedef struct mspritegroup_s
 {
 	int				numframes;
@@ -216,14 +202,12 @@ typedef struct mspritegroup_s
 	mspriteframe_t	*frames[1];
 } mspritegroup_t;
 
-/* <4b4df> ../engine/model.h:226 */
 typedef struct mspriteframedesc_s
 {
 	spriteframetype_t type;
 	mspriteframe_t	*frameptr;
 } mspriteframedesc_t;
 
-/* <4b50f> ../engine/model.h:232 */
 typedef struct msprite_s
 {
 	short int		type;
@@ -236,7 +220,6 @@ typedef struct msprite_s
 	mspriteframedesc_t frames[1];
 } msprite_t;
 
-/* <4b5b5> ../engine/model.h:255 */
 typedef struct maliasframedesc_s
 {
 	aliasframetype_t type;
@@ -245,7 +228,6 @@ typedef struct maliasframedesc_s
 	char			name[16];
 } maliasframedesc_t;
 
-/* <4b615> ../engine/model.h:264 */
 typedef struct maliasskindesc_s
 {
 	aliasskintype_t type;
@@ -253,14 +235,12 @@ typedef struct maliasskindesc_s
 	int				skin;
 } maliasskindesc_t;
 
-/* <4b658> ../engine/model.h:271 */
 typedef struct maliasgroupframedesc_s
 {
 	trivertx_t		bboxmin, bboxmax;
 	int				frame;
 } maliasgroupframedesc_t;
 
-/* <4b69b> ../engine/model.h:278 */
 typedef struct maliasgroup_s
 {
 	int				numframes;
@@ -268,7 +248,6 @@ typedef struct maliasgroup_s
 	maliasgroupframedesc_t frames[1];
 } maliasgroup_t;
 
-/* <4b6ee> ../engine/model.h:285 */
 typedef struct maliasskingroup_s
 {
 	int				numskins;
@@ -276,14 +255,12 @@ typedef struct maliasskingroup_s
 	maliasskindesc_t skindescs[1];
 } maliasskingroup_t;
 
-/* <4b741> ../engine/model.h:293 */
 typedef struct mtriangle_s
 {
 	int				facesfront;
 	int				vertindex[3];
 } mtriangle_t;
 
-/* <4b779> ../engine/model.h:298 */
 typedef struct aliashdr_s
 {
 	int				model;
@@ -294,7 +271,6 @@ typedef struct aliashdr_s
 	maliasframedesc_t frames[1];
 } aliashdr_t;
 
-/* <1de30> ../engine/model.h:315 */
 typedef enum modtype_e
 {
 	mod_brush,
@@ -303,12 +279,10 @@ typedef enum modtype_e
 	mod_studio,
 } modtype_t;
 
-/* <1de5e> ../engine/model.h:331 */
 typedef struct model_s
 {
 	char			name[MAX_MODEL_NAME];
 
-	//TODO: qboolean? seriously?
 	int		needload;		// bmodels and sprites don't cache normally
 	
 	modtype_t		type;

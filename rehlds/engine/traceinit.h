@@ -39,7 +39,6 @@
 #define CInitTracker_destruct ~CInitTracker
 #endif
 
-/* <d7004> ../engine/traceinit.cpp:16 */
 class CInitTracker
 {
 public:

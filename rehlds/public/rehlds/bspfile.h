@@ -59,14 +59,12 @@
 
 #define	HEADER_LUMPS	15
 
-/* <a1fc> ../engine/bspfile.h:41 */
 typedef struct  lump_s
 {
 	int				fileofs;
 	int				filelen;
 } lump_t;
 
-/* <a22c> ../engine/bspfile.h:64 */
 typedef struct dmodel_s
 {
 	float			mins[3], maxs[3];
@@ -76,21 +74,18 @@ typedef struct dmodel_s
 	int				firstface, numfaces;
 } dmodel_t;
 
-/* <a2c2> ../engine/bspfile.h:73 */
 typedef struct dheader_s
 {
 	int				version;
 	lump_t			lumps[15];
 } dheader_t;
 
-/* <485b2> ../engine/bspfile.h:79 */
 typedef struct dmiptexlump_s
 {
 	int				_nummiptex;
 	int				dataofs[4];
 } dmiptexlump_t;
 
-/* <1ce18> ../engine/bspfile.h:86 */
 typedef struct miptex_s
 {
 	char			name[16];
@@ -99,13 +94,11 @@ typedef struct miptex_s
 	unsigned		offsets[4];
 } miptex_t;
 
-/* <48652> ../engine/bspfile.h:94 */
 typedef struct dvertex_s
 {
 	float			point[3];
 } dvertex_t;
 
-/* <48674> ../engine/bspfile.h:110 */
 typedef struct dplane_s
 {
 	float			normal[3];
@@ -113,7 +106,6 @@ typedef struct dplane_s
 	int				type;
 } dplane_t;
 
-/* <486b2> ../engine/bspfile.h:132 */
 typedef struct dnode_s
 {
 	int				planenum;
@@ -124,14 +116,12 @@ typedef struct dnode_s
 	unsigned short	numfaces;
 } dnode_t;
 
-/* <a332> ../engine/bspfile.h:142 */
 typedef struct dclipnode_s
 {
 	int				planenum;
 	short			children[2];	// negative numbers are contents
 } dclipnode_t;
 
-/* <4876a> ../engine/bspfile.h:149 */
 typedef struct texinfo_s
 {
 	float			vecs[2][4];
@@ -139,13 +129,11 @@ typedef struct texinfo_s
 	int				flags;
 } texinfo_t;
 
-/* <487c2> ../engine/bspfile.h:159 */
 typedef struct dedge_s
 {
 	unsigned short	v[2];
 } dedge_t;
 
-/* <487f2> ../engine/bspfile.h:165 */
 typedef struct dface_s
 {
 	short			planenum;

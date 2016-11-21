@@ -29,34 +29,29 @@
 
 #include "maintypes.h"
 
-#define DELTA_MAX_FIELDS	56			// 7*8
+#define DELTA_MAX_FIELDS		56		// 7*8
 
 #define DT_BYTE				BIT(0)		// A byte
 #define DT_SHORT			BIT(1)		// 2 byte field
 #define DT_FLOAT			BIT(2)		// A floating point field
 #define DT_INTEGER			BIT(3)		// 4 byte integer
 #define DT_ANGLE			BIT(4)		// A floating point angle
-#define DT_TIMEWINDOW_8		BIT(5)		// A floating point timestamp relative to server time
-#define DT_TIMEWINDOW_BIG	BIT(6)		// A floating point timestamp relative to server time (with more precision and custom multiplier)
+#define DT_TIMEWINDOW_8			BIT(5)		// A floating point timestamp relative to server time
+#define DT_TIMEWINDOW_BIG		BIT(6)		// A floating point timestamp relative to server time (with more precision and custom multiplier)
 #define DT_STRING			BIT(7)		// A null terminated string, sent as 8 byte chars
 #define DT_SIGNED			BIT(31)		// sign modificator
 
 #define FDT_MARK			BIT(0)		// Delta mark for sending
 
-
 typedef struct delta_s delta_t;
-
-/* <bf6d> ../engine/delta.h:76 */
 typedef void(*encoder_t)(delta_t *, const unsigned char *, const unsigned char *);
 
-/* <9f6a5> ../engine/delta.h:34 */
 typedef struct delta_stats_s
 {
 	int sendcount;
 	int receivedcount;
 } delta_stats_t;
 
-/* <bee2> ../engine/delta.h:45 */
 typedef struct delta_description_s
 {
 	int fieldType;
@@ -72,7 +67,6 @@ typedef struct delta_description_s
 
 class CDeltaJit;
 
-/* <bfa0> ../engine/delta.h:78 */
 typedef struct delta_s
 {
 	int dynamic;
@@ -86,10 +80,8 @@ typedef struct delta_s
 #endif
 } delta_t;
 
-/* <23b2a> ../engine/delta.h:104 */
 typedef struct delta_encoder_s delta_encoder_t;
 
-/* <23b35> ../engine/delta.h:106 */
 struct delta_encoder_s
 {
 	delta_encoder_t *next;
@@ -103,7 +95,6 @@ typedef struct delta_definition_list_s delta_definition_list_t;
 typedef struct delta_registry_s delta_registry_t;
 typedef struct delta_info_s delta_info_t;
 
-/* <a59b9> ../engine/sv_main.c:102 */
 typedef struct delta_info_s
 {
 	delta_info_s *next;
@@ -118,12 +109,10 @@ typedef struct delta_info_s
 #define g_deltaregistry (*pg_deltaregistry)
 #endif // HOOK_ENGINE
 
-
 extern delta_definition_list_t *g_defs;
 extern delta_encoder_t *g_encoders;
 extern delta_registry_t *g_deltaregistry;
 extern delta_t g_MetaDelta[];
-
 
 delta_description_t *DELTA_FindField(delta_t *pFields, const char *pszField);
 int DELTA_FindFieldIndex(struct delta_s *pFields, const char *fieldname);

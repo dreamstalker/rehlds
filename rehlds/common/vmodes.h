@@ -27,8 +27,6 @@
 */
 #pragma once
 
-
-/* <430ee> ../common/vmodes.h:40 */
 typedef struct rect_s
 {
 	int left, right, top, bottom;

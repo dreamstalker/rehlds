@@ -36,7 +36,6 @@
 
 #define NUM_BASELINES 64
 
-/* <7469c> ../engine/inst_baseline.h:9 */
 typedef struct extra_baselines_s
 {
 	int number;

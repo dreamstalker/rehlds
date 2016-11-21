@@ -34,8 +34,6 @@
 
 #include "maintypes.h"
 
-
-/* <8eef1> ../engine/modinfo.h:7 */
 typedef enum
 {
 	BOTH = 0,
@@ -43,7 +41,6 @@ typedef enum
 	MULTIPLAYER_ONLY,
 } MOD_GAMEPLAY_TYPE_E;
 
-/* <8ef1b> ../engine/modinfo.h:10 */
 typedef struct modinfo_s
 {
 	qboolean bIsMod;
@@ -59,6 +56,5 @@ typedef struct modinfo_s
 	int num_edicts;
 	int clientDllCRC;
 } modinfo_t;
-
 
 #endif // MODINFO_H

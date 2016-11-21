@@ -93,7 +93,6 @@
 #define HL_GENERIC_MAX 512
 #define HL_EVENT_MAX 256
 
-/* <87d6f> ../engine/server.h:43 */
 typedef enum redirect_e
 {
 	RD_NONE = 0,
@@ -101,7 +100,6 @@ typedef enum redirect_e
 	RD_PACKET = 2,
 } redirect_t;
 
-/* <7588> ../engine/server.h:65 */
 typedef enum server_state_e
 {
 	ss_dead = 0,
@@ -109,7 +107,6 @@ typedef enum server_state_e
 	ss_active = 2,
 } server_state_t;
 
-/* <75f3> ../engine/server.h:75 */
 typedef struct server_s
 {
 	qboolean active;
@@ -180,8 +177,6 @@ struct rehlds_server_t {
 #endif
 };
 
-
-/* <3b30a> ../engine/server.h:163 */
 typedef struct client_frame_s
 {
 	double senttime;
@@ -191,7 +186,6 @@ typedef struct client_frame_s
 	packet_entities_t entities;
 } client_frame_t;
 
-/* <2eb23> ../engine/server.h:177 */
 typedef struct client_s
 {
 	qboolean active;
@@ -251,14 +245,12 @@ typedef struct client_s
 	int m_sendrescount;
 } client_t;
 
-/* <9e1af> ../engine/server.h:276 */
 typedef enum sv_delta_s
 {
 	sv_packet_nodelta,
 	sv_packet_delta,
 } sv_delta_t;
 
-/* <9e1d1> ../engine/server.h:336 */
 enum
 {
 	SND_ANYPLAYER,
@@ -268,7 +260,6 @@ enum
 typedef struct rcon_failure_s rcon_failure_t;
 typedef struct challenge_s challenge_t;
 
-/* <a5b0c> ../engine/sv_main.c:5335 */
 typedef struct deltacallback_s
 {
 	int *numbase;
@@ -663,8 +654,8 @@ int SV_CheckIPRestrictions_internal(netadr_t *adr, int nAuthProtocol);
 int SV_CheckIPConnectionReuse(netadr_t *adr);
 int SV_FinishCertificateCheck(netadr_t *adr, int nAuthProtocol, char *szRawCertificate, char *userinfo);
 int SV_FinishCertificateCheck_internal(netadr_t *adr, int nAuthProtocol, char *szRawCertificate, char *userinfo);
-int SV_CheckKeyInfo(netadr_t *adr, char *protinfo, short unsigned int *port, int *pAuthProtocol, char *pszRaw, char *cdkey);
-int SV_CheckKeyInfo_internal(netadr_t *adr, char *protinfo, short unsigned int *port, int *pAuthProtocol, char *pszRaw, char *cdkey);
+int SV_CheckKeyInfo(netadr_t *adr, char *protinfo, unsigned short *port, int *pAuthProtocol, char *pszRaw, char *cdkey);
+int SV_CheckKeyInfo_internal(netadr_t *adr, char *protinfo, unsigned short *port, int *pAuthProtocol, char *pszRaw, char *cdkey);
 int SV_CheckForDuplicateSteamID(client_t *client);
 int SV_CheckForDuplicateNames(char *userinfo, qboolean bIsReconnecting, int nExcludeSlot);
 int SV_CheckUserInfo(netadr_t *adr, char *userinfo, qboolean bIsReconnecting, int nReconnectSlot, char *name);

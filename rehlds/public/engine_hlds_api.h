@@ -31,8 +31,6 @@
 #include "maintypes.h"
 #include "interface.h"
 
-
-/* <8f5d0> ../public/engine_hlds_api.h:11 */
 class IDedicatedServerAPI : public IBaseInterface
 {
 public:

@@ -45,20 +45,16 @@ cmdalias_t *cmd_alias;
 cmd_function_t *cmd_functions;
 char *const cmd_null_string = "";
 
-
-/* <4aad> ../engine/cmd.c:47 */
 void Cmd_Wait_f(void)
 {
 	cmd_wait = 1;
 }
 
-/* <4d6b> ../engine/cmd.c:69 */
 void Cbuf_Init(void)
 {
 	SZ_Alloc("cmd_text", &cmd_text, MAX_CMD_BUFFER);
 }
 
-/* <4d80> ../engine/cmd.c:83 */
 // As new commands are generated from the console or keybindings,
 // the text is added to the end of the command buffer.
 void Cbuf_AddText(char *text)
@@ -74,7 +70,6 @@ void Cbuf_AddText(char *text)
 	SZ_Write(&cmd_text, text, len);
 }
 
-/* <4dcf> ../engine/cmd.c:109 */
 // When a command wants to issue other commands immediately, the text is
 // inserted at the beginning of the buffer, before any remaining unexecuted
 // commands.
@@ -101,7 +96,7 @@ void Cbuf_InsertText(char *text)
 	char *temp = NULL;
 	if (currLen)
 	{
-		
+
 		temp = (char *)Z_Malloc(currLen);	// TODO: Optimize: better use memmove without need for a temp buffer
 		Q_memcpy(temp, cmd_text.data, currLen);
 		SZ_Clear(&cmd_text);
@@ -117,7 +112,6 @@ void Cbuf_InsertText(char *text)
 #endif // REHLDS_FIXES
 }
 
-/* <4f05> ../engine/cmd.c:148 */
 void Cbuf_InsertTextLines(char *text)
 {
 	int addLen = Q_strlen(text);
@@ -144,7 +138,7 @@ void Cbuf_InsertTextLines(char *text)
 	char *temp = NULL;
 	if (currLen)
 	{
-		
+
 		temp = (char *)Z_Malloc(currLen);
 		Q_memcpy(temp, cmd_text.data, currLen);
 		SZ_Clear(&cmd_text);
@@ -162,7 +156,6 @@ void Cbuf_InsertTextLines(char *text)
 #endif // REHLDS_FIXES
 }
 
-/* <5d96> ../engine/cmd.c:193 */
 // Pulls off \n terminated lines of text from the command buffer and sends
 // them through Cmd_ExecuteString.  Stops when the buffer is empty.
 // Normally called once per frame, but may be explicitly invoked.
@@ -244,7 +237,6 @@ void Cbuf_Execute(void)
 	}
 }
 
-/* <4e74> ../engine/cmd.c:271 */
 void Cmd_StuffCmds_f(void)
 {
 	int i;
@@ -311,7 +303,6 @@ void Cmd_StuffCmds_f(void)
 	Z_Free(build);
 }
 
-/* <5e43> ../engine/cmd.c:347 */
 void Cmd_Exec_f(void)
 {
 	const char *pszFileName;
@@ -413,7 +404,6 @@ void Cmd_Exec_f(void)
 	Mem_Free(pszFileData);
 }
 
-/* <4ac1> ../engine/cmd.c:493 */
 void Cmd_Echo_f(void)
 {
 	int i;
@@ -427,7 +417,6 @@ void Cmd_Echo_f(void)
 	Con_Printf("\n");
 }
 
-/* <4c38> ../engine/cmd.c:510 */
 char *CopyString(char *in)
 {
 	char *out = (char *)Z_Malloc(Q_strlen(in) + 1);
@@ -435,7 +424,6 @@ char *CopyString(char *in)
 	return out;
 }
 
-/* <4c63> ../engine/cmd.c:521 */
 void Cmd_Alias_f(void)
 {
 	cmdalias_t *a;
@@ -534,13 +522,11 @@ void Cmd_Alias_f(void)
 	a->value = CopyString(cmd);
 }
 
-/* <5079> ../engine/cmd.c:632 */
 struct cmd_function_s *Cmd_GetFirstCmd(void)
 {
 	return cmd_functions;
 }
 
-/* <5091> ../engine/cmd.c:646 */
 void Cmd_Init(void)
 {
 	Cmd_AddCommand("stuffcmds", Cmd_StuffCmds_f);
@@ -552,7 +538,6 @@ void Cmd_Init(void)
 	Cmd_AddCommand("cmdlist", Cmd_CmdList_f);
 }
 
-/* <5521> ../engine/cmd.c:663 */
 void Cmd_Shutdown(void)
 {
 	for (int i = 0; i < cmd_argc; i++)
@@ -566,7 +551,6 @@ void Cmd_Shutdown(void)
 	cmd_functions = NULL;	// TODO: Check that memory from functions is released too
 }
 
-/* <5536> ../engine/cmd.c:677 */
 int EXT_FUNC Cmd_Argc(void)
 {
 #ifndef SWDS
@@ -576,7 +560,6 @@ int EXT_FUNC Cmd_Argc(void)
 	return cmd_argc;
 }
 
-/* <5547> ../engine/cmd.c:689 */
 const char* EXT_FUNC Cmd_Argv(int arg)
 {
 #ifndef SWDS
@@ -590,7 +573,6 @@ const char* EXT_FUNC Cmd_Argv(int arg)
 	return "";	// TODO: Possibly better to return NULL here, but require to check all usages
 }
 
-/* <5565> ../engine/cmd.c:703 */
 const char* EXT_FUNC Cmd_Args(void)
 {
 #ifndef SWDS
@@ -600,15 +582,10 @@ const char* EXT_FUNC Cmd_Args(void)
 	return cmd_args;
 }
 
-/* <5575> ../engine/cmd.c:715 */
 /*
-============
-Cmd_TokenizeString
-
 Parses the given string into command line tokens.
 Takes a null terminated string. Does not need to be \n terminated.
 Breaks the string up into arg tokens.
-============
 */
 void EXT_FUNC Cmd_TokenizeString(char *text)
 {
@@ -674,7 +651,6 @@ void EXT_FUNC Cmd_TokenizeString(char *text)
 	}
 }
 
-/* <55be> ../engine/cmd.c:773 */
 NOXREF cmd_function_t *Cmd_FindCmd(char *cmd_name)
 {
 	NOXREFCHECK;
@@ -692,7 +668,6 @@ NOXREF cmd_function_t *Cmd_FindCmd(char *cmd_name)
 	return NULL;
 }
 
-/* <5611> ../engine/cmd.c:791 */
 NOXREF cmd_function_t *Cmd_FindCmdPrev(char *cmd_name)
 {
 	NOXREFCHECK;
@@ -740,7 +715,6 @@ void Cmd_InsertCommand(cmd_function_t *cmd)
 	*p = cmd;
 }
 
-/* <5664> ../engine/cmd.c:812 */
 // Use this for engine inside call only, not from user code, because it doesn't alloc string for the name.
 void Cmd_AddCommand(char *cmd_name, xcommand_t function)
 {
@@ -774,7 +748,6 @@ void Cmd_AddCommand(char *cmd_name, xcommand_t function)
 	Cmd_InsertCommand(cmd);
 }
 
-/* <5700> ../engine/cmd.c:891 */
 // Use this for call from user code, because it alloc string for the name.
 void Cmd_AddMallocCommand(char *cmd_name, xcommand_t function, int flag)
 {
@@ -803,7 +776,6 @@ void Cmd_AddMallocCommand(char *cmd_name, xcommand_t function, int flag)
 	Cmd_InsertCommand(cmd);
 }
 
-/* <5776> ../engine/cmd.c:934 */
 NOXREF void Cmd_AddHUDCommand(char *cmd_name, xcommand_t function)
 {
 	NOXREFCHECK;
@@ -811,7 +783,6 @@ NOXREF void Cmd_AddHUDCommand(char *cmd_name, xcommand_t function)
 	Cmd_AddMallocCommand(cmd_name, function, FCMD_HUD_COMMAND);
 }
 
-/* <5824> ../engine/cmd.c:946 */
 NOXREF void Cmd_AddWrapperCommand(char *cmd_name, xcommand_t function)
 {
 	NOXREFCHECK;
@@ -819,13 +790,11 @@ NOXREF void Cmd_AddWrapperCommand(char *cmd_name, xcommand_t function)
 	Cmd_AddMallocCommand(cmd_name, function, FCMD_WRAPPER_COMMAND);
 }
 
-/* <58d2> ../engine/cmd.c:960 */
 void EXT_FUNC Cmd_AddGameCommand(char *cmd_name, xcommand_t function)
 {
 	Cmd_AddMallocCommand(cmd_name, function, FCMD_GAME_COMMAND);
 }
 
-/* <5980> ../engine/cmd.c:970 */
 void Cmd_RemoveMallocedCmds(int flag)
 {
 	cmd_function_t *c, **p;
@@ -847,7 +816,6 @@ void Cmd_RemoveMallocedCmds(int flag)
 	}
 }
 
-/* <59f9> ../engine/cmd.c:1002 */
 NOXREF void Cmd_RemoveHudCmds(void)
 {
 	NOXREFCHECK;
@@ -855,19 +823,16 @@ NOXREF void Cmd_RemoveHudCmds(void)
 	Cmd_RemoveMallocedCmds(FCMD_HUD_COMMAND);
 }
 
-/* <5a4c> ../engine/cmd.c:1012 */
 void Cmd_RemoveGameCmds(void)
 {
 	Cmd_RemoveMallocedCmds(FCMD_GAME_COMMAND);
 }
 
-/* <5a9f> ../engine/cmd.c:1022 */
 void Cmd_RemoveWrapperCmds(void)
 {
 	Cmd_RemoveMallocedCmds(FCMD_WRAPPER_COMMAND);
 }
 
-/* <5af2> ../engine/cmd.c:1035 */
 qboolean Cmd_Exists(const char *cmd_name)
 {
 	cmd_function_t *cmd = cmd_functions;
@@ -885,7 +850,6 @@ qboolean Cmd_Exists(const char *cmd_name)
 	return FALSE;
 }
 
-/* <5b30> ../engine/cmd.c:1055 */
 NOXREF char *Cmd_CompleteCommand(char *search, int forward)
 {
 	NOXREFCHECK;
@@ -995,7 +959,6 @@ void EXT_FUNC Cmd_ExecuteString_internal(const char* cmdName, cmd_source_t src, 
 	}
 }
 
-/* <5d4e> ../engine/cmd.c:1133 */
 void Cmd_ExecuteString(char *text, cmd_source_t src)
 {
 	cmd_source = src;
@@ -1013,7 +976,6 @@ void Cmd_ExecuteString(char *text, cmd_source_t src)
 	g_RehldsHookchains.m_ExecuteServerStringCmd.callChain(Cmd_ExecuteString_internal, cmd_argv[0], src, cl);
 }
 
-/* <5c15> ../engine/cmd.c:1181 */
 qboolean Cmd_ForwardToServerInternal(sizebuf_t *pBuf)
 {
 	const char *cmd_name = Cmd_Argv(0);
@@ -1066,7 +1028,6 @@ qboolean Cmd_ForwardToServerInternal(sizebuf_t *pBuf)
 	return FALSE;
 }
 
-/* <5cfd> ../engine/cmd.c:1247 */
 void Cmd_ForwardToServer(void)
 {
 	if (Q_stricmp(Cmd_Argv(0), "cmd") || Q_stricmp(Cmd_Argv(1), "dlfile"))
@@ -1075,13 +1036,11 @@ void Cmd_ForwardToServer(void)
 	}
 }
 
-/* <5f1b> ../engine/cmd.c:1258 */
 qboolean Cmd_ForwardToServerUnreliable(void)
 {
 	return Cmd_ForwardToServerInternal(&g_pcls.datagram);
 }
 
-/* <5f35> ../engine/cmd.c:1273 */
 // Returns the position (1 to argc-1) in the command's argument list
 // where the given parameter apears, or 0 if not present.
 NOXREF int Cmd_CheckParm(char *parm)
@@ -1106,7 +1065,6 @@ NOXREF int Cmd_CheckParm(char *parm)
 	return 0;
 }
 
-/* <4b17> ../engine/cmd.c:1301 */
 void Cmd_CmdList_f(void)
 {
 	cmd_function_t *cmd;

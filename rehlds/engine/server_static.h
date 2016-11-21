@@ -35,8 +35,6 @@
 #include "maintypes.h"
 #include "netadr.h"
 
-
-/* <2e957> ../engine/server_static.h:13 */
 typedef struct server_log_s
 {
 	qboolean active;
@@ -45,7 +43,6 @@ typedef struct server_log_s
 	void *file;
 } server_log_t;
 
-/* <2e9a3> ../engine/server_static.h:22 */
 typedef struct server_stats_s
 {
 	int num_samples;
@@ -64,7 +61,6 @@ typedef struct server_stats_s
 	float average_latency;
 } server_stats_t;
 
-/* <2ea7b> ../engine/server_static.h:43 */
 typedef struct server_static_s
 {
 	qboolean dll_initialized;
@@ -79,6 +75,5 @@ typedef struct server_static_s
 	server_stats_t stats;
 	qboolean isSecure;
 } server_static_t;
-
 
 #endif // SERVER_STATIC_H

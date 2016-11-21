@@ -28,8 +28,6 @@
 
 #include "precompiled.h"
 
-
-
 /*
 	All cvar names are case insensitive! Values not.
 */
@@ -37,8 +35,6 @@
 cvar_t *cvar_vars;
 char cvar_null_string[] = "";
 
-
-/* <1853e> ../engine/cvar.c:26 */
 void Cvar_Init(void)
 {
 #ifndef SWDS
@@ -46,14 +42,12 @@ void Cvar_Init(void)
 #endif
 }
 
-/* <18552> ../engine/cvar.c:30 */
 void Cvar_Shutdown(void)
 {
 	// TODO: Check memory releasing
 	cvar_vars = NULL;
 }
 
-/* <18566> ../engine/cvar.c:40 */
 cvar_t *Cvar_FindVar(const char *var_name)
 {
 	cvar_t *var;
@@ -70,7 +64,6 @@ cvar_t *Cvar_FindVar(const char *var_name)
 	return var;
 }
 
-/* <185b6> ../engine/cvar.c:58 */
 NOXREF cvar_t *Cvar_FindPrevVar(const char *var_name)
 {
 	NOXREFCHECK;
@@ -85,7 +78,6 @@ NOXREF cvar_t *Cvar_FindPrevVar(const char *var_name)
 	return NULL;
 }
 
-/* <18606> ../engine/cvar.c:78 */
 float Cvar_VariableValue(const char *var_name)
 {
 	cvar_t *var = Cvar_FindVar(var_name);
@@ -98,7 +90,6 @@ float Cvar_VariableValue(const char *var_name)
 	return 0.0f;
 }
 
-/* <18666> ../engine/cvar.c:94 */
 NOXREF int Cvar_VariableInt(const char *var_name)
 {
 	NOXREFCHECK;
@@ -113,7 +104,6 @@ NOXREF int Cvar_VariableInt(const char *var_name)
 	return 0;
 }
 
-/* <186c6> ../engine/cvar.c:110 */
 char *Cvar_VariableString(const char *var_name)
 {
 	cvar_t *var = Cvar_FindVar(var_name);
@@ -126,7 +116,6 @@ char *Cvar_VariableString(const char *var_name)
 	return cvar_null_string;
 }
 
-/* <1872a> ../engine/cvar.c:126 */
 NOXREF const char *Cvar_CompleteVariable(const char *search, int forward)
 {
 	NOXREFCHECK;
@@ -185,7 +174,6 @@ NOXREF const char *Cvar_CompleteVariable(const char *search, int forward)
 	return NULL;
 }
 
-/* <18805> ../engine/cvar.c:198 */
 void EXT_FUNC Cvar_DirectSet_internal(struct cvar_s *var, const char *value)
 {
 	if (!var || !value)
@@ -315,7 +303,6 @@ void Cvar_DirectSet(struct cvar_s *var, const char *value)
 	g_RehldsHookchains.m_Cvar_DirectSet.callChain(Cvar_DirectSet_internal, var, value);
 }
 
-/* <188e9> ../engine/cvar.c:347 */
 void Cvar_Set(const char *var_name, const char *value)
 {
 	cvar_t *var = Cvar_FindVar(var_name);
@@ -329,7 +316,6 @@ void Cvar_Set(const char *var_name, const char *value)
 	Cvar_DirectSet(var, value);
 }
 
-/* <1893e> ../engine/cvar.c:365 */
 void Cvar_SetValue(const char *var_name, float value)
 {
 	char val[32];
@@ -351,7 +337,6 @@ void Cvar_SetValue(const char *var_name, float value)
 	Cvar_Set(var_name, val);
 }
 
-/* <189df> ../engine/cvar.c:391 */
 void EXT_FUNC Cvar_RegisterVariable(cvar_t *variable)
 {
 	char *oldstr;
@@ -400,7 +385,6 @@ void EXT_FUNC Cvar_RegisterVariable(cvar_t *variable)
 	cvar_vars = dummyvar.next;
 }
 
-/* <18a7e> ../engine/cvar.c:452 */
 NOXREF void Cvar_RemoveHudCvars(void)
 {
 	NOXREFCHECK;
@@ -428,7 +412,6 @@ NOXREF void Cvar_RemoveHudCvars(void)
 	}
 }
 
-/* <18ac9> ../engine/cvar.c:499 */
 // Returns first token if there is more than one, else returns NULL.
 const char *Cvar_IsMultipleTokens(const char *varname)
 {
@@ -466,7 +449,6 @@ const char *Cvar_IsMultipleTokens(const char *varname)
 	return firstToken;	// multiple tokens, return first one
 }
 
-/* <18b6e> ../engine/cvar.c:542 */
 qboolean Cvar_Command(void)
 {
 	cvar_t *v;
@@ -510,7 +492,6 @@ qboolean Cvar_Command(void)
 	return FALSE;
 }
 
-/* <18ca4> ../engine/cvar.c:601 */
 NOXREF void Cvar_WriteVariables(FileHandle_t f)
 {
 	NOXREFCHECK;
@@ -526,7 +507,6 @@ NOXREF void Cvar_WriteVariables(FileHandle_t f)
 	}
 }
 
-/* <18cdc> ../engine/cvar.c:627 */
 void Cmd_CvarListPrintCvar(cvar_t *var, FileHandle_t f)
 {
 	char szOutstr[256];
@@ -569,7 +549,6 @@ void Cmd_CvarListPrintCvar(cvar_t *var, FileHandle_t f)
 	}
 }
 
-/* <18d23> ../engine/cvar.c:671 */
 void Cmd_CvarList_f(void)
 {
 	cvar_t *var;
@@ -695,7 +674,6 @@ void Cmd_CvarList_f(void)
 	}
 }
 
-/* <18e0f> ../engine/cvar.c:806 */
 NOXREF int Cvar_CountServerVariables(void)
 {
 	NOXREFCHECK;
@@ -713,7 +691,6 @@ NOXREF int Cvar_CountServerVariables(void)
 	return i;
 }
 
-/* <18e4a> ../engine/cvar.c:829 */
 void Cvar_UnlinkExternals(void)
 {
 	cvar_t *pVar;
@@ -737,7 +714,6 @@ void Cvar_UnlinkExternals(void)
 	}
 }
 
-/* <18e8a> ../engine/cvar.c:853 */
 void Cvar_CmdInit(void)
 {
 	Cmd_AddCommand("cvarlist", Cmd_CvarList_f);

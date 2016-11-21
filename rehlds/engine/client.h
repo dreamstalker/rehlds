@@ -63,7 +63,6 @@ typedef enum cactive_e
 	ca_active,
 } cactive_t;
 
-/* <1523b> ../engine/client.h:70 */
 typedef struct cmd_s
 {
 	usercmd_t cmd;
@@ -75,7 +74,6 @@ typedef struct cmd_s
 	int sendsize;
 } cmd_t;
 
-/* <152b1> ../engine/client.h:85 */
 typedef struct frame_s
 {
 	double receivedtime;
@@ -98,7 +96,6 @@ typedef struct frame_s
 	uint16 msgbytes;
 } frame_t;
 
-/* <153e9> ../engine/client.h:127 */
 typedef struct player_info_s
 {
 	int userid;
@@ -120,7 +117,6 @@ typedef struct player_info_s
 	uint64 m_nSteamID;
 } player_info_t;
 
-/* <277f5> ../engine/client.h:208 */
 typedef struct soundfade_s
 {
 	int nStartPercent;
@@ -131,7 +127,6 @@ typedef struct soundfade_s
 	int soundFadeInTime;
 } soundfade_t;
 
-/* <1f23> ../engine/client.h:223 */
 typedef struct client_static_s
 {
 	cactive_t state;
@@ -187,7 +182,6 @@ typedef struct client_static_s
 	int build_num;
 } client_static_t;
 
-/* <1bda4> ../engine/client.h:320 */
 typedef struct client_state_s
 {
 	int max_edicts;
@@ -264,14 +258,12 @@ typedef struct client_state_s
 	char downloadUrl[128];
 } client_state_t;
 
-/* <3a9c7> ../engine/client.h:645 */
 typedef enum CareerStateType_e
 {
 	CAREER_NONE = 0,
 	CAREER_LOADING = 1,
 	CAREER_PLAYING = 2,
 } CareerStateType;
-
 
 #ifdef HOOK_ENGINE
 #define g_pcls (*pcls)
@@ -333,40 +325,26 @@ void Con_Shutdown(void);
 int DispatchDirectUserMsg(const char *pszName, int iSize, void *pBuf);
 void CL_ShutDownUsrMessages(void);
 void CL_ShutDownClientStatic(void);
-
 extern "C" void ClientDLL_MoveClient(struct playermove_s *ppmove);
-
 void CL_Shutdown(void);
-
 extern "C" void ClientDLL_Frame(double time);
 extern "C" void ClientDLL_CAM_Think(void);
 void CL_InitEventSystem(void);
 void CL_CheckClientState(void);
 void CL_RedoPrediction(void);
 void CL_SetLastUpdate(void);
-
 void Con_NPrintf(int idx, const char *fmt, ...);
-
-
 void CL_WriteMessageHistory(int starting_count, int cmd);
-
 void CL_MoveSpectatorCamera(void);
 void CL_AddVoiceToDatagram(qboolean bFinal);
 void CL_VoiceIdle(void);
-
 void PollDInputDevices(void);
-
 void CL_KeepConnectionActive(void);
-
 void CL_UpdateModuleC(void);
-
 int VGuiWrap2_IsInCareerMatch(void);
-
 void VguiWrap2_GetCareerUI(void);
-
 int VGuiWrap2_GetLocalizedStringLength(const char *label);
 void VGuiWrap2_LoadingStarted(const char *resourceType, const char *resourceName);
-
 void ConstructTutorMessageDecayBuffer(int *buffer, int bufferLength);
 void ProcessTutorMessageDecayBuffer(int *buffer, int bufferLength);
 int GetTimesTutorMessageShown(int id);

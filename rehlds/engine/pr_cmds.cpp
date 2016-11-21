@@ -60,7 +60,6 @@ int c_notvis;
 vec3_t vec_origin;
 int r_visframecount;
 
-
 /*
 * Globals initialization
 */
@@ -68,37 +67,33 @@ int r_visframecount;
 
 sizebuf_t gMsgBuffer = { "MessageBegin/End", 0, gMsgData, sizeof(gMsgData), 0 };
 
-#else //HOOK_ENGINE
+#else // HOOK_ENGINE
 
 sizebuf_t gMsgBuffer;
 
-#endif //HOOK_ENGINE
+#endif // HOOK_ENGINE
 
-/* <782a3> ../engine/pr_cmds.c:53 */
 void EXT_FUNC PF_makevectors_I(const float *rgflVector)
 {
 	AngleVectors(rgflVector, gGlobalVariables.v_forward, gGlobalVariables.v_right, gGlobalVariables.v_up);
 }
 
-/* <782cb> ../engine/pr_cmds.c:58 */
 float EXT_FUNC PF_Time(void)
 {
 	return Sys_FloatTime();
 }
 
-/* <782e4> ../engine/pr_cmds.c:74 */
 void EXT_FUNC PF_setorigin_I(edict_t *e, const float *org)
 {
 	if (!e)
 		return;
-	
+
 	e->v.origin[0] = org[0];
 	e->v.origin[1] = org[1];
 	e->v.origin[2] = org[2];
 	SV_LinkEdict(e, FALSE);
 }
 
-/* <78317> ../engine/pr_cmds.c:84 */
 void EXT_FUNC SetMinMaxSize(edict_t *e, const float *min, const float *max, qboolean rotate)
 {
 	for (int i = 0; i < 3; i++)
@@ -110,7 +105,7 @@ void EXT_FUNC SetMinMaxSize(edict_t *e, const float *min, const float *max, qboo
 	e->v.mins[0] = min[0];
 	e->v.mins[1] = min[1];
 	e->v.mins[2] = min[2];
-	
+
 	e->v.maxs[0] = max[0];
 	e->v.maxs[1] = max[1];
 	e->v.maxs[2] = max[2];
@@ -121,13 +116,11 @@ void EXT_FUNC SetMinMaxSize(edict_t *e, const float *min, const float *max, qboo
 	SV_LinkEdict(e, 0);
 }
 
-/* <7840f> ../engine/pr_cmds.c:169 */
 void EXT_FUNC PF_setsize_I(edict_t *e, const float *rgflMin, const float *rgflMax)
 {
 	SetMinMaxSize(e, rgflMin, rgflMax, 0);
 }
 
-/* <78451> ../engine/pr_cmds.c:184 */
 void EXT_FUNC PF_setmodel_I(edict_t *e, const char *m)
 {
 	const char** check = &g_psv.model_precache[0];
@@ -146,7 +139,7 @@ void EXT_FUNC PF_setmodel_I(edict_t *e, const char *m)
 #else
 		if (!Q_stricmp(*check, m))
 #endif
-		
+
 		{
 			e->v.modelindex = i;
 			model_t *mod = g_psv.models[i];
@@ -171,13 +164,11 @@ void EXT_FUNC PF_setmodel_I(edict_t *e, const char *m)
 	Host_Error("no precache: %s\n", m);
 }
 
-/* <784b4> ../engine/pr_cmds.c:210 */
 int EXT_FUNC PF_modelindex(const char *pstr)
 {
 	return SV_ModelIndex(pstr);
 }
 
-/* <784df> ../engine/pr_cmds.c:217 */
 int EXT_FUNC ModelFrames(int modelIndex)
 {
 	if (modelIndex <= 0 || modelIndex >= 512)
@@ -189,13 +180,11 @@ int EXT_FUNC ModelFrames(int modelIndex)
 	return ModelFrameCount(g_psv.models[modelIndex]);
 }
 
-/* <7851a> ../engine/pr_cmds.c:239 */
 void EXT_FUNC PF_bprint(char *s)
 {
 	SV_BroadcastPrintf("%s", s);
 }
 
-/* <78540> ../engine/pr_cmds.c:253 */
 void EXT_FUNC PF_sprint(char *s, int entnum)
 {
 	if (entnum <= 0 || entnum > g_psvs.maxclients)
@@ -216,13 +205,11 @@ void EXT_FUNC PF_sprint(char *s, int entnum)
 	}
 }
 
-/* <78589> ../engine/pr_cmds.c:280 */
 void EXT_FUNC ServerPrint(const char *szMsg)
 {
 	Con_Printf("%s", szMsg);
 }
 
-/* <785b3> ../engine/pr_cmds.c:293 */
 void EXT_FUNC ClientPrintf(edict_t *pEdict, PRINT_TYPE ptype, const char *szMsg)
 {
 	client_t *client;
@@ -256,10 +243,8 @@ void EXT_FUNC ClientPrintf(edict_t *pEdict, PRINT_TYPE ptype, const char *szMsg)
 		Con_Printf("invalid PRINT_TYPE %i\n", ptype);
 		break;
 	}
-
 }
 
-/* <7861b> ../engine/pr_cmds.c:339 */
 float EXT_FUNC PF_vectoyaw_I(const float *rgflVector)
 {
 	float yaw = 0.0f;
@@ -273,19 +258,16 @@ float EXT_FUNC PF_vectoyaw_I(const float *rgflVector)
 	return yaw;
 }
 
-/* <78659> ../engine/pr_cmds.c:363 */
 void EXT_FUNC PF_vectoangles_I(const float *rgflVectorIn, float *rgflVectorOut)
 {
 	VectorAngles(rgflVectorIn, rgflVectorOut);
 }
 
-/* <78691> ../engine/pr_cmds.c:377 */
 void EXT_FUNC PF_particle_I(const float *org, const float *dir, float color, float count)
 {
 	SV_StartParticle(org, dir, color, count);
 }
 
-/* <786e7> ../engine/pr_cmds.c:390 */
 void EXT_FUNC PF_ambientsound_I(edict_t *entity, float *pos, const char *samp, float vol, float attenuation, int fFlags, int pitch)
 {
 	int i;
@@ -339,7 +321,6 @@ void EXT_FUNC PF_ambientsound_I(edict_t *entity, float *pos, const char *samp, f
 	MSG_WriteByte(pout, fFlags);
 }
 
-/* <787c0> ../engine/pr_cmds.c:459 */
 void EXT_FUNC PF_sound_I(edict_t *entity, int channel, const char *sample, float volume, float attenuation, int fFlags, int pitch)
 {
 	if (volume < 0.0 || volume > 255.0)
@@ -353,7 +334,6 @@ void EXT_FUNC PF_sound_I(edict_t *entity, int channel, const char *sample, float
 	SV_StartSound(0, entity, channel, sample, (int)(volume * 255), attenuation, fFlags, pitch);
 }
 
-/* <78cdd> ../engine/pr_cmds.c:491 */
 void EXT_FUNC PF_traceline_Shared(const float *v1, const float *v2, int nomonsters, edict_t *ent)
 {
 #ifdef REHLDS_OPT_PEDANTIC
@@ -364,9 +344,8 @@ void EXT_FUNC PF_traceline_Shared(const float *v1, const float *v2, int nomonste
 
 	gGlobalVariables.trace_flags = 0;
 	SV_SetGlobalTrace(&trace);
-} 
+}
 
-/* <78d1c> ../engine/pr_cmds.c:502 */
 void EXT_FUNC PF_traceline_DLL(const float *v1, const float *v2, int fNoMonsters, edict_t *pentToSkip, TraceResult *ptr)
 {
 	PF_traceline_Shared(v1, v2, fNoMonsters, pentToSkip ? pentToSkip : &g_psv.edicts[0]);
@@ -386,7 +365,6 @@ void EXT_FUNC PF_traceline_DLL(const float *v1, const float *v2, int fNoMonsters
 	ptr->iHitgroup = gGlobalVariables.trace_hitgroup;
 }
 
-/* <78844> ../engine/pr_cmds.c:531 */
 void EXT_FUNC TraceHull(const float *v1, const float *v2, int fNoMonsters, int hullNumber, edict_t *pentToSkip, TraceResult *ptr)
 {
 	hullNumber = hullNumber;
@@ -410,20 +388,18 @@ void EXT_FUNC TraceHull(const float *v1, const float *v2, int fNoMonsters, int h
 	ptr->vecPlaneNormal[2] = trace.plane.normal[2];
 }
 
-/* <788c8> ../engine/pr_cmds.c:556 */
 void EXT_FUNC TraceSphere(const float *v1, const float *v2, int fNoMonsters, float radius, edict_t *pentToSkip, TraceResult *ptr)
 {
 	Sys_Error("TraceSphere not yet implemented!\n");
 }
 
-/* <7893a> ../engine/pr_cmds.c:578 */
 void EXT_FUNC TraceModel(const float *v1, const float *v2, int hullNumber, edict_t *pent, TraceResult *ptr)
 {
 	int oldMovetype, oldSolid;
 
 	if (hullNumber < 0 || hullNumber > 3)
 		hullNumber = 0;
-	
+
 	model_t* pmodel = g_psv.models[pent->v.modelindex];
 	if (pmodel && pmodel->type == mod_brush)
 	{
@@ -455,7 +431,6 @@ void EXT_FUNC TraceModel(const float *v1, const float *v2, int hullNumber, edict
 	ptr->vecPlaneNormal[2] = trace.plane.normal[2];
 }
 
-/* <789df> ../engine/pr_cmds.c:619 */
 msurface_t* EXT_FUNC SurfaceAtPoint(model_t *pModel, mnode_t *node, vec_t *start, vec_t *end)
 {
 	mplane_t *plane;
@@ -513,7 +488,6 @@ msurface_t* EXT_FUNC SurfaceAtPoint(model_t *pModel, mnode_t *node, vec_t *start
 	return SurfaceAtPoint(pModel, node->children[s ^ 1], mid, end);
 }
 
-/* <78af9> ../engine/pr_cmds.c:688 */
 const char* EXT_FUNC TraceTexture(edict_t *pTextureEntity, const float *v1, const float *v2)
 {
 	int firstnode;
@@ -552,7 +526,7 @@ const char* EXT_FUNC TraceTexture(edict_t *pTextureEntity, const float *v1, cons
 			start[0] = _DotProduct(forward, temp);
 			start[1] = -_DotProduct(right, temp);
 			start[2] = _DotProduct(up, temp);
-			
+
 			temp[0] = end[0]; temp[1] = end[1]; temp[2] = end[2];
 			end[0] = _DotProduct(forward, temp);
 			end[1] = -_DotProduct(right, temp);
@@ -576,18 +550,16 @@ const char* EXT_FUNC TraceTexture(edict_t *pTextureEntity, const float *v1, cons
 	psurf = SurfaceAtPoint(pmodel, &pmodel->nodes[firstnode], start, end);
 	if (psurf)
 		return psurf->texinfo->texture->name;
-	
+
 	return NULL;
 }
 
-/* <78c30> ../engine/pr_cmds.c:749 */
 void EXT_FUNC PF_TraceToss_Shared(edict_t *ent, edict_t *ignore)
 {
 	trace_t trace = SV_Trace_Toss(ent, ignore);
 	SV_SetGlobalTrace(&trace);
 }
 
-/* <78c06> ../engine/pr_cmds.c:758 */
 void EXT_FUNC SV_SetGlobalTrace(trace_t *ptrace)
 {
 	gGlobalVariables.trace_fraction = ptrace->fraction;
@@ -614,7 +586,6 @@ void EXT_FUNC SV_SetGlobalTrace(trace_t *ptrace)
 	}
 }
 
-/* <78dc1> ../engine/pr_cmds.c:775 */
 void EXT_FUNC PF_TraceToss_DLL(edict_t *pent, edict_t *pentToIgnore, TraceResult *ptr)
 {
 	PF_TraceToss_Shared(pent, pentToIgnore ? pentToIgnore : &g_psv.edicts[0]);
@@ -635,7 +606,6 @@ void EXT_FUNC PF_TraceToss_DLL(edict_t *pent, edict_t *pentToIgnore, TraceResult
 	ptr->iHitgroup = gGlobalVariables.trace_hitgroup;
 }
 
-/* <78e3a> ../engine/pr_cmds.c:791 */
 int EXT_FUNC TraceMonsterHull(edict_t *pEdict, const float *v1, const float *v2, int fNoMonsters, edict_t *pentToSkip, TraceResult *ptr)
 {
 	qboolean monsterClip = (pEdict->v.flags & FL_MONSTERCLIP) ? 1 : 0;
@@ -661,7 +631,6 @@ int EXT_FUNC TraceMonsterHull(edict_t *pEdict, const float *v1, const float *v2,
 	return trace.allsolid || trace.fraction != 1.0f;
 }
 
-/* <78ed1> ../engine/pr_cmds.c:830 */
 int EXT_FUNC PF_newcheckclient(int check)
 {
 	int i;
@@ -698,11 +667,10 @@ int EXT_FUNC PF_newcheckclient(int check)
 	return i;
 }
 
-/* <78f53> ../engine/pr_cmds.c:898 */
 edict_t* EXT_FUNC PF_checkclient_I(edict_t *pEdict)
 {
-	edict_t *ent; 
-	mleaf_t *leaf; 
+	edict_t *ent;
+	mleaf_t *leaf;
 	int l;
 	vec3_t view;
 
@@ -734,7 +702,6 @@ edict_t* EXT_FUNC PF_checkclient_I(edict_t *pEdict)
 	return &g_psv.edicts[0];
 }
 
-/* <78fbe> ../engine/pr_cmds.c:942 */
 mnode_t* EXT_FUNC PVSNode(mnode_t *node, vec_t *emins, vec_t *emaxs)
 {
 	mplane_t *splitplane;
@@ -746,7 +713,7 @@ mnode_t* EXT_FUNC PVSNode(mnode_t *node, vec_t *emins, vec_t *emaxs)
 
 	if (node->contents < 0)
 		return node->contents != CONTENT_SOLID ? node : NULL;
-	
+
 
 	splitplane = node->plane;
 	if (splitplane->type >= 3u)
@@ -781,7 +748,6 @@ mnode_t* EXT_FUNC PVSNode(mnode_t *node, vec_t *emins, vec_t *emaxs)
 	return NULL;
 }
 
-/* <7903a> ../engine/pr_cmds.c:976 */
 void EXT_FUNC PVSMark(model_t *pmodel, unsigned char *ppvs)
 {
 	++r_visframecount;
@@ -801,7 +767,6 @@ void EXT_FUNC PVSMark(model_t *pmodel, unsigned char *ppvs)
 	}
 }
 
-/* <790b0> ../engine/pr_cmds.c:1009 */
 edict_t* EXT_FUNC PVSFindEntities(edict_t *pplayer)
 {
 	edict_t *pent;
@@ -834,9 +799,9 @@ edict_t* EXT_FUNC PVSFindEntities(edict_t *pplayer)
 			pent->v.chain = pchain;
 			pchain = pent;
 		}
-		
+
 	}
-	
+
 	if (g_pcl.worldmodel)
 	{
 		//r_oldviewleaf = NULL; //clientside only
@@ -845,14 +810,12 @@ edict_t* EXT_FUNC PVSFindEntities(edict_t *pplayer)
 	return pchain;
 }
 
-/* <79182> ../engine/pr_cmds.c:1055 */
 qboolean EXT_FUNC ValidCmd(const char *pCmd)
 {
 	int len = Q_strlen(pCmd);
 	return len && (pCmd[len - 1] == '\n' || pCmd[len - 1] == ';');
-} 
+}
 
-/* <791d5> ../engine/pr_cmds.c:1079 */
 void EXT_FUNC PF_stuffcmd_I(edict_t *pEdict, char *szFmt, ...)
 {
 	int entnum;
@@ -890,7 +853,6 @@ void EXT_FUNC PF_stuffcmd_I(edict_t *pEdict, char *szFmt, ...)
 	}
 }
 
-/* <79292> ../engine/pr_cmds.c:1119 */
 void EXT_FUNC PF_localcmd_I(char *str)
 {
 	if (ValidCmd(str))
@@ -899,13 +861,11 @@ void EXT_FUNC PF_localcmd_I(char *str)
 		Con_Printf("Error, bad server command %s\n", str);
 }
 
-/* <792e8> ../engine/pr_cmds.c:1137 */
 void EXT_FUNC PF_localexec_I(void)
 {
 	Cbuf_Execute();
 }
 
-/* <792fd> ../engine/pr_cmds.c:1154 */
 edict_t* EXT_FUNC FindEntityInSphere(edict_t *pEdictStartSearchAfter, const float *org, float rad)
 {
 	int e = pEdictStartSearchAfter ? NUM_FOR_EDICT(pEdictStartSearchAfter) : 0;
@@ -938,13 +898,11 @@ edict_t* EXT_FUNC FindEntityInSphere(edict_t *pEdictStartSearchAfter, const floa
 	return &g_psv.edicts[0];
 }
 
-/* <793a2> ../engine/pr_cmds.c:1219 */
 edict_t* EXT_FUNC PF_Spawn_I(void)
 {
 	return ED_Alloc();
 }
 
-/* <793cc> ../engine/pr_cmds.c:1226 */
 edict_t* EXT_FUNC CreateNamedEntity(int className)
 {
 	edict_t *pedict;
@@ -974,13 +932,11 @@ void EXT_FUNC PF_Remove_I(edict_t *ed)
 	g_RehldsHookchains.m_PF_Remove_I.callChain(PF_Remove_I_internal, ed);
 }
 
-/* <7941a> ../engine/pr_cmds.c:1253 */
 void EXT_FUNC PF_Remove_I_internal(edict_t *ed)
 {
 	ED_Free(ed);
 }
 
-/* <7820f> ../engine/pr_cmds.c:1263 */
 edict_t* EXT_FUNC PF_find_Shared(int eStartSearchAfter, int iFieldToMatch, const char *szValueToFind)
 {
 	for (int e = eStartSearchAfter + 1; e < g_psv.num_edicts; e++)
@@ -998,10 +954,7 @@ edict_t* EXT_FUNC PF_find_Shared(int eStartSearchAfter, int iFieldToMatch, const
 
 	}
 	return &g_psv.edicts[0];
-
 }
-
-/* <79442> ../engine/pr_cmds.c:1290 */
 
 int EXT_FUNC iGetIndex(const char *pszField)
 {
@@ -1028,10 +981,9 @@ int EXT_FUNC iGetIndex(const char *pszField)
 	IGETINDEX_CHECK_FIELD(globalname);
 
 	return -1;
-	
+
 }
 
-/* <7949b> ../engine/pr_cmds.c:1332 */
 edict_t* EXT_FUNC FindEntityByString(edict_t *pEdictStartSearchAfter, const char *pszField, const char *pszValue)
 {
 	if (!pszValue)
@@ -1044,7 +996,6 @@ edict_t* EXT_FUNC FindEntityByString(edict_t *pEdictStartSearchAfter, const char
 	return PF_find_Shared(pEdictStartSearchAfter ? NUM_FOR_EDICT(pEdictStartSearchAfter) : 0, iField, pszValue);
 }
 
-/* <79540> ../engine/pr_cmds.c:1348 */
 int EXT_FUNC GetEntityIllum(edict_t *pEnt)
 {
 	if (!pEnt)
@@ -1063,13 +1014,11 @@ int EXT_FUNC GetEntityIllum(edict_t *pEnt)
 	}
 }
 
-/* <78265> ../engine/pr_cmds.c:1383 */
 qboolean EXT_FUNC PR_IsEmptyString(const char *s)
 {
 	return s[0] < ' ';
 }
 
-/* <795b5> ../engine/pr_cmds.c:1397 */
 int EXT_FUNC PF_precache_sound_I(const char *s)
 {
 	int i;
@@ -1124,8 +1073,7 @@ int EXT_FUNC PF_precache_sound_I(const char *s)
 	return -1; // unreach
 }
 
-/* <79609> ../engine/pr_cmds.c:1455 */
-short unsigned int EXT_FUNC EV_Precache(int type, const char *psz)
+unsigned short EXT_FUNC EV_Precache(int type, const char *psz)
 {
 	if (!psz)
 		Host_Error("EV_Precache: NULL pointer");
@@ -1185,28 +1133,22 @@ short unsigned int EXT_FUNC EV_Precache(int type, const char *psz)
 	}
 }
 
-void EXT_FUNC EV_PlayReliableEvent_api(IGameClient *cl, int entindex, short unsigned int eventindex, float delay, event_args_t *pargs)
+void EXT_FUNC EV_PlayReliableEvent_api(IGameClient *cl, int entindex, unsigned short eventindex, float delay, event_args_t *pargs)
 {
 	EV_PlayReliableEvent_internal(cl->GetClient(), entindex, eventindex, delay, pargs);
 }
 
-void EV_PlayReliableEvent(client_t *cl, int entindex, short unsigned int eventindex, float delay, event_args_t *pargs)
+void EV_PlayReliableEvent(client_t *cl, int entindex, unsigned short eventindex, float delay, event_args_t *pargs)
 {
 	g_RehldsHookchains.m_EV_PlayReliableEvent.callChain(EV_PlayReliableEvent_api, GetRehldsApiClient(cl), entindex, eventindex, delay, pargs);
 }
 
-/* <796ae> ../engine/pr_cmds.c:1531 */
-void EV_PlayReliableEvent_internal(client_t *cl, int entindex, short unsigned int eventindex, float delay, event_args_t *pargs)
+void EV_PlayReliableEvent_internal(client_t *cl, int entindex, unsigned short eventindex, float delay, event_args_t *pargs)
 {
-//	unsigned char data;                                           //  1533
-//	sizebuf_t msg;                                                //  1534
-//	event_args_t eargs;                                           //  1536
-//	event_args_t nullargs;                                        //  1537
-
-	unsigned char data[1024]; // [sp+4h] [bp-4A4h]@2
-	event_args_t from; // [sp+404h] [bp-A4h]@2
-	event_args_t to; // [sp+44Ch] [bp-5Ch]@2
-	sizebuf_t msg; // [sp+494h] [bp-14h]@2
+	unsigned char data[1024];
+	event_args_t from;
+	event_args_t to;
+	sizebuf_t msg;
 
 	if (cl->fakeclient)
 		return;
@@ -1240,11 +1182,9 @@ void EV_PlayReliableEvent_internal(client_t *cl, int entindex, short unsigned in
 		SZ_Write(&cl->netchan.message, msg.data, msg.cursize);
 	else
 		Netchan_CreateFragments(1, &cl->netchan, &msg);
-	
 }
 
-/* <79769> ../engine/pr_cmds.c:1595 */
-void EXT_FUNC EV_Playback(int flags, const edict_t *pInvoker, short unsigned int eventindex, float delay, float *origin, float *angles, float fparam1, float fparam2, int iparam1, int iparam2, int bparam1, int bparam2)
+void EXT_FUNC EV_Playback(int flags, const edict_t *pInvoker, unsigned short eventindex, float delay, float *origin, float *angles, float fparam1, float fparam2, int iparam1, int iparam2, int bparam1, int bparam2)
 {
 	client_t *cl;
 	signed int j;
@@ -1253,7 +1193,7 @@ void EXT_FUNC EV_Playback(int flags, const edict_t *pInvoker, short unsigned int
 	int invoker;
 	int slot;
 	int leafnum;
-	
+
 	if (flags & FEV_CLIENT)
 		return;
 
@@ -1410,12 +1350,10 @@ void EXT_FUNC EV_Playback(int flags, const edict_t *pInvoker, short unsigned int
 			Q_memcpy(&ei->args, &eargs, sizeof(ei->args));
 			ei->fire_time = delay;
 		}
-		
 	}
 }
 
-/* <798fb> ../engine/pr_cmds.c:1826 */
-void EXT_FUNC EV_SV_Playback(int flags, int clientindex, short unsigned int eventindex, float delay, float *origin, float *angles, float fparam1, float fparam2, int iparam1, int iparam2, int bparam1, int bparam2)
+void EXT_FUNC EV_SV_Playback(int flags, int clientindex, unsigned short eventindex, float delay, float *origin, float *angles, float fparam1, float fparam2, int iparam1, int iparam2, int bparam1, int bparam2)
 {
 	if (flags & FEV_CLIENT)
 		return;
@@ -1453,7 +1391,6 @@ int SV_LookupModelIndex(const char *name)
 }
 #endif // REHLDS_FIXES
 
-/* <799da> ../engine/pr_cmds.c:1849 */
 int EXT_FUNC PF_precache_model_I(const char *s)
 {
 	int iOptional = 0;
@@ -1525,7 +1462,6 @@ int EXT_FUNC PF_precache_model_I(const char *s)
 }
 
 #ifdef REHLDS_FIXES
-/* <79a3f> ../engine/pr_cmds.c:1903 */
 int EXT_FUNC PF_precache_generic_I(char *s)
 // TODO: Call to Con_Printf is replaced with Host_Error in 6153
 {
@@ -1558,7 +1494,7 @@ int EXT_FUNC PF_precache_generic_I(char *s)
 
 	if (g_psv.state != ss_loading)
 		Host_Error("PF_precache_generic_I: '%s' Precache can only be done in spawn functions", resName);
-	
+
 	if (resCount >= ARRAYSIZE(g_rehlds_sv.precachedGenericResourceNames))
 		Host_Error(
 			"PF_precache_generic_I: Generic item '%s' failed to precache because the item count is over the %d limit.\n\
@@ -1571,7 +1507,6 @@ Reduce the number of brush models and/or regular models in the map to correct th
 	return g_rehlds_sv.precachedGenericResourceCount++;
 }
 #else // REHLDS_FIXES
-/* <79a3f> ../engine/pr_cmds.c:1903 */
 int EXT_FUNC PF_precache_generic_I(char *s)
 // TODO: Call to Con_Printf is replaced with Host_Error in 6153
 {
@@ -1611,19 +1546,17 @@ int EXT_FUNC PF_precache_generic_I(char *s)
 }
 #endif // REHLDS_FIXES
 
-/* <79a93> ../engine/pr_cmds.c:1944 */
 int EXT_FUNC PF_IsMapValid_I(char *mapname)
 {
 	char cBuf[260];
 	if (!mapname || Q_strlen(mapname) == 0)
 		return 0;
 
-	
+
 	Q_snprintf(cBuf, sizeof(cBuf), "maps/%.32s.bsp", mapname);
 	return FS_FileExists(cBuf);
 }
 
-/* <79ad1> ../engine/pr_cmds.c:1955 */
 int EXT_FUNC PF_NumberOfEntities_I(void)
 {
 	int ent_count = 0;
@@ -1636,7 +1569,6 @@ int EXT_FUNC PF_NumberOfEntities_I(void)
 	return ent_count;
 }
 
-/* <79b0e> ../engine/pr_cmds.c:1977 */
 char* EXT_FUNC PF_GetInfoKeyBuffer_I(edict_t *e)
 {
 	int e1;
@@ -1669,13 +1601,11 @@ char* EXT_FUNC PF_GetInfoKeyBuffer_I(edict_t *e)
 	return value;
 }
 
-/* <79b55> ../engine/pr_cmds.c:2012 */
 char* EXT_FUNC PF_InfoKeyValue_I(char *infobuffer, const char *key)
 {
 	return (char *)Info_ValueForKey(infobuffer, key);
 }
 
-/* <79b91> ../engine/pr_cmds.c:2022 */
 void EXT_FUNC PF_SetKeyValue_I(char *infobuffer, const char *key, const char *value)
 {
 	if (infobuffer == localinfo)
@@ -1696,13 +1626,11 @@ void EXT_FUNC PF_SetKeyValue_I(char *infobuffer, const char *key, const char *va
 	}
 }
 
-/* <79bd9> ../engine/pr_cmds.c:2037 */
 void EXT_FUNC PF_RemoveKey_I(char *s, const char *key)
 {
 	Info_RemoveKey(s, key);
 }
 
-/* <79c0f> ../engine/pr_cmds.c:2047 */
 void EXT_FUNC PF_SetClientKeyValue_I(int clientIndex, char *infobuffer, const char *key, const char *value)
 {
 	client_t *pClient;
@@ -1724,7 +1652,6 @@ void EXT_FUNC PF_SetClientKeyValue_I(int clientIndex, char *infobuffer, const ch
 	}
 }
 
-/* <79c74> ../engine/pr_cmds.c:2078 */
 int EXT_FUNC PF_walkmove_I(edict_t *ent, float yaw, float dist, int iMode)
 {
 	vec3_t move;
@@ -1735,13 +1662,12 @@ int EXT_FUNC PF_walkmove_I(edict_t *ent, float yaw, float dist, int iMode)
 		move[1] = sin(yaw * 2.0 * M_PI / 360.0) * dist;
 		move[2] = 0;
 
-		switch (iMode) {
+		switch (iMode)
+		{
 		case 1:
 			return SV_movetest(ent, move, 1);
-
 		case 2:
 			return SV_movestep(ent, move, 0);
-
 		default:
 			return SV_movestep(ent, move, 1);
 		}
@@ -1749,7 +1675,6 @@ int EXT_FUNC PF_walkmove_I(edict_t *ent, float yaw, float dist, int iMode)
 	return 0;
 }
 
-/* <79cef> ../engine/pr_cmds.c:2120 */
 int EXT_FUNC PF_droptofloor_I(edict_t *ent)
 {
 	vec3_t end;
@@ -1776,7 +1701,6 @@ int EXT_FUNC PF_droptofloor_I(edict_t *ent)
 	return 1;
 }
 
-/* <79d4c> ../engine/pr_cmds.c:2158 */
 int EXT_FUNC PF_DecalIndex(const char *name)
 {
 	for (int i = 0; i < sv_decalnamecount; i++)
@@ -1788,7 +1712,6 @@ int EXT_FUNC PF_DecalIndex(const char *name)
 	return -1;
 }
 
-/* <79d88> ../engine/pr_cmds.c:2180 */
 void EXT_FUNC PF_lightstyle_I(int style, char *val)
 {
 	g_psv.lightstyles[style] = val;
@@ -1807,29 +1730,26 @@ void EXT_FUNC PF_lightstyle_I(int style, char *val)
 	}
 }
 
-/* <79ddf> ../engine/pr_cmds.c:2209 */
 int EXT_FUNC PF_checkbottom_I(edict_t *pEdict)
 {
 	return SV_CheckBottom(pEdict);
 }
 
-/* <79e0c> ../engine/pr_cmds.c:2221 */
 int EXT_FUNC PF_pointcontents_I(const float *rgflVector)
 {
 	return SV_PointContents(rgflVector);
 }
 
-/* <79e39> ../engine/pr_cmds.c:2237 */
 void EXT_FUNC PF_aim_I(edict_t *ent, float speed, float *rgflReturn)
 {
-	vec3_t start;                                                 //  2240
-	vec3_t dir;                                                   //  2240
-	vec3_t end;                                                   //  2240
-	vec3_t bestdir;                                               //  2240
-	int j;                                                        //  2241
-	trace_t tr;                                                   //  2242
-	float dist;                                                   //  2243
-	float bestdist;                                               //  2243
+	vec3_t start;
+	vec3_t dir;
+	vec3_t end;
+	vec3_t bestdir;
+	int j;
+	trace_t tr;
+	float dist;
+	float bestdist;
 
 	if (!ent || (ent->v.flags & FL_FAKECLIENT))
 	{
@@ -1906,7 +1826,6 @@ void EXT_FUNC PF_aim_I(edict_t *ent, float speed, float *rgflReturn)
 	rgflReturn[2] = bestdir[2];
 }
 
-/* <79f2a> ../engine/pr_cmds.c:2313 */
 void EXT_FUNC PF_changeyaw_I(edict_t *ent)
 {
 	float ideal;
@@ -1946,7 +1865,6 @@ void EXT_FUNC PF_changeyaw_I(edict_t *ent)
 	ent->v.angles[1] = anglemod(move + current);
 }
 
-/* <79f94> ../engine/pr_cmds.c:2355 */
 void EXT_FUNC PF_changepitch_I(edict_t *ent)
 {
 	float ideal;
@@ -1986,14 +1904,13 @@ void EXT_FUNC PF_changepitch_I(edict_t *ent)
 	ent->v.angles[0] = anglemod(move + current);
 }
 
-/* <79ffe> ../engine/pr_cmds.c:2398 */
 void EXT_FUNC PF_setview_I(const edict_t *clientent, const edict_t *viewent)
 {
 	int clientnum = NUM_FOR_EDICT(clientent);
 	if (clientnum < 1 || clientnum > g_psvs.maxclients)
 		Host_Error("PF_setview_I: not a client");
 
-	client_t * client = &g_psvs.clients[clientnum - 1];
+	client_t *client = &g_psvs.clients[clientnum - 1];
 	if (!client->fakeclient)
 	{
 		client->pViewEntity = viewent;
@@ -2002,7 +1919,6 @@ void EXT_FUNC PF_setview_I(const edict_t *clientent, const edict_t *viewent)
 	}
 }
 
-/* <7a057> ../engine/pr_cmds.c:2426 */
 void EXT_FUNC PF_crosshairangle_I(const edict_t *clientent, float pitch, float yaw)
 {
 	int clientnum = NUM_FOR_EDICT(clientent);
@@ -2031,7 +1947,6 @@ void EXT_FUNC PF_crosshairangle_I(const edict_t *clientent, float pitch, float y
 	}
 }
 
-/* <7a0c1> ../engine/pr_cmds.c:2457 */
 edict_t* EXT_FUNC PF_CreateFakeClient_I(const char *netname)
 {
 	client_t *fakeclient;
@@ -2083,12 +1998,11 @@ edict_t* EXT_FUNC PF_CreateFakeClient_I(const char *netname)
 	fakeclient->network_userid.m_SteamID = ISteamGameServer_CreateUnauthenticatedUserConnection();
 	fakeclient->network_userid.idtype = AUTH_IDTYPE_STEAM;
 	ISteamGameServer_BUpdateUserData(fakeclient->network_userid.m_SteamID, netname, 0);
-	
+
 	return ent;
 }
 
-/* <7a12b> ../engine/pr_cmds.c:2519 */
-void EXT_FUNC PF_RunPlayerMove_I(edict_t *fakeclient, const float *viewangles, float forwardmove, float sidemove, float upmove, short unsigned int buttons, unsigned char impulse, unsigned char msec)
+void EXT_FUNC PF_RunPlayerMove_I(edict_t *fakeclient, const float *viewangles, float forwardmove, float sidemove, float upmove, unsigned short buttons, unsigned char impulse, unsigned char msec)
 {
 	usercmd_t cmd;
 	edict_t *oldclient;
@@ -2100,7 +2014,7 @@ void EXT_FUNC PF_RunPlayerMove_I(edict_t *fakeclient, const float *viewangles, f
 	entnum = NUM_FOR_EDICT(fakeclient);
 	sv_player = fakeclient;
 	host_client = &g_psvs.clients[entnum - 1];
-	
+
 	host_client->svtimebase = host_frametime + g_psv.time - msec / 1000.0;
 	Q_memset(&cmd, 0, sizeof(cmd));
 	cmd.lightlevel = 0;
@@ -2124,7 +2038,6 @@ void EXT_FUNC PF_RunPlayerMove_I(edict_t *fakeclient, const float *viewangles, f
 	host_client = old;
 }
 
-/* <7a1fe> ../engine/pr_cmds.c:2578 */
 sizebuf_t* EXT_FUNC WriteDest_Parm(int dest)
 {
 	int entnum;
@@ -2162,7 +2075,6 @@ sizebuf_t* EXT_FUNC WriteDest_Parm(int dest)
 	}
 }
 
-/* <7a23d> ../engine/pr_cmds.c:2624 */
 void EXT_FUNC PF_MessageBegin_I(int msg_dest, int msg_type, const float *pOrigin, edict_t *ed)
 {
 	if (msg_dest == MSG_ONE || msg_dest == MSG_ONE_UNRELIABLE)
@@ -2203,7 +2115,6 @@ void EXT_FUNC PF_MessageBegin_I(int msg_dest, int msg_type, const float *pOrigin
 	gMsgBuffer.cursize = 0;
 }
 
-/* <7a293> ../engine/pr_cmds.c:2669 */
 void EXT_FUNC PF_MessageEnd_I(void)
 {
 	qboolean MsgIsVarLength = 0;
@@ -2293,7 +2204,7 @@ void EXT_FUNC PF_MessageEnd_I(void)
 		break;
 
 	case MSG_PVS_R:
-		SV_Multicast((edict_t *)gMsgEntity, gMsgOrigin, MSG_FL_PAS, 1); //TODO: Should be MSG_FL_PVS, investigation needed
+		SV_Multicast((edict_t *)gMsgEntity, gMsgOrigin, MSG_FL_PAS, 1); // TODO: Should be MSG_FL_PVS, investigation needed
 		break;
 
 	case MSG_PAS_R:
@@ -2305,7 +2216,6 @@ void EXT_FUNC PF_MessageEnd_I(void)
 	}
 }
 
-/* <7a317> ../engine/pr_cmds.c:2802 */
 void EXT_FUNC PF_WriteByte_I(int iValue)
 {
 	if (!gMsgStarted)
@@ -2313,7 +2223,6 @@ void EXT_FUNC PF_WriteByte_I(int iValue)
 	MSG_WriteByte(&gMsgBuffer, iValue);
 }
 
-/* <7a341> ../engine/pr_cmds.c:2810 */
 void EXT_FUNC PF_WriteChar_I(int iValue)
 {
 	if (!gMsgStarted)
@@ -2321,7 +2230,6 @@ void EXT_FUNC PF_WriteChar_I(int iValue)
 	MSG_WriteChar(&gMsgBuffer, iValue);
 }
 
-/* <7a36b> ../engine/pr_cmds.c:2818 */
 void EXT_FUNC PF_WriteShort_I(int iValue)
 {
 	if (!gMsgStarted)
@@ -2329,7 +2237,6 @@ void EXT_FUNC PF_WriteShort_I(int iValue)
 	MSG_WriteShort(&gMsgBuffer, iValue);
 }
 
-/* <7a395> ../engine/pr_cmds.c:2826 */
 void EXT_FUNC PF_WriteLong_I(int iValue)
 {
 	if (!gMsgStarted)
@@ -2337,7 +2244,6 @@ void EXT_FUNC PF_WriteLong_I(int iValue)
 	MSG_WriteLong(&gMsgBuffer, iValue);
 }
 
-/* <7a3bf> ../engine/pr_cmds.c:2834 */
 void EXT_FUNC PF_WriteAngle_I(float flValue)
 {
 	if (!gMsgStarted)
@@ -2345,7 +2251,6 @@ void EXT_FUNC PF_WriteAngle_I(float flValue)
 	MSG_WriteAngle(&gMsgBuffer, flValue);
 }
 
-/* <7a3e9> ../engine/pr_cmds.c:2842 */
 void EXT_FUNC PF_WriteCoord_I(float flValue)
 {
 	if (!gMsgStarted)
@@ -2353,7 +2258,6 @@ void EXT_FUNC PF_WriteCoord_I(float flValue)
 	MSG_WriteShort(&gMsgBuffer, (int)(flValue * 8.0));
 }
 
-/* <7a413> ../engine/pr_cmds.c:2851 */
 void EXT_FUNC PF_WriteString_I(const char *sz)
 {
 	if (!gMsgStarted)
@@ -2361,7 +2265,6 @@ void EXT_FUNC PF_WriteString_I(const char *sz)
 	MSG_WriteString(&gMsgBuffer, sz);
 }
 
-/* <7a43c> ../engine/pr_cmds.c:2859 */
 void EXT_FUNC PF_WriteEntity_I(int iValue)
 {
 	if (!gMsgStarted)
@@ -2369,7 +2272,6 @@ void EXT_FUNC PF_WriteEntity_I(int iValue)
 	MSG_WriteShort(&gMsgBuffer, iValue);
 }
 
-/* <7a466> ../engine/pr_cmds.c:2874 */
 void EXT_FUNC PF_makestatic_I(edict_t *ent)
 {
 	MSG_WriteByte(&g_psv.signon, svc_spawnstatic);
@@ -2398,7 +2300,6 @@ void EXT_FUNC PF_makestatic_I(edict_t *ent)
 	ED_Free(ent);
 }
 
-/* <7a49e> ../engine/pr_cmds.c:2910 */
 void EXT_FUNC PF_StaticDecal(const float *origin, int decalIndex, int entityIndex, int modelIndex)
 {
 	MSG_WriteByte(&g_psv.signon, svc_temp_entity);
@@ -2408,12 +2309,11 @@ void EXT_FUNC PF_StaticDecal(const float *origin, int decalIndex, int entityInde
 	MSG_WriteCoord(&g_psv.signon, origin[2]);
 	MSG_WriteShort(&g_psv.signon, decalIndex);
 	MSG_WriteShort(&g_psv.signon, entityIndex);
-	
+
 	if (entityIndex)
 		MSG_WriteShort(&g_psv.signon, modelIndex);
 }
 
-/* <7a4f5> ../engine/pr_cmds.c:2935 */
 void EXT_FUNC PF_setspawnparms_I(edict_t *ent)
 {
 	int i = NUM_FOR_EDICT(ent);
@@ -2421,7 +2321,6 @@ void EXT_FUNC PF_setspawnparms_I(edict_t *ent)
 		Host_Error("Entity is not a client");
 }
 
-/* <7a539> ../engine/pr_cmds.c:2956 */
 void EXT_FUNC PF_changelevel_I(const char *s1, const char *s2)
 {
 	static int last_spawncount;
@@ -2437,7 +2336,6 @@ void EXT_FUNC PF_changelevel_I(const char *s1, const char *s2)
 	}
 }
 
-/* <7a582> ../engine/pr_cmds.c:2988 */
 void SeedRandomNumberGenerator(void)
 {
 	idum = -(int)CRehldsPlatformHolder::get()->time(NULL);
@@ -2458,7 +2356,6 @@ void SeedRandomNumberGenerator(void)
 #define NTAB 32
 #define NDIV (1+(IM-1)/NTAB)
 
-/* <7a598> ../engine/pr_cmds.c:3003 */
 int32 ran1(void)
 {
 	int j;
@@ -2493,7 +2390,6 @@ int32 ran1(void)
 #define EPS 1.2e-7
 #define RNMX (1.0-EPS)
 
-/* <7a605> ../engine/pr_cmds.c:3038 */
 float fran1(void)
 {
 	float temp = (float)AM*ran1();
@@ -2501,7 +2397,6 @@ float fran1(void)
 	else return temp;
 }
 
-/* <7a644> ../engine/pr_cmds.c:3045 */
 float EXT_FUNC RandomFloat(float flLow, float flHigh)
 {
 #ifndef SWDS
@@ -2512,7 +2407,6 @@ float EXT_FUNC RandomFloat(float flLow, float flHigh)
 	return (fl * (flHigh - flLow)) + flLow; // float in [low,high)
 }
 
-/* <7a6b2> ../engine/pr_cmds.c:3056 */
 int32 EXT_FUNC RandomLong(int32 lLow, int32 lHigh)
 {
 #ifndef SWDS
@@ -2544,7 +2438,6 @@ int32 EXT_FUNC RandomLong(int32 lLow, int32 lHigh)
 	return lLow + (n % x);
 }
 
-/* <7a71b> ../engine/pr_cmds.c:3089 */
 void EXT_FUNC PF_FadeVolume(const edict_t *clientent, int fadePercent, int fadeOutSeconds, int holdTime, int fadeInSeconds)
 {
 	int entnum = NUM_FOR_EDICT(clientent);
@@ -2565,23 +2458,22 @@ void EXT_FUNC PF_FadeVolume(const edict_t *clientent, int fadePercent, int fadeO
 	MSG_WriteByte(&client->netchan.message, (uint8)fadeInSeconds);
 }
 
-/* <7a7a1> ../engine/pr_cmds.c:3124 */
 void EXT_FUNC PF_SetClientMaxspeed(edict_t *clientent, float fNewMaxspeed)
 {
 	int entnum = NUM_FOR_EDICT(clientent);
 	if (entnum < 1 || entnum > g_psvs.maxclients)
 		Con_Printf("tried to PF_SetClientMaxspeed a non-client\n");
-	
+
 	clientent->v.maxspeed = fNewMaxspeed;
 }
 
-/* <7a80b> ../engine/pr_cmds.c:3149 */
 int EXT_FUNC PF_GetPlayerUserId(edict_t *e)
 {
 	if (!g_psv.active || !e)
 		return -1;
 
-	for (int i = 0; i < g_psvs.maxclients; i++) {
+	for (int i = 0; i < g_psvs.maxclients; i++)
+	{
 		if (g_psvs.clients[i].edict == e) {
 			return g_psvs.clients[i].userid;
 		}
@@ -2590,13 +2482,11 @@ int EXT_FUNC PF_GetPlayerUserId(edict_t *e)
 	return -1;
 }
 
-/* <7a854> ../engine/pr_cmds.c:3172 */
 unsigned int EXT_FUNC PF_GetPlayerWONId(edict_t *e)
 {
 	return 0xFFFFFFFF;
 }
 
-/* <7a87f> ../engine/pr_cmds.c:3180 */
 const char* EXT_FUNC PF_GetPlayerAuthId(edict_t *e)
 {
 	static char szAuthID[5][64];
@@ -2645,7 +2535,6 @@ void EXT_FUNC PF_BuildSoundMsg_I(edict_t *entity, int channel, const char *sampl
 	g_RehldsHookchains.m_PF_BuildSoundMsg_I.callChain(PF_BuildSoundMsg_I_internal, entity, channel, sample, volume, attenuation, fFlags, pitch, msg_dest, msg_type, pOrigin, ed);
 }
 
-/* <7a902> ../engine/pr_cmds.c:3229 */
 void EXT_FUNC PF_BuildSoundMsg_I_internal(edict_t *entity, int channel, const char *sample, float volume, float attenuation, int fFlags, int pitch, int msg_dest, int msg_type, const float *pOrigin, edict_t *ed)
 {
 	PF_MessageBegin_I(msg_dest, msg_type, pOrigin, ed);
@@ -2653,13 +2542,11 @@ void EXT_FUNC PF_BuildSoundMsg_I_internal(edict_t *entity, int channel, const ch
 	PF_MessageEnd_I();
 }
 
-/* <7a9c1> ../engine/pr_cmds.c:3240 */
 int EXT_FUNC PF_IsDedicatedServer(void)
 {
 	return g_bIsDedicatedServer;
 }
 
-/* <7a9da> ../engine/pr_cmds.c:3245 */
 const char* EXT_FUNC PF_GetPhysicsInfoString(const edict_t *pClient)
 {
 	int entnum = NUM_FOR_EDICT(pClient);
@@ -2673,7 +2560,6 @@ const char* EXT_FUNC PF_GetPhysicsInfoString(const edict_t *pClient)
 	return client->physinfo;
 }
 
-/* <7aa28> ../engine/pr_cmds.c:3259 */
 const char* EXT_FUNC PF_GetPhysicsKeyValue(const edict_t *pClient, const char *key)
 {
 	int entnum = NUM_FOR_EDICT(pClient);
@@ -2687,7 +2573,6 @@ const char* EXT_FUNC PF_GetPhysicsKeyValue(const edict_t *pClient, const char *k
 	return Info_ValueForKey(client->physinfo, key);
 }
 
-/* <7aa85> ../engine/pr_cmds.c:3273 */
 void EXT_FUNC PF_SetPhysicsKeyValue(const edict_t *pClient, const char *key, const char *value)
 {
 	int entnum = NUM_FOR_EDICT(pClient);
@@ -2698,7 +2583,6 @@ void EXT_FUNC PF_SetPhysicsKeyValue(const edict_t *pClient, const char *key, con
 	Info_SetValueForKey(client->physinfo, key, value, MAX_INFO_STRING);
 }
 
-/* <7aaed> ../engine/pr_cmds.c:3287 */
 int EXT_FUNC PF_GetCurrentPlayer(void)
 {
 	int idx = host_client - g_psvs.clients;
@@ -2708,7 +2592,6 @@ int EXT_FUNC PF_GetCurrentPlayer(void)
 	return idx;
 }
 
-/* <7ab19> ../engine/pr_cmds.c:3296 */
 int EXT_FUNC PF_CanSkipPlayer(const edict_t *pClient)
 {
 	int entnum = NUM_FOR_EDICT(pClient);
@@ -2722,14 +2605,12 @@ int EXT_FUNC PF_CanSkipPlayer(const edict_t *pClient)
 	return client->lw != 0;
 }
 
-/* <7ab67> ../engine/pr_cmds.c:3313 */
 void EXT_FUNC PF_SetGroupMask(int mask, int op)
 {
 	g_groupmask = mask;
 	g_groupop = op;
 }
 
-/* <7ab9e> ../engine/pr_cmds.c:3319 */
 int EXT_FUNC PF_CreateInstancedBaseline(int classname, struct entity_state_s *baseline)
 {
 	extra_baselines_t *bls = g_psv.instance_baselines;
@@ -2742,13 +2623,11 @@ int EXT_FUNC PF_CreateInstancedBaseline(int classname, struct entity_state_s *ba
 	return bls->number;
 }
 
-/* <7abdb> ../engine/pr_cmds.c:3332 */
 void EXT_FUNC PF_Cvar_DirectSet(struct cvar_s *var, const char *value)
 {
 	Cvar_DirectSet(var, value);
 }
 
-/* <7ac13> ../engine/pr_cmds.c:3337 */
 void EXT_FUNC PF_ForceUnmodified(FORCE_TYPE type, float *mins, float *maxs, const char *filename)
 {
 	int i;
@@ -2804,7 +2683,6 @@ void EXT_FUNC PF_ForceUnmodified(FORCE_TYPE type, float *mins, float *maxs, cons
 	}
 }
 
-/* <7ac92> ../engine/pr_cmds.c:3386 */
 void EXT_FUNC PF_GetPlayerStats(const edict_t *pClient, int *ping, int *packet_loss)
 {
 	*packet_loss = 0;
@@ -2821,7 +2699,6 @@ void EXT_FUNC PF_GetPlayerStats(const edict_t *pClient, int *ping, int *packet_l
 	*ping = client->latency * 1000.0;
 }
 
-/* <7ad3a> ../engine/pr_cmds.c:3408 */
 NOXREF void QueryClientCvarValueCmd(void)
 {
 	if (Cmd_Argc() <= 1)
@@ -2844,7 +2721,6 @@ NOXREF void QueryClientCvarValueCmd(void)
 	}
 }
 
-/* <7adff> ../engine/pr_cmds.c:3433 */
 NOXREF void QueryClientCvarValueCmd2(void)
 {
 	int i;
@@ -2872,7 +2748,6 @@ NOXREF void QueryClientCvarValueCmd2(void)
 	}
 }
 
-/* <7acfa> ../engine/pr_cmds.c:3461 */
 void EXT_FUNC QueryClientCvarValue(const edict_t *player, const char *cvarName)
 {
 
@@ -2890,7 +2765,6 @@ void EXT_FUNC QueryClientCvarValue(const edict_t *player, const char *cvarName)
 	MSG_WriteString(&client->netchan.message, cvarName);
 }
 
-/* <7adb3> ../engine/pr_cmds.c:3485 */
 void EXT_FUNC QueryClientCvarValue2(const edict_t *player, const char *cvarName, int requestID)
 {
 	int entnum = NUM_FOR_EDICT(player);
@@ -2908,7 +2782,6 @@ void EXT_FUNC QueryClientCvarValue2(const edict_t *player, const char *cvarName,
 	MSG_WriteString(&client->netchan.message, cvarName);
 }
 
-/* <7af41> ../engine/pr_cmds.c:3509 */
 int hudCheckParm(char *parm, char **ppnext)
 {
 #ifndef SWDS
@@ -2926,7 +2799,6 @@ int hudCheckParm(char *parm, char **ppnext)
 	return i;
 }
 
-/* <7afa4> ../engine/pr_cmds.c:3532 */
 int EXT_FUNC EngCheckParm(const char *pchCmdLineToken, char **pchNextVal)
 {
 	return hudCheckParm((char*)pchCmdLineToken, pchNextVal);

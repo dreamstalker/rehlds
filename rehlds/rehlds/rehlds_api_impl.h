@@ -116,8 +116,8 @@ typedef IVoidHookChainImpl<IGameClient *, packet_entities_t *, sizebuf_t *> CReh
 typedef IVoidHookChainRegistryImpl<IGameClient *, packet_entities_t *, sizebuf_t *> CRehldsHookRegistry_SV_EmitEvents;
 
 //EV_PlayReliableEvent hook
-typedef IVoidHookChainImpl<IGameClient *, int, short unsigned int, float, event_args_t *> CRehldsHook_EV_PlayReliableEvent;
-typedef IVoidHookChainRegistryImpl<IGameClient *, int, short unsigned int, float, event_args_t *> CRehldsHookRegistry_EV_PlayReliableEvent;
+typedef IVoidHookChainImpl<IGameClient *, int, unsigned short, float, event_args_t *> CRehldsHook_EV_PlayReliableEvent;
+typedef IVoidHookChainRegistryImpl<IGameClient *, int, unsigned short, float, event_args_t *> CRehldsHookRegistry_EV_PlayReliableEvent;
 
 //SV_StartSound hook
 typedef IVoidHookChainImpl<int , edict_t *, int, const char *, int, float, int, int> CRehldsHook_SV_StartSound;

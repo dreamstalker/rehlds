@@ -39,10 +39,9 @@
 #define HASHPAK_EXTENSION	".hpk"
 #define HASHPAK_VERSION		0x0001
 
-#define MAX_FILE_SIZE		0x20000		/* size: 131072 */
-#define MAX_FILE_ENTRIES	0x8000		/* size: 32768 */
+#define MAX_FILE_SIZE		0x20000
+#define MAX_FILE_ENTRIES	0x8000
 
-/* <29eca> ../engine/hashpak.c:40 */
 typedef struct hash_pack_queue_s
 {
 	char *pakname;
@@ -52,7 +51,6 @@ typedef struct hash_pack_queue_s
 	struct hash_pack_queue_s *next;
 } hash_pack_queue_t;
 
-/* <29e0a> ../engine/hashpak.c:20 */
 typedef struct hash_pack_entry_s
 {
 	resource_t resource;
@@ -60,14 +58,12 @@ typedef struct hash_pack_entry_s
 	int nFileLength;
 } hash_pack_entry_t;
 
-/* <29e4e> ../engine/hashpak.c:27 */
 typedef struct hash_pack_directory_s
 {
 	int nEntries;
 	hash_pack_entry_t *p_rgEntries;
 } hash_pack_directory_t;
 
-/* <29e88> ../engine/hashpak.c:33 */
 typedef struct hash_pack_header_s
 {
 	char szFileStamp[4];
@@ -83,7 +79,7 @@ typedef struct hash_pack_header_s
 
 extern hash_pack_queue_t *gp_hpak_queue;
 
-//TODO: used only in hashpak
+// TODO: used only in hashpak
 extern hash_pack_directory_t hash_pack_dir;
 extern hash_pack_header_t hash_pack_header;
 

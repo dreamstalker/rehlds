@@ -28,8 +28,6 @@
 
 #include "precompiled.h"
 
-
-/* <82eb2> ../engine/r_studio.c:108 */
 typedef struct r_studiocache_s
 {
 	float frame;
@@ -44,7 +42,6 @@ typedef struct r_studiocache_s
 	int nStartPlane;
 	int numhulls;
 } r_studiocache_t;
-
 
 studiohdr_t *pstudiohdr;
 
@@ -78,17 +75,15 @@ sv_blending_interface_t svBlending = { 1, SV_StudioSetupBones };
 sv_blending_interface_t *g_pSvBlendingAPI = &svBlending;
 server_studio_api_t server_studio_api = { Mem_Calloc, Cache_Check, COM_LoadCacheFile, Mod_Extradata };
 
-#else //HOOK_ENGINE
+#else // HOOK_ENGINE
 
 cvar_t r_cachestudio;
 sv_blending_interface_t svBlending;
 sv_blending_interface_t *g_pSvBlendingAPI;
 server_studio_api_t server_studio_api;
 
+#endif // HOOK_ENGINE
 
-#endif //HOOK_ENGINE
-
-/* <83117> ../engine/r_studio.c:190 */
 void SV_InitStudioHull(void)
 {
 	if (studio_hull[0].planes == NULL)
@@ -111,7 +106,6 @@ void SV_InitStudioHull(void)
 	}
 }
 
-/* <83160> ../engine/r_studio.c:227 */
 r_studiocache_t *R_CheckStudioCache(model_t *pModel, float frame, int sequence, const vec_t *angles, const vec_t *origin, const vec_t *size, const unsigned char *controller, const unsigned char *blending)
 {
 	for (int i = 0; i < STUDIO_CACHE_SIZE; i++)
@@ -132,7 +126,6 @@ r_studiocache_t *R_CheckStudioCache(model_t *pModel, float frame, int sequence, 
 	return NULL;
 }
 
-/* <83215> ../engine/r_studio.c:275 */
 NOXREF void R_AddToStudioCache(float frame, int sequence, const vec_t *angles, const vec_t *origin, const vec_t *size, const unsigned char *controller, const unsigned char *pblending, model_t *pModel, hull_t *pHulls, int numhulls)
 {
 	r_studiocache_t *p;
@@ -175,7 +168,6 @@ NOXREF void R_AddToStudioCache(float frame, int sequence, const vec_t *angles, c
 	nCurrentPlane += 6 * numhulls;
 }
 
-/* <832a5> ../engine/r_studio.c:317 */
 void AngleQuaternion(vec_t *angles, vec_t *quaternion)
 {
 	float		angle;
@@ -198,7 +190,6 @@ void AngleQuaternion(vec_t *angles, vec_t *quaternion)
 	quaternion[3] = cr*cp*cy + sr*sp*sy; // W
 }
 
-/* <83344> ../engine/r_studio.c:340 */
 void QuaternionSlerp(vec_t *p, vec_t *q, float t, vec_t *qt)
 {
 	int i;
@@ -256,7 +247,6 @@ void QuaternionSlerp(vec_t *p, vec_t *q, float t, vec_t *qt)
 	}
 }
 
-/* <833be> ../engine/r_studio.c:387 */
 void QuaternionMatrix(vec_t *quaternion, float matrix[3][4])
 {
 	matrix[0][0] = 1.0f - 2.0f * quaternion[1] * quaternion[1] - 2.0f * quaternion[2] * quaternion[2];
@@ -272,7 +262,6 @@ void QuaternionMatrix(vec_t *quaternion, float matrix[3][4])
 	matrix[2][2] = 1.0f - 2.0f * quaternion[0] * quaternion[0] - 2.0f * quaternion[1] * quaternion[1];
 }
 
-/* <8340d> ../engine/r_studio.c:436 */
 void R_StudioCalcBoneAdj(float dadt, float *adj, const unsigned char *pcontroller1, const unsigned char *pcontroller2, unsigned char mouthopen)
 {
 	int i, j;
@@ -333,7 +322,6 @@ void R_StudioCalcBoneAdj(float dadt, float *adj, const unsigned char *pcontrolle
 	}
 }
 
-/* <83487> ../engine/r_studio.c:497 */
 void R_StudioCalcBoneQuaterion(int frame, float s, mstudiobone_t *pbone, mstudioanim_t *panim, float *adj, float *q)
 {
 	int					j, k;
@@ -408,7 +396,6 @@ void R_StudioCalcBoneQuaterion(int frame, float s, mstudiobone_t *pbone, mstudio
 	}
 }
 
-/* <83572> ../engine/r_studio.c:577 */
 void R_StudioCalcBonePosition(int frame, float s, mstudiobone_t *pbone, mstudioanim_t *panim, float *adj, float *pos)
 {
 	int					j, k;
@@ -477,7 +464,6 @@ void R_StudioCalcBonePosition(int frame, float s, mstudiobone_t *pbone, mstudioa
 	}
 }
 
-/* <830a3> ../engine/r_studio.c:639 */
 void R_StudioSlerpBones(vec4_t *q1, vec3_t *pos1, vec4_t *q2, vec3_t *pos2, float s)
 {
 	int			i;
@@ -502,7 +488,6 @@ void R_StudioSlerpBones(vec4_t *q1, vec3_t *pos1, vec4_t *q2, vec3_t *pos2, floa
 	}
 }
 
-/* <83669> ../engine/r_studio.c:663 */
 mstudioanim_t *R_GetAnim(model_t *psubmodel, mstudioseqdesc_t *pseqdesc)
 {
 	mstudioseqgroup_t *pseqgroup;
@@ -528,7 +513,6 @@ mstudioanim_t *R_GetAnim(model_t *psubmodel, mstudioseqdesc_t *pseqdesc)
 	return (mstudioanim_t *)((char *)paSequences[pseqdesc->seqgroup].data + pseqdesc->animindex);
 }
 
-/* <836d8> ../engine/r_studio.c:696 */
 void EXT_FUNC SV_StudioSetupBones(model_t *pModel, float frame, int sequence, const vec_t *angles, const vec_t *origin, const unsigned char *pcontroller, const unsigned char *pblending, int iBone, const edict_t *edict)
 {
 	static vec4_t q1[128];
@@ -622,7 +606,6 @@ void EXT_FUNC SV_StudioSetupBones(model_t *pModel, float frame, int sequence, co
 	}
 }
 
-/* <839e7> ../engine/r_studio.c:816 */
 void SV_SetStudioHullPlane(mplane_t *pplane, int iBone, int k, float dist)
 {
 	pplane->type = 5;
@@ -637,7 +620,6 @@ void SV_SetStudioHullPlane(mplane_t *pplane, int iBone, int k, float dist)
 		+ dist;
 }
 
-/* <83a1c> ../engine/r_studio.c:844 */
 hull_t *R_StudioHull(model_t *pModel, float frame, int sequence, const vec_t *angles, const vec_t *origin, const vec_t *size, const unsigned char *pcontroller, const unsigned char *pblending, int *pNumHulls, const edict_t *pEdict, int bSkipShield)
 {
 	SV_InitStudioHull();
@@ -696,13 +678,11 @@ hull_t *R_StudioHull(model_t *pModel, float frame, int sequence, const vec_t *an
 	return &studio_hull[0];
 }
 
-/* <83d4f> ../engine/r_studio.c:924 */
 int SV_HitgroupForStudioHull(int index)
 {
 	return studio_hull_hitgroup[index];
 }
 
-/* <83d7c> ../engine/r_studio.c:935 */
 NOXREF void R_InitStudioCache(void)
 {
 	Q_memset(rgStudioCache, 0, sizeof(rgStudioCache));
@@ -712,13 +692,11 @@ NOXREF void R_InitStudioCache(void)
 	nCurrentPlane = 0;
 }
 
-/* <83d8d> ../engine/r_studio.c:950 */
 NOXREF void R_FlushStudioCache(void)
 {
 	R_InitStudioCache();
 }
 
-/* <83db3> ../engine/r_studio.c:957 */
 int R_StudioBodyVariations(model_t *model)
 {
 	if (model->type != mod_studio)
@@ -738,7 +716,6 @@ int R_StudioBodyVariations(model_t *model)
 	return count;
 }
 
-/* <83e4f> ../engine/r_studio.c:982 */
 void R_StudioPlayerBlend(mstudioseqdesc_t *pseqdesc, int *pBlend, float *pPitch)
 {
 	*pBlend = (int)(*pPitch * 3.0);
@@ -768,7 +745,6 @@ void R_StudioPlayerBlend(mstudioseqdesc_t *pseqdesc, int *pBlend, float *pPitch)
 	}
 }
 
-/* <83e97> ../engine/r_studio.c:1015 */
 hull_t *SV_HullForStudioModel(const edict_t *pEdict, const vec_t *mins, const vec_t *maxs, vec_t *offset, int *pNumHulls)
 {
 	qboolean useComplexHull = FALSE;
@@ -861,7 +837,6 @@ hull_t *SV_HullForStudioModel(const edict_t *pEdict, const vec_t *mins, const ve
 	}
 }
 
-/* <83f98> ../engine/r_studio.c:1232 */
 qboolean DoesSphereIntersect(float *vSphereCenter, float fSphereRadiusSquared, float *vLinePt, float *vLineDir)
 {
 	vec3_t P;
@@ -882,7 +857,6 @@ qboolean DoesSphereIntersect(float *vSphereCenter, float fSphereRadiusSquared, f
 	return insideSqr > 0.000001;
 }
 
-/* <8402e> ../engine/r_studio.c:1264 */
 qboolean SV_CheckSphereIntersection(edict_t *ent, const vec_t *start, const vec_t *end)
 {
 	studiohdr_t *studiohdr;
@@ -916,12 +890,10 @@ qboolean SV_CheckSphereIntersection(edict_t *ent, const vec_t *start, const vec_
 }
 
 
-/* <840e2> ../engine/r_studio.c:1302 */
 void EXT_FUNC AnimationAutomove(const edict_t *pEdict, float flTime)
 {
 }
 
-/* <8411a> ../engine/r_studio.c:1329 */
 void EXT_FUNC GetBonePosition(const edict_t *pEdict, int iBone, float *rgflOrigin, float *rgflAngles)
 {
 	pstudiohdr = (studiohdr_t *)Mod_Extradata(g_psv.models[pEdict->v.modelindex]);
@@ -945,7 +917,6 @@ void EXT_FUNC GetBonePosition(const edict_t *pEdict, int iBone, float *rgflOrigi
 	}
 }
 
-/* <84171> ../engine/r_studio.c:1351 */
 void EXT_FUNC GetAttachment(const edict_t *pEdict, int iAttachment, float *rgflOrigin, float *rgflAngles)
 {
 	mstudioattachment_t *pattachment;
@@ -954,7 +925,7 @@ void EXT_FUNC GetAttachment(const edict_t *pEdict, int iAttachment, float *rgflO
 	angles[0] = -pEdict->v.angles[0];
 	angles[1] = pEdict->v.angles[1];
 	angles[2] = pEdict->v.angles[2];
-	
+
 	pstudiohdr = (studiohdr_t *)Mod_Extradata(g_psv.models[pEdict->v.modelindex]);
 	pattachment = (mstudioattachment_t *)((char *)pstudiohdr + pstudiohdr->attachmentindex);
 	pattachment += iAttachment;
@@ -975,7 +946,6 @@ void EXT_FUNC GetAttachment(const edict_t *pEdict, int iAttachment, float *rgflO
 		VectorTransform(pattachment->org, (float *)bonetransform[pattachment->bone], rgflOrigin);
 }
 
-/* <841ed> ../engine/r_studio.c:1379 */
 int ModelFrameCount(model_t *model)
 {
 	int count;
@@ -1003,7 +973,6 @@ int ModelFrameCount(model_t *model)
 	return count;
 }
 
-/* <84296> ../engine/r_studio.c:5618 */
 void R_StudioBoundVertex(vec_t *mins, vec_t *maxs, int *vertcount, const vec_t *point)
 {
 	if (*vertcount)
@@ -1016,7 +985,7 @@ void R_StudioBoundVertex(vec_t *mins, vec_t *maxs, int *vertcount, const vec_t *
 			if (maxs[i] < point[i])
 				maxs[i] = point[i];
 		}
-		
+
 	}
 	else
 	{
@@ -1030,7 +999,6 @@ void R_StudioBoundVertex(vec_t *mins, vec_t *maxs, int *vertcount, const vec_t *
 	++(*vertcount);
 }
 
-/* <842fb> ../engine/r_studio.c:5640 */
 void R_StudioBoundBone(vec_t *mins, vec_t *maxs, int *bonecount, const vec_t *point)
 {
 	if (*bonecount)
@@ -1057,7 +1025,6 @@ void R_StudioBoundBone(vec_t *mins, vec_t *maxs, int *bonecount, const vec_t *po
 	++(*bonecount);
 }
 
-/* <84360> ../engine/r_studio.c:5662 */
 void R_StudioAccumulateBoneVerts(vec_t *mins, vec_t *maxs, int *vertcount, vec_t *bone_mins, vec_t *bone_maxs, int *bonecount)
 {
 	vec3_t delta;
@@ -1080,7 +1047,6 @@ void R_StudioAccumulateBoneVerts(vec_t *mins, vec_t *maxs, int *vertcount, vec_t
 	}
 }
 
-/* <843f3> ../engine/r_studio.c:5693 */
 int R_StudioComputeBounds(unsigned char *pBuffer, float *mins, float *maxs)
 {
 	vec3_t bone_mins;
@@ -1138,12 +1104,11 @@ int R_StudioComputeBounds(unsigned char *pBuffer, float *mins, float *maxs)
 	return 1;
 }
 
-/* <845bc> ../engine/r_studio.c:5809 */
 int R_GetStudioBounds(const char *filename, float *mins, float *maxs)
 {
 	int iret = 0;
 	qboolean usingReadBuffer = 0;
-	
+
 	for (int i = 0; i < 3; i++)
 		mins[0] = maxs[0] = vec3_origin[i];
 
@@ -1154,20 +1119,20 @@ int R_GetStudioBounds(const char *filename, float *mins, float *maxs)
 	FileHandle_t fp = FS_Open(filename, "rb");
 	if (!fp)
 		return 0;
-	
+
 	int length;
 	char *pBuffer = (char *)FS_GetReadBuffer(fp, &length);
 	if (pBuffer)
 		usingReadBuffer = 1;
 	else
 		pBuffer = (char*) COM_LoadFile(filename, 5, 0);
-		
+
 	if (pBuffer)
 	{
 		if (LittleLong(*(unsigned int *)pBuffer) == 'TSDI')
 			iret = R_StudioComputeBounds((unsigned char*)pBuffer, mins, maxs);
 #ifndef REHLDS_FIXES
-		//wrong release memory code	
+		//wrong release memory code
 		else
 			COM_FreeFile(pBuffer);
 #endif
@@ -1183,7 +1148,6 @@ int R_GetStudioBounds(const char *filename, float *mins, float *maxs)
 	return iret;
 }
 
-/* <8465f> ../engine/r_studio.c:6565 */
 void R_ResetSvBlending(void)
 {
 	g_pSvBlendingAPI = &svBlending;

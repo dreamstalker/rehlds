@@ -28,9 +28,8 @@
 
 #include "precompiled.h"
 
-
-texlumpinfo_t* lumpinfo; 
-int nTexLumps; 
+texlumpinfo_t* lumpinfo;
+int nTexLumps;
 FILE* texfiles[128];
 int nTexFiles;
 
@@ -40,8 +39,6 @@ texture_t * r_notexture_mip;
 int nummiptex;
 char miptex[512][64];
 
-
-
 /*
  * Globals initialization
  */
@@ -49,13 +46,12 @@ char miptex[512][64];
 
 cvar_t r_wadtextures = { "r_wadtextures", "0", 0, 0.0f, NULL };
 
-#else //HOOK_ENGINE
+#else // HOOK_ENGINE
 
 cvar_t r_wadtextures;
 
-#endif //HOOK_ENGINE
+#endif // HOOK_ENGINE
 
-/* <c61e8> ../engine/textures.c:35 */
 void SafeRead(FileHandle_t f, void *buffer, int count)
 {
 	if (FS_Read(buffer, count, 1, f) != count)
@@ -75,7 +71,6 @@ void CleanupName(char *in, char *out)
 	}
 }
 
-/* <c616d> ../engine/textures.c:64 */
 int lump_sorter(const void *lump1, const void *lump2)
 {
 	const texlumpinfo_t *plump1 = (const texlumpinfo_t *)lump1;
@@ -83,7 +78,6 @@ int lump_sorter(const void *lump1, const void *lump2)
 	return Q_strcmp(plump1->lump.name, plump2->lump.name);
 }
 
-/* <c6153> ../engine/textures.c:72 */
 void ForwardSlashes(char *pname)
 {
 	while (*pname) {
@@ -94,7 +88,6 @@ void ForwardSlashes(char *pname)
 	}
 }
 
-/* <c62da> ../engine/textures.c:87 */
 qboolean TEX_InitFromWad(char *path)
 {
 	char *pszWadFile;
@@ -149,13 +142,12 @@ qboolean TEX_InitFromWad(char *path)
 			lumpinfo[nTexLumps].lump.disksize = LittleLong(lumpinfo[nTexLumps].lump.disksize);;
 			lumpinfo[nTexLumps].iTexFile = nTexFiles - 1;
 		}
-		
+
 	}
 	qsort(lumpinfo, nTexLumps, sizeof(texlumpinfo_t), lump_sorter);
 	return 1;
 }
 
-/* <c644f> ../engine/textures.c:178 */
 void TEX_CleanupWadInfo(void)
 {
 	if (lumpinfo)
@@ -174,7 +166,6 @@ void TEX_CleanupWadInfo(void)
 	nTexFiles = 0;
 }
 
-/* <c6476> ../engine/textures.c:203 */
 int TEX_LoadLump(char *name, unsigned char *dest)
 {
 	texlumpinfo_t *found;
@@ -195,10 +186,9 @@ int TEX_LoadLump(char *name, unsigned char *dest)
 	}
 }
 
-/* <c653c> ../engine/textures.c:220 */
 int FindMiptex(char *name)
 {
-	int i = 0;                                                        //   222
+	int i = 0;
 	for (i = 0; i < nummiptex; i++)
 	{
 		if (!Q_stricmp(name, miptex[i]))
@@ -214,7 +204,6 @@ int FindMiptex(char *name)
 	return i;
 }
 
-/* <c658a> ../engine/textures.c:241 */
 void TEX_AddAnimatingTextures(void)
 {
 	char name[32];
@@ -224,7 +213,6 @@ void TEX_AddAnimatingTextures(void)
 	{
 		if (miptex[i][0] != '+' && miptex[i][0] != '-')
 			continue;
-
 
 		Q_strncpy(name, miptex[i], 0x1Fu);
 		name[31] = 0;
@@ -246,7 +234,6 @@ void TEX_AddAnimatingTextures(void)
 			}
 		}
 	}
-
 
 	if (nummiptex != base)
 		Con_DPrintf("added %i texture frames\n", nummiptex - base);

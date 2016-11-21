@@ -28,24 +28,20 @@
 
 #include "precompiled.h"
 
-
 #ifndef Defines_and_Variables_region
 
-/* <23bb1> ../engine/delta.c:47 */
 typedef struct delta_link_s
 {
 	delta_link_t *next;
 	delta_description_t *delta;
 } delta_link_t;
 
-/* <23be5> ../engine/delta.c:53 */
 typedef struct delta_definition_s
 {
 	char *fieldName;
 	int fieldOffset;
 } delta_definition_t;
 
-/* <23c19> ../engine/delta.c:59 */
 typedef struct delta_definition_list_s
 {
 	delta_definition_list_t *next;
@@ -54,14 +50,12 @@ typedef struct delta_definition_list_s
 	delta_definition_t *pdefinition;
 } delta_definition_list_t;
 
-/* <23c69> ../engine/delta.c:67 */
 typedef struct delta_registry_s
 {
 	delta_registry_t *next;
 	char *name;
 	delta_t *pdesc;
 } delta_registry_t;
-
 
 delta_definition_list_t *g_defs;
 delta_encoder_t *g_encoders;
@@ -119,6 +113,7 @@ static delta_definition_t g_EventDataDefinition[] =
 	DELTA_DEF(event_args_s, bparam2),
 	DELTA_DEF(event_args_s, ducking),
 };
+
 static delta_definition_t g_EntityDataDefinition[] =
 {
 	DELTA_DEF(entity_state_s, startpos[0]),
@@ -209,6 +204,7 @@ static delta_definition_t g_EntityDataDefinition[] =
 	DELTA_DEF(entity_state_s, vuser4[1]),
 	DELTA_DEF(entity_state_s, vuser4[2]),
 };
+
 static delta_definition_t g_UsercmdDataDefinition[] =
 {
 	DELTA_DEF(usercmd_s, lerp_msec),
@@ -228,6 +224,7 @@ static delta_definition_t g_UsercmdDataDefinition[] =
 	DELTA_DEF(usercmd_s, impact_position[1]),
 	DELTA_DEF(usercmd_s, impact_position[2]),
 };
+
 static delta_definition_t g_WeaponDataDefinition[] =
 {
 	DELTA_DEF(weapon_data_s, m_iId),
@@ -253,6 +250,7 @@ static delta_definition_t g_WeaponDataDefinition[] =
 	DELTA_DEF(weapon_data_s, fuser3),
 	DELTA_DEF(weapon_data_s, fuser4),
 };
+
 static delta_definition_t g_ClientDataDefinition[] =
 {
 	DELTA_DEF(clientdata_s, origin[0]),
@@ -315,8 +313,6 @@ static delta_definition_t g_ClientDataDefinition[] =
 
 #endif
 
-
-/* <23f5d> ../engine/delta.c:346 */
 delta_description_t *DELTA_FindField(delta_t *pFields, const char *pszField)
 {
 	int fieldCount = pFields->fieldCount;
@@ -334,7 +330,6 @@ delta_description_t *DELTA_FindField(delta_t *pFields, const char *pszField)
 	return NULL;
 }
 
-/* <23fd7> ../engine/delta.c:370 */
 int EXT_FUNC DELTA_FindFieldIndex(struct delta_s *pFields, const char *fieldname)
 {
 	int fieldCount = pFields->fieldCount;
@@ -352,7 +347,6 @@ int EXT_FUNC DELTA_FindFieldIndex(struct delta_s *pFields, const char *fieldname
 	return -1;
 }
 
-/* <24032> ../engine/delta.c:393 */
 void EXT_FUNC DELTA_SetField(struct delta_s *pFields, const char *fieldname)
 {
 #if defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)
@@ -370,7 +364,6 @@ void EXT_FUNC DELTA_SetField(struct delta_s *pFields, const char *fieldname)
 #endif
 }
 
-/* <240b2> ../engine/delta.c:411 */
 void EXT_FUNC DELTA_UnsetField(struct delta_s *pFields, const char *fieldname)
 {
 #if defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)
@@ -388,7 +381,6 @@ void EXT_FUNC DELTA_UnsetField(struct delta_s *pFields, const char *fieldname)
 #endif
 }
 
-/* <24132> ../engine/delta.c:429 */
 void EXT_FUNC DELTA_SetFieldByIndex(struct delta_s *pFields, int fieldNumber)
 {
 #if defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)
@@ -398,7 +390,6 @@ void EXT_FUNC DELTA_SetFieldByIndex(struct delta_s *pFields, int fieldNumber)
 #endif
 }
 
-/* <2416a> ../engine/delta.c:441 */
 void EXT_FUNC DELTA_UnsetFieldByIndex(struct delta_s *pFields, int fieldNumber)
 {
 #if defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)
@@ -408,7 +399,6 @@ void EXT_FUNC DELTA_UnsetFieldByIndex(struct delta_s *pFields, int fieldNumber)
 #endif
 }
 
-/* <23cc4> ../engine/delta.c:453 */
 void DELTA_ClearFlags(delta_t *pFields)
 {
 	int i;
@@ -419,7 +409,6 @@ void DELTA_ClearFlags(delta_t *pFields)
 	}
 }
 
-/* <241d2> ../engine/delta.c:473 */
 int DELTA_TestDelta(unsigned char *from, unsigned char *to, delta_t *pFields)
 {
 #if defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)
@@ -502,7 +491,6 @@ int DELTA_TestDelta(unsigned char *from, unsigned char *to, delta_t *pFields)
 #endif
 }
 
-/* <24309> ../engine/delta.c:602 */
 int DELTA_CountSendFields(delta_t *pFields)
 {
 	int i, c;
@@ -519,7 +507,6 @@ int DELTA_CountSendFields(delta_t *pFields)
 	return c;
 }
 
-/* <24382> ../engine/delta.c:629 */
 void DELTA_MarkSendFields(unsigned char *from, unsigned char *to, delta_t *pFields)
 {
 	int i;
@@ -580,7 +567,6 @@ void DELTA_MarkSendFields(unsigned char *from, unsigned char *to, delta_t *pFiel
 		pFields->conditionalencode(pFields, from, to);
 }
 
-/* <2448d> ../engine/delta.c:738 */
 void DELTA_SetSendFlagBits(delta_t *pFields, int *bits, int *bytecount)
 {
 	delta_description_t *pTest;
@@ -615,12 +601,11 @@ qboolean DELTA_IsFieldMarked(delta_t* pFields, int fieldNumber)
 {
 #if defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)
 	return DELTAJit_IsFieldMarked(pFields, fieldNumber);
-#else 
+#else
 	return pFields->pdd[fieldNumber].flags & FDT_MARK;
 #endif
 }
 
-/* <2456d> ../engine/delta.c:782 */
 void DELTA_WriteMarkedFields(unsigned char *from, unsigned char *to, delta_t *pFields)
 {
 	int i;
@@ -736,7 +721,6 @@ void DELTA_WriteMarkedFields(unsigned char *from, unsigned char *to, delta_t *pF
 	}
 }
 
-/* <2467e> ../engine/delta.c:924 */
 qboolean DELTA_CheckDelta(unsigned char *from, unsigned char *to, delta_t *pFields)
 {
 	qboolean sendfields;
@@ -748,11 +732,10 @@ qboolean DELTA_CheckDelta(unsigned char *from, unsigned char *to, delta_t *pFiel
 	DELTA_MarkSendFields(from, to, pFields);
 	sendfields = DELTA_CountSendFields(pFields);
 #endif
-	
+
 	return sendfields;
 }
 
-/* <247f5> ../engine/delta.c:949 */
 NOINLINE qboolean DELTA_WriteDelta(unsigned char *from, unsigned char *to, qboolean force, delta_t *pFields, void(*callback)(void))
 {
 	qboolean sendfields;
@@ -808,7 +791,6 @@ qboolean _DELTA_WriteDelta(unsigned char *from, unsigned char *to, qboolean forc
 }
 
 
-/* <24aa0> ../engine/delta.c:1010 */
 int DELTA_ParseDelta(unsigned char *from, unsigned char *to, delta_t *pFields)
 {
 	delta_description_t *pTest;
@@ -1013,7 +995,6 @@ int DELTA_ParseDelta(unsigned char *from, unsigned char *to, delta_t *pFields)
 	return MSG_CurrentBit() - startbit;
 }
 
-/* <24c50> ../engine/delta.c:1276 */
 void EXT_FUNC DELTA_AddEncoder(char *name, void(*conditionalencode)(struct delta_s *, const unsigned char *, const unsigned char *))
 {
 	delta_encoder_t *p = (delta_encoder_t *)Mem_ZeroMalloc(sizeof(delta_encoder_t));
@@ -1023,7 +1004,6 @@ void EXT_FUNC DELTA_AddEncoder(char *name, void(*conditionalencode)(struct delta
 	g_encoders = p;
 }
 
-/* <24c9d> ../engine/delta.c:1293 */
 void DELTA_ClearEncoders(void)
 {
 	delta_encoder_t *n, *p = g_encoders;
@@ -1037,7 +1017,6 @@ void DELTA_ClearEncoders(void)
 	g_encoders = 0;
 }
 
-/* <24ce9> ../engine/delta.c:1315 */
 encoder_t DELTA_LookupEncoder(char *name)
 {
 	delta_encoder_t *p = g_encoders;
@@ -1052,7 +1031,6 @@ encoder_t DELTA_LookupEncoder(char *name)
 	return NULL;
 }
 
-/* <23d3e> ../engine/delta.c:1338 */
 int DELTA_CountLinks(delta_link_t *plinks)
 {
 	delta_link_t *p = plinks;
@@ -1066,7 +1044,6 @@ int DELTA_CountLinks(delta_link_t *plinks)
 	return c;
 }
 
-/* <23cf6> ../engine/delta.c:1360 */
 void DELTA_ReverseLinks(delta_link_t **plinks)
 {
 	delta_link_t *n, *p = *plinks;
@@ -1083,7 +1060,6 @@ void DELTA_ReverseLinks(delta_link_t **plinks)
 	*plinks = newlist;
 }
 
-/* <24d8d> ../engine/delta.c:1383 */
 void DELTA_ClearLinks(delta_link_t **plinks)
 {
 	delta_link_t *n, *p = *plinks;
@@ -1096,7 +1072,6 @@ void DELTA_ClearLinks(delta_link_t **plinks)
 	*plinks = 0;
 }
 
-/* <24ded> ../engine/delta.c:1405 */
 delta_t *DELTA_BuildFromLinks(delta_link_t **pplinks)
 {
 	delta_description_t *pdesc, *pcur;
@@ -1133,7 +1108,6 @@ delta_t *DELTA_BuildFromLinks(delta_link_t **pplinks)
 	return pdelta;
 }
 
-/* <23dfa> ../engine/delta.c:1445 */
 int DELTA_FindOffset(int count, delta_definition_t *pdef, char *fieldname)
 {
 	for (int i = 0; i < count; i++)
@@ -1147,7 +1121,6 @@ int DELTA_FindOffset(int count, delta_definition_t *pdef, char *fieldname)
 	Sys_Error(__FUNCTION__ ": Couldn't find offset for %s!!!\n", fieldname);
 }
 
-/* <24f58> ../engine/delta.c:1469 */
 qboolean DELTA_ParseType(delta_description_t *pdelta, char **pstream)
 {
 	// Read the stream till we hit the end
@@ -1187,7 +1160,6 @@ qboolean DELTA_ParseType(delta_description_t *pdelta, char **pstream)
 	return FALSE;
 }
 
-/* <24f95> ../engine/delta.c:1545 */
 qboolean DELTA_ParseField(int count, delta_definition_t *pdefinition, delta_link_t *pField, char **pstream)
 {
 	int readpost;
@@ -1258,7 +1230,6 @@ qboolean DELTA_ParseField(int count, delta_definition_t *pdefinition, delta_link
 	return TRUE;
 }
 
-/* <25051> ../engine/delta.c:1657 */
 void DELTA_FreeDescription(delta_t **ppdesc)
 {
 	delta_t *p;
@@ -1276,7 +1247,6 @@ void DELTA_FreeDescription(delta_t **ppdesc)
 	}
 }
 
-/* <23d92> ../engine/delta.c:1679 */
 void DELTA_AddDefinition(char *name, delta_definition_t *pdef, int numelements)
 {
 	delta_definition_list_t *p = g_defs;
@@ -1301,7 +1271,6 @@ void DELTA_AddDefinition(char *name, delta_definition_t *pdef, int numelements)
 	p->numelements = numelements;
 }
 
-/* <25100> ../engine/delta.c:1713 */
 void DELTA_ClearDefinitions(void)
 {
 	delta_definition_list_t *n, *p = g_defs;
@@ -1315,7 +1284,6 @@ void DELTA_ClearDefinitions(void)
 	g_defs = 0;
 }
 
-/* <23e3c> ../engine/delta.c:1735 */
 delta_definition_t *DELTA_FindDefinition(char *name, int *count)
 {
 	delta_definition_list_t *p = g_defs;
@@ -1335,7 +1303,6 @@ delta_definition_t *DELTA_FindDefinition(char *name, int *count)
 	return NULL;
 }
 
-/* <2517b> ../engine/delta.c:1765 */
 void DELTA_SkipDescription(char **pstream)
 {
 	*pstream = COM_Parse(*pstream);
@@ -1349,7 +1316,6 @@ void DELTA_SkipDescription(char **pstream)
 	} while (Q_stricmp(com_token, "}"));
 }
 
-/* <251b5> ../engine/delta.c:1792 */
 qboolean DELTA_ParseOneField(char **ppstream, delta_link_t **pplist, int count, delta_definition_t *pdefinition)
 {
 	delta_link_t *newlink;
@@ -1384,7 +1350,6 @@ qboolean DELTA_ParseOneField(char **ppstream, delta_link_t **pplist, int count, 
 	return TRUE;
 }
 
-/* <2523f> ../engine/delta.c:1842 */
 qboolean DELTA_ParseDescription(char *name, delta_t **ppdesc, char *pstream)
 {
 	delta_link_t *links;
@@ -1488,7 +1453,6 @@ qboolean DELTA_ParseDescription(char *name, delta_t **ppdesc, char *pstream)
 	return TRUE;
 }
 
-/* <25338> ../engine/delta.c:1959 */
 qboolean DELTA_Load(char *name, delta_t **ppdesc, char *pszFile)
 {
 	char *pbuf;
@@ -1507,7 +1471,6 @@ qboolean DELTA_Load(char *name, delta_t **ppdesc, char *pszFile)
 	return bret;
 }
 
-/* <253a4> ../engine/delta.c:1990 */
 void DELTA_RegisterDescription(char *name)
 {
 	delta_registry_t *p = (delta_registry_t *)Mem_ZeroMalloc(sizeof(delta_registry_t));
@@ -1517,7 +1480,6 @@ void DELTA_RegisterDescription(char *name)
 	p->pdesc = 0;
 }
 
-/* <253dc> ../engine/delta.c:2008 */
 void DELTA_ClearRegistrations(void)
 {
 	delta_registry_t *n, *p = g_deltaregistry;
@@ -1533,7 +1495,6 @@ void DELTA_ClearRegistrations(void)
 	g_deltaregistry = 0;
 }
 
-/* <25442> ../engine/delta.c:2036 */
 delta_t **DELTA_LookupRegistration(const char *name)
 {
 	delta_registry_t *p = g_deltaregistry;
@@ -1548,7 +1509,6 @@ delta_t **DELTA_LookupRegistration(const char *name)
 	return NULL;
 }
 
-/* <23dd6> ../engine/delta.c:2060 */
 void DELTA_ClearStats(delta_t *p)
 {
 	int i;
@@ -1563,7 +1523,6 @@ void DELTA_ClearStats(delta_t *p)
 	}
 }
 
-/* <23e72> ../engine/delta.c:2081 */
 void DELTA_ClearStats_f(void)
 {
 	delta_registry_t *p;
@@ -1575,7 +1534,6 @@ void DELTA_ClearStats_f(void)
 	}
 }
 
-/* <23ece> ../engine/delta.c:2100 */
 void DELTA_PrintStats(const char *name, delta_t *p)
 {
 	if (p)
@@ -1593,7 +1551,6 @@ void DELTA_PrintStats(const char *name, delta_t *p)
 	}
 }
 
-/* <23efe> ../engine/delta.c:2124 */
 void DELTA_DumpStats_f(void)
 {
 	Con_Printf("Delta Stats\n");
@@ -1601,7 +1558,6 @@ void DELTA_DumpStats_f(void)
 		DELTA_PrintStats(dr->name, dr->pdesc);
 }
 
-/* <254d4> ../engine/delta.c:2143 */
 void DELTA_Init(void)
 {
 	Cmd_AddCommand("delta_stats", DELTA_DumpStats_f);
@@ -1616,7 +1572,6 @@ void DELTA_Init(void)
 	DELTA_AddDefinition("event_t", g_EventDataDefinition, ARRAYSIZE(g_EventDataDefinition));
 }
 
-/* <25847> ../engine/delta.c:2164 */
 void DELTA_Shutdown(void)
 {
 	DELTA_ClearEncoders();

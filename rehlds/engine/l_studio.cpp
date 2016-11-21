@@ -30,8 +30,6 @@
 
 //int giTextureSize;
 
-
-/* <42900> ../engine/l_studio.c:31 */
 void EXT_FUNC Mod_LoadStudioModel_internal(model_t * mod, void * buffer)
 {
 	uint8 *poutdata;

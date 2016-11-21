@@ -28,7 +28,6 @@
 
 #include "precompiled.h"
 
-
 static const uint32 pulCRCTable[256] =
 {
 	0x00000000, 0x77073096, 0xee0e612c, 0x990951ba,
@@ -97,20 +96,16 @@ static const uint32 pulCRCTable[256] =
 	0xb40bbe37, 0xc30c8ea1, 0x5a05df1b, 0x2d02ef8d
 };
 
-
-/* <193b9> ../engine/crc.c:86 */
 void EXT_FUNC CRC32_Init(CRC32_t *pulCRC)
 {
 	*pulCRC = -1;
 }
 
-/* <193d9> ../engine/crc.c:91 */
 CRC32_t EXT_FUNC CRC32_Final(CRC32_t pulCRC)
 {
 	return ~pulCRC;
 }
 
-/* <19453> ../engine/crc.c:96 */
 void EXT_FUNC CRC32_ProcessByte(CRC32_t *pulCRC, unsigned char ch)
 {
 	CRC32_t ulCrc = *pulCRC;
@@ -118,7 +113,6 @@ void EXT_FUNC CRC32_ProcessByte(CRC32_t *pulCRC, unsigned char ch)
 	*pulCRC = ulCrc;
 }
 
-/* <19496> ../engine/crc.c:106 */
 void EXT_FUNC CRC32_ProcessBuffer(CRC32_t *pulCRC, void *pBuffer, int nBuffer)
 {
 	CRC32_t ulCrc = *pulCRC;
@@ -132,7 +126,6 @@ void EXT_FUNC CRC32_ProcessBuffer(CRC32_t *pulCRC, void *pBuffer, int nBuffer)
 	*pulCRC = ulCrc;
 }
 
-/* <19527> ../engine/crc.c:247 */
 byte COM_BlockSequenceCRCByte(byte *base, int length, int sequence)
 {
 	byte *p;
@@ -157,7 +150,6 @@ byte COM_BlockSequenceCRCByte(byte *base, int length, int sequence)
 	return CRC32_Final(crc);
 }
 
-/* <195e1> ../engine/crc.c:292 */
 NOXREF BOOL CRC_File(CRC32_t *crcvalue, char *pszFileName)
 {
 	FileHandle_t fp;
@@ -200,7 +192,6 @@ NOXREF BOOL CRC_File(CRC32_t *crcvalue, char *pszFileName)
 	return 1;
 }
 
-/* <1966e> ../engine/crc.c:354 */
 int CRC_MapFile(CRC32_t *crcvalue, char *pszFileName)
 {
 	FileHandle_t fp;
@@ -212,7 +203,7 @@ int CRC_MapFile(CRC32_t *crcvalue, char *pszFileName)
 	int nSize;
 	lump_t *curLump;
 	int32 startOfs;
-	int nLumpID; 
+	int nLumpID;
 
 	nLumpID = 0;
 	if (Q_stricmp(com_gamedir, "bshift") == 0)
@@ -290,7 +281,7 @@ static unsigned char PADDING[64] =
 #define F(x, y, z) (((x) & (y)) | ((~x) & (z)))
 #define G(x, y, z) (((x) & (z)) | ((y) & (~z)))
 #define H(x, y, z) ((x) ^ (y) ^ (z))
-#define I(x, y, z) ((y) ^ ((x) | (~z))) 
+#define I(x, y, z) ((y) ^ ((x) | (~z)))
 
 /* ROTATE_LEFT rotates x left n bits */
 #define ROTATE_LEFT(x, n) (((x) << (n)) | ((x) >> (32-(n))))
@@ -323,7 +314,6 @@ static unsigned char PADDING[64] =
 	}
 
 
-/* <1974c> ../engine/crc.c:455 */
 void MD5Init(MD5Context_t *ctx)
 {
 	ctx->bits[0] = ctx->bits[1] = 0;
@@ -335,7 +325,6 @@ void MD5Init(MD5Context_t *ctx)
 	ctx->buf[3] = 0x10325476;
 }
 
-/* <19841> ../engine/crc.c:473 */
 void MD5Update(MD5Context_t *ctx, const unsigned char *buf, unsigned int len)
 {
 	uint32 in[16];
@@ -373,7 +362,6 @@ void MD5Update(MD5Context_t *ctx, const unsigned char *buf, unsigned int len)
 	}
 }
 
-/* <197ea> ../engine/crc.c:528 */
 void MD5Final(unsigned char digest[16], MD5Context_t *ctx)
 {
 	uint32 in[16];
@@ -410,7 +398,6 @@ void MD5Final(unsigned char digest[16], MD5Context_t *ctx)
 	}
 }
 
-/* <19769> ../engine/crc.c:592 */
 void MD5Transform(unsigned int buf[4], const unsigned int in[16])
 {
 	uint32 a = buf[0], b = buf[1], c = buf[2], d = buf[3];
@@ -509,13 +496,12 @@ void MD5Transform(unsigned int buf[4], const unsigned int in[16])
 	buf[3] += d;
 }
 
-/* <198b8> ../engine/crc.c:686 */
 BOOL MD5_Hash_File(unsigned char digest[16], char *pszFileName, BOOL bUsefopen, BOOL bSeed, unsigned int seed[4])
 {
 	FileHandle_t fp = (FileHandle_t)FS_OpenPathID(pszFileName, "rb", "GAMECONFIG");
 	if (!fp)
 		fp = FS_Open(pszFileName, "rb");
-	
+
 	if (!fp)
 		return 0;
 
@@ -526,7 +512,7 @@ BOOL MD5_Hash_File(unsigned char digest[16], char *pszFileName, BOOL bUsefopen, 
 		return 0;
 
 	}
-	
+
 	MD5Context_t ctx;
 	Q_memset(&ctx, 0, sizeof(ctx));
 	MD5Init(&ctx);
@@ -565,7 +551,6 @@ BOOL MD5_Hash_File(unsigned char digest[16], char *pszFileName, BOOL bUsefopen, 
 	return 0;
 }
 
-/* <1998b> ../engine/crc.c:762 */
 char *MD5_Print(unsigned char hash[16])
 {
 	static char szReturn[64];

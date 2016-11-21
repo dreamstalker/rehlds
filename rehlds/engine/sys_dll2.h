@@ -65,67 +65,60 @@ extern char *szCommonPreloads;
 extern char *szReslistsBaseDir;
 extern char *szReslistsExt;
 
-class CDedicatedServerAPI : public IDedicatedServerAPI
+class CDedicatedServerAPI: public IDedicatedServerAPI
 {
 private:
 	char m_OrigCmd[1024];
 
 public:
-
 	virtual bool Init(char *basedir, char *cmdline, CreateInterfaceFn launcherFactory, CreateInterfaceFn filesystemFactory);
-	bool Init_noVirt(char *basedir, char *cmdline, CreateInterfaceFn launcherFactory, CreateInterfaceFn filesystemFactory);
-
-	virtual int Shutdown(void);
-	int Shutdown_noVirt(void);
-
-	virtual bool RunFrame(void);
-	bool RunFrame_noVirt(void);
-
+	virtual int Shutdown();
+	virtual bool RunFrame();
 	virtual void AddConsoleText(char *text);
-	void AddConsoleText_noVirt(char *text);
-
 	virtual void UpdateStatus(float *fps, int *nActive, int *nMaxPlayers, char *pszMap);
+
+	// non-virtual function's of wrap for hooks a virtual
+	// Only need to HOOK_ENGINE
+	bool Init_noVirt(char *basedir, char *cmdline, CreateInterfaceFn launcherFactory, CreateInterfaceFn filesystemFactory);
+	int Shutdown_noVirt();
+	bool RunFrame_noVirt();
+	void AddConsoleText_noVirt(char *text);
 	void UpdateStatus_noVirt(float *fps, int *nActive, int *nMaxPlayers, char *pszMap);
 };
 
-const char *GetCurrentSteamAppName(void);
+const char *GetCurrentSteamAppName();
 NOXREF void SetRateRegistrySetting(const char *pchRate);
 NOXREF const char *GetRateRegistrySetting(const char *pchDef);
 void EXPORT F(IEngineAPI **api);
 void Sys_GetCDKey(char *pszCDKey, int *nLength, int *bDedicated);
 NOXREF void Legacy_ErrorMessage(int nLevel, const char *pszErrorMessage);
 void Legacy_Sys_Printf(char *fmt, ...);
-NOXREF void Legacy_MP3subsys_Suspend_Audio(void);
-NOXREF void Legacy_MP3subsys_Resume_Audio(void);
-void Sys_SetupLegacyAPIs(void);
-NOXREF int Sys_IsWin95(void);
-NOXREF int Sys_IsWin98(void);
+NOXREF void Legacy_MP3subsys_Suspend_Audio();
+NOXREF void Legacy_MP3subsys_Resume_Audio();
+void Sys_SetupLegacyAPIs();
+NOXREF int Sys_IsWin95();
+NOXREF int Sys_IsWin98();
 
 #ifdef _WIN32
-NOXREF void Sys_CheckOSVersion(void);
+NOXREF void Sys_CheckOSVersion();
 #endif
 
-NOXREF void Sys_Init(void);
-NOXREF void Sys_Shutdown(void);
+NOXREF void Sys_Init();
+NOXREF void Sys_Shutdown();
 void Sys_InitArgv(char *lpCmdLine);
-NOXREF void Sys_ShutdownArgv(void);
-void Sys_InitMemory(void);
-void Sys_ShutdownMemory(void);
-void Sys_InitLauncherInterface(void);
-NOXREF void Sys_ShutdownLauncherInterface(void);
-void Sys_InitAuthentication(void);
-NOXREF void Sys_ShutdownAuthentication(void);
+NOXREF void Sys_ShutdownArgv();
+void Sys_InitMemory();
+void Sys_ShutdownMemory();
+void Sys_InitLauncherInterface();
+NOXREF void Sys_ShutdownLauncherInterface();
+void Sys_InitAuthentication();
+NOXREF void Sys_ShutdownAuthentication();
 void Sys_ShowProgressTicks(char *specialProgressMsg);
 int Sys_InitGame(char *lpOrgCmdLine, char *pBaseDir, void *pwnd, int bIsDedicated);
-void Sys_ShutdownGame(void);
-void ClearIOStates(void);
+void Sys_ShutdownGame();
+void ClearIOStates();
 
-NOBODY class IBaseInterface *__CreateCEngineAPIIEngineAPI_interface(void);
-
-// Needs rechecking
+// TODO: Needs rechecking
 //NOXREF int BuildMapCycleListHints(char **hints);
-
-NOBODY class IBaseInterface *__CreateCDedicatedServerAPIIDedicatedServerAPI_interface(void);
-NOBODY void _GLOBAL__sub_I_D_SurfaceCacheForRes(void);
 
 #endif // SYS_DLL2_H

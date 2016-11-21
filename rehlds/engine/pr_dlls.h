@@ -35,16 +35,12 @@
 #include "maintypes.h"
 #include "eiface.h"
 
-
-/* <8a763> ../engine/pr_dlls.h:42 */
 typedef struct functiontable_s
 {
 	uint32 pFunction;
 	char *pFunctionName;
 } functiontable_t;
 
-/* 572 */
-/* <8a793> ../engine/pr_dlls.h:48 */
 typedef struct extensiondll_s
 {
 	void *lDLLHandle;
@@ -52,11 +48,8 @@ typedef struct extensiondll_s
 	int functionCount;
 } extensiondll_t;
 
-/* <8a7db> ../engine/pr_dlls.h:63 */
 typedef void(*ENTITYINIT)(struct entvars_s *);
-/* <8a7f8> ../engine/pr_dlls.h:64 */
 typedef void(*DISPATCHFUNCTION)(struct entvars_s *, void *);
-/* <8a81a> ../engine/pr_dlls.h:65 */
 typedef void(*FIELDIOFUNCTION)(SAVERESTOREDATA *, const char *, void *, TYPEDESCRIPTION *, int);
 
 #endif // PR_DLLS_H

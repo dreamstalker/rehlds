@@ -33,7 +33,7 @@ double rolling_fps;
 quakeparms_t host_parms;
 qboolean host_initialized;
 double host_frametime;
-//short unsigned int *host_basepal;
+//unsigned short *host_basepal;
 int host_framecount;
 //int minimum_memory;
 client_t *host_client;
@@ -71,7 +71,7 @@ cvar_t host_framerate = { "host_framerate", "0", 0, 0.0f, NULL };
 cvar_t pausable = { "pausable", "1", FCVAR_SERVER, 0.0f, NULL };
 cvar_t suitvolume = { "suitvolume", "0.25", FCVAR_ARCHIVE, 0.0f, NULL };
 
-#else //HOOK_ENGINE
+#else // HOOK_ENGINE
 
 cvar_t host_name;
 cvar_t host_speeds;
@@ -92,9 +92,8 @@ cvar_t host_framerate;
 cvar_t pausable;
 cvar_t suitvolume;
 
-#endif //HOOK_ENGINE
+#endif // HOOK_ENGINE
 
-/* <3617e> ../engine/host.c:201 */
 NOXREF void Host_EndGame(const char *message, ...)
 {
 	int oldn;
@@ -133,7 +132,6 @@ NOXREF void Host_EndGame(const char *message, ...)
 	longjmp(host_abortserver, 1);
 }
 
-/* <36123> ../engine/host.c:255 */
 void __declspec(noreturn) Host_Error(const char *error, ...)
 {
 	va_list argptr;
@@ -167,7 +165,6 @@ void __declspec(noreturn) Host_Error(const char *error, ...)
 	Sys_Error(__FUNCTION__ ": %s\n", string);
 }
 
-/* <35d12> ../engine/host.c:297 */
 void Host_InitLocal(void)
 {
 	Host_InitCommands();
@@ -198,7 +195,6 @@ void Host_InitLocal(void)
 	SV_SetMaxclients();
 }
 
-/* <35d28> ../engine/host.c:349 */
 NOXREF void Info_WriteVars(FileHandle_t fp)
 {
 	cvar_t *pcvar;
@@ -249,7 +245,6 @@ NOXREF void Info_WriteVars(FileHandle_t fp)
 	}
 }
 
-/* <35dc8> ../engine/host.c:409 */
 void Host_WriteConfiguration(void)
 {
 #ifndef SWDS
@@ -323,7 +318,6 @@ void Host_WriteConfiguration(void)
 #endif // SWDS
 }
 
-/* <35df2> ../engine/host.c:516 */
 void Host_WriteCustomConfig(void)
 {
 #ifndef SWDS
@@ -381,7 +375,6 @@ void Host_WriteCustomConfig(void)
 #endif // SWDS
 }
 
-/* <35e4e> ../engine/host.c:594 */
 void SV_ClientPrintf(const char *fmt, ...)
 {
 	va_list va;
@@ -400,7 +393,6 @@ void SV_ClientPrintf(const char *fmt, ...)
 	}
 }
 
-/* <35eaa> ../engine/host.c:617 */
 void SV_BroadcastPrintf(const char *fmt, ...)
 {
 	va_list argptr;
@@ -424,7 +416,6 @@ void SV_BroadcastPrintf(const char *fmt, ...)
 	Con_DPrintf("%s", string);
 }
 
-/* <35f03> ../engine/host.c:646 */
 void Host_ClientCommands(const char *fmt, ...)
 {
 	va_list argptr;
@@ -471,7 +462,6 @@ void SV_DropClient(client_t *cl, qboolean crash, const char *fmt, ...)
 	g_RehldsHookchains.m_SV_DropClient.callChain(SV_DropClient_hook, GetRehldsApiClient(cl), crash != FALSE, buf);
 }
 
-/* <35f4e> ../engine/host.c:673 */
 void SV_DropClient_internal(client_t *cl, qboolean crash, const char *string)
 {
 	int i;
@@ -540,7 +530,6 @@ void SV_DropClient_internal(client_t *cl, qboolean crash, const char *string)
 	NotifyDedicatedServerUI("UpdatePlayers");
 }
 
-/* <35cc8> ../engine/host.c:763 */
 void Host_ClearClients(qboolean bFramesOnly)
 {
 	int i;
@@ -581,7 +570,6 @@ void Host_ClearClients(qboolean bFramesOnly)
 	}
 }
 
-/* <3605a> ../engine/host.c:815 */
 void Host_ShutdownServer(qboolean crash)
 {
 	int i;
@@ -620,7 +608,6 @@ void Host_ShutdownServer(qboolean crash)
 	Log_Close();
 }
 
-/* <361d4> ../engine/host.c:924 */
 void SV_ClearClientStates(void)
 {
 	int i;
@@ -633,7 +620,6 @@ void SV_ClearClientStates(void)
 	}
 }
 
-/* <361fc> ../engine/host.c:942 */
 void Host_CheckDyanmicStructures(void)
 {
 	int i;
@@ -647,7 +633,6 @@ void Host_CheckDyanmicStructures(void)
 	}
 }
 
-/* <36249> ../engine/host.c:970 */
 void Host_ClearMemory(qboolean bQuiet)
 {
 
@@ -677,7 +662,6 @@ void Host_ClearMemory(qboolean bQuiet)
 	SV_ClearClientStates();
 }
 
-/* <362d1> ../engine/host.c:1003 */
 qboolean Host_FilterTime(float time)
 {
 	float fps;
@@ -750,26 +734,22 @@ qboolean Host_FilterTime(float time)
 	return TRUE;
 }
 
-/* <36351> ../engine/host.c:1100 */
 qboolean Master_IsLanGame(void)
 {
 	return sv_lan.value != 0.0f;
 }
 
-/* <3636a> ../engine/host.c:1116 */
 void Master_Heartbeat_f(void)
 {
 	//Steam_ForceHeartbeat in move?
 	CRehldsPlatformHolder::get()->SteamGameServer()->ForceHeartbeat();
 }
 
-/* <3637f> ../engine/host.c:1130 */
 void Host_ComputeFPS(double frametime)
 {
 	rolling_fps = 0.6 * rolling_fps + 0.4 * frametime;
 }
 
-/* <3639c> ../engine/host.c:1140 */
 void Host_GetHostInfo(float *fps, int *nActive, int *unused, int *nMaxPlayers, char *pszMap)
 {
 	if (rolling_fps > 0.0)
@@ -804,7 +784,6 @@ void Host_GetHostInfo(float *fps, int *nActive, int *unused, int *nMaxPlayers, c
 	*nMaxPlayers = g_psvs.maxclients;
 }
 
-/* <36411> ../engine/host.c:1174 */
 void Host_Speeds(double *time)
 {
 	float pass1, pass2, pass3, pass4, pass5;
@@ -851,7 +830,6 @@ void Host_Speeds(double *time)
 #endif // SWDS
 }
 
-/* <36495> ../engine/host.c:1231 */
 void Host_UpdateScreen(void)
 {
 	if (!gfBackground)
@@ -865,7 +843,6 @@ void Host_UpdateScreen(void)
 	}
 }
 
-/* <364b1> ../engine/host.c:1288 */
 void Host_UpdateSounds(void)
 {
 	if (!gfBackground)
@@ -874,7 +851,6 @@ void Host_UpdateSounds(void)
 	}
 }
 
-/* <364dd> ../engine/host.c:1320 */
 void Host_CheckConnectionFailure(void)
 {
 	static int frames = 5;
@@ -888,10 +864,9 @@ void Host_CheckConnectionFailure(void)
 	}
 }
 
-/* <364fd> ../engine/host.c:1350 */
 void _Host_Frame(float time)
 {
-	
+
 
 	static double host_times[6];
 	if (setjmp(host_enddemo))
@@ -977,7 +952,6 @@ void _Host_Frame(float time)
 #endif //REHLDS_FLIGHT_REC
 }
 
-/* <36628> ../engine/host.c:1501 */
 int Host_Frame(float time, int iState, int *stateInfo)
 {
 	double time1;
@@ -1032,7 +1006,6 @@ int Host_Frame(float time, int iState, int *stateInfo)
 	return giActive;
 }
 
-/* <3672c> ../engine/host.c:1577 */
 void CheckGore(void)
 {
 	if (bLowViolenceBuild)
@@ -1051,7 +1024,6 @@ void CheckGore(void)
 	}
 }
 
-/* <35bad> ../engine/host.c:1649 */
 qboolean Host_IsSinglePlayerGame(void)
 {
 	if (g_psv.active)
@@ -1061,13 +1033,11 @@ qboolean Host_IsSinglePlayerGame(void)
 
 }
 
-/* <3676e> ../engine/host.c:1656 */
 qboolean Host_IsServerActive(void)
 {
 	return g_psv.active;
 }
 
-/* <36787> ../engine/host.c:1664 */
 void Host_Version(void)
 {
 	char szFileName[MAX_PATH];
@@ -1085,7 +1055,7 @@ void Host_Version(void)
 		FS_Close(fp);
 		buffer[bufsize] = 0;
 		int gotKeys = 0;
-	
+
 		pbuf = COM_Parse(pbuf);
 		if (pbuf)
 		{
@@ -1132,7 +1102,6 @@ void Host_Version(void)
 	}
 }
 
-/* <36823> ../engine/host.c:1764 */
 int Host_Init(quakeparms_t *parms)
 {
 	char versionString[256];
@@ -1252,7 +1221,6 @@ int Host_Init(quakeparms_t *parms)
 	return 1;
 }
 
-/* <368c2> ../engine/host.c:1977 */
 void Host_Shutdown(void)
 {
 	static qboolean isdown = FALSE;

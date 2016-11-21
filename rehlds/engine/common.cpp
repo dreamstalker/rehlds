@@ -39,26 +39,17 @@ char* strcpy_safe(char* dst, char* src) {
 	return dst;
 }
 
-
-/* <e875> ../engine/common.c:80 */
 char *Info_Serverinfo(void)
 {
 	return serverinfo;
 }
 
-
 #ifdef Q_functions
 
-/* <e8ed> ../engine/common.c:123 */
 NOBODY void Q_memset(void *dest, int fill, int count);
-
-/* <eafe> ../engine/common.c:143 */
 NOBODY void Q_memcpy(void *dest, const void *src, int count);
-
-/* <eb5c> ../engine/common.c:162 */
 NOBODY int Q_memcmp(void *m1, void *m2, int count);
 
-/* <e6a5> ../engine/common.c:180 */
 void Q_strcpy(char *dest, const char *src)
 {
 	char *c;
@@ -75,10 +66,8 @@ void Q_strcpy(char *dest, const char *src)
 	*c = 0;
 }
 
-/* <ebf7> ../engine/common.c:189 */
 NOBODY void Q_strncpy(char *dest, const char *src, int count);
 
-/* <e67c> ../engine/common.c:203 */
 int Q_strlen(const char *str)
 {
 	int result = 0;
@@ -92,54 +81,26 @@ int Q_strlen(const char *str)
 	return result;
 }
 
-/* <ec7a> ../engine/common.c:219 */
+
 NOBODY char *Q_strrchr(char *s, char c);
-
-/* <ece5> ../engine/common.c:228 */
 NOBODY void Q_strcat(char *dest, char *src);
-
-/* <e832> ../engine/common.c:234 */
 NOBODY int Q_strcmp(const char *s1, const char *s2);
-
-/* <ed94> ../engine/common.c:252 */
 NOBODY int Q_strncmp(const char *s1, const char *s2, int count);
-
-/* <eddd> ../engine/common.c:272 */
 NOBODY int Q_strncasecmp(const char *s1, const char *s2, int n);
-
-/* <ee5e> ../engine/common.c:311 */
 NOBODY int Q_strcasecmp(const char *s1, const char *s2);
-
-/* <eee8> ../engine/common.c:316 */
 NOBODY int Q_stricmp(const char *s1, const char *s2);
-
-/* <ef7e> ../engine/common.c:321 */
 NOBODY int Q_strnicmp(const char *s1, const char *s2, int n);
-
-/* <effb> ../engine/common.c:326 */
 NOBODY int Q_atoi(const char *str);
-
-/* <f058> ../engine/common.c:385 */
 NOBODY float Q_atof(const char *str);
-
-/* <f0d3> ../engine/common.c:460 */
 NOBODY char *Q_strlwr(char *src);
-
-/* <f129> ../engine/common.c:475 */
 NOBODY int Q_FileNameCmp(char *file1, char *file2);
-
-/* <f198> ../engine/common.c:495 */
 NOBODY char *Q_strstr(const char *s1, const char *search);
-
-/* <f1d3> ../engine/common.c:502 */
 NOBODY uint64 Q_strtoull(char *str);
 
 #endif // Q_functions
 
-
 #ifndef COM_Functions_region
 
-/* <e6ca> ../engine/common.c:550 */
 unsigned char COM_Nibble(char c)
 {
 	if (c >= '0' && c <= '9')
@@ -160,7 +121,6 @@ unsigned char COM_Nibble(char c)
 	return '0';
 }
 
-/* <f259> ../engine/common.c:580 */
 void COM_HexConvert(const char *pszInput, int nInputLength, unsigned char *pOutput)
 {
 	unsigned char *p;
@@ -180,7 +140,6 @@ void COM_HexConvert(const char *pszInput, int nInputLength, unsigned char *pOutp
 	}
 }
 
-/* <f335> ../engine/common.c:597 */
 NOXREF char *COM_BinPrintf(unsigned char *buf, int nLen)
 {
 	static char szReturn[4096];
@@ -200,7 +159,6 @@ NOXREF char *COM_BinPrintf(unsigned char *buf, int nLen)
 	return szReturn;
 }
 
-/* <f400> ../engine/common.c:616 */
 void COM_ExplainDisconnection(qboolean bPrint, char *fmt, ...)
 {
 	va_list argptr;
@@ -220,7 +178,6 @@ void COM_ExplainDisconnection(qboolean bPrint, char *fmt, ...)
 	}
 }
 
-/* <f495> ../engine/common.c:636 */
 NOXREF void COM_ExtendedExplainDisconnection(qboolean bPrint, char *fmt, ...)
 {
 	NOXREFCHECK;
@@ -261,7 +218,6 @@ int (*BigLong)(int l);
 int (*LittleLong)(int l);
 float (*BigFloat)(float l);
 float (*LittleFloat)(float l);
-
 
 int LongSwap(int l)
 {
@@ -310,17 +266,10 @@ float FloatNoSwap(float f)
 
 #endif // Byte_Functions_region
 
-
 #ifndef MSG_Functions_region
 
-/*
-==============================================================================
-
-			MESSAGE IO FUNCTIONS
-
-Handles byte ordering and avoids alignment errors
-==============================================================================
-*/
+// MESSAGE IO FUNCTIONS
+// Handles byte ordering and avoids alignment errors
 
 int msg_badread;
 int msg_readcount;
@@ -339,7 +288,7 @@ const uint32 BITTABLE[] =
 	0x00000000,
 };
 
-const uint32 ROWBITTABLE[] = 
+const uint32 ROWBITTABLE[] =
 {
 	0x00000000, 0x00000001, 0x00000003, 0x00000007,
 	0x0000000F, 0x0000001F, 0x0000003F, 0x0000007F,
@@ -364,7 +313,6 @@ const uint32 INVBITTABLE[] =
 	0xEFFFFFFF, 0xDFFFFFFF, 0xBFFFFFFF, 0x7FFFFFFF,
 	0xFFFFFFFF,
 };
-
 
 void MSG_WriteChar(sizebuf_t *sb, int c)
 {
@@ -442,11 +390,9 @@ void MSG_WriteUsercmd(sizebuf_t *buf, usercmd_t *to, usercmd_t *from)
 	MSG_EndBitWriting(buf);
 }
 
-
 typedef struct bf_write_s
 {
-
-	//For enhanced and safe bits writing functions
+	// For enhanced and safe bits writing functions
 #if defined(REHLDS_FIXES)
 
 #pragma pack(push, 1)
@@ -461,13 +407,13 @@ typedef struct bf_write_s
 	int nCurOutputBit;
 	sizebuf_t *pbuf;
 
-#else //defined(REHLDS_FIXES)
+#else // defined(REHLDS_FIXES)
 
 	int nCurOutputBit;
 	unsigned char *pOutByte;
 	sizebuf_t *pbuf;
 
-#endif //defined(REHLDS_FIXES)
+#endif // defined(REHLDS_FIXES)
 } bf_write_t;
 
 typedef struct bf_read_s
@@ -491,7 +437,7 @@ void COM_BitOpsInit(void)
 	Q_memset(&bfread, 0, sizeof(bf_read_t));
 }
 
-//Enhanced and safe bits writing functions
+// Enhanced and safe bits writing functions
 #if defined(REHLDS_FIXES)
 
 void MSG_WBits_MaybeFlush() {
@@ -751,7 +697,7 @@ void MSG_StartBitReading(sizebuf_t *buf)
 	bfread.pbuf = buf;
 	bfread.pInByte = &buf->data[msg_readcount];
 	bfread.nMsgReadCount = msg_readcount + 1;
-	
+
 	if (msg_readcount + 1 > buf->cursize)
 	{
 		msg_badread = 1;
@@ -802,7 +748,7 @@ int MSG_ReadOneBit(void)
 			msg_badread = 1;
 		}
 	}
-	
+
 	return nValue;
 }
 
@@ -887,7 +833,7 @@ int MSG_ReadSBits(int numbits)
 {
 	int nSignBit = MSG_ReadOneBit();
 	int result = MSG_ReadBits(numbits - 1);
-	
+
 	if (nSignBit)
 	{
 		result = -result;
@@ -1265,7 +1211,6 @@ void MSG_ReadUsercmd(usercmd_t *to, usercmd_t* from)
 
 #endif // MSG_Functions_region
 
-
 #ifndef SZ_Functions_region
 
 void SZ_Alloc(const char *name, sizebuf_t *buf, int startsize)
@@ -1434,8 +1379,6 @@ unsigned char mungify_table3[] =
 	0x4A, 0x12, 0xA9, 0xB5
 };
 
-
-/* <1118a> ../engine/common.c:1808 */
 NOXREF char *COM_SkipPath(char *pathname)
 {
 	NOXREFCHECK;
@@ -1451,7 +1394,6 @@ NOXREF char *COM_SkipPath(char *pathname)
 	return last;
 }
 
-/* <111c8> ../engine/common.c:1827 */
 void COM_StripExtension(char *in, char *out)
 {
 	char *c, *d = NULL;
@@ -1494,7 +1436,6 @@ void COM_StripExtension(char *in, char *out)
 	}
 }
 
-/* <11285> ../engine/common.c:1855 */
 char *COM_FileExtension(char *in)
 {
 	static char exten[MAX_PATH];
@@ -1532,8 +1473,7 @@ char *COM_FileExtension(char *in)
 	return exten;
 }
 
-/* <112d2> ../engine/common.c:1877 */
-/// Fills "out" with the file name without path and extension.
+// Fills "out" with the file name without path and extension.
 void COM_FileBase(const char *in, char *out)
 {
 	const char *start, *end;
@@ -1560,7 +1500,6 @@ void COM_FileBase(const char *in, char *out)
 	out[len] = 0;
 }
 
-/* <11396> ../engine/common.c:1922 */
 void COM_DefaultExtension(char *path, char *extension)
 {
 	char *src;
@@ -1579,13 +1518,11 @@ void COM_DefaultExtension(char *path, char *extension)
 	Q_strcat(path, extension);
 }
 
-/* <11407> ../engine/common.c:1948 */
 void COM_UngetToken(void)
 {
 	s_com_token_unget = 1;
 }
 
-/* <1141c> ../engine/common.c:1960 */
 char *COM_Parse(char *data)
 {
 	int c;
@@ -1689,7 +1626,6 @@ inquotes:
 	return data;
 }
 
-/* <11495> ../engine/common.c:2049 */
 char *COM_ParseLine(char *data)
 {
 #ifndef REHLDS_FIXES
@@ -1754,7 +1690,6 @@ char *COM_ParseLine(char *data)
 	return data;
 }
 
-/* <114e2> ../engine/common.c:2100 */
 int COM_TokenWaiting(char *buffer)
 {
 	char *p;
@@ -1771,7 +1706,6 @@ int COM_TokenWaiting(char *buffer)
 	return 0;
 }
 
-/* <1151e> ../engine/common.c:2125 */
 int COM_CheckParm(char *parm)
 {
 	int i;
@@ -1792,7 +1726,6 @@ int COM_CheckParm(char *parm)
 	return 0;
 }
 
-/* <11592> ../engine/common.c:2145 */
 void COM_InitArgv(int argc, char *argv[])
 {
 	qboolean safe = 0;
@@ -1853,7 +1786,6 @@ void COM_InitArgv(int argc, char *argv[])
 	com_argv = largv;
 }
 
-/* <11628> ../engine/common.c:2204 */
 void COM_Init(char *basedir)
 {
 	unsigned short swaptest = 1;
@@ -1882,7 +1814,6 @@ void COM_Init(char *basedir)
 	COM_BitOpsInit();
 }
 
-/* <116ca> ../engine/common.c:2242 */
 char *va(char *format, ...)
 {
 	va_list argptr;
@@ -1898,7 +1829,6 @@ char *va(char *format, ...)
 	return string[current];
 }
 
-/* <11743> ../engine/common.c:2267 */
 NOXREF char *vstr(vec_t *v)
 {
 	NOXREFCHECK;
@@ -1913,7 +1843,6 @@ NOXREF char *vstr(vec_t *v)
 	return string[idx];
 }
 
-/* <117aa> ../engine/common.c:2280 */
 NOXREF int memsearch(unsigned char *start, int count, int search)
 {
 	NOXREFCHECK;
@@ -1929,7 +1858,6 @@ NOXREF int memsearch(unsigned char *start, int count, int search)
 	return -1;
 }
 
-/* <11838> ../engine/common.c:2308 */
 NOXREF void COM_WriteFile(char *filename, void *data, int len)
 {
 	NOXREFCHECK;
@@ -1955,7 +1883,6 @@ NOXREF void COM_WriteFile(char *filename, void *data, int len)
 	}
 }
 
-/* <e859> ../engine/common.c:2338 */
 void COM_FixSlashes(char *pname)
 {
 	while (*pname)
@@ -1976,7 +1903,6 @@ void COM_FixSlashes(char *pname)
 	}
 }
 
-/* <11804> ../engine/common.c:2362 */
 void COM_CreatePath(char *path)
 {
 	char *ofs;
@@ -1999,7 +1925,6 @@ void COM_CreatePath(char *path)
 	}
 }
 
-/* <1193e> ../engine/common.c:2388 */
 NOXREF void COM_CopyFile(char *netpath, char *cachepath)
 {
 	NOXREFCHECK;
@@ -2010,7 +1935,7 @@ NOXREF void COM_CopyFile(char *netpath, char *cachepath)
 
 	FileHandle_t out;
 	FileHandle_t in = FS_Open(netpath, "rb");
-	
+
 	if (!in)
 	{
 		return;
@@ -2036,7 +1961,6 @@ NOXREF void COM_CopyFile(char *netpath, char *cachepath)
 	FS_Close(out);
 }
 
-/* <119f8> ../engine/common.c:2426 */
 NOXREF int COM_ExpandFilename(char *filename)
 {
 	NOXREFCHECK;
@@ -2048,7 +1972,6 @@ NOXREF int COM_ExpandFilename(char *filename)
 	return *filename != 0;
 }
 
-/* <11a36> ../engine/common.c:2446 */
 int EXT_FUNC COM_FileSize(char *filename)
 {
 	FileHandle_t fp;
@@ -2064,7 +1987,6 @@ int EXT_FUNC COM_FileSize(char *filename)
 	return iSize;
 }
 
-/* <11a83> ../engine/common.c:2472 */
 unsigned char* EXT_FUNC COM_LoadFile(const char *path, int usehunk, int *pLength)
 {
 	char base[33];
@@ -2151,7 +2073,6 @@ unsigned char* EXT_FUNC COM_LoadFile(const char *path, int usehunk, int *pLength
 	return buf;
 }
 
-/* <11b0f> ../engine/common.c:2538 */
 void EXT_FUNC COM_FreeFile(void *buffer)
 {
 #ifndef SWDS
@@ -2164,7 +2085,6 @@ void EXT_FUNC COM_FreeFile(void *buffer)
 	}
 }
 
-/* <11b39> ../engine/common.c:2554 */
 void COM_CopyFileChunk(FileHandle_t dst, FileHandle_t src, int nSize)
 {
 	int copysize;
@@ -2185,7 +2105,6 @@ void COM_CopyFileChunk(FileHandle_t dst, FileHandle_t src, int nSize)
 	FS_Flush(dst);
 }
 
-/* <11ba1> ../engine/common.c:2589 */
 NOXREF unsigned char *COM_LoadFileLimit(char *path, int pos, int cbmax, int *pcbread, FileHandle_t *phFile)
 {
 	FileHandle_t hFile;
@@ -2245,26 +2164,22 @@ NOXREF unsigned char *COM_LoadFileLimit(char *path, int pos, int cbmax, int *pcb
 	return buf;
 }
 
-/* <11c60> ../engine/common.c:2647 */
 unsigned char *COM_LoadHunkFile(char *path)
 {
 	return COM_LoadFile(path, 1, NULL);
 }
 
-/* <11c8e> ../engine/common.c:2652 */
 unsigned char *COM_LoadTempFile(char *path, int *pLength)
 {
 	return COM_LoadFile(path, 2, pLength);
 }
 
-/* <11ccb> ../engine/common.c:2657 */
 void EXT_FUNC COM_LoadCacheFile(char *path, struct cache_user_s *cu)
 {
 	loadcache = cu;
 	COM_LoadFile(path, 3, 0);
 }
 
-/* <11d09> ../engine/common.c:2664 */
 NOXREF unsigned char *COM_LoadStackFile(char *path, void *buffer, int bufsize, int *length)
 {
 	NOXREFCHECK;
@@ -2275,13 +2190,11 @@ NOXREF unsigned char *COM_LoadStackFile(char *path, void *buffer, int bufsize, i
 	return COM_LoadFile(path, 4, length);
 }
 
-/* <11d6f> ../engine/common.c:2682 */
 void COM_Shutdown(void)
 {
 	// Do nothing.
 }
 
-/* <11d84> ../engine/common.c:2693 */
 NOXREF void COM_AddAppDirectory(char *pszBaseDir, const char *appName)
 {
 	NOXREFCHECK;
@@ -2289,7 +2202,6 @@ NOXREF void COM_AddAppDirectory(char *pszBaseDir, const char *appName)
 	FS_AddSearchPath(pszBaseDir, "PLATFORM");
 }
 
-/* <11dbc> ../engine/common.c:2707 */
 void COM_AddDefaultDir(char *pszDir)
 {
 	if (pszDir && *pszDir)
@@ -2298,7 +2210,6 @@ void COM_AddDefaultDir(char *pszDir)
 	}
 }
 
-/* <11de5> ../engine/common.c:2715 */
 void COM_StripTrailingSlash(char *ppath)
 {
 	int len = Q_strlen(ppath);
@@ -2312,7 +2223,6 @@ void COM_StripTrailingSlash(char *ppath)
 	}
 }
 
-/* <11e34> ../engine/common.c:2729 */
 void COM_ParseDirectoryFromCmd(const char *pCmdName, char *pDirName, const char *pDefault)
 {
 	const char *pParameter = NULL;
@@ -2349,7 +2259,6 @@ void COM_ParseDirectoryFromCmd(const char *pCmdName, char *pDirName, const char 
 }
 
 // TODO: finish me!
-/* <11f12> ../engine/common.c:2766 */
 qboolean COM_SetupDirectories(void)
 {
 	char pDirName[512];
@@ -2363,14 +2272,12 @@ qboolean COM_SetupDirectories(void)
 	if (FileSystem_SetGameDirectory(pDirName, (const char *)(com_gamedir[0] != 0 ? com_gamedir : 0)))
 	{
 		Info_SetValueForStarKey(Info_Serverinfo(), "*gamedir", com_gamedir, MAX_INFO_STRING);
-
 		return 1;
 	}
 
 	return 0;
 }
 
-/* <e637> ../engine/common.c:2796 */
 void COM_CheckPrintMap(dheader_t *header, const char *mapname, qboolean bShowOutdated)
 {
 	if (header->version == BSPVERSION)
@@ -2389,7 +2296,6 @@ void COM_CheckPrintMap(dheader_t *header, const char *mapname, qboolean bShowOut
 	}
 }
 
-/* <11f41> ../engine/common.c:2821 */
 void COM_ListMaps(char *pszSubString)
 {
 	dheader_t header;
@@ -2442,7 +2348,6 @@ void COM_ListMaps(char *pszSubString)
 	}
 }
 
-/* <1202d> ../engine/common.c:2873 */
 void COM_Log(char *pszFile, char *fmt, ...)
 {
 	char *pfilename;
@@ -2474,13 +2379,11 @@ void COM_Log(char *pszFile, char *fmt, ...)
 	}
 }
 
-/* <120a6> ../engine/common.c:2900 */
 unsigned char* EXT_FUNC COM_LoadFileForMe(char *filename, int *pLength)
 {
 	return COM_LoadFile(filename, 5, pLength);
 }
 
-/* <120e3> ../engine/common.c:2905 */
 int EXT_FUNC COM_CompareFileTime(char *filename1, char *filename2, int *iCompare)
 {
 	int ft1;
@@ -2512,7 +2415,6 @@ int EXT_FUNC COM_CompareFileTime(char *filename1, char *filename2, int *iCompare
 	return 0;
 }
 
-/* <12165> ../engine/common.c:2930 */
 void EXT_FUNC COM_GetGameDir(char *szGameDir)
 {
 	if (szGameDir)
@@ -2521,7 +2423,6 @@ void EXT_FUNC COM_GetGameDir(char *szGameDir)
 	}
 }
 
-/* <1218f> ../engine/common.c:2947 */
 int COM_EntsForPlayerSlots(int nPlayers)
 {
 	int numedicts = gmodinfo.num_edicts;
@@ -2540,7 +2441,6 @@ int COM_EntsForPlayerSlots(int nPlayers)
 	return (numedicts + 15 * (nPlayers - 1));
 }
 
-/* <12270> ../engine/common.c:2965 */
 void COM_NormalizeAngles(vec_t *angles)
 {
 	int i;
@@ -2558,16 +2458,8 @@ void COM_NormalizeAngles(vec_t *angles)
 	}
 }
 
-/*
-================
-COM_Munge funcs
-
-Anti-proxy/aimbot obfuscation code
-
-COM_UnMunge should reversably fixup the data
-================
-*/
-/* <12320> ../engine/common.c:3018 */
+// Anti-proxy/aimbot obfuscation code
+// COM_UnMunge should reversably fixup the data
 void COM_Munge(unsigned char *data, int len, int seq)
 {
 	int i;
@@ -2598,7 +2490,6 @@ void COM_Munge(unsigned char *data, int len, int seq)
 	}
 }
 
-/* <123f7> ../engine/common.c:3060 */
 void COM_UnMunge(unsigned char *data, int len, int seq)
 {
 	int i;
@@ -2696,7 +2587,7 @@ void COM_Munge2(unsigned char *data, int len, int seq)
 	}
 }
 #else // REHLDS_FIXES
-/* <124de> ../engine/common.c:3104 */
+
 void COM_Munge2(unsigned char *data, int len, int seq)
 {
 	int i;
@@ -2795,7 +2686,7 @@ void COM_UnMunge2(unsigned char *data, int len, int seq)
 	}
 }
 #else // REHLDS_FIXES
-/* <125b5> ../engine/common.c:3146 */
+
 void COM_UnMunge2(unsigned char *data, int len, int seq)
 {
 	int i;
@@ -2827,7 +2718,6 @@ void COM_UnMunge2(unsigned char *data, int len, int seq)
 }
 #endif // REHLDS_FIXES
 
-/* <1269c> ../engine/common.c:3190 */
 void COM_Munge3(unsigned char *data, int len, int seq)
 {
 	int i;
@@ -2858,7 +2748,6 @@ void COM_Munge3(unsigned char *data, int len, int seq)
 	}
 }
 
-/* <12773> ../engine/common.c:3232 */
 NOXREF void COM_UnMunge3(unsigned char *data, int len, int seq)
 {
 	NOXREFCHECK;
@@ -2891,29 +2780,27 @@ NOXREF void COM_UnMunge3(unsigned char *data, int len, int seq)
 	}
 }
 
-/* <e5a9> ../engine/common.c:3272 */
 typedef struct
 {
 	unsigned char chunkID[4];
-	long int chunkSize;
-	short int wFormatTag;
-	short unsigned int wChannels;
-	long unsigned int dwSamplesPerSec;
-	long unsigned int dwAvgBytesPerSec;
-	short unsigned int wBlockAlign;
-	short unsigned int wBitsPerSample;
+	long chunkSize;
+	short wFormatTag;
+	unsigned short wChannels;
+	unsigned long dwSamplesPerSec;
+	unsigned long dwAvgBytesPerSec;
+	unsigned short wBlockAlign;
+	unsigned short wBitsPerSample;
 } FormatChunk;
 
 #define WAVE_HEADER_LENGTH 128
 
-/* <1285a> ../engine/common.c:3287 */
 unsigned int EXT_FUNC COM_GetApproxWavePlayLength(const char *filepath)
 {
 	char buf[WAVE_HEADER_LENGTH + 1];
 	int filelength;
 	FileHandle_t hFile;
 	FormatChunk format;
-	
+
 	hFile = FS_Open(filepath, "rb");
 
 	if (hFile)

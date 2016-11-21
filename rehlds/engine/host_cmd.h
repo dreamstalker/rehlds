@@ -42,10 +42,8 @@
 #define FILETIME_TO_PAIR(f,h)\
 		(((uint64)f << 32) | h)
 
-/* <3d22f> ../engine/host_cmd.c:83 */
 typedef void (*SV_SAVEGAMECOMMENT_FUNC)(char *, int);
 
-/* <3c2b9> ../engine/host_cmd.h:40 */
 typedef struct GAME_HEADER_s
 {
 	char mapName[32];
@@ -53,7 +51,6 @@ typedef struct GAME_HEADER_s
 	int mapCount;
 } GAME_HEADER;
 
-/* <3c307> ../engine/host_cmd.h:47 */
 typedef struct SAVE_HEADER_s
 {
 	int saveId;
@@ -73,14 +70,12 @@ typedef struct SAVE_HEADER_s
 	float skyVec_z;
 } SAVE_HEADER;
 
-/* <3c3ed> ../engine/host_cmd.h:67 */
 typedef struct SAVELIGHTSTYLE_s
 {
 	int index;
 	char style[64];
 } SAVELIGHTSTYLE;
 
-/* <3d29e> ../engine/host_cmd.c:1792 */
 typedef struct TITLECOMMENT_s
 {
 	char *pBSPName;
@@ -110,7 +105,7 @@ typedef struct TITLECOMMENT_s
 #define g_iQuitCommandIssued (*pg_iQuitCommandIssued)
 #define g_pPostRestartCmdLineArgs pg_pPostRestartCmdLineArgs
 
-#endif //HOOK_ENGINE
+#endif // HOOK_ENGINE
 
 extern int r_dointerp;
 extern vec3_t r_origin;

@@ -45,7 +45,6 @@ hash_pack_header_t hash_pack_header;
 
 #endif //HOOK_ENGINE
 
-/* <2a7cb> ../engine/hashpak.c:65 */
 qboolean HPAK_GetDataPointer(char *pakname, struct resource_s *pResource, unsigned char **pbuffer, int *bufsize)
 {
 	qboolean retval = FALSE;
@@ -155,7 +154,6 @@ qboolean HPAK_GetDataPointer(char *pakname, struct resource_s *pResource, unsign
 	return retval;
 }
 
-/* <2a451> ../engine/hashpak.c:217 */
 qboolean HPAK_FindResource(hash_pack_directory_t *pDir, unsigned char *hash, struct resource_s *pResourceEntry)
 {
 	for (int i = 0; i < pDir->nEntries; i++)
@@ -171,7 +169,6 @@ qboolean HPAK_FindResource(hash_pack_directory_t *pDir, unsigned char *hash, str
 	return FALSE;
 }
 
-/* <2a916> ../engine/hashpak.c:243 */
 void HPAK_AddToQueue(char *pakname, struct resource_s *pResource, void *pData, FileHandle_t fpSource)
 {
 	hash_pack_queue_t *n = (hash_pack_queue_t *)Mem_Malloc(sizeof(hash_pack_queue_t));
@@ -202,7 +199,6 @@ void HPAK_AddToQueue(char *pakname, struct resource_s *pResource, void *pData, F
 	}
 }
 
-/* <2a955> ../engine/hashpak.c:286 */
 void HPAK_FlushHostQueue(void)
 {
 	for (hash_pack_queue_t *p = gp_hpak_queue; gp_hpak_queue != NULL; p = gp_hpak_queue)
@@ -215,7 +211,6 @@ void HPAK_FlushHostQueue(void)
 	}
 }
 
-/* <2a494> ../engine/hashpak.c:322 */
 void HPAK_AddLump(qboolean bUseQueue, char *pakname, struct resource_s *pResource, void *pData, FileHandle_t fpSource)
 {
 	FileHandle_t iRead;
@@ -412,7 +407,6 @@ void HPAK_AddLump(qboolean bUseQueue, char *pakname, struct resource_s *pResourc
 	FS_Rename(szTempName, szOriginalName);
 }
 
-/* <2a974> ../engine/hashpak.c:598 */
 void HPAK_RemoveLump(char *pakname, resource_t *pResource)
 {
 	FileHandle_t fp;
@@ -463,7 +457,7 @@ void HPAK_RemoveLump(char *pakname, resource_t *pResource)
 		FS_Close(fp);
 		Con_Printf("ERROR: couldn't create %s.\n", szTempName);
 		return;
-	}	
+	}
 	FS_Seek(fp, 0, FILESYSTEM_SEEK_HEAD);
 	FS_Seek(tmp, 0, FILESYSTEM_SEEK_HEAD);
 	FS_Read(&hash_pack_header, sizeof(hash_pack_header_t), 1, fp);
@@ -549,7 +543,6 @@ void HPAK_RemoveLump(char *pakname, resource_t *pResource)
 	Mem_Free(newdir.p_rgEntries);
 }
 
-/* <2aac9> ../engine/hashpak.c:772 */
 qboolean HPAK_ResourceForIndex(char *pakname, int nIndex, struct resource_s *pResource)
 {
 	hash_pack_header_t header;
@@ -609,7 +602,6 @@ qboolean HPAK_ResourceForIndex(char *pakname, int nIndex, struct resource_s *pRe
 	return TRUE;
 }
 
-/* <2abc5> ../engine/hashpak.c:855 */
 qboolean HPAK_ResourceForHash(char *pakname, unsigned char *hash, struct resource_s *pResourceEntry)
 {
 	qboolean bFound;
@@ -675,7 +667,6 @@ qboolean HPAK_ResourceForHash(char *pakname, unsigned char *hash, struct resourc
 	return bFound;
 }
 
-/* <2a644> ../engine/hashpak.c:945 */
 void HPAK_List_f(void)
 {
 	hash_pack_header_t header;
@@ -765,7 +756,6 @@ void HPAK_List_f(void)
 	Mem_Free(directory.p_rgEntries);
 }
 
-/* <2a121> ../engine/hashpak.c:1060 */
 void HPAK_CreatePak(char *pakname, struct resource_s *pResource, void *pData, FileHandle_t fpSource)
 {
 	char name[MAX_PATH];
@@ -866,7 +856,6 @@ void HPAK_CreatePak(char *pakname, struct resource_s *pResource, void *pData, Fi
 	FS_Close(fp);
 }
 
-/* <2ab62> ../engine/hashpak.c:1200 */
 void HPAK_Remove_f(void)
 {
 	int nIndex;
@@ -892,7 +881,6 @@ void HPAK_Remove_f(void)
 	else Con_Printf("Could not locate resource %i in %s\n", nIndex, pakname);
 }
 
-/* <2a3cb> ../engine/hashpak.c:1235 */
 void HPAK_Validate_f(void)
 {
 	hash_pack_header_t header;
@@ -1024,7 +1012,6 @@ void HPAK_Validate_f(void)
 	Mem_Free(directory.p_rgEntries);
 }
 
-/* <2a33c> ../engine/hashpak.c:1401 */
 void HPAK_Extract_f(void)
 {
 	hash_pack_header_t header;
@@ -1170,7 +1157,6 @@ void HPAK_Extract_f(void)
 	Mem_Free(directory.p_rgEntries);
 }
 
-/* <2ae78> ../engine/hashpak.c:1580 */
 void HPAK_Init(void)
 {
 #ifdef HOOK_ENGINE
@@ -1187,7 +1173,6 @@ void HPAK_Init(void)
 	gp_hpak_queue = NULL;
 }
 
-/* <2ae8e> ../engine/hashpak.c:1599 */
 NOXREF char *HPAK_GetItem(int item)
 {
 	NOXREFCHECK;
@@ -1244,7 +1229,6 @@ NOXREF char *HPAK_GetItem(int item)
 	return name;
 }
 
-/* <2af4b> ../engine/hashpak.c:1678 */
 void HPAK_CheckSize(char *pakname)
 {
 	char fullname[MAX_PATH];
@@ -1288,7 +1272,6 @@ void HPAK_CheckSize(char *pakname)
 	}
 }
 
-/* <2afb5> ../engine/hashpak.c:1728 */
 void HPAK_ValidatePak(char *fullpakname)
 {
 	hash_pack_header_t header;
@@ -1374,7 +1357,6 @@ void HPAK_ValidatePak(char *fullpakname)
 	Mem_Free(directory.p_rgEntries);
 }
 
-/* <2b0b6> ../engine/hashpak.c:1848 */
 void HPAK_CheckIntegrity(char *pakname)
 {
 	char name[256];

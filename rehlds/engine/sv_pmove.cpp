@@ -28,20 +28,16 @@
 
 #include "precompiled.h"
 
-
-/* <b1cb4> ../engine/sv_pmove.c:12 */
-void PM_SV_PlaybackEventFull(int flags, int clientindex, short unsigned int eventindex, float delay, float *origin, float *angles, float fparam1, float fparam2, int iparam1, int iparam2, int bparam1, int bparam2)
+void PM_SV_PlaybackEventFull(int flags, int clientindex, unsigned short eventindex, float delay, float *origin, float *angles, float fparam1, float fparam2, int iparam1, int iparam2, int bparam1, int bparam2)
 {
 	EV_SV_Playback(flags | FEV_NOTHOST, clientindex, eventindex, delay, origin, angles, fparam1, fparam2, iparam1, iparam2, bparam1, bparam2);
 }
 
-/* <b1d75> ../engine/sv_pmove.c:25 */
 void PM_SV_PlaySound(int channel, const char  *sample, float volume, float attenuation, int fFlags, int pitch)
 {
 	SV_StartSound(1, host_client->edict, channel, sample, (int)(volume * 255.0), attenuation, fFlags, pitch);
 }
 
-/* <b1de3> ../engine/sv_pmove.c:38 */
 const char *PM_SV_TraceTexture(int ground, vec_t *vstart, vec_t *vend)
 {
 	if (ground < 0 || ground >= pmove->numphysent)

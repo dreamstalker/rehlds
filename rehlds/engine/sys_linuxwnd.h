@@ -31,55 +31,43 @@
 #include "maintypes.h"
 #include "igame.h"
 
-class CGame : public IGame {
+class CGame: public IGame {
 private:
-	bool m_bActiveApp;         /*     4     1 */
+	bool m_bActiveApp;
 
 public:
-
 	CGame();
-
 	virtual ~CGame();
 
 	virtual bool Init(void *pvInstance);
-	bool Init_noVirt(void *pvInstance);
-
 	virtual bool Shutdown();
-	bool Shutdown_noVirt();
-
 	virtual bool CreateGameWindow();
-	bool CreateGameWindow_noVirt();
-
 	virtual void SleepUntilInput(int time);
-	void SleepUntilInput_noVirt(int time);
-
 	virtual HWND GetMainWindow();
-	HWND GetMainWindow_noVirt();
-
 	virtual HWND * GetMainWindowAddress();
-	HWND * GetMainWindowAddress_noVirt();
-
 	virtual void SetWindowXY(int x, int y);
-	void SetWindowXY_noVirt(int x, int y);
-
 	virtual void SetWindowSize(int w, int h);
-	void SetWindowSize_noVirt(int w, int h);
-
 	virtual void GetWindowRect(int *x, int *y, int *w, int *h);
-	void GetWindowRect_noVirt(int *x, int *y, int *w, int *h);
-
 	virtual bool IsActiveApp();
-	bool IsActiveApp_noVirt();
-
 	virtual bool IsMultiplayer();
-	bool IsMultiplayer_noVirt();
-
 	virtual void PlayStartupVideos();
-	void PlayStartupVideos_noVirt();
-
 	virtual void PlayAVIAndWait(const char *aviFile);
-	void PlayAVIAndWait_noVirt(const char *aviFile);
+	virtual void SetCursorVisible(bool bState);
 
-	virtual void SetCursorVisible(bool vis);
-	void SetCursorVisible_noVirt(bool vis);
+	// non-virtual function's of wrap for hooks a virtual
+	// Only need to HOOK_ENGINE
+	bool Init_noVirt(void *pvInstance);
+	bool Shutdown_noVirt();
+	bool CreateGameWindow_noVirt();
+	void SleepUntilInput_noVirt(int time);
+	HWND GetMainWindow_noVirt();
+	HWND * GetMainWindowAddress_noVirt();
+	void SetWindowXY_noVirt(int x, int y);
+	void SetWindowSize_noVirt(int w, int h);
+	void GetWindowRect_noVirt(int *x, int *y, int *w, int *h);
+	bool IsActiveApp_noVirt();
+	bool IsMultiplayer_noVirt();
+	void PlayStartupVideos_noVirt();
+	void PlayAVIAndWait_noVirt(const char *aviFile);
+	void SetCursorVisible_noVirt(bool bState);
 };

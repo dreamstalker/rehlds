@@ -28,14 +28,11 @@
 
 #include "precompiled.h"
 
-
-/* <47cf1> ../engine/mem.c:8 */
 void *Mem_Malloc(size_t size)
 {
 	return malloc(size);
 }
 
-/* <47d1c> ../engine/mem.c:13 */
 void *Mem_ZeroMalloc(size_t size)
 {
 	void *p = malloc(size);
@@ -43,25 +40,21 @@ void *Mem_ZeroMalloc(size_t size)
 	return p;
 }
 
-/* <47d55> ../engine/mem.c:23 */
 void *Mem_Realloc(void *memblock, size_t size)
 {
 	return realloc(memblock, size);
 }
 
-/* <47d8e> ../engine/mem.c:28 */
 void* EXT_FUNC Mem_Calloc(int num, size_t size)
 {
 	return calloc(num, size);
 }
 
-/* <47dc7> ../engine/mem.c:33 */
 char *Mem_Strdup(const char *strSource)
 {
 	return _strdup(strSource);
 }
 
-/* <47df2> ../engine/mem.c:38 */
 void Mem_Free(void *p)
 {
 	free(p);

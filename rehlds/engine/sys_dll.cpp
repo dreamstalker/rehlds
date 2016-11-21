@@ -196,7 +196,7 @@ enginefuncs_t g_engfuncsExportedToDlls = {
 	EngCheckParm
 };
 
-#else //HOOK_ENGINE
+#else // HOOK_ENGINE
 
 int g_FPUCW_Mask_Prec_64Bit;
 int g_FPUCW_Mask_Prec_64Bit_2;
@@ -207,7 +207,7 @@ FileFindHandle_t g_hfind;
 
 enginefuncs_t g_engfuncsExportedToDlls;
 
-#endif //HOOK_ENGINE
+#endif // HOOK_ENGINE
 
 #ifdef _WIN32
 void Sys_SetupFPUOptions()
@@ -290,13 +290,11 @@ NOINLINE void Sys_FPUCW_Pop_Prec64() {
 
 #endif // _WIN32
 
-/* <8d234> ../engine/sys_dll.c:161 */
 NOXREF void Sys_PageIn(void *ptr, int size)
 {
 }
 
 // TODO: investigate filesystem_stdio problem (multiple enumeration of files).
-/* <8d0fa> ../engine/sys_dll.c:201 */
 const char *Sys_FindFirst(const char *path, char *basename)
 {
 	if (g_hfind != -1)
@@ -322,7 +320,6 @@ const char *Sys_FindFirst(const char *path, char *basename)
 	return psz;
 }
 
-/* <8d565> ../engine/sys_dll.c:227 */
 const char *Sys_FindFirstPathID(const char *path, char *pathid)
 {
 	//const char *psz;//unused?
@@ -332,7 +329,6 @@ const char *Sys_FindFirstPathID(const char *path, char *pathid)
 }
 
 // TODO: investigate filesystem_stdio problem (multiple enumeration of files).
-/* <8d168> ../engine/sys_dll.c:247 */
 const char *Sys_FindNext(char *basename)
 {
 	const char *psz = FS_FindNext(g_hfind);
@@ -353,7 +349,6 @@ const char *Sys_FindNext(char *basename)
 	return psz;
 }
 
-/* <8d290> ../engine/sys_dll.c:263 */
 void Sys_FindClose(void)
 {
 	if (g_hfind != -1)
@@ -367,7 +362,6 @@ void Sys_FindClose(void)
 #endif // REHLDS_FIXES
 }
 
-/* <8d2ac> ../engine/sys_dll.c:280 */
 NOBODY int glob_match_after_star(char *pattern, char *text);
 //{
 //	char *p;                                                     //   282
@@ -376,13 +370,12 @@ NOBODY int glob_match_after_star(char *pattern, char *text);
 //	char c1;                                                      //   283
 //}
 
-/* <8d300> ../engine/sys_dll.c:323 */
 NOBODY int glob_match(char *pattern, char *text);
 //{
 //	char *p;                                                     //   325
 //	char *t;                                                     //   325
 //	char c;                                                       //   326
-//	
+//
 //match :                                                                //   386;
 //	{
 //		char c1;                                              //   347
@@ -396,7 +389,6 @@ NOBODY int glob_match(char *pattern, char *text);
 //				char *text); /* size=0, low_pc=0 */ //   343
 //}
 
-/* <8d403> ../engine/sys_dll.c:424 */
 NOXREF void Sys_MakeCodeWriteable(uint32 startaddr, uint32 length)
 {
 #ifdef _WIN32
@@ -405,30 +397,24 @@ NOXREF void Sys_MakeCodeWriteable(uint32 startaddr, uint32 length)
 #endif // _WIN32
 }
 
-/* <8d43b> ../engine/sys_dll.c:441 */
 NOBODY void Sys_SetFPCW(void);
 //{
 //}
 
-/* <8d450> ../engine/sys_dll.c:445 */
 NOBODY void Sys_PushFPCW_SetHigh(void);
 //{
 //}
 
-/* <8d465> ../engine/sys_dll.c:449 */
 NOBODY void Sys_PopFPCW(void);
 //{
 //}
 
-/* <8d47a> ../engine/sys_dll.c:453 */
 NOBODY void MaskExceptions(void);
 //{
 //}
 
-/* <8d48f> ../engine/sys_dll.c:469 */
 NOBODY void Sys_Init(void);
 
-/* <8d4a4> ../engine/sys_dll.c:509 */
 NOXREF void Sys_Sleep(int msec)
 {
 #ifdef _WIN32
@@ -438,12 +424,10 @@ NOXREF void Sys_Sleep(int msec)
 #endif // _WIN32
 }
 
-/* <8d4cd> ../engine/sys_dll.c:519 */
 NOBODY void Sys_DebugOutStraight(const char *pStr);
 //{
 //}
 
-/* <8d4f7> ../engine/sys_dll.c:529 */
 void __declspec(noreturn) Sys_Error(const char *error, ...)
 {
 	va_list argptr;
@@ -515,7 +499,6 @@ void __declspec(noreturn) Sys_Error(const char *error, ...)
 	*(int *)NULL = NULL;
 }
 
-/* <8d626> ../engine/sys_dll.c:600 */
 NOXREF void Sys_Warning(const char *pszWarning, ...)
 {
 	va_list argptr;
@@ -528,7 +511,6 @@ NOXREF void Sys_Warning(const char *pszWarning, ...)
 	Sys_Printf(text);
 }
 
-/* <8d5db> ../engine/sys_dll.c:612 */
 void Sys_Printf(const char *fmt, ...)
 {
 	char Dest[1024];
@@ -550,7 +532,6 @@ void Sys_Printf(const char *fmt, ...)
 
 }
 
-/* <8d671> ../engine/sys_dll.c:645 */
 void Sys_Quit(void)
 {
 	giActive = DLL_CLOSE;
@@ -636,13 +617,11 @@ double Sys_FloatTime(void)
 
 #endif //_WIN32
 
-/* <8d042> ../engine/sys_dll.c:830 */
 void Dispatch_Substate(int iSubState)
 {
 	giSubState = iSubState;
 }
 
-/* <8d6f5> ../engine/sys_dll.c:835 */
 void GameSetSubState(int iSubState)
 {
 	if (iSubState & 2)
@@ -655,18 +634,15 @@ void GameSetSubState(int iSubState)
 	}
 }
 
-/* <8d753> ../engine/sys_dll.c:847 */
 void GameSetState(int iState)
 {
 	giActive = iState;
 }
 
-/* <8d77c> ../engine/sys_dll.c:853 */
 NOBODY void GameSetBackground(qboolean bNewSetting);
 //{
 //}
 
-/* <8d191> ../engine/sys_dll.c:1076 */
 qboolean EXT_FUNC Voice_GetClientListening(int iReceiver, int iSender)
 {
 	--iReceiver;
@@ -682,7 +658,6 @@ qboolean EXT_FUNC Voice_GetClientListening(int iReceiver, int iSender)
 #endif // REHLDS_FIXES
 }
 
-/* <8d1d0> ../engine/sys_dll.c:1090 */
 qboolean EXT_FUNC Voice_SetClientListening(int iReceiver, int iSender, qboolean bListen)
 {
 	--iReceiver;
@@ -704,7 +679,6 @@ qboolean EXT_FUNC Voice_SetClientListening(int iReceiver, int iSender, qboolean 
 	return 1;
 }
 
-/* <8d7a5> ../engine/sys_dll.c:1332 */
 DISPATCHFUNCTION GetDispatch(char *pname)
 {
 	int i;
@@ -722,7 +696,6 @@ DISPATCHFUNCTION GetDispatch(char *pname)
 	return NULL;
 }
 
-/* <8d80b> ../engine/sys_dll.c:1362 */
 const char *FindAddressInTable(extensiondll_t *pDll, uint32 function)
 {
 #ifdef _WIN32
@@ -744,7 +717,6 @@ const char *FindAddressInTable(extensiondll_t *pDll, uint32 function)
 	return NULL;
 }
 
-/* <8d05e> ../engine/sys_dll.c:1383 */
 uint32 FindNameInTable(extensiondll_t *pDll, const char *pName)
 {
 #ifdef _WIN32
@@ -761,7 +733,6 @@ uint32 FindNameInTable(extensiondll_t *pDll, const char *pName)
 #endif // _WIN32
 }
 
-/* <8d8a0> ../engine/sys_dll.c:1407 */
 NOBODY const char *ConvertNameToLocalPlatform(const char *pchInName);
 //{
 //	char s_szNewName;                                             //  1409
@@ -779,13 +750,11 @@ NOBODY const char *ConvertNameToLocalPlatform(const char *pchInName);
 //	}
 //}
 
-/* <8df19> ../engine/sys_dll.c:1499 */
 uint32 EXT_FUNC FunctionFromName(const char *pName)
 {
 	return 0; //TODO: do we really need to reverse it?
 }
 
-/* <8de9a> ../engine/sys_dll.c:1518 */
 const char* EXT_FUNC NameForFunction(uint32 function)
 {
 	int i;
@@ -804,19 +773,16 @@ const char* EXT_FUNC NameForFunction(uint32 function)
 	return NULL;
 }
 
-/* <8d9e7> ../engine/sys_dll.c:1536 */
 ENTITYINIT GetEntityInit(char *pClassName)
 {
 	return (ENTITYINIT)GetDispatch(pClassName);
 }
 
-/* <8da46> ../engine/sys_dll.c:1543 */
 FIELDIOFUNCTION GetIOFunction(char *pName)
 {
 	return (FIELDIOFUNCTION)GetDispatch(pName);
 }
 
-/* <8daa5> ../engine/sys_dll.c:1550 */
 void DLL_SetModKey(modinfo_t *pinfo, char *pkey, char *pvalue)
 {
 	if (!Q_stricmp(pkey, "url_info"))
@@ -888,7 +854,6 @@ void DLL_SetModKey(modinfo_t *pinfo, char *pkey, char *pvalue)
 
 }
 
-/* <8e07f> ../engine/sys_dll.c:1629 */
 void LoadEntityDLLs(const char *szBaseDir)
 {
 	FileHandle_t hLibListFile;
@@ -1057,7 +1022,6 @@ HMODULE LoadWindowsDLL(LPCSTR lpLibFileName)
 }
 #endif //_WIN32
 
-/* <8de05> ../engine/sys_dll.c:1884 */
 void LoadThisDll(const char *szDllFilename)
 {
 #ifdef _WIN32
@@ -1120,7 +1084,6 @@ IgnoreThisDLL:
 	}
 }
 
-/* <8dba1> ../engine/sys_dll.c:1958 */
 void ReleaseEntityDlls(void)
 {
 	extensiondll_t *pextdll;
@@ -1130,7 +1093,7 @@ void ReleaseEntityDlls(void)
 		return;
 
 	FreeAllEntPrivateData();
-	
+
 	if (gNewDLLFunctions.pfnGameShutdown)
 		gNewDLLFunctions.pfnGameShutdown();
 
@@ -1158,13 +1121,11 @@ void ReleaseEntityDlls(void)
 	g_psvs.dll_initialized = FALSE;
 }
 
-/* <8ddcb> ../engine/sys_dll.c:2006 */
 void EXT_FUNC EngineFprintf(void *pfile, const char *szFmt, ...)
 {
 	AlertMessage(at_console, "EngineFprintf:  Obsolete API\n");
 }
 
-/* <8dd6f> ../engine/sys_dll.c:2022 */
 void EXT_FUNC AlertMessage(ALERT_TYPE atype, const char *szFmt, ...)
 {
 	va_list argptr;
@@ -1209,7 +1170,6 @@ void EXT_FUNC AlertMessage(ALERT_TYPE atype, const char *szFmt, ...)
 	va_end(argptr);
 }
 
-/* <8dbdc> ../engine/sys_dll.c:2198 */
 NOXREF void Sys_SplitPath(const char *path, char *drive, char *dir, char *fname, char *ext)
 {
 #ifdef _WIN32
@@ -1287,7 +1247,6 @@ NOXREF void Sys_SplitPath(const char *path, char *drive, char *dir, char *fname,
 #endif // _WIN32
 }
 
-/* <8d0c6> ../engine/sys_dll.c:2344 */
 void Con_Debug_f(void)
 {
 	if (con_debuglog)
@@ -1302,7 +1261,6 @@ void Con_Debug_f(void)
 	}
 }
 
-/* <8e069> ../engine/sys_dll.c:2364 */
 void Con_Init(void)
 {
 	con_debuglog = COM_CheckParm("-condebug");
@@ -1315,7 +1273,6 @@ void Con_Init(void)
 #endif
 }
 
-/* <8dc81> ../engine/sys_dll.c:2385 */
 void Con_DebugLog(const char *file, const char *fmt, ...)
 {
 	va_list argptr;
@@ -1343,7 +1300,6 @@ void Con_DebugLog(const char *file, const char *fmt, ...)
 #endif // _WIN32
 }
 
-/* <8dcfd> ../engine/sys_dll.c:2407 */
 void EXT_FUNC Con_Printf(const char *fmt, ...)
 {
 	char Dest[4096];
@@ -1389,7 +1345,6 @@ void EXT_FUNC Con_Printf(const char *fmt, ...)
 	}
 }
 
-/* <8dfae> ../engine/sys_dll.c:2442 */
 void Con_SafePrintf(const char *fmt, ...)
 {
 	va_list argptr;
@@ -1407,7 +1362,6 @@ void Con_SafePrintf(const char *fmt, ...)
 #endif // _WIN32
 }
 
-/* <8e00b> ../engine/sys_dll.c:2459 */
 #if defined(REHLDS_FIXES) && defined(REHLDS_FLIGHT_REC)
 // Always print debug logs to the flight recorder
 void EXT_FUNC Con_DPrintf(const char *fmt, ...)
@@ -1433,7 +1387,7 @@ void EXT_FUNC Con_DPrintf(const char *fmt, ...)
 	}
 }
 
-#else //defined(REHLDS_FIXES) and defined(REHLDS_FLIGHT_REC)
+#else // defined(REHLDS_FIXES) and defined(REHLDS_FLIGHT_REC)
 
 void EXT_FUNC Con_DPrintf(const char *fmt, ...)
 {

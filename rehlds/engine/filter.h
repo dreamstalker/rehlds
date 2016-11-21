@@ -42,7 +42,6 @@
 #define MAX_USERFILTERS		32768
 #endif // REHLDS_FIXES
 
-/* <a05ba> ../engine/filter.h:12 */
 typedef struct ipfilter_s
 {
 	unsigned int mask;
@@ -57,7 +56,6 @@ typedef struct ipfilter_s
 #endif // REHLDS_FIXES
 } ipfilter_t;
 
-/* <a0606> ../engine/filter.h:20 */
 typedef struct userfilter_s
 {
 	USERID_t userid;

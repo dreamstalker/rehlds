@@ -43,7 +43,6 @@ int c_no;
 
 #endif //HOOK_ENGINE
 
-/* <ade4a> ../engine/sv_move.c:27 */
 qboolean SV_CheckBottom(edict_t *ent)
 {
 	vec3_t mins;
@@ -90,7 +89,7 @@ realcheck:
 		return 0;
 
 	mid = bottom = trace.endpos[2];
-	
+
 	for (x = 0; x <= 1; x++)
 	{
 		for (y = 0; y <= 1; y++)
@@ -110,7 +109,6 @@ realcheck:
 	return 1;
 }
 
-/* <adf79> ../engine/sv_move.c:106 */
 qboolean SV_movetest(edict_t *ent, vec_t *move, qboolean relink)
 {
 	vec3_t oldorg;
@@ -127,7 +125,7 @@ qboolean SV_movetest(edict_t *ent, vec_t *move, qboolean relink)
 	neworg[2] = ent->v.origin[2] + move[2];
 	end[0] = neworg[0];
 	end[1] = neworg[1];
-	
+
 	neworg[2] += sv_stepsize.value;
 	end[2] = neworg[2] - (2 * sv_stepsize.value);
 	trace = SV_MoveNoEnts(neworg, ent->v.mins, ent->v.maxs, end, 0, ent);
@@ -185,7 +183,6 @@ qboolean SV_movetest(edict_t *ent, vec_t *move, qboolean relink)
 	return 1;
 }
 
-/* <addc1> ../engine/sv_move.c:197 */
 qboolean SV_movestep(edict_t *ent, vec_t *move, qboolean relink)
 {
 	trace_t trace;
@@ -198,7 +195,7 @@ qboolean SV_movestep(edict_t *ent, vec_t *move, qboolean relink)
 	oldorg[0] = ent->v.origin[0];
 	oldorg[1] = ent->v.origin[1];
 	oldorg[2] = ent->v.origin[2];
-	
+
 	start[0] = ent->v.origin[0] + move[0];
 	start[1] = ent->v.origin[1] + move[1];
 	start[2] = ent->v.origin[2] + move[2];
@@ -212,8 +209,8 @@ qboolean SV_movestep(edict_t *ent, vec_t *move, qboolean relink)
 			start[1] = ent->v.origin[1] + move[1];
 			start[2] = ent->v.origin[2] + move[2];
 			edict_t* enemy = ent->v.enemy;
-			
-			
+
+
 			if (i == 0 && enemy)
 			{
 				dz = ent->v.origin[2] - enemy->v.origin[2];
@@ -306,7 +303,6 @@ qboolean SV_movestep(edict_t *ent, vec_t *move, qboolean relink)
 	return 1;
 }
 
-/* <ae06b> ../engine/sv_move.c:333 */
 qboolean SV_StepDirection(edict_t *ent, float yaw, float dist)
 {
 	vec3_t move;
@@ -326,7 +322,6 @@ qboolean SV_StepDirection(edict_t *ent, float yaw, float dist)
 	}
 }
 
-/* <ae0f7> ../engine/sv_move.c:381 */
 qboolean SV_FlyDirection(edict_t *ent, vec_t *direction)
 {
 	if (SV_movestep(ent, direction, 0))
@@ -341,13 +336,11 @@ qboolean SV_FlyDirection(edict_t *ent, vec_t *direction)
 	}
 }
 
-/* <ae15a> ../engine/sv_move.c:402 */
 void SV_FixCheckBottom(edict_t *ent)
 {
 	ent->v.flags |= FL_PARTIALGROUND;
 }
 
-/* <ae177> ../engine/sv_move.c:418 */
 NOXREF void SV_NewChaseDir(edict_t *actor, edict_t *enemy, float dist)
 {
 	float deltax;
@@ -382,7 +375,7 @@ NOXREF void SV_NewChaseDir(edict_t *actor, edict_t *enemy, float dist)
 			tdir = d[2] == 90.0 ? 45.0 : 315.0;
 		else
 			tdir = d[2] == 90.0 ? 135.0 : 215.0;
-			
+
 		if (tdir != turnaround && SV_StepDirection(actor, tdir, dist))
 			return;
 	}
@@ -425,7 +418,6 @@ NOXREF void SV_NewChaseDir(edict_t *actor, edict_t *enemy, float dist)
 		SV_FixCheckBottom(actor);
 }
 
-/* <ae41e> ../engine/sv_move.c:507 */
 NOXREF qboolean SV_CloseEnough(edict_t *ent, edict_t *goal, float dist)
 {
 	int i;
@@ -439,7 +431,6 @@ NOXREF qboolean SV_CloseEnough(edict_t *ent, edict_t *goal, float dist)
 	return TRUE;
 }
 
-/* <ae477> ../engine/sv_move.c:528 */
 NOXREF qboolean SV_ReachedGoal(edict_t *ent, vec_t *vecGoal, float flDist)
 {
 	int i;
@@ -453,7 +444,6 @@ NOXREF qboolean SV_ReachedGoal(edict_t *ent, vec_t *vecGoal, float flDist)
 	return TRUE;
 }
 
-/* <ae4d0> ../engine/sv_move.c:601 */
 void SV_NewChaseDir2(edict_t *actor, vec_t *vecGoal, float dist)
 {
 	float deltax;
@@ -536,7 +526,6 @@ void SV_NewChaseDir2(edict_t *actor, vec_t *vecGoal, float dist)
 	}
 }
 
-/* <ae777> ../engine/sv_move.c:690 */
 void EXT_FUNC SV_MoveToOrigin_I(edict_t *ent, const float *pflGoal, float dist, int iStrafe)
 {
 	vec3_t vecGoal;
@@ -545,7 +534,7 @@ void EXT_FUNC SV_MoveToOrigin_I(edict_t *ent, const float *pflGoal, float dist, 
 	vecGoal[0] = pflGoal[0];
 	vecGoal[1] = pflGoal[1];
 	vecGoal[2] = pflGoal[2];
-	
+
 	if (ent->v.flags & (FL_ONGROUND | FL_SWIM | FL_FLY))
 	{
 		if (iStrafe)

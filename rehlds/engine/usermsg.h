@@ -35,8 +35,6 @@
 #include "maintypes.h"
 #include "quakedef.h"
 
-
-/* <3d23a> ../engine/usermsg.h:17 */
 typedef struct _UserMsg
 {
 	int iMsg;

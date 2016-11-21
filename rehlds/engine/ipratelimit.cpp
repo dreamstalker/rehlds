@@ -30,13 +30,11 @@
 
 //bool (__fastcall *pCIPRateLimit__CheckIP)(CIPRateLimit *obj, int none, netadr_t adr);
 
-
-/* <e50a3> ../engine/ipratelimit.cpp:27 */
-bool CIPRateLimit::CheckIP(netadr_t adr)
+NOBODY bool CIPRateLimit::CheckIP(netadr_t adr)
 {
 	// TODO: Reverse me
 	//{
-	//	long int curTime;                                     //    29
+	//	long curTime;                                     //    29
 	//	ip_t clientIP;                                        //    32
 	//	class iprate_s findEntry;                             //    56
 	//	ip_t entry;                                           //    57

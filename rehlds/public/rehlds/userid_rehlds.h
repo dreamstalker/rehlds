@@ -38,7 +38,6 @@ enum AUTH_IDTYPE
 	AUTH_IDTYPE_LOCAL	= 3
 };
 
-/* <2e915> ../engine/userid.h:22 */
 typedef struct USERID_s
 {
 	int idtype;

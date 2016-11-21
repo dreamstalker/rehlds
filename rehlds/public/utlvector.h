@@ -20,7 +20,6 @@
 #include "utlmemory.h"
 #include "tier0/platform.h"
 
-/* <27e3b> ../public/UtlVector.h:37 */
 template<class T>
 class CUtlVector
 {
@@ -31,7 +30,7 @@ public:
 	CUtlVector( int growSize = 0, int initSize = 0 );
 	CUtlVector( T* pMemory, int numElements );
 	~CUtlVector();
-	
+
 	// Copy the array.
 	CUtlVector<T>& operator=( const CUtlVector<T> &other );
 
@@ -68,17 +67,17 @@ public:
 
 	// Adds multiple elements, uses default constructor
 	int AddMultipleToHead( int num );
-	int AddMultipleToTail( int num, const T *pToCopy=NULL );	   
+	int AddMultipleToTail( int num, const T *pToCopy=NULL );
 	int InsertMultipleBefore( int elem, int num, const T *pToCopy=NULL );	// If pToCopy is set, then it's an array of length 'num' and
 	int InsertMultipleAfter( int elem, int num );
 
 	// Calls RemoveAll() then AddMultipleToTail.
 	void SetSize( int size );
 	void SetCount( int count );
-	
+
 	// Calls SetSize and copies each element.
 	void CopyArray( T const *pArray, int size );
-	
+
 	// Add the specified array to the tail.
 	int AddVectorToTail( CUtlVector<T> const &src );
 
@@ -111,7 +110,7 @@ public:
 
 protected:
 	// Can't copy this unless we explicitly do it!
-	CUtlVector( CUtlVector const& vec ) { assert(0); 
+	CUtlVector( CUtlVector const& vec ) { assert(0);
 	}
 
 	// Grows the vector
@@ -132,11 +131,9 @@ protected:
 	T *m_pElements;
 };
 
-
 //-----------------------------------------------------------------------------
 // For easier access to the elements through the debugger
 //-----------------------------------------------------------------------------
-
 template< class T >
 inline void CUtlVector<T>::ResetDbgInfo()
 {
@@ -146,16 +143,15 @@ inline void CUtlVector<T>::ResetDbgInfo()
 //-----------------------------------------------------------------------------
 // constructor, destructor
 //-----------------------------------------------------------------------------
-
 template< class T >
-inline CUtlVector<T>::CUtlVector( int growSize, int initSize )	: 
+inline CUtlVector<T>::CUtlVector( int growSize, int initSize )	:
 	m_Memory(growSize, initSize), m_Size(0)
 {
 	ResetDbgInfo();
 }
 
 template< class T >
-inline CUtlVector<T>::CUtlVector( T* pMemory, int numElements )	: 
+inline CUtlVector<T>::CUtlVector( T* pMemory, int numElements )	:
 	m_Memory(pMemory, numElements), m_Size(0)
 {
 	ResetDbgInfo();
@@ -177,7 +173,6 @@ inline CUtlVector<T>& CUtlVector<T>::operator=( const CUtlVector<T> &other )
 //-----------------------------------------------------------------------------
 // element access
 //-----------------------------------------------------------------------------
-
 template< class T >
 inline T& CUtlVector<T>::operator[]( int i )
 {
@@ -206,11 +201,9 @@ inline T const& CUtlVector<T>::Element( int i ) const
 	return m_Memory[i];
 }
 
-
 //-----------------------------------------------------------------------------
 // Gets the base address (can change when adding elements!)
 //-----------------------------------------------------------------------------
-
 template< class T >
 inline T* CUtlVector<T>::Base()
 {
@@ -226,7 +219,6 @@ inline T const* CUtlVector<T>::Base() const
 //-----------------------------------------------------------------------------
 // Count
 //-----------------------------------------------------------------------------
-
 template< class T >
 inline int CUtlVector<T>::Size() const
 {
@@ -239,17 +231,14 @@ inline int CUtlVector<T>::Count() const
 	return m_Size;
 }
 
-
 //-----------------------------------------------------------------------------
 // Is element index valid?
 //-----------------------------------------------------------------------------
-
 template< class T >
 inline bool CUtlVector<T>::IsValidIndex( int i ) const
 {
 	return (i >= 0) && (i < m_Size);
 }
- 
 
 //-----------------------------------------------------------------------------
 // Returns in invalid index
@@ -259,7 +248,6 @@ inline int CUtlVector<T>::InvalidIndex( void )
 {
 	return -1;
 }
-
 
 //-----------------------------------------------------------------------------
 // Grows the vector
@@ -276,7 +264,6 @@ void CUtlVector<T>::GrowVector( int num )
 	ResetDbgInfo();
 }
 
-
 //-----------------------------------------------------------------------------
 // Makes sure we have enough memory allocated to store a requested # of elements
 //-----------------------------------------------------------------------------
@@ -287,7 +274,6 @@ void CUtlVector<T>::EnsureCapacity( int num )
 	ResetDbgInfo();
 }
 
-
 //-----------------------------------------------------------------------------
 // Makes sure we have at least this many elements
 //-----------------------------------------------------------------------------
@@ -297,7 +283,6 @@ void CUtlVector<T>::EnsureCount( int num )
 	if (Count() < num)
 		AddMultipleToTail( num - Count() );
 }
-
 
 //-----------------------------------------------------------------------------
 // Shifts elements
@@ -359,7 +344,6 @@ int CUtlVector<T>::InsertBefore( int elem )
 	Construct( &Element(elem) );
 	return elem;
 }
-
 
 //-----------------------------------------------------------------------------
 // Adds an element, uses copy constructor
@@ -444,11 +428,11 @@ template< class T >
 int CUtlVector<T>::AddVectorToTail( CUtlVector const &src )
 {
 	int base = Count();
-	
+
 	// Make space.
 	AddMultipleToTail( src.Count() );
 
-	// Copy the elements.	
+	// Copy the elements.
 	for ( int i=0; i < src.Count(); i++ )
 		(*this)[base + i] = src[i];
 
@@ -460,7 +444,7 @@ inline int CUtlVector<T>::InsertMultipleBefore( int elem, int num, const T *pToI
 {
 	if( num == 0 )
 		return elem;
-	
+
 	// Can insert at the end
 	assert( (elem == Count()) || IsValidIndex(elem) );
 
@@ -560,7 +544,6 @@ void CUtlVector<T>::RemoveAll()
 	m_Size = 0;
 }
 
-
 //-----------------------------------------------------------------------------
 // Memory deallocation
 //-----------------------------------------------------------------------------
@@ -573,7 +556,6 @@ void CUtlVector<T>::Purge()
 	ResetDbgInfo();
 }
 
-
 template<class T>
 inline void CUtlVector<T>::PurgeAndDeleteElements()
 {
@@ -583,12 +565,10 @@ inline void CUtlVector<T>::PurgeAndDeleteElements()
 	Purge();
 }
 
-
 template< class T >
 void CUtlVector<T>::SetGrowSize( int size )
 {
 	m_Memory.SetGrowSize( size );
 }
-
 
 #endif // CCVECTOR_H

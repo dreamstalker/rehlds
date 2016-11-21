@@ -39,28 +39,25 @@
 
 #ifndef _WIN32
 
-#define WSAEWOULDBLOCK		EWOULDBLOCK		/* EAGAIN 11 */
-#define WSAEMSGSIZE			EMSGSIZE		/* 90 */
-#define WSAEADDRNOTAVAIL	EADDRNOTAVAIL	/* 99 */
-#define WSAEAFNOSUPPORT		EAFNOSUPPORT	/* 97 */
-#define WSAECONNRESET		ECONNRESET		/* 104 */
-#define WSAECONNREFUSED		ECONNREFUSED	/* 111 */
-#define WSAEADDRINUSE		EADDRINUSE		/* 98 */
-#define WSAENOBUFS			ENOBUFS			/* 105 */
+#define WSAEWOULDBLOCK		EWOULDBLOCK	// Operation would block EAGAIN (11)
+#define WSAEMSGSIZE		EMSGSIZE	// Message too long (90)
+#define WSAEADDRNOTAVAIL	EADDRNOTAVAIL	// Cannot assign requested address (99)
+#define WSAEAFNOSUPPORT		EAFNOSUPPORT	// Address family not supported by protocol (97)
+#define WSAECONNRESET		ECONNRESET	// Connection reset by peer (104)
+#define WSAECONNREFUSED		ECONNREFUSED	// Connection refused (111)
+#define WSAEADDRINUSE		EADDRINUSE	// Address already in use (98)
+#define WSAENOBUFS		ENOBUFS		// No buffer space available (105)
 
 #endif // _WIN32
 
-
 #define MAX_ROUTEABLE_PACKET	1400
 
-//1400 - 9 = 1391
 #define SPLIT_SIZE				(MAX_ROUTEABLE_PACKET - sizeof(SPLITPACKET))
 
 // Create general message queues
 #define NUM_MSG_QUEUES 40
 #define MSG_QUEUE_SIZE 1536
 
-/* <d297f> ../engine/net_ws.c:137 */
 typedef struct loopmsg_s
 {
 	unsigned char data[NET_MAX_MESSAGE];
@@ -69,7 +66,6 @@ typedef struct loopmsg_s
 
 #define MAX_LOOPBACK 4
 
-/* <d29c2> ../engine/net_ws.c:143 */
 typedef struct loopback_s
 {
 	loopmsg_t msgs[MAX_LOOPBACK];
@@ -77,7 +73,6 @@ typedef struct loopback_s
 	int send;
 } loopback_t;
 
-/* <d2a13> ../engine/net_ws.c:151 */
 typedef struct packetlag_s
 {
 	unsigned char *pPacketData;	// Raw stream data is stored.
@@ -88,7 +83,6 @@ typedef struct packetlag_s
 	struct packetlag_s *pPrev;
 } packetlag_t;
 
-/* <d2b2c> ../engine/net_ws.c:1118 */
 typedef struct net_messages_s
 {
 	struct net_messages_s *next;
@@ -98,7 +92,6 @@ typedef struct net_messages_s
 	int buffersize;
 } net_messages_t;
 
-/* <d2a85> ../engine/net_ws.c:886 */
 // Split long packets. Anything over 1460 is failing on some routers.
 typedef struct LONGPACKET_t
 {
@@ -109,7 +102,6 @@ typedef struct LONGPACKET_t
 	char buffer[MAX_UDP_PACKET];	// This has to be big enough to hold the largest message
 } LONGPACKET;
 
-/* <d2ae9> ../engine/net_ws.c:900 */
 // Use this to pick apart the network stream, must be packed
 #pragma pack(push, 1)
 typedef struct SPLITPACKET_t
@@ -119,7 +111,6 @@ typedef struct SPLITPACKET_t
 	unsigned char packetID;
 } SPLITPACKET;
 #pragma pack(pop)
-
 
 #define NET_WS_MAX_FRAGMENTS 5
 
@@ -227,10 +218,10 @@ extern net_messages_t *normalqueue;
 
 void NET_ThreadLock(void);
 void NET_ThreadUnlock(void);
-short unsigned int Q_ntohs(short unsigned int netshort);
+unsigned short Q_ntohs(unsigned short netshort);
 void NetadrToSockadr(const netadr_t *a, struct sockaddr *s);
 void SockadrToNetadr(const struct sockaddr *s, netadr_t *a);
-NOXREF short unsigned int NET_HostToNetShort(short unsigned int us_in);
+NOXREF unsigned short NET_HostToNetShort(unsigned short us_in);
 qboolean NET_CompareAdr(netadr_t& a, netadr_t& b);
 qboolean NET_CompareClassBAdr(netadr_t& a, netadr_t& b);
 qboolean NET_IsReservedAdr(netadr_t& a);

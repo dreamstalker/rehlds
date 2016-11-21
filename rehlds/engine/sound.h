@@ -37,7 +37,6 @@
 // max number of sentences in game. NOTE: this must match CVOXFILESENTENCEMAX in dlls\util.h!!!
 #define CVOXFILESENTENCEMAX		1536
 
-/* <2e874> ../engine/sound.h:26 */
 typedef struct sfx_s
 {
 	char name[64];
@@ -45,30 +44,30 @@ typedef struct sfx_s
 	int servercount;
 } sfx_t;
 
-void S_Init(void);
-void S_AmbientOff(void);
-void S_AmbientOn(void);
-void S_Shutdown(void);
+void S_Init();
+void S_AmbientOff();
+void S_AmbientOn();
+void S_Shutdown();
 void S_TouchSound(char *sample);
-void S_ClearBuffer(void);
+void S_ClearBuffer();
 void S_StartStaticSound(int entnum, int entchannel, sfx_t *sfx, vec_t *origin, float vol, float attenuation, int flags, int pitch);
 void S_StartDynamicSound(int entnum, int entchannel, sfx_t *sfx, vec_t *origin, float fvol, float attenuation, int flags, int pitch);
 void S_StopSound(int entnum, int entchannel);
 sfx_t *S_PrecacheSound(char *sample);
-void S_ClearPrecache(void);
+void S_ClearPrecache();
 void S_Update(vec_t * origin, vec_t * v_forward, vec_t * v_right, vec_t * v_up);
 void S_StopAllSounds(qboolean clear);
-void S_BeginPrecaching(void);
-void S_EndPrecaching(void);
-void S_ExtraUpdate(void);
+void S_BeginPrecaching();
+void S_EndPrecaching();
+void S_ExtraUpdate();
 void S_LocalSound(char * s);
-void S_BlockSound(void);
-void S_PrintStats(void);
+void S_BlockSound();
+void S_PrintStats();
 qboolean Voice_RecordStart(const char  * pUncompressedFile, const char  * pDecompressedFile, const char  * pMicInputFile);
-qboolean Voice_IsRecording(void);
-void Voice_RegisterCvars(void);
-void Voice_Deinit(void);
+qboolean Voice_IsRecording();
+void Voice_RegisterCvars();
+void Voice_Deinit();
 void Voice_Idle(float frametime);
-qboolean Voice_RecordStop(void);
+qboolean Voice_RecordStop();
 
 #endif // SOUND_H

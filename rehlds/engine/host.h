@@ -38,10 +38,8 @@
 #include "server.h"
 #include "rehlds_api.h"
 
-
 #define MAX_COMMAND_LINE_PARAMS 50
 
-/* <271d2> ../engine/host.h:19 */
 typedef struct quakeparms_s
 {
 	char *basedir;
@@ -69,7 +67,6 @@ typedef struct quakeparms_s
 #define fps_override (*pfps_override)
 #define host_framerate (*phost_framerate)
 #define pausable (*ppausable)
-
 #define suitvolume (*psuitvolume)
 
 #define realtime (*prealtime)
@@ -77,9 +74,7 @@ typedef struct quakeparms_s
 #define host_parms (*phost_parms)
 #define host_initialized (*phost_initialized)
 #define host_frametime (*phost_frametime)
-
 #define host_framecount (*phost_framecount)
-
 #define host_client (*phost_client)
 #define gfNoMasterServer (*pgfNoMasterServer)
 #define oldrealtime (*poldrealtime)
@@ -105,7 +100,6 @@ extern cvar_t sv_stats;
 extern cvar_t fps_override;
 extern cvar_t host_framerate;
 extern cvar_t pausable;
-
 extern cvar_t suitvolume;
 
 extern double realtime;
@@ -113,9 +107,7 @@ extern double rolling_fps;
 extern quakeparms_t host_parms;
 extern qboolean host_initialized;
 extern double host_frametime;
-
 extern int host_framecount;
-
 extern client_t *host_client;
 extern qboolean gfNoMasterServer;
 extern double oldrealtime;
@@ -123,7 +115,6 @@ extern int host_hunklevel;
 extern jmp_buf host_abortserver;
 extern jmp_buf host_enddemo;
 extern unsigned short *host_basepal;
-
 
 NOXREF void Host_EndGame(const char *message, ...);
 void __declspec(noreturn) Host_Error(const char *error, ...);

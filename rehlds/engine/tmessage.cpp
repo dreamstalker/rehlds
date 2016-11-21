@@ -62,7 +62,7 @@ client_textmessage_t gNetworkTextMessage[MAX_NETMESSAGE] =
 	gNetworkTextMessageBuffer[0] // pMessage
 };
 
-#else //HOOK_ENGINE
+#else // HOOK_ENGINE
 
 client_textmessage_t *gMessageTable;
 int gMessageTableCount;
@@ -70,9 +70,8 @@ int gMessageTableCount;
 const char *gNetworkMessageNames[MAX_NETMESSAGE];
 client_textmessage_t gNetworkTextMessage[MAX_NETMESSAGE];
 
-#endif //HOOK_ENGINE
+#endif // HOOK_ENGINE
 
-/* <c5144> ../engine/tmessage.c:47 */
 char* EXT_FUNC memfgets(unsigned char *pMemFile, int fileSize, int *pFilePos, char *pBuffer, int bufferSize)
 {
 	int filePos;
@@ -114,7 +113,6 @@ char* EXT_FUNC memfgets(unsigned char *pMemFile, int fileSize, int *pFilePos, ch
 	return pBuffer;
 }
 
-/* <c5236> ../engine/tmessage.c:99 */
 int IsComment(char *pText)
 {
 	int length;
@@ -132,25 +130,21 @@ int IsComment(char *pText)
 	return FALSE;
 }
 
-/* <c5108> ../engine/tmessage.c:118 */
 int IsStartOfText(char *pText)
 {
 	return pText && pText[0] == '{';
 }
 
-/* <c5126> ../engine/tmessage.c:130 */
 int IsEndOfText(char *pText)
 {
 	return pText && pText[0] == '}';
 }
 
-/* <c50c1> ../engine/tmessage.c:141 */
 int IsWhiteSpace(char space)
 {
 	return space == ' ' || space == '\t' || space == '\r' || space == '\n';
 }
 
-/* <c52fe> ../engine/tmessage.c:149 */
 NOXREF const char *SkipSpace(const char *pText)
 {
 	if (pText)
@@ -164,7 +158,6 @@ NOXREF const char *SkipSpace(const char *pText)
 	return NULL;
 }
 
-/* <c5372> ../engine/tmessage.c:163 */
 NOXREF const char *SkipText(const char *pText)
 {
 	if (pText)
@@ -177,7 +170,6 @@ NOXREF const char *SkipText(const char *pText)
 	return NULL;
 }
 
-/* <c5400> ../engine/tmessage.c:177 */
 NOXREF int ParseFloats(const char *pText, float *pFloat, int count)
 {
 	const char *pTemp = pText;
@@ -201,7 +193,6 @@ NOXREF int ParseFloats(const char *pText, float *pFloat, int count)
 	return 0;
 }
 
-/* <c5506> ../engine/tmessage.c:205 */
 void TrimSpace(const char *source, char *dest)
 {
 	int start, end, length;
@@ -233,7 +224,6 @@ void TrimSpace(const char *source, char *dest)
 	}
 }
 
-/* <c50df> ../engine/tmessage.c:232 */
 NOXREF int IsToken(const char *pText, const char *pTokenName)
 {
 	if (!pText || !pTokenName)
@@ -241,11 +231,10 @@ NOXREF int IsToken(const char *pText, const char *pTokenName)
 
 	if (!Q_strnicmp(pText + 1, pTokenName, Q_strlen(pTokenName)))
 		return 1;
-	
+
 	return 0;
 }
 
-/* <c55e5> ../engine/tmessage.c:245 */
 NOXREF int ParseDirective(const char *pText)
 {
 	if (pText && pText[0] == '$')
@@ -321,7 +310,6 @@ NOXREF int ParseDirective(const char *pText)
 	return 0;
 }
 
-/* <c584f> ../engine/tmessage.c:324 */
 NOXREF void TextMessageParse(unsigned char *pMemFile, int fileSize)
 {
 	char buf[512];
@@ -362,7 +350,7 @@ NOXREF void TextMessageParse(unsigned char *pMemFile, int fileSize)
 			{
 				if (IsComment(trim))
 					break;
-			
+
 				if (ParseDirective(trim))
 					break;
 
@@ -429,9 +417,9 @@ NOXREF void TextMessageParse(unsigned char *pMemFile, int fileSize)
 	messageSize = (messageCount * sizeof(client_textmessage_t));
 
 	gMessageTable = (client_textmessage_t *)Mem_Malloc(textHeapSize + nameHeapSize + messageSize);
-	
+
 	Q_memcpy(gMessageTable, textMessages, messageSize);
-	
+
 	pNameHeap = ((char *)gMessageTable) + messageSize;
 	Q_memcpy(pNameHeap, nameHeap, nameHeapSize);
 	nameOffset = pNameHeap - gMessageTable[0].pName;
@@ -448,7 +436,6 @@ NOXREF void TextMessageParse(unsigned char *pMemFile, int fileSize)
 	gMessageTableCount = messageCount;
 }
 
-/* <c5b18> ../engine/tmessage.c:454 */
 NOXREF void TextMessageShutdown(void)
 {
 	if (gMessageTable)
@@ -458,7 +445,6 @@ NOXREF void TextMessageShutdown(void)
 	}
 }
 
-/* <c5b2e> ../engine/tmessage.c:464 */
 NOXREF void TextMessageInit(void)
 {
 	int fileSize;
@@ -476,7 +462,6 @@ NOXREF void TextMessageInit(void)
 		TextMessageParse(pMemFile, fileSize);
 }
 
-/* <c5b68> ../engine/tmessage.c:497 */
 NOXREF client_textmessage_t *TextMessageGet(const char *pName)
 {
 	int i;
@@ -506,5 +491,6 @@ NOXREF client_textmessage_t *TextMessageGet(const char *pName)
 		if (!Q_strcmp(pName, gMessageTable[i].pName))
 			return &gMessageTable[i];
 	}
+
 	return NULL;
 }

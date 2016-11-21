@@ -72,15 +72,14 @@ typedef struct memzone_s
 
 cvar_t mem_dbgfile = { "mem_dbgfile", ".\\mem.txt", 0, 0.0f, NULL };
 
-#else //HOOK_ENGINE
+#else // HOOK_ENGINE
 
 cvar_t mem_dbgfile;
 
-#endif //HOOK_ENGINE
+#endif // HOOK_ENGINE
 
 memzone_t *mainzone;
 
-/* <cd94b> ../engine/zone.c:71 */
 void Z_ClearZone(memzone_t *zone, int size)
 {
 	memblock_t *block = (memblock_t *)&zone[1];
@@ -95,7 +94,6 @@ void Z_ClearZone(memzone_t *zone, int size)
 	block->size = size - sizeof(memzone_t);
 }
 
-/* <cdb66> ../engine/zone.c:96 */
 void Z_Free(void *ptr)
 {
 	if (!ptr)
@@ -148,7 +146,6 @@ void Z_Free(void *ptr)
 	}
 }
 
-/* <cdbc6> ../engine/zone.c:139 */
 void *Z_Malloc(int size)
 {
 	Z_CheckHeap();
@@ -164,7 +161,6 @@ void *Z_Malloc(int size)
 	return buf;
 }
 
-/* <cd9bd> ../engine/zone.c:152 */
 void *Z_TagMalloc(int size, int tag)
 {
 	int extra;
@@ -224,7 +220,6 @@ void *Z_TagMalloc(int size, int tag)
 	return (void *)((byte *)base + sizeof(memblock_t));
 }
 
-/* <cdcc9> ../engine/zone.c:216 */
 NOXREF void Z_Print(memzone_t *zone)
 {
 	NOXREFCHECK;
@@ -258,7 +253,6 @@ NOXREF void Z_Print(memzone_t *zone)
 	}
 }
 
-/* <cdbac> ../engine/zone.c:244 */
 void Z_CheckHeap(void)
 {
 	memblock_t *block;
@@ -318,7 +312,6 @@ Run consistency and sentinel trashing checks
 ==============
 */
 
-/* <cdd1f> ../engine/zone.c:291 */
 void Hunk_Check(void)
 {
 	hunk_t *h;
@@ -346,7 +339,6 @@ Otherwise, allocations with the same name will be totaled up before printing.
 ==============
 */
 
-/* <ce570> ../engine/zone.c:316 */
 NOXREF void Hunk_Print(qboolean all)
 {
 	NOXREFCHECK;
@@ -433,7 +425,6 @@ Hunk_AllocName
 ===================
 */
 
-/* <ce31c> ../engine/zone.c:413 */
 void *Hunk_AllocName(int size, const char *name)
 {
 	if (size < 0)
@@ -462,19 +453,16 @@ void *Hunk_AllocName(int size, const char *name)
 	return (void *)(h + 1);
 }
 
-/* <ce368> ../engine/zone.c:449 */
 void *Hunk_Alloc(int size)
 {
 	return Hunk_AllocName(size, "unknown");
 }
 
-/* <cdd48> ../engine/zone.c:454 */
 int Hunk_LowMark(void)
 {
 	return hunk_low_used;
 }
 
-/* <cdd61> ../engine/zone.c:459 */
 void Hunk_FreeToLowMark(int mark)
 {
 	if (mark < 0 || mark > hunk_low_used)
@@ -485,7 +473,6 @@ void Hunk_FreeToLowMark(int mark)
 	hunk_low_used = mark;
 }
 
-/* <cdddf> ../engine/zone.c:474 */
 int Hunk_HighMark(void)
 {
 	if (hunk_tempactive)
@@ -497,7 +484,6 @@ int Hunk_HighMark(void)
 	return hunk_high_used;
 }
 
-/* <cdd8b> ../engine/zone.c:485 */
 void Hunk_FreeToHighMark(int mark)
 {
 	if (hunk_tempactive)
@@ -520,7 +506,6 @@ Hunk_HighAllocName
 ===================
 */
 
-/* <cd981> ../engine/zone.c:512 */
 void *Hunk_HighAllocName(int size, const char *name)
 {
 	hunk_t *h;
@@ -565,7 +550,6 @@ Return space from the top of the hunk
 =================
 */
 
-/* <ce18a> ../engine/zone.c:559 */
 void *Hunk_TempAlloc(int size)
 {
 	void *buf;
@@ -616,7 +600,6 @@ Cache_Move
 ===========
 */
 
-/* <cdf27> ../engine/zone.c:607 */
 void Cache_Move(cache_system_t *c)
 {
 	cache_system_t *newmem = Cache_TryAlloc(c->size, 1);
@@ -643,7 +626,6 @@ Throw things out until the hunk can be expanded to the given point
 ============
 */
 
-/* <ce231> ../engine/zone.c:638 */
 void Cache_FreeLow(int new_low_hunk)
 {
 	cache_system_t	*c;
@@ -667,7 +649,6 @@ Throw things out until the hunk can be expanded to the given point
 ============
 */
 
-/* <cdffe> ../engine/zone.c:660 */
 void Cache_FreeHigh(int new_high_hunk)
 {
 	cache_system_t	*c, *prev;
@@ -690,7 +671,6 @@ void Cache_FreeHigh(int new_high_hunk)
 	}
 }
 
-/* <cdaae> ../engine/zone.c:682 */
 void Cache_UnlinkLRU(cache_system_t *cs)
 {
 	if (!cs->lru_next || !cs->lru_prev)
@@ -703,7 +683,6 @@ void Cache_UnlinkLRU(cache_system_t *cs)
 	cs->lru_next = cs->lru_prev = 0;
 }
 
-/* <cde3c> ../engine/zone.c:693 */
 void Cache_MakeLRU(cache_system_t *cs)
 {
 	if (cs->lru_next || cs->lru_prev)
@@ -726,7 +705,6 @@ Size should already include the header and padding
 ============
 */
 
-/* <cde75> ../engine/zone.c:712 */
 cache_system_t *Cache_TryAlloc(int size, qboolean nobottom)
 {
 	cache_system_t *cs;
@@ -799,7 +777,6 @@ Throw everything out, so new data will be demand cached
 ============
 */
 
-/* <cda7e> ../engine/zone.c:793 */
 void Cache_Force_Flush(void)
 {
 	cache_system_t *i;
@@ -810,7 +787,6 @@ void Cache_Force_Flush(void)
 	}
 }
 
-/* <cdac9> ../engine/zone.c:806 */
 void Cache_Flush(void)
 {
 	if (g_pcl.maxclients <= 1 || allow_cheats)
@@ -832,7 +808,6 @@ Used with qsort()
 ============
 */
 
-/* <cda1d> ../engine/zone.c:827 */
 NOXREF int CacheSystemCompare(const void *ppcs1, const void *ppcs2)
 {
 	NOXREFCHECK;
@@ -850,7 +825,6 @@ Cache_Print
 ============
 */
 
-/* <ce4e9> ../engine/zone.c:842 */
 NOXREF void Cache_Print(void)
 {
 	NOXREFCHECK;
@@ -872,7 +846,6 @@ compares the first directory of two paths...
 ============
 */
 
-/* <ce3ef> ../engine/zone.c:883 */
 NOXREF int ComparePath1(char *path1, char *path2)
 {
 	NOXREFCHECK;
@@ -898,7 +871,6 @@ appropriate places.
 ============
 */
 
-/* <ce443> ../engine/zone.c:906 */
 NOXREF char *CommatizeNumber(int num, char *pout)
 {
 	NOXREFCHECK;
@@ -938,7 +910,6 @@ Cache_Report
 ============
 */
 
-/* <ce65e> ../engine/zone.c:946 */
 NOXREF void Cache_Report(void)
 {
 	NOXREFCHECK;
@@ -952,7 +923,6 @@ Cache_Compact
 ============
 */
 
-/* <ce674> ../engine/zone.c:957 */
 NOXREF void Cache_Compact(void)
 {
 	NOXREFCHECK;
@@ -965,7 +935,6 @@ Cache_Init
 ============
 */
 
-/* <ce689> ../engine/zone.c:967 */
 void Cache_Init(void)
 {
 	cache_head.next = cache_head.prev = &cache_head;
@@ -982,7 +951,6 @@ Frees the memory and removes it from the LRU list
 ==============
 */
 
-/* <cda89> ../engine/zone.c:982 */
 void Cache_Free(cache_user_t *c)
 {
 	if (!c->data)
@@ -999,7 +967,6 @@ void Cache_Free(cache_user_t *c)
 	Cache_UnlinkLRU(cs);
 }
 
-/* <ce6e6> ../engine/zone.c:1000 */
 NOXREF int Cache_TotalUsed(void)
 {
 	NOXREFCHECK;
@@ -1018,7 +985,6 @@ Cache_Check
 ==============
 */
 
-/* <ce723> ../engine/zone.c:1018 */
 void* EXT_FUNC Cache_Check(cache_user_t *c)
 {
 	cache_system_t *cs;
@@ -1040,7 +1006,6 @@ Cache_Alloc
 ==============
 */
 
-/* <ce7ab> ../engine/zone.c:1040 */
 void *Cache_Alloc(cache_user_t *c, int size, char *name)
 {
 	cache_system_t *cs;
@@ -1086,7 +1051,6 @@ Memory_Init
 ========================
 */
 
-/* <ce8ad> ../engine/zone.c:1262 */
 void Memory_Init(void *buf, int size)
 {
 	int zonesize = ZONE_DYNAMIC_SIZE;
@@ -1116,7 +1080,6 @@ void Memory_Init(void *buf, int size)
 	Z_ClearZone(mainzone, zonesize);
 }
 
-/* <ce944> ../engine/zone.c:1299 */
 NOXREF void Cache_Print_Models_And_Totals(void)
 {
 	char buf[50];
@@ -1143,7 +1106,7 @@ NOXREF void Cache_Print_Models_And_Totals(void)
 	qsort(sortarray, i, sizeof(cache_system_t *), CacheSystemCompare);
 	FS_FPrintf(file, "\nCACHED MODELS:\n");
 
-	//now process the sorted list.  
+	//now process the sorted list.
 	for (j = 0; j < i; j++)
 	{
 		FS_FPrintf(file, "\t%16.16s : %s\n", CommatizeNumber(sortarray[j]->size, buf), sortarray[j]->name);
@@ -1156,7 +1119,6 @@ NOXREF void Cache_Print_Models_And_Totals(void)
 
 #define MAX_SFX	1024
 
-/* <cea16> ../engine/zone.c:1367 */
 NOXREF void Cache_Print_Sounds_And_Totals(void)
 {
 	char buf[50];

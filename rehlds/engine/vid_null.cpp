@@ -38,64 +38,33 @@ float scr_con_current;
 int r_pixbytes = 1;
 cvar_t gl_vsync = { "gl_vsync", "1", 0, 0.0f, NULL };
 
-#else //HOOK_ENGINE
+#else // HOOK_ENGINE
 
 int r_pixbytes;
 cvar_t gl_vsync;
 
-#endif //HOOK_ENGINE
+#endif // HOOK_ENGINE
 
-/* <d6867> ../engine/vid_null.c:28 */
 void VID_SetPalette(unsigned char *palette) { }
-
-/* <d6894> ../engine/vid_null.c:29 */
 void VID_ShiftPalette(unsigned char *palette) { }
-
-/* <d68bb> ../engine/vid_null.c:30 */
 void VID_WriteBuffer(const char *pFilename) { }
-
-/* <d68e2> ../engine/vid_null.c:32 */
-int VID_Init(short unsigned int *palette) { return 1; }
-
-/* <d690d> ../engine/vid_null.c:51 */
-void D_FlushCaches(void) { }
-
-/* <d6921> ../engine/vid_null.c:52 */
-void R_SetStackBase(void) { }
-
-/* <d6935> ../engine/vid_null.c:53 */
-void SCR_UpdateScreen(void) { }
-
-/* <d6949> ../engine/vid_null.c:54 */
-void V_Init(void) { }
-
-/* <d695d> ../engine/vid_null.c:56 */
-void Draw_Init(void) { }
-
-/* <d6971> ../engine/vid_null.c:57 */
-void SCR_Init(void) { }
-
-/* <d6985> ../engine/vid_null.c:58 */
-void R_Init(void) { }
-
+int VID_Init(unsigned short *palette) { return 1; }
+void D_FlushCaches() { }
+void R_SetStackBase() { }
+void SCR_UpdateScreen() { }
+void V_Init() { }
+void Draw_Init() { }
+void SCR_Init() { }
+void R_Init() { }
 void R_ForceCVars(qboolean multiplayer) { }
-
-/* <d6999> ../engine/vid_null.c:59 */
 void SCR_BeginLoadingPlaque(qboolean reconnect) { }
-
-/* <d69c0> ../engine/vid_null.c:60 */
-void SCR_EndLoadingPlaque(void) { }
-
-/* <d69d4> ../engine/vid_null.c:62 */
-void R_InitSky(void) { }
-
-/* <d69e8> ../engine/vid_null.c:63 */
-void R_MarkLeaves(void)
+void SCR_EndLoadingPlaque() { }
+void R_InitSky() { }
+void R_MarkLeaves()
 {
 }
 
-/* <d69fc> ../engine/vid_null.c:78 */
-void R_InitTextures(void)
+void R_InitTextures()
 {
 	r_notexture_mip = (texture_t *)Hunk_AllocName(404, "notexture");
 	r_notexture_mip->height = 16;
@@ -125,11 +94,6 @@ void R_InitTextures(void)
 
 }
 
-/* <d6a48> ../engine/vid_null.c:110 */
 void StartLoadingProgressBar(const char *loadingType, int numProgressPoints) { }
-
-/* <d6a7d> ../engine/vid_null.c:114 */
 void ContinueLoadingProgressBar(const char *loadingType, int progressPoint, float progressFraction) { }
-
-/* <d6ac0> ../engine/vid_null.c:118 */
 void SetLoadingProgressBarStatusText(const char *statusText) { }

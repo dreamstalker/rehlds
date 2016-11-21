@@ -33,17 +33,12 @@ unsigned char *gPVS;
 int gPVSRowBytes;
 unsigned char mod_novis[MODEL_MAX_PVS];
 
-
-
-
-/* <812a> ../engine/cmodel.c:23 */
 void Mod_Init(void)
 {
 	SW_Mod_Init();
 	Q_memset(mod_novis, 255, MODEL_MAX_PVS);
 }
 
-/* <813f> ../engine/cmodel.c:37 */
 unsigned char *Mod_DecompressVis(unsigned char *in, model_t *model)
 {
 	static unsigned char decompressed[MODEL_MAX_PVS];
@@ -64,7 +59,6 @@ unsigned char *Mod_DecompressVis(unsigned char *in, model_t *model)
 	return decompressed;
 }
 
-/* <824c> ../engine/cmodel.c:54 */
 unsigned char *Mod_LeafPVS(mleaf_t *leaf, model_t *model)
 {
 	if (leaf == model->leafs)
@@ -81,7 +75,6 @@ unsigned char *Mod_LeafPVS(mleaf_t *leaf, model_t *model)
 	return CM_LeafPVS(leafnum);
 }
 
-/* <8358> ../engine/cmodel.c:68 */
 void CM_DecompressPVS(unsigned char *in, unsigned char *decompressed, int byteCount)
 {
 	int c;
@@ -119,7 +112,6 @@ void CM_DecompressPVS(unsigned char *in, unsigned char *decompressed, int byteCo
 	}
 }
 
-/* <8106> ../engine/cmodel.c:100 */
 unsigned char *CM_LeafPVS(int leafnum)
 {
 	if (gPVS)
@@ -129,7 +121,6 @@ unsigned char *CM_LeafPVS(int leafnum)
 	return mod_novis;
 }
 
-/* <83b7> ../engine/cmodel.c:109 */
 unsigned char *CM_LeafPAS(int leafnum)
 {
 	if (gPAS)
@@ -139,7 +130,6 @@ unsigned char *CM_LeafPAS(int leafnum)
 	return mod_novis;
 }
 
-/* <83ec> ../engine/cmodel.c:118 */
 void CM_FreePAS(void)
 {
 	if (gPAS)
@@ -150,7 +140,6 @@ void CM_FreePAS(void)
 	gPVS = 0;
 }
 
-/* <83fd> ../engine/cmodel.c:139 */
 void CM_CalcPAS(model_t *pModel)
 {
 	int rows, rowwords;
@@ -253,7 +242,6 @@ void CM_CalcPAS(model_t *pModel)
 	Con_DPrintf("Average leaves visible / audible / total: %i / %i / %i\n", vcount / count, acount / count, count);
 }
 
-/* <858a> ../engine/cmodel.c:218 */
 qboolean CM_HeadnodeVisible(mnode_t *node, unsigned char *visbits, int *first_visible_leafnum)
 {
 	int leafnum;

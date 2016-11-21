@@ -43,7 +43,7 @@ extern float scr_con_current;
 void VID_SetPalette(unsigned char *palette);
 void VID_ShiftPalette(unsigned char *palette);
 void VID_WriteBuffer(const char *pFilename);
-NOBODY int VID_Init(short unsigned int *palette);
+NOBODY int VID_Init(unsigned short *palette);
 void D_FlushCaches(void);
 void R_SetStackBase(void);
 void SCR_UpdateScreen(void);

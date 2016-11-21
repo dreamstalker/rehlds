@@ -32,13 +32,10 @@
 #pragma once
 #endif
 
-
-/* <31b2a> ../common/kbutton.h:7 */
 typedef struct kbutton_s
 {
 	int down[2];
 	int state;
 } kbutton_t;
-
 
 #endif // KBUTTON_H
