@@ -9,6 +9,9 @@ repositories {
 	maven {
 		url 'http://nexus.rehlds.org/nexus/content/repositories/rehlds-snapshots/'
 	}
+	maven {
+		url 'http://nexus.rehlds.org/nexus/content/repositories/rehlds-dev/'
+	}
 }
 
 dependencies {

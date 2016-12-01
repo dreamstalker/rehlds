@@ -90,6 +90,11 @@ publishing {
                     resolveStrategy = DELEGATE_FIRST
                     name project.name
                     description project.description
+                    properties {
+                        commitDate project.ext.rehldsVersionInfo.commitDate
+                        commitSHA project.ext.rehldsVersionInfo.commitSHA
+                    }
+
                     //url github
                     //scm {
                     //    url "${github}.git"
@@ -129,7 +134,7 @@ publishing {
     repositories {
         maven {
             if (project.version.contains('dev')) {
-                url "http://nexus.rehlds.org/nexus/content/repositories/rehlds-snapshots/"
+                url "http://nexus.rehlds.org/nexus/content/repositories/rehlds-dev/"
             } else {
                 url "http://nexus.rehlds.org/nexus/content/repositories/rehlds-releases/"
             }

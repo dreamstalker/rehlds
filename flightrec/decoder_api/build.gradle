@@ -56,8 +56,8 @@ publishing {
 publishing {
     repositories {
         maven {
-            if (project.version.contains('SNAPSHOT')) {
-                url "http://nexus.rehlds.org/nexus/content/repositories/rehlds-snapshots/"
+            if (project.version.contains('dev')) {
+                url "http://nexus.rehlds.org/nexus/content/repositories/rehlds-dev/"
             } else {
                 url "http://nexus.rehlds.org/nexus/content/repositories/rehlds-releases/"
             }
