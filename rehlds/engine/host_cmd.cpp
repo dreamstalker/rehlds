@@ -2638,8 +2638,20 @@ void Host_TogglePause_f(void)
 	else
 		SV_BroadcastPrintf("%s unpaused the game\n", &pr_strings[sv_player->v.netname]);
 
+	// TODO: send svc_setpause to client on spawn command
+#ifdef REHLDS_FIXES
+	for (int i = 0; i < g_psvs.maxclients; i++)
+	{
+		if (!g_psvs.clients[i].connected)
+			continue;
+
+		MSG_WriteByte(&g_psvs.clients[i].netchan.message, svc_setpause);
+		MSG_WriteByte(&g_psvs.clients[i].netchan.message, g_psv.paused);
+	}
+#else // REHLDS_FIXES
 	MSG_WriteByte(&g_psv.reliable_datagram, svc_setpause);
 	MSG_WriteByte(&g_psv.reliable_datagram, g_psv.paused);
+#endif // REHLDS_FIXES
 }
 
 void Host_Pause_f(void)
@@ -2656,8 +2668,19 @@ void Host_Pause_f(void)
 		return;
 
 	g_psv.paused = TRUE;
+#ifdef REHLDS_FIXES
+	for (int i = 0; i < g_psvs.maxclients; i++)
+	{
+		if (!g_psvs.clients[i].connected)
+			continue;
+
+		MSG_WriteByte(&g_psvs.clients[i].netchan.message, svc_setpause);
+		MSG_WriteByte(&g_psvs.clients[i].netchan.message, g_psv.paused);
+	}
+#else // REHLDS_FIXES
 	MSG_WriteByte(&g_psv.reliable_datagram, svc_setpause);
 	MSG_WriteByte(&g_psv.reliable_datagram, g_psv.paused);
+#endif // REHLDS_FIXES
 }
 
 void Host_Unpause_f(void)
@@ -2674,8 +2697,19 @@ void Host_Unpause_f(void)
 		return;
 
 	g_psv.paused = FALSE;
+#ifdef REHLDS_FIXES
+	for (int i = 0; i < g_psvs.maxclients; i++)
+	{
+		if (!g_psvs.clients[i].connected)
+			continue;
+
+		MSG_WriteByte(&g_psvs.clients[i].netchan.message, svc_setpause);
+		MSG_WriteByte(&g_psvs.clients[i].netchan.message, g_psv.paused);
+	}
+#else // REHLDS_FIXES
 	MSG_WriteByte(&g_psv.reliable_datagram, svc_setpause);
 	MSG_WriteByte(&g_psv.reliable_datagram, g_psv.paused);
+#endif // REHLDS_FIXES
 }
 
 void Host_Interp_f(void)
