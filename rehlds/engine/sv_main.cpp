@@ -3748,6 +3748,24 @@ void EXT_FUNC SV_WriteFullClientUpdate_internal(IGameClient *client, char *info,
 	MSG_WriteBuf(sb, sizeof(digest), digest);
 }
 
+void SV_SendFullClientUpdateForAll(client_t *client)
+{
+#ifdef REHLDS_FIXES
+	auto oldHostClient = host_client;
+	for (int i = 0; i < g_psvs.maxclients; i++)
+	{
+		host_client = &g_psvs.clients[i];
+		if (!host_client->connected)
+			continue;
+
+		SV_FullClientUpdate(client, &host_client->netchan.message);
+	}
+	host_client = oldHostClient;
+#else
+	SV_FullClientUpdate(client, &g_psv.reliable_datagram);
+#endif
+}
+
 void SV_FullClientUpdate(client_t *cl, sizebuf_t *sb)
 {
 	char info[MAX_INFO_STRING];
@@ -3765,7 +3783,7 @@ void SV_FullClientUpdate(client_t *cl, sizebuf_t *sb)
 		Info_RemovePrefixedKeys(info, '_');
 	}
 
-	g_RehldsHookchains.m_SV_WriteFullClientUpdate.callChain(SV_WriteFullClientUpdate_internal, GetRehldsApiClient(cl), info, MAX_INFO_STRING, sb, GetRehldsApiClient((sb == &g_psv.reliable_datagram) ? NULL : host_client));
+	g_RehldsHookchains.m_SV_WriteFullClientUpdate.callChain(SV_WriteFullClientUpdate_internal, GetRehldsApiClient(cl), info, MAX_INFO_STRING, sb, GetRehldsApiClient((sb == &g_psv.reliable_datagram) ? nullptr : host_client));
 }
 
 void EXT_FUNC SV_EmitEvents_api(IGameClient *cl, packet_entities_t *pack, sizebuf_t *ms)
@@ -4602,22 +4620,12 @@ qboolean SV_SendClientDatagram(client_t *client)
 	return TRUE;
 }
 
-void SV_UpdateUserInfo(client_t *pClient)
+void SV_UpdateUserInfo(client_t *client)
 {
-	pClient->sendinfo = FALSE;
-	pClient->sendinfo_time = realtime + 1.0;
-	SV_ExtractFromUserinfo(pClient);
-#ifdef REHLDS_FIXES
-	for (int i = 0; i < g_psvs.maxclients; i++)
-	{
-		if (!g_psvs.clients[i].connected)
-			continue;
-
-		SV_FullClientUpdate(pClient, &g_psvs.clients[i].netchan.message);
-	}
-#else // REHLDS_FIXES
-	SV_FullClientUpdate(pClient, &g_psv.reliable_datagram);
-#endif // REHLDS_FIXES
+	client->sendinfo = FALSE;
+	client->sendinfo_time = realtime + 1.0;
+	SV_ExtractFromUserinfo(client);
+	SV_SendFullClientUpdateForAll(client);
 }
 
 void SV_UpdateToReliableMessages(void)

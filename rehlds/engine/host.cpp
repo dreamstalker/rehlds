@@ -525,17 +525,7 @@ void SV_DropClient_internal(client_t *cl, qboolean crash, const char *string)
 	g_GameClients[cl - g_psvs.clients]->SetSpawnedOnce(false);
 #endif // REHLDS_FIXES
 
-#ifdef REHLDS_FIXES
-	for (int i = 0; i < g_psvs.maxclients; i++)
-	{
-		if (!g_psvs.clients[i].connected)
-			continue;
-
-		SV_FullClientUpdate(cl, &g_psvs.clients[i].netchan.message);
-	}
-#else // REHLDS_FIXES
-	SV_FullClientUpdate(cl, &g_psv.reliable_datagram);
-#endif // REHLDS_FIXES
+	SV_SendFullClientUpdateForAll(cl);
 
 	NotifyDedicatedServerUI("UpdatePlayers");
 }
