@@ -307,7 +307,7 @@ cvar_t syserror_logfile = { "syserror_logfile", "sys_error.log", 0, 0.0f, nullpt
 cvar_t sv_rehlds_hull_centering = { "sv_rehlds_hull_centering", "0", 0, 0.0f, nullptr };
 cvar_t sv_rcon_condebug = { "sv_rcon_condebug", "1", 0, 1.0f, nullptr };
 cvar_t sv_rehlds_userinfo_transmitted_fields = { "sv_rehlds_userinfo_transmitted_fields", "", 0, 0.0f, nullptr };
-cvar_t sv_rehlds_attachedentities_playeranimationspeed_fix = {"sv_rehlds_attachedentities_playeranimationspeed_fix", "", 0, 0.0f, nullptr};
+cvar_t sv_rehlds_attachedentities_playeranimationspeed_fix = {"sv_rehlds_attachedentities_playeranimationspeed_fix", "0", 0, 0.0f, nullptr};
 #endif
 
 delta_t *SV_LookupDelta(char *name)
@@ -4572,6 +4572,8 @@ void SV_WriteEntitiesToClient(client_t *client, sizebuf_t *msg)
 			{
 				if (attachedEntCount[entityState.number] != 0)
 				{
+					// Each attached entity causes StudioProcessGait for player
+					// But this will slow down normal animation predicting on client
 					entityState.framerate /= (1 + attachedEntCount[entityState.number]);
 				}
 			}
