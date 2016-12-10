@@ -234,6 +234,7 @@ void SV_ParseConsistencyResponse(client_t *pSenderClient)
 				SV_ClientPrintf("%s", dropmessage);
 
 			SV_DropClient(host_client, FALSE, "Bad file %s", g_rehlds_sv.resources[c - 1].szFileName); // only filename. reason was printed in console if exists.
+			return;
 		}
 #else // REHLDS_FIXES
 		if (gEntityInterface.pfnInconsistentFile(host_client->edict, g_psv.resourcelist[c - 1].szFileName, dropmessage))
@@ -243,12 +244,12 @@ void SV_ParseConsistencyResponse(client_t *pSenderClient)
 
 			SV_DropClient(host_client, FALSE, "Bad file %s", dropmessage);
 		}
-#endif // REHLDS_FIXES
-
 		return;
+#endif // REHLDS_FIXES
 	}
 
-	host_client->has_force_unmodified = 0;
+	// Reset has_force_unmodified if we have received response from the client
+	host_client->has_force_unmodified = FALSE;
 }
 
 qboolean EXT_FUNC SV_FileInConsistencyList(const char *filename, consistency_t **ppconsist)

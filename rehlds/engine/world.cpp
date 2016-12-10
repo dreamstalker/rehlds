@@ -1237,7 +1237,7 @@ void SV_ClipToLinks(areanode_t *node, moveclip_t *clip)
 
 			if (trace.allsolid || trace.startsolid || trace.fraction < clip->trace.fraction)
 			{
-				int oldStartSolid = clip->trace.startsolid;
+				qboolean oldStartSolid = clip->trace.startsolid;
 				trace.ent = touch;
 				clip->trace = trace;
 				if (oldStartSolid)
