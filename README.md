@@ -19,7 +19,7 @@ You can try play on one of the servers that using rehlds: http://www.gametracker
 Rehlds is fully compatible with latest official HLDS downloaded by steamcmd. All you have to do is to download rehlds binaries and replace original swds.dll/engine_i486.so. For windows you can also copy a swds.pdb file with a debug information.
 <br /><b>Warning!</b> Rehlds is not compatible with an old 5xxx or below platforms downloaded by hldsupdatetool.
 
-Compiled binaries are available here: http://nexus.rehlds.org/nexus/content/repositories/rehlds-snapshots/rehlds/rehlds/0.2-SNAPSHOT/
+Compiled binaries are available here: http://nexus.rehlds.org/nexus/content/repositories/rehlds-dev/rehlds/rehlds/
 
 Archive's bin directory contains 2 subdirectories, 'bugfixed' and 'pure'
 <ul>
@@ -50,6 +50,7 @@ Bugfixed version of rehlds contains an additional cvars:
 <li>sv_rehlds_stringcmdrate_max_burst // Max burst level of 'string' cmds for ban. Default: 400
 <li>sv_rehlds_stringcmdrate_burst_punish // Time in minutes for which the player will be banned (0 - Permanent, use a negative number for a kick). Default: 5
 <li>sv_rehlds_userinfo_transmitted_fields // Userinfo fields only with these keys will be transmitted to clients via network. If not set then all fields will be transmitted (except prefixed with underscore). Each key must be prefixed by backslash, for example "\name\model\*sid\*hltv\bottomcolor\topcolor". Default: ""
+<li>sv_rehlds_attachedentities_playeranimationspeed_fix // Fixes bug with gait animation speed increase when player has some attached entities (aiments). Can cause animation lags when cl_updaterate is low. Default: 0
 </ul>
 
 ## Build instructions
