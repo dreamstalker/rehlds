@@ -1898,7 +1898,7 @@ NOXREF void Mod_ChangeGame(void)
 model_t *Mod_Handle(int modelindex)
 {
 #ifdef REHLDS_FIXES
-	if (modelindex <= 0 || modelindex >= MAX_MODELS) {
+	if (modelindex < 0 || modelindex > MAX_MODELS - 1) {
 		Sys_Error(__FUNCTION__ ": bad modelindex #%i\n", modelindex);
 	}
 #endif

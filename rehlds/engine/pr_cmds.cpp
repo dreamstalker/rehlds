@@ -831,11 +831,8 @@ void EXT_FUNC PF_stuffcmd_I(edict_t *pEdict, char *szFmt, ...)
 	szOut[1023] = 0;
 	if (entnum < 1 || entnum > g_psvs.maxclients)
 	{
-		Con_Printf(
-			"\n!!!\n\nStuffCmd:  Some entity tried to stuff '%s' to console buffer of entity %i when maxclients was set to %i, ignoring\n\n",
-			szOut,
-			entnum,
-			g_psvs.maxclients);
+		Con_Printf("\n!!!\n\nStuffCmd:  Some entity tried to stuff '%s' to console "
+			"buffer of entity %i when maxclients was set to %i, ignoring\n\n", szOut, entnum, g_psvs.maxclients);
 	}
 	else
 	{
@@ -1052,8 +1049,8 @@ int EXT_FUNC PF_precache_sound_I(const char *s)
 				return i;
 		}
 
-		Host_Error(
-			__FUNCTION__  ": Sound '%s' failed to precache because the item count is over the %d limit.\nReduce the number of brush models and/or regular models in the map to correct this.",
+		Host_Error(__FUNCTION__  ": Sound '%s' failed to precache because the item count is over the %d limit.\n"
+			"Reduce the number of brush models and/or regular models in the map to correct this.",
 			s, MAX_SOUNDS);
 	}
 	else
@@ -1438,8 +1435,8 @@ int EXT_FUNC PF_precache_model_I(const char *s)
 				return i;
 #endif
 		}
-		Host_Error(
-			__FUNCTION__ ": Model '%s' failed to precache because the item count is over the %d limit.\nReduce the number of brush models and/or regular models in the map to correct this.",
+		Host_Error(__FUNCTION__ ": Model '%s' failed to precache because the item count is over the %d limit.\n"
+			"Reduce the number of brush models and/or regular models in the map to correct this.",
 			s, MAX_MODELS);
 	}
 	else
@@ -1497,9 +1494,8 @@ int EXT_FUNC PF_precache_generic_I(char *s)
 
 	if (resCount >= ARRAYSIZE(g_rehlds_sv.precachedGenericResourceNames))
 	{
-		Host_Error(
-			__FUNCTION__ ": Generic item '%s' failed to precache because the item count is over the %d limit.\n\
-Reduce the number of brush models and/or regular models in the map to correct this.",
+		Host_Error(__FUNCTION__ ": Generic item '%s' failed to precache because the item count is over the %d limit.\n"
+			"Reduce the number of brush models and/or regular models in the map to correct this.",
 			resName, ARRAYSIZE(g_rehlds_sv.precachedGenericResourceNames));
 	}
 
@@ -1532,10 +1528,9 @@ int EXT_FUNC PF_precache_generic_I(char *s)
 			if (!Q_stricmp(g_psv.generic_precache[i], s))
 				return i;
 		}
-		Host_Error(
-			__FUNCTION__ ": Generic item '%s' failed to precache because the item count is over the %d limit.\nReduce the number of brush models and/or regular models in the map to correct this.",
-			s, MAX_GENERIC
-		);
+		Host_Error(__FUNCTION__ ": Generic item '%s' failed to precache because the item count is over the %d limit.\n"
+			"Reduce the number of brush models and/or regular models in the map to correct this.",
+			s, MAX_GENERIC);
 	}
 	else
 	{
@@ -2243,56 +2238,56 @@ void EXT_FUNC PF_MessageEnd_I(void)
 void EXT_FUNC PF_WriteByte_I(int iValue)
 {
 	if (!gMsgStarted)
-		Sys_Error("WRITE_BYTE called with no active message\n");
+		Sys_Error(__FUNCTION__ " called with no active message\n");
 	MSG_WriteByte(&gMsgBuffer, iValue);
 }
 
 void EXT_FUNC PF_WriteChar_I(int iValue)
 {
 	if (!gMsgStarted)
-		Sys_Error("WRITE_CHAR called with no active message\n");
+		Sys_Error(__FUNCTION__ " called with no active message\n");
 	MSG_WriteChar(&gMsgBuffer, iValue);
 }
 
 void EXT_FUNC PF_WriteShort_I(int iValue)
 {
 	if (!gMsgStarted)
-		Sys_Error("WRITE_SHORT called with no active message\n");
+		Sys_Error(__FUNCTION__ " called with no active message\n");
 	MSG_WriteShort(&gMsgBuffer, iValue);
 }
 
 void EXT_FUNC PF_WriteLong_I(int iValue)
 {
 	if (!gMsgStarted)
-		Sys_Error("PF_WriteLong_I called with no active message\n");
+		Sys_Error(__FUNCTION__ " called with no active message\n");
 	MSG_WriteLong(&gMsgBuffer, iValue);
 }
 
 void EXT_FUNC PF_WriteAngle_I(float flValue)
 {
 	if (!gMsgStarted)
-		Sys_Error("PF_WriteAngle_I called with no active message\n");
+		Sys_Error(__FUNCTION__ " called with no active message\n");
 	MSG_WriteAngle(&gMsgBuffer, flValue);
 }
 
 void EXT_FUNC PF_WriteCoord_I(float flValue)
 {
 	if (!gMsgStarted)
-		Sys_Error("PF_WriteCoord_I called with no active message\n");
+		Sys_Error(__FUNCTION__ " called with no active message\n");
 	MSG_WriteShort(&gMsgBuffer, (int)(flValue * 8.0));
 }
 
 void EXT_FUNC PF_WriteString_I(const char *sz)
 {
 	if (!gMsgStarted)
-		Sys_Error("PF_WriteString_I called with no active message\n");
+		Sys_Error(__FUNCTION__ " called with no active message\n");
 	MSG_WriteString(&gMsgBuffer, sz);
 }
 
 void EXT_FUNC PF_WriteEntity_I(int iValue)
 {
 	if (!gMsgStarted)
-		Sys_Error("PF_WriteEntity_I called with no active message\n");
+		Sys_Error(__FUNCTION__ " called with no active message\n");
 	MSG_WriteShort(&gMsgBuffer, iValue);
 }
 
@@ -2657,10 +2652,10 @@ void EXT_FUNC PF_ForceUnmodified(FORCE_TYPE type, float *mins, float *maxs, cons
 	int i;
 
 	if (!filename)
-		Host_Error("PF_ForceUnmodified: NULL pointer");
+		Host_Error(__FUNCTION__ ": NULL pointer");
 
 	if (PR_IsEmptyString(filename))
-		Host_Error("PF_ForceUnmodified: Bad string '%s'", filename);
+		Host_Error(__FUNCTION__ ": Bad string '%s'", filename);
 
 	if (g_psv.state == ss_loading)
 	{
@@ -2675,7 +2670,7 @@ void EXT_FUNC PF_ForceUnmodified(FORCE_TYPE type, float *mins, float *maxs, cons
 			++i;
 
 			if (i >= 512)
-				Host_Error("ForceUnmodified: '%s' overflow", filename);
+				Host_Error(__FUNCTION__ ": '%s' overflow", filename);
 		}
 
 		cnode->check_type = type;
@@ -2702,7 +2697,7 @@ void EXT_FUNC PF_ForceUnmodified(FORCE_TYPE type, float *mins, float *maxs, cons
 			++cnode;
 			++i;
 			if (i >= 512)
-				Host_Error("ForceUnmodified: '%s' Precache can only be done in spawn functions", filename);
+				Host_Error(__FUNCTION__ ": '%s' Precache can only be done in spawn functions", filename);
 		}
 	}
 }
