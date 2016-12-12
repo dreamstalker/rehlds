@@ -160,7 +160,7 @@ NOBODY void MaskExceptions(void);
 NOBODY void Sys_Init(void);
 NOXREF void Sys_Sleep(int msec);
 NOBODY void Sys_DebugOutStraight(const char *pStr);
-NOBODY void __declspec(noreturn) Sys_Error(const char *error, ...);
+NOBODY void NORETURN Sys_Error(const char *error, ...);
 NOXREF void Sys_Warning(const char *pszWarning, ...);
 void Sys_Printf(const char *fmt, ...);
 void Sys_Quit(void);

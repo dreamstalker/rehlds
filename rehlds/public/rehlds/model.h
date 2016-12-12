@@ -292,6 +292,7 @@ typedef struct aliashdr_s
 
 typedef enum modtype_e
 {
+	mod_bad = -1,
 	mod_brush,
 	mod_sprite,
 	mod_alias,

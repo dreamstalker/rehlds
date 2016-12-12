@@ -50,7 +50,7 @@ public:
 
 // Specifies priorities for hooks call order in the chain.
 // For equal priorities first registered hook will be called first.
-enum HookChainPriority : int
+enum HookChainPriority
 {
 	HC_PRIORITY_UNINTERRUPTABLE = 255,  // Hook will be called before other hooks.
 	HC_PRIORITY_HIGH = 192,             // Hook will be called before hooks with default priority.

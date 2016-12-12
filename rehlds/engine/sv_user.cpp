@@ -1533,7 +1533,6 @@ void SV_ParseMove(client_t *pSenderClient)
 	if (!g_psv.active || !(host_client->active || host_client->spawned))
 		return;
 
-
 	if (msg_badread)
 	{
 		Con_Printf("Client %s:%s sent a bogus command packet\n", host_client->name, NET_AdrToString(host_client->netchan.remote_address));
@@ -1807,7 +1806,7 @@ void SV_SendEnts_f(void)
 		{
 			if (host_client->connected)
 			{
-				host_client->fully_connected = 1;
+				host_client->fully_connected = TRUE;
 
 #ifdef REHLDS_FIXES
 				// See SV_CheckFile function

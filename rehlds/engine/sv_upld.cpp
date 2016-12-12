@@ -426,10 +426,10 @@ void SV_ParseResourceList(client_t *pSenderClient)
 			resource->nDownloadSize > 1024 * 1024 * 1024)	// FIXME: Are they gone crazy??!
 		{
 #ifdef REHLDS_FIXES
-			SV_ClearResourceLists( host_client );
+			SV_ClearResourceLists(host_client);
 #else // REHLDS_FIXES
-			SV_ClearResourceList( &host_client->resourcesneeded );
-			SV_ClearResourceList( &host_client->resourcesonhand );
+			SV_ClearResourceList(&host_client->resourcesneeded);
+			SV_ClearResourceList(&host_client->resourcesonhand);
 #endif // REHLDS_FIXES
 			return;
 		}
@@ -488,14 +488,13 @@ void SV_ParseResourceList(client_t *pSenderClient)
 			Con_DPrintf("----------------------\n");
 
 			int bytestodownload = SV_EstimateNeededResources();
-
 			if (bytestodownload > sv_max_upload.value * 1024 * 1024)
 			{
 #ifdef REHLDS_FIXES
-				SV_ClearResourceLists( host_client );
+				SV_ClearResourceLists(host_client);
 #else // REHLDS_FIXES
-				SV_ClearResourceList( &host_client->resourcesneeded );
-				SV_ClearResourceList( &host_client->resourcesonhand );
+				SV_ClearResourceList(&host_client->resourcesneeded);
+				SV_ClearResourceList(&host_client->resourcesonhand);
 #endif //REHLDS_FIXES
 				return;
 			}

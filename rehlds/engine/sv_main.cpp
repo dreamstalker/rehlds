@@ -692,12 +692,12 @@ void SV_FindModelNumbers(void)
 {
 	sv_playermodel = -1;
 
-	for (int i = 0; i < HL_MODEL_MAX; i++)
+	for (int i = 0; i < MAX_MODELS; i++)
 	{
 		if (!g_psv.model_precache[i])
 			break;
 
-		//use case-sensitive names to increase performance
+		// use case-sensitive names to increase performance
 #ifdef REHLDS_FIXES
 		if (!Q_stricmp(g_psv.model_precache[i], "models/player.mdl"))
 			sv_playermodel = i;
@@ -869,7 +869,7 @@ int EXT_FUNC SV_LookupSoundIndex(const char *sample)
 	{
 		if (g_psv.state == ss_loading)
 		{
-			for (index = 1; index < HL_SOUND_MAX && g_psv.sound_precache[index]; index++) // TODO: why from 1?
+			for (index = 1; index < MAX_SOUNDS && g_psv.sound_precache[index]; index++) // TODO: why from 1?
 			{
 				if (!Q_stricmp(sample, g_psv.sound_precache[index]))
 					return index;
@@ -887,7 +887,7 @@ int EXT_FUNC SV_LookupSoundIndex(const char *sample)
 			return g_psv.sound_precache_hashedlookup[index];
 
 		index++;
-		if (index >= HL_SOUND_HASHLOOKUP_SIZE)
+		if (index >= MAX_SOUNDS_HASHLOOKUP_SIZE)
 			index = 0;
 		if (index == starting_index)
 			return 0;
@@ -899,7 +899,7 @@ void SV_BuildHashedSoundLookupTable(void)
 {
 	Q_memset(g_psv.sound_precache_hashedlookup, 0, sizeof(g_psv.sound_precache_hashedlookup));
 
-	for (int sound_num = 0; sound_num < HL_SOUND_MAX; sound_num++)
+	for (int sound_num = 0; sound_num < MAX_SOUNDS; sound_num++)
 	{
 		if (!g_psv.sound_precache[sound_num])
 			break;
@@ -912,14 +912,14 @@ void SV_BuildHashedSoundLookupTable(void)
 
 void SV_AddSampleToHashedLookupTable(const char *pszSample, int iSampleIndex)
 {
-	int starting_index = SV_HashString(pszSample, HL_SOUND_HASHLOOKUP_SIZE);
+	int starting_index = SV_HashString(pszSample, MAX_SOUNDS_HASHLOOKUP_SIZE);
 	int index = starting_index;
 	while (g_psv.sound_precache_hashedlookup[index])
 	{
 		index++;
 		hashstrings_collisions++;
 
-		if (index >= HL_SOUND_HASHLOOKUP_SIZE)
+		if (index >= MAX_SOUNDS_HASHLOOKUP_SIZE)
 			index = 0;
 
 		if (index == starting_index)
@@ -1413,8 +1413,8 @@ void SV_WriteSpawn(sizebuf_t *msg)
 
 #ifdef REHLDS_FIXES
 	// do it before PutInServer to allow mods send messages from forward
-	SZ_Clear( &host_client->netchan.message );
-	SZ_Clear( &host_client->datagram );
+	SZ_Clear(&host_client->netchan.message);
+	SZ_Clear(&host_client->datagram);
 #endif // REHLDS_FIXES
 
 	if (g_psv.loadgame)
@@ -1492,13 +1492,13 @@ void SV_WriteSpawn(sizebuf_t *msg)
 	MSG_WriteByte(msg, svc_signonnum);
 	MSG_WriteByte(msg, 1);
 
-	host_client->connecttime		= 0.0;
-	host_client->ignorecmdtime		= 0.0;
-	host_client->cmdtime			= 0.0;
-	host_client->active				= TRUE;
-	host_client->spawned			= TRUE;
-	host_client->connected			= TRUE;
-	host_client->fully_connected	= FALSE;
+	host_client->connecttime = 0.0;
+	host_client->ignorecmdtime = 0.0;
+	host_client->cmdtime = 0.0;
+	host_client->active = TRUE;
+	host_client->spawned = TRUE;
+	host_client->connected = TRUE;
+	host_client->fully_connected = FALSE;
 
 #ifdef REHLDS_FIXES
 	g_GameClients[host_client - g_psvs.clients]->SetSpawnedOnce(true);
@@ -4976,7 +4976,7 @@ int SV_ModelIndex(const char *name)
 		return node->val;
 	}
 #else
-	for (int i = 0; i < HL_MODEL_MAX; i++)
+	for (int i = 0; i < MAX_MODELS; i++)
 	{
 		if (!g_psv.model_precache[i])
 			break;
@@ -5196,7 +5196,7 @@ void SV_CreateResourceList(void)
 	}
 #else // REHLDS_FIXES
 #ifdef REHLDS_CHECKS
-	for (i = 1, s = &g_psv.generic_precache[1]; i < HL_GENERIC_MAX && *s != NULL; i++, s++)
+	for (i = 1, s = &g_psv.generic_precache[1]; i < MAX_GENERIC && *s != NULL; i++, s++)
 #else // REHLDS_CHECKS
 	for (i = 1, s = &g_psv.generic_precache[1]; *s != NULL; i++, s++)
 #endif // REHLDS_CHECKS
@@ -5211,7 +5211,7 @@ void SV_CreateResourceList(void)
 #endif // REHLDS_FIXES
 
 #ifdef REHLDS_CHECKS
-	for (i = 1, s = &g_psv.sound_precache[1]; i < HL_SOUND_MAX && *s != NULL; i++, s++)
+	for (i = 1, s = &g_psv.sound_precache[1]; i < MAX_SOUNDS && *s != NULL; i++, s++)
 #else // REHLDS_CHECKS
 	for (i = 1, s = &g_psv.sound_precache[1]; *s != NULL; i++, s++)
 #endif // REHLDS_CHECKS
@@ -5233,7 +5233,7 @@ void SV_CreateResourceList(void)
 		}
 	}
 #ifdef REHLDS_CHECKS
-	for (i = 1, s = &g_psv.model_precache[1]; i < HL_MODEL_MAX && *s != NULL; i++, s++)
+	for (i = 1, s = &g_psv.model_precache[1]; i < MAX_MODELS && *s != NULL; i++, s++)
 #else // REHLDS_CHECKS
 	for (i = 1, s = &g_psv.model_precache[1]; *s != NULL; i++, s++)
 #endif // REHLDS_CHECKS
@@ -5248,7 +5248,7 @@ void SV_CreateResourceList(void)
 	for (i = 0; i < sv_decalnamecount; i++)
 		SV_AddResource(t_decal, sv_decalnames[i].name, Draw_DecalSize(i), 0, i);
 
-	for (i = 1; i < HL_EVENT_MAX; i++)
+	for (i = 1; i < MAX_EVENTS; i++)
 	{
 		ep = &g_psv.event_precache[i];
 		if (!ep->filename)
@@ -5262,7 +5262,7 @@ void SV_ClearCaches(void)
 {
 	int i;
 	event_t *ep;
-	for (i = 1; i < HL_EVENT_MAX; i++)
+	for (i = 1; i < MAX_EVENTS; i++)
 	{
 		ep = &g_psv.event_precache[i];
 		if (ep->filename == NULL)
@@ -5488,7 +5488,6 @@ NOXREF void SV_ReconnectAllClients(void)
 			SV_DropClient(client, FALSE, message);
 		}
 	}
-
 }
 
 void SetCStrikeFlags(void)

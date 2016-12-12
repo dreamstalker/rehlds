@@ -428,7 +428,7 @@ NOBODY void Sys_DebugOutStraight(const char *pStr);
 //{
 //}
 
-void __declspec(noreturn) Sys_Error(const char *error, ...)
+void NORETURN Sys_Error(const char *error, ...)
 {
 	va_list argptr;
 	char text[1024];

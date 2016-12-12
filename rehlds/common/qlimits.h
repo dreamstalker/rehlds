@@ -25,15 +25,19 @@
 #define MAX_LIGHTSTYLE_INDEX_BITS	6
 #define MAX_LIGHTSTYLES			(1<<MAX_LIGHTSTYLE_INDEX_BITS)
 
-// Resource counts;
+// Resource counts
 #define MAX_MODEL_INDEX_BITS		9	// sent as a short
 #define MAX_MODELS			(1<<MAX_MODEL_INDEX_BITS)
 #define MAX_SOUND_INDEX_BITS		9
 #define MAX_SOUNDS			(1<<MAX_SOUND_INDEX_BITS)
+#define MAX_SOUNDS_HASHLOOKUP_SIZE	(MAX_SOUNDS * 2 - 1)
 
 #define MAX_GENERIC_INDEX_BITS		9
 #define MAX_GENERIC			(1<<MAX_GENERIC_INDEX_BITS)
 #define MAX_DECAL_INDEX_BITS		9
 #define MAX_BASE_DECALS			(1<<MAX_DECAL_INDEX_BITS)
+
+#define MAX_EVENTS			256
+#define MAX_PACKET_ENTITIES		256	// 256 visible entities per frame
 
 #endif // QLIMITS_H

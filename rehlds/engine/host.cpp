@@ -132,7 +132,7 @@ NOXREF void Host_EndGame(const char *message, ...)
 	longjmp(host_abortserver, 1);
 }
 
-void __declspec(noreturn) Host_Error(const char *error, ...)
+void NORETURN Host_Error(const char *error, ...)
 {
 	va_list argptr;
 	char string[1024];

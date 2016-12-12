@@ -23,8 +23,8 @@
 #define ARRAYSIZE(p)		(sizeof(p)/sizeof(p[0]))
 
 // Keeps clutter down a bit, when using a float as a bit-vector
-#define SETBITS(flBitVector, bits)		((flBitVector) = (int)(flBitVector) | (bits))
-#define CLEARBITS(flBitVector, bits)	((flBitVector) = (int)(flBitVector) & ~(bits))
-#define FBitSet(flBitVector, bit)		((flBitVector) & (bit))
+#define SetBits(flBitVector, bits)		((flBitVector) = (int)(flBitVector) | (bits))
+#define ClearBits(flBitVector, bits)		((flBitVector) = (int)(flBitVector) & ~(bits))
+#define FBitSet(flBitVector, bit)		((int)(flBitVector) & (bit))
 
 #endif		// COMMONMACROS_H

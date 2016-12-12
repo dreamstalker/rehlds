@@ -403,7 +403,6 @@ void Mod_AdSwap(texture_t *src, int pixels, int entries)
 	if (!tested)
 		return;
 
-	int j;
 	uint8 *mippal;
 	uint16 *texpal;
 	texture_t *tex;
@@ -1894,4 +1893,25 @@ NOXREF void Mod_ChangeGame(void)
 		p->firstCRCDone = FALSE;
 		p->initialCRC = 0;
 	}
+}
+
+model_t *Mod_Handle(int modelindex)
+{
+#ifdef REHLDS_FIXES
+	if (modelindex <= 0 || modelindex >= MAX_MODELS) {
+		Sys_Error(__FUNCTION__ ": bad modelindex #%i\n", modelindex);
+	}
+#endif
+
+	return g_psv.models[modelindex];
+}
+
+modtype_t Mod_GetType(int modelindex)
+{
+	model_t *mod = Mod_Handle(modelindex);
+	if (!mod) {
+		return mod_bad;
+	}
+
+	return mod->type;
 }

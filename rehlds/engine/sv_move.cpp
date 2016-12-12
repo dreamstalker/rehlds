@@ -36,24 +36,24 @@
 static int c_yes = 0;
 static int c_no = 0;
 
-#else //HOOK_ENGINE
+#else // HOOK_ENGINE
 
 int c_yes;
 int c_no;
 
-#endif //HOOK_ENGINE
+#endif // HOOK_ENGINE
 
 qboolean SV_CheckBottom(edict_t *ent)
 {
 	vec3_t mins;
 	vec3_t maxs;
 	vec3_t start;
-	vec3_t stop;                                                  //    29
-	trace_t trace;                                                //    30
-	int x;                                                        //    31
-	int y;                                                        //    31
-	float mid;                                                    //    32
-	float bottom;                                                 //    32
+	vec3_t stop;
+	trace_t trace;
+	int x;
+	int y;
+	float mid;
+	float bottom;
 	qboolean monsterClip = (ent->v.flags & FL_MONSTERCLIP) ? 1 : 0;
 
 	_VectorAdd(ent->v.origin, ent->v.mins, mins);

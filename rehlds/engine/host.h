@@ -117,7 +117,7 @@ extern jmp_buf host_enddemo;
 extern unsigned short *host_basepal;
 
 NOXREF void Host_EndGame(const char *message, ...);
-void __declspec(noreturn) Host_Error(const char *error, ...);
+void NORETURN Host_Error(const char *error, ...);
 void Host_InitLocal(void);
 NOBODY void Info_WriteVars(FileHandle_t fp);
 void Host_WriteConfiguration(void);

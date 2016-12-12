@@ -51,7 +51,7 @@ task publishPrepareFiles {
         copy {
             from 'rehlds/public'
             into 'publish/publishRoot/hlsdk/public'
-            include 'interface.h', 'interface.cpp', 'FileSystem.h'
+            exclude '**/rehlds/*', '**/tier0/*'
         }
         copy {
             from 'rehlds/public/rehlds'

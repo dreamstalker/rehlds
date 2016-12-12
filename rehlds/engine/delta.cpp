@@ -311,7 +311,7 @@ static delta_definition_t g_ClientDataDefinition[] =
 	DELTA_DEF(clientdata_s, vuser4[2]),
 };
 
-#endif
+#endif // Delta_definitions_region
 
 delta_description_t *DELTA_FindField(delta_t *pFields, const char *pszField)
 {
@@ -760,7 +760,6 @@ qboolean DELTA_WriteDeltaForceMask(unsigned char *from, unsigned char *to, qbool
 }
 #endif
 
-
 qboolean _DELTA_WriteDelta(unsigned char *from, unsigned char *to, qboolean force, delta_t *pFields, void(*callback)( void ), qboolean sendfields)
 {
 	int i;
@@ -789,7 +788,6 @@ qboolean _DELTA_WriteDelta(unsigned char *from, unsigned char *to, qboolean forc
 
 	return 1;
 }
-
 
 int DELTA_ParseDelta(unsigned char *from, unsigned char *to, delta_t *pFields)
 {

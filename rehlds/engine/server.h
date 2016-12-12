@@ -37,7 +37,6 @@
 // TODO: I think this defines must be in /common/
 #define NUM_EDICTS				900
 #define MAX_NAME				32
-#define MAX_PACKET_ENTITIES		256
 
 #include "custom_int.h"
 #include "crc.h"
@@ -86,13 +85,6 @@
 #define RESOURCE_MAX_COUNT  (1 << RESOURCE_INDEX_BITS)
 #endif // REHLDS_FIXES
 
-#define HL_SOUND_MAX 512
-#define HL_SOUND_HASHLOOKUP_SIZE (HL_SOUND_MAX * 2 - 1)
-
-#define HL_MODEL_MAX 512
-#define HL_GENERIC_MAX 512
-#define HL_EVENT_MAX 256
-
 typedef enum redirect_e
 {
 	RD_NONE = 0,
@@ -127,15 +119,15 @@ typedef struct server_s
 	int num_resources;
 	consistency_t consistency_list[MAX_CONSISTENCY_LIST];
 	int num_consistency;
-	const char *model_precache[HL_MODEL_MAX];
-	struct model_s *models[HL_MODEL_MAX];
-	unsigned char model_precache_flags[HL_MODEL_MAX];
-	struct event_s event_precache[HL_EVENT_MAX];
-	const char *sound_precache[HL_SOUND_MAX];
-	short int sound_precache_hashedlookup[HL_SOUND_HASHLOOKUP_SIZE];
+	const char *model_precache[MAX_MODELS];
+	struct model_s *models[MAX_MODELS];
+	unsigned char model_precache_flags[MAX_MODELS];
+	struct event_s event_precache[MAX_EVENTS];
+	const char *sound_precache[MAX_SOUNDS];
+	short int sound_precache_hashedlookup[MAX_SOUNDS_HASHLOOKUP_SIZE];
 	qboolean sound_precache_hashedlookup_built;
-	const char *generic_precache[HL_GENERIC_MAX];
-	char generic_precache_names[HL_GENERIC_MAX][64];
+	const char *generic_precache[MAX_GENERIC];
+	char generic_precache_names[MAX_GENERIC][64];
 	int num_generic_names;
 	char *lightstyles[MAX_LIGHTSTYLES];
 	int num_edicts;
@@ -158,11 +150,11 @@ typedef struct server_s
 
 
 struct rehlds_server_t {
-	//map for sv.model_precache (for faster resolving of model index by its name)
+	// map for sv.model_precache (for faster resolving of model index by its name)
 #if defined(REHLDS_FIXES)
-	CStringKeyStaticMap<int, 7, HL_MODEL_MAX * 2> modelsMap; //case-sensitive keys for better performance
+	CStringKeyStaticMap<int, 7, MAX_MODELS * 2> modelsMap; // case-sensitive keys for better performance
 #elif defined(REHLDS_OPT_PEDANTIC)
-	CICaseStringKeyStaticMap<int, 7, HL_MODEL_MAX * 2> modelsMap; //use case-insensitive keys to conform original engine's behavior
+	CICaseStringKeyStaticMap<int, 7, MAX_MODELS * 2> modelsMap; // use case-insensitive keys to conform original engine's behavior
 #endif
 
 #ifdef REHLDS_FIXES

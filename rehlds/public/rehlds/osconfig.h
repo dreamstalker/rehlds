@@ -103,6 +103,7 @@
 	#define HIDDEN
 	#define NOINLINE __declspec(noinline)
 	#define ALIGN16 __declspec(align(16))
+	#define NORETURN __declspec(noreturn)
 	#define FORCE_STACK_ALIGN
 
 	//inline bool SOCKET_FIONBIO(SOCKET s, int m) { return (ioctlsocket(s, FIONBIO, (u_long*)&m) == 0); }
@@ -148,6 +149,7 @@
 	#define HIDDEN __attribute__((visibility("hidden")))
 	#define NOINLINE __attribute__((noinline))
 	#define ALIGN16 __attribute__((aligned(16)))
+	#define NORETURN __attribute__((noreturn))
 	#define FORCE_STACK_ALIGN __attribute__((force_align_arg_pointer))
 
 	//inline bool SOCKET_FIONBIO(SOCKET s, int m) { return (ioctl(s, FIONBIO, (int*)&m) == 0); }

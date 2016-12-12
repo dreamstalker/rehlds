@@ -114,3 +114,5 @@ void Mod_LoadSpriteModel(model_t *mod, void *buffer);
 NOXREF void Mod_UnloadSpriteTextures(model_t *pModel);
 void Mod_Print(void);
 NOXREF void Mod_ChangeGame(void);
+model_t *Mod_Handle(int modelindex);
+modtype_t Mod_GetType(int modelindex);

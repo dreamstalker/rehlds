@@ -127,7 +127,7 @@ void EXT_FUNC PF_setmodel_I(edict_t *e, const char *m)
 	int i = 0;
 
 #ifdef REHLDS_CHECKS
-	for (; *check && i < HL_MODEL_MAX; i++, check++)
+	for (; *check && i < MAX_MODELS; i++, check++)
 #else
 	for (; *check; i++, check++)
 #endif
@@ -287,7 +287,7 @@ void EXT_FUNC PF_ambientsound_I(edict_t *entity, float *pos, const char *samp, f
 	}
 	else
 	{
-		for (i = 0; i < HL_SOUND_MAX; i++)
+		for (i = 0; i < MAX_SOUNDS; i++)
 		{
 			if (g_psv.sound_precache[i] && !Q_stricmp(g_psv.sound_precache[i], samp))
 			{
@@ -296,7 +296,7 @@ void EXT_FUNC PF_ambientsound_I(edict_t *entity, float *pos, const char *samp, f
 			}
 		}
 
-		if (i == HL_SOUND_MAX)
+		if (i == MAX_SOUNDS)
 		{
 			Con_Printf("no precache: %s\n", samp);
 			return;
@@ -1023,19 +1023,19 @@ int EXT_FUNC PF_precache_sound_I(const char *s)
 	int i;
 
 	if (!s)
-		Host_Error("PF_precache_sound_I: NULL pointer");
+		Host_Error(__FUNCTION__ ": NULL pointer");
 
 	if (PR_IsEmptyString(s))
-		Host_Error("PF_precache_sound_I: Bad string '%s'", s);
+		Host_Error(__FUNCTION__ ": Bad string '%s'", s);
 
 	if (s[0] == '!')
-		Host_Error("PF_precache_sound_I: '%s' do not precache sentence names!", s);
+		Host_Error(__FUNCTION__ ": '%s' do not precache sentence names!", s);
 
 	if (g_psv.state == ss_loading)
 	{
 		g_psv.sound_precache_hashedlookup_built = 0;
 
-		for (i = 0; i < HL_SOUND_MAX; i++)
+		for (i = 0; i < MAX_SOUNDS; i++)
 		{
 			if (!g_psv.sound_precache[i])
 			{
@@ -1053,42 +1053,42 @@ int EXT_FUNC PF_precache_sound_I(const char *s)
 		}
 
 		Host_Error(
-			"PF_precache_sound_I: Sound '%s' failed to precache because the item count is over the %d limit.\nReduce the number of brush models and/or regular models in the map to correct this.",
-			s,
-			HL_SOUND_MAX);
+			__FUNCTION__  ": Sound '%s' failed to precache because the item count is over the %d limit.\nReduce the number of brush models and/or regular models in the map to correct this.",
+			s, MAX_SOUNDS);
 	}
 	else
 	{
 		// precaching not enabled. check if already exists.
-		for (i = 0; i < HL_SOUND_MAX; i++)
+		for (i = 0; i < MAX_SOUNDS; i++)
 		{
 			if (g_psv.sound_precache[i] && !Q_stricmp(g_psv.sound_precache[i], s))
 				return i;
 		}
 
-		Host_Error("PF_precache_sound_I: '%s' Precache can only be done in spawn functions", s);
+		Host_Error(__FUNCTION__ ": '%s' Precache can only be done in spawn functions", s);
 	}
 
-	return -1; // unreach
+	// unreach
+	return -1;
 }
 
 unsigned short EXT_FUNC EV_Precache(int type, const char *psz)
 {
 	if (!psz)
-		Host_Error("EV_Precache: NULL pointer");
+		Host_Error(__FUNCTION__ ": NULL pointer");
 
 	if (PR_IsEmptyString(psz))
-		Host_Error("EV_Precache: Bad string '%s'", psz);
+		Host_Error(__FUNCTION__ ": Bad string '%s'", psz);
 
 	if (g_psv.state == ss_loading)
 	{
-		for (int i = 1; i < HL_EVENT_MAX; i++)
+		for (int i = 1; i < MAX_EVENTS; i++)
 		{
 			struct event_s* ev = &g_psv.event_precache[i];
 			if (!ev->filename)
 			{
 				if (type != 1)
-					Host_Error("EV_Precache:  only file type 1 supported currently\n");
+					Host_Error(__FUNCTION__ ":  only file type 1 supported currently\n");
 
 				char szpath[MAX_PATH];
 				Q_snprintf(szpath, sizeof(szpath), "%s", psz);
@@ -1097,7 +1097,7 @@ unsigned short EXT_FUNC EV_Precache(int type, const char *psz)
 				int scriptSize = 0;
 				char* evScript = (char*) COM_LoadFile(szpath, 5, &scriptSize);
 				if (!evScript)
-					Host_Error("EV_Precache:  file %s missing from server\n", psz);
+					Host_Error(__FUNCTION__ ":  file %s missing from server\n", psz);
 #ifdef REHLDS_FIXES
 				// Many modders don't know that the resource names passed to precache functions must be a static strings.
 				// Also some metamod modules can be unloaded during the server running.
@@ -1117,18 +1117,18 @@ unsigned short EXT_FUNC EV_Precache(int type, const char *psz)
 			if (!Q_stricmp(ev->filename, psz))
 				return i;
 		}
-		Host_Error("EV_Precache: '%s' overflow", psz);
+		Host_Error(__FUNCTION__ ": '%s' overflow", psz);
 	}
 	else
 	{
-		for (int i = 1; i < HL_EVENT_MAX; i++)
+		for (int i = 1; i < MAX_EVENTS; i++)
 		{
 			struct event_s* ev = &g_psv.event_precache[i];
 			if (!Q_stricmp(ev->filename, psz))
 				return i;
 		}
 
-		Host_Error("EV_Precache: '%s' Precache can only be done in spawn functions", psz);
+		Host_Error(__FUNCTION__ ": '%s' Precache can only be done in spawn functions", psz);
 	}
 }
 
@@ -1219,15 +1219,15 @@ void EXT_FUNC EV_Playback(int flags, const edict_t *pInvoker, unsigned short eve
 	eargs.bparam1 = bparam1;
 	eargs.bparam2 = bparam2;
 
-	if (eventindex < 1u || eventindex >= HL_EVENT_MAX)
+	if (eventindex < 1u || eventindex >= MAX_EVENTS)
 	{
-		Con_DPrintf("EV_Playback:  index out of range %i\n", eventindex);
+		Con_DPrintf(__FUNCTION__ ":  index out of range %i\n", eventindex);
 		return;
 	}
 
 	if (!g_psv.event_precache[eventindex].pszScript)
 	{
-		Con_DPrintf("EV_Playback:  no event for index %i\n", eventindex);
+		Con_DPrintf(__FUNCTION__ ":  no event for index %i\n", eventindex);
 		return;
 	}
 
@@ -1358,7 +1358,7 @@ void EXT_FUNC EV_SV_Playback(int flags, int clientindex, unsigned short eventind
 		return;
 
 	if (clientindex < 0 || clientindex >= g_psvs.maxclients)
-		Host_Error("EV_SV_Playback:  Client index %i out of range\n", clientindex);
+		Host_Error(__FUNCTION__ ":  Client index %i out of range\n", clientindex);
 
 	edict_t *pEdict = g_psvs.clients[clientindex].edict;
 	EV_Playback(flags,pEdict, eventindex, delay, origin, angles, fparam1, fparam2, iparam1, iparam2, bparam1, bparam2);
@@ -1376,7 +1376,7 @@ int SV_LookupModelIndex(const char *name)
 		return node->val;
 	}
 #else // REHLDS_OPT_PEDANTIC
-	for (int i = 0; i < HL_MODEL_MAX; i++)
+	for (int i = 0; i < MAX_MODELS; i++)
 	{
 		if (!g_psv.model_precache[i])
 			break;
@@ -1394,10 +1394,10 @@ int EXT_FUNC PF_precache_model_I(const char *s)
 {
 	int iOptional = 0;
 	if (!s)
-		Host_Error("PF_precache_model_I: NULL pointer");
+		Host_Error(__FUNCTION__ ": NULL pointer");
 
 	if (PR_IsEmptyString(s))
-		Host_Error("PF_precache_model_I: Bad string '%s'", s);
+		Host_Error(__FUNCTION__ ": Bad string '%s'", s);
 
 	if (*s == '!')
 	{
@@ -1407,7 +1407,7 @@ int EXT_FUNC PF_precache_model_I(const char *s)
 
 	if (g_psv.state == ss_loading)
 	{
-		for (int i = 0; i < HL_MODEL_MAX; i++)
+		for (int i = 0; i < MAX_MODELS; i++)
 		{
 			if (!g_psv.model_precache[i])
 			{
@@ -1422,14 +1422,14 @@ int EXT_FUNC PF_precache_model_I(const char *s)
 				g_rehlds_sv.modelsMap.put(g_psv.model_precache[i], i);
 #endif //REHLDS_OPT_PEDANTIC
 
-				g_psv.models[i] = Mod_ForName(s, 1, 1);
+				g_psv.models[i] = Mod_ForName(s, TRUE, TRUE);
 				if (!iOptional)
-					g_psv.model_precache_flags[i] |= 1u;
+					g_psv.model_precache_flags[i] |= RES_FATALIFMISSING;
 
 				return i;
 			}
 
-			//use case-sensitive names to increase performance
+			// use case-sensitive names to increase performance
 #ifdef REHLDS_FIXES
 			if (!Q_strcmp(g_psv.model_precache[i], s))
 				return i;
@@ -1439,15 +1439,14 @@ int EXT_FUNC PF_precache_model_I(const char *s)
 #endif
 		}
 		Host_Error(
-			"PF_precache_model_I: Model '%s' failed to precache because the item count is over the %d limit.\nReduce the number of brush models and/or regular models in the map to correct this.",
-			s,
-			512);
+			__FUNCTION__ ": Model '%s' failed to precache because the item count is over the %d limit.\nReduce the number of brush models and/or regular models in the map to correct this.",
+			s, MAX_MODELS);
 	}
 	else
 	{
-		for (int i = 0; i < HL_MODEL_MAX; i++)
+		for (int i = 0; i < MAX_MODELS; i++)
 		{
-			//use case-sensitive names to increase performance
+			// use case-sensitive names to increase performance
 #ifdef REHLDS_FIXES
 			if (!Q_strcmp(g_psv.model_precache[i], s))
 				return i;
@@ -1456,19 +1455,21 @@ int EXT_FUNC PF_precache_model_I(const char *s)
 				return i;
 #endif
 		}
-		Host_Error("PF_precache_model_I: '%s' Precache can only be done in spawn functions", s);
+		Host_Error(__FUNCTION__ ": '%s' Precache can only be done in spawn functions", s);
 	}
 }
 
 #ifdef REHLDS_FIXES
 int EXT_FUNC PF_precache_generic_I(char *s)
-// TODO: Call to Con_Printf is replaced with Host_Error in 6153
 {
 	if (!s)
-		Host_Error("PF_precache_generic_I: NULL pointer");
+		Host_Error(__FUNCTION__ ": NULL pointer");
 
 	if (PR_IsEmptyString(s))
-		Host_Error("PF_precache_generic_I: Bad string '%s'", s);
+	{
+		// TODO: Call to Con_Printf is replaced with Host_Error in 6153
+		Host_Error(__FUNCTION__ ": Bad string '%s'", s);
+	}
 
 	char resName[MAX_QPATH];
 	Q_strncpy(resName, s, sizeof(resName));
@@ -1492,14 +1493,15 @@ int EXT_FUNC PF_precache_generic_I(char *s)
 	}
 
 	if (g_psv.state != ss_loading)
-		Host_Error("PF_precache_generic_I: '%s' Precache can only be done in spawn functions", resName);
+		Host_Error(__FUNCTION__ ": '%s' Precache can only be done in spawn functions", resName);
 
 	if (resCount >= ARRAYSIZE(g_rehlds_sv.precachedGenericResourceNames))
+	{
 		Host_Error(
-			"PF_precache_generic_I: Generic item '%s' failed to precache because the item count is over the %d limit.\n\
+			__FUNCTION__ ": Generic item '%s' failed to precache because the item count is over the %d limit.\n\
 Reduce the number of brush models and/or regular models in the map to correct this.",
-			resName,
-			ARRAYSIZE(g_rehlds_sv.precachedGenericResourceNames));
+			resName, ARRAYSIZE(g_rehlds_sv.precachedGenericResourceNames));
+	}
 
 	Q_strcpy(g_rehlds_sv.precachedGenericResourceNames[resCount], resName);
 
@@ -1507,17 +1509,19 @@ Reduce the number of brush models and/or regular models in the map to correct th
 }
 #else // REHLDS_FIXES
 int EXT_FUNC PF_precache_generic_I(char *s)
-// TODO: Call to Con_Printf is replaced with Host_Error in 6153
 {
 	if (!s)
-		Host_Error("PF_precache_generic_I: NULL pointer");
+		Host_Error(__FUNCTION__ ": NULL pointer");
 
 	if (PR_IsEmptyString(s))
-		Host_Error("PF_precache_generic_I: Bad string '%s'", s);
+	{
+		// TODO: Call to Con_Printf is replaced with Host_Error in 6153
+		Host_Error(__FUNCTION__ ": Bad string '%s'", s);
+	}
 
 	if (g_psv.state == ss_loading)
 	{
-		for (int i = 0; i < HL_GENERIC_MAX; i++)
+		for (int i = 0; i < MAX_GENERIC; i++)
 		{
 			if (!g_psv.generic_precache[i])
 			{
@@ -1529,18 +1533,18 @@ int EXT_FUNC PF_precache_generic_I(char *s)
 				return i;
 		}
 		Host_Error(
-			"PF_precache_generic_I: Generic item '%s' failed to precache because the item count is over the %d limit.\nReduce the number of brush models and/or regular models in the map to correct this.",
-			s,
-			HL_GENERIC_MAX);
+			__FUNCTION__ ": Generic item '%s' failed to precache because the item count is over the %d limit.\nReduce the number of brush models and/or regular models in the map to correct this.",
+			s, MAX_GENERIC
+		);
 	}
 	else
 	{
-		for (int i = 0; i < HL_GENERIC_MAX; i++)
+		for (int i = 0; i < MAX_GENERIC; i++)
 		{
 			if (!Q_stricmp(g_psv.generic_precache[i], s))
 				return i;
 		}
-		Host_Error("PF_precache_generic_I: '%s' Precache can only be done in spawn functions", s);
+		Host_Error(__FUNCTION__ ": '%s' Precache can only be done in spawn functions", s);
 	}
 }
 #endif // REHLDS_FIXES
@@ -1975,13 +1979,13 @@ edict_t* EXT_FUNC PF_CreateFakeClient_I(const char *netname)
 	Q_strncpy(fakeclient->name, netname, sizeof(fakeclient->name) - 1);
 	fakeclient->name[sizeof(fakeclient->name) - 1] = 0;
 
-	fakeclient->active = 1;
-	fakeclient->spawned = 1;
-	fakeclient->fully_connected = 1;
-	fakeclient->connected = 1;
-	fakeclient->fakeclient = 1;
+	fakeclient->active = TRUE;
+	fakeclient->spawned = TRUE;
+	fakeclient->fully_connected = TRUE;
+	fakeclient->connected = TRUE;
+	fakeclient->fakeclient = TRUE;
 	fakeclient->userid = g_userid++;
-	fakeclient->uploading = 0;
+	fakeclient->uploading = FALSE;
 	fakeclient->edict = ent;
 	ent->v.netname = (size_t)fakeclient->name - (size_t)pr_strings;
 	ent->v.pContainingEntity = ent;
