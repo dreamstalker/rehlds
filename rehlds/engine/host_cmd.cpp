@@ -2642,6 +2642,8 @@ void Host_TogglePause_f(void)
 #ifdef REHLDS_FIXES
 	for (int i = 0; i < g_psvs.maxclients; i++)
 	{
+		if (g_psvs.clients[i].fakeclient)
+			continue;
 		if (!g_psvs.clients[i].connected)
 			continue;
 
@@ -2671,6 +2673,8 @@ void Host_Pause_f(void)
 #ifdef REHLDS_FIXES
 	for (int i = 0; i < g_psvs.maxclients; i++)
 	{
+		if (g_psvs.clients[i].fakeclient)
+			continue;
 		if (!g_psvs.clients[i].connected)
 			continue;
 
@@ -2700,6 +2704,8 @@ void Host_Unpause_f(void)
 #ifdef REHLDS_FIXES
 	for (int i = 0; i < g_psvs.maxclients; i++)
 	{
+		if (g_psvs.clients[i].fakeclient)
+			continue;
 		if (!g_psvs.clients[i].connected)
 			continue;
 

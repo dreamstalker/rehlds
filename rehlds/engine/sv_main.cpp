@@ -3756,6 +3756,8 @@ void SV_SendFullClientUpdateForAll(client_t *client)
 	for (int i = 0; i < g_psvs.maxclients; i++)
 	{
 		host_client = &g_psvs.clients[i];
+		if (host_client->fakeclient)
+			continue;
 		if (!host_client->connected)
 			continue;
 
