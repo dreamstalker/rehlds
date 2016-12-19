@@ -6775,10 +6775,10 @@ void SV_AddIP_f(void)
 	if (Cmd_Argc() != 3)
 	{
 #ifdef REHLDS_FIXES
-		Con_Printf("Usage: addip <minutes> <ipaddress>\n\
-	   addip <minutes> <ipaddress/CIDR>\n\
-Use 0 minutes for permanent\n\
-ipaddress A.B.C.D/24 is equivalent to A.B.C.0 and A.B.C\n");
+		Con_Printf("Usage: addip <minutes> <ipaddress>\n"
+				   "       addip <minutes> <ipaddress/CIDR>\n"
+				   "Use 0 minutes for permanent\n"
+				   "ipaddress A.B.C.D/24 is equivalent to A.B.C.0 and A.B.C\n");
 #else // REHLDS_FIXES
 		Con_Printf("Usage: addip <minutes> <ipaddress>\nUse 0 minutes for permanent\n");
 #endif // REHLDS_FIXES
@@ -6876,9 +6876,9 @@ void SV_RemoveIP_f(void)
 	int argCount = Cmd_Argc();
 	if (argCount != 2 && argCount != 3)
 	{
-		Con_Printf("Usage: removeip <ipaddress> {removeAll}\n\
-	   removeip <ipaddress/CIDR> {removeAll}\n\
-Use removeAll to delete all ip filters which ipaddress or ipaddress/CIDR includes\n");
+		Con_Printf("Usage: removeip <ipaddress> {removeAll}\n"
+				   "removeip <ipaddress/CIDR> {removeAll}\n"
+				   "Use removeAll to delete all ip filters which ipaddress or ipaddress/CIDR includes\n");
 
 		return;
 	}
@@ -6889,10 +6889,10 @@ Use removeAll to delete all ip filters which ipaddress or ipaddress/CIDR include
 	if (!StringToFilter(Cmd_Argv(1), &f))
 	{
 #ifdef REHLDS_FIXES
-		Con_Printf("Invalid IP address\n\
-Usage: removeip <ipaddress> {removeAll}\n\
-	   removeip <ipaddress/CIDR> {removeAll}\n\
-Use removeAll to delete all ip filters which ipaddress or ipaddress/CIDR includes\n");
+		Con_Printf("Invalid IP address\n"
+				   "Usage: removeip <ipaddress> {removeAll}\n"
+				   "       removeip <ipaddress/CIDR> {removeAll}\n"
+				   "Use removeAll to delete all ip filters which ipaddress or ipaddress/CIDR includes\n");
 #endif // REHLDS_FIXES
 
 		return;
