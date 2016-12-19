@@ -2115,9 +2115,9 @@ void SV_ReplaceSpecialCharactersInName(char *newname, const char *oldname)
 	for (const char *s = oldname; *s != '\0' && remainChars; s++)
 	{
 		if (*s == '#' ||
-		    *s == '%' ||
-		    *s == '&' ||
-		    (n && newname[n-1] == '+' && (signed char)*s > 0 && isalnum(*s)))
+			*s == '%' ||
+			*s == '&' ||
+			(n && newname[n-1] == '+' && (signed char)*s > 0 && isalnum(*s)))
 		{
 			if (remainChars < 3)
 				break;
@@ -4020,7 +4020,7 @@ void SV_AddToFatPVS(vec_t *org, mnode_t *node)
 /* <a8af2> ../engine/sv_main.c:5239 */
 unsigned char* EXT_FUNC SV_FatPVS(float *org)
 {
-	fatbytes = (g_psv.worldmodel->numleafs + 31) >> 3;
+	fatbytes = gPVSRowBytes;
 	Q_memset(fatpvs, 0, fatbytes);
 	SV_AddToFatPVS(org, g_psv.worldmodel->nodes);
 	return fatpvs;
@@ -4073,7 +4073,7 @@ void SV_AddToFatPAS(vec_t *org, mnode_t *node)
 /* <a8bac> ../engine/sv_main.c:5295 */
 unsigned char* EXT_FUNC SV_FatPAS(float *org)
 {
-	fatpasbytes = (g_psv.worldmodel->numleafs + 31) >> 3;
+	fatpasbytes = gPVSRowBytes;
 	Q_memset(fatpas, 0, fatpasbytes);
 	SV_AddToFatPAS(org, g_psv.worldmodel->nodes);
 	return fatpas;
@@ -6132,7 +6132,7 @@ void FilterToString(const ipfilter_t &f, char *s)
 bool IsFilterIncludesAnotherFilter(const ipfilter_t &f, const ipfilter_t &f2)
 {
 	return f2.mask >= f.mask
-	    && (f2.compare.u32 & f.mask) == f.compare.u32;
+		&& (f2.compare.u32 & f.mask) == f.compare.u32;
 }
 
 qboolean StringToFilter(const char *s, ipfilter_t *f)
@@ -6812,7 +6812,7 @@ void SV_AddIP_f(void)
 	{
 #ifdef REHLDS_FIXES
 		Con_Printf("Usage: addip <minutes> <ipaddress>\n\
-       addip <minutes> <ipaddress/CIDR>\n\
+	   addip <minutes> <ipaddress/CIDR>\n\
 Use 0 minutes for permanent\n\
 ipaddress A.B.C.D/24 is equivalent to A.B.C.0 and A.B.C\n");
 #else // REHLDS_FIXES
@@ -6914,7 +6914,7 @@ void SV_RemoveIP_f(void)
 	if (argCount != 2 && argCount != 3)
 	{
 		Con_Printf("Usage: removeip <ipaddress> {removeAll}\n\
-       removeip <ipaddress/CIDR> {removeAll}\n\
+	   removeip <ipaddress/CIDR> {removeAll}\n\
 Use removeAll to delete all ip filters which ipaddress or ipaddress/CIDR includes\n");
 
 		return;
@@ -6928,7 +6928,7 @@ Use removeAll to delete all ip filters which ipaddress or ipaddress/CIDR include
 #ifdef REHLDS_FIXES
 		Con_Printf("Invalid IP address\n\
 Usage: removeip <ipaddress> {removeAll}\n\
-       removeip <ipaddress/CIDR> {removeAll}\n\
+	   removeip <ipaddress/CIDR> {removeAll}\n\
 Use removeAll to delete all ip filters which ipaddress or ipaddress/CIDR includes\n");
 #endif // REHLDS_FIXES
 
