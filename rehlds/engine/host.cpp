@@ -477,9 +477,9 @@ void SV_DropClient_internal(client_t *cl, qboolean crash, const char *string)
 			MSG_WriteByte(&cl->netchan.message, svc_disconnect);
 			MSG_WriteString(&cl->netchan.message, string);
 			final[0] = svc_disconnect;
-			Q_strncpy((char *)&final[1], string, min(sizeof(final) - 1, Q_strlen(string) + 1));
+			Q_strncpy((char *)&final[1], string, Q_min(sizeof(final) - 1, Q_strlen(string) + 1));
 			final[sizeof(final) - 1] = 0;
-			i = 1 + min(sizeof(final) - 1, Q_strlen(string) + 1);
+			i = 1 + Q_min(sizeof(final) - 1, Q_strlen(string) + 1);
 		}
 		if (cl->edict && cl->spawned)
 			gEntityInterface.pfnClientDisconnect(cl->edict);

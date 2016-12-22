@@ -883,7 +883,7 @@ qboolean SV_CheckSphereIntersection(edict_t *ent, const vec_t *start, const vec_
 	pseqdesc += ent->v.sequence;
 	for (int i = 0; i < 3; i++)
 	{
-		maxDim[i] = max(fabs(pseqdesc->bbmax[i]), fabs(pseqdesc->bbmin[i]));
+		maxDim[i] = Q_max(fabs(pseqdesc->bbmax[i]), fabs(pseqdesc->bbmin[i]));
 	}
 	radiusSquared = maxDim[0] * maxDim[0] + maxDim[1] * maxDim[1] + maxDim[2] * maxDim[2];
 	return DoesSphereIntersect(ent->v.origin, radiusSquared, traceOrg, traceDir) != 0;
