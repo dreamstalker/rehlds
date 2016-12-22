@@ -275,14 +275,18 @@ void Netchan_UpdateFlow(netchan_t *chan)
 
 void Netchan_Transmit(netchan_t *chan, int length, byte *data)
 {
-	byte		send_buf[NET_MAX_MESSAGE];
-	qboolean	send_reliable;
-	qboolean	send_reliable_fragment;
-	qboolean	send_resending = false;
-	unsigned	w1, w2;
+#ifdef REHLDS_FIXES
+	byte send_buf[MAX_UDP_PACKET];
+#else
+	byte send_buf[NET_MAX_MESSAGE];
+#endif
+	qboolean send_reliable;
+	qboolean send_reliable_fragment;
+	qboolean send_resending = false;
+	unsigned w1, w2;
 	int i, j;
 
-	float       fRate;
+	float fRate;
 
 	sizebuf_t sb_send;
 	sb_send.data = send_buf;
