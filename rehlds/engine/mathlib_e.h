@@ -56,24 +56,57 @@ static const int nanmask = 0x7F800000;
 
 #define IS_NAN(fvar) ((*reinterpret_cast<int*>(&(fvar)) & nanmask) == nanmask)
 
-inline double M_sqrt(int value) {
-	return sqrt(value);
-}
-
 inline float M_sqrt(float value) {
 	return _mm_cvtss_f32(_mm_sqrt_ss(_mm_load_ss(&value)));
 }
 
 inline double M_sqrt(double value) {
-	double ret;
 	auto v = _mm_load_sd(&value);
-	_mm_store_sd(&ret, _mm_sqrt_sd(v, v));
-	return ret;
+	return _mm_cvtsd_f64(_mm_sqrt_sd(v, v));
 }
 
-inline double M_sqrt(long double value)
-{
-	return M_sqrt(double(value));
+template<typename T>
+inline double M_sqrt(T value) {
+	return sqrt(value);
+}
+
+inline float M_min(float a, float b) {
+	return _mm_cvtss_f32(_mm_min_ss(_mm_load_ss(&a), _mm_load_ss(&b)));
+}
+
+inline double M_min(double a, double b) {
+	return _mm_cvtsd_f64(_mm_min_sd(_mm_load_sd(&a), _mm_load_sd(&b)));
+}
+
+template<typename T>
+inline T M_min(T a, T b) {
+	return min(a, b);
+}
+
+inline float M_max(float a, float b) {
+	return _mm_cvtss_f32(_mm_max_ss(_mm_load_ss(&a), _mm_load_ss(&b)));
+}
+
+inline double M_max(double a, double b) {
+	return _mm_cvtsd_f64(_mm_max_sd(_mm_load_sd(&a), _mm_load_sd(&b)));
+}
+
+template<typename T>
+inline T M_max(T a, T b) {
+	return max(a, b);
+}
+
+inline float M_clamp(float a, float min, float max) {
+	return _mm_cvtss_f32(_mm_min_ss(_mm_max_ss(_mm_load_ss(&a), _mm_load_ss(&min)), _mm_load_ss(&max)));
+}
+
+inline double M_clamp(double a, double min, double max) {
+	return _mm_cvtsd_f64(_mm_min_sd(_mm_max_sd(_mm_load_sd(&a), _mm_load_sd(&min)), _mm_load_sd(&max)));
+}
+
+template<typename T>
+inline T M_clamp(T a, T min, T max) {
+	return clamp(a, min, max);
 }
 
 float anglemod(float a);

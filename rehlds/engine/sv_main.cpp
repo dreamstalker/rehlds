@@ -719,7 +719,7 @@ void SV_StartParticle(const vec_t *org, const vec_t *dir, int color, int count)
 
 		for (int i = 0; i < 3; i++)
 		{
-			MSG_WriteChar(&g_psv.datagram, clamp((int)(dir[i] * 16.0f), -128, 127));
+			MSG_WriteChar(&g_psv.datagram, Q_clamp((int)(dir[i] * 16.0f), -128, 127));
 		}
 
 		MSG_WriteByte(&g_psv.datagram, count);
@@ -1771,7 +1771,7 @@ int SV_GetFragmentSize(void *state)
 		if (val[0] != 0)
 		{
 			size = Q_atoi( val );
-			size = clamp(size, FRAGMENT_S2C_MIN_SIZE, FRAGMENT_S2C_MAX_SIZE);
+			size = Q_clamp(size, FRAGMENT_S2C_MIN_SIZE, FRAGMENT_S2C_MAX_SIZE);
 		}
 	}
 
@@ -4937,7 +4937,7 @@ void SV_ExtractFromUserinfo(client_t *cl)
 	if (val[0] != 0)
 	{
 		i = Q_atoi(val);
-		cl->netchan.rate = clamp(float(i), MIN_RATE, MAX_RATE);
+		cl->netchan.rate = Q_clamp(float(i), MIN_RATE, MAX_RATE);
 	}
 
 	val = Info_ValueForKey(userinfo, "topcolor");
