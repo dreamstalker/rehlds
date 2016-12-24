@@ -308,6 +308,7 @@ cvar_t sv_rehlds_hull_centering = { "sv_rehlds_hull_centering", "0", 0, 0.0f, nu
 cvar_t sv_rcon_condebug = { "sv_rcon_condebug", "1", 0, 1.0f, nullptr };
 cvar_t sv_rehlds_userinfo_transmitted_fields = { "sv_rehlds_userinfo_transmitted_fields", "", 0, 0.0f, nullptr };
 cvar_t sv_rehlds_attachedentities_playeranimationspeed_fix = {"sv_rehlds_attachedentities_playeranimationspeed_fix", "0", 0, 0.0f, nullptr};
+cvar_t sv_rehlds_local_gametime = {"sv_rehlds_local_gametime", "0", 0, 0.0f, nullptr};
 #endif
 
 delta_t *SV_LookupDelta(char *name)
@@ -1382,6 +1383,33 @@ void SV_WriteClientdataToMessage(client_t *client, sizebuf_t *msg)
 
 		for (int i = 0; i < 64; i++, tdata++)
 		{
+#ifdef REHLDS_FIXES
+			// So, HL and CS games send absolute gametime in these vars, DMC and Ricochet games don't send absolute gametime
+			// TODO: idk about other games
+			// FIXME: there is a loss of precision, because gamedll has already written float gametime in them 
+			if (sv_rehlds_local_gametime.value != 0.0f)
+			{
+				auto convertGameTimeToLocal = 
+					[](float &gameTime)
+				{
+					if (gameTime > 0.0f)
+					{
+						auto currentLocalGameTime = realtime - host_client->connection_started;
+						auto currentGameTime = g_psv.time;
+						auto difference = gameTime - currentGameTime;
+						gameTime = (float)(currentLocalGameTime + difference);
+					}
+				};
+				if (g_bIsCStrike || g_bIsCZero)
+					convertGameTimeToLocal(std::ref(tdata->m_fAimedDamage));
+				if (g_bIsHL1 || g_bIsCStrike || g_bIsCZero)
+				{
+					convertGameTimeToLocal(std::ref(tdata->fuser2));
+					convertGameTimeToLocal(std::ref(tdata->fuser3));
+				}
+			}
+#endif
+
 			if (host_client->delta_sequence == -1)
 				fdata = &wbaseline;
 			else
@@ -1457,7 +1485,16 @@ void SV_WriteSpawn(sizebuf_t *msg)
 #endif // REHLDS_FIXES
 
 	MSG_WriteByte(msg, svc_time);
-	MSG_WriteFloat(msg, g_psv.time);
+#ifdef REHLDS_FIXES
+	if (sv_rehlds_local_gametime.value != 0.0f)
+	{
+		MSG_WriteFloat(msg, (float)(realtime - host_client->connection_started));
+	}
+	else
+#endif
+	{
+		MSG_WriteFloat(msg, g_psv.time);
+	}
 
 	host_client->sendinfo = TRUE;
 
@@ -4625,7 +4662,16 @@ qboolean SV_SendClientDatagram(client_t *client)
 	msg.flags = SIZEBUF_ALLOW_OVERFLOW;
 
 	MSG_WriteByte(&msg, svc_time);
-	MSG_WriteFloat(&msg, g_psv.time);
+#ifdef REHLDS_FIXES
+	if (sv_rehlds_local_gametime.value != 0.0f)
+	{
+		MSG_WriteFloat(&msg, (float)(realtime - client->connection_started));
+	}
+	else
+#endif
+	{
+		MSG_WriteFloat(&msg, g_psv.time);
+	}
 
 	SV_WriteClientdataToMessage(client, &msg);
 	SV_WriteEntitiesToClient(client, &msg);
@@ -7731,6 +7777,7 @@ void SV_Init(void)
 	Cvar_RegisterVariable(&sv_rcon_condebug);
 	Cvar_RegisterVariable(&sv_rehlds_userinfo_transmitted_fields);
 	Cvar_RegisterVariable(&sv_rehlds_attachedentities_playeranimationspeed_fix);
+	Cvar_RegisterVariable(&sv_rehlds_local_gametime);
 #endif
 
 	for (int i = 0; i < MAX_MODELS; i++)
