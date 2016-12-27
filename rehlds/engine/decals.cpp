@@ -525,6 +525,9 @@ void Decal_Init(void)
 	FileHandle_t hfile;
 	cachewad_t *decal_wad_temp;
 	char pszPathID[2][15] = { "DEFAULTGAME", "GAME" };
+#ifdef REHLDS_FIXES
+	bool found = false;
+#endif
 
 	Draw_DecalShutdown();
 	for (i = 0; i < ARRAYSIZE(pszPathID); i++)
@@ -532,13 +535,17 @@ void Decal_Init(void)
 		hfile = FS_OpenPathID("decals.wad", "rb", pszPathID[i]);
 #ifdef REHLDS_FIXES
 		if (!hfile)
-			if (i < ARRAYSIZE(pszPathID) - 1)
+			if (found || i < ARRAYSIZE(pszPathID) - 1)
 				continue;
 			else
 #else
 		if (i == 0 && !hfile)
 #endif
 			Sys_Error("Couldn't find '%s' in \"%s\" search path\n", "decals.wad", pszPathID[i]);
+
+#ifdef REHLDS_FIXES
+		found = true;
+#endif
 
 		filesize = FS_Size(hfile);
 		decal_wad_temp = (cachewad_t *)Mem_Malloc(sizeof(cachewad_t));
