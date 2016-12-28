@@ -198,11 +198,11 @@ NOXREF qboolean Sys_IsWin98(void)
 #pragma warning( disable : 4996 )  
 void Sys_CheckOSVersion(void)
 {
-	struct _OSVERSIONINFOA verInfo;
-
+   
+	OSVERSIONINFOA verInfo;
 	Q_memset(&verInfo, 0, sizeof(verInfo));
 	verInfo.dwOSVersionInfoSize = sizeof(verInfo);
-	if (!GetVersionExA(&verInfo))
+	if (!GetVersionEx(&verInfo))
 		Sys_Error("Couldn't get OS info");
 
 	g_WinNTOrHigher = verInfo.dwMajorVersion >= 4;
