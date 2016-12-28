@@ -43,7 +43,7 @@
 extern IFileSystem *g_pFileSystem;
 
 
-NOXREF void FS_RemoveAllSearchPaths(void);
+void FS_RemoveAllSearchPaths(void);
 void FS_AddSearchPath(const char *pPath, const char *pathID);
 NOXREF int FS_RemoveSearchPath(const char *pPath);
 void FS_RemoveFile(const char *pRelativePath, const char *pathID);

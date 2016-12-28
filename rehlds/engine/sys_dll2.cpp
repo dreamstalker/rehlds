@@ -171,7 +171,7 @@ void Sys_SetupLegacyAPIs(void)
 	Launcher_ConsolePrintf = Legacy_Sys_Printf;
 }
 
-NOXREF int Sys_IsWin95(void)
+NOXREF qboolean Sys_IsWin95(void)
 {
 	NOXREFCHECK;
 #ifdef _WIN32
@@ -182,7 +182,7 @@ NOXREF int Sys_IsWin95(void)
 #endif // _WIN32
 }
 
-NOXREF int Sys_IsWin98(void)
+NOXREF qboolean Sys_IsWin98(void)
 {
 	NOXREFCHECK;
 #ifdef _WIN32
@@ -211,11 +211,11 @@ void Sys_CheckOSVersion(void)
 		if (verInfo.dwMinorVersion)
 		{
 			if (verInfo.dwMinorVersion < 90)
-				g_bIsWin98 = 1;
+				g_bIsWin98 = TRUE;
 		}
 		else
 		{
-			g_bIsWin95 = 1;
+			g_bIsWin95 = TRUE;
 		}
 	}
 }
