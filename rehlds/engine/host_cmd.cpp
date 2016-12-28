@@ -41,7 +41,7 @@ int gHostSpawnCount;
 qboolean g_bMajorMapChange;
 
 int g_iQuitCommandIssued;
-char *g_pPostRestartCmdLineArgs;
+char *g_pPostRestartCmdLineArgs=NULL;
 
 /*
 * Globals initialization
@@ -498,7 +498,7 @@ void Host_Quit_Restart_f(void)
 	giActive = DLL_RESTART;
 	giStateInfo = 4;
 
-	if (g_psv.active || (g_pcls.state == ca_active && g_pcls.trueaddress[0] && g_pPostRestartCmdLineArgs))
+	if ((g_psv.active || (g_pcls.state == ca_active && g_pcls.trueaddress[0])) && g_pPostRestartCmdLineArgs)
 	{
 		Q_strcat(g_pPostRestartCmdLineArgs, " +connect ");
 		Q_strcat(g_pPostRestartCmdLineArgs, g_pcls.servername);
