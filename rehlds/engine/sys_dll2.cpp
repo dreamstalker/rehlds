@@ -196,9 +196,8 @@ NOXREF int Sys_IsWin98(void)
 #ifdef _WIN32
 #pragma warning( push )  
 #pragma warning( disable : 4996 )  
-NOXREF void Sys_CheckOSVersion(void)
+void Sys_CheckOSVersion(void)
 {
-	NOXREFCHECK;
 	struct _OSVERSIONINFOA verInfo;
 
 	Q_memset(&verInfo, 0, sizeof(verInfo));

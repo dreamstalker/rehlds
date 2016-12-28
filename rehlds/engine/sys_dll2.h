@@ -100,7 +100,7 @@ NOXREF int Sys_IsWin95();
 NOXREF int Sys_IsWin98();
 
 #ifdef _WIN32
-NOXREF void Sys_CheckOSVersion();
+void Sys_CheckOSVersion();
 #endif
 
 NOXREF void Sys_Init();

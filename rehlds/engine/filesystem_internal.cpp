@@ -30,11 +30,8 @@
 
 IFileSystem *g_pFileSystem;
 
-NOXREF void FS_RemoveAllSearchPaths(void)
+void FS_RemoveAllSearchPaths(void)
 {
-	NOXREFCHECK;
-	//NOXREFCHECK;	// We call it
-
 	g_pFileSystem->RemoveAllSearchPaths();
 }
 
