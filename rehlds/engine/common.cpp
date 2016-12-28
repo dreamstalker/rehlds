@@ -142,6 +142,7 @@ void COM_HexConvert(const char *pszInput, int nInputLength, unsigned char *pOutp
 
 NOXREF char *COM_BinPrintf(unsigned char *buf, int nLen)
 {
+	NOXREFCHECK;
 	static char szReturn[4096];
 	unsigned char c;
 	char szChunk[10];
@@ -2107,6 +2108,7 @@ void COM_CopyFileChunk(FileHandle_t dst, FileHandle_t src, int nSize)
 
 NOXREF unsigned char *COM_LoadFileLimit(char *path, int pos, int cbmax, int *pcbread, FileHandle_t *phFile)
 {
+	NOXREFCHECK;
 	FileHandle_t hFile;
 	unsigned char *buf;
 	char base[32];

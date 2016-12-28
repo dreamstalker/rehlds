@@ -293,6 +293,7 @@ void Draw_FreeWad(cachewad_t *pWad)
 
 NOXREF void Draw_DecalSetName(int decal, char *name)
 {
+	NOXREFCHECK;
 	//Used Host_Frame -> CL_ReadPackets -> CL_ProcessFile -> CL_PrecacheResources -> Draw_DecalSetName
 	if (decal >= MAX_DECALS)
 		return;
@@ -304,6 +305,7 @@ NOXREF void Draw_DecalSetName(int decal, char *name)
 
 NOXREF int Draw_DecalIndex(int id)
 {
+	NOXREFCHECK;
 	//Used hw -> CL_Restore
 	char tmp[32];
 	char *pName;
@@ -347,6 +349,7 @@ const char *Draw_DecalName(int number)
 
 NOXREF texture_t *Draw_DecalTexture(int index)
 {
+	NOXREFCHECK;
 	texture_t *retval;
 	customization_t *pCust;
 
@@ -388,6 +391,7 @@ int Draw_CacheByIndex(cachewad_t *wad, int nIndex, int playernum)
 
 NOXREF int Draw_DecalIndexFromName(char *name)
 {
+	NOXREFCHECK;
 	char tmpName[16];
 	Q_strncpy(tmpName, name, sizeof(tmpName) - 1);
 	tmpName[sizeof(tmpName) - 1] = 0;
@@ -600,6 +604,7 @@ qboolean CustomDecal_Init(struct cachewad_s *wad, void *raw, int nFileSize, int 
 
 NOXREF void *Draw_CacheGet(cachewad_t *wad, int index)
 {
+	NOXREFCHECK;
 	int i;
 	void *dat;
 	char *path;
@@ -670,6 +675,7 @@ void *Draw_CustomCacheGet(cachewad_t *wad, void *raw, int rawsize, int index)
 
 NOXREF qboolean Draw_CacheReload(cachewad_t *wad, int i, lumpinfo_t *pLump, cachepic_t *pic, char *clean, char *path)
 {
+	NOXREFCHECK;
 	int len;
 	byte *buf;
 	FileHandle_t hFile;
@@ -807,6 +813,7 @@ qboolean Draw_CacheLoadFromCustom(char *clean, cachewad_t *wad, void *raw, int r
 
 NOXREF int Draw_CacheIndex(cachewad_t *wad, char *path)
 {
+	NOXREFCHECK;
 	int i;
 	cachepic_t *pic;
 	for (i = 0, pic = wad->cache; i < wad->cacheCount; i++, pic++)
@@ -828,6 +835,7 @@ NOXREF int Draw_CacheIndex(cachewad_t *wad, char *path)
 
 NOXREF int Draw_CacheFindIndex(cachewad_t *wad, char *path)
 {
+	NOXREFCHECK;
 	cachepic_t *pic = wad->cache;
 	for (int i = 0; i < wad->cacheCount; i++, pic++)
 	{

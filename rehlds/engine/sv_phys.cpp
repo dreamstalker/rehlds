@@ -56,6 +56,7 @@ cvar_t sv_stopspeed;
 
 NOXREF void SV_CheckAllEnts(void)
 {
+	NOXREFCHECK;
 	int e;
 	edict_t *check;
 
@@ -377,6 +378,7 @@ void SV_AddGravity(edict_t *ent)
 
 NOXREF void SV_AddCorrectGravity(edict_t *ent)
 {
+	NOXREFCHECK;
 	float ent_gravity = 1.0f;
 	if (ent->v.gravity != 0.0f)
 		ent_gravity = ent->v.gravity;
@@ -390,6 +392,7 @@ NOXREF void SV_AddCorrectGravity(edict_t *ent)
 
 NOXREF void SV_FixupGravityVelocity(edict_t *ent)
 {
+	NOXREFCHECK;
 	float ent_gravity = 1.0f;
 	if (ent->v.gravity != 0.0f)
 		ent_gravity = ent->v.gravity;

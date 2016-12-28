@@ -152,6 +152,7 @@ byte COM_BlockSequenceCRCByte(byte *base, int length, int sequence)
 
 NOXREF BOOL CRC_File(CRC32_t *crcvalue, char *pszFileName)
 {
+	NOXREFCHECK;
 	FileHandle_t fp;
 	byte chunk[1024];
 	int nBytesRead;

@@ -292,6 +292,7 @@ NOINLINE void Sys_FPUCW_Pop_Prec64() {
 
 NOXREF void Sys_PageIn(void *ptr, int size)
 {
+	NOXREFCHECK;
 }
 
 // TODO: investigate filesystem_stdio problem (multiple enumeration of files).
@@ -391,6 +392,7 @@ NOBODY int glob_match(char *pattern, char *text);
 
 NOXREF void Sys_MakeCodeWriteable(uint32 startaddr, uint32 length)
 {
+	NOXREFCHECK;
 #ifdef _WIN32
 	if (!VirtualProtect((LPVOID)startaddr, length, PAGE_EXECUTE_READWRITE, (PDWORD)&length))
 		Sys_Error("Protection change failed.");
@@ -417,6 +419,7 @@ NOBODY void Sys_Init(void);
 
 NOXREF void Sys_Sleep(int msec)
 {
+	NOXREFCHECK;
 #ifdef _WIN32
 	Sleep(msec);
 #else
@@ -501,6 +504,7 @@ void NORETURN Sys_Error(const char *error, ...)
 
 NOXREF void Sys_Warning(const char *pszWarning, ...)
 {
+	NOXREFCHECK;
 	va_list argptr;
 	char text[1024];
 
@@ -1172,6 +1176,7 @@ void EXT_FUNC AlertMessage(ALERT_TYPE atype, const char *szFmt, ...)
 
 NOXREF void Sys_SplitPath(const char *path, char *drive, char *dir, char *fname, char *ext)
 {
+	NOXREFCHECK;
 #ifdef _WIN32
 	_splitpath(path, drive, dir, fname, ext);
 #else // _WIN32

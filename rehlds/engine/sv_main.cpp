@@ -2700,6 +2700,7 @@ int SV_GetFakeClientCount(void)
 
 NOXREF qboolean SV_GetModInfo(char *pszInfo, char *pszDL, int *version, int *size, qboolean *svonly, qboolean *cldll, char *pszHLVersion)
 {
+	NOXREFCHECK;
 	if (gmodinfo.bIsMod)
 	{
 		Q_strcpy(pszInfo, gmodinfo.szInfo);
@@ -2727,11 +2728,13 @@ NOXREF qboolean SV_GetModInfo(char *pszInfo, char *pszDL, int *version, int *siz
 
 NOXREF qboolean RequireValidChallenge(netadr_t* /*adr*/)
 {
+	NOXREFCHECK;
 	return sv_enableoldqueries.value == 0.0f;
 }
 
 NOXREF qboolean ValidInfoChallenge(netadr_t *adr, const char *nugget)
 {
+	NOXREFCHECK;
 	if (nugget && g_psv.active && g_psvs.maxclients > 1)
 	{
 		if (RequireValidChallenge(adr))
@@ -2743,6 +2746,7 @@ NOXREF qboolean ValidInfoChallenge(netadr_t *adr, const char *nugget)
 
 NOXREF int GetChallengeNr(netadr_t *adr)
 {
+	NOXREFCHECK;
 	int oldest = 0;
 	int oldestTime = 0x7FFFFFFFu;
 	int i;
@@ -2770,6 +2774,7 @@ NOXREF int GetChallengeNr(netadr_t *adr)
 
 NOXREF qboolean CheckChallengeNr(netadr_t *adr, int nChallengeValue)
 {
+	NOXREFCHECK;
 	int i;
 	if (nChallengeValue == -1 || adr == NULL)
 		return FALSE;
@@ -2791,6 +2796,7 @@ NOXREF qboolean CheckChallengeNr(netadr_t *adr, int nChallengeValue)
 
 NOXREF void ReplyServerChallenge(netadr_t *adr)
 {
+	NOXREFCHECK;
 	char buffer[16];
 	sizebuf_t buf;
 
@@ -2808,6 +2814,7 @@ NOXREF void ReplyServerChallenge(netadr_t *adr)
 
 NOXREF qboolean ValidChallenge(netadr_t *adr, int challengeNr)
 {
+	NOXREFCHECK;
 	if (!g_psv.active)
 		return FALSE;
 
@@ -2823,6 +2830,7 @@ NOXREF qboolean ValidChallenge(netadr_t *adr, int challengeNr)
 
 NOXREF void SVC_InfoString(void)
 {
+	NOXREFCHECK;
 	int i;
 	int count = 0;
 	int proxy = 0;
@@ -2936,6 +2944,7 @@ NOXREF void SVC_InfoString(void)
 
 NOXREF void SVC_Info(qboolean bDetailed)
 {
+	NOXREFCHECK;
 	int i;
 	int count = 0;
 	sizebuf_t buf;
@@ -3048,6 +3057,7 @@ typedef struct entcount_s
 
 NOXREF void SVC_PlayerInfo(void)
 {
+	NOXREFCHECK;
 	int i;
 	int count = 0;
 	client_t *client;
@@ -3096,6 +3106,7 @@ NOXREF void SVC_PlayerInfo(void)
 
 NOXREF void SVC_RuleInfo(void)
 {
+	NOXREFCHECK;
 	int nNumRules;
 	cvar_t *var;
 	sizebuf_t buf;
@@ -4438,6 +4449,7 @@ qboolean SV_ShouldUpdatePing(client_t *client)
 
 NOXREF qboolean SV_HasEventsInQueue(client_t *client)
 {
+	NOXREFCHECK;
 	int i;
 	event_state_t *es;
 	event_info_t *ei;
@@ -5523,6 +5535,7 @@ void SV_BuildReconnect(sizebuf_t *msg)
 
 NOXREF void SV_ReconnectAllClients(void)
 {
+	NOXREFCHECK;
 	int i;
 	char message[34];
 	Q_snprintf(message, sizeof(message), "Server updating Security Module.\n");
@@ -7991,6 +8004,7 @@ qboolean IsGameSubscribed(const char *gameName)
 
 NOXREF qboolean BIsValveGame(void)
 {
+	NOXREFCHECK;
 	for (int i = 0; i < ARRAYSIZE(g_GameToAppIDMap); i++)
 	{
 		if (!Q_stricmp(g_GameToAppIDMap[i].pGameDir, com_gamedir))
