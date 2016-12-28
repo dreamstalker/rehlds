@@ -831,7 +831,7 @@ FunctionHook g_FunctionHooks[] =
 	//{ 0x01DA09C0, "_Z11Sys_IsWin95v", (size_t)&Sys_IsWin95 },	// NOXREF
 	//{ 0x01DA09D0, "_Z11Sys_IsWin98v", (size_t)&Sys_IsWin98 },	// NOXREF
 #ifdef _WIN32
-	//{ 0x, "_Z18Sys_CheckOSVersionv", (size_t)&Sys_CheckOSVersion },	// NOXREF
+	{ 0x01DA09E0, "_Z18Sys_CheckOSVersionv", (size_t)&Sys_CheckOSVersion },
 #endif
 	//{ 0x, "Sys_Init", (size_t)&Sys_Init },			// NOXREF
 	//{ 0x, "Sys_Shutdown", (size_t)&Sys_Shutdown },	// NOXREF

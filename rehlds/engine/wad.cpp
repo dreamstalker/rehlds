@@ -127,6 +127,7 @@ void *W_GetLumpName(int wad, char *name)
 
 NOXREF void *W_GetLumpNum(int wad, int num)
 {
+	NOXREFCHECK;
 	lumpinfo_t *lump;
 	if (num < 0 || num > wads[wad].wad_numlumps)
 		Sys_Error("W_GetLumpNum: bad number: %i", num);

@@ -2720,6 +2720,7 @@ void EXT_FUNC PF_GetPlayerStats(const edict_t *pClient, int *ping, int *packet_l
 
 NOXREF void QueryClientCvarValueCmd(void)
 {
+	NOXREFCHECK;
 	if (Cmd_Argc() <= 1)
 	{
 		Con_Printf("%s <player name> <cvar>\n", Cmd_Argv(0));
@@ -2742,6 +2743,7 @@ NOXREF void QueryClientCvarValueCmd(void)
 
 NOXREF void QueryClientCvarValueCmd2(void)
 {
+	NOXREFCHECK;
 	int i;
 	client_t *cl;
 	int requestID;

@@ -2433,6 +2433,7 @@ void Host_FullInfo_f(void)
 
 NOXREF void Host_KillVoice_f(void)
 {
+	NOXREFCHECK;
 	Voice_Deinit();
 }
 
@@ -2809,6 +2810,7 @@ void Host_Stopdemo_f(void)
 
 NOXREF void Host_EndSection(const char *pszSection)
 {
+	NOXREFCHECK;
 	giActive = DLL_PAUSED;
 	giSubState = 1;
 	giStateInfo = 1;

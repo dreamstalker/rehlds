@@ -96,6 +96,7 @@ cvar_t suitvolume;
 
 NOXREF void Host_EndGame(const char *message, ...)
 {
+	NOXREFCHECK;
 	int oldn;
 	va_list argptr;
 	char string[1024];
@@ -197,6 +198,7 @@ void Host_InitLocal(void)
 
 NOXREF void Info_WriteVars(FileHandle_t fp)
 {
+	NOXREFCHECK;
 	cvar_t *pcvar;
 	char *s;
 	char pkey[512];

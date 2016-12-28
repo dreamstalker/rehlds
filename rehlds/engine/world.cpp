@@ -60,6 +60,7 @@ void InsertLinkBefore(link_t *l, link_t *before)
 
 NOXREF void InsertLinkAfter(link_t *l, link_t *after)
 {
+	NOXREFCHECK;
 	l->prev = after;
 	l->next = after->next;
 
@@ -101,6 +102,7 @@ hull_t *SV_HullForBox(const vec_t *mins, const vec_t *maxs)
 
 NOXREF hull_t *SV_HullForBeam(const vec_t *start, const vec_t *end, const vec_t *size)
 {
+	NOXREFCHECK;
 	vec3_t tmp = { 0, 0, 0 };
 
 	beam_planes[0].normal[0] = end[0] - start[0];

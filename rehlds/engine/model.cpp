@@ -180,6 +180,7 @@ model_t *Mod_FindName(qboolean trackCRC, const char *name)
 
 NOXREF qboolean Mod_ValidateCRC(const char *name, CRC32_t crc)
 {
+	NOXREFCHECK;
 	model_t *mod;
 	mod_known_info_t *p;
 
@@ -196,6 +197,7 @@ NOXREF qboolean Mod_ValidateCRC(const char *name, CRC32_t crc)
 
 NOXREF void Mod_NeedCRC(const char *name, qboolean needCRC)
 {
+	NOXREFCHECK;
 	model_t *mod;
 	mod_known_info_t *p;
 
@@ -356,6 +358,7 @@ model_t *Mod_LoadModel(model_t *mod, qboolean crash, qboolean trackCRC)
 
 NOXREF void Mod_MarkClient(model_t *pModel)
 {
+	NOXREFCHECK;
 	pModel->needload = (NL_NEEDS_LOADED | NL_UNREFERENCED);
 }
 
@@ -1835,6 +1838,7 @@ void Mod_LoadSpriteModel(model_t *mod, void *buffer)
 
 NOXREF void Mod_UnloadSpriteTextures(model_t *pModel)
 {
+	NOXREFCHECK;
 	if (!pModel)
 		return;
 
@@ -1874,6 +1878,7 @@ void Mod_Print(void)
 
 NOXREF void Mod_ChangeGame(void)
 {
+	NOXREFCHECK;
 	int i;
 	model_t *mod;
 	mod_known_info_t *p;

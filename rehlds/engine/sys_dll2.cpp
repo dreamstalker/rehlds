@@ -78,11 +78,13 @@ const char *GetCurrentSteamAppName(void)
 
 NOXREF void SetRateRegistrySetting(const char *pchRate)
 {
+	NOXREFCHECK;
 	registry->WriteString("rate", pchRate);
 }
 
 NOXREF const char *GetRateRegistrySetting(const char *pchDef)
 {
+	NOXREFCHECK;
 	return registry->ReadString("rate", pchDef);
 }
 
@@ -134,6 +136,7 @@ void Sys_GetCDKey(char *pszCDKey, int *nLength, int *bDedicated)
 
 NOXREF void Legacy_ErrorMessage(int nLevel, const char *pszErrorMessage)
 {
+	NOXREFCHECK;
 }
 
 void Legacy_Sys_Printf(char *fmt, ...)
@@ -151,10 +154,12 @@ void Legacy_Sys_Printf(char *fmt, ...)
 
 NOXREF void Legacy_MP3subsys_Suspend_Audio(void)
 {
+	NOXREFCHECK;
 }
 
 NOXREF void Legacy_MP3subsys_Resume_Audio(void)
 {
+	NOXREFCHECK;
 }
 
 void Sys_SetupLegacyAPIs(void)
@@ -166,8 +171,9 @@ void Sys_SetupLegacyAPIs(void)
 	Launcher_ConsolePrintf = Legacy_Sys_Printf;
 }
 
-NOXREF int Sys_IsWin95(void)
+NOXREF qboolean Sys_IsWin95(void)
 {
+	NOXREFCHECK;
 #ifdef _WIN32
 	return g_bIsWin95;
 #else
@@ -176,8 +182,9 @@ NOXREF int Sys_IsWin95(void)
 #endif // _WIN32
 }
 
-NOXREF int Sys_IsWin98(void)
+NOXREF qboolean Sys_IsWin98(void)
 {
+	NOXREFCHECK;
 #ifdef _WIN32
 	return g_bIsWin98;
 #else
@@ -189,13 +196,13 @@ NOXREF int Sys_IsWin98(void)
 #ifdef _WIN32
 #pragma warning( push )  
 #pragma warning( disable : 4996 )  
-NOXREF void Sys_CheckOSVersion(void)
+void Sys_CheckOSVersion(void)
 {
-	struct _OSVERSIONINFOA verInfo;
-
+   
+	OSVERSIONINFOA verInfo;
 	Q_memset(&verInfo, 0, sizeof(verInfo));
 	verInfo.dwOSVersionInfoSize = sizeof(verInfo);
-	if (!GetVersionExA(&verInfo))
+	if (!GetVersionEx(&verInfo))
 		Sys_Error("Couldn't get OS info");
 
 	g_WinNTOrHigher = verInfo.dwMajorVersion >= 4;
@@ -204,11 +211,11 @@ NOXREF void Sys_CheckOSVersion(void)
 		if (verInfo.dwMinorVersion)
 		{
 			if (verInfo.dwMinorVersion < 90)
-				g_bIsWin98 = 1;
+				g_bIsWin98 = TRUE;
 		}
 		else
 		{
-			g_bIsWin95 = 1;
+			g_bIsWin95 = TRUE;
 		}
 	}
 }
@@ -320,6 +327,7 @@ void Sys_InitArgv(char *lpCmdLine)
 
 NOXREF void Sys_ShutdownArgv(void)
 {
+	NOXREFCHECK;
 }
 
 void Sys_InitMemory(void)
@@ -398,6 +406,7 @@ void Sys_InitLauncherInterface(void)
 
 NOXREF void Sys_ShutdownLauncherInterface(void)
 {
+	NOXREFCHECK;
 }
 
 void Sys_InitAuthentication(void)
@@ -407,6 +416,7 @@ void Sys_InitAuthentication(void)
 
 NOXREF void Sys_ShutdownAuthentication(void)
 {
+	NOXREFCHECK;
 }
 
 void Sys_ShowProgressTicks(char *specialProgressMsg)
@@ -588,6 +598,7 @@ InterfaceReg g_CreateCEngineAPI = InterfaceReg(CreateCEngineAPI, "VENGINE_LAUNCH
 /*
 NOXREF int BuildMapCycleListHints(char **hints)
 {
+	NOXREFCHECK;
 	char szMap[262];
 	unsigned int length;
 	char *pFileList;

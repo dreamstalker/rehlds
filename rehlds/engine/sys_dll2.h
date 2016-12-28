@@ -96,11 +96,11 @@ void Legacy_Sys_Printf(char *fmt, ...);
 NOXREF void Legacy_MP3subsys_Suspend_Audio();
 NOXREF void Legacy_MP3subsys_Resume_Audio();
 void Sys_SetupLegacyAPIs();
-NOXREF int Sys_IsWin95();
-NOXREF int Sys_IsWin98();
+NOXREF qboolean Sys_IsWin95();
+NOXREF qboolean Sys_IsWin98();
 
 #ifdef _WIN32
-NOXREF void Sys_CheckOSVersion();
+void Sys_CheckOSVersion();
 #endif
 
 NOXREF void Sys_Init();

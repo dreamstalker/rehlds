@@ -1701,6 +1701,7 @@ qboolean Netchan_CopyFileFragments(netchan_t *chan)
 
 NOXREF qboolean Netchan_IsSending(netchan_t *chan)
 {
+	NOXREFCHECK;
 	int i;
 	for (i = 0; i < MAX_STREAMS; i++)
 	{
@@ -1712,6 +1713,7 @@ NOXREF qboolean Netchan_IsSending(netchan_t *chan)
 
 NOXREF qboolean Netchan_IsReceiving(netchan_t *chan)
 {
+	NOXREFCHECK;
 	int i;
 	for (i = 0; i < MAX_STREAMS; i++)
 	{
@@ -1733,6 +1735,7 @@ qboolean Netchan_IncomingReady(netchan_t *chan)
 
 NOXREF void Netchan_UpdateProgress(netchan_t *chan)
 {
+	NOXREFCHECK;
 	fragbuf_t *p;
 	int c = 0;
 	int total = 0;
@@ -1821,10 +1824,12 @@ void Netchan_Init(void)
 
 NOXREF qboolean Netchan_CompressPacket(sizebuf_t *chan)
 {
+	NOXREFCHECK;
 	return FALSE;
 }
 
 NOXREF qboolean Netchan_DecompressPacket(sizebuf_t *chan)
 {
+	NOXREFCHECK;
 	return FALSE;
 }

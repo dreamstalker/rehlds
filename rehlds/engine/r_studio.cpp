@@ -128,6 +128,7 @@ r_studiocache_t *R_CheckStudioCache(model_t *pModel, float frame, int sequence, 
 
 NOXREF void R_AddToStudioCache(float frame, int sequence, const vec_t *angles, const vec_t *origin, const vec_t *size, const unsigned char *controller, const unsigned char *pblending, model_t *pModel, hull_t *pHulls, int numhulls)
 {
+	NOXREFCHECK;
 	r_studiocache_t *p;
 	if (numhulls + nCurrentHull >= 128)
 		R_FlushStudioCache();
@@ -685,6 +686,7 @@ int SV_HitgroupForStudioHull(int index)
 
 NOXREF void R_InitStudioCache(void)
 {
+	NOXREFCHECK;
 	Q_memset(rgStudioCache, 0, sizeof(rgStudioCache));
 
 	r_cachecurrent = 0;
@@ -694,6 +696,7 @@ NOXREF void R_InitStudioCache(void)
 
 NOXREF void R_FlushStudioCache(void)
 {
+	NOXREFCHECK;
 	R_InitStudioCache();
 }
 
