@@ -498,24 +498,19 @@ void Host_Quit_Restart_f(void)
 	giActive = DLL_RESTART;
 	giStateInfo = 4;
 
-	if (g_psv.active || (g_pcls.state == ca_active && g_pcls.trueaddress[0] && g_pPostRestartCmdLineArgs))
+	if (g_psv.active)
+	{
+		if (g_psvs.maxclients == 1 && g_pcls.state == ca_active && g_pPostRestartCmdLineArgs)
+		{
+			Cbuf_AddText("save quick\n");
+			Cbuf_Execute();
+			Q_strcat(g_pPostRestartCmdLineArgs, " +load quick");
+		}
+	}
+	else if (g_pcls.state == ca_active && g_pcls.trueaddress[0] && g_pPostRestartCmdLineArgs)
 	{
 		Q_strcat(g_pPostRestartCmdLineArgs, " +connect ");
 		Q_strcat(g_pPostRestartCmdLineArgs, g_pcls.servername);
-	}
-	else
-	{
-		if (g_psvs.maxclients == 1 && g_pcls.state == ca_active)
-		{
-			if (g_pPostRestartCmdLineArgs)
-			{
-				Cbuf_AddText("save quick\n");
-				Cbuf_Execute();
-
-				Q_strcat(g_pPostRestartCmdLineArgs, " +load quick");
-			}
-		}
-
 	}
 }
 
@@ -880,7 +875,7 @@ void Host_Map_f(void)
 	if (careerState == CAREER_LOADING)
 		g_careerState = CAREER_LOADING;
 
-        if (COM_CheckParm("-steam") && PF_IsDedicatedServer())
+	if (COM_CheckParm("-steam") && PF_IsDedicatedServer())
 		g_bMajorMapChange = TRUE;
 
 	FS_LogLevelLoadStarted("Map_Common");
@@ -1373,7 +1368,7 @@ void Host_Savegame_f(void)
 		Con_DPrintf("Relative pathnames are not allowed.\n");
 		return;
 	}
-        g_pSaveGameCommentFunc(szTemp, 80);
+	g_pSaveGameCommentFunc(szTemp, 80);
 	Q_snprintf(szComment, sizeof(szComment) - 1,"%-64.64s %02d:%02d", szTemp, (int)(g_psv.time / 60.0), (int)fmod(g_psv.time, 60.0));
 	SaveGameSlot(Cmd_Argv(1), szComment);
 	CL_HudMessage("GAMESAVED");
@@ -1809,8 +1804,8 @@ SAVERESTOREDATA *LoadSaveData(const char *level)
 	pSaveData->vecLandmarkOffset[2] = 0.0f;
 	gGlobalVariables.pSaveData = pSaveData;
 
-        FS_Read(pSaveData->pBaseData, size, 1, pFile);
-        FS_Close(pFile);
+	FS_Read(pSaveData->pBaseData, size, 1, pFile);
+	FS_Close(pFile);
 
 	return pSaveData;
 }
