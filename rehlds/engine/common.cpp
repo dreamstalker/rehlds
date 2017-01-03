@@ -1230,6 +1230,12 @@ void SZ_Alloc(const char *name, sizebuf_t *buf, int startsize)
 
 void SZ_Clear(sizebuf_t *buf)
 {
+#ifdef REHLDS_FIXES
+	if (buf == &g_psv.spectator && buf->cursize != 0) {
+		Con_Printf("Clearing the spectator buffer: cs=%d, ms=%d\n", buf->cursize, buf->maxsize);
+	}
+#endif
+
 	buf->flags &= ~SIZEBUF_OVERFLOWED;
 	buf->cursize = 0;
 }
@@ -1239,6 +1245,11 @@ void *EXT_FUNC SZ_GetSpace(sizebuf_t *buf, int length)
 	void *data;
 	const char *buffername = buf->buffername ? buf->buffername : "???";
 
+#ifdef REHLDS_FIXES
+	if (buf == &g_psv.spectator) {
+		Con_Printf("Writing to the spectator buffer: cs=%d, ms=%d, l=%d\n", buf->cursize, buf->maxsize, length);
+	}
+#endif
 
 	if (length < 0)
 	{
