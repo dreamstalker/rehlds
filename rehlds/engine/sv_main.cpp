@@ -5921,6 +5921,9 @@ int SV_SpawnServer(qboolean bIsDemo, char *server, char *startspot)
 	g_psv.datagram.data = g_psv.datagram_buf;
 	g_psv.datagram.maxsize = sizeof(g_psv.datagram_buf);
 	g_psv.datagram.cursize = 0;
+#ifdef REHLDS_FIXES
+	g_psv.datagram.flags = SIZEBUF_ALLOW_OVERFLOW;
+#endif
 
 	g_psv.reliable_datagram.buffername = "Server Reliable Datagram";
 #ifdef REHLDS_FIXES
@@ -5933,8 +5936,14 @@ int SV_SpawnServer(qboolean bIsDemo, char *server, char *startspot)
 	g_psv.reliable_datagram.cursize = 0;
 
 	g_psv.spectator.buffername = "Server Spectator Buffer";
+#ifdef REHLDS_FIXES
+	g_psv.spectator.data = g_rehlds_sv.spectatorBuffer;
+	g_psv.spectator.maxsize = sizeof(g_rehlds_sv.spectatorBuffer);
+	g_psv.spectator.flags = SIZEBUF_ALLOW_OVERFLOW;
+#else
 	g_psv.spectator.data = g_psv.spectator_buf;
 	g_psv.spectator.maxsize = sizeof(g_psv.spectator_buf);
+#endif
 
 	g_psv.multicast.buffername = "Server Multicast Buffer";
 	g_psv.multicast.data = g_psv.multicast_buf;
