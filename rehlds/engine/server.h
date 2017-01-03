@@ -546,28 +546,25 @@ extern cvar_t sv_rcon_banpenalty;
 
 extern cvar_t scr_downloading;
 #ifdef REHLDS_FIXES
-enum CS_CZ_Flags_e
+enum GameType_e
 {
-	//I'm actually don't know what kind of prefix should I use here, because "CSCZF_" is too long and confusing.
-	//So, I will use "GT_", stands for "Game Type".
-
-	GT_IsUnitialized,
-	GT_IsCZero,
-	GT_IsCZeroRitual,
-	GT_IsTerrorStrike,
-	GT_IsTFC,
-	GT_IsHL1,
-	GT_IsCStrike
+	GT_Unitialized,
+	GT_CZero,
+	GT_CZeroRitual,
+	GT_TerrorStrike,
+	GT_TFC,
+	GT_HL1,
+	GT_CStrike
 };
-extern CS_CZ_Flags_e g_eCS_CZ_Flags;
+extern GameType_e g_eGameType;
 
 //A crutch to prevent rewriting tons of code.
-#define g_bIsCZero (g_eCS_CZ_Flags==GT_IsCZero)
-#define g_bIsCZeroRitual (g_eCS_CZ_Flags==GT_IsCZeroRitual)
-#define g_bIsTerrorStrike (g_eCS_CZ_Flags==GT_IsTerrorStrike)
-#define g_bIsTFC (g_eCS_CZ_Flags==GT_IsTFC)
-#define g_bIsHL1 (g_eCS_CZ_Flags==GT_IsHL1)
-#define g_bIsCStrike (g_eCS_CZ_Flags==GT_IsCStrike)
+#define g_bIsCZero (g_eGameType==GT_CZero)
+#define g_bIsCZeroRitual (g_eGameType==GT_CZeroRitual)
+#define g_bIsTerrorStrike (g_eGameType==GT_TerrorStrike)
+#define g_bIsTFC (g_eGameType==GT_TFC)
+#define g_bIsHL1 (g_eGameType==GT_HL1)
+#define g_bIsCStrike (g_eGameType==GT_CStrike)
 
 #else
 extern int g_bCS_CZ_Flags_Initialized;

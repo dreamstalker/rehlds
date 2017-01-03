@@ -101,7 +101,7 @@ netadr_t sv_redirectto;
 
 // DONE: make one global var with mods enum.
 #ifdef REHLDS_FIXES
-CS_CZ_Flags_e g_eCS_CZ_Flags = GT_IsUnitialized;
+GameType_e g_eGameType = GT_Unitialized;
 #else
 int g_bCS_CZ_Flags_Initialized;
 int g_bIsCZero;
@@ -5565,7 +5565,7 @@ NOXREF void SV_ReconnectAllClients(void)
 void SetCStrikeFlags(void)
 {
 #ifdef REHLDS_FIXES
-	if(g_eCS_CZ_Flags==GT_IsUnitialized)
+	if(g_eGameType==GT_Unitialized)
 #else
 	if (!g_bCS_CZ_Flags_Initialized)	// DONE: Convert these to enum
 #endif
@@ -5573,7 +5573,7 @@ void SetCStrikeFlags(void)
 		if (!Q_stricmp(com_gamedir, "valve"))
 		{
 #ifdef REHLDS_FIXES
-			g_eCS_CZ_Flags = GT_IsHL1;
+			g_eGameType = GT_HL1;
 #else
 			g_bIsHL1 = 1;
 #endif
@@ -5581,7 +5581,7 @@ void SetCStrikeFlags(void)
 		else if (!Q_stricmp(com_gamedir, "cstrike") || !Q_stricmp(com_gamedir, "cstrike_beta"))
 		{
 #ifdef REHLDS_FIXES
-			g_eCS_CZ_Flags = GT_IsCStrike;
+			g_eGameType = GT_CStrike;
 #else
 			g_bIsCStrike = 1;
 #endif
@@ -5589,7 +5589,7 @@ void SetCStrikeFlags(void)
 		else if (!Q_stricmp(com_gamedir, "czero"))
 		{
 #ifdef REHLDS_FIXES
-			g_eCS_CZ_Flags = GT_IsCZero;
+			g_eGameType = GT_CZero;
 #else
 			g_bIsCZero = 1;
 #endif			
@@ -5597,7 +5597,7 @@ void SetCStrikeFlags(void)
 		else if (!Q_stricmp(com_gamedir, "czeror"))
 		{
 #ifdef REHLDS_FIXES
-			g_eCS_CZ_Flags = GT_IsCZeroRitual;
+			g_eGameType = GT_CZeroRitual;
 #else
 			g_bIsCZeroRitual = 1;
 #endif		
@@ -5605,7 +5605,7 @@ void SetCStrikeFlags(void)
 		else if (!Q_stricmp(com_gamedir, "terror"))
 		{
 #ifdef REHLDS_FIXES
-			g_eCS_CZ_Flags = GT_IsTerrorStrike;
+			g_eGameType = GT_TerrorStrike;
 #else
 			g_bIsTerrorStrike = 1;
 #endif		
@@ -5613,7 +5613,7 @@ void SetCStrikeFlags(void)
 		else if (!Q_stricmp(com_gamedir, "tfc"))
 		{
 #ifdef REHLDS_FIXES
-			g_eCS_CZ_Flags = GT_IsTFC;
+			g_eGameType = GT_TFC;
 #else
 			g_bIsTFC = 1;
 #endif	
