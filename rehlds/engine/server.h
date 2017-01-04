@@ -545,7 +545,28 @@ extern cvar_t sv_rcon_minfailuretime;
 extern cvar_t sv_rcon_banpenalty;
 
 extern cvar_t scr_downloading;
+#ifdef REHLDS_FIXES
+enum GameType_e
+{
+	GT_Unitialized,
+	GT_CZero,
+	GT_CZeroRitual,
+	GT_TerrorStrike,
+	GT_TFC,
+	GT_HL1,
+	GT_CStrike
+};
+extern GameType_e g_eGameType;
 
+//A crutch to prevent rewriting tons of code.
+#define g_bIsCZero (g_eGameType==GT_CZero)
+#define g_bIsCZeroRitual (g_eGameType==GT_CZeroRitual)
+#define g_bIsTerrorStrike (g_eGameType==GT_TerrorStrike)
+#define g_bIsTFC (g_eGameType==GT_TFC)
+#define g_bIsHL1 (g_eGameType==GT_HL1)
+#define g_bIsCStrike (g_eGameType==GT_CStrike)
+
+#else
 extern int g_bCS_CZ_Flags_Initialized;
 extern int g_bIsCZero;
 extern int g_bIsCZeroRitual;
@@ -553,7 +574,7 @@ extern int g_bIsTerrorStrike;
 extern int g_bIsTFC;
 extern int g_bIsHL1;
 extern int g_bIsCStrike;
-
+#endif
 extern int fatbytes;
 extern int giNextUserMsg;
 extern int hashstrings_collisions;
