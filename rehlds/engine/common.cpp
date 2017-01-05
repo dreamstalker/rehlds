@@ -2358,7 +2358,7 @@ void COM_Log(char *pszFile, char *fmt, ...)
 	if (!pszFile)
 	{
 #ifdef REHLDS_FIXES
-		pfilename = "status.log";
+		pfilename = "hllog.txt";
 #else
 		// Why so serious?
 		pfilename = "c:\\hllog.txt";
