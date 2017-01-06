@@ -668,10 +668,8 @@ NOXREF cmd_function_t *Cmd_FindCmd(char *cmd_name)
 	return NULL;
 }
 
-NOXREF cmd_function_t *Cmd_FindCmdPrev(char *cmd_name)
+cmd_function_t *Cmd_FindCmdPrev(char *cmd_name)
 {
-	NOXREFCHECK;
-
 	cmd_function_t *cmd = NULL;
 
 	if (cmd_functions == NULL)
@@ -793,6 +791,19 @@ NOXREF void Cmd_AddWrapperCommand(char *cmd_name, xcommand_t function)
 void EXT_FUNC Cmd_AddGameCommand(char *cmd_name, xcommand_t function)
 {
 	Cmd_AddMallocCommand(cmd_name, function, FCMD_GAME_COMMAND);
+}
+
+void EXT_FUNC Cmd_RemoveCmd(char *cmd_name)
+{
+	auto prev = Cmd_FindCmdPrev(cmd_name);
+
+	if (prev) {
+		auto cmd = prev->next;
+		prev->next = cmd->next;
+
+		Z_Free(cmd->name);
+		Mem_Free(cmd);
+	}
 }
 
 void Cmd_RemoveMallocedCmds(int flag)

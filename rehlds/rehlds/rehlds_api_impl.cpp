@@ -210,7 +210,8 @@ RehldsFuncs_t g_RehldsApiFuncs =
 	&SV_StartSound_api,
 	&SV_EmitSound2_api,
 	&SV_UpdateUserInfo_api,
-	&StripUnprintableAndSpace_api
+	&StripUnprintableAndSpace_api,
+	&Cmd_RemoveCmd
 };
 
 bool EXT_FUNC SV_EmitSound2_internal(edict_t *entity, IGameClient *pReceiver, int channel, const char *sample, float volume, float attenuation, int flags, int pitch, int emitFlags, const float *pOrigin)
