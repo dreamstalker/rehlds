@@ -699,9 +699,6 @@ bool CDedicatedServerAPI::Init_noVirt(char *basedir, char *cmdline, CreateInterf
 		Q_snprintf(text, ARRAYSIZE(text), "exec %s\n", servercfgfile.string);
 		text[255] = 0;
 		Cbuf_InsertText(text);
-#ifdef REHLDS_FIXES // DONE: Set cstrike flags on server start
-		SetCStrikeFlags();
-#endif
 		return true;
 	}
 
