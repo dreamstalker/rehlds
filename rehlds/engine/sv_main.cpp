@@ -5746,7 +5746,9 @@ void EXT_FUNC SV_ActivateServer_internal(int runPhysics)
 	msg.cursize = 0;
 	msg.flags = SIZEBUF_CHECK_OVERFLOW;
 
+#ifndef REHLDS_FIXES
 	SetCStrikeFlags();
+#endif
 	Cvar_Set("sv_newunit", "0");
 
 	ContinueLoadingProgressBar("Server", 8, 0.0f);

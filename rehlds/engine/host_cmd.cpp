@@ -219,6 +219,10 @@ void Host_InitializeGameDLL(void)
 	SV_CheckBlendingInterface();
 	SV_CheckSaveGameCommentInterface();
 	Cbuf_Execute();
+
+#ifdef REHLDS_FIXES // DONE: Set cstrike flags on server start
+		SetCStrikeFlags();
+#endif
 }
 
 void Host_Motd_f(void)
