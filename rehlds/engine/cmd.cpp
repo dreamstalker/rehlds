@@ -458,8 +458,9 @@ void Cmd_Alias_f(void)
 		return;
 	}
 
-	SetCStrikeFlags();	// TODO: Do this once somewhere at the server start
-
+#ifndef REHLDS_FIXES
+	SetCStrikeFlags();	// DONE: Do this once somewhere at the server start
+#endif
 	if ((g_bIsCStrike || g_bIsCZero) &&
 		(!Q_stricmp(s, "cl_autobuy")
 		|| !Q_stricmp(s, "cl_rebuy")
