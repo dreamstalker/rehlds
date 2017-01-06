@@ -5,9 +5,11 @@ import org.gradle.nativeplatform.NativeExecutableBinarySpec
 import org.gradle.nativeplatform.SharedLibraryBinarySpec
 import org.gradle.nativeplatform.StaticLibraryBinarySpec
 import org.gradle.nativeplatform.toolchain.VisualCpp
+import org.gradle.nativeplatform.toolchain.Clang
 
 apply from: 'shared_msvc.gradle'
 apply from: 'shared_icc.gradle'
+apply from: 'shared_llvm.gradle'
 
 rootProject.ext.createToolchainConfig = { NativeBinarySpec bin ->
     BinaryKind binaryKind
@@ -27,6 +29,8 @@ rootProject.ext.createToolchainConfig = { NativeBinarySpec bin ->
         return rootProject.createMsvcConfig(releaseBuild, binaryKind)
     } else if (bin.toolChain instanceof Icc) {
         return rootProject.createIccConfig(releaseBuild, binaryKind)
+    } else if (bin.toolChain instanceof Clang) {
+        return rootProject.createClangConfig(releaseBuild, binaryKind)
     } else {
         throw new RuntimeException("Unknown native toolchain: ${bin.toolChain.class.name}")
     }

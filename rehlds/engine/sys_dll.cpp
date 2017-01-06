@@ -214,15 +214,25 @@ void Sys_SetupFPUOptions()
 {
 	static uint8 fpuOpts[32];
 
+#if defined _MSC_VER || defined __INTEL_COMPILER
 	__asm { fnstenv byte ptr fpuOpts }
 	fpuOpts[0] |= 0x3Fu;
 	__asm { fldenv  byte ptr fpuOpts }
+#else
+	asm volatile ("fnstenv %0" : "=m" (fpuOpts));
+	fpuOpts[0] |= 0x3Fu;
+	asm volatile ("fldenv %0" : "=m" (fpuOpts));
+#endif
 }
 
 NOINLINE void Sys_InitFPUControlWords()
 {
 	int fpucw = 0;
+#if defined _MSC_VER || defined __INTEL_COMPILER
 	__asm { fnstcw fpucw }
+#else
+	asm volatile ("fnstcw %0" : "=m" (fpucw));
+#endif
 
 	g_FPUCW_Mask_Prec_64Bit = (fpucw & 0xF0FF) | 0x300;
 	g_FPUCW_Mask_Prec_64Bit_2 = (fpucw & 0xF0FF) | 0x300;
@@ -279,13 +289,27 @@ void __cdecl Sys_InitHardwareTimer()
 int g_SavedFPUCW1 = 0;
 NOINLINE void Sys_FPUCW_Push_Prec64() {
 	uint16 tmp = g_FPUCW_Mask_Prec_64Bit;
-	__asm { fnstcw  g_SavedFPUCW1 }
-	__asm { fldcw tmp }
+#if defined _MSC_VER || defined __INTEL_COMPILER
+	__asm {
+		fnstcw  g_SavedFPUCW1;
+		fldcw tmp;
+	}
+#else
+	asm volatile ("fnstcw %0\n\t"
+				  "fldcw %1" :
+				"=m" (g_SavedFPUCW1),
+				"=m" (tmp));
+#endif
 }
 
 NOINLINE void Sys_FPUCW_Pop_Prec64() {
 	uint16 tmp = g_SavedFPUCW1;
+
+#if defined _MSC_VER || defined __INTEL_COMPILER
 	__asm { fldcw tmp }
+#else
+	asm volatile ("fldcw %0" : "=m" (tmp));
+#endif
 }
 
 #endif // _WIN32
