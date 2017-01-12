@@ -400,6 +400,8 @@ task generateAppVersion {
     inputs.property('version', rootProject.version)
     inputs.property('commitDate', verInfo.asCommitDate())
 
+    println "##teamcity[buildNumber '" + verInfo.asMavenVersion(false) + "']";
+
     doLast {
 
         def templateCtx = [

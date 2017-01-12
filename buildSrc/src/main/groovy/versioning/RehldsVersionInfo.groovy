@@ -20,7 +20,7 @@ class RehldsVersionInfo {
     String   commitURL
     Integer  commitCount
 
-    String asMavenVersion() {
+    String asMavenVersion(boolean extra = true) {
         StringBuilder sb = new StringBuilder()
         sb.append(majorVersion).append('.' + minorVersion);
         if (maintenanceVersion != null) {
@@ -31,12 +31,12 @@ class RehldsVersionInfo {
             sb.append('.' + commitCount)
         }
 
-        if (suffix) {
+        if (extra && suffix) {
             sb.append('-' + suffix)
         }
 
         // do mark for this build like a modified version
-        if (localChanges) {
+        if (extra && localChanges) {
             sb.append('+m');
         }
 

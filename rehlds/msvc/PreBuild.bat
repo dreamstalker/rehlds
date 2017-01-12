@@ -127,10 +127,10 @@ IF NOT %errlvl% == "1" (
 		)
 
 		:: append extra string
-		If NOT "%commitURL%"=="%commitURL:bitbucket.org=%" (
-			set commitURL=!commitURL!/commit/
-		) ELSE (
+		If NOT "!commitURL!"=="!commitURL:bitbucket.org=!" (
 			set commitURL=!commitURL!/commits/
+		) ELSE (
+			set commitURL=!commitURL!/commit/
 		)
 
 	) ELSE (
@@ -142,10 +142,10 @@ IF NOT %errlvl% == "1" (
 		set commitURL=!commitURL::=/!
 
 		:: append extra string
-		If NOT "%commitURL%"=="%commitURL:bitbucket.org=%" (
-			set commitURL=https://!commitURL!/commit/
-		) ELSE (
+		If NOT "!commitURL!"=="!commitURL:bitbucket.org=!" (
 			set commitURL=https://!commitURL!/commits/
+		) ELSE (
+			set commitURL=https://!commitURL!/commit/
 		)
 	)
 )
