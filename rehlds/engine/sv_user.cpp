@@ -1716,6 +1716,14 @@ void EXT_FUNC SV_HandleClientMessage_api(IGameClient* client, int8 opcode) {
 	void(*func)(client_t *) = sv_clcfuncs[opcode].pfnParse;
 	if (func)
 		func(cl);
+
+#ifdef REHLDS_FIXES
+	if (msg_badread)
+	{
+		Con_Printf("SV_ReadClientMessage: badread on %s, opcode %s\n", host_client->name, sv_clcfuncs[opcode].pszname);
+	}
+#endif
+
 }
 
 void SV_ExecuteClientMessage(client_t *cl)

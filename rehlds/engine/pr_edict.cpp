@@ -636,5 +636,6 @@ void* EXT_FUNC GetModelPtr(edict_t *pEdict)
 	{
 		return NULL;
 	}
-	return Mod_Extradata(g_psv.models[pEdict->v.modelindex]);
+
+	return Mod_Extradata(Mod_Handle(pEdict->v.modelindex));
 }
