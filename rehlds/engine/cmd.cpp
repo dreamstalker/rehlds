@@ -42,7 +42,12 @@ cmdalias_t *cmd_alias;
 //int trashtest;
 //int *trashspot;
 
+
+#ifdef REHLDS_FIXES
+std::vector <cmd_function_t*> cmd_functions;
+#else
 cmd_function_t *cmd_functions;
+#endif
 char *const cmd_null_string = "";
 
 void Cmd_Wait_f(void)
@@ -525,8 +530,13 @@ void Cmd_Alias_f(void)
 
 struct cmd_function_s *Cmd_GetFirstCmd(void)
 {
+#ifdef REHLDS_FIXES
+	return cmd_functions.front();
+#else
 	return cmd_functions;
+#endif
 }
+
 
 void Cmd_Init(void)
 {
@@ -548,8 +558,23 @@ void Cmd_Shutdown(void)
 	Q_memset(cmd_argv, 0, sizeof(cmd_argv));
 	cmd_argc = 0;
 	cmd_args = NULL;
-
+#ifdef REHLDS_FIXES
+	//Checking if memory released:
+	for (auto cmd : cmd_functions)
+	{
+		if (cmd)
+		{
+			if (cmd->name)
+			{
+				Z_Free(cmd->name);
+			}
+			Mem_Free(cmd);
+		}
+	}
+	cmd_functions.clear();
+#else
 	cmd_functions = NULL;	// TODO: Check that memory from functions is released too
+#endif
 }
 
 int EXT_FUNC Cmd_Argc(void)
@@ -655,22 +680,24 @@ void EXT_FUNC Cmd_TokenizeString(char *text)
 NOXREF cmd_function_t *Cmd_FindCmd(char *cmd_name)
 {
 	NOXREFCHECK;
-
+#ifndef REHLDS_FIXES
 	cmd_function_t *cmd;
-
 	for (cmd = cmd_functions; cmd; cmd = cmd->next)
+#else
+	for (auto cmd:cmd_functions)
+#endif
 	{
 		if (!Q_stricmp(cmd_name, cmd->name))
 		{
 			return cmd;
 		}
 	}
-
 	return NULL;
 }
 
 cmd_function_t *Cmd_FindCmdPrev(char *cmd_name)
 {
+#ifndef REHLDS_FIXES
 	cmd_function_t *cmd = NULL;
 
 	if (cmd_functions == NULL)
@@ -685,12 +712,30 @@ cmd_function_t *Cmd_FindCmdPrev(char *cmd_name)
 			return cmd;
 		}
 	}
+#else
+	auto end = cmd_functions.end() - 1;
+	for (auto cmd = cmd_functions.begin(); cmd < end; ++cmd)
+	{
+		if (!Q_stricmp(cmd_name, (*(cmd+1))->name))
+		{
+			return *cmd;
+		}
+	}
+#endif
+
 
 	return NULL;
 }
 
 void Cmd_InsertCommand(cmd_function_t *cmd)
 {
+#ifdef REHLDS_FIXES
+	cmd_functions.push_back(cmd);
+	std::sort(cmd_functions.begin(), cmd_functions.end(), [](cmd_function_t *a, cmd_function_t *b)
+	{	
+		return Q_stricmp(a->name, b->name) < 0;
+	});
+#else
 	cmd_function_t *c, **p;
 
 	// Commands list is alphabetically sorted, search where to push
@@ -712,6 +757,8 @@ void Cmd_InsertCommand(cmd_function_t *cmd)
 	// All commands in the list are lower then the new one
 	cmd->next = NULL;
 	*p = cmd;
+#endif
+
 }
 
 // Use this for engine inside call only, not from user code, because it doesn't alloc string for the name.
@@ -796,6 +843,7 @@ void EXT_FUNC Cmd_AddGameCommand(char *cmd_name, xcommand_t function)
 
 void EXT_FUNC Cmd_RemoveCmd(char *cmd_name)
 {
+#ifndef REHLDS_FIXES
 	auto prev = Cmd_FindCmdPrev(cmd_name);
 
 	if (prev) {
@@ -805,10 +853,34 @@ void EXT_FUNC Cmd_RemoveCmd(char *cmd_name)
 		Z_Free(cmd->name);
 		Mem_Free(cmd);
 	}
+#else
+	cmd_functions.erase(std::remove_if(cmd_functions.begin(), cmd_functions.end(), [cmd_name](cmd_function_t *func)->bool
+	{
+		if (!Q_stricmp(func->name, cmd_name))
+		{
+			Z_Free(func->name);
+			Mem_Free(func);
+			return true;
+		}
+		return false;
+	}), cmd_functions.end());
+#endif
 }
 
 void Cmd_RemoveMallocedCmds(int flag)
 {
+#ifdef REHLDS_FIXES
+	cmd_functions.erase(std::remove_if(cmd_functions.begin(), cmd_functions.end(), [flag](cmd_function_t *func)->bool
+	{
+		if (func->flags==flag)
+		{
+			Z_Free(func->name);
+			Mem_Free(func);
+			return true;
+		}
+		return false;
+	}), cmd_functions.end());
+#else
 	cmd_function_t *c, **p;
 
 	c = cmd_functions;
@@ -826,6 +898,7 @@ void Cmd_RemoveMallocedCmds(int flag)
 		p = &c->next;
 		c = c->next;
 	}
+#endif
 }
 
 NOXREF void Cmd_RemoveHudCmds(void)
@@ -847,6 +920,15 @@ void Cmd_RemoveWrapperCmds(void)
 
 qboolean Cmd_Exists(const char *cmd_name)
 {
+#ifdef REHLDS_FIXES
+	for (auto cmd : cmd_functions)
+	{
+		if (!Q_stricmp(cmd_name, cmd->name))
+		{
+			return TRUE;
+		}
+	}
+#else
 	cmd_function_t *cmd = cmd_functions;
 
 	while (cmd)
@@ -858,14 +940,14 @@ qboolean Cmd_Exists(const char *cmd_name)
 
 		cmd = cmd->next;
 	}
-
+#endif
 	return FALSE;
 }
 
 NOXREF char *Cmd_CompleteCommand(char *search, int forward)
 {
 	NOXREFCHECK;
-
+#ifndef REHLDS_FIXES //TODO: Not important for now, as NOXREF. I'll rewrite it sometimes later.
 	// TODO: We have a command name length limit here: prepare for unforeseen consequences!
 	static char lastpartial[256];
 	char partial[256];
@@ -916,7 +998,7 @@ NOXREF char *Cmd_CompleteCommand(char *search, int forward)
 			return cmd->name;
 		}
 	}
-
+#endif
 	return NULL;
 }
 
@@ -924,8 +1006,29 @@ bool EXT_FUNC ValidateCmd_API(const char* cmd, cmd_source_t src, IGameClient* cl
 	return true;
 }
 
-void EXT_FUNC Cmd_ExecuteString_internal(const char* cmdName, cmd_source_t src, IGameClient* client) {
+void EXT_FUNC Cmd_ExecuteString_internal(const char* cmdName, cmd_source_t src, IGameClient* client)
+{
 	// Search in functions
+#ifdef REHLDS_FIXES
+
+	if (std::find_if(cmd_functions.begin(), cmd_functions.end(), [cmdName](cmd_function_t *func)
+	{
+		if (!Q_stricmp(cmdName, func->name))
+		{
+			func->function();
+
+			if (g_pcls.demorecording && (func->flags & FCMD_HUD_COMMAND) && !g_pcls.spectator)
+			{
+				CL_RecordHUDCommand(func->name);
+			}
+			return true;
+		}
+		return false;
+	}) != cmd_functions.end())
+	{
+		return;
+	}
+#else
 	cmd_function_t *cmd = cmd_functions;
 	while (cmd)
 	{
@@ -943,6 +1046,7 @@ void EXT_FUNC Cmd_ExecuteString_internal(const char* cmdName, cmd_source_t src, 
 
 		cmd = cmd->next;
 	}
+#endif
 
 	// Search in aliases
 	cmdalias_t *a = cmd_alias;
@@ -1079,7 +1183,9 @@ NOXREF int Cmd_CheckParm(char *parm)
 
 void Cmd_CmdList_f(void)
 {
+#ifndef REHLDS_FIXES
 	cmd_function_t *cmd;
+#endif
 	int iCmds;
 	int iArgs;
 	const char *partial, *arg1;
@@ -1153,8 +1259,11 @@ void Cmd_CmdList_f(void)
 
 	// Print commands
 	Con_Printf("Command List\n--------------\n");
-
+#ifdef REHLDS_FIXES
+	for(auto cmd:cmd_functions)
+#else
 	for (cmd = cmd_functions; cmd; cmd = cmd->next)
+#endif
 	{
 		if (partial && Q_strnicmp(cmd->name, partial, ipLen))
 		{
@@ -1187,3 +1296,15 @@ void Cmd_CmdList_f(void)
 		Con_Printf("cmdlist logged to %s\n", szTemp);
 	}
 }
+
+#ifdef REHLDS_FIXES
+EXT_FUNC size_t  Cmd_GetCmds(std::vector <std::string> &list)
+{
+	list.clear();
+	for (auto cmd : cmd_functions)
+	{
+		list.push_back(std::string(cmd->name));
+	}
+	return list.size();
+}
+#endif

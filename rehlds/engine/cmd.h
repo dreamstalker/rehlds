@@ -30,7 +30,10 @@
 #include "maintypes.h"
 #include "common.h"
 #include "cmd_rehlds.h"
-
+#ifdef REHLDS_FIXES
+#include <vector> 
+#include <algorithm>
+#endif
 /*
 All command/alias names are case insensitive! Arguments not.
 */
@@ -81,7 +84,11 @@ extern sizebuf_t cmd_text;
 extern cmd_source_t cmd_source;
 extern qboolean cmd_wait;
 
+#ifdef REHLDS_FIXES
+extern std::vector <cmd_function_t*> cmd_functions; //maybe try std::map?
+#else
 extern cmd_function_t *cmd_functions;
+#endif
 extern cmdalias_t *cmd_alias;
 
 void Cmd_Wait_f(void);
@@ -122,3 +129,6 @@ void Cmd_ForwardToServer(void);
 qboolean Cmd_ForwardToServerUnreliable(void);
 NOXREF int Cmd_CheckParm(char *parm);
 void Cmd_CmdList_f(void);
+#ifdef REHLDS_FIXES
+size_t Cmd_GetCmds(std::vector <std::string> &list);
+#endif

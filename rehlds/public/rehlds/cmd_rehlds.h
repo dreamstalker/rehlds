@@ -32,7 +32,9 @@
 typedef void(*xcommand_t)(void);
 typedef struct cmd_function_s
 {
+#ifndef REHLDS_FIXES
 	struct cmd_function_s *next;
+#endif
 	char *name;
 	xcommand_t function;
 	int flags;
