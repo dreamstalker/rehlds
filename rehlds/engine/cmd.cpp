@@ -1282,14 +1282,17 @@ void Cmd_CmdList_f(void)
 	}
 }
 
-#ifdef REHLDS_FIXES
+
 EXT_FUNC size_t  Cmd_GetCmds(std::vector <std::string> &list)
 {
 	list.clear();
+#ifdef REHLDS_FIXES
 	for (auto cmd : cmd_functions)
+#else
+	for (auto cmd = cmd_functions; cmd; cmd = cmd->next)
+#endif
 	{
 		list.push_back(std::string(cmd->name));
 	}
 	return list.size();
 }
-#endif

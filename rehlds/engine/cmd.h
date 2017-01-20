@@ -30,8 +30,8 @@
 #include "maintypes.h"
 #include "common.h"
 #include "cmd_rehlds.h"
+#include <vector> //Maybe it should be moved to top?
 #ifdef REHLDS_FIXES
-#include <vector> 
 #include <algorithm>
 #endif
 /*
@@ -129,6 +129,4 @@ void Cmd_ForwardToServer(void);
 qboolean Cmd_ForwardToServerUnreliable(void);
 NOXREF int Cmd_CheckParm(char *parm);
 void Cmd_CmdList_f(void);
-#ifdef REHLDS_FIXES
 size_t Cmd_GetCmds(std::vector <std::string> &list);
-#endif

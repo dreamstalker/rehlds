@@ -33,6 +33,7 @@
 #include "FlightRecorder.h"
 #include "interface.h"
 #include "model.h"
+#include <vector>
 
 #define REHLDS_API_VERSION_MAJOR 3
 #define REHLDS_API_VERSION_MINOR 2
