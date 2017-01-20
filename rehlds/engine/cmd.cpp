@@ -562,7 +562,7 @@ void Cmd_Shutdown(void)
 	//Checking if memory released:
 	for (auto cmd : cmd_functions)
 	{
-		if (cmd)
+		if (cmd&&cmd->flags)
 		{
 			if (cmd->name)
 			{
@@ -1010,27 +1010,11 @@ void EXT_FUNC Cmd_ExecuteString_internal(const char* cmdName, cmd_source_t src, 
 {
 	// Search in functions
 #ifdef REHLDS_FIXES
-
-	if (std::find_if(cmd_functions.begin(), cmd_functions.end(), [cmdName](cmd_function_t *func)
-	{
-		if (!Q_stricmp(cmdName, func->name))
-		{
-			func->function();
-
-			if (g_pcls.demorecording && (func->flags & FCMD_HUD_COMMAND) && !g_pcls.spectator)
-			{
-				CL_RecordHUDCommand(func->name);
-			}
-			return true;
-		}
-		return false;
-	}) != cmd_functions.end())
-	{
-		return;
-	}
+	for (auto cmd:cmd_functions)
 #else
 	cmd_function_t *cmd = cmd_functions;
 	while (cmd)
+#endif
 	{
 		if (!Q_stricmp(cmdName, cmd->name))
 		{
@@ -1043,10 +1027,11 @@ void EXT_FUNC Cmd_ExecuteString_internal(const char* cmdName, cmd_source_t src, 
 
 			return;
 		}
-
+#ifndef REHLDS_FIXES
 		cmd = cmd->next;
-	}
 #endif
+	}
+
 
 	// Search in aliases
 	cmdalias_t *a = cmd_alias;
