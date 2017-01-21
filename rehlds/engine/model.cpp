@@ -1033,7 +1033,16 @@ void Mod_LoadLeafs(lump_t *l)
 
 	loadmodel->leafs = out;
 	loadmodel->numleafs = count;
+#ifdef REHLDS_FIXES
+	{
+		int row = (loadmodel->numleafs + 7) / 8;
 
+		if (row < 0 || row > MODEL_MAX_PVS)
+		{
+			Sys_Error(__FUNCTION__ ": oversized loadmodel->numleafs: %i", loadmodel->numleafs);
+		}
+	}
+#endif
 	for (i = 0; i < count; i++, in++, out++)
 	{
 		for (j = 0; j < 3; j++)
