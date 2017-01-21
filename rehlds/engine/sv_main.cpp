@@ -5236,6 +5236,9 @@ void SV_CreateGenericResources(void)
 				successful = true;
 				
 		}
+		else
+			successful = true;
+
 		if(successful)
 #else
 		else if (Q_strstr(com_token, ".cfg"))
