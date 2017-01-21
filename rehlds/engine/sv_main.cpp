@@ -5204,6 +5204,10 @@ void SV_CreateGenericResources(void)
 		data = COM_Parse(data);
 		if (Q_strlen(com_token) <= 0)
 			break;
+#ifdef REHLDS_FIXES
+		char *com_token_extension = Q_strrchr(com_token, '.');
+		bool successful = false;
+#endif
 
 		if (Q_strstr(com_token, ".."))
 			Con_Printf("Can't precache resource with invalid relative path %s\n", com_token);
@@ -5211,6 +5215,29 @@ void SV_CreateGenericResources(void)
 			Con_Printf("Can't precache resource with absolute path %s\n", com_token);
 		else if (Q_strstr(com_token, "\\"))
 			Con_Printf("Can't precache resource with invalid relative path %s\n", com_token);
+#ifdef REHLDS_FIXES
+		else if(com_token_extension)
+		{
+			if (Q_strcmp(com_token_extension, ".cfg") == 0)
+				Con_Printf("Can't precache .cfg files:  %s\n", com_token);
+			else if (Q_strcmp(com_token_extension, ".lst") == 0)
+				Con_Printf("Can't precache .lst files:  %s\n", com_token);
+			else if (Q_strcmp(com_token_extension, ".exe") == 0)
+				Con_Printf("Can't precache .exe files:  %s\n", com_token);
+			else if (Q_strcmp(com_token_extension, ".vbs") == 0)
+				Con_Printf("Can't precache .vbs files:  %s\n", com_token);
+			else if (Q_strcmp(com_token_extension, ".com") == 0)
+				Con_Printf("Can't precache .com files:  %s\n", com_token);
+			else if (Q_strcmp(com_token_extension, ".bat") == 0)
+				Con_Printf("Can't precache .bat files:  %s\n", com_token);
+			else if (Q_strcmp(com_token_extension, ".dll") == 0)
+				Con_Printf("Can't precache .dll files:  %s\n", com_token);
+			else
+				successful = true;
+				
+		}
+		if(successful)
+#else
 		else if (Q_strstr(com_token, ".cfg"))
 			Con_Printf("Can't precache .cfg files:  %s\n", com_token);
 		else if (Q_strstr(com_token, ".lst"))
@@ -5226,6 +5253,7 @@ void SV_CreateGenericResources(void)
 		else if (Q_strstr(com_token, ".dll"))
 			Con_Printf("Can't precache .dll files:  %s\n", com_token);
 		else
+#endif
 		{
 			// In fixed version of PrecacheGeneric we don't need local copy
 #ifdef REHLDS_FIXES
@@ -7250,6 +7278,7 @@ qboolean IsSafeFileToDownload(const char *filename)
 {
 	char *first;
 	char *last;
+
 	char lwrfilename[MAX_PATH];
 
 	if (!filename)
@@ -7271,7 +7300,11 @@ qboolean IsSafeFileToDownload(const char *filename)
 	Q_strlwr(lwrfilename);
 
 	first = Q_strchr(lwrfilename, '.');
+#ifdef REHLDS_FIXES
+	last = Q_strrchr(first, '.');
+#else
 	last = Q_strrchr(lwrfilename, '.');
+#endif
 
 	if (lwrfilename[0] == '/'
 		|| Q_strstr(lwrfilename, "\\")
@@ -7281,6 +7314,23 @@ qboolean IsSafeFileToDownload(const char *filename)
 		|| first != last
 		|| !first
 		|| Q_strlen(first) != 4
+		|| Q_strstr(lwrfilename, "halflife.wad")
+		|| Q_strstr(lwrfilename, "pak0.pak")
+		|| Q_strstr(lwrfilename, "xeno.wad")
+#ifdef REHLDS_FIXES
+		|| Q_strcmp(first, ".cfg") == 0
+		|| Q_strcmp(first, ".lst") == 0
+		|| Q_strcmp(first, ".exe") == 0
+		|| Q_strcmp(first, ".vbs") == 0
+		|| Q_strcmp(first, ".com") == 0
+		|| Q_strcmp(first, ".bat") == 0
+		|| Q_strcmp(first, ".dll") == 0
+		|| Q_strcmp(first, ".ini") == 0
+		|| Q_strcmp(first, ".log") == 0
+//		|| Q_strcmp(lwrfilename, ".so") == 0 // Extension length must be 4 to get here
+//		|| Q_strcmp(lwrfilename, ".dylib") == 0
+		|| Q_strcmp(first, ".sys") == 0)
+#else
 		|| Q_strstr(lwrfilename, ".cfg")
 		|| Q_strstr(lwrfilename, ".lst")
 		|| Q_strstr(lwrfilename, ".exe")
@@ -7290,12 +7340,10 @@ qboolean IsSafeFileToDownload(const char *filename)
 		|| Q_strstr(lwrfilename, ".dll")
 		|| Q_strstr(lwrfilename, ".ini")
 		|| Q_strstr(lwrfilename, ".log")
-		|| Q_strstr(lwrfilename, "halflife.wad")
-		|| Q_strstr(lwrfilename, "pak0.pak")
-		|| Q_strstr(lwrfilename, "xeno.wad")
 		|| Q_strstr(lwrfilename, ".so")
 		|| Q_strstr(lwrfilename, ".dylib")
 		|| Q_strstr(lwrfilename, ".sys"))
+#endif
 	{
 		return FALSE;
 	}
