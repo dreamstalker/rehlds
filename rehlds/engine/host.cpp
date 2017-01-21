@@ -276,7 +276,11 @@ void Host_WriteConfiguration(void)
 	f = FS_OpenPathID("config.cfg", "w", "GAMECONFIG");
 	if (!f)
 	{
-		if (!developer.value || !FS_FileExists("../goldsrc/dev_build_all.bat"))
+		if (!developer.value
+#ifndef REHLDS_FIXES
+		|| !FS_FileExists("../goldsrc/dev_build_all.bat")
+#endif
+		)
 		{
 			if (FS_GetLocalPath("config.cfg", nameBuf, sizeof(nameBuf)))
 			{
