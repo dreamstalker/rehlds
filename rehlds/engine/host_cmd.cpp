@@ -2607,7 +2607,12 @@ void Host_Kill_f(void)
 		Cmd_ForwardToServer();
 		return;
 	}
-	if (sv_player->v.health <= 0.0f)
+	
+	if (sv_player->v.health <= 0.0f
+#ifdef REHLDS_FIXES
+	    || sv_player->v.deadflag != DEAD_NO
+#endif
+	   )
 	{
 		SV_ClientPrintf("Can't suicide -- already dead!\n");
 		return;
