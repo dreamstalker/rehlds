@@ -1008,7 +1008,7 @@ int Host_Frame(float time, int iState, int *stateInfo)
 
 void CheckGore(void)
 {
-	float fValue = float(!bLowViolenceBuild);
+	float fValue = bLowViolenceBuild ? 0.0f : 1.0f;
 	
 	Cvar_SetValue("violence_hblood", fValue);
 	Cvar_SetValue("violence_hgibs", fValue);
