@@ -112,7 +112,7 @@ qboolean TEX_InitFromWad(char *path)
 			continue;
 
 #ifdef REHLDS_FIXES
-		if (g_psv.active
+		if (g_psv.state == ss_loading
 		 && Q_stricmp(wadPath, "halflife.wad")
 		 && Q_stricmp(wadPath, "xeno.wad")
 		 && Q_stricmp(wadPath, "decals.wad"))
