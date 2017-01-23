@@ -1222,11 +1222,7 @@ void Host_Shutdown(void)
 
 	if (isdown)
 	{
-#ifdef REHLDS_FIXES
-		Sys_Error(__FUNCTION__ ": recursive shutdown");
-#else
 		printf("recursive shutdown\n");
-#endif
 		return;
 	}
 
