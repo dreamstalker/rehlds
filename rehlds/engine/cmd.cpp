@@ -721,7 +721,7 @@ void Cmd_AddCommand(char *cmd_name, xcommand_t function)
 
 	if (host_initialized)
 	{
-		Sys_Error(__FUNCTION__ " after host_initialized");
+		Sys_Error(__FUNCTION__ ": called after host_initialized");
 	}
 
 	// Check in variables list

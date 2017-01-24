@@ -1494,17 +1494,17 @@ void NET_SendPacket(netsrc_t sock, int length, void *data, const netadr_t& to)
 		// let dedicated servers continue after errors
 		if (g_pcls.state == ca_dedicated)
 		{
-			Con_Printf(__FUNCTION__ " ERROR: %s\n", NET_ErrorString(err));
+			Con_Printf(__FUNCTION__ ": ERROR: %s\n", NET_ErrorString(err));
 		}
 		else
 		{
 			if (err == WSAEADDRNOTAVAIL || err == WSAENOBUFS)
 			{
-				Con_DPrintf(__FUNCTION__ " Warning: %s : %s\n", NET_ErrorString(err), NET_AdrToString(to));
+				Con_DPrintf(__FUNCTION__ ": Warning: %s : %s\n", NET_ErrorString(err), NET_AdrToString(to));
 			}
 			else
 			{
-				Sys_Error(__FUNCTION__ " ERROR: %s\n", NET_ErrorString(err));
+				Sys_Error(__FUNCTION__ ": ERROR: %s\n", NET_ErrorString(err));
 			}
 		}
 	}

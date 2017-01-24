@@ -1363,13 +1363,13 @@ qboolean DELTA_ParseDescription(char *name, delta_t **ppdesc, char *pstream)
 
 	if (!ppdesc)
 	{
-		Sys_Error(__FUNCTION__ " with no delta_description_t\n");
+		Sys_Error(__FUNCTION__ ": called with no delta_description_t\n");
 	}
 	*ppdesc = 0;
 
 	if (!pstream)
 	{
-		Sys_Error(__FUNCTION__ " with no data stream\n");
+		Sys_Error(__FUNCTION__ ": called with no data stream\n");
 	}
 
 	while (true)

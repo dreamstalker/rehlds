@@ -308,7 +308,7 @@ const char *Sys_FindFirst(const char *path, char *basename)
 {
 	if (g_hfind != -1)
 	{
-		Sys_Error(__FUNCTION__ " without close");
+		Sys_Error(__FUNCTION__ ": called without close");
 	}
 
 	const char *psz = FS_FindFirst(path, &g_hfind, 0);
@@ -333,7 +333,10 @@ const char *Sys_FindFirstPathID(const char *path, char *pathid)
 {
 	//const char *psz;//unused?
 	if (g_hfind != -1)
-		Sys_Error("Sys_FindFirst without close");
+	{
+		Sys_Error(__FUNCTION__ ": called without close");
+	}
+
 	return FS_FindFirst(path, &g_hfind, pathid);
 }
 

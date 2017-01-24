@@ -423,7 +423,7 @@ void SV_ReallocateDynamicData(void)
 {
 	if (!g_psv.max_edicts)
 	{
-		Con_DPrintf(__FUNCTION__ " with sv.max_edicts == 0\n");
+		Con_DPrintf(__FUNCTION__ ": sv.max_edicts == 0\n");
 		return;
 	}
 

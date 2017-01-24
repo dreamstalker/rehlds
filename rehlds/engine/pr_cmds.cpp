@@ -1049,7 +1049,7 @@ int EXT_FUNC PF_precache_sound_I(const char *s)
 				return i;
 		}
 
-		Host_Error(__FUNCTION__  ": Sound '%s' failed to precache because the item count is over the %d limit.\n"
+		Host_Error(__FUNCTION__ ": Sound '%s' failed to precache because the item count is over the %d limit.\n"
 			"Reduce the number of brush models and/or regular models in the map to correct this.",
 			s, MAX_SOUNDS);
 	}
@@ -2238,56 +2238,56 @@ void EXT_FUNC PF_MessageEnd_I(void)
 void EXT_FUNC PF_WriteByte_I(int iValue)
 {
 	if (!gMsgStarted)
-		Sys_Error(__FUNCTION__ " called with no active message\n");
+		Sys_Error(__FUNCTION__ ": called with no active message\n");
 	MSG_WriteByte(&gMsgBuffer, iValue);
 }
 
 void EXT_FUNC PF_WriteChar_I(int iValue)
 {
 	if (!gMsgStarted)
-		Sys_Error(__FUNCTION__ " called with no active message\n");
+		Sys_Error(__FUNCTION__ ": called with no active message\n");
 	MSG_WriteChar(&gMsgBuffer, iValue);
 }
 
 void EXT_FUNC PF_WriteShort_I(int iValue)
 {
 	if (!gMsgStarted)
-		Sys_Error(__FUNCTION__ " called with no active message\n");
+		Sys_Error(__FUNCTION__ ": called with no active message\n");
 	MSG_WriteShort(&gMsgBuffer, iValue);
 }
 
 void EXT_FUNC PF_WriteLong_I(int iValue)
 {
 	if (!gMsgStarted)
-		Sys_Error(__FUNCTION__ " called with no active message\n");
+		Sys_Error(__FUNCTION__ ": called with no active message\n");
 	MSG_WriteLong(&gMsgBuffer, iValue);
 }
 
 void EXT_FUNC PF_WriteAngle_I(float flValue)
 {
 	if (!gMsgStarted)
-		Sys_Error(__FUNCTION__ " called with no active message\n");
+		Sys_Error(__FUNCTION__ ": called with no active message\n");
 	MSG_WriteAngle(&gMsgBuffer, flValue);
 }
 
 void EXT_FUNC PF_WriteCoord_I(float flValue)
 {
 	if (!gMsgStarted)
-		Sys_Error(__FUNCTION__ " called with no active message\n");
+		Sys_Error(__FUNCTION__ ": called with no active message\n");
 	MSG_WriteShort(&gMsgBuffer, (int)(flValue * 8.0));
 }
 
 void EXT_FUNC PF_WriteString_I(const char *sz)
 {
 	if (!gMsgStarted)
-		Sys_Error(__FUNCTION__ " called with no active message\n");
+		Sys_Error(__FUNCTION__ ": called with no active message\n");
 	MSG_WriteString(&gMsgBuffer, sz);
 }
 
 void EXT_FUNC PF_WriteEntity_I(int iValue)
 {
 	if (!gMsgStarted)
-		Sys_Error(__FUNCTION__ " called with no active message\n");
+		Sys_Error(__FUNCTION__ ": called with no active message\n");
 	MSG_WriteShort(&gMsgBuffer, iValue);
 }
 

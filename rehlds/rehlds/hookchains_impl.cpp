@@ -40,11 +40,11 @@ bool AbstractHookChainRegistry::findHook(void* hookFunc) const
 void AbstractHookChainRegistry::addHook(void* hookFunc, int priority)
 {
 	if (!hookFunc) {
-		Sys_Error(__FUNCTION__ " Parameter hookFunc can't be a nullptr");
+		Sys_Error(__FUNCTION__ ": Parameter hookFunc can't be a nullptr");
 	}
 
 	if (findHook(hookFunc)) {
-		Sys_Error(__FUNCTION__ " The same handler can't be used twice on the hookchain.");
+		Sys_Error(__FUNCTION__ ": The same handler can't be used twice on the hookchain.");
 	}
 
 	for (auto i = 0; i < MAX_HOOKS_IN_CHAIN; i++)
@@ -63,7 +63,7 @@ void AbstractHookChainRegistry::addHook(void* hookFunc, int priority)
 	}
 
 	if (m_NumHooks >= MAX_HOOKS_IN_CHAIN) {
-		Sys_Error(__FUNCTION__ " MAX_HOOKS_IN_CHAIN limit hit");
+		Sys_Error(__FUNCTION__ ": MAX_HOOKS_IN_CHAIN limit hit");
 	}
 
 	m_NumHooks++;
