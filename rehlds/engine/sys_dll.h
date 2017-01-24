@@ -42,9 +42,9 @@
 #define __LINE__AS_STRING __HACK_LINE_AS_STRING__(__LINE__) //Gives you the line number in constant string form
 
 #if defined _MSC_VER || defined __INTEL_COMPILER
-#define NOXREFCHECK		   __asm { push [ebp + 4] } Sys_Error("[NOXREFCHECK]:" __FUNCTION__ " (" __FILE__ ":"__LINE__AS_STRING") NOXREF, but called from 0x%.08x")
+#define NOXREFCHECK		   __asm { push [ebp + 4] } Sys_Error("[NOXREFCHECK]:" __FUNCTION__ " (" __FILE__ ":" __LINE__AS_STRING") NOXREF, but called from 0x%.08x")
 #else
-#define NOXREFCHECK		   const char* noxref_msg = "[NOXREFCHECK]:" __FUNCTION__ " (" __FILE__ ":"__LINE__AS_STRING") NOXREF, but called from 0x%.08x"; \
+#define NOXREFCHECK		   const char* noxref_msg = "[NOXREFCHECK]:" __FUNCTION__ " (" __FILE__ ":" __LINE__AS_STRING") NOXREF, but called from 0x%.08x"; \
 						   asm volatile (				\
 								"pushl 4(%%ebp)\n\t"	\
 								"pushl %0\n\t"			\
