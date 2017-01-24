@@ -161,6 +161,7 @@ struct rehlds_server_t {
 	// Extended net buffers
 	uint8_t reliableDatagramBuffer[NET_MAX_PAYLOAD];
 	uint8_t signonData[NET_MAX_PAYLOAD];
+	uint8_t spectatorBuffer[MAX_DATAGRAM];
 
 	// Extended resource list
 	resource_t resources[RESOURCE_MAX_COUNT];
