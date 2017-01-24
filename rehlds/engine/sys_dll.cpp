@@ -508,9 +508,10 @@ void NORETURN Sys_Error(const char *error, ...)
 	}
 #endif // SWDS
 
-	//exit(-1);
 	//Allahu akbar!
-	*(int *)NULL = NULL;
+	int *null = 0;
+	*null = 0;
+	exit(-1);
 }
 
 NOXREF void Sys_Warning(const char *pszWarning, ...)
