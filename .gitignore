@@ -10,7 +10,10 @@
 **/msvc/*.opensdf
 **/msvc/*.user
 **/msvc/*.suo
+**/msvc/*.db
+**/msvc/*.opendb
 **/msvc/ipch
+**/msvc/.vs
 
 rehlds/version/appversion.h
 rehlds/msvc/PublishPath*.txt
