@@ -80,7 +80,7 @@ Help -> About
 icc (ICC) 15.0.1 20141023
 </pre>
 
-####ICC
+####GCC
 <pre>$ gcc --version
 gcc (Debian 4.9.2-10) 4.9.2
 </pre>
