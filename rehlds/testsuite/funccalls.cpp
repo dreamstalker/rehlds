@@ -40,7 +40,7 @@ void PrintBinaryArray(const char* data, int dataLen, std::stringstream &ss)
 {
 	ss << "[";
 	for (int i = 0; i < dataLen; i++)
-		ss << " " << (unsigned int) (unsigned char)data[i];
+		ss << " " << (unsigned int)(unsigned char)data[i];
 	ss << "]";
 }
 
@@ -73,7 +73,7 @@ bool CompareSockAddrs(void* ps1, void* ps2) {
 }
 
 /* ============================================================================
-                                 CSleepExtCall
+								 CSleepExtCall
 ============================================================================ */
 CSleepExtCall::CSleepExtCall(DWORD time)
 {
@@ -109,7 +109,7 @@ void CSleepExtCall::readPrologue(std::istream &stream)
 
 
 /* ============================================================================
-                               CQueryPerfFreqCall
+							   CQueryPerfFreqCall
 ============================================================================ */
 std::string CQueryPerfFreqCall::toString()
 {
@@ -142,7 +142,7 @@ void CQueryPerfFreqCall::readEpilogue(std::istream &stream) {
 
 
 /* ============================================================================
-                              CQueryPerfCounterCall
+							  CQueryPerfCounterCall
 ============================================================================ */
 std::string CQueryPerfCounterCall::toString()
 {
@@ -176,7 +176,7 @@ void CQueryPerfCounterCall::readEpilogue(std::istream &stream) {
 
 
 /* ============================================================================
-                               CGetTickCountCall
+							   CGetTickCountCall
 ============================================================================ */
 std::string CGetTickCountCall::toString()
 {
@@ -207,7 +207,7 @@ void CGetTickCountCall::readEpilogue(std::istream &stream) {
 
 
 /* ============================================================================
-                             CGetTickCountCall
+							 CGetTickCountCall
 ============================================================================ */
 
 std::string CGetLocalTimeCall::toString()
@@ -239,7 +239,7 @@ void CGetLocalTimeCall::readEpilogue(std::istream &stream) {
 
 
 /* ============================================================================
-                        CGetSystemTimeCall
+						CGetSystemTimeCall
 ============================================================================ */
 std::string CGetSystemTimeCall::toString()
 {
@@ -270,7 +270,7 @@ void CGetSystemTimeCall::readEpilogue(std::istream &stream) {
 
 
 /* ============================================================================
-                               CGetTimeZoneInfoCall
+							   CGetTimeZoneInfoCall
 ============================================================================ */
 std::string CGetTimeZoneInfoCall::toString()
 {
@@ -279,7 +279,7 @@ std::string CGetTimeZoneInfoCall::toString()
 		<< " Bias: " << m_Res.Bias
 		<< " StandardName: " << m_Res.StandardName
 		<< " StandardDate: "; PrintSystemTime(&m_Res.StandardDate, ss);
-	
+
 	ss << " StandardBias: " << m_Res.StandardBias
 		<< " DaylightName: " << m_Res.DaylightName
 		<< " DaylightDate: "; PrintSystemTime(&m_Res.DaylightDate, ss);
@@ -309,7 +309,7 @@ void CGetTimeZoneInfoCall::readEpilogue(std::istream &stream) {
 
 
 /* ============================================================================
-                         CSocketCall
+						 CSocketCall
 ============================================================================ */
 CSocketCall::CSocketCall(int af, int type, int protocol)
 {
@@ -364,7 +364,7 @@ void CSocketCall::readEpilogue(std::istream &stream) {
 
 
 /* ============================================================================
-                              CIoCtlSocketCall
+							  CIoCtlSocketCall
 ============================================================================ */
 CIoCtlSocketCall::CIoCtlSocketCall(SOCKET s, long cmd, u_long inValue)
 {
@@ -430,7 +430,7 @@ void CIoCtlSocketCall::readEpilogue(std::istream &stream) {
 
 
 /* ============================================================================
-                               CSetSockOptCall
+							   CSetSockOptCall
 ============================================================================ */
 CSetSockOptCall::CSetSockOptCall(SOCKET s, int level, int optname, const char* optval, int optlen)
 {
@@ -508,7 +508,7 @@ void CSetSockOptCall::readEpilogue(std::istream &stream) {
 
 
 /* ============================================================================
-                               CCloseSocketCall
+							   CCloseSocketCall
 ============================================================================ */
 CCloseSocketCall::CCloseSocketCall(SOCKET s)
 {
@@ -553,7 +553,7 @@ void CCloseSocketCall::readEpilogue(std::istream &stream) {
 
 
 /* ============================================================================
-                             CRecvFromCall
+							 CRecvFromCall
 ============================================================================ */
 CRecvFromCall::CRecvFromCall(SOCKET s, int len, int flags, int fromlen)
 {
@@ -607,7 +607,7 @@ void CRecvFromCall::setResult(const void* data, const void* from, int fromLen, i
 	m_FromLenOut = fromLen;
 	m_Res = res;
 
-	if (res > 0) 
+	if (res > 0)
 		memcpy(m_Data, data, res);
 
 	if (fromLen > 0)
@@ -652,7 +652,7 @@ void CRecvFromCall::readEpilogue(std::istream &stream) {
 
 
 /* ============================================================================
-                              CSendToCall
+							  CSendToCall
 ============================================================================ */
 CSendToCall::CSendToCall(SOCKET s, const void* buf, int len, int flags, const void* to, int tolen)
 {
@@ -695,15 +695,19 @@ bool CSendToCall::compareInputArgs(IEngExtCall* other, bool strict)
 	if (strict) {
 		if (otherCall->m_Len != m_Len)
 			return false;
-	} else {
+	}
+	else {
 		int maxDiff;
 		if (m_Len < 40) {
 			maxDiff = 10;
-		} else if (m_Len < 90) {
+		}
+		else if (m_Len < 90) {
 			maxDiff = 15;
-		} else if (m_Len < 120) {
+		}
+		else if (m_Len < 120) {
 			maxDiff = 18;
-		} else {
+		}
+		else {
 			maxDiff = m_Len / 8;
 		}
 		if (abs(otherCall->m_Len - m_Len) > maxDiff)
@@ -761,7 +765,7 @@ void CSendToCall::readEpilogue(std::istream &stream) {
 
 
 /* ============================================================================
-                                    CBindCall
+									CBindCall
 ============================================================================ */
 CBindCall::CBindCall(SOCKET s, const void* addr, int addrlen)
 {
@@ -829,7 +833,7 @@ void CBindCall::readEpilogue(std::istream &stream) {
 
 
 /* ============================================================================
-                          CGetSockNameCall
+						  CGetSockNameCall
 ============================================================================ */
 CGetSockNameCall::CGetSockNameCall(SOCKET s, int addrlen)
 {
@@ -898,7 +902,7 @@ void CGetSockNameCall::readEpilogue(std::istream &stream) {
 		.read((char*)&m_Res, 4);
 
 	stream.read((char*)&m_Addr, m_AddrLenOut);
-		
+
 }
 
 
@@ -907,7 +911,7 @@ void CGetSockNameCall::readEpilogue(std::istream &stream) {
 
 
 /* ============================================================================
-                           CWSAGetLastErrorCall
+						   CWSAGetLastErrorCall
 ============================================================================ */
 std::string CWSAGetLastErrorCall::toString()
 {
@@ -937,7 +941,7 @@ void CWSAGetLastErrorCall::readEpilogue(std::istream &stream) {
 
 
 /* ============================================================================
-                              CSteamCallbackCall1
+							  CSteamCallbackCall1
 ============================================================================ */
 CSteamCallbackCall1::CSteamCallbackCall1(int cbId, void* data, int dataSize, CCallbackBase* cb)
 {
@@ -1000,7 +1004,7 @@ void CSteamCallbackCall1::readEpilogue(std::istream &stream) {
 
 
 /* ============================================================================
-                                 CSteamCallbackCall2
+								 CSteamCallbackCall2
 ============================================================================ */
 CSteamCallbackCall2::CSteamCallbackCall2(int cbId, void* data, int dataSize, bool ioFailure, SteamAPICall_t apiCall, CCallbackBase* cb)
 {
@@ -1069,7 +1073,7 @@ void CSteamCallbackCall2::readEpilogue(std::istream &stream) {
 }
 
 /* ============================================================================
-                         CSteamApiRegisterCallbackCall
+						 CSteamApiRegisterCallbackCall
 ============================================================================ */
 CSteamApiRegisterCallbackCall::CSteamApiRegisterCallbackCall(int rehldsCallbackId, int steamCallbackId, CCallbackBase* cb)
 {
@@ -1131,7 +1135,7 @@ void CSteamApiRegisterCallbackCall::readEpilogue(std::istream &stream) {
 
 
 /* ============================================================================
-                         CSteamApiInitCall
+						 CSteamApiInitCall
 ============================================================================ */
 
 std::string CSteamApiInitCall::toString()
@@ -1164,7 +1168,7 @@ void CSteamApiInitCall::readEpilogue(std::istream &stream) {
 
 
 /* ============================================================================
-                   CSteamApiUnrigestierCallResultCall
+				   CSteamApiUnrigestierCallResultCall
 ============================================================================ */
 CSteamApiUnrigestierCallResultCall::CSteamApiUnrigestierCallResultCall(int rehldsCallbackId, SteamAPICall_t steamApiCall, CCallbackBase* cb)
 {
@@ -1225,7 +1229,7 @@ void CSteamApiUnrigestierCallResultCall::readEpilogue(std::istream &stream) {
 
 
 /* ============================================================================
-                              CSteamAppsCall
+							  CSteamAppsCall
 ============================================================================ */
 std::string CSteamAppsCall::toString()
 {
@@ -1256,7 +1260,7 @@ void CSteamAppsCall::readEpilogue(std::istream &stream) {
 
 
 /* ============================================================================
-                       CSteamAppGetCurrentGameLanguageCall
+					   CSteamAppGetCurrentGameLanguageCall
 ============================================================================ */
 
 std::string CSteamAppGetCurrentGameLanguageCall::toString()
@@ -1303,7 +1307,7 @@ void CSteamAppGetCurrentGameLanguageCall::readEpilogue(std::istream &stream) {
 
 
 /* ============================================================================
-                    CSteamGameServerInitCall
+					CSteamGameServerInitCall
 ============================================================================ */
 CSteamGameServerInitCall::CSteamGameServerInitCall(uint32 unIP, uint16 usSteamPort, uint16 usGamePort, uint16 usQueryPort, EServerMode eServerMode, const char *pchVersionString)
 {
@@ -1398,7 +1402,7 @@ void CSteamGameServerInitCall::readEpilogue(std::istream &stream) {
 
 
 /* ============================================================================
-                     CSteamGameServerCall
+					 CSteamGameServerCall
 ============================================================================ */
 std::string CSteamGameServerCall::toString()
 {
@@ -1430,7 +1434,7 @@ void CSteamGameServerCall::readEpilogue(std::istream &stream) {
 
 
 /* ============================================================================
-                 CGameServerSetProductCall
+				 CGameServerSetProductCall
 ============================================================================ */
 CGameServerSetProductCall::CGameServerSetProductCall(const char* product)
 {
@@ -1482,7 +1486,7 @@ void CGameServerSetProductCall::readPrologue(std::istream &stream) {
 
 
 /* ============================================================================
-                     CGameServerSetModDirCall
+					 CGameServerSetModDirCall
 ============================================================================ */
 CGameServerSetModDirCall::CGameServerSetModDirCall(const char* dir)
 {
@@ -1534,7 +1538,7 @@ void CGameServerSetModDirCall::readPrologue(std::istream &stream) {
 
 
 /* ============================================================================
-                 CGameServerSetDedicatedServerCall
+				 CGameServerSetDedicatedServerCall
 ============================================================================ */
 CGameServerSetDedicatedServerCall::CGameServerSetDedicatedServerCall(bool dedicated)
 {
@@ -1574,7 +1578,7 @@ void CGameServerSetDedicatedServerCall::readPrologue(std::istream &stream) {
 
 
 /* ============================================================================
-                   CGameServerSetGameDescCall
+				   CGameServerSetGameDescCall
 ============================================================================ */
 CGameServerSetGameDescCall::CGameServerSetGameDescCall(const char* desc)
 {
@@ -1625,7 +1629,7 @@ void CGameServerSetGameDescCall::readPrologue(std::istream &stream) {
 
 
 /* ============================================================================
-                      CGameServerLogOnAnonymousCall
+					  CGameServerLogOnAnonymousCall
 ============================================================================ */
 std::string CGameServerLogOnAnonymousCall::toString()
 {
@@ -1648,7 +1652,7 @@ bool CGameServerLogOnAnonymousCall::compareInputArgs(IEngExtCall* other, bool st
 
 
 /* ============================================================================
-                          CGameServerEnableHeartbeatsCall
+						  CGameServerEnableHeartbeatsCall
 ============================================================================ */
 CGameServerEnableHeartbeatsCall::CGameServerEnableHeartbeatsCall(bool hearbeats)
 {
@@ -1688,7 +1692,7 @@ void CGameServerEnableHeartbeatsCall::readPrologue(std::istream &stream) {
 
 
 /* ============================================================================
-                  CGameServerSetHeartbeatIntervalCall
+				  CGameServerSetHeartbeatIntervalCall
 ============================================================================ */
 CGameServerSetHeartbeatIntervalCall::CGameServerSetHeartbeatIntervalCall(int interval)
 {
@@ -1726,7 +1730,7 @@ void CGameServerSetHeartbeatIntervalCall::readPrologue(std::istream &stream) {
 
 
 /* ============================================================================
-                       CGameServerSetMaxPlayersCall
+					   CGameServerSetMaxPlayersCall
 ============================================================================ */
 CGameServerSetMaxPlayersCall::CGameServerSetMaxPlayersCall(int maxPlayers)
 {
@@ -1765,7 +1769,7 @@ void CGameServerSetMaxPlayersCall::readPrologue(std::istream &stream) {
 
 
 /* ============================================================================
-                       CGameServerSetBotCountCall
+					   CGameServerSetBotCountCall
 ============================================================================ */
 CGameServerSetBotCountCall::CGameServerSetBotCountCall(int numBots)
 {
@@ -1804,7 +1808,7 @@ void CGameServerSetBotCountCall::readPrologue(std::istream &stream) {
 
 
 /* ============================================================================
-                    CGameServerSetServerNameCall
+					CGameServerSetServerNameCall
 ============================================================================ */
 CGameServerSetServerNameCall::CGameServerSetServerNameCall(const char* serverName)
 {
@@ -1856,7 +1860,7 @@ void CGameServerSetServerNameCall::readPrologue(std::istream &stream) {
 
 
 /* ============================================================================
-                     CGameServerSetMapNameCall
+					 CGameServerSetMapNameCall
 ============================================================================ */
 CGameServerSetMapNameCall::CGameServerSetMapNameCall(const char* mapName)
 {
@@ -1908,7 +1912,7 @@ void CGameServerSetMapNameCall::readPrologue(std::istream &stream) {
 
 
 /* ============================================================================
-                  CGameServerSetPasswordProtectedCall
+				  CGameServerSetPasswordProtectedCall
 ============================================================================ */
 CGameServerSetPasswordProtectedCall::CGameServerSetPasswordProtectedCall(bool passwordProtected)
 {
@@ -1948,7 +1952,7 @@ void CGameServerSetPasswordProtectedCall::readPrologue(std::istream &stream) {
 
 
 /* ============================================================================
-                       CGameServerClearAllKVsCall
+					   CGameServerClearAllKVsCall
 ============================================================================ */
 std::string CGameServerClearAllKVsCall::toString()
 {
@@ -1971,7 +1975,7 @@ bool CGameServerClearAllKVsCall::compareInputArgs(IEngExtCall* other, bool stric
 
 
 /* ============================================================================
-                      CGameServerSetKeyValueCall
+					  CGameServerSetKeyValueCall
 ============================================================================ */
 CGameServerSetKeyValueCall::CGameServerSetKeyValueCall(const char* key, const char* value)
 {
@@ -2034,7 +2038,7 @@ void CGameServerSetKeyValueCall::readPrologue(std::istream &stream) {
 	stream
 		.read((char*)&m_ValueLen, sizeof(m_ValueLen))
 		.read((char*)&m_KeyLen, sizeof(m_KeyLen));
-	
+
 	stream
 		.read(m_Value, m_ValueLen)
 		.read(m_Key, m_KeyLen);
@@ -2044,7 +2048,7 @@ void CGameServerSetKeyValueCall::readPrologue(std::istream &stream) {
 
 
 /* ============================================================================
-                     CSteamApiSetBreakpadAppIdCall
+					 CSteamApiSetBreakpadAppIdCall
 ============================================================================ */
 CSteamApiSetBreakpadAppIdCall::CSteamApiSetBreakpadAppIdCall(uint32 appId)
 {
@@ -2084,7 +2088,7 @@ void CSteamApiSetBreakpadAppIdCall::readPrologue(std::istream &stream) {
 
 
 /* ============================================================================
-                  CGameServerWasRestartRequestedCall
+				  CGameServerWasRestartRequestedCall
 ============================================================================ */
 std::string CGameServerWasRestartRequestedCall::toString()
 {
@@ -2116,7 +2120,7 @@ void CGameServerWasRestartRequestedCall::readPrologue(std::istream &stream) {
 
 
 /* ============================================================================
-                    CSteamGameServerRunCallbacksCall
+					CSteamGameServerRunCallbacksCall
 ============================================================================ */
 std::string CSteamGameServerRunCallbacksCall::toString()
 {
@@ -2139,7 +2143,7 @@ bool CSteamGameServerRunCallbacksCall::compareInputArgs(IEngExtCall* other, bool
 
 
 /* ============================================================================
-                   CGameServerGetNextOutgoingPacketCall
+				   CGameServerGetNextOutgoingPacketCall
 ============================================================================ */
 CGameServerGetNextOutgoingPacketCall::CGameServerGetNextOutgoingPacketCall(int maxOut)
 {
@@ -2221,7 +2225,7 @@ void CGameServerGetNextOutgoingPacketCall::readEpilogue(std::istream &stream) {
 
 
 /* ============================================================================
-                            CSteamApiRunCallbacksCall
+							CSteamApiRunCallbacksCall
 ============================================================================ */
 std::string CSteamApiRunCallbacksCall::toString()
 {
@@ -2244,7 +2248,7 @@ bool CSteamApiRunCallbacksCall::compareInputArgs(IEngExtCall* other, bool strict
 
 
 /* ============================================================================
-                     CGameServerGetSteamIdCall
+					 CGameServerGetSteamIdCall
 ============================================================================ */
 std::string CGameServerGetSteamIdCall::toString()
 {
@@ -2275,7 +2279,7 @@ void CGameServerGetSteamIdCall::readEpilogue(std::istream &stream) {
 
 
 /* ============================================================================
-                  CGameServerBSecureCall
+				  CGameServerBSecureCall
 ============================================================================ */
 std::string CGameServerBSecureCall::toString()
 {
@@ -2307,7 +2311,7 @@ void CGameServerBSecureCall::readEpilogue(std::istream &stream) {
 
 
 /* ============================================================================
-                   CGameServerHandleIncomingPacketCall
+				   CGameServerHandleIncomingPacketCall
 ============================================================================ */
 
 CGameServerHandleIncomingPacketCall::CGameServerHandleIncomingPacketCall(const void *pData, int cbData, uint32 srcIP, uint16 srcPort)
@@ -2380,7 +2384,7 @@ void CGameServerHandleIncomingPacketCall::readEpilogue(std::istream &stream) {
 
 
 /* ============================================================================
-              CGameServerSendUserConnectAndAuthenticateCall
+			  CGameServerSendUserConnectAndAuthenticateCall
 ============================================================================ */
 CGameServerSendUserConnectAndAuthenticateCall::CGameServerSendUserConnectAndAuthenticateCall(uint32 unIPClient, const void *pvAuthBlob, uint32 cubAuthBlobSize)
 {
@@ -2456,7 +2460,7 @@ void CGameServerSendUserConnectAndAuthenticateCall::readEpilogue(std::istream &s
 
 
 /* ============================================================================
-             CGameServerSendUserDisconnectCall
+			 CGameServerSendUserDisconnectCall
 ============================================================================ */
 std::string CGameServerSendUserDisconnectCall::toString()
 {
@@ -2490,7 +2494,7 @@ void CGameServerSendUserDisconnectCall::readPrologue(std::istream &stream) {
 
 
 /* ============================================================================
-                   CGameServerBUpdateUserDataCall
+				   CGameServerBUpdateUserDataCall
 ============================================================================ */
 CGameServerBUpdateUserDataCall::CGameServerBUpdateUserDataCall(CSteamID steamIDUser, const char *pchPlayerName, uint32 uScore)
 {
@@ -2563,7 +2567,7 @@ void CGameServerBUpdateUserDataCall::readEpilogue(std::istream &stream) {
 
 
 /* ============================================================================
-              CGameServerCreateUnauthUserConnectionCall
+			  CGameServerCreateUnauthUserConnectionCall
 ============================================================================ */
 std::string CGameServerCreateUnauthUserConnectionCall::toString()
 {
@@ -2596,7 +2600,7 @@ void CGameServerCreateUnauthUserConnectionCall::readEpilogue(std::istream &strea
 
 
 /* ============================================================================
-                              CGetHostNameCall
+							  CGetHostNameCall
 ============================================================================ */
 std::string CGetHostNameCall::toString()
 {
@@ -2655,7 +2659,7 @@ void CGetHostNameCall::readEpilogue(std::istream &stream) {
 
 
 /* ============================================================================
-                           CGetHostByNameCall
+						   CGetHostByNameCall
 ============================================================================ */
 CGetHostByNameCall::CGetHostByNameCall(const char* name)
 {
@@ -2784,12 +2788,12 @@ void CGetHostByNameCall::readEpilogue(std::istream &stream) {
 
 
 /* ============================================================================
-                           CGetProcessTimesCall
+						   CGetProcessTimesCall
 ============================================================================ */
 std::string CGetProcessTimesCall::toString()
 {
 	std::stringstream ss;
-	
+
 	ss << "GetProcessTimes( creationTime: "; PrintFileTime(&m_CreationTime, ss);
 	ss << "; exitTime: "; PrintFileTime(&m_ExitTime, ss);
 	ss << "; kernelTime: "; PrintFileTime(&m_KernelTime, ss);
@@ -2839,7 +2843,7 @@ void CGetProcessTimesCall::readEpilogue(std::istream &stream) {
 
 
 /* ============================================================================
-                   CGetSystemTimeAsFileTimeCall
+				   CGetSystemTimeAsFileTimeCall
 ============================================================================ */
 std::string CGetSystemTimeAsFileTimeCall::toString()
 {
@@ -2877,7 +2881,7 @@ void CGetSystemTimeAsFileTimeCall::readEpilogue(std::istream &stream) {
 
 
 /* ============================================================================
-                            CStdTimeCall
+							CStdTimeCall
 ============================================================================ */
 CStdTimeCall::CStdTimeCall(uint32* inTime)
 {
@@ -2931,7 +2935,7 @@ void CStdTimeCall::readEpilogue(std::istream &stream) {
 
 
 /* ============================================================================
-                          CStdLocalTimeCall
+						  CStdLocalTimeCall
 ============================================================================ */
 CStdLocalTimeCall::CStdLocalTimeCall(uint32 inTime)
 {
@@ -2985,7 +2989,7 @@ void CStdLocalTimeCall::readEpilogue(std::istream &stream) {
 
 
 /* ============================================================================
-                    CStdSrandCall
+					CStdSrandCall
 ============================================================================ */
 std::string CStdSrandCall::toString()
 {
@@ -3020,7 +3024,7 @@ void CStdSrandCall::readPrologue(std::istream &stream) {
 
 
 /* ============================================================================
-                              CStdRandCall
+							  CStdRandCall
 ============================================================================ */
 std::string CStdRandCall::toString()
 {
@@ -3052,7 +3056,7 @@ void CStdRandCall::readEpilogue(std::istream &stream) {
 
 
 /* ============================================================================
-                  CGameServerLogOffCall
+				  CGameServerLogOffCall
 ============================================================================ */
 std::string CGameServerLogOffCall::toString()
 {
@@ -3075,7 +3079,7 @@ bool CGameServerLogOffCall::compareInputArgs(IEngExtCall* other, bool strict)
 
 
 /* ============================================================================
-                         CSteamGameServerShutdownCall
+						 CSteamGameServerShutdownCall
 ============================================================================ */
 std::string CSteamGameServerShutdownCall::toString()
 {
@@ -3099,7 +3103,7 @@ bool CSteamGameServerShutdownCall::compareInputArgs(IEngExtCall* other, bool str
 
 
 /* ============================================================================
-                   CSteamApiUnregisterCallbackCall
+				   CSteamApiUnregisterCallbackCall
 ============================================================================ */
 CSteamApiUnregisterCallbackCall::CSteamApiUnregisterCallbackCall(int rehldsCallbackId, CCallbackBase* cb)
 {
@@ -3155,7 +3159,7 @@ void CSteamApiUnregisterCallbackCall::readEpilogue(std::istream &stream) {
 
 
 /* ============================================================================
-                  CGameServerBLoggedOnCall
+				  CGameServerBLoggedOnCall
 ============================================================================ */
 std::string CGameServerBLoggedOnCall::toString()
 {
@@ -3220,7 +3224,7 @@ IEngExtCall* IEngExtCallFactory::createByOpcode(ExtCallFuncs opc, void* buf, int
 	case ECF_CLOSE_SOCKET: IEngExtCallFactory_CreateFuncCall(CCloseSocketCall, buf, ptrSize);
 	case ECF_RECVFROM: IEngExtCallFactory_CreateFuncCall(CRecvFromCall, buf, ptrSize);
 	case ECF_SENDTO: IEngExtCallFactory_CreateFuncCall(CSendToCall, buf, ptrSize);
-	case ECF_BIND: IEngExtCallFactory_CreateFuncCall(CBindCall , buf, ptrSize);
+	case ECF_BIND: IEngExtCallFactory_CreateFuncCall(CBindCall, buf, ptrSize);
 	case ECF_GET_SOCK_NAME: IEngExtCallFactory_CreateFuncCall(CGetSockNameCall, buf, ptrSize);
 	case ECF_WSA_GET_LAST_ERROR: IEngExtCallFactory_CreateFuncCall(CWSAGetLastErrorCall, buf, ptrSize);
 
@@ -3263,7 +3267,7 @@ IEngExtCall* IEngExtCallFactory::createByOpcode(ExtCallFuncs opc, void* buf, int
 	case ECF_GS_CREATE_UNAUTH_USER_CONNECTION: IEngExtCallFactory_CreateFuncCall(CGameServerCreateUnauthUserConnectionCall, buf, ptrSize);
 	case ECF_GET_HOST_BY_NAME: IEngExtCallFactory_CreateFuncCall(CGetHostByNameCall, buf, ptrSize);
 	case ECF_GET_HOST_NAME: IEngExtCallFactory_CreateFuncCall(CGetHostNameCall, buf, ptrSize);
-	
+
 	case ECF_GET_PROCESS_TIMES: IEngExtCallFactory_CreateFuncCall(CGetProcessTimesCall, buf, ptrSize);
 	case ECF_GET_SYSTEM_TIME_AS_FILE_TIME: IEngExtCallFactory_CreateFuncCall(CGetSystemTimeAsFileTimeCall, buf, ptrSize);
 
@@ -3279,7 +3283,7 @@ IEngExtCall* IEngExtCallFactory::createByOpcode(ExtCallFuncs opc, void* buf, int
 	case ECF_STEAM_API_UNREGISTER_CALLBACK: IEngExtCallFactory_CreateFuncCall(CSteamApiUnregisterCallbackCall, buf, ptrSize);
 
 	case ECF_GS_BLOGGEDON: IEngExtCallFactory_CreateFuncCall(CGameServerBLoggedOnCall, buf, ptrSize);
-	
+
 
 	default:
 		rehlds_syserror("%s: unknown funccall opcode %d", __FUNCTION__, opc);
