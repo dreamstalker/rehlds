@@ -282,7 +282,7 @@ struct RehldsFuncs_t {
 	bool(*SV_EmitSound2)(edict_t *entity, IGameClient *receiver, int channel, const char *sample, float volume, float attenuation, int flags, int pitch, int emitFlags, const float *pOrigin);
 	void(*SV_UpdateUserInfo)(IGameClient *pGameClient);
 	bool(*StripUnprintableAndSpace)(char *pch);
-	void(*Cmd_RemoveCmd)(char *cmd_name);
+	void(*Cmd_RemoveCmd)(const char *cmd_name);
 };
 
 class IRehldsApi {

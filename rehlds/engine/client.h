@@ -289,7 +289,7 @@ extern cvar_t cl_name;
 extern cvar_t rate_;
 extern cvar_t console;
 
-void CL_RecordHUDCommand(char *cmdname);
+void CL_RecordHUDCommand(const char *cmdname);
 void R_DecalRemoveAll(int textureIndex);
 void CL_CheckForResend(void);
 qboolean CL_CheckFile(sizebuf_t *msg, char *filename);
