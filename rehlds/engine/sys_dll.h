@@ -42,17 +42,12 @@
 #define __LINE__AS_STRING __HACK_LINE_AS_STRING__(__LINE__) //Gives you the line number in constant string form
 
 #if defined _MSC_VER || defined __INTEL_COMPILER
-#define NOXREFCHECK		   __asm { push [ebp + 4] } Sys_Error("[NOXREFCHECK]: " __FUNCTION__ " (" __FILE__ ":" __LINE__AS_STRING") NOXREF, but called from 0x%.08x")
+#define NOXREFCHECK			int __retAddr; __asm { __asm mov eax, [ebp + 4] __asm mov __retAddr, eax }; Sys_Error("[NOXREFCHECK]: %s: (" __FILE__ ":" __LINE__AS_STRING ") NOXREF, but called from 0x%.08x", __FUNCTION__, __retAddr)
 #else
-#define NOXREFCHECK		   const char* noxref_msg = "[NOXREFCHECK]: " __FUNCTION__ " (" __FILE__ ":" __LINE__AS_STRING") NOXREF, but called from 0x%.08x"; \
-						   asm volatile (				\
-								"pushl 4(%%ebp)\n\t"	\
-								"pushl %0\n\t"			\
-								"call $Sys_Error\n\t"	\
-								"addl %%esp, $8\n\t"	\
-								::						\
-								"m" (noxref_msg)			\
-							);
+// For EBP based stack
+#define NOXREFCHECK			int __retAddr; __asm__ __volatile__("movl 4(%%ebp), %%eax;" "movl %%eax, %0":"=r"(__retAddr)::"%eax"); Sys_Error("[NOXREFCHECK]: %s: (" __FILE__ ":" __LINE__AS_STRING ") NOXREF, but called from 0x%.08x", __FUNCTION__, __retAddr);
+// For ESP based stack
+#define NOXREFCHECK			int __retAddr; __asm__ __volatile__("movl 16(%%esp), %%eax;" "movl %%eax, %0":"=r"(__retAddr)::"%eax"); Sys_Error("[NOXREFCHECK]: %s: (" __FILE__ ":" __LINE__AS_STRING ") NOXREF, but called from 0x%.08x", __FUNCTION__, __retAddr);
 #endif
 
 
