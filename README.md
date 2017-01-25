@@ -80,16 +80,26 @@ Help -> About
 icc (ICC) 15.0.1 20141023
 </pre>
 
+####ICC
+<pre>$ gcc --version
+gcc (Debian 4.9.2-10) 4.9.2
+</pre>
+
 ### Building
 On Windows:
 <pre>gradlew --max-workers=1 clean buildRelease</pre>
 * For faster building without unit tests use this:exclamation:
 <pre>gradlew --max-workers=1 clean buildFixes</pre>
 
-On Linux:
+On Linux (ICC):
 <pre>./gradlew --max-workers=1 clean buildRelease</pre>
 * For faster building without unit tests use this:exclamation:
 <pre>./gradlew --max-workers=1 clean buildFixes</pre>
+
+On Linux (GCC):
+<pre>./gradlew --max-workers=1 -PuseGcc clean buildRelease</pre>
+* For faster building without unit tests use this:exclamation:
+<pre>./gradlew --max-workers=1 -PuseGcc clean buildFixes</pre>
 
 Compiled binaries will be placed in the rehlds/build/binaries/ directory
 
