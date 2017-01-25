@@ -92,6 +92,7 @@
 #include <smmintrin.h>
 #include <xmmintrin.h>
 
+
 #ifdef _WIN32 // WINDOWS
 	#define _CRT_SECURE_NO_WARNINGS
 	#define WIN32_LEAN_AND_MEAN
@@ -105,6 +106,10 @@
 	#define ALIGN16 __declspec(align(16))
 	#define NORETURN __declspec(noreturn)
 	#define FORCE_STACK_ALIGN
+
+	#define __builtin_bswap16 _byteswap_ushort
+	#define __builtin_bswap32 _byteswap_ulong
+	#define __builtin_bswap64 _byteswap_uint64
 
 	//inline bool SOCKET_FIONBIO(SOCKET s, int m) { return (ioctlsocket(s, FIONBIO, (u_long*)&m) == 0); }
 	//inline int SOCKET_MSGLEN(SOCKET s, u_long& r) { return ioctlsocket(s, FIONREAD, (u_long*)&r); }
@@ -151,6 +156,12 @@
 	#define ALIGN16 __attribute__((aligned(16)))
 	#define NORETURN __attribute__((noreturn))
 	#define FORCE_STACK_ALIGN __attribute__((force_align_arg_pointer))
+
+#if defined __INTEL_COMPILER
+	#define __builtin_bswap16 _bswap16
+	#define __builtin_bswap32 _bswap
+	#define __builtin_bswap64 _bswap64
+#endif // __INTEL_COMPILER
 
 	//inline bool SOCKET_FIONBIO(SOCKET s, int m) { return (ioctl(s, FIONBIO, (int*)&m) == 0); }
 	//inline int SOCKET_MSGLEN(SOCKET s, u_long& r) { return ioctl(s, FIONREAD, (int*)&r); }

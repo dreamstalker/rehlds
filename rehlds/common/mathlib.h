@@ -65,32 +65,31 @@ typedef union DLONG_u
 #endif
 
 template <typename T>
-inline T min(T a, T b) {
+inline T min(T a, T b)
+{
 	return (a < b) ? a : b;
 }
 
 template <typename T>
-inline T max(T a, T b) {
+inline T max(T a, T b)
+{
 	return (a < b) ? b : a;
 }
 
 template <typename T>
-inline T clamp(T a, T min, T max) {
+inline T clamp(T a, T min, T max)
+{
 	return (a > max) ? max : (a < min) ? min : a;
 }
 
 template <typename T>
-inline T bswap(T s) {
-	switch (sizeof(T)) {
-#ifdef _WIN32
-	case 2: {auto res = _byteswap_ushort(*(uint16 *)&s); return *(T *)&res;}
-	case 4:	{auto res = _byteswap_ulong(*(uint32 *)(&s)); return *(T *)&res;}
-	case 8: {auto res = _byteswap_uint64(*(uint64 *)&s); return *(T *)&res;}
-#else
-	case 2: {auto res = _bswap16(*(uint16 *)&s); return *(T *)&res;}
-	case 4: {auto res = _bswap(*(uint32 *)&s); return *(T *)&res;}
-	case 8: {auto res = _bswap64(*(uint64 *)&s); return *(T *)&res;}
-#endif
+inline T bswap(T s)
+{
+	switch (sizeof(T))
+	{
+	case 2: {auto res = __builtin_bswap16(*(uint16 *)&s); return *(T *)&res; }
+	case 4: {auto res = __builtin_bswap32(*(uint32 *)&s); return *(T *)&res; }
+	case 8: {auto res = __builtin_bswap64(*(uint64 *)&s); return *(T *)&res; }
 	default: return s;
 	}
 }
