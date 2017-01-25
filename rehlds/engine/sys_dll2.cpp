@@ -693,7 +693,7 @@ bool CDedicatedServerAPI::Init_noVirt(char *basedir, char *cmdline, CreateInterf
 
 	g_bIsDedicatedServer = TRUE;
 	TraceInit("FileSystem_Init(basedir, (void *)filesystemFactory)", "FileSystem_Shutdown()", 0);
-	if (FileSystem_Init(basedir, filesystemFactory) && game->Init(0) && eng->Load(true, basedir, cmdline))
+	if (FileSystem_Init(basedir, (void *)filesystemFactory) && game->Init(0) && eng->Load(true, basedir, cmdline))
 	{
 		char text[256];
 		Q_snprintf(text, ARRAYSIZE(text), "exec %s\n", servercfgfile.string);
