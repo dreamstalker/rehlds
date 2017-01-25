@@ -306,7 +306,7 @@ void COM_UngetToken(void);
 char *COM_Parse(char *data);
 char *COM_ParseLine(char *data);
 int COM_TokenWaiting(char *buffer);
-int COM_CheckParm(char *parm);
+int COM_CheckParm(const char *parm);
 void COM_InitArgv(int argc, char *argv[]);
 void COM_Init(char *basedir);
 char *va(char *format, ...);

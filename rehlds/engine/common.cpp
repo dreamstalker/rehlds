@@ -1707,7 +1707,7 @@ int COM_TokenWaiting(char *buffer)
 	return 0;
 }
 
-int COM_CheckParm(char *parm)
+int COM_CheckParm(const char *parm)
 {
 	int i;
 
@@ -2228,7 +2228,7 @@ void COM_StripTrailingSlash(char *ppath)
 void COM_ParseDirectoryFromCmd(const char *pCmdName, char *pDirName, const char *pDefault)
 {
 	const char *pParameter = NULL;
-	int cmdParameterIndex = COM_CheckParm((char *)pCmdName);
+	int cmdParameterIndex = COM_CheckParm(pCmdName);
 
 	if (cmdParameterIndex && cmdParameterIndex < com_argc - 1)
 	{
