@@ -602,7 +602,7 @@ int SV_HullPointContents(hull_t *hull, int num, const vec_t *p)
 	while (i >= 0)
 	{
 		if (hull->firstclipnode > i || hull->lastclipnode < i)
-			Sys_Error(__FUNCTION__ ": bad node number");
+			Sys_Error("%s: bad node number", __FUNCTION__);
 		node = &hull->clipnodes[i];
 		plane = &hull->planes[node->planenum];
 		if (plane->type > 2)
@@ -753,7 +753,7 @@ qboolean SV_RecursiveHullCheck(hull_t *hull, int num, float p1f, float p2f, cons
 	if (num >= 0)
 	{
 		if (num < hull->firstclipnode || num > hull->lastclipnode || !hull->planes)
-			Sys_Error(__FUNCTION__ ": bad node number");
+			Sys_Error("%s: bad node number", __FUNCTION__);
 
 		node = &hull->clipnodes[num];
 		plane = &hull->planes[hull->clipnodes[num].planenum];
@@ -893,7 +893,7 @@ qboolean SV_RecursiveHullCheck(hull_t *hull, int num, float p1f, float p2f, cons
 		pdif = p2f - p1f;
 
 		if (num < hull->firstclipnode || num > hull->lastclipnode || !hull->planes)
-			Sys_Error(__FUNCTION__ ": bad node number");
+			Sys_Error("%s: bad node number", __FUNCTION__);
 
 		node = &hull->clipnodes[num];
 		plane = &hull->planes[hull->clipnodes[num].planenum];

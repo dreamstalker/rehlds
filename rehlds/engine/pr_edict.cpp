@@ -57,9 +57,9 @@ edict_t *ED_Alloc(void)
 	{
 		if (!g_psv.max_edicts)
 		{
-			Sys_Error(__FUNCTION__ ": no edicts yet");
+			Sys_Error("%s: no edicts yet", __FUNCTION__);
 		}
-		Sys_Error(__FUNCTION__ ": no free edicts");
+		Sys_Error("%s: no free edicts", __FUNCTION__);
 	}
 
 	// Use new one
@@ -221,7 +221,7 @@ char *ED_ParseEdict(char *data, edict_t *ent)
 			}
 			if (!data)
 			{
-				Host_Error(__FUNCTION__ ": EOF without closing brace");
+				Host_Error("%s: EOF without closing brace", __FUNCTION__);
 			}
 
 			Q_strncpy(keyname, com_token, ARRAYSIZE(keyname) - 1);
@@ -235,11 +235,11 @@ char *ED_ParseEdict(char *data, edict_t *ent)
 			data = COM_Parse(data);
 			if (!data)
 			{
-				Host_Error(__FUNCTION__ ": EOF without closing brace");
+				Host_Error("%s: EOF without closing brace", __FUNCTION__);
 			}
 			if (com_token[0] == '}')
 			{
-				Host_Error(__FUNCTION__ ": closing brace without data");
+				Host_Error("%s: closing brace without data", __FUNCTION__);
 			}
 
 			if (className != NULL && !Q_strcmp(className, com_token))
@@ -300,7 +300,7 @@ void ED_LoadFromFile(char *data)
 		}
 		if (com_token[0] != '{')
 		{
-			Host_Error(__FUNCTION__ ": found %s when expecting {", com_token);
+			Host_Error("%s: found %s when expecting {", __FUNCTION__, com_token);
 		}
 
 		if (ent)
@@ -353,7 +353,7 @@ edict_t *EDICT_NUM(int n)
 {
 	if (n < 0 || n >= g_psv.max_edicts)
 	{
-		Sys_Error(__FUNCTION__ ": bad number %i", n);
+		Sys_Error("%s: bad number %i", __FUNCTION__, n);
 	}
 	return &g_psv.edicts[n];
 }
@@ -365,7 +365,7 @@ int NUM_FOR_EDICT(const edict_t *e)
 
 	if (b < 0 || b >= g_psv.num_edicts)
 	{
-		Sys_Error(__FUNCTION__ ": bad pointer");
+		Sys_Error("%s: bad pointer", __FUNCTION__);
 	}
 
 	return b;
@@ -397,7 +397,7 @@ bool SuckOutClassname(char *szInputStream, edict_t *pEdict)
 
 			if (kvd.fHandled == FALSE)
 			{
-				Host_Error(__FUNCTION__ ": parse error");
+				Host_Error("%s: parse error", __FUNCTION__);
 			}
 
 			return true;
@@ -424,7 +424,7 @@ bool SuckOutClassname(char *szInputStream, edict_t *pEdict)
 
 		if (kvd.fHandled == FALSE)
 		{
-			Host_Error(__FUNCTION__ ": parse error");
+			Host_Error("%s: parse error", __FUNCTION__);
 		}
 
 		return true;
@@ -525,7 +525,7 @@ int EXT_FUNC IndexOfEdict(const edict_t *pEdict)
 		if (index < 0 || index > g_psv.max_edicts)
 #endif // REHLDS_FIXES
 		{
-			Sys_Error(__FUNCTION__ ": bad entity");
+			Sys_Error("%s: bad entity", __FUNCTION__);
 		}
 	}
 	return index;

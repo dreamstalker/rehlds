@@ -40,7 +40,7 @@ public:
 	IHookChainImpl(void** hooks, origfunc_t orig) : m_Hooks(hooks), m_OriginalFunc(orig)
 	{
 		if (orig == NULL)
-			Sys_Error(__FUNCTION__ ": Non-void HookChain without original function.");
+			Sys_Error("%s: Non-void HookChain without original function.", __FUNCTION__);
 	}
 
 	virtual ~IHookChainImpl() {}

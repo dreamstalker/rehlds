@@ -105,7 +105,7 @@ NOXREF void Host_EndGame(const char *message, ...)
 	Q_vsnprintf(string, sizeof(string), message, argptr);
 	va_end(argptr);
 
-	Con_DPrintf(__FUNCTION__ ": %s\n", string);
+	Con_DPrintf("%s: %s\n", __FUNCTION__, string);
 
 	oldn = g_pcls.demonum;
 
@@ -116,7 +116,7 @@ NOXREF void Host_EndGame(const char *message, ...)
 
 	if (!g_pcls.state)
 	{
-		Sys_Error(__FUNCTION__ ": %s\n", string);
+		Sys_Error("%s: %s\n", __FUNCTION__, string);
 	}
 
 	if (oldn != -1)
@@ -142,7 +142,7 @@ void NORETURN Host_Error(const char *error, ...)
 	va_start(argptr, error);
 
 	if (inerror)
-		Sys_Error(__FUNCTION__ ": recursively entered");
+		Sys_Error("%s: recursively entered", __FUNCTION__);
 
 	inerror = TRUE;
 	SCR_EndLoadingPlaque();
@@ -152,7 +152,7 @@ void NORETURN Host_Error(const char *error, ...)
 	if (g_psv.active && developer.value != 0.0 )
 		CL_WriteMessageHistory(0, 0);
 
-	Con_Printf(__FUNCTION__ ": %s\n", string);
+	Con_Printf("%s: %s\n", __FUNCTION__, string);
 	if (g_psv.active)
 		Host_ShutdownServer(FALSE);
 
@@ -163,7 +163,7 @@ void NORETURN Host_Error(const char *error, ...)
 		inerror = FALSE;
 		longjmp(host_abortserver, 1);
 	}
-	Sys_Error(__FUNCTION__ ": %s\n", string);
+	Sys_Error("%s: %s\n", __FUNCTION__, string);
 }
 
 void Host_InitLocal(void)

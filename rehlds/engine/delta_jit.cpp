@@ -30,7 +30,7 @@ unsigned int DELTAJIT_GetFieldSize(delta_description_t* desc) {
 		return 0;
 
 	default:
-		Sys_Error(__FUNCTION__ ": Unknown delta field type %d", desc->fieldType);
+		Sys_Error("%s: Unknown delta field type %d", __FUNCTION__, desc->fieldType);
 		return 0;
 	}
 }
@@ -56,11 +56,11 @@ void DELTAJIT_CreateDescription(delta_t* delta, deltajitdata_t &jitdesc) {
 
 	// sanity checks & pre-clean
 	if (numMemBlocks > DELTAJIT_MAX_BLOCKS) {
-		Sys_Error(__FUNCTION__ ": numMemBlocks > DELTAJIT_MAX_BLOCKS (%d > %d)", numMemBlocks, DELTAJIT_MAX_BLOCKS);
+		Sys_Error("%s: numMemBlocks > DELTAJIT_MAX_BLOCKS (%d > %d)", __FUNCTION__, numMemBlocks, DELTAJIT_MAX_BLOCKS);
 	}
 
 	if (delta->fieldCount > DELTAJIT_MAX_FIELDS) {
-		Sys_Error(__FUNCTION__ ": fieldCount > DELTAJIT_MAX_FIELDS (%d > %d)", delta->fieldCount, DELTAJIT_MAX_FIELDS);
+		Sys_Error("%s: fieldCount > DELTAJIT_MAX_FIELDS (%d > %d)", __FUNCTION__, delta->fieldCount, DELTAJIT_MAX_FIELDS);
 	}
 
 	Q_memset(&jitdesc, 0, sizeof(jitdesc));

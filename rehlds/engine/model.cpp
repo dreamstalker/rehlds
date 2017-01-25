@@ -68,14 +68,14 @@ void* EXT_FUNC Mod_Extradata(model_t *mod)
 
 	if (mod->type == mod_brush)
 	{
-		Sys_Error(__FUNCTION__ ": called with mod_brush!\n");
+		Sys_Error("%s: called with mod_brush!\n", __FUNCTION__);
 	}
 
 	Mod_LoadModel(mod, 1, 0);
 
 	if (mod->cache.data == NULL)
 	{
-		Sys_Error(__FUNCTION__ ": caching failed");
+		Sys_Error("%s: caching failed", __FUNCTION__);
 	}
 
 	return mod->cache.data;
@@ -88,7 +88,7 @@ mleaf_t *Mod_PointInLeaf(vec_t *p, model_t *model)
 	mplane_t *plane;
 
 	if (!model || !model->nodes)
-		Sys_Error(__FUNCTION__ ": bad model");
+		Sys_Error("%s: bad model", __FUNCTION__);
 
 	node = model->nodes;
 	while (node->contents >= 0)
@@ -1039,7 +1039,7 @@ void Mod_LoadLeafs(lump_t *l)
 
 		if (row < 0 || row > MODEL_MAX_PVS)
 		{
-			Sys_Error(__FUNCTION__ ": oversized loadmodel->numleafs: %i", loadmodel->numleafs);
+			Sys_Error("%s: oversized loadmodel->numleafs: %i", __FUNCTION__, loadmodel->numleafs);
 		}
 	}
 #endif
@@ -1415,7 +1415,7 @@ void *Mod_LoadAliasGroup(void *pin, int *pframeindex, int numv, trivertx_t *pbbo
 		*poutintervals = LittleFloat(pin_intervals->interval);
 
 		if (*poutintervals <= 0.0f)
-			Sys_Error(__FUNCTION__ ": interval<=0");
+			Sys_Error("%s: interval<=0", __FUNCTION__);
 
 		poutintervals++;
 		pin_intervals++;
@@ -1441,7 +1441,7 @@ void *Mod_LoadAliasSkin(void *pin, int *pskinindex, int skinsize, aliashdr_t *ph
 	if (r_pixbytes == 1)
 		Q_memcpy(pskin, pinskin, skinsize);
 	else if (r_pixbytes != 2)
-		Sys_Error(__FUNCTION__ ": driver set invalid r_pixbytes: %d\n", r_pixbytes);
+		Sys_Error("%s: driver set invalid r_pixbytes: %d\n", __FUNCTION__, r_pixbytes);
 
 	return (void *)&pinskin[skinsize];
 }
@@ -1471,7 +1471,7 @@ void *Mod_LoadAliasSkinGroup(void *pin, int *pskinindex, int skinsize, aliashdr_
 		*poutskinintervals = LittleFloat(pinskinintervals->interval);
 
 		if (*poutskinintervals <= 0.0f)
-			Sys_Error(__FUNCTION__ ": interval<=0");
+			Sys_Error("%s: interval<=0", __FUNCTION__);
 
 		poutskinintervals++;
 		pinskinintervals++;
@@ -1564,7 +1564,7 @@ void Mod_LoadAliasModel(model_t *mod, void *buffer)
 	numframes = pmodel->numframes;
 
 	if ((pmodel->skinwidth % 4) != 0)
-		Sys_Error(__FUNCTION__ ": skinwidth not multiple of 4");
+		Sys_Error("%s: skinwidth not multiple of 4", __FUNCTION__);
 
 	pheader->model = (byte *)pmodel - (byte *)pheader;
 
@@ -1572,7 +1572,7 @@ void Mod_LoadAliasModel(model_t *mod, void *buffer)
 	skinsize = pmodel->skinwidth * pmodel->skinheight;
 
 	if (numskins < 1)
-		Sys_Error(__FUNCTION__ ": Invalid # of skins: %d\n", numskins);
+		Sys_Error("%s: Invalid # of skins: %d\n", __FUNCTION__, numskins);
 
 	pskintype = (daliasskintype_t *)(pinmodel + 1);
 	pskindesc = (maliasskindesc_t *)Hunk_AllocName(sizeof(maliasskindesc_t) * numskins, loadname);
@@ -1619,7 +1619,7 @@ void Mod_LoadAliasModel(model_t *mod, void *buffer)
 
 	// load the frames
 	if (numframes < 1)
-		Sys_Error(__FUNCTION__ ": Invalid # of frames: %d\n", numframes);
+		Sys_Error("%s: Invalid # of frames: %d\n", __FUNCTION__, numframes);
 
 	pframetype = (daliasframetype_t *)(pintriangles + pmodel->numtris);
 	for (i = 0; i < numframes; i++)
@@ -1747,7 +1747,7 @@ void *Mod_LoadSpriteGroup(void *pin, mspriteframe_t **ppframe)
 	{
 		*poutintervals = LittleFloat(pin_intervals->interval);
 		if (*poutintervals <= 0.0f)
-			Sys_Error(__FUNCTION__ ": interval<=0");
+			Sys_Error("%s: interval<=0", __FUNCTION__);
 
 		poutintervals++;
 		pin_intervals++;
@@ -1815,7 +1815,7 @@ void Mod_LoadSpriteModel(model_t *mod, void *buffer)
 	// load the frames
 	//
 	if (numframes < 1)
-		Sys_Error(__FUNCTION__ ": Invalid # of frames: %d\n", numframes);
+		Sys_Error("%s: Invalid # of frames: %d\n", __FUNCTION__, numframes);
 
 	mod->numframes = numframes;
 	mod->flags = 0;
@@ -1914,7 +1914,7 @@ model_t *Mod_Handle(int modelindex)
 {
 #ifdef REHLDS_FIXES
 	if (modelindex < 0 || modelindex > MAX_MODELS - 1) {
-		Sys_Error(__FUNCTION__ ": bad modelindex #%i\n", modelindex);
+		Sys_Error("%s: bad modelindex #%i\n", __FUNCTION__, modelindex);
 	}
 #endif
 

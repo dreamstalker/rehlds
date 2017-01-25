@@ -63,7 +63,7 @@ void Cbuf_AddText(char *text)
 
 	if (cmd_text.cursize + len >= cmd_text.maxsize)
 	{
-		Con_Printf(__FUNCTION__ ": overflow\n");
+		Con_Printf("%s: overflow\n", __FUNCTION__);
 		return;
 	}
 
@@ -81,7 +81,7 @@ void Cbuf_InsertText(char *text)
 
 	if (cmd_text.cursize + addLen >= cmd_text.maxsize)
 	{
-		Con_Printf(__FUNCTION__ ": overflow\n");
+		Con_Printf("%s: overflow\n", __FUNCTION__);
 		return;
 	}
 
@@ -119,7 +119,7 @@ void Cbuf_InsertTextLines(char *text)
 
 	if (cmd_text.cursize + addLen + 2 >= cmd_text.maxsize)
 	{
-		Con_Printf(__FUNCTION__ ": overflow\n");
+		Con_Printf("%s: overflow\n", __FUNCTION__);
 		return;
 	}
 
@@ -721,20 +721,20 @@ void Cmd_AddCommand(char *cmd_name, xcommand_t function)
 
 	if (host_initialized)
 	{
-		Sys_Error(__FUNCTION__ ": called after host_initialized");
+		Sys_Error("%s: called after host_initialized", __FUNCTION__);
 	}
 
 	// Check in variables list
 	if (Cvar_FindVar(cmd_name) != NULL)
 	{
-		Con_Printf(__FUNCTION__ ": \"%s\" already defined as a var\n", cmd_name);
+		Con_Printf("%s: \"%s\" already defined as a var\n", __FUNCTION__, cmd_name);
 		return;
 	}
 
 	// Check if this command is already defined
 	if (Cmd_Exists(cmd_name))
 	{
-		Con_Printf(__FUNCTION__ ": \"%s\" already defined\n", cmd_name);
+		Con_Printf("%s: \"%s\" already defined\n", __FUNCTION__, cmd_name);
 		return;
 	}
 
@@ -755,14 +755,14 @@ void Cmd_AddMallocCommand(char *cmd_name, xcommand_t function, int flag)
 	// Check in variables list
 	if (Cvar_FindVar(cmd_name) != NULL)
 	{
-		Con_Printf(__FUNCTION__ ": \"%s\" already defined as a var\n", cmd_name);
+		Con_Printf("%s: \"%s\" already defined as a var\n", __FUNCTION__, cmd_name);
 		return;
 	}
 
 	// Check if this command is already defined
 	if (Cmd_Exists(cmd_name))
 	{
-		Con_Printf(__FUNCTION__ ": \"%s\" already defined\n", cmd_name);
+		Con_Printf("%s: \"%s\" already defined\n", __FUNCTION__, cmd_name);
 		return;
 	}
 
@@ -1010,7 +1010,7 @@ qboolean Cmd_ForwardToServerInternal(sizebuf_t *pBuf)
 	char tempData[4096];
 	sizebuf_t tempBuf;
 
-	tempBuf.buffername = __FUNCTION__ "::tempBuf";
+	tempBuf.buffername = "Cmd_ForwardToServerInternal::tempBuf";
 	tempBuf.data = (byte *)tempData;
 	tempBuf.maxsize = 4096;
 	tempBuf.cursize = 0;
@@ -1061,7 +1061,7 @@ NOXREF int Cmd_CheckParm(char *parm)
 
 	if (!parm)
 	{
-		Sys_Error(__FUNCTION__ ": NULL");
+		Sys_Error("%s: NULL", __FUNCTION__);
 	}
 
 	int c = Cmd_Argc();

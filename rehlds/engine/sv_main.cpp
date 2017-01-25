@@ -327,7 +327,7 @@ delta_t *SV_LookupDelta(char *name)
 		p = p->next;
 	}
 
-	Sys_Error(__FUNCTION__ ": Couldn't find delta for %s\n", name);
+	Sys_Error("%s: Couldn't find delta for %s\n", __FUNCTION__, name);
 
 	return NULL;
 }
@@ -423,7 +423,7 @@ void SV_ReallocateDynamicData(void)
 {
 	if (!g_psv.max_edicts)
 	{
-		Con_DPrintf(__FUNCTION__ ": sv.max_edicts == 0\n");
+		Con_DPrintf("%s: sv.max_edicts == 0\n", __FUNCTION__);
 		return;
 	}
 
@@ -784,22 +784,22 @@ qboolean SV_BuildSoundMsg(edict_t *entity, int channel, const char *sample, int 
 
 	if (volume < 0 || volume > 255)
 	{
-		Con_Printf(__FUNCTION__ ": volume = %i", volume);
+		Con_Printf("%s: volume = %i", __FUNCTION__, volume);
 		volume = (volume < 0) ? 0 : 255;
 	}
 	if (attenuation < 0.0f || attenuation > 4.0f)
 	{
-		Con_Printf(__FUNCTION__ ": attenuation = %f", attenuation);
+		Con_Printf("%s: attenuation = %f", __FUNCTION__, attenuation);
 		attenuation = (attenuation < 0.0f) ? 0.0f : 4.0f;
 	}
 	if (channel < 0 || channel > 7)
 	{
-		Con_Printf(__FUNCTION__ ": channel = %i", channel);
+		Con_Printf("%s: channel = %i", __FUNCTION__, channel);
 		channel = (channel < 0) ? CHAN_AUTO : CHAN_NETWORKVOICE_BASE;
 	}
 	if (pitch < 0 || pitch > 255)
 	{
-		Con_Printf(__FUNCTION__ ": pitch = %i", pitch);
+		Con_Printf("%s: pitch = %i", __FUNCTION__, pitch);
 		pitch = (pitch < 0) ? 0 : 255;
 	}
 
@@ -811,7 +811,7 @@ qboolean SV_BuildSoundMsg(edict_t *entity, int channel, const char *sample, int 
 		sound_num = Q_atoi(sample + 1);
 		if (sound_num >= CVOXFILESENTENCEMAX)
 		{
-			Con_Printf(__FUNCTION__ ": invalid sentence number: %s", sample + 1);
+			Con_Printf("%s: invalid sentence number: %s", __FUNCTION__, sample + 1);
 			return FALSE;
 		}
 	}
@@ -825,7 +825,7 @@ qboolean SV_BuildSoundMsg(edict_t *entity, int channel, const char *sample, int 
 		sound_num = SV_LookupSoundIndex(sample);
 		if (!sound_num || !g_psv.sound_precache[sound_num])
 		{
-			Con_Printf(__FUNCTION__ ": %s not precached (%d)\n", sample, sound_num);
+			Con_Printf("%s: %s not precached (%d)\n", __FUNCTION__, sample, sound_num);
 			return FALSE;
 		}
 	}
@@ -934,7 +934,7 @@ void SV_AddSampleToHashedLookupTable(const char *pszSample, int iSampleIndex)
 			index = 0;
 
 		if (index == starting_index)
-			Sys_Error(__FUNCTION__ ": NO FREE SLOTS IN SOUND LOOKUP TABLE");
+			Sys_Error("%s: NO FREE SLOTS IN SOUND LOOKUP TABLE", __FUNCTION__);
 	}
 
 	g_psv.sound_precache_hashedlookup[index] = iSampleIndex;
@@ -1857,7 +1857,7 @@ int EXT_FUNC SV_CheckProtocol_internal(netadr_t *adr, int nProtocol)
 {
 	if (adr == NULL)
 	{
-		Sys_Error(__FUNCTION__ ":  Null address\n");
+		Sys_Error("%s:  Null address\n", __FUNCTION__);
 	}
 
 	if (nProtocol == PROTOCOL_VERSION)
@@ -1910,7 +1910,7 @@ bool EXT_FUNC SV_CheckChallenge_api(const netadr_t &adr, int nChallengeValue) {
 int SV_CheckChallenge(netadr_t *adr, int nChallengeValue)
 {
 	if (!adr)
-		Sys_Error(__FUNCTION__ ":  Null address\n");
+		Sys_Error("%s:  Null address\n", __FUNCTION__);
 
 	if (NET_IsLocalAddress(*adr))
 		return 1;
@@ -6463,7 +6463,7 @@ void SV_BanId_f(void)
 		}
 		if (id == NULL)
 		{
-			Con_Printf(__FUNCTION__ ":  Couldn't find #userid %u\n", search);
+			Con_Printf("%s:  Couldn't find #userid %u\n", __FUNCTION__, search);
 			return;
 		}
 	}
@@ -6492,7 +6492,7 @@ void SV_BanId_f(void)
 
 		if (id == NULL)
 		{
-			Con_Printf(__FUNCTION__ ":  Couldn't resolve uniqueid %s.\n", idstring);
+			Con_Printf("%s:  Couldn't resolve uniqueid %s.\n", __FUNCTION__, idstring);
 			Con_Printf("Usage:  banid <minutes> <uniqueid or #userid> { kick }\n");
 			Con_Printf("Use 0 minutes for permanent\n");
 			return;
@@ -6510,7 +6510,7 @@ void SV_BanId_f(void)
 	{
 		if (numuserfilters >= MAX_USERFILTERS)
 		{
-			Con_Printf(__FUNCTION__ ":  User filter list is full\n");
+			Con_Printf("%s:  User filter list is full\n", __FUNCTION__);
 			return;
 		}
 		numuserfilters++;
@@ -6797,7 +6797,7 @@ void SV_RemoveId_f(void)
 
 	if (!idstring[0])
 	{
-		Con_Printf(__FUNCTION__ ":  Id string is empty!\n");
+		Con_Printf("%s:  Id string is empty!\n", __FUNCTION__);
 		return;
 	}
 
@@ -6806,7 +6806,7 @@ void SV_RemoveId_f(void)
 		int slot = Q_atoi(&idstring[1]);
 		if (slot <= 0 || slot > numuserfilters)
 		{
-			Con_Printf(__FUNCTION__ ":  invalid slot #%i\n", slot);
+			Con_Printf("%s:  invalid slot #%i\n", __FUNCTION__, slot);
 			return;
 		}
 		slot--;

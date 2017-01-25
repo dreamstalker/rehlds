@@ -651,7 +651,7 @@ void MSG_WriteBitAngle(float fAngle, int numbits)
 {
 	if (numbits >= 32)
 	{
-		Sys_Error(__FUNCTION__ ": Can't write bit angle with 32 bits precision\n");
+		Sys_Error("%s: Can't write bit angle with 32 bits precision\n", __FUNCTION__);
 	}
 
 	uint32 shift = (1 << numbits);
@@ -759,7 +759,7 @@ uint32 MSG_ReadBits(int numbits)
 
 #ifdef REHLDS_FIXES
 	if (numbits > 32) {
-		Sys_Error(__FUNCTION__ ": invalid numbits %d\n", numbits);
+		Sys_Error("%s: invalid numbits %d\n", __FUNCTION__, numbits);
 	}
 #endif // REHLDS_FIXES
 
@@ -1243,7 +1243,7 @@ void *EXT_FUNC SZ_GetSpace(sizebuf_t *buf, int length)
 
 	if (length < 0)
 	{
-		Sys_Error(__FUNCTION__ ": %i negative length on %s", length, buffername);
+		Sys_Error("%s: %i negative length on %s", __FUNCTION__, length, buffername);
 	}
 
 	if (buf->cursize + length > buf->maxsize)
@@ -1253,32 +1253,32 @@ void *EXT_FUNC SZ_GetSpace(sizebuf_t *buf, int length)
 		{
 			if (!buf->maxsize)
 			{
-				Sys_Error(__FUNCTION__ ": tried to write to an uninitialized sizebuf_t: %s", buffername);
+				Sys_Error("%s: tried to write to an uninitialized sizebuf_t: %s", __FUNCTION__, buffername);
 			}
 			else if (length > buf->maxsize)
 			{
-				Sys_Error(__FUNCTION__ ": %i is > full buffer size on %s", length, buffername);
+				Sys_Error("%s: %i is > full buffer size on %s", __FUNCTION__, length, buffername);
 			}
 			else
 			{
-				Sys_Error(__FUNCTION__ ": overflow without FSB_ALLOWOVERFLOW set on %s", buffername);
+				Sys_Error("%s: overflow without FSB_ALLOWOVERFLOW set on %s", __FUNCTION__, buffername);
 			}
 		}
 
 		if (length > buf->maxsize)
 		{
-			Con_DPrintf(__FUNCTION__ ": %i is > full buffer size on %s, ignoring", length, buffername);
+			Con_DPrintf("%s: %i is > full buffer size on %s, ignoring", __FUNCTION__, length, buffername);
 		}
 #else // REHLDS_FIXES
 		if (!(buf->flags & SIZEBUF_ALLOW_OVERFLOW))
 		{
 			if (!buf->maxsize)
 			{
-				Sys_Error(__FUNCTION__ ": Tried to write to an uninitialized sizebuf_t: %s", buffername);
+				Sys_Error("%s: Tried to write to an uninitialized sizebuf_t: %s", __FUNCTION__, buffername);
 			}
 			else
 			{
-				Sys_Error(__FUNCTION__ ": overflow without FSB_ALLOWOVERFLOW set on %s", buffername);
+				Sys_Error("%s: overflow without FSB_ALLOWOVERFLOW set on %s", __FUNCTION__, buffername);
 			}
 		}
 
@@ -1286,14 +1286,14 @@ void *EXT_FUNC SZ_GetSpace(sizebuf_t *buf, int length)
 		{
 			if (!(buf->flags & SIZEBUF_ALLOW_OVERFLOW))
 			{
-				Sys_Error(__FUNCTION__ ": %i is > full buffer size on %s", length, buffername);
+				Sys_Error("%s: %i is > full buffer size on %s", __FUNCTION__, length, buffername);
 			}
 
-			Con_DPrintf(__FUNCTION__ ": %i is > full buffer size on %s, ignoring", length, buffername);
+			Con_DPrintf("%s: %i is > full buffer size on %s, ignoring", __FUNCTION__, length, buffername);
 		}
 #endif // REHLDS_FIXES
 
-		Con_Printf(__FUNCTION__ ": overflow on %s\n", buffername);
+		Con_Printf("%s: overflow on %s\n", __FUNCTION__, buffername);
 
 		SZ_Clear(buf);
 		buf->flags |= SIZEBUF_OVERFLOWED;
@@ -1874,13 +1874,13 @@ NOXREF void COM_WriteFile(char *filename, void *data, int len)
 
 	if (fp)
 	{
-		Sys_Printf(__FUNCTION__ ": %s\n", path);
+		Sys_Printf("%s: %s\n", __FUNCTION__, path);
 		FS_Write(data, len, 1, fp);
 		FS_Close(fp);
 	}
 	else
 	{
-		Sys_Printf(__FUNCTION__ ": failed on %s\n", path);
+		Sys_Printf("%s: failed on %s\n", __FUNCTION__, path);
 	}
 }
 
@@ -2050,7 +2050,7 @@ unsigned char* EXT_FUNC COM_LoadFile(const char *path, int usehunk, int *pLength
 #ifdef REHLDS_FIXES
 		FS_Close(hFile);
 #endif
-		Sys_Error(__FUNCTION__ ": bad usehunk");
+		Sys_Error("%s: bad usehunk", __FUNCTION__);
 	}
 
 	if (!buf)
@@ -2058,7 +2058,7 @@ unsigned char* EXT_FUNC COM_LoadFile(const char *path, int usehunk, int *pLength
 #ifdef REHLDS_FIXES
 		FS_Close(hFile);
 #endif
-		Sys_Error(__FUNCTION__ ": not enough space for %s", path);
+		Sys_Error("%s: not enough space for %s", __FUNCTION__, path);
 	}
 
 	FS_Read(buf, len, 1, hFile);
@@ -2129,7 +2129,7 @@ NOXREF unsigned char *COM_LoadFileLimit(char *path, int pos, int cbmax, int *pcb
 #ifdef REHLDS_FIXES
 		FS_Close(hFile);
 #endif
-		Sys_Error(__FUNCTION__ ": invalid seek position for %s", path);
+		Sys_Error("%s: invalid seek position for %s", __FUNCTION__, path);
 	}
 
 	FS_Seek(hFile, pos, FILESYSTEM_SEEK_HEAD);
@@ -2152,7 +2152,7 @@ NOXREF unsigned char *COM_LoadFileLimit(char *path, int pos, int cbmax, int *pcb
 #ifdef REHLDS_FIXES
 			FS_Close(hFile);
 #endif
-			Sys_Error(__FUNCTION__ ": not enough space for %s", path);
+			Sys_Error("%s: not enough space for %s", __FUNCTION__, path);
 		}
 
 		FS_Close(hFile);

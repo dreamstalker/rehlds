@@ -725,7 +725,7 @@ qboolean Draw_ValidateCustomLogo(cachewad_t *wad, unsigned char *data, lumpinfo_
 
 	if (wad->cacheExtra != DECAL_EXTRASIZE)
 	{
-		Con_Printf(__FUNCTION__ ": Bad cached wad %s\n", wad->name);
+		Con_Printf("%s: Bad cached wad %s\n", __FUNCTION__, wad->name);
 		return FALSE;
 	}
 
@@ -754,20 +754,20 @@ qboolean Draw_ValidateCustomLogo(cachewad_t *wad, unsigned char *data, lumpinfo_
 		|| (tmp.offsets[0] + pix != tmp.offsets[1])
 		|| paloffset != tmp.offsets[2] || palettesize != tmp.offsets[3])
 	{
-		Con_Printf(__FUNCTION__ ": Bad cached wad %s\n", wad->name);
+		Con_Printf("%s: Bad cached wad %s\n", __FUNCTION__, wad->name);
 		return FALSE;
 	}
 
 	if (nPalleteCount > 256)
 	{
-		Con_Printf(__FUNCTION__ ": Bad cached wad palette size %i on %s\n", nPalleteCount, wad->name);
+		Con_Printf("%s: Bad cached wad palette size %i on %s\n", __FUNCTION__, nPalleteCount, wad->name);
 		return FALSE;
 	}
 
 	nSize = pixoffset + LittleLong(tmp.offsets[0]) + 3 * nPalleteCount + 2;
 	if (nSize > lump->disksize)
 	{
-		Con_Printf(__FUNCTION__ ": Bad cached wad %s\n", wad->name);
+		Con_Printf("%s: Bad cached wad %s\n", __FUNCTION__, wad->name);
 		return FALSE;
 	}
 

@@ -422,7 +422,7 @@ void HPAK_RemoveLump(char *pakname, resource_t *pResource)
 
 	if (pakname == NULL || *pakname == '\0' || pResource == NULL)
 	{
-		Con_Printf(__FUNCTION__ ":  Invalid arguments\n");
+		Con_Printf("%s:  Invalid arguments\n", __FUNCTION__);
 		return;
 	}
 	HPAK_FlushHostQueue();

@@ -54,7 +54,7 @@ unsigned char *Mod_DecompressVis(unsigned char *in, model_t *model)
 
 	if (row < 0 || row > MODEL_MAX_PVS)
 	{
-		Sys_Error(__FUNCTION__ ": oversized model->numleafs: %i", model->numleafs);
+		Sys_Error("%s: oversized model->numleafs: %i", __FUNCTION__, model->numleafs);
 	}
 
 	CM_DecompressPVS(in, decompressed, row);

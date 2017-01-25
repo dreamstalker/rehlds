@@ -98,19 +98,19 @@ void Z_Free(void *ptr)
 {
 	if (!ptr)
 	{
-		Sys_Error(__FUNCTION__ ": NULL pointer");
+		Sys_Error("%s: NULL pointer", __FUNCTION__);
 	}
 
 	memblock_t *block = (memblock_t *)((char *)ptr - sizeof(memblock_t));
 
 	if (block->id != ZONEID)
 	{
-		Sys_Error(__FUNCTION__ ": freed a pointer without ZONEID");
+		Sys_Error("%s: freed a pointer without ZONEID", __FUNCTION__);
 	}
 
 	if (!block->tag)
 	{
-		Sys_Error(__FUNCTION__ ": freed a freed pointer");
+		Sys_Error("%s: freed a freed pointer", __FUNCTION__);
 	}
 
 	block->tag = 0;
@@ -154,7 +154,7 @@ void *Z_Malloc(int size)
 
 	if (!buf)
 	{
-		Sys_Error(__FUNCTION__ ": failed on allocation of %i bytes", size);
+		Sys_Error("%s: failed on allocation of %i bytes", __FUNCTION__, size);
 	}
 
 	Q_memset(buf, 0, size);
@@ -168,7 +168,7 @@ void *Z_TagMalloc(int size, int tag)
 
 	if (tag == 0)
 	{
-		Sys_Error(__FUNCTION__ ": tried to use a 0 tag");
+		Sys_Error("%s: tried to use a 0 tag", __FUNCTION__);
 	}
 
 	size += sizeof(memblock_t);
@@ -266,17 +266,17 @@ void Z_CheckHeap(void)
 
 		if ((byte *)block + block->size != (byte *)block->next)
 		{
-			Sys_Error(__FUNCTION__ ": block size does not touch the next block\n");
+			Sys_Error("%s: block size does not touch the next block\n", __FUNCTION__);
 		}
 
 		if (block->next->prev != block)
 		{
-			Sys_Error(__FUNCTION__ ": next block doesn't have proper back link\n");
+			Sys_Error("%s: next block doesn't have proper back link\n", __FUNCTION__);
 		}
 
 		if (!block->tag && !block->next->tag)
 		{
-			Sys_Error(__FUNCTION__ ": two consecutive free blocks\n");
+			Sys_Error("%s: two consecutive free blocks\n", __FUNCTION__);
 		}
 	}
 }
@@ -320,12 +320,12 @@ void Hunk_Check(void)
 	{
 		if (h->sentinel != HUNK_SENTINEL)
 		{
-			Sys_Error(__FUNCTION__ ": trahsed sentinel");
+			Sys_Error("%s: trahsed sentinel", __FUNCTION__);
 		}
 
 		if (h->size < 16 || h->size + (byte *)h - hunk_base > hunk_size)
 		{
-			Sys_Error(__FUNCTION__ ": bad size");
+			Sys_Error("%s: bad size", __FUNCTION__);
 		}
 	}
 }
@@ -384,9 +384,9 @@ NOXREF void Hunk_Print(qboolean all)
 		// run consistancy checks
 		//
 		if (h->sentinel != HUNK_SENTINEL)
-			Sys_Error(__FUNCTION__ ": trahsed sentinal");
+			Sys_Error("%s: trahsed sentinal", __FUNCTION__);
 		if (h->size < 16 || h->size + (byte *)h - hunk_base > hunk_size)
-			Sys_Error(__FUNCTION__ ": bad size");
+			Sys_Error("%s: bad size", __FUNCTION__);
 
 		next = (hunk_t *)((byte *)h + h->size);
 		count++;
@@ -429,14 +429,14 @@ void *Hunk_AllocName(int size, const char *name)
 {
 	if (size < 0)
 	{
-		Sys_Error(__FUNCTION__ ": bad size: %i", size);
+		Sys_Error("%s: bad size: %i", __FUNCTION__, size);
 	}
 
 	int totalsize = ((size + 15) & ~15) + sizeof(hunk_t);
 
 	if (hunk_size - hunk_high_used - hunk_low_used < totalsize)
 	{
-		Sys_Error(__FUNCTION__ ": failed on %i bytes", totalsize);
+		Sys_Error("%s: failed on %i bytes", __FUNCTION__, totalsize);
 	}
 
 	hunk_t *h = (hunk_t *)(hunk_base + hunk_low_used);
@@ -467,7 +467,7 @@ void Hunk_FreeToLowMark(int mark)
 {
 	if (mark < 0 || mark > hunk_low_used)
 	{
-		Sys_Error(__FUNCTION__ ": bad mark %i", mark);
+		Sys_Error("%s: bad mark %i", __FUNCTION__, mark);
 	}
 
 	hunk_low_used = mark;
@@ -494,7 +494,7 @@ void Hunk_FreeToHighMark(int mark)
 
 	if (mark < 0 || mark > hunk_high_used)
 	{
-		Sys_Error(__FUNCTION__ ": bad mark %i", mark);
+		Sys_Error("%s: bad mark %i", __FUNCTION__, mark);
 	}
 
 	hunk_high_used = mark;
@@ -511,7 +511,7 @@ void *Hunk_HighAllocName(int size, const char *name)
 	hunk_t *h;
 	if (size < 0)
 	{
-		Sys_Error(__FUNCTION__ ": bad size: %i", size);
+		Sys_Error("%s: bad size: %i", __FUNCTION__, size);
 	}
 
 	if (hunk_tempactive)
@@ -524,7 +524,7 @@ void *Hunk_HighAllocName(int size, const char *name)
 
 	if (hunk_size - hunk_high_used - hunk_low_used < size)
 	{
-		Con_Printf(__FUNCTION__ ": failed on %i bytes\n", size);
+		Con_Printf("%s: failed on %i bytes\n", __FUNCTION__, size);
 		return 0;
 	}
 
@@ -675,7 +675,7 @@ void Cache_UnlinkLRU(cache_system_t *cs)
 {
 	if (!cs->lru_next || !cs->lru_prev)
 	{
-		Sys_Error(__FUNCTION__ ": NULL link");
+		Sys_Error("%s: NULL link", __FUNCTION__);
 	}
 
 	cs->lru_next->lru_prev = cs->lru_prev;
@@ -687,7 +687,7 @@ void Cache_MakeLRU(cache_system_t *cs)
 {
 	if (cs->lru_next || cs->lru_prev)
 	{
-		Sys_Error(__FUNCTION__ ": active link");
+		Sys_Error("%s: active link", __FUNCTION__);
 	}
 
 	cache_head.lru_next->lru_prev = cs;
@@ -714,7 +714,7 @@ cache_system_t *Cache_TryAlloc(int size, qboolean nobottom)
 	{
 		if (hunk_size - hunk_low_used - hunk_high_used < size)
 		{
-			Sys_Error(__FUNCTION__ ": %i is greater then free hunk", size);
+			Sys_Error("%s: %i is greater then free hunk", __FUNCTION__, size);
 		}
 
 		newmem = (cache_system_t *)(hunk_base + hunk_low_used);
@@ -955,7 +955,7 @@ void Cache_Free(cache_user_t *c)
 {
 	if (!c->data)
 	{
-		Sys_Error(__FUNCTION__ ": not allocated");
+		Sys_Error("%s: not allocated", __FUNCTION__);
 	}
 
 	cache_system_t *cs = ((cache_system_t *)c->data - 1);
@@ -1012,12 +1012,12 @@ void *Cache_Alloc(cache_user_t *c, int size, char *name)
 
 	if (c->data)
 	{
-		Sys_Error(__FUNCTION__ ": already allocated");
+		Sys_Error("%s: already allocated", __FUNCTION__);
 	}
 
 	if (size <= 0)
 	{
-		Sys_Error(__FUNCTION__ ": size %i", size);
+		Sys_Error("%s: size %i", __FUNCTION__, size);
 	}
 
 	while (true)
@@ -1036,7 +1036,7 @@ void *Cache_Alloc(cache_user_t *c, int size, char *name)
 
 		if (cache_head.lru_prev == &cache_head)
 		{
-			Sys_Error(__FUNCTION__ ": out of memory");
+			Sys_Error("%s: out of memory", __FUNCTION__);
 		}
 
 		Cache_Free(cache_head.lru_prev->user);
@@ -1072,7 +1072,7 @@ void Memory_Init(void *buf, int size)
 		}
 		else
 		{
-			Sys_Error(__FUNCTION__ ": you must specify a size in KB after -zone");
+			Sys_Error("%s: you must specify a size in KB after -zone", __FUNCTION__);
 		}
 	}
 

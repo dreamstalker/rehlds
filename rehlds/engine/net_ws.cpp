@@ -589,7 +589,7 @@ void NET_TransferRawData(sizebuf_t *msg, unsigned char *pStart, int nSize)
 #ifdef REHLDS_CHECKS
 	if (msg->maxsize < nSize)
 	{
-		Sys_Error(__FUNCTION__ ": data size is bigger than sizebuf maxsize");
+		Sys_Error("%s: data size is bigger than sizebuf maxsize", __FUNCTION__);
 	}
 #endif // REHLDS_CHECKS
 	Q_memcpy(msg->data, pStart, nSize);
@@ -638,7 +638,7 @@ void NET_SendLoopPacket(netsrc_t sock, int length, void *data, const netadr_t& t
 #ifdef REHLDS_CHECKS
 	if (sizeof(loop->msgs[i].data) < length)
 	{
-		Sys_Error(__FUNCTION__ ": data size is bigger than message storage size");
+		Sys_Error("%s: data size is bigger than message storage size", __FUNCTION__);
 	}
 #endif // REHLDS_CHECKS
 
@@ -1466,7 +1466,7 @@ void NET_SendPacket(netsrc_t sock, int length, void *data, const netadr_t& to)
 #endif // _WIN32
 	else
 	{
-		Sys_Error(__FUNCTION__ ": bad address type");
+		Sys_Error("%s: bad address type", __FUNCTION__);
 	}
 
 	NetadrToSockadr(&to, &addr);
@@ -1494,17 +1494,17 @@ void NET_SendPacket(netsrc_t sock, int length, void *data, const netadr_t& to)
 		// let dedicated servers continue after errors
 		if (g_pcls.state == ca_dedicated)
 		{
-			Con_Printf(__FUNCTION__ ": ERROR: %s\n", NET_ErrorString(err));
+			Con_Printf("%s: ERROR: %s\n", __FUNCTION__, NET_ErrorString(err));
 		}
 		else
 		{
 			if (err == WSAEADDRNOTAVAIL || err == WSAENOBUFS)
 			{
-				Con_DPrintf(__FUNCTION__ ": Warning: %s : %s\n", NET_ErrorString(err), NET_AdrToString(to));
+				Con_DPrintf("%s: Warning: %s : %s\n", __FUNCTION__, NET_ErrorString(err), NET_AdrToString(to));
 			}
 			else
 			{
-				Sys_Error(__FUNCTION__ ": ERROR: %s\n", NET_ErrorString(err));
+				Sys_Error("%s: ERROR: %s\n", __FUNCTION__, NET_ErrorString(err));
 			}
 		}
 	}
