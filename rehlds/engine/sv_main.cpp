@@ -470,6 +470,7 @@ qboolean SV_IsPlayerIndex(int index)
 	return (index >= 1 && index <= g_psvs.maxclients);
 }
 
+#ifdef _WIN32
 qboolean __declspec(naked) SV_IsPlayerIndex_wrapped(int index)
 {
 	// Original SV_IsPlayerIndex in swds.dll doesn't modify ecx nor edx.
@@ -488,6 +489,12 @@ qboolean __declspec(naked) SV_IsPlayerIndex_wrapped(int index)
 		retn;
 	}
 }
+#else // _WIN32
+qboolean SV_IsPlayerIndex_wrapped(int index)
+{
+	return SV_IsPlayerIndex(index);
+}
+#endif // _WIN32
 
 void SV_ClearPacketEntities(client_frame_t *frame)
 {
@@ -5428,38 +5435,6 @@ void EXT_FUNC SV_WriteVoiceCodec_internal(sizebuf_t *pBuf)
 	MSG_WriteByte(pBuf, 0);
 }
 
-/*
- * Interface between engine and gamedll has a flaw which can lead to inconsistent behavior when passing arguments of type vec3_t to gamedll
- * Consider function func(vec3_t v) defined in gamedll. vec3_t defined in gamedll as a class (not array), therefore it's expected that all vector components (12 bytes) will be written in the stack,
- * i.e. the function signature may be represented as func(float v_0, float v_1, float v_2).
- * In the engine, on the other hand, vec3_t is an array of vec_t (vec_t[3]). C/C++ compiler treats arguments of array type as pointers to array's first element, thus, on attempt to
- * invoke gamedll's func(vec3_t v) from engine, only pointer to first vector's element will be passed in stack, while gamedll expects all 3 vector elements.
- * This inconsistency in the interface between gamedll and engine leads to exposure of some data from stack of caller function to vector's elements in gamedll, which, in turn,
- * leads to inconsistent behavior (since stack data may contain pointers) across different systems
- *
- * This functions emulates swds.dll behavior, i.e. it sends the same garbage when invoking CreateBaseline as swds.dll does.
- * This is required since not emulating this behavior will break rehlds test demos
- */
-void __invokeValvesBuggedCreateBaseline(void* func, int player, int eindex, struct entity_state_s *baseline, struct edict_s *entity, int playermodelindex, vec_t* pmins, vec_t* pmaxs)
-{
-	__asm {
-		mov ecx, func
-		push 0
-		push 1
-		push 0
-		push 0
-		push pmaxs
-		push pmins
-		push playermodelindex
-		push entity
-		push baseline
-		push eindex
-		push player
-		call ecx
-		add esp, 0x2C
-	}
-}
-
 void SV_CreateBaseline(void)
 {
 	edict_t *svent;
@@ -5489,7 +5464,35 @@ void SV_CreateBaseline(void)
 				else
 					g_psv.baselines[entnum].entityType = ENTITY_NORMAL;
 
-				__invokeValvesBuggedCreateBaseline((void *)gEntityInterface.pfnCreateBaseline, player, entnum, &(g_psv.baselines[entnum]), svent, sv_playermodel, player_mins[0], player_maxs[0]);
+				/*
+				* Interface between engine and gamedll has a flaw which can lead to inconsistent behavior when passing arguments of type vec3_t to gamedll
+				* Consider function func(vec3_t v) defined in gamedll. vec3_t defined in gamedll as a class (not array), therefore it's expected that all vector components (12 bytes) will be written in the stack,
+				* i.e. the function signature may be represented as func(float v_0, float v_1, float v_2).
+				* In the engine, on the other hand, vec3_t is an array of vec_t (vec_t[3]). C/C++ compiler treats arguments of array type as pointers to array's first element, thus, on attempt to
+				* invoke gamedll's func(vec3_t v) from engine, only pointer to first vector's element will be passed in stack, while gamedll expects all 3 vector elements.
+				* This inconsistency in the interface between gamedll and engine leads to exposure of some data from stack of caller function to vector's elements in gamedll, which, in turn,
+				* leads to inconsistent behavior (since stack data may contain pointers) across different systems.
+				*/
+#ifdef REHLDS_FIXES
+				/*
+				* Fixed function call.
+				*/
+				typedef void CreateBaseline_t(int player, int eindex, struct entity_state_s *baseline, struct edict_s *entity, int playermodelindex, vec_t player_mins0, vec_t player_mins1, vec_t player_mins2, vec_t player_maxs0, vec_t player_maxs1, vec_t player_maxs2);
+				((CreateBaseline_t*)gEntityInterface.pfnCreateBaseline)(player, entnum, &(g_psv.baselines[entnum]), svent, sv_playermodel, player_mins[0][0], player_mins[0][1], player_mins[0][2], player_maxs[0][0], player_maxs[0][1], player_maxs[0][2]);
+#else // REHLDS_FIXES
+				/*
+				* This function call emulates swds.dll behavior, i.e. it sends the same garbage when invoking CreateBaseline as swds.dll does.
+				* This is required since not emulating this behavior will break rehlds test demos.
+				*/
+				typedef void CreateBaseline_t(int player, int eindex, struct entity_state_s *baseline, struct edict_s *entity, int playermodelindex, vec3_t player_mins, vec3_t player_maxs, int dummy1, int dummy2, int dummy3, int dummy4);
+				((CreateBaseline_t*)gEntityInterface.pfnCreateBaseline)(player, entnum, &(g_psv.baselines[entnum]), svent, sv_playermodel, player_mins[0], player_maxs[0], 0, 0, 1, 0);
+
+				/*
+				* Bugged function call that is used in the original engine. Just for a reference.
+				*/
+				//gEntityInterface.pfnCreateBaseline(player, entnum, &(g_psv.baselines[entnum]), svent, sv_playermodel, player_mins[0], player_maxs[0]);
+#endif // REHLDS_FIXES
+
 				sv_lastnum = entnum;
 			}
 		}
