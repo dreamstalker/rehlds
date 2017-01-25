@@ -765,9 +765,6 @@
     <ClInclude Include="..\public\tier0\platform.h">
       <Filter>public\tier0</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\tier0\fasttimer.h">
-      <Filter>public\tier0</Filter>
-    </ClInclude>
     <ClInclude Include="..\public\tier0\dbg.h">
       <Filter>public\tier0</Filter>
     </ClInclude>

@@ -456,7 +456,7 @@ PLATFORM_INTERFACE bool Plat_FastVerifyHardwareKey();
 //-----------------------------------------------------------------------------
 // Include additional dependant header components.
 //-----------------------------------------------------------------------------
-#include "tier0/fasttimer.h"
+//#include "tier0/fasttimer.h"
 
 
 //-----------------------------------------------------------------------------
@@ -606,7 +606,7 @@ struct __MetaLooper_##NAME<0>											\
 class NAME																\
 {																		\
 private:																\
-    static const __MetaLooper_##NAME<COUNT> m;							\
+	static const __MetaLooper_##NAME<COUNT> m;							\
 public:																	\
 	enum { count = COUNT };												\
 	static const __Type_##NAME* functions;								\

@@ -529,7 +529,6 @@
     <ClInclude Include="..\public\steam\steam_gameserver.h" />
     <ClInclude Include="..\public\string_t.h" />
     <ClInclude Include="..\public\tier0\dbg.h" />
-    <ClInclude Include="..\public\tier0\fasttimer.h" />
     <ClInclude Include="..\public\tier0\mem.h" />
     <ClInclude Include="..\public\tier0\memalloc.h" />
     <ClInclude Include="..\public\tier0\memdbgoff.h" />
