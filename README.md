@@ -58,7 +58,7 @@ There are several software requirements for building rehlds:
 <ol>
 <li>Java Development Kit (JDK) 7+ (http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)</li>
 <li>For Windows: Visual Studio 2013 and later</li>
-<li>For Linux: Intel C++ Compiler 13 and later</li>
+<li>For Linux: Intel C++ Compiler 13 and later or GCC 4.9.2 or later (some earlier versions might work too)</li>
 </ol>
 
 ### Checking requirements
