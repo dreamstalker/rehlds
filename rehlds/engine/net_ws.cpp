@@ -1033,6 +1033,15 @@ qboolean NET_QueuePacket(netsrc_t sock)
 	{
 		if (in_message.cursize >= 9)
 		{
+#ifdef REHLDS_FIXES
+			// Only server can send split packets, there is no server<->server communication, so server can't receive split packets
+			if (sock == NS_SERVER)
+			{
+				Con_NetPrintf("Someone tries to send split packet to the server\n");
+				return FALSE;
+			}
+#endif
+
 			return NET_GetLong(in_message.data, ret, &in_message.cursize);
 		}
 		else
