@@ -5663,7 +5663,7 @@ void PrecacheModelTexture(const char *s, studiohdr_t *pStudioHeader)
 		return;
 
 	size_t modelNameLength = Q_strlen(s);
-	if (modelNameLength >= MAX_QPATH - 1)
+	if (modelNameLength > MAX_QPATH - 2)
 		return;
 
 	char textureModelName[MAX_QPATH];
@@ -5672,6 +5672,11 @@ void PrecacheModelTexture(const char *s, studiohdr_t *pStudioHeader)
 	size_t modelExtensionLength = sizeof(".mdl") - 1;
 	char *modelExtension = &textureModelName[modelNameLength - modelExtensionLength];
 	Q_strcpy(modelExtension, "T.mdl");
+
+#ifndef _WIN32
+	if (!FS_FileExists(textureModelName))
+		modelExtension[0] = 't';
+#endif
 
 	// Use generic, because model max count is 512...
 	PF_precache_generic_I(textureModelName);
