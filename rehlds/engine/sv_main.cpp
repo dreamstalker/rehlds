@@ -6070,7 +6070,7 @@ int SV_SpawnServer(qboolean bIsDemo, char *server, char *startspot)
 
 	Sequence_OnLevelLoad(server);
 	ContinueLoadingProgressBar("Server", 4, 0.0);
-	if (gmodinfo.clientDllCRC)
+	if (gmodinfo.clientcrccheck)
 	{
 		char szDllName[64];
 		Q_snprintf(szDllName, sizeof(szDllName), "cl_dlls//client.dll");
