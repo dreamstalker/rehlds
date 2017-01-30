@@ -142,9 +142,9 @@ int HookEngine(size_t addr)
 #ifdef _WIN32
 	Module hlds_exe;
 	if (!FindModuleByName("hlds.exe", &hlds_exe))
-		return (FALSE);
-
-	TestSuite_Init(&g_EngineModule, &hlds_exe, g_FunctionRefs);
+		printf("%s: launcher is not hlds.exe, tests playing/recording is disabled!\n", __FUNCTION__);
+	else
+		TestSuite_Init(&g_EngineModule, &hlds_exe, g_FunctionRefs);
 #endif
 
 
