@@ -4612,7 +4612,6 @@ void SV_WriteEntitiesToClient(client_t *client, sizebuf_t *msg)
 		if (add)
 			++curPack->num_entities;
 #endif //REHLDS_OPT_PEDANTIC
-
 	}
 
 #ifdef REHLDS_FIXES
@@ -4745,7 +4744,7 @@ void SV_UpdateToReliableMessages(void)
 
 #ifdef REHLDS_FIXES
 		// skip update in this frame if would overflow
-		if (client->sendinfo && client->sendinfo_time <= realtime && ( 1 + 1 + 4 + ( int )Q_strlen( client->userinfo ) + 1 + 16 + g_psv.reliable_datagram.cursize <= g_psv.reliable_datagram.maxsize ) )
+		if (client->sendinfo && client->sendinfo_time <= realtime && (1 + 1 + 4 + (int)Q_strlen(client->userinfo) + 1 + 16 + g_psv.reliable_datagram.cursize <= g_psv.reliable_datagram.maxsize))
 #else // REHLDS_FIXES
 		if (client->sendinfo && client->sendinfo_time <= realtime)
 #endif // REHLDS_FIXES
@@ -4792,8 +4791,8 @@ void SV_UpdateToReliableMessages(void)
 		SZ_Clear(&g_psv.spectator);
 	}
 
-	//Fix for the "server failed to transmit file 'AY&SY..." bug
-	//https://github.com/dreamstalker/rehlds/issues/38
+	// Fix for the "server failed to transmit file 'AY&SY..." bug
+	// https://github.com/dreamstalker/rehlds/issues/38
 #ifdef REHLDS_FIXES
 	bool svReliableCompressed = false;
 #endif
@@ -4803,8 +4802,8 @@ void SV_UpdateToReliableMessages(void)
 	{
 		client = &g_psvs.clients[i];
 
-		//Fix for the "server failed to transmit file 'AY&SY..." bug
-		//https://github.com/dreamstalker/rehlds/issues/38
+		// Fix for the "server failed to transmit file 'AY&SY..." bug
+		// https://github.com/dreamstalker/rehlds/issues/38
 #ifdef REHLDS_FIXES
 		if (!client->fakeclient && (client->active || g_GameClients[i]->GetSpawnedOnce()))
 		{

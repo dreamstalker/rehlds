@@ -411,7 +411,8 @@ void Netchan_Transmit(netchan_t *chan, int length, byte *data)
 			pbuf = chan->fragbufs[i];
 
 			fragment_size = 0; // Compiler warning.
-			if (pbuf)	{
+			if (pbuf)
+			{
 				fragment_size = pbuf->frag_message.cursize;
 
 				// Files set size a bit differently.
@@ -912,10 +913,8 @@ void Netchan_FragSend(netchan_t *chan)
 			}
 
 			fragbufwaiting_t *prev = nullptr;
-			while (true) {
-				if (!chan->waitlist[i]->next)
-					break;
-
+			while (chan->waitlist[i]->next)
+			{
 				prev = chan->waitlist[i];
 				chan->waitlist[i] = chan->waitlist[i]->next;
 			}
@@ -1112,8 +1111,8 @@ void Netchan_CreateFileFragmentsFromBuffer(qboolean server, netchan_t *chan, con
 	fragbufwaiting_t *p;
 	fragbuf_t *buf;
 	unsigned char *pbuf;
-	signed int bCompressed;
-	signed int firstfragment;
+	qboolean bCompressed;
+	qboolean firstfragment;
 	signed int bufferid;
 	int remaining;
 	int pos;
@@ -1221,7 +1220,7 @@ int Netchan_CreateFileFragments(qboolean server, netchan_t *chan, const char *fi
 	if (FS_FileSize(filename) > sv_filetransfermaxsize.value)
 		return FALSE;
 
-	auto wait = (fragbufwaiting_t *)Mem_ZeroMalloc(0xCu);
+	auto wait = (fragbufwaiting_t *)Mem_ZeroMalloc(sizeof(fragbufwaiting_t));
 
 	auto buf = Netchan_AllocFragbuf();
 	buf->bufferid = 1;
@@ -1260,9 +1259,9 @@ int Netchan_CreateFileFragments_(qboolean server, netchan_t *chan, const char *f
 	int send;
 	fragbuf_t *buf;
 	char compressedfilename[MAX_PATH];
-	int firstfragment;
+	qboolean firstfragment;
 	int bufferid;
-	int bCompressed;
+	qboolean bCompressed;
 	int pos;
 	fragbufwaiting_t *wait;
 	int uncompressed_size;
@@ -1278,7 +1277,7 @@ int Netchan_CreateFileFragments_(qboolean server, netchan_t *chan, const char *f
 	{
 		filesize = FS_Size(hfile);
 		FS_Close(hfile);
-		bCompressed = 1;
+		bCompressed = TRUE;
 		hfile = FS_Open(filename, "rb");
 		if (!hfile)
 		{
@@ -1326,7 +1325,7 @@ int Netchan_CreateFileFragments_(qboolean server, netchan_t *chan, const char *f
 					FS_Write(compressed, compressedSize, 1, destFile);
 					FS_Close(destFile);
 					filesize = compressedSize;
-					bCompressed = 1;
+					bCompressed = TRUE;
 				}
 			}
 			Mem_Free(uncompressed);
