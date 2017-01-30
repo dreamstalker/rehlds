@@ -794,8 +794,8 @@ void Host_Speeds(double *time)
 
 #ifdef REHLDS_FIXES
 	if (host_speeds.value != 0.0f)	// FIXED: do calculations only if host_speeds is enabled
-	{
 #endif // REHLDS_FIXES
+	{
 		pass1 = (float)((time[1] - time[0]) * 1000.0);
 		pass2 = (float)((time[2] - time[1]) * 1000.0);
 		pass3 = (float)((time[3] - time[2]) * 1000.0);
@@ -808,9 +808,9 @@ void Host_Speeds(double *time)
 			fps = 1.0 / frameTime;
 		else
 			fps = 999.0;
-
-	// FIXED: do calculations only if host_speeds is enabled
 #ifndef REHLDS_FIXES
+	}
+
 	if (host_speeds.value != 0.0f)
 	{
 #endif // REHLDS_FIXES
