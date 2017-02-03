@@ -194,12 +194,12 @@ NOXREF qboolean Sys_IsWin98(void)
 }
 
 #ifdef _WIN32
-#pragma warning( push )  
-#pragma warning( disable : 4996 )  
+#pragma warning( push )
+#pragma warning( disable : 4996 )
 void Sys_CheckOSVersion(void)
 {
-   
-	OSVERSIONINFOA verInfo;
+	OSVERSIONINFO verInfo;
+
 	Q_memset(&verInfo, 0, sizeof(verInfo));
 	verInfo.dwOSVersionInfoSize = sizeof(verInfo);
 	if (!GetVersionEx(&verInfo))

@@ -848,7 +848,7 @@ void DLL_SetModKey(modinfo_t *pinfo, char *pkey, char *pvalue)
 	else if (!Q_stricmp(pkey, "crcclientdll"))
 	{
 		pinfo->bIsMod = 1;
-		pinfo->clientDllCRC = Q_atoi(pvalue) != 0;
+		pinfo->clientcrccheck = Q_atoi(pvalue) != 0;
 	}
 	else if (!Q_stricmp(pkey, "type"))
 	{

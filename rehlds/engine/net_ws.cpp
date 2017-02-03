@@ -886,9 +886,7 @@ qboolean NET_GetLong(unsigned char *pData, int size, int *outSize)
 	unsigned int packetPayloadSize = size - sizeof(SPLITPACKET);
 	if (gNetSplitFlags[packetNumber] == sequenceNumber)
 	{
-		Con_NetPrintf(	"NET_GetLong:  Ignoring duplicated split packet %i of %i ( %i bytes )\n",
-			packetNumber + 1, packetCount, packetPayloadSize
-		);
+		Con_NetPrintf("NET_GetLong:  Ignoring duplicated split packet %i of %i ( %i bytes )\n", packetNumber + 1, packetCount, packetPayloadSize);
 	}
 	else
 	{
@@ -900,9 +898,7 @@ qboolean NET_GetLong(unsigned char *pData, int size, int *outSize)
 
 		if (net_showpackets.value == 4.0f)
 		{
-			Con_Printf("<-- Split packet %i of %i, %i bytes %i seq\n",
-				packetNumber + 1, packetCount, packetPayloadSize, sequenceNumber
-				);
+			Con_Printf("<-- Split packet %i of %i, %i bytes %i seq\n", packetNumber + 1, packetCount, packetPayloadSize, sequenceNumber);
 		}
 
 		if (SPLIT_SIZE * packetNumber + packetPayloadSize > MAX_UDP_PACKET)

@@ -4612,7 +4612,6 @@ void SV_WriteEntitiesToClient(client_t *client, sizebuf_t *msg)
 		if (add)
 			++curPack->num_entities;
 #endif //REHLDS_OPT_PEDANTIC
-
 	}
 
 #ifdef REHLDS_FIXES
@@ -4745,7 +4744,7 @@ void SV_UpdateToReliableMessages(void)
 
 #ifdef REHLDS_FIXES
 		// skip update in this frame if would overflow
-		if (client->sendinfo && client->sendinfo_time <= realtime && ( 1 + 1 + 4 + ( int )Q_strlen( client->userinfo ) + 1 + 16 + g_psv.reliable_datagram.cursize <= g_psv.reliable_datagram.maxsize ) )
+		if (client->sendinfo && client->sendinfo_time <= realtime && (1 + 1 + 4 + (int)Q_strlen(client->userinfo) + 1 + 16 + g_psv.reliable_datagram.cursize <= g_psv.reliable_datagram.maxsize))
 #else // REHLDS_FIXES
 		if (client->sendinfo && client->sendinfo_time <= realtime)
 #endif // REHLDS_FIXES
@@ -4792,8 +4791,8 @@ void SV_UpdateToReliableMessages(void)
 		SZ_Clear(&g_psv.spectator);
 	}
 
-	//Fix for the "server failed to transmit file 'AY&SY..." bug
-	//https://github.com/dreamstalker/rehlds/issues/38
+	// Fix for the "server failed to transmit file 'AY&SY..." bug
+	// https://github.com/dreamstalker/rehlds/issues/38
 #ifdef REHLDS_FIXES
 	bool svReliableCompressed = false;
 #endif
@@ -4803,55 +4802,56 @@ void SV_UpdateToReliableMessages(void)
 	{
 		client = &g_psvs.clients[i];
 
-		//Fix for the "server failed to transmit file 'AY&SY..." bug
-		//https://github.com/dreamstalker/rehlds/issues/38
+		// Fix for the "server failed to transmit file 'AY&SY..." bug
+		// https://github.com/dreamstalker/rehlds/issues/38
 #ifdef REHLDS_FIXES
-		if (!client->fakeclient && (client->active || g_GameClients[i]->GetSpawnedOnce()))
+		if (!(!client->fakeclient && (client->active || g_GameClients[i]->GetSpawnedOnce())))
+			continue;
+
+		if (!svReliableCompressed && g_psv.reliable_datagram.cursize + client->netchan.message.cursize < client->netchan.message.maxsize)
 		{
-			if (!svReliableCompressed && g_psv.reliable_datagram.cursize + client->netchan.message.cursize < client->netchan.message.maxsize)
-			{
-				SZ_Write(&client->netchan.message, g_psv.reliable_datagram.data, g_psv.reliable_datagram.cursize);
-			}
-			else
-			{
-				Netchan_CreateFragments(TRUE, &client->netchan, &g_psv.reliable_datagram);
-				svReliableCompressed = true;
-			}
+			SZ_Write(&client->netchan.message, g_psv.reliable_datagram.data, g_psv.reliable_datagram.cursize);
+		}
+		else
+		{
+			Netchan_CreateFragments(TRUE, &client->netchan, &g_psv.reliable_datagram);
+			svReliableCompressed = true;
+		}
 #else
-		if (!client->fakeclient && client->active)
+		if (!(!client->fakeclient && client->active))
+			continue;
+
+		if (g_psv.reliable_datagram.cursize + client->netchan.message.cursize < client->netchan.message.maxsize)
 		{
-			if (g_psv.reliable_datagram.cursize + client->netchan.message.cursize < client->netchan.message.maxsize)
-			{
-				SZ_Write(&client->netchan.message, g_psv.reliable_datagram.data, g_psv.reliable_datagram.cursize);
-			}
-			else
-			{
-				Netchan_CreateFragments(TRUE, &client->netchan, &g_psv.reliable_datagram);
-			}
+			SZ_Write(&client->netchan.message, g_psv.reliable_datagram.data, g_psv.reliable_datagram.cursize);
+		}
+		else
+		{
+			Netchan_CreateFragments(TRUE, &client->netchan, &g_psv.reliable_datagram);
+		}
 #endif
 
-			if (g_psv.datagram.cursize + client->datagram.cursize < client->datagram.maxsize)
-			{
-				SZ_Write(&client->datagram, g_psv.datagram.data, g_psv.datagram.cursize);
-			}
-			else
-			{
-				Con_DPrintf("Warning:  Ignoring unreliable datagram for %s, would overflow\n", client->name);
-			}
+		if (g_psv.datagram.cursize + client->datagram.cursize < client->datagram.maxsize)
+		{
+			SZ_Write(&client->datagram, g_psv.datagram.data, g_psv.datagram.cursize);
+		}
+		else
+		{
+			Con_DPrintf("Warning:  Ignoring unreliable datagram for %s, would overflow\n", client->name);
+		}
 
-			if (client->proxy)
+		if (client->proxy)
+		{
+			if (g_psv.spectator.cursize + client->datagram.cursize < client->datagram.maxsize)
 			{
-				if (g_psv.spectator.cursize + client->datagram.cursize < client->datagram.maxsize)
-				{
-					SZ_Write(&client->datagram, g_psv.spectator.data, g_psv.spectator.cursize);
-				}
+				SZ_Write(&client->datagram, g_psv.spectator.data, g_psv.spectator.cursize);
+			}
 #ifdef REHLDS_FIXES
-				else
-				{
-					Con_DPrintf("Warning:  Ignoring spectator datagram for %s, would overflow\n", client->name);
-				}
-#endif
+			else
+			{
+				Con_DPrintf("Warning:  Ignoring spectator datagram for %s, would overflow\n", client->name);
 			}
+#endif
 		}
 	}
 
@@ -6070,7 +6070,7 @@ int SV_SpawnServer(qboolean bIsDemo, char *server, char *startspot)
 
 	Sequence_OnLevelLoad(server);
 	ContinueLoadingProgressBar("Server", 4, 0.0);
-	if (gmodinfo.clientDllCRC)
+	if (gmodinfo.clientcrccheck)
 	{
 		char szDllName[64];
 		Q_snprintf(szDllName, sizeof(szDllName), "cl_dlls//client.dll");
