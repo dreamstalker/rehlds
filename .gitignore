@@ -6,6 +6,9 @@
 **/msvc/Release*
 **/msvc/Tests
 **/msvc/Test Fixes
+**/msvc/.vs
+**/msvc/*.db
+**/msvc/*.opendb
 **/msvc/*.sdf
 **/msvc/*.opensdf
 **/msvc/*.user
