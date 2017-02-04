@@ -1034,6 +1034,8 @@ void Mod_LoadLeafs(lump_t *l)
 	loadmodel->leafs = out;
 	loadmodel->numleafs = count;
 #ifdef REHLDS_FIXES
+	// Originally check was called only in singleplayer mode, that is why this "if" here (see Mod_LeafPVS, gPVS is not NULL for multiplayer)
+	if (g_psvs.maxclients == 1)
 	{
 		int row = (loadmodel->numleafs + 7) / 8;
 
