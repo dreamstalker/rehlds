@@ -64,6 +64,10 @@ private:
 	// we would also use the field client_t:connected, but actually can't because there is a bug in CS client when server sends TeamScore
 	// and client is not yet initialized ScoreBoard which leads to memory corruption in the client.
 	bool m_bSpawnedOnce;
+
+#ifdef REHLDS_FIXES
+	double m_localGameTimeBase;
+#endif
 public:
 	CGameClient(int id, client_t* cl);
 
@@ -101,6 +105,12 @@ public:
 	void SetSpawnedOnce(bool spawned) { m_bSpawnedOnce = spawned; }
 #ifdef REHLDS_FIXES
 	uint8_t* GetExtendedMessageBuffer() { return m_NetChan.GetExtendedMessageBuffer(); };
+#endif
+
+#ifdef REHLDS_FIXES
+	void SetupLocalGameTime() { m_localGameTimeBase = g_psv.time; }
+	double GetLocalGameTime() const { return g_psv.time - m_localGameTimeBase; }
+	double GetLocalGameTimeBase() const { return m_localGameTimeBase; }
 #endif
 };
 

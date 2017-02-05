@@ -1389,23 +1389,18 @@ void SV_WriteClientdataToMessage(client_t *client, sizebuf_t *msg)
 			// FIXME: there is a loss of precision, because gamedll has already written float gametime in them 
 			if (sv_rehlds_local_gametime.value != 0.0f)
 			{
-				auto convertGameTimeToLocal = 
-					[](float &gameTime)
+				auto convertGlobalGameTimeToLocal =
+					[](float &globalGameTime)
 				{
-					if (gameTime > 0.0f)
-					{
-						auto currentLocalGameTime = realtime - host_client->connection_started;
-						auto currentGameTime = g_psv.time;
-						auto difference = gameTime - currentGameTime;
-						gameTime = (float)(currentLocalGameTime + difference);
-					}
+					if (globalGameTime > 0.0f)
+						globalGameTime -= (float)g_GameClients[host_client - g_psvs.clients]->GetLocalGameTimeBase();
 				};
 				if (g_bIsCStrike || g_bIsCZero)
-					convertGameTimeToLocal(std::ref(tdata->m_fAimedDamage));
+					convertGlobalGameTimeToLocal(std::ref(tdata->m_fAimedDamage));
 				if (g_bIsHL1 || g_bIsCStrike || g_bIsCZero)
 				{
-					convertGameTimeToLocal(std::ref(tdata->fuser2));
-					convertGameTimeToLocal(std::ref(tdata->fuser3));
+					convertGlobalGameTimeToLocal(std::ref(tdata->fuser2));
+					convertGlobalGameTimeToLocal(std::ref(tdata->fuser3));
 				}
 			}
 #endif
@@ -1488,7 +1483,7 @@ void SV_WriteSpawn(sizebuf_t *msg)
 #ifdef REHLDS_FIXES
 	if (sv_rehlds_local_gametime.value != 0.0f)
 	{
-		MSG_WriteFloat(msg, (float)(realtime - host_client->connection_started));
+		MSG_WriteFloat(msg, (float)g_GameClients[host_client - g_psvs.clients]->GetLocalGameTime());
 	}
 	else
 #endif
@@ -1591,6 +1586,7 @@ void SV_New_f(void)
 
 	host_client->connected = TRUE;
 	host_client->connection_started = realtime;
+	g_GameClients[host_client - g_psvs.clients]->SetupLocalGameTime();
 	host_client->m_sendrescount = 0;
 
 	SZ_Clear(&host_client->netchan.message);
@@ -4665,7 +4661,7 @@ qboolean SV_SendClientDatagram(client_t *client)
 #ifdef REHLDS_FIXES
 	if (sv_rehlds_local_gametime.value != 0.0f)
 	{
-		MSG_WriteFloat(&msg, (float)(realtime - client->connection_started));
+		MSG_WriteFloat(&msg, (float)g_GameClients[client - g_psvs.clients]->GetLocalGameTime());
 	}
 	else
 #endif

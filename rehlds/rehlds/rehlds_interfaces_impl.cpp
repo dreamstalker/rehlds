@@ -31,8 +31,7 @@
 CGameClient** g_GameClients;
 
 CGameClient::CGameClient(int id, client_t* cl)
-	: m_NetChan(&cl->netchan)
-{
+	: m_NetChan(&cl->netchan), m_localGameTimeBase(0) {
 	m_Id = id;
 	m_pClient = cl;
 	m_bSpawnedOnce = false;
