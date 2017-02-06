@@ -1586,7 +1586,9 @@ void SV_New_f(void)
 
 	host_client->connected = TRUE;
 	host_client->connection_started = realtime;
+#ifdef REHLDS_FIXES
 	g_GameClients[host_client - g_psvs.clients]->SetupLocalGameTime();
+#endif
 	host_client->m_sendrescount = 0;
 
 	SZ_Clear(&host_client->netchan.message);
