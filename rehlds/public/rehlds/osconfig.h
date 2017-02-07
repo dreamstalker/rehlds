@@ -202,4 +202,8 @@
 
 #define EXT_FUNC FORCE_STACK_ALIGN
 
+// Used to obtain the string name of a variable.
+#define nameof_variable(name) template_nameof_variable(name, #name)
+template <typename T> const char* template_nameof_variable(const T& /*validate_type*/, const char* name) { return name; }
+
 #endif // _OSCONFIG_H

@@ -1007,10 +1007,12 @@ qboolean Cmd_ForwardToServerInternal(sizebuf_t *pBuf)
 		return FALSE;
 	}
 
-	char tempData[4096];
+	char tempData[4096], buffername[64];
 	sizebuf_t tempBuf;
 
-	tempBuf.buffername = "Cmd_ForwardToServerInternal::tempBuf";
+	Q_sprintf(buffername, "%s::%s", __FUNCTION__, nameof_variable(tempBuf));
+
+	tempBuf.buffername = buffername;
 	tempBuf.data = (byte *)tempData;
 	tempBuf.maxsize = 4096;
 	tempBuf.cursize = 0;
