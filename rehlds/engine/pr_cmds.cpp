@@ -99,7 +99,7 @@ void EXT_FUNC SetMinMaxSize(edict_t *e, const float *min, const float *max, qboo
 	for (int i = 0; i < 3; i++)
 	{
 		if (min[i] > max[i])
-			Host_Error("backwards mins/maxs");
+			Host_Error("%s: backwards mins/maxs", __FUNCTION__);
 	}
 
 	e->v.mins[0] = min[0];
@@ -161,7 +161,7 @@ void EXT_FUNC PF_setmodel_I(edict_t *e, const char *m)
 		}
 	}
 
-	Host_Error("no precache: %s\n", m);
+	Host_Error("%s: no precache: %s\n", __FUNCTION__, m);
 }
 
 int EXT_FUNC PF_modelindex(const char *pstr)
@@ -324,13 +324,13 @@ void EXT_FUNC PF_ambientsound_I(edict_t *entity, float *pos, const char *samp, f
 void EXT_FUNC PF_sound_I(edict_t *entity, int channel, const char *sample, float volume, float attenuation, int fFlags, int pitch)
 {
 	if (volume < 0.0 || volume > 255.0)
-		Sys_Error("EMIT_SOUND: volume = %i", volume);
+		Sys_Error("%s: volume = %i", __FUNCTION__, volume);
 	if (attenuation < 0.0 || attenuation > 4.0)
-		Sys_Error("EMIT_SOUND: attenuation = %f", attenuation);
+		Sys_Error("%s: attenuation = %f", __FUNCTION__, attenuation);
 	if (channel < 0 || channel > 7)
-		Sys_Error("EMIT_SOUND: channel = %i", channel);
+		Sys_Error("%s: channel = %i", __FUNCTION__, channel);
 	if (pitch < 0 || pitch > 255)
-		Sys_Error("EMIT_SOUND: pitch = %i", pitch);
+		Sys_Error("%s: pitch = %i", __FUNCTION__, pitch);
 	SV_StartSound(0, entity, channel, sample, (int)(volume * 255), attenuation, fFlags, pitch);
 }
 
@@ -390,7 +390,7 @@ void EXT_FUNC TraceHull(const float *v1, const float *v2, int fNoMonsters, int h
 
 void EXT_FUNC TraceSphere(const float *v1, const float *v2, int fNoMonsters, float radius, edict_t *pentToSkip, TraceResult *ptr)
 {
-	Sys_Error("TraceSphere not yet implemented!\n");
+	Sys_Error("%s: TraceSphere not yet implemented!\n", __FUNCTION__);
 }
 
 void EXT_FUNC TraceModel(const float *v1, const float *v2, int hullNumber, edict_t *pent, TraceResult *ptr)
@@ -906,7 +906,7 @@ edict_t* EXT_FUNC CreateNamedEntity(int className)
 	ENTITYINIT pEntityInit;
 
 	if (!className)
-		Sys_Error("Spawned a NULL entity!");
+		Sys_Error("%s: Spawned a NULL entity!", __FUNCTION__);
 
 	pedict = ED_Alloc();
 	pedict->v.classname = className;
@@ -1614,7 +1614,7 @@ void EXT_FUNC PF_SetKeyValue_I(char *infobuffer, const char *key, const char *va
 	{
 		if (infobuffer != Info_Serverinfo())
 		{
-			Sys_Error("Can't set client keys with SetKeyValue");
+			Sys_Error("%s: Can't set client keys with SetKeyValue", __FUNCTION__);
 		}
 #ifdef REHLDS_FIXES
 		Info_SetValueForKey(infobuffer, key, value, MAX_INFO_STRING);	// Use correct length
@@ -1906,7 +1906,7 @@ void EXT_FUNC PF_setview_I(const edict_t *clientent, const edict_t *viewent)
 {
 	int clientnum = NUM_FOR_EDICT(clientent);
 	if (clientnum < 1 || clientnum > g_psvs.maxclients)
-		Host_Error("PF_setview_I: not a client");
+		Host_Error("%s: not a client", __FUNCTION__);
 
 	client_t *client = &g_psvs.clients[clientnum - 1];
 	if (!client->fakeclient)
@@ -2049,7 +2049,7 @@ sizebuf_t* EXT_FUNC WriteDest_Parm(int dest)
 		entnum = NUM_FOR_EDICT(gMsgEntity);
 		if (entnum <= 0 || entnum > g_psvs.maxclients)
 		{
-			Host_Error("WriteDest_Parm: not a client");
+			Host_Error("%s: not a client", __FUNCTION__);
 		}
 		if (dest == MSG_ONE)
 		{
@@ -2069,7 +2069,7 @@ sizebuf_t* EXT_FUNC WriteDest_Parm(int dest)
 	case MSG_SPEC:
 		return &g_psv.spectator;
 	default:
-		Host_Error("WriteDest_Parm: bad destination=%d", dest);
+		Host_Error("%s: bad destination = %d", __FUNCTION__, dest);
 	}
 }
 
@@ -2078,19 +2078,19 @@ void EXT_FUNC PF_MessageBegin_I(int msg_dest, int msg_type, const float *pOrigin
 	if (msg_dest == MSG_ONE || msg_dest == MSG_ONE_UNRELIABLE)
 	{
 		if (!ed)
-			Sys_Error("MSG_ONE or MSG_ONE_UNRELIABLE with no target entity\n");
+			Sys_Error("%s: with no target entity\n", __FUNCTION__);
 	}
 	else
 	{
 		if (ed)
-			Sys_Error("Invalid message;  cannot use broadcast message with a target entity");
+			Sys_Error("%s: Invalid message: Cannot use broadcast message with a target entity", __FUNCTION__);
 	}
 
 	if (gMsgStarted)
-		Sys_Error("New message started when msg '%d' has not been sent yet", gMsgType);
+		Sys_Error("%s: New message started when msg '%d' has not been sent yet", __FUNCTION__, gMsgType);
 
 	if (msg_type == 0)
-		Sys_Error("Tried to create a message with a bogus message type ( 0 )");
+		Sys_Error("%s: Tried to create a message with a bogus message type ( 0 )", __FUNCTION__);
 
 	gMsgStarted = 1;
 	gMsgType = msg_type;
@@ -2117,14 +2117,14 @@ void EXT_FUNC PF_MessageEnd_I(void)
 {
 	qboolean MsgIsVarLength = 0;
 	if (!gMsgStarted)
-		Sys_Error("MESSAGE_END called with no active message\n");
+		Sys_Error("%s: called with no active message\n", __FUNCTION__);
 	gMsgStarted = 0;
 
 	if (gMsgEntity && (gMsgEntity->v.flags & FL_FAKECLIENT))
 		return;
 
 	if (gMsgBuffer.flags & SIZEBUF_OVERFLOWED)
-		Sys_Error("MESSAGE_END called, but message buffer from .dll had overflowed\n");
+		Sys_Error("%s: called, but message buffer from .dll had overflowed\n", __FUNCTION__);
 
 
 	if (gMsgType > svc_startofusermessages)
@@ -2142,7 +2142,7 @@ void EXT_FUNC PF_MessageEnd_I(void)
 
 		if (!pUserMsg)
 		{
-			Con_DPrintf("PF_MessageEnd_I:  Unknown User Msg %d\n", gMsgType);
+			Con_DPrintf("%s:  Unknown User Msg %d\n", __FUNCTION__, gMsgType);
 			return;
 		}
 
@@ -2152,22 +2152,12 @@ void EXT_FUNC PF_MessageEnd_I(void)
 
 			// Limit packet sizes
 			if (gMsgBuffer.cursize > MAX_USER_MSG_DATA)
-				Host_Error(
-					"PF_MessageEnd_I:  Refusing to send user message %s of %i bytes to client, user message size limit is %i bytes\n",
-					pUserMsg->szName,
-					gMsgBuffer.cursize,
-					MAX_USER_MSG_DATA
-				);
+				Host_Error("%s: Refusing to send user message %s of %i bytes to client, user message size limit is %i bytes\n", __FUNCTION__, pUserMsg->szName, gMsgBuffer.cursize, MAX_USER_MSG_DATA);
 		}
 		else
 		{
 			if (pUserMsg->iSize != gMsgBuffer.cursize)
-				Sys_Error(
-					"User Msg '%s': %d bytes written, expected %d\n",
-					pUserMsg->szName,
-					gMsgBuffer.cursize,
-					pUserMsg->iSize
-				);
+				Sys_Error("%s: User Msg '%s': %d bytes written, expected %d\n", __FUNCTION__, pUserMsg->szName, gMsgBuffer.cursize, pUserMsg->iSize);
 		}
 	}
 #ifdef REHLDS_FIXES
@@ -2182,7 +2172,7 @@ void EXT_FUNC PF_MessageEnd_I(void)
 		{
 			int entnum = NUM_FOR_EDICT((const edict_t *)gMsgEntity);
 			if (entnum < 1 || entnum > g_psvs.maxclients)
-				Host_Error("WriteDest_Parm: not a client");
+				Host_Error("%s: not a client", __FUNCTION__);
 
 			client_t* client = &g_psvs.clients[entnum - 1];
 			if (client->fakeclient || !client->hasusrmsgs || (!client->active && !client->spawned))
@@ -2197,9 +2187,11 @@ void EXT_FUNC PF_MessageEnd_I(void)
 #ifdef REHLDS_FIXES
 	;
 
-	if (gMsgDest == MSG_ALL) {
+	if (gMsgDest == MSG_ALL)
+	{
 		gMsgDest = MSG_ONE;
-		for (int i = 0; i < g_psvs.maxclients; i++) {
+		for (int i = 0; i < g_psvs.maxclients; i++)
+		{
 			gMsgEntity = g_psvs.clients[i].edict;
 			if (gMsgEntity == nullptr)
 				continue;
@@ -2207,7 +2199,9 @@ void EXT_FUNC PF_MessageEnd_I(void)
 				continue;
 			writer();
 		}
-	} else {
+	}
+	else
+	{
 		writer();
 	}
 #endif
@@ -2337,7 +2331,7 @@ void EXT_FUNC PF_setspawnparms_I(edict_t *ent)
 {
 	int i = NUM_FOR_EDICT(ent);
 	if (i < 1 || i > g_psvs.maxclients)
-		Host_Error("Entity is not a client");
+		Host_Error("%s: Entity is not a client", __FUNCTION__);
 }
 
 void EXT_FUNC PF_changelevel_I(const char *s1, const char *s2)

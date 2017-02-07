@@ -88,7 +88,7 @@ void ForceReloadProfile()
 	//SDL_GL_SetSwapInterval((gl_vsync.value <= 0.0) - 1);
 	if (g_pcls.state != ca_dedicated)
 	{
-		Sys_Error("Only dedicated mode is supported");
+		Sys_Error("%s: Only dedicated mode is supported", __FUNCTION__);
 		/*
 		v0 = GetRateRegistrySetting(rate.string);
 		Q_strncpy(szRate, v0, 0x20u);

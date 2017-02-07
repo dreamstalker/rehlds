@@ -69,8 +69,8 @@ int W_LoadWadFile(char *filename)
 	if (!wad->wad_base)
 	{
 		if (!slot)
-			Sys_Error("W_LoadWadFile: couldn't load %s", filename);
-		Con_Printf("WARNING:  W_LoadWadFile, couldn't load %s\n", filename);
+			Sys_Error("%s: couldn't load %s", __FUNCTION__, filename);
+		Con_Printf("WARNING:  %s, couldn't load %s\n", __FUNCTION__, filename);
 		return -1;
 	}
 
@@ -79,7 +79,7 @@ int W_LoadWadFile(char *filename)
 	wad->wadname[sizeof(wad->wadname) - 1] = 0;
 	wad->loaded = TRUE;
 	if (*(uint32 *)header->identification != MAKEID('W', 'A', 'D', '3'))
-		Sys_Error("Wad file %s doesn't have WAD3 id\n", filename);
+		Sys_Error("%s: Wad file %s doesn't have WAD3 id\n", __FUNCTION__, filename);
 	wad->wad_numlumps = LittleLong(header->numlumps);
 
 	lumpinfo_t * lump_p = (lumpinfo_t *)&wad->wad_base[LittleLong(header->infotableofs)];
@@ -112,7 +112,7 @@ lumpinfo_t *W_GetLumpinfo(int wad, char *name, qboolean doerror)
 	}
 
 	if (doerror)
-		Sys_Error("W_GetLumpinfo: %s not found", name);
+		Sys_Error("%s: %s not found", __FUNCTION__, name);
 
 	return NULL;
 }
@@ -130,7 +130,7 @@ NOXREF void *W_GetLumpNum(int wad, int num)
 	NOXREFCHECK;
 	lumpinfo_t *lump;
 	if (num < 0 || num > wads[wad].wad_numlumps)
-		Sys_Error("W_GetLumpNum: bad number: %i", num);
+		Sys_Error("%s: bad number: %i", __FUNCTION__, num);
 
 	lump = wads[wad].wad_lumps;
 	return (void *)&wads[wad].wad_base[lump->filepos];

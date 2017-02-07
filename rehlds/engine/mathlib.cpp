@@ -116,7 +116,7 @@ float anglemod(float a)
 
 void BOPS_Error(void)
 {
-	Sys_Error("BoxOnPlaneSide:  Bad signbits");
+	Sys_Error("%s: Bad signbits", __FUNCTION__);
 }
 
 #ifdef REHLDS_OPT_PEDANTIC

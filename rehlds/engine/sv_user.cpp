@@ -315,7 +315,7 @@ int EXT_FUNC SV_TransferConsistencyInfo_internal(void)
 				vec3_t maxs;
 
 				if (!R_GetStudioBounds(filename, mins, maxs))
-					Host_Error("Server unable to get bounds for %s\n", filename);
+					Host_Error("%s: Server unable to get bounds for %s\n", __FUNCTION__, filename);
 
 				Q_memcpy(&r->rguc_reserved[1], mins, sizeof(mins));
 				Q_memcpy(&r->rguc_reserved[13], maxs, sizeof(maxs));

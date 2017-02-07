@@ -2655,19 +2655,19 @@ void SV_ResetModInfo(void)
 	nFileSize = FS_Size(hLibListFile);
 	if (!nFileSize || (signed int)nFileSize > 256 * 1024)
 	{
-		Sys_Error("Game listing file size is bogus [%s: size %i]", "liblist.gam", nFileSize);
+		Sys_Error("%s: Game listing file size is bogus [%s: size %i]", __FUNCTION__, "liblist.gam", nFileSize);
 	}
 
 	pszInputStream = (char *)Mem_Malloc(nFileSize + 1);
 	if (!pszInputStream)
 	{
-		Sys_Error("Could not allocate space for game listing file of %i bytes", nFileSize + 1);
+		Sys_Error("%s: Could not allocate space for game listing file of %i bytes", __FUNCTION__, nFileSize + 1);
 	}
 
 	nBytesRead = FS_Read(pszInputStream, nFileSize, 1, hLibListFile);
 	if (nBytesRead != nFileSize)
 	{
-		Sys_Error("Error reading in game listing file, expected %i bytes, read %i", nFileSize, nBytesRead);
+		Sys_Error("%s: Error reading in game listing file, expected %i bytes, read %i", __FUNCTION__, nFileSize, nBytesRead);
 	}
 
 	pszInputStream[nFileSize] = 0;
@@ -5064,7 +5064,7 @@ int SV_ModelIndex(const char *name)
 	};
 #endif
 
-	Sys_Error("SV_ModelIndex: model %s not precached", name);
+	Sys_Error("%s: SV_ModelIndex: model %s not precached", __FUNCTION__, name);
 }
 
 void EXT_FUNC SV_AddResource(resourcetype_t type, const char *name, int size, unsigned char flags, int index)
@@ -5076,7 +5076,7 @@ void EXT_FUNC SV_AddResource(resourcetype_t type, const char *name, int size, un
 	if (g_psv.num_resources >= MAX_RESOURCE_LIST)
 #endif // REHLDS_FIXES
 	{
-		Sys_Error("Too many resources on server.");
+		Sys_Error("%s: Too many resources on server.", __FUNCTION__);
 	}
 
 #ifdef REHLDS_FIXES
@@ -5552,7 +5552,7 @@ void SV_BroadcastCommand(char *fmt, ...)
 	MSG_WriteByte(&msg, svc_stufftext);
 	MSG_WriteString(&msg, string);
 	if (msg.flags & SIZEBUF_OVERFLOWED)
-		Sys_Error("SV_BroadcastCommand:  Overflowed on %s, %i is max size\n", string, msg.maxsize);
+		Sys_Error("%s: Overflowed on %s, %i is max size\n", __FUNCTION__, string, msg.maxsize);
 
 	for (int i = 0; i < g_psvs.maxclients; ++i)
 	{
@@ -7650,7 +7650,7 @@ void SV_RegisterDelta(char *name, char *loadfile)
 {
 	delta_t *pdesc = NULL;
 	if (!DELTA_Load(name, &pdesc, loadfile))
-		Sys_Error("Error parsing %s!!!\n", loadfile);
+		Sys_Error("%s: Error parsing %s!!!\n", __FUNCTION__, loadfile);
 
 	delta_info_t *p = (delta_info_t *)Mem_ZeroMalloc(sizeof(delta_info_t));
 	p->loadfile = Mem_Strdup(loadfile);
@@ -7677,32 +7677,32 @@ void SV_InitDeltas(void)
 
 	g_pplayerdelta = SV_LookupDelta("entity_state_player_t");
 	if (!g_pplayerdelta)
-		Sys_Error("No entity_state_player_t encoder on server!\n");
+		Sys_Error("%s: No entity_state_player_t encoder on server!\n", __FUNCTION__);
 
 	g_pentitydelta = SV_LookupDelta("entity_state_t");
 	if (!g_pentitydelta)
-		Sys_Error("No entity_state_t encoder on server!\n");
+		Sys_Error("%s: No entity_state_t encoder on server!\n", __FUNCTION__);
 
 	g_pcustomentitydelta = SV_LookupDelta("custom_entity_state_t");
 	if (!g_pcustomentitydelta)
-		Sys_Error("No custom_entity_state_t encoder on server!\n");
+		Sys_Error("%s: No custom_entity_state_t encoder on server!\n", __FUNCTION__);
 
 	g_pclientdelta = SV_LookupDelta("clientdata_t");
 	if (!g_pclientdelta)
-		Sys_Error("No clientdata_t encoder on server!\n");
+		Sys_Error("%s: No clientdata_t encoder on server!\n", __FUNCTION__);
 
 	g_pweapondelta = SV_LookupDelta("weapon_data_t");
 	if (!g_pweapondelta)
-		Sys_Error("No weapon_data_t encoder on server!\n");
+		Sys_Error("%s: No weapon_data_t encoder on server!\n", __FUNCTION__);
 
 	g_peventdelta = SV_LookupDelta("event_t");
 	if (!g_peventdelta)
-		Sys_Error("No event_t encoder on server!\n");
+		Sys_Error("%s: No event_t encoder on server!\n", __FUNCTION__);
 
 #ifdef REHLDS_OPT_PEDANTIC
 	g_pusercmddelta = SV_LookupDelta("usercmd_t");
 	if (!g_pusercmddelta)
-		Sys_Error("No usercmd_t encoder on server!\n");
+		Sys_Error("%s: No usercmd_t encoder on server!\n", __FUNCTION__);
 #endif
 
 #if defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)

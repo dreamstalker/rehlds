@@ -625,7 +625,7 @@ void EXT_FUNC SaveSpawnParms(edict_t *pEdict)
 	int eoffset = NUM_FOR_EDICT(pEdict);
 	if (eoffset < 1 || eoffset > g_psvs.maxclients)
 	{
-		Host_Error("Entity is not a client");
+		Host_Error("%s: Entity is not a client", __FUNCTION__);
 	}
 	// Nothing more for this function even on client-side
 }

@@ -164,7 +164,7 @@ struct hull_s *SV_HullForBsp(edict_t *ent, const vec_t *mins, const vec_t *maxs,
 
 	model = Mod_Handle(ent->v.modelindex);
 	if (!model || model->type != mod_brush)
-		Sys_Error("Hit a %s with no model (%s)", &pr_strings[ent->v.classname], &pr_strings[ent->v.model]);
+		Sys_Error("%s: Hit a %s with no model (%s)", __FUNCTION__, &pr_strings[ent->v.classname], &pr_strings[ent->v.model]);
 
 	float xSize = maxs[0] - mins[0];
 	if (xSize > 8.0f)
@@ -220,7 +220,7 @@ hull_t *SV_HullForEntity(edict_t *ent, const vec_t *mins, const vec_t *maxs, vec
 	if (ent->v.solid == SOLID_BSP)
 	{
 		if (ent->v.movetype != MOVETYPE_PUSH && ent->v.movetype != MOVETYPE_PUSHSTEP)
-			Sys_Error("SOLID_BSP without MOVETYPE_PUSH");
+			Sys_Error("%s: SOLID_BSP without MOVETYPE_PUSH", __FUNCTION__);
 
 		return SV_HullForBsp(ent, mins, maxs, offset);
 	}
@@ -1185,7 +1185,7 @@ void SV_ClipToLinks(areanode_t *node, moveclip_t *clip)
 			continue;
 
 		if (touch->v.solid == SOLID_TRIGGER)
-			Sys_Error("Trigger in clipping list");
+			Sys_Error("%s: Trigger in clipping list", __FUNCTION__);
 
 		if (gNewDLLFunctions.pfnShouldCollide && !gNewDLLFunctions.pfnShouldCollide(touch, clip->passedict))
 #ifdef REHLDS_FIXES

@@ -1004,14 +1004,15 @@ qboolean NET_QueuePacket(netsrc_t sock)
 			{
 				if (err == WSAEMSGSIZE)
 				{
-					Con_DPrintf("NET_QueuePacket:  Ignoring oversized network message\n");
+					Con_DPrintf("%s: Ignoring oversized network message\n", __FUNCTION__);
 				}
 				else
 				{
 					if (g_pcls.state != ca_dedicated)
-						Sys_Error("NET_QueuePacket: %s", NET_ErrorString(err));
-					else
-						Con_Printf("NET_QueuePacket: %s\n", NET_ErrorString(err));
+					{
+						Sys_Error("%s: %s", __FUNCTION__, NET_ErrorString(err));
+					}
+					Con_Printf("%s: %s\n", __FUNCTION__, NET_ErrorString(err));
 				}
 			}
 			continue;
@@ -1021,7 +1022,7 @@ qboolean NET_QueuePacket(netsrc_t sock)
 		if (ret != MAX_UDP_PACKET)
 			break;
 
-		Con_NetPrintf("NET_QueuePacket:  Oversize packet from %s\n", NET_AdrToString(in_from));
+		Con_NetPrintf("%s: Oversize packet from %s\n", __FUNCTION__, NET_AdrToString(in_from));
 	}
 
 	if (ret == -1 || ret == MAX_UDP_PACKET) {
@@ -1168,7 +1169,7 @@ void NET_StartThread(void)
 		if (!net_thread_initialized)
 		{
 			net_thread_initialized = TRUE;
-			Sys_Error("-net_thread is not reversed yet");
+			Sys_Error("%s: -net_thread is not reversed yet", __FUNCTION__);
 #ifdef _WIN32
 			/*
 			InitializeCriticalSection(&net_cs);
@@ -1178,7 +1179,7 @@ void NET_StartThread(void)
 				DeleteCriticalSection(&net_cs);
 				net_thread_initialized = 0;
 				use_thread = 0;
-				Sys_Error("Couldn't initialize network thread, run without -net_thread\n");
+				Sys_Error("%s: Couldn't initialize network thread, run without -net_thread\n", __FUNCTION__);
 			}
 			*/
 #endif // _WIN32
@@ -1199,7 +1200,7 @@ void NET_StopThread(void)
 			*/
 #endif // _WIN32
 			net_thread_initialized = FALSE;
-			Sys_Error("-net_thread is not reversed yet");
+			Sys_Error("%s: -net_thread is not reversed yet", __FUNCTION__);
 		}
 	}
 }
@@ -1667,7 +1668,7 @@ void NET_OpenIP(void)
 		if (!ip_sockets[NS_SERVER] && dedicated)
 #endif
 		{
-			Sys_Error("Couldn't allocate dedicated server IP port %d.", port);
+			Sys_Error("%s: Couldn't allocate dedicated server IP port %d.", __FUNCTION__, port);
 		}
 		sv_port = port;
 	}

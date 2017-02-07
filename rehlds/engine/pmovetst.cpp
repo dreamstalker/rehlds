@@ -113,7 +113,7 @@ int EXT_FUNC PM_HullPointContents(hull_t *hull, int num, vec_t *p)
 	while (num >= 0)
 	{
 		if (num < hull->firstclipnode || num > hull->lastclipnode)
-			Sys_Error("PM_HullPointContents: bad node number");
+			Sys_Error("%s: bad node number", __FUNCTION__);
 		node = &hull->clipnodes[num];
 		plane = &hull->planes[node->planenum];
 

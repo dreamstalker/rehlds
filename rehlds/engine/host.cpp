@@ -1161,11 +1161,11 @@ int Host_Init(quakeparms_t *parms)
 	Q_memset(&g_module, 0, sizeof(g_module));
 	if (g_pcls.state != ca_dedicated)
 	{
-		//Sys_Error("Only dedicated server mode is supported");
+		//Sys_Error("%s: Only dedicated server mode is supported", __FUNCTION__);
 
 		color24 *disk_basepal = (color24 *)COM_LoadHunkFile("gfx/palette.lmp");
 		if (!disk_basepal)
-			Sys_Error("Host_Init: Couldn't load gfx/palette.lmp");
+			Sys_Error("%s: Couldn't load gfx/palette.lmp", __FUNCTION__);
 
 		host_basepal = (unsigned short *)Hunk_AllocName(sizeof(PackedColorVec) * 256, "palette.lmp");
 		for (int i = 0; i < 256; i++)
