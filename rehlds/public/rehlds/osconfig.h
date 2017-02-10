@@ -91,6 +91,11 @@
 
 
 #ifdef _WIN32 // WINDOWS
+	// Define __func__ on VS less than 2015
+	#if _MSC_VER < 1900
+		#define __func__ __FUNCTION__
+	#endif
+
 	#define _CRT_SECURE_NO_WARNINGS
 	#define WIN32_LEAN_AND_MEAN
 
