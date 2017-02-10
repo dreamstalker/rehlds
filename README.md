@@ -21,6 +21,8 @@ Rehlds is fully compatible with latest official HLDS downloaded by steamcmd. All
 
 Compiled binaries are available here: http://nexus.rehlds.org/nexus/content/repositories/rehlds-dev/rehlds/rehlds/
 
+Rehlds binaries require SSE, SSE2 and SSE3 instruction sets to run and can benefit from SSE4.1 and SSE4.2.
+
 Archive's bin directory contains 2 subdirectories, 'bugfixed' and 'pure'
 <ul>
 <li>'pure' version is designed to work exactly as official hlds engine</li>
