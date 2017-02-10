@@ -58,7 +58,7 @@ There are several software requirements for building rehlds:
 <ol>
 <li>Java Development Kit (JDK) 7+ (http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)</li>
 <li>For Windows: Visual Studio 2013 and later</li>
-<li>For Linux: Intel C++ Compiler 13 and later</li>
+<li>For Linux: Intel C++ Compiler 13 and later or GCC 4.9.2 or later (some earlier versions might work too)</li>
 </ol>
 
 ### Checking requirements
@@ -80,16 +80,26 @@ Help -> About
 icc (ICC) 15.0.1 20141023
 </pre>
 
+####GCC
+<pre>$ gcc --version
+gcc (Debian 4.9.2-10) 4.9.2
+</pre>
+
 ### Building
 On Windows:
 <pre>gradlew --max-workers=1 clean buildRelease</pre>
 * For faster building without unit tests use this:exclamation:
 <pre>gradlew --max-workers=1 clean buildFixes</pre>
 
-On Linux:
+On Linux (ICC):
 <pre>./gradlew --max-workers=1 clean buildRelease</pre>
 * For faster building without unit tests use this:exclamation:
 <pre>./gradlew --max-workers=1 clean buildFixes</pre>
+
+On Linux (GCC):
+<pre>./gradlew --max-workers=1 -PuseGcc clean buildRelease</pre>
+* For faster building without unit tests use this:exclamation:
+<pre>./gradlew --max-workers=1 -PuseGcc clean buildFixes</pre>
 
 Compiled binaries will be placed in the rehlds/build/binaries/ directory
 

@@ -19,7 +19,7 @@ CSimplePlatform::CSimplePlatform() {
 	wsock = LoadLibraryA("wsock32.dll");
 	setsockopt_v11 = (setsockopt_proto)GetProcAddress(wsock, "setsockopt");
 	if (setsockopt_v11 == NULL)
-		rehlds_syserror("%s: setsockopt_v11 not found", __FUNCTION__);
+		rehlds_syserror("%s: setsockopt_v11 not found", __func__);
 #endif
 }
 

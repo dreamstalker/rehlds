@@ -163,7 +163,7 @@ bool EXT_FUNC CRehldsServerStatic::IsLogActive()
 IGameClient* EXT_FUNC CRehldsServerStatic::GetClient(int id)
 {
 	if (id < 0 || id >= g_psvs.maxclients)
-		Sys_Error(__FUNCTION__": invalid id provided: %d", id);
+		Sys_Error("%s: invalid id provided: %d", __func__, id);
 
 	return g_GameClients[id];
 }
@@ -171,7 +171,7 @@ IGameClient* EXT_FUNC CRehldsServerStatic::GetClient(int id)
 client_t* EXT_FUNC CRehldsServerStatic::GetClient_t(int id)
 {
 	if (id < 0 || id >= g_psvs.maxclients)
-		Sys_Error(__FUNCTION__": invalid id provided: %d", id);
+		Sys_Error("%s: invalid id provided: %d", __func__, id);
 
 	return &g_psvs.clients[id];
 }
@@ -288,7 +288,7 @@ IGameClient* GetRehldsApiClient(client_t* cl)
 	int idx = cl - g_psvs.clients;
 	if (idx < 0 || idx >= g_psvs.maxclients)
 	{
-		Sys_Error(__FUNCTION__": Invalid client index %d", idx);
+		Sys_Error("%s: Invalid client index %d", __func__, idx);
 	}
 
 	return g_GameClients[idx];

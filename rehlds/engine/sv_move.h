@@ -42,10 +42,10 @@
 #define c_yes (*pc_yes)
 #define c_no (*pc_no)
 
-#endif // HOOK_ENGINE
-
 extern int c_yes;
 extern int c_no;
+
+#endif // HOOK_ENGINE
 
 qboolean SV_CheckBottom(edict_t *ent);
 qboolean SV_movetest(edict_t *ent, vec_t *move, qboolean relink);

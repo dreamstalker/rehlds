@@ -44,7 +44,7 @@ private:
 			// this was a root node
 			unsigned int rootId = GetRoodNodeId(node->key);
 			if (m_RootNodes[rootId] != node) {
-				Sys_Error(__FUNCTION__ ": invalid root node");
+				Sys_Error("%s: invalid root node", __func__);
 				return;
 			}
 

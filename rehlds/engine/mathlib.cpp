@@ -39,7 +39,7 @@ vec3_t vec3_origin;
 
 // aligned vec4_t
 typedef ALIGN16 vec4_t avec4_t;
-typedef ALIGN16 int aivec4_t[4];
+typedef ALIGN16 unsigned int aivec4_t[4];
 
 // conversion multiplier
 const avec4_t deg2rad =
@@ -116,7 +116,7 @@ float anglemod(float a)
 
 void BOPS_Error(void)
 {
-	Sys_Error("BoxOnPlaneSide:  Bad signbits");
+	Sys_Error("%s: Bad signbits", __func__);
 }
 
 #ifdef REHLDS_OPT_PEDANTIC

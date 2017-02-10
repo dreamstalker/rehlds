@@ -30,7 +30,7 @@ unsigned int DELTAJIT_GetFieldSize(delta_description_t* desc) {
 		return 0;
 
 	default:
-		Sys_Error(__FUNCTION__ ": Unknown delta field type %d", desc->fieldType);
+		Sys_Error("%s: Unknown delta field type %d", __func__, desc->fieldType);
 		return 0;
 	}
 }
@@ -56,11 +56,11 @@ void DELTAJIT_CreateDescription(delta_t* delta, deltajitdata_t &jitdesc) {
 
 	// sanity checks & pre-clean
 	if (numMemBlocks > DELTAJIT_MAX_BLOCKS) {
-		Sys_Error(__FUNCTION__ ": numMemBlocks > DELTAJIT_MAX_BLOCKS (%d > %d)", numMemBlocks, DELTAJIT_MAX_BLOCKS);
+		Sys_Error("%s: numMemBlocks > DELTAJIT_MAX_BLOCKS (%d > %d)", __func__, numMemBlocks, DELTAJIT_MAX_BLOCKS);
 	}
 
 	if (delta->fieldCount > DELTAJIT_MAX_FIELDS) {
-		Sys_Error(__FUNCTION__ ": fieldCount > DELTAJIT_MAX_FIELDS (%d > %d)", delta->fieldCount, DELTAJIT_MAX_FIELDS);
+		Sys_Error("%s: fieldCount > DELTAJIT_MAX_FIELDS (%d > %d)", __func__, delta->fieldCount, DELTAJIT_MAX_FIELDS);
 	}
 
 	Q_memset(&jitdesc, 0, sizeof(jitdesc));
@@ -684,20 +684,20 @@ CDeltaJit* DELTAJit_LookupDeltaJit(const char* callsite, delta_t *pFields) {
 }
 
 NOINLINE int DELTAJit_Fields_Clear_Mark_Check(unsigned char *from, unsigned char *to, delta_t *pFields, void* pForceMarkMask) {
-	CDeltaJit* deltaJit = DELTAJit_LookupDeltaJit(__FUNCTION__, pFields);
+	CDeltaJit* deltaJit = DELTAJit_LookupDeltaJit(__func__, pFields);
 	CDeltaClearMarkFieldsJIT &func = *deltaJit->cleanMarkCheckFunc;
 	return func(from, to, deltaJit, pForceMarkMask);
 }
 
 NOINLINE int DELTAJit_TestDelta(unsigned char *from, unsigned char *to, delta_t *pFields)
 {
-	CDeltaJit* deltaJit = DELTAJit_LookupDeltaJit(__FUNCTION__, pFields);
+	CDeltaJit* deltaJit = DELTAJit_LookupDeltaJit(__func__, pFields);
 	CDeltaTestDeltaJIT &func = *deltaJit->testDeltaFunc;
 	return func(from, to, deltaJit);
 }
 
 void DELTAJit_SetSendFlagBits(delta_t *pFields, int *bits, int *bytecount) {
-	CDeltaJit* deltaJit = DELTAJit_LookupDeltaJit(__FUNCTION__, pFields);
+	CDeltaJit* deltaJit = DELTAJit_LookupDeltaJit(__func__, pFields);
 
 	bits[0] = deltaJit->marked_fields_mask.u32[0];
 	bits[1] = deltaJit->marked_fields_mask.u32[1];
@@ -706,29 +706,29 @@ void DELTAJit_SetSendFlagBits(delta_t *pFields, int *bits, int *bytecount) {
 
 void DELTAJit_SetFieldByIndex(struct delta_s *pFields, int fieldNumber)
 {
-	CDeltaJit* deltaJit = DELTAJit_LookupDeltaJit(__FUNCTION__, pFields);
+	CDeltaJit* deltaJit = DELTAJit_LookupDeltaJit(__func__, pFields);
 	deltaJit->marked_fields_mask.u32[fieldNumber >> 5] |= (1 << (fieldNumber & 31));
 }
 
 void DELTAJit_UnsetFieldByIndex(struct delta_s *pFields, int fieldNumber)
 {
-	CDeltaJit* deltaJit = DELTAJit_LookupDeltaJit(__FUNCTION__, pFields);
+	CDeltaJit* deltaJit = DELTAJit_LookupDeltaJit(__func__, pFields);
 	deltaJit->marked_fields_mask.u32[fieldNumber >> 5] &= ~(1 << (fieldNumber & 31));
 }
 
 qboolean DELTAJit_IsFieldMarked(delta_t* pFields, int fieldNumber)
 {
-	CDeltaJit* deltaJit = DELTAJit_LookupDeltaJit(__FUNCTION__, pFields);
+	CDeltaJit* deltaJit = DELTAJit_LookupDeltaJit(__func__, pFields);
 	return deltaJit->marked_fields_mask.u32[fieldNumber >> 5] & (1 << (fieldNumber & 31));
 }
 
 uint64 DELTAJit_GetOriginalMask(delta_t* pFields) {
-	CDeltaJit* deltaJit = DELTAJit_LookupDeltaJit(__FUNCTION__, pFields);
+	CDeltaJit* deltaJit = DELTAJit_LookupDeltaJit(__func__, pFields);
 	return deltaJit->originalMarkedFieldsMask.u64;
 }
 
 uint64 DELTAJit_GetMaskU64(delta_t* pFields) {
-	CDeltaJit* deltaJit = DELTAJit_LookupDeltaJit(__FUNCTION__, pFields);
+	CDeltaJit* deltaJit = DELTAJit_LookupDeltaJit(__func__, pFields);
 	return deltaJit->marked_fields_mask.u64;
 }
 

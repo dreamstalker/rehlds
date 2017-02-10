@@ -672,7 +672,7 @@ qboolean Steam_NotifyClientConnect_internal(client_t *cl, const void *pvSteam2Ke
 	{
 		return Steam3Server()->NotifyClientConnect(cl, pvSteam2Key, ucbSteam2Key);
 	}
-	return NULL;
+	return FALSE;
 }
 
 qboolean EXT_FUNC Steam_NotifyBotConnect_api(IGameClient* cl)
@@ -691,7 +691,7 @@ qboolean Steam_NotifyBotConnect_internal(client_t *cl)
 	{
 		return Steam3Server()->NotifyBotConnect(cl);
 	}
-	return NULL;
+	return FALSE;
 }
 
 void EXT_FUNC Steam_NotifyClientDisconnect_api(IGameClient* cl)

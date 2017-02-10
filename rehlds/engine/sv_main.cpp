@@ -327,7 +327,7 @@ delta_t *SV_LookupDelta(char *name)
 		p = p->next;
 	}
 
-	Sys_Error(__FUNCTION__ ": Couldn't find delta for %s\n", name);
+	Sys_Error("%s: Couldn't find delta for %s\n", __func__, name);
 
 	return NULL;
 }
@@ -423,7 +423,7 @@ void SV_ReallocateDynamicData(void)
 {
 	if (!g_psv.max_edicts)
 	{
-		Con_DPrintf(__FUNCTION__ " with sv.max_edicts == 0\n");
+		Con_DPrintf("%s: sv.max_edicts == 0\n", __func__);
 		return;
 	}
 
@@ -470,6 +470,7 @@ qboolean SV_IsPlayerIndex(int index)
 	return (index >= 1 && index <= g_psvs.maxclients);
 }
 
+#ifdef _WIN32
 qboolean __declspec(naked) SV_IsPlayerIndex_wrapped(int index)
 {
 	// Original SV_IsPlayerIndex in swds.dll doesn't modify ecx nor edx.
@@ -488,6 +489,12 @@ qboolean __declspec(naked) SV_IsPlayerIndex_wrapped(int index)
 		retn;
 	}
 }
+#else // _WIN32
+qboolean SV_IsPlayerIndex_wrapped(int index)
+{
+	return SV_IsPlayerIndex(index);
+}
+#endif // _WIN32
 
 void SV_ClearPacketEntities(client_frame_t *frame)
 {
@@ -777,22 +784,22 @@ qboolean SV_BuildSoundMsg(edict_t *entity, int channel, const char *sample, int 
 
 	if (volume < 0 || volume > 255)
 	{
-		Con_Printf(__FUNCTION__ ": volume = %i", volume);
+		Con_Printf("%s: volume = %i", __func__, volume);
 		volume = (volume < 0) ? 0 : 255;
 	}
 	if (attenuation < 0.0f || attenuation > 4.0f)
 	{
-		Con_Printf(__FUNCTION__ ": attenuation = %f", attenuation);
+		Con_Printf("%s: attenuation = %f", __func__, attenuation);
 		attenuation = (attenuation < 0.0f) ? 0.0f : 4.0f;
 	}
 	if (channel < 0 || channel > 7)
 	{
-		Con_Printf(__FUNCTION__ ": channel = %i", channel);
+		Con_Printf("%s: channel = %i", __func__, channel);
 		channel = (channel < 0) ? CHAN_AUTO : CHAN_NETWORKVOICE_BASE;
 	}
 	if (pitch < 0 || pitch > 255)
 	{
-		Con_Printf(__FUNCTION__ ": pitch = %i", pitch);
+		Con_Printf("%s: pitch = %i", __func__, pitch);
 		pitch = (pitch < 0) ? 0 : 255;
 	}
 
@@ -804,7 +811,7 @@ qboolean SV_BuildSoundMsg(edict_t *entity, int channel, const char *sample, int 
 		sound_num = Q_atoi(sample + 1);
 		if (sound_num >= CVOXFILESENTENCEMAX)
 		{
-			Con_Printf(__FUNCTION__ ": invalid sentence number: %s", sample + 1);
+			Con_Printf("%s: invalid sentence number: %s", __func__, sample + 1);
 			return FALSE;
 		}
 	}
@@ -818,7 +825,7 @@ qboolean SV_BuildSoundMsg(edict_t *entity, int channel, const char *sample, int 
 		sound_num = SV_LookupSoundIndex(sample);
 		if (!sound_num || !g_psv.sound_precache[sound_num])
 		{
-			Con_Printf(__FUNCTION__ ": %s not precached (%d)\n", sample, sound_num);
+			Con_Printf("%s: %s not precached (%d)\n", __func__, sample, sound_num);
 			return FALSE;
 		}
 	}
@@ -927,7 +934,7 @@ void SV_AddSampleToHashedLookupTable(const char *pszSample, int iSampleIndex)
 			index = 0;
 
 		if (index == starting_index)
-			Sys_Error(__FUNCTION__ ": NO FREE SLOTS IN SOUND LOOKUP TABLE");
+			Sys_Error("%s: NO FREE SLOTS IN SOUND LOOKUP TABLE", __func__);
 	}
 
 	g_psv.sound_precache_hashedlookup[index] = iSampleIndex;
@@ -1848,7 +1855,7 @@ int EXT_FUNC SV_CheckProtocol_internal(netadr_t *adr, int nProtocol)
 {
 	if (adr == NULL)
 	{
-		Sys_Error(__FUNCTION__ ":  Null address\n");
+		Sys_Error("%s:  Null address\n", __func__);
 	}
 
 	if (nProtocol == PROTOCOL_VERSION)
@@ -1901,7 +1908,7 @@ bool EXT_FUNC SV_CheckChallenge_api(const netadr_t &adr, int nChallengeValue) {
 int SV_CheckChallenge(netadr_t *adr, int nChallengeValue)
 {
 	if (!adr)
-		Sys_Error(__FUNCTION__ ":  Null address\n");
+		Sys_Error("%s:  Null address\n", __func__);
 
 	if (NET_IsLocalAddress(*adr))
 		return 1;
@@ -2646,19 +2653,19 @@ void SV_ResetModInfo(void)
 	nFileSize = FS_Size(hLibListFile);
 	if (!nFileSize || (signed int)nFileSize > 256 * 1024)
 	{
-		Sys_Error("Game listing file size is bogus [%s: size %i]", "liblist.gam", nFileSize);
+		Sys_Error("%s: Game listing file size is bogus [%s: size %i]", __func__, "liblist.gam", nFileSize);
 	}
 
 	pszInputStream = (char *)Mem_Malloc(nFileSize + 1);
 	if (!pszInputStream)
 	{
-		Sys_Error("Could not allocate space for game listing file of %i bytes", nFileSize + 1);
+		Sys_Error("%s: Could not allocate space for game listing file of %i bytes", __func__, nFileSize + 1);
 	}
 
 	nBytesRead = FS_Read(pszInputStream, nFileSize, 1, hLibListFile);
 	if (nBytesRead != nFileSize)
 	{
-		Sys_Error("Error reading in game listing file, expected %i bytes, read %i", nFileSize, nBytesRead);
+		Sys_Error("%s: Error reading in game listing file, expected %i bytes, read %i", __func__, nFileSize, nBytesRead);
 	}
 
 	pszInputStream[nFileSize] = 0;
@@ -5055,7 +5062,7 @@ int SV_ModelIndex(const char *name)
 	};
 #endif
 
-	Sys_Error("SV_ModelIndex: model %s not precached", name);
+	Sys_Error("%s: SV_ModelIndex: model %s not precached", __func__, name);
 }
 
 void EXT_FUNC SV_AddResource(resourcetype_t type, const char *name, int size, unsigned char flags, int index)
@@ -5067,7 +5074,7 @@ void EXT_FUNC SV_AddResource(resourcetype_t type, const char *name, int size, un
 	if (g_psv.num_resources >= MAX_RESOURCE_LIST)
 #endif // REHLDS_FIXES
 	{
-		Sys_Error("Too many resources on server.");
+		Sys_Error("%s: Too many resources on server.", __func__);
 	}
 
 #ifdef REHLDS_FIXES
@@ -5426,38 +5433,6 @@ void EXT_FUNC SV_WriteVoiceCodec_internal(sizebuf_t *pBuf)
 	MSG_WriteByte(pBuf, 0);
 }
 
-/*
- * Interface between engine and gamedll has a flaw which can lead to inconsistent behavior when passing arguments of type vec3_t to gamedll
- * Consider function func(vec3_t v) defined in gamedll. vec3_t defined in gamedll as a class (not array), therefore it's expected that all vector components (12 bytes) will be written in the stack,
- * i.e. the function signature may be represented as func(float v_0, float v_1, float v_2).
- * In the engine, on the other hand, vec3_t is an array of vec_t (vec_t[3]). C/C++ compiler treats arguments of array type as pointers to array's first element, thus, on attempt to
- * invoke gamedll's func(vec3_t v) from engine, only pointer to first vector's element will be passed in stack, while gamedll expects all 3 vector elements.
- * This inconsistency in the interface between gamedll and engine leads to exposure of some data from stack of caller function to vector's elements in gamedll, which, in turn,
- * leads to inconsistent behavior (since stack data may contain pointers) across different systems
- *
- * This functions emulates swds.dll behavior, i.e. it sends the same garbage when invoking CreateBaseline as swds.dll does.
- * This is required since not emulating this behavior will break rehlds test demos
- */
-void __invokeValvesBuggedCreateBaseline(void* func, int player, int eindex, struct entity_state_s *baseline, struct edict_s *entity, int playermodelindex, vec_t* pmins, vec_t* pmaxs)
-{
-	__asm {
-		mov ecx, func
-		push 0
-		push 1
-		push 0
-		push 0
-		push pmaxs
-		push pmins
-		push playermodelindex
-		push entity
-		push baseline
-		push eindex
-		push player
-		call ecx
-		add esp, 0x2C
-	}
-}
-
 void SV_CreateBaseline(void)
 {
 	edict_t *svent;
@@ -5487,7 +5462,35 @@ void SV_CreateBaseline(void)
 				else
 					g_psv.baselines[entnum].entityType = ENTITY_NORMAL;
 
-				__invokeValvesBuggedCreateBaseline((void *)gEntityInterface.pfnCreateBaseline, player, entnum, &(g_psv.baselines[entnum]), svent, sv_playermodel, player_mins[0], player_maxs[0]);
+				/*
+				* Interface between engine and gamedll has a flaw which can lead to inconsistent behavior when passing arguments of type vec3_t to gamedll
+				* Consider function func(vec3_t v) defined in gamedll. vec3_t defined in gamedll as a class (not array), therefore it's expected that all vector components (12 bytes) will be written in the stack,
+				* i.e. the function signature may be represented as func(float v_0, float v_1, float v_2).
+				* In the engine, on the other hand, vec3_t is an array of vec_t (vec_t[3]). C/C++ compiler treats arguments of array type as pointers to array's first element, thus, on attempt to
+				* invoke gamedll's func(vec3_t v) from engine, only pointer to first vector's element will be passed in stack, while gamedll expects all 3 vector elements.
+				* This inconsistency in the interface between gamedll and engine leads to exposure of some data from stack of caller function to vector's elements in gamedll, which, in turn,
+				* leads to inconsistent behavior (since stack data may contain pointers) across different systems.
+				*/
+#ifdef REHLDS_FIXES
+				/*
+				* Fixed function call.
+				*/
+				typedef void CreateBaseline_t(int player, int eindex, struct entity_state_s *baseline, struct edict_s *entity, int playermodelindex, vec_t player_mins0, vec_t player_mins1, vec_t player_mins2, vec_t player_maxs0, vec_t player_maxs1, vec_t player_maxs2);
+				((CreateBaseline_t*)gEntityInterface.pfnCreateBaseline)(player, entnum, &(g_psv.baselines[entnum]), svent, sv_playermodel, player_mins[0][0], player_mins[0][1], player_mins[0][2], player_maxs[0][0], player_maxs[0][1], player_maxs[0][2]);
+#else // REHLDS_FIXES
+				/*
+				* This function call emulates swds.dll behavior, i.e. it sends the same garbage when invoking CreateBaseline as swds.dll does.
+				* This is required since not emulating this behavior will break rehlds test demos.
+				*/
+				typedef void CreateBaseline_t(int player, int eindex, struct entity_state_s *baseline, struct edict_s *entity, int playermodelindex, vec3_t player_mins, vec3_t player_maxs, int dummy1, int dummy2, int dummy3, int dummy4);
+				((CreateBaseline_t*)gEntityInterface.pfnCreateBaseline)(player, entnum, &(g_psv.baselines[entnum]), svent, sv_playermodel, player_mins[0], player_maxs[0], 0, 0, 1, 0);
+
+				/*
+				* Bugged function call that is used in the original engine. Just for a reference.
+				*/
+				//gEntityInterface.pfnCreateBaseline(player, entnum, &(g_psv.baselines[entnum]), svent, sv_playermodel, player_mins[0], player_maxs[0]);
+#endif // REHLDS_FIXES
+
 				sv_lastnum = entnum;
 			}
 		}
@@ -5547,7 +5550,7 @@ void SV_BroadcastCommand(char *fmt, ...)
 	MSG_WriteByte(&msg, svc_stufftext);
 	MSG_WriteString(&msg, string);
 	if (msg.flags & SIZEBUF_OVERFLOWED)
-		Sys_Error("SV_BroadcastCommand:  Overflowed on %s, %i is max size\n", string, msg.maxsize);
+		Sys_Error("%s: Overflowed on %s, %i is max size\n", __func__, string, msg.maxsize);
 
 	for (int i = 0; i < g_psvs.maxclients; ++i)
 	{
@@ -6472,7 +6475,7 @@ void SV_BanId_f(void)
 		}
 		if (id == NULL)
 		{
-			Con_Printf(__FUNCTION__ ":  Couldn't find #userid %u\n", search);
+			Con_Printf("%s:  Couldn't find #userid %u\n", __func__, search);
 			return;
 		}
 	}
@@ -6501,7 +6504,7 @@ void SV_BanId_f(void)
 
 		if (id == NULL)
 		{
-			Con_Printf(__FUNCTION__ ":  Couldn't resolve uniqueid %s.\n", idstring);
+			Con_Printf("%s:  Couldn't resolve uniqueid %s.\n", __func__, idstring);
 			Con_Printf("Usage:  banid <minutes> <uniqueid or #userid> { kick }\n");
 			Con_Printf("Use 0 minutes for permanent\n");
 			return;
@@ -6519,7 +6522,7 @@ void SV_BanId_f(void)
 	{
 		if (numuserfilters >= MAX_USERFILTERS)
 		{
-			Con_Printf(__FUNCTION__ ":  User filter list is full\n");
+			Con_Printf("%s:  User filter list is full\n", __func__);
 			return;
 		}
 		numuserfilters++;
@@ -6806,7 +6809,7 @@ void SV_RemoveId_f(void)
 
 	if (!idstring[0])
 	{
-		Con_Printf(__FUNCTION__ ":  Id string is empty!\n");
+		Con_Printf("%s:  Id string is empty!\n", __func__);
 		return;
 	}
 
@@ -6815,7 +6818,7 @@ void SV_RemoveId_f(void)
 		int slot = Q_atoi(&idstring[1]);
 		if (slot <= 0 || slot > numuserfilters)
 		{
-			Con_Printf(__FUNCTION__ ":  invalid slot #%i\n", slot);
+			Con_Printf("%s:  invalid slot #%i\n", __func__, slot);
 			return;
 		}
 		slot--;
@@ -7659,7 +7662,7 @@ void SV_RegisterDelta(char *name, char *loadfile)
 {
 	delta_t *pdesc = NULL;
 	if (!DELTA_Load(name, &pdesc, loadfile))
-		Sys_Error("Error parsing %s!!!\n", loadfile);
+		Sys_Error("%s: Error parsing %s!!!\n", __func__, loadfile);
 
 	delta_info_t *p = (delta_info_t *)Mem_ZeroMalloc(sizeof(delta_info_t));
 	p->loadfile = Mem_Strdup(loadfile);
@@ -7686,32 +7689,32 @@ void SV_InitDeltas(void)
 
 	g_pplayerdelta = SV_LookupDelta("entity_state_player_t");
 	if (!g_pplayerdelta)
-		Sys_Error("No entity_state_player_t encoder on server!\n");
+		Sys_Error("%s: No entity_state_player_t encoder on server!\n", __func__);
 
 	g_pentitydelta = SV_LookupDelta("entity_state_t");
 	if (!g_pentitydelta)
-		Sys_Error("No entity_state_t encoder on server!\n");
+		Sys_Error("%s: No entity_state_t encoder on server!\n", __func__);
 
 	g_pcustomentitydelta = SV_LookupDelta("custom_entity_state_t");
 	if (!g_pcustomentitydelta)
-		Sys_Error("No custom_entity_state_t encoder on server!\n");
+		Sys_Error("%s: No custom_entity_state_t encoder on server!\n", __func__);
 
 	g_pclientdelta = SV_LookupDelta("clientdata_t");
 	if (!g_pclientdelta)
-		Sys_Error("No clientdata_t encoder on server!\n");
+		Sys_Error("%s: No clientdata_t encoder on server!\n", __func__);
 
 	g_pweapondelta = SV_LookupDelta("weapon_data_t");
 	if (!g_pweapondelta)
-		Sys_Error("No weapon_data_t encoder on server!\n");
+		Sys_Error("%s: No weapon_data_t encoder on server!\n", __func__);
 
 	g_peventdelta = SV_LookupDelta("event_t");
 	if (!g_peventdelta)
-		Sys_Error("No event_t encoder on server!\n");
+		Sys_Error("%s: No event_t encoder on server!\n", __func__);
 
 #ifdef REHLDS_OPT_PEDANTIC
 	g_pusercmddelta = SV_LookupDelta("usercmd_t");
 	if (!g_pusercmddelta)
-		Sys_Error("No usercmd_t encoder on server!\n");
+		Sys_Error("%s: No usercmd_t encoder on server!\n", __func__);
 #endif
 
 #if defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)

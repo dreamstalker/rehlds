@@ -258,7 +258,7 @@ typedef struct enginefuncs_s
 
 	void		(*pfnGetPlayerStats)		( const edict_t *pClient, int *ping, int *packet_loss );
 
-	void		(*pfnAddServerCommand)		( char *cmd_name, void (*function) (void) );
+	void		(*pfnAddServerCommand)		( const char *cmd_name, void (*function) (void) );
 
 	// For voice communications, set which clients hear eachother.
 	// NOTE: these functions take player entity indices (starting at 1).

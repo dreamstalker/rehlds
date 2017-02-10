@@ -203,7 +203,7 @@ void Sys_CheckOSVersion(void)
 	Q_memset(&verInfo, 0, sizeof(verInfo));
 	verInfo.dwOSVersionInfoSize = sizeof(verInfo);
 	if (!GetVersionEx(&verInfo))
-		Sys_Error("Couldn't get OS info");
+		Sys_Error("%s: Couldn't get OS info", __func__);
 
 	g_WinNTOrHigher = verInfo.dwMajorVersion >= 4;
 	if (verInfo.dwPlatformId == 1 && verInfo.dwMajorVersion == 4)
@@ -348,7 +348,7 @@ void Sys_InitMemory(void)
 		if (lpBuffer.dwTotalPhys)
 		{
 			if (lpBuffer.dwTotalPhys < FIFTEEN_MB)
-				Sys_Error("Available memory less than 15MB!!! %i", host_parms.memsize);
+				Sys_Error("%s: Available memory less than 15MB!!! %i", __func__, host_parms.memsize);
 
 			host_parms.memsize = (int)(lpBuffer.dwTotalPhys >> 1);
 			if (host_parms.memsize < MINIMUM_WIN_MEMORY)
@@ -376,7 +376,7 @@ void Sys_InitMemory(void)
 #endif // _WIN32
 
 	if (!host_parms.membase)
-		Sys_Error("Unable to allocate %.2f MB\n", (float)host_parms.memsize / (1024.0f * 1024.0f));
+		Sys_Error("%s: Unable to allocate %.2f MB\n", __func__, (float)host_parms.memsize / (1024.0f * 1024.0f));
 }
 
 void Sys_ShutdownMemory(void)
@@ -693,7 +693,7 @@ bool CDedicatedServerAPI::Init_noVirt(char *basedir, char *cmdline, CreateInterf
 
 	g_bIsDedicatedServer = TRUE;
 	TraceInit("FileSystem_Init(basedir, (void *)filesystemFactory)", "FileSystem_Shutdown()", 0);
-	if (FileSystem_Init(basedir, filesystemFactory) && game->Init(0) && eng->Load(true, basedir, cmdline))
+	if (FileSystem_Init(basedir, (void *)filesystemFactory) && game->Init(0) && eng->Load(true, basedir, cmdline))
 	{
 		char text[256];
 		Q_snprintf(text, ARRAYSIZE(text), "exec %s\n", servercfgfile.string);

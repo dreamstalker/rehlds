@@ -55,7 +55,7 @@ cvar_t r_wadtextures;
 void SafeRead(FileHandle_t f, void *buffer, int count)
 {
 	if (FS_Read(buffer, count, 1, f) != count)
-		Sys_Error("File read failure");
+		Sys_Error("%s: File read failure", __func__);
 }
 
 void CleanupName(char *in, char *out)
@@ -122,12 +122,12 @@ qboolean TEX_InitFromWad(char *path)
 		texfile = FS_Open(wadPath, "rb");
 		texfiles[nTexFiles++] = texfile;
 		if (!texfile)
-			Sys_Error("WARNING: couldn't open %s\n", wadPath);
+			Sys_Error("%s: couldn't open %s\n", __func__, wadPath);
 
 		Con_DPrintf("Using WAD File: %s\n", wadPath);
 		SafeRead(texfile, &header, 12);
 		if (Q_strncmp(header.identification, "WAD2", 4) && Q_strncmp(header.identification, "WAD3", 4))
-			Sys_Error("TEX_InitFromWad: %s isn't a wadfile", wadPath);
+			Sys_Error("%s: %s isn't a wadfile", __func__, wadPath);
 
 		header.numlumps = LittleLong(header.numlumps);
 		header.infotableofs = LittleLong(header.infotableofs);
@@ -196,7 +196,7 @@ int FindMiptex(char *name)
 	}
 
 	if (nummiptex == 512)
-		Sys_Error("Exceeded MAX_MAP_TEXTURES");
+		Sys_Error("%s: Exceeded MAX_MAP_TEXTURES", __func__);
 
 	Q_strncpy(miptex[i], name, 63);
 	miptex[i][63] = 0;

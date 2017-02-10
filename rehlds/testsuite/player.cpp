@@ -36,16 +36,16 @@ CPlayingEngExtInterceptor::CPlayingEngExtInterceptor(const char* fname, bool str
 	m_InStream.read((char*)&versionMinor, 2).read((char*)&versionMajor, 2);
 
 	if (versionMajor != TESTSUITE_PROTOCOL_VERSION_MAJOR) {
-		rehlds_syserror("%s: protocol major version mismatch; need %d, got %d", __FUNCTION__, TESTSUITE_PROTOCOL_VERSION_MAJOR, versionMajor);
+		rehlds_syserror("%s: protocol major version mismatch; need %d, got %d", __func__, TESTSUITE_PROTOCOL_VERSION_MAJOR, versionMajor);
 	}
 
 	if (versionMinor > TESTSUITE_PROTOCOL_VERSION_MINOR) {
-		rehlds_syserror("%s: protocol minor version mismatch; need <= %d, got %d", __FUNCTION__, TESTSUITE_PROTOCOL_VERSION_MINOR, versionMinor);
+		rehlds_syserror("%s: protocol minor version mismatch; need <= %d, got %d", __func__, TESTSUITE_PROTOCOL_VERSION_MINOR, versionMinor);
 	}
 
 	m_InStream.read((char*)&cmdlineLen, 4);
 	if (cmdlineLen > sizeof(cmdLine)) {
-		rehlds_syserror("%s: too long cmdline", __FUNCTION__);
+		rehlds_syserror("%s: too long cmdline", __func__);
 	}
 
 	m_InStream.read(cmdLine, cmdlineLen);
@@ -66,7 +66,7 @@ void* CPlayingEngExtInterceptor::allocFuncCall()
 		}
 	}
 
-	rehlds_syserror("%s: running out of free slots", __FUNCTION__);
+	rehlds_syserror("%s: running out of free slots", __func__);
 	return NULL;
 }
 
@@ -81,7 +81,7 @@ void CPlayingEngExtInterceptor::freeFuncCall(void* fcall)
 		}
 	}
 
-	rehlds_syserror("%s: invalid pointer provided: %p", __FUNCTION__, fcall);
+	rehlds_syserror("%s: invalid pointer provided: %p", __func__, fcall);
 }
 
 bool CPlayingEngExtInterceptor::readFuncCall() {
@@ -127,7 +127,7 @@ IEngExtCall* CPlayingEngExtInterceptor::getNextCallInternal(bool peek) {
 	}
 
 	if (m_CommandsQueue.empty()) {
-		rehlds_syserror("%s: command queue is empty!", __FUNCTION__);
+		rehlds_syserror("%s: command queue is empty!", __func__);
 	}
 
 	IEngExtCall* next = m_CommandsQueue.front();
@@ -164,7 +164,7 @@ IEngExtCall* CPlayingEngExtInterceptor::getNextCall(bool peek, bool processCallb
 	IEngCallbackCall* callback = dynamic_cast<IEngCallbackCall*>(cmd);
 	if (callback != NULL && callback->m_Start) {
 		if (!processCallbacks) {
-			rehlds_syserror("%s: read a callback, but it's not allowed here", __FUNCTION__);
+			rehlds_syserror("%s: read a callback, but it's not allowed here", __func__);
 			return NULL;
 		}
 
@@ -176,13 +176,13 @@ IEngExtCall* CPlayingEngExtInterceptor::getNextCall(bool peek, bool processCallb
 	}
 
 	if (cmd->getOpcode() != expectedOpcode) {
-		rehlds_syserror("%s: bad opcode; expected %d got %d; size left: %d", __FUNCTION__, expectedOpcode, cmd->getOpcode(), sizeLeft);
+		rehlds_syserror("%s: bad opcode; expected %d got %d; size left: %d", __func__, expectedOpcode, cmd->getOpcode(), sizeLeft);
 	}
 	if (needStart) {
-		if (!cmd->m_Start) rehlds_syserror("%s: bad fcall %d; expected start flag", __FUNCTION__, cmd->getOpcode());
+		if (!cmd->m_Start) rehlds_syserror("%s: bad fcall %d; expected start flag", __func__, cmd->getOpcode());
 	}
 	else {
-		if (!cmd->m_End) rehlds_syserror("%s: bad fcall %d; expected end flag", __FUNCTION__, cmd->getOpcode());
+		if (!cmd->m_End) rehlds_syserror("%s: bad fcall %d; expected end flag", __func__, cmd->getOpcode());
 	}
 
 	return cmd;
@@ -200,42 +200,42 @@ void CPlayingEngExtInterceptor::playCallback(IEngCallbackCall* cb) {
 		return;
 
 	default:
-		rehlds_syserror("%s: unknown callback", __FUNCTION__);
+		rehlds_syserror("%s: unknown callback", __func__);
 	}
 }
 
 void CPlayingEngExtInterceptor::playSteamCallback1(CSteamCallbackCall1* cb) {
 	auto itr = m_SteamCallbacks.find(cb->m_CallbackId);
-	if (itr == m_SteamCallbacks.end()) rehlds_syserror("%s: callback %d not found", __FUNCTION__, cb->m_CallbackId);
+	if (itr == m_SteamCallbacks.end()) rehlds_syserror("%s: callback %d not found", __func__, cb->m_CallbackId);
 	CCallbackBase* steamCallback = (*itr).second;
 
-	if (steamCallback->GetFlags() != cb->m_InState.m_nCallbackFlags) rehlds_syserror("%s: PRE flags desync", __FUNCTION__);
-	if (steamCallback->GetICallback() != cb->m_InState.m_iCallback) rehlds_syserror("%s: PRE flags desync", __FUNCTION__);
+	if (steamCallback->GetFlags() != cb->m_InState.m_nCallbackFlags) rehlds_syserror("%s: PRE flags desync", __func__);
+	if (steamCallback->GetICallback() != cb->m_InState.m_iCallback) rehlds_syserror("%s: PRE flags desync", __func__);
 
 	steamCallback->Run(cb->m_Data);
 
-	CSteamCallbackCall1* endCallback = (CSteamCallbackCall1*)getNextCall(false, true, cb->getOpcode(), false, __FUNCTION__);
+	CSteamCallbackCall1* endCallback = (CSteamCallbackCall1*)getNextCall(false, true, cb->getOpcode(), false, __func__);
 
-	if (steamCallback->GetFlags() != endCallback->m_OutState.m_nCallbackFlags) rehlds_syserror("%s: POST flags desync", __FUNCTION__);
-	if (steamCallback->GetICallback() != endCallback->m_OutState.m_iCallback) rehlds_syserror("%s: POST flags desync", __FUNCTION__);
+	if (steamCallback->GetFlags() != endCallback->m_OutState.m_nCallbackFlags) rehlds_syserror("%s: POST flags desync", __func__);
+	if (steamCallback->GetICallback() != endCallback->m_OutState.m_iCallback) rehlds_syserror("%s: POST flags desync", __func__);
 	freeFuncCall(cb);
 	freeFuncCall(endCallback);
 }
 
 void CPlayingEngExtInterceptor::playSteamCallback2(CSteamCallbackCall2* cb) {
 	auto itr = m_SteamCallbacks.find(cb->m_CallbackId);
-	if (itr == m_SteamCallbacks.end()) rehlds_syserror("%s: callback %d not found", __FUNCTION__, cb->m_CallbackId);
+	if (itr == m_SteamCallbacks.end()) rehlds_syserror("%s: callback %d not found", __func__, cb->m_CallbackId);
 	CCallbackBase* steamCallback = (*itr).second;
 
-	if (steamCallback->GetFlags() != cb->m_InState.m_nCallbackFlags) rehlds_syserror("%s: PRE flags desync", __FUNCTION__);
-	if (steamCallback->GetICallback() != cb->m_InState.m_iCallback) rehlds_syserror("%s: PRE flags desync", __FUNCTION__);
+	if (steamCallback->GetFlags() != cb->m_InState.m_nCallbackFlags) rehlds_syserror("%s: PRE flags desync", __func__);
+	if (steamCallback->GetICallback() != cb->m_InState.m_iCallback) rehlds_syserror("%s: PRE flags desync", __func__);
 
 	steamCallback->Run(cb->m_Data, cb->m_bIOFailure, cb->m_SteamAPICall);
 
-	CSteamCallbackCall2* endCallback = (CSteamCallbackCall2*)getNextCall(false, true, cb->getOpcode(), false, __FUNCTION__);
+	CSteamCallbackCall2* endCallback = (CSteamCallbackCall2*)getNextCall(false, true, cb->getOpcode(), false, __func__);
 
-	if (steamCallback->GetFlags() != endCallback->m_OutState.m_nCallbackFlags) rehlds_syserror("%s: POST flags desync", __FUNCTION__);
-	if (steamCallback->GetICallback() != endCallback->m_OutState.m_iCallback) rehlds_syserror("%s: POST flags desync", __FUNCTION__);
+	if (steamCallback->GetFlags() != endCallback->m_OutState.m_nCallbackFlags) rehlds_syserror("%s: POST flags desync", __func__);
+	if (steamCallback->GetICallback() != endCallback->m_OutState.m_iCallback) rehlds_syserror("%s: POST flags desync", __func__);
 	freeFuncCall(cb);
 	freeFuncCall(endCallback);
 }
@@ -256,15 +256,15 @@ int CPlayingEngExtInterceptor::getOrRegisterSteamCallback(CCallbackBase* cb) {
 void CPlayingEngExtInterceptor::maybeHeartBeat(int readPos) {
 	if (m_PrevHeartBeat + m_HeartBeatInterval <= readPos) {
 		m_PrevHeartBeat = readPos;
-		Con_Printf("%s: readPos=%u\n", __FUNCTION__, readPos);
+		Con_Printf("%s: readPos=%u\n", __func__, readPos);
 	}
 }
 
 uint32 CPlayingEngExtInterceptor::time(uint32* pTime)
 {
-	CStdTimeCall* playCall = dynamic_cast<CStdTimeCall*>(getNextCall(false, false, ECF_CSTD_TIME, true, __FUNCTION__));
-	CStdTimeCall(pTime).ensureArgsAreEqual(playCall, m_bStrictChecks, __FUNCTION__);
-	CStdTimeCall* playEndCall = dynamic_cast<CStdTimeCall*>(getNextCall(false, true, ECF_CSTD_TIME, false, __FUNCTION__));
+	CStdTimeCall* playCall = dynamic_cast<CStdTimeCall*>(getNextCall(false, false, ECF_CSTD_TIME, true, __func__));
+	CStdTimeCall(pTime).ensureArgsAreEqual(playCall, m_bStrictChecks, __func__);
+	CStdTimeCall* playEndCall = dynamic_cast<CStdTimeCall*>(getNextCall(false, true, ECF_CSTD_TIME, false, __func__));
 
 	uint32 res = playEndCall->m_Res;
 	if (pTime != NULL) *pTime = res;
@@ -276,9 +276,9 @@ uint32 CPlayingEngExtInterceptor::time(uint32* pTime)
 
 struct tm* CPlayingEngExtInterceptor::localtime(uint32 time)
 {
-	CStdLocalTimeCall* playCall = dynamic_cast<CStdLocalTimeCall*>(getNextCall(false, false, ECF_CSTD_LOCALTIME, true, __FUNCTION__));
-	CStdLocalTimeCall(time).ensureArgsAreEqual(playCall, m_bStrictChecks, __FUNCTION__);
-	CStdLocalTimeCall* playEndCall = dynamic_cast<CStdLocalTimeCall*>(getNextCall(false, true, ECF_CSTD_LOCALTIME, false, __FUNCTION__));
+	CStdLocalTimeCall* playCall = dynamic_cast<CStdLocalTimeCall*>(getNextCall(false, false, ECF_CSTD_LOCALTIME, true, __func__));
+	CStdLocalTimeCall(time).ensureArgsAreEqual(playCall, m_bStrictChecks, __func__);
+	CStdLocalTimeCall* playEndCall = dynamic_cast<CStdLocalTimeCall*>(getNextCall(false, true, ECF_CSTD_LOCALTIME, false, __func__));
 
 	setCurrentTm(&playEndCall->m_Res);
 
@@ -289,17 +289,17 @@ struct tm* CPlayingEngExtInterceptor::localtime(uint32 time)
 
 void CPlayingEngExtInterceptor::srand(uint32 seed)
 {
-	CStdSrandCall* playCall = dynamic_cast<CStdSrandCall*>(getNextCall(false, false, ECF_CSTD_SRAND_CALL, true, __FUNCTION__));
-	CStdSrandCall(seed).ensureArgsAreEqual(playCall, m_bStrictChecks, __FUNCTION__);
-	CStdSrandCall* playEndCall = dynamic_cast<CStdSrandCall*>(getNextCall(false, true, ECF_CSTD_SRAND_CALL, false, __FUNCTION__));
+	CStdSrandCall* playCall = dynamic_cast<CStdSrandCall*>(getNextCall(false, false, ECF_CSTD_SRAND_CALL, true, __func__));
+	CStdSrandCall(seed).ensureArgsAreEqual(playCall, m_bStrictChecks, __func__);
+	CStdSrandCall* playEndCall = dynamic_cast<CStdSrandCall*>(getNextCall(false, true, ECF_CSTD_SRAND_CALL, false, __func__));
 
 	freeFuncCall(playCall); freeFuncCall(playEndCall);
 }
 
 int CPlayingEngExtInterceptor::rand()
 {
-	CStdRandCall* playCall = dynamic_cast<CStdRandCall*>(getNextCall(false, false, ECF_CSTD_RAND_CALL, true, __FUNCTION__));
-	CStdRandCall* playEndCall = dynamic_cast<CStdRandCall*>(getNextCall(false, true, ECF_CSTD_RAND_CALL, false, __FUNCTION__));
+	CStdRandCall* playCall = dynamic_cast<CStdRandCall*>(getNextCall(false, false, ECF_CSTD_RAND_CALL, true, __func__));
+	CStdRandCall* playEndCall = dynamic_cast<CStdRandCall*>(getNextCall(false, true, ECF_CSTD_RAND_CALL, false, __func__));
 
 	int res = playEndCall->m_Res;
 
@@ -309,16 +309,16 @@ int CPlayingEngExtInterceptor::rand()
 }
 
 void CPlayingEngExtInterceptor::Sleep(DWORD msec) {
-	CSleepExtCall* playCall = dynamic_cast<CSleepExtCall*>(getNextCall(false, false, ECF_SLEEP, true, __FUNCTION__));
-	CSleepExtCall(msec).ensureArgsAreEqual(playCall, m_bStrictChecks, __FUNCTION__);
-	CSleepExtCall* playEndCall = dynamic_cast<CSleepExtCall*>(getNextCall(false, true, ECF_SLEEP, false, __FUNCTION__));
+	CSleepExtCall* playCall = dynamic_cast<CSleepExtCall*>(getNextCall(false, false, ECF_SLEEP, true, __func__));
+	CSleepExtCall(msec).ensureArgsAreEqual(playCall, m_bStrictChecks, __func__);
+	CSleepExtCall* playEndCall = dynamic_cast<CSleepExtCall*>(getNextCall(false, true, ECF_SLEEP, false, __func__));
 
 	freeFuncCall(playCall); freeFuncCall(playEndCall);
 }
 
 BOOL CPlayingEngExtInterceptor::QueryPerfCounter(LARGE_INTEGER* counter) {
-	CQueryPerfCounterCall* playCall = dynamic_cast<CQueryPerfCounterCall*>(getNextCall(false, false, ECF_QUERY_PERF_COUNTER, true, __FUNCTION__));
-	CQueryPerfCounterCall* playEndCall = dynamic_cast<CQueryPerfCounterCall*>(getNextCall(false, true, ECF_QUERY_PERF_COUNTER, false, __FUNCTION__));
+	CQueryPerfCounterCall* playCall = dynamic_cast<CQueryPerfCounterCall*>(getNextCall(false, false, ECF_QUERY_PERF_COUNTER, true, __func__));
+	CQueryPerfCounterCall* playEndCall = dynamic_cast<CQueryPerfCounterCall*>(getNextCall(false, true, ECF_QUERY_PERF_COUNTER, false, __func__));
 	
 	counter->QuadPart = playEndCall->m_Counter;
 	BOOL res = playEndCall->m_Res;
@@ -328,8 +328,8 @@ BOOL CPlayingEngExtInterceptor::QueryPerfCounter(LARGE_INTEGER* counter) {
 }
 
 BOOL CPlayingEngExtInterceptor::QueryPerfFreq(LARGE_INTEGER* freq) {
-	CQueryPerfFreqCall* playCall = dynamic_cast<CQueryPerfFreqCall*>(getNextCall(false, false, ECF_QUERY_PERF_FREQ, true, __FUNCTION__));
-	CQueryPerfFreqCall* playEndCall = dynamic_cast<CQueryPerfFreqCall*>(getNextCall(false, true, ECF_QUERY_PERF_FREQ, false, __FUNCTION__));
+	CQueryPerfFreqCall* playCall = dynamic_cast<CQueryPerfFreqCall*>(getNextCall(false, false, ECF_QUERY_PERF_FREQ, true, __func__));
+	CQueryPerfFreqCall* playEndCall = dynamic_cast<CQueryPerfFreqCall*>(getNextCall(false, true, ECF_QUERY_PERF_FREQ, false, __func__));
 
 	freq->QuadPart = playEndCall->m_Freq;
 	BOOL res = playEndCall->m_Res;
@@ -339,8 +339,8 @@ BOOL CPlayingEngExtInterceptor::QueryPerfFreq(LARGE_INTEGER* freq) {
 }
 
 DWORD CPlayingEngExtInterceptor::GetTickCount() {
-	CGetTickCountCall* playCall = dynamic_cast<CGetTickCountCall*>(getNextCall(false, false, ECF_GET_TICK_COUNT, true, __FUNCTION__));
-	CGetTickCountCall* playEndCall = dynamic_cast<CGetTickCountCall*>(getNextCall(false, true, ECF_GET_TICK_COUNT, false, __FUNCTION__));
+	CGetTickCountCall* playCall = dynamic_cast<CGetTickCountCall*>(getNextCall(false, false, ECF_GET_TICK_COUNT, true, __func__));
+	CGetTickCountCall* playEndCall = dynamic_cast<CGetTickCountCall*>(getNextCall(false, true, ECF_GET_TICK_COUNT, false, __func__));
 
 	DWORD res = playEndCall->m_Res;
 	freeFuncCall(playCall); freeFuncCall(playEndCall);
@@ -349,24 +349,24 @@ DWORD CPlayingEngExtInterceptor::GetTickCount() {
 }
 
 void CPlayingEngExtInterceptor::GetLocalTime(LPSYSTEMTIME time) {
-	CGetLocalTimeCall* playCall = dynamic_cast<CGetLocalTimeCall*>(getNextCall(false, false, ECF_GET_LOCAL_TIME, true, __FUNCTION__));
-	CGetLocalTimeCall* playEndCall = dynamic_cast<CGetLocalTimeCall*>(getNextCall(false, true, ECF_GET_LOCAL_TIME, false, __FUNCTION__));
+	CGetLocalTimeCall* playCall = dynamic_cast<CGetLocalTimeCall*>(getNextCall(false, false, ECF_GET_LOCAL_TIME, true, __func__));
+	CGetLocalTimeCall* playEndCall = dynamic_cast<CGetLocalTimeCall*>(getNextCall(false, true, ECF_GET_LOCAL_TIME, false, __func__));
 
 	memcpy(time, &playEndCall->m_Res, sizeof(SYSTEMTIME));
 	freeFuncCall(playCall); freeFuncCall(playEndCall);
 }
 
 void CPlayingEngExtInterceptor::GetSystemTime(LPSYSTEMTIME time) {
-	CGetSystemTimeCall* playCall = dynamic_cast<CGetSystemTimeCall*>(getNextCall(false, false, ECF_GET_SYSTEM_TIME, true, __FUNCTION__));
-	CGetSystemTimeCall* playEndCall = dynamic_cast<CGetSystemTimeCall*>(getNextCall(false, true, ECF_GET_SYSTEM_TIME, false, __FUNCTION__));
+	CGetSystemTimeCall* playCall = dynamic_cast<CGetSystemTimeCall*>(getNextCall(false, false, ECF_GET_SYSTEM_TIME, true, __func__));
+	CGetSystemTimeCall* playEndCall = dynamic_cast<CGetSystemTimeCall*>(getNextCall(false, true, ECF_GET_SYSTEM_TIME, false, __func__));
 
 	memcpy(time, &playEndCall->m_Res, sizeof(SYSTEMTIME));
 	freeFuncCall(playCall); freeFuncCall(playEndCall);
 }
 
 void CPlayingEngExtInterceptor::GetTimeZoneInfo(LPTIME_ZONE_INFORMATION zinfo) {
-	CGetTimeZoneInfoCall* playCall = dynamic_cast<CGetTimeZoneInfoCall*>(getNextCall(false, false, ECF_GET_TIMEZONE_INFO, true, __FUNCTION__));
-	CGetTimeZoneInfoCall* playEndCall = dynamic_cast<CGetTimeZoneInfoCall*>(getNextCall(false, true, ECF_GET_TIMEZONE_INFO, false, __FUNCTION__));
+	CGetTimeZoneInfoCall* playCall = dynamic_cast<CGetTimeZoneInfoCall*>(getNextCall(false, false, ECF_GET_TIMEZONE_INFO, true, __func__));
+	CGetTimeZoneInfoCall* playEndCall = dynamic_cast<CGetTimeZoneInfoCall*>(getNextCall(false, true, ECF_GET_TIMEZONE_INFO, false, __func__));
 
 	memcpy(zinfo, &playEndCall->m_Res, sizeof(TIME_ZONE_INFORMATION));
 	freeFuncCall(playCall); freeFuncCall(playEndCall);
@@ -374,8 +374,8 @@ void CPlayingEngExtInterceptor::GetTimeZoneInfo(LPTIME_ZONE_INFORMATION zinfo) {
 
 BOOL CPlayingEngExtInterceptor::GetProcessTimes(HANDLE hProcess, LPFILETIME lpCreationTime, LPFILETIME lpExitTime, LPFILETIME lpKernelTime, LPFILETIME lpUserTime)
 {
-	CGetProcessTimesCall* playCall = dynamic_cast<CGetProcessTimesCall*>(getNextCall(false, false, ECF_GET_PROCESS_TIMES, true, __FUNCTION__));
-	CGetProcessTimesCall* playEndCall = dynamic_cast<CGetProcessTimesCall*>(getNextCall(false, true, ECF_GET_PROCESS_TIMES, false, __FUNCTION__));
+	CGetProcessTimesCall* playCall = dynamic_cast<CGetProcessTimesCall*>(getNextCall(false, false, ECF_GET_PROCESS_TIMES, true, __func__));
+	CGetProcessTimesCall* playEndCall = dynamic_cast<CGetProcessTimesCall*>(getNextCall(false, true, ECF_GET_PROCESS_TIMES, false, __func__));
 
 	BOOL res = playEndCall->m_Res;
 	memcpy(lpCreationTime, &playEndCall->m_CreationTime, sizeof(FILETIME));
@@ -389,8 +389,8 @@ BOOL CPlayingEngExtInterceptor::GetProcessTimes(HANDLE hProcess, LPFILETIME lpCr
 
 void CPlayingEngExtInterceptor::GetSystemTimeAsFileTime(LPFILETIME lpSystemTimeAsFileTime)
 {
-	CGetSystemTimeAsFileTimeCall* playCall = dynamic_cast<CGetSystemTimeAsFileTimeCall*>(getNextCall(false, false, ECF_GET_SYSTEM_TIME_AS_FILE_TIME, true, __FUNCTION__));
-	CGetSystemTimeAsFileTimeCall* playEndCall = dynamic_cast<CGetSystemTimeAsFileTimeCall*>(getNextCall(false, true, ECF_GET_SYSTEM_TIME_AS_FILE_TIME, false, __FUNCTION__));
+	CGetSystemTimeAsFileTimeCall* playCall = dynamic_cast<CGetSystemTimeAsFileTimeCall*>(getNextCall(false, false, ECF_GET_SYSTEM_TIME_AS_FILE_TIME, true, __func__));
+	CGetSystemTimeAsFileTimeCall* playEndCall = dynamic_cast<CGetSystemTimeAsFileTimeCall*>(getNextCall(false, true, ECF_GET_SYSTEM_TIME_AS_FILE_TIME, false, __func__));
 
 	memcpy(lpSystemTimeAsFileTime, &playEndCall->m_SystemTime, sizeof(FILETIME));
 	freeFuncCall(playCall); freeFuncCall(playEndCall);
@@ -398,9 +398,9 @@ void CPlayingEngExtInterceptor::GetSystemTimeAsFileTime(LPFILETIME lpSystemTimeA
 
 
 SOCKET CPlayingEngExtInterceptor::socket(int af, int type, int protocol) {
-	CSocketCall* playCall = dynamic_cast<CSocketCall*>(getNextCall(false, false, ECF_SOCKET, true, __FUNCTION__));
-	CSocketCall(af, type, protocol).ensureArgsAreEqual(playCall, m_bStrictChecks, __FUNCTION__);
-	CSocketCall* playEndCall = dynamic_cast<CSocketCall*>(getNextCall(false, true, ECF_SOCKET, false, __FUNCTION__));
+	CSocketCall* playCall = dynamic_cast<CSocketCall*>(getNextCall(false, false, ECF_SOCKET, true, __func__));
+	CSocketCall(af, type, protocol).ensureArgsAreEqual(playCall, m_bStrictChecks, __func__);
+	CSocketCall* playEndCall = dynamic_cast<CSocketCall*>(getNextCall(false, true, ECF_SOCKET, false, __func__));
 
 	SOCKET res = playEndCall->m_Res;
 	freeFuncCall(playCall); freeFuncCall(playEndCall);
@@ -409,9 +409,9 @@ SOCKET CPlayingEngExtInterceptor::socket(int af, int type, int protocol) {
 }
 
 int CPlayingEngExtInterceptor::ioctlsocket(SOCKET s, long cmd, u_long *argp) {
-	CIoCtlSocketCall* playCall = dynamic_cast<CIoCtlSocketCall*>(getNextCall(false, false, ECF_IOCTL_SOCKET, true, __FUNCTION__));
-	CIoCtlSocketCall(s, cmd, *argp).ensureArgsAreEqual(playCall, m_bStrictChecks, __FUNCTION__);
-	CIoCtlSocketCall* playEndCall = dynamic_cast<CIoCtlSocketCall*>(getNextCall(false, true, ECF_IOCTL_SOCKET, false, __FUNCTION__));
+	CIoCtlSocketCall* playCall = dynamic_cast<CIoCtlSocketCall*>(getNextCall(false, false, ECF_IOCTL_SOCKET, true, __func__));
+	CIoCtlSocketCall(s, cmd, *argp).ensureArgsAreEqual(playCall, m_bStrictChecks, __func__);
+	CIoCtlSocketCall* playEndCall = dynamic_cast<CIoCtlSocketCall*>(getNextCall(false, true, ECF_IOCTL_SOCKET, false, __func__));
 
 	int res = playEndCall->m_Res;
 	*argp = playEndCall->m_OutValue;
@@ -421,9 +421,9 @@ int CPlayingEngExtInterceptor::ioctlsocket(SOCKET s, long cmd, u_long *argp) {
 }
 
 int CPlayingEngExtInterceptor::setsockopt(SOCKET s, int level, int optname, const char* optval, int optlen) {
-	CSetSockOptCall* playCall = dynamic_cast<CSetSockOptCall*>(getNextCall(false, false, ECF_SET_SOCK_OPT, true, __FUNCTION__));
-	CSetSockOptCall(s, level, optname, optval, optlen).ensureArgsAreEqual(playCall, m_bStrictChecks, __FUNCTION__);
-	CSetSockOptCall* playEndCall = dynamic_cast<CSetSockOptCall*>(getNextCall(false, true, ECF_SET_SOCK_OPT, false, __FUNCTION__));
+	CSetSockOptCall* playCall = dynamic_cast<CSetSockOptCall*>(getNextCall(false, false, ECF_SET_SOCK_OPT, true, __func__));
+	CSetSockOptCall(s, level, optname, optval, optlen).ensureArgsAreEqual(playCall, m_bStrictChecks, __func__);
+	CSetSockOptCall* playEndCall = dynamic_cast<CSetSockOptCall*>(getNextCall(false, true, ECF_SET_SOCK_OPT, false, __func__));
 
 	int res = playEndCall->m_Res;
 	freeFuncCall(playCall); freeFuncCall(playEndCall);
@@ -432,9 +432,9 @@ int CPlayingEngExtInterceptor::setsockopt(SOCKET s, int level, int optname, cons
 }
 
 int CPlayingEngExtInterceptor::closesocket(SOCKET s) {
-	CCloseSocketCall* playCall = dynamic_cast<CCloseSocketCall*>(getNextCall(false, false, ECF_CLOSE_SOCKET, true, __FUNCTION__));
-	CCloseSocketCall(s).ensureArgsAreEqual(playCall, m_bStrictChecks, __FUNCTION__);
-	CCloseSocketCall* playEndCall = dynamic_cast<CCloseSocketCall*>(getNextCall(false, true, ECF_CLOSE_SOCKET, false, __FUNCTION__));
+	CCloseSocketCall* playCall = dynamic_cast<CCloseSocketCall*>(getNextCall(false, false, ECF_CLOSE_SOCKET, true, __func__));
+	CCloseSocketCall(s).ensureArgsAreEqual(playCall, m_bStrictChecks, __func__);
+	CCloseSocketCall* playEndCall = dynamic_cast<CCloseSocketCall*>(getNextCall(false, true, ECF_CLOSE_SOCKET, false, __func__));
 
 	int res = playEndCall->m_Res;
 	freeFuncCall(playCall); freeFuncCall(playEndCall);
@@ -443,9 +443,9 @@ int CPlayingEngExtInterceptor::closesocket(SOCKET s) {
 }
 
 int CPlayingEngExtInterceptor::recvfrom(SOCKET s, char* buf, int len, int flags, struct sockaddr* from, socklen_t *fromlen) {
-	CRecvFromCall* playCall = dynamic_cast<CRecvFromCall*>(getNextCall(false, false, ECF_RECVFROM, true, __FUNCTION__));
-	CRecvFromCall(s, len, flags, *fromlen).ensureArgsAreEqual(playCall, m_bStrictChecks, __FUNCTION__);
-	CRecvFromCall* playEndCall = dynamic_cast<CRecvFromCall*>(getNextCall(false, true, ECF_RECVFROM, false, __FUNCTION__));
+	CRecvFromCall* playCall = dynamic_cast<CRecvFromCall*>(getNextCall(false, false, ECF_RECVFROM, true, __func__));
+	CRecvFromCall(s, len, flags, *fromlen).ensureArgsAreEqual(playCall, m_bStrictChecks, __func__);
+	CRecvFromCall* playEndCall = dynamic_cast<CRecvFromCall*>(getNextCall(false, true, ECF_RECVFROM, false, __func__));
 
 	int res = playEndCall->m_Res;
 	*fromlen = playEndCall->m_FromLenOut;
@@ -464,9 +464,9 @@ int CPlayingEngExtInterceptor::recvfrom(SOCKET s, char* buf, int len, int flags,
 }
 
 int CPlayingEngExtInterceptor::sendto(SOCKET s, const char* buf, int len, int flags, const struct sockaddr* to, int tolen) {
-	CSendToCall* playCall = dynamic_cast<CSendToCall*>(getNextCall(false, false, ECF_SENDTO, true, __FUNCTION__));
-	CSendToCall(s, buf, len, flags, to, tolen).ensureArgsAreEqual(playCall, m_bStrictChecks, __FUNCTION__);
-	CSendToCall* playEndCall = dynamic_cast<CSendToCall*>(getNextCall(false, true, ECF_SENDTO, false, __FUNCTION__));
+	CSendToCall* playCall = dynamic_cast<CSendToCall*>(getNextCall(false, false, ECF_SENDTO, true, __func__));
+	CSendToCall(s, buf, len, flags, to, tolen).ensureArgsAreEqual(playCall, m_bStrictChecks, __func__);
+	CSendToCall* playEndCall = dynamic_cast<CSendToCall*>(getNextCall(false, true, ECF_SENDTO, false, __func__));
 
 	int res = playEndCall->m_Res;
 	freeFuncCall(playCall); freeFuncCall(playEndCall);
@@ -475,9 +475,9 @@ int CPlayingEngExtInterceptor::sendto(SOCKET s, const char* buf, int len, int fl
 }
 
 int CPlayingEngExtInterceptor::bind(SOCKET s, const struct sockaddr* addr, int namelen) {
-	CBindCall* playCall = dynamic_cast<CBindCall*>(getNextCall(false, false, ECF_BIND, true, __FUNCTION__));
-	CBindCall(s, addr, namelen).ensureArgsAreEqual(playCall, m_bStrictChecks, __FUNCTION__);
-	CBindCall* playEndCall = dynamic_cast<CBindCall*>(getNextCall(false, true, ECF_BIND, false, __FUNCTION__));
+	CBindCall* playCall = dynamic_cast<CBindCall*>(getNextCall(false, false, ECF_BIND, true, __func__));
+	CBindCall(s, addr, namelen).ensureArgsAreEqual(playCall, m_bStrictChecks, __func__);
+	CBindCall* playEndCall = dynamic_cast<CBindCall*>(getNextCall(false, true, ECF_BIND, false, __func__));
 
 	int res = playEndCall->m_Res;
 	freeFuncCall(playCall); freeFuncCall(playEndCall);
@@ -486,9 +486,9 @@ int CPlayingEngExtInterceptor::bind(SOCKET s, const struct sockaddr* addr, int n
 }
 
 int CPlayingEngExtInterceptor::getsockname(SOCKET s, struct sockaddr* name, socklen_t* namelen) {
-	CGetSockNameCall* playCall = dynamic_cast<CGetSockNameCall*>(getNextCall(false, false, ECF_GET_SOCK_NAME, true, __FUNCTION__));
-	CGetSockNameCall(s, *namelen).ensureArgsAreEqual(playCall, m_bStrictChecks, __FUNCTION__);
-	CGetSockNameCall* playEndCall = dynamic_cast<CGetSockNameCall*>(getNextCall(false, true, ECF_GET_SOCK_NAME, false, __FUNCTION__));
+	CGetSockNameCall* playCall = dynamic_cast<CGetSockNameCall*>(getNextCall(false, false, ECF_GET_SOCK_NAME, true, __func__));
+	CGetSockNameCall(s, *namelen).ensureArgsAreEqual(playCall, m_bStrictChecks, __func__);
+	CGetSockNameCall* playEndCall = dynamic_cast<CGetSockNameCall*>(getNextCall(false, true, ECF_GET_SOCK_NAME, false, __func__));
 
 	int res = playEndCall->m_Res;
 	*namelen = playEndCall->m_AddrLenOut;
@@ -502,8 +502,8 @@ int CPlayingEngExtInterceptor::getsockname(SOCKET s, struct sockaddr* name, sock
 }
 
 int CPlayingEngExtInterceptor::WSAGetLastError() {
-	CWSAGetLastErrorCall* playCall = dynamic_cast<CWSAGetLastErrorCall*>(getNextCall(false, false, ECF_WSA_GET_LAST_ERROR, true, __FUNCTION__));
-	CWSAGetLastErrorCall* playEndCall = dynamic_cast<CWSAGetLastErrorCall*>(getNextCall(false, true, ECF_WSA_GET_LAST_ERROR, false, __FUNCTION__));
+	CWSAGetLastErrorCall* playCall = dynamic_cast<CWSAGetLastErrorCall*>(getNextCall(false, false, ECF_WSA_GET_LAST_ERROR, true, __func__));
+	CWSAGetLastErrorCall* playEndCall = dynamic_cast<CWSAGetLastErrorCall*>(getNextCall(false, true, ECF_WSA_GET_LAST_ERROR, false, __func__));
 
 	int res = playEndCall->m_Res;
 	freeFuncCall(playCall); freeFuncCall(playEndCall);
@@ -512,9 +512,9 @@ int CPlayingEngExtInterceptor::WSAGetLastError() {
 }
 
 struct hostent* CPlayingEngExtInterceptor::gethostbyname(const char *name) {
-	CGetHostByNameCall* playCall = dynamic_cast<CGetHostByNameCall*>(getNextCall(false, false, ECF_GET_HOST_BY_NAME, true, __FUNCTION__));
-	CGetHostByNameCall(name).ensureArgsAreEqual(playCall, m_bStrictChecks, __FUNCTION__);
-	CGetHostByNameCall* playEndCall = dynamic_cast<CGetHostByNameCall*>(getNextCall(false, true, ECF_GET_HOST_BY_NAME, false, __FUNCTION__));
+	CGetHostByNameCall* playCall = dynamic_cast<CGetHostByNameCall*>(getNextCall(false, false, ECF_GET_HOST_BY_NAME, true, __func__));
+	CGetHostByNameCall(name).ensureArgsAreEqual(playCall, m_bStrictChecks, __func__);
+	CGetHostByNameCall* playEndCall = dynamic_cast<CGetHostByNameCall*>(getNextCall(false, true, ECF_GET_HOST_BY_NAME, false, __func__));
 
 	setCurrentHostent(&playEndCall->m_HostentData);
 
@@ -524,9 +524,9 @@ struct hostent* CPlayingEngExtInterceptor::gethostbyname(const char *name) {
 }
 
 int CPlayingEngExtInterceptor::gethostname(char *name, int namelen) {
-	CGetHostNameCall* playCall = dynamic_cast<CGetHostNameCall*>(getNextCall(false, false, ECF_GET_HOST_NAME, true, __FUNCTION__));
-	CGetHostNameCall(namelen).ensureArgsAreEqual(playCall, m_bStrictChecks, __FUNCTION__);
-	CGetHostNameCall* playEndCall = dynamic_cast<CGetHostNameCall*>(getNextCall(false, true, ECF_GET_HOST_NAME, false, __FUNCTION__));
+	CGetHostNameCall* playCall = dynamic_cast<CGetHostNameCall*>(getNextCall(false, false, ECF_GET_HOST_NAME, true, __func__));
+	CGetHostNameCall(namelen).ensureArgsAreEqual(playCall, m_bStrictChecks, __func__);
+	CGetHostNameCall* playEndCall = dynamic_cast<CGetHostNameCall*>(getNextCall(false, true, ECF_GET_HOST_NAME, false, __func__));
 
 	int res = playEndCall->m_Res;
 	strcpy(name, playEndCall->m_Name);
@@ -560,9 +560,9 @@ void CPlayingEngExtInterceptor::setCurrentTm(struct tm* t) {
 }
 
 void CPlayingEngExtInterceptor::SteamAPI_SetBreakpadAppID(uint32 unAppID) {
-	CSteamApiSetBreakpadAppIdCall* playCall = dynamic_cast<CSteamApiSetBreakpadAppIdCall*>(getNextCall(false, false, ECF_STEAM_API_SET_BREAKPAD_APP_ID, true, __FUNCTION__));
-	CSteamApiSetBreakpadAppIdCall(unAppID).ensureArgsAreEqual(playCall, m_bStrictChecks, __FUNCTION__);
-	CSteamApiSetBreakpadAppIdCall* playEndCall = dynamic_cast<CSteamApiSetBreakpadAppIdCall*>(getNextCall(false, true, ECF_STEAM_API_SET_BREAKPAD_APP_ID, false, __FUNCTION__));
+	CSteamApiSetBreakpadAppIdCall* playCall = dynamic_cast<CSteamApiSetBreakpadAppIdCall*>(getNextCall(false, false, ECF_STEAM_API_SET_BREAKPAD_APP_ID, true, __func__));
+	CSteamApiSetBreakpadAppIdCall(unAppID).ensureArgsAreEqual(playCall, m_bStrictChecks, __func__);
+	CSteamApiSetBreakpadAppIdCall* playEndCall = dynamic_cast<CSteamApiSetBreakpadAppIdCall*>(getNextCall(false, true, ECF_STEAM_API_SET_BREAKPAD_APP_ID, false, __func__));
 
 	freeFuncCall(playCall); freeFuncCall(playEndCall);
 }
@@ -574,9 +574,9 @@ void CPlayingEngExtInterceptor::SteamAPI_UseBreakpadCrashHandler(char const *pch
 void CPlayingEngExtInterceptor::SteamAPI_RegisterCallback(CCallbackBase *pCallback, int iCallback) {
 	int rehldsId = getOrRegisterSteamCallback(pCallback);
 
-	CSteamApiRegisterCallbackCall* playCall = dynamic_cast<CSteamApiRegisterCallbackCall*>(getNextCall(false, false, ECF_STEAM_API_REGISTER_CALLBACK, true, __FUNCTION__));
-	CSteamApiRegisterCallbackCall(rehldsId, iCallback, pCallback).ensureArgsAreEqual(playCall, m_bStrictChecks, __FUNCTION__);
-	CSteamApiRegisterCallbackCall* playEndCall = dynamic_cast<CSteamApiRegisterCallbackCall*>(getNextCall(false, true, ECF_STEAM_API_REGISTER_CALLBACK, false, __FUNCTION__));
+	CSteamApiRegisterCallbackCall* playCall = dynamic_cast<CSteamApiRegisterCallbackCall*>(getNextCall(false, false, ECF_STEAM_API_REGISTER_CALLBACK, true, __func__));
+	CSteamApiRegisterCallbackCall(rehldsId, iCallback, pCallback).ensureArgsAreEqual(playCall, m_bStrictChecks, __func__);
+	CSteamApiRegisterCallbackCall* playEndCall = dynamic_cast<CSteamApiRegisterCallbackCall*>(getNextCall(false, true, ECF_STEAM_API_REGISTER_CALLBACK, false, __func__));
 
 	pCallback->SetFlags(playEndCall->m_OutState.m_nCallbackFlags);
 	pCallback->SetICallback(playEndCall->m_OutState.m_iCallback);
@@ -584,8 +584,8 @@ void CPlayingEngExtInterceptor::SteamAPI_RegisterCallback(CCallbackBase *pCallba
 }
 
 bool CPlayingEngExtInterceptor::SteamAPI_Init() {
-	CSteamApiInitCall* playCall = dynamic_cast<CSteamApiInitCall*>(getNextCall(false, false, ECF_STEAM_API_INIT, true, __FUNCTION__));
-	CSteamApiInitCall* playEndCall = dynamic_cast<CSteamApiInitCall*>(getNextCall(false, true, ECF_STEAM_API_INIT, false, __FUNCTION__));
+	CSteamApiInitCall* playCall = dynamic_cast<CSteamApiInitCall*>(getNextCall(false, false, ECF_STEAM_API_INIT, true, __func__));
+	CSteamApiInitCall* playEndCall = dynamic_cast<CSteamApiInitCall*>(getNextCall(false, true, ECF_STEAM_API_INIT, false, __func__));
 
 	bool res = playEndCall->m_Res;
 	freeFuncCall(playCall); freeFuncCall(playEndCall);
@@ -596,9 +596,9 @@ bool CPlayingEngExtInterceptor::SteamAPI_Init() {
 void CPlayingEngExtInterceptor::SteamAPI_UnregisterCallResult(class CCallbackBase *pCallback, SteamAPICall_t hAPICall) {
 	int rehldsId = getOrRegisterSteamCallback(pCallback);
 
-	CSteamApiUnrigestierCallResultCall* playCall = dynamic_cast<CSteamApiUnrigestierCallResultCall*>(getNextCall(false, false, ECF_STEAM_API_UNREGISTER_CALL_RESULT, true, __FUNCTION__));
-	CSteamApiUnrigestierCallResultCall(rehldsId, hAPICall, pCallback).ensureArgsAreEqual(playCall, m_bStrictChecks, __FUNCTION__);
-	CSteamApiUnrigestierCallResultCall* playEndCall = dynamic_cast<CSteamApiUnrigestierCallResultCall*>(getNextCall(false, true, ECF_STEAM_API_UNREGISTER_CALL_RESULT, false, __FUNCTION__));
+	CSteamApiUnrigestierCallResultCall* playCall = dynamic_cast<CSteamApiUnrigestierCallResultCall*>(getNextCall(false, false, ECF_STEAM_API_UNREGISTER_CALL_RESULT, true, __func__));
+	CSteamApiUnrigestierCallResultCall(rehldsId, hAPICall, pCallback).ensureArgsAreEqual(playCall, m_bStrictChecks, __func__);
+	CSteamApiUnrigestierCallResultCall* playEndCall = dynamic_cast<CSteamApiUnrigestierCallResultCall*>(getNextCall(false, true, ECF_STEAM_API_UNREGISTER_CALL_RESULT, false, __func__));
 
 	pCallback->SetFlags(playEndCall->m_OutState.m_nCallbackFlags);
 	pCallback->SetICallback(playEndCall->m_OutState.m_iCallback);
@@ -606,8 +606,8 @@ void CPlayingEngExtInterceptor::SteamAPI_UnregisterCallResult(class CCallbackBas
 }
 
 ISteamApps* CPlayingEngExtInterceptor::SteamApps() {
-	CSteamAppsCall* playCall = (CSteamAppsCall*)getNextCall(false, false, ECF_STEAMAPPS, true, __FUNCTION__);
-	CSteamAppsCall* playEndCall = (CSteamAppsCall*)getNextCall(false, true, ECF_STEAMAPPS, false, __FUNCTION__);
+	CSteamAppsCall* playCall = (CSteamAppsCall*)getNextCall(false, false, ECF_STEAMAPPS, true, __func__);
+	CSteamAppsCall* playEndCall = (CSteamAppsCall*)getNextCall(false, true, ECF_STEAMAPPS, false, __func__);
 
 	ISteamApps* res = NULL;
 	if (!playEndCall->m_ReturnNull) {
@@ -620,9 +620,9 @@ ISteamApps* CPlayingEngExtInterceptor::SteamApps() {
 }
 
 bool CPlayingEngExtInterceptor::SteamGameServer_Init(uint32 unIP, uint16 usSteamPort, uint16 usGamePort, uint16 usQueryPort, EServerMode eServerMode, const char *pchVersionString) {
-	CSteamGameServerInitCall* playCall = dynamic_cast<CSteamGameServerInitCall*>(getNextCall(false, false, ECF_STEAMGAMESERVER_INIT, true, __FUNCTION__));
-	CSteamGameServerInitCall(unIP, usSteamPort, usGamePort, usQueryPort, eServerMode, pchVersionString).ensureArgsAreEqual(playCall, m_bStrictChecks, __FUNCTION__);
-	CSteamGameServerInitCall* playEndCall = dynamic_cast<CSteamGameServerInitCall*>(getNextCall(false, true, ECF_STEAMGAMESERVER_INIT, false, __FUNCTION__));
+	CSteamGameServerInitCall* playCall = dynamic_cast<CSteamGameServerInitCall*>(getNextCall(false, false, ECF_STEAMGAMESERVER_INIT, true, __func__));
+	CSteamGameServerInitCall(unIP, usSteamPort, usGamePort, usQueryPort, eServerMode, pchVersionString).ensureArgsAreEqual(playCall, m_bStrictChecks, __func__);
+	CSteamGameServerInitCall* playEndCall = dynamic_cast<CSteamGameServerInitCall*>(getNextCall(false, true, ECF_STEAMGAMESERVER_INIT, false, __func__));
 
 	bool res = playEndCall->m_Res;
 	freeFuncCall(playCall); freeFuncCall(playEndCall);
@@ -631,8 +631,8 @@ bool CPlayingEngExtInterceptor::SteamGameServer_Init(uint32 unIP, uint16 usSteam
 }
 
 ISteamGameServer* CPlayingEngExtInterceptor::SteamGameServer() {
-	CSteamGameServerCall* playCall = dynamic_cast<CSteamGameServerCall*>(getNextCall(false, false, ECF_STEAMGAMESERVER, true, __FUNCTION__));
-	CSteamGameServerCall* playEndCall = dynamic_cast<CSteamGameServerCall*>(getNextCall(false, true, ECF_STEAMGAMESERVER, false, __FUNCTION__));
+	CSteamGameServerCall* playCall = dynamic_cast<CSteamGameServerCall*>(getNextCall(false, false, ECF_STEAMGAMESERVER, true, __func__));
+	CSteamGameServerCall* playEndCall = dynamic_cast<CSteamGameServerCall*>(getNextCall(false, true, ECF_STEAMGAMESERVER, false, __func__));
 
 	ISteamGameServer* res = NULL;
 	if (!playEndCall->m_ReturnNull) {
@@ -645,23 +645,23 @@ ISteamGameServer* CPlayingEngExtInterceptor::SteamGameServer() {
 }
 
 void CPlayingEngExtInterceptor::SteamGameServer_RunCallbacks() {
-	CSteamGameServerRunCallbacksCall* playCall = dynamic_cast<CSteamGameServerRunCallbacksCall*>(getNextCall(false, false, ECF_STEAMGAMESERVER_RUN_CALLBACKS, true, __FUNCTION__));
-	CSteamGameServerRunCallbacksCall* playEndCall = dynamic_cast<CSteamGameServerRunCallbacksCall*>(getNextCall(false, true, ECF_STEAMGAMESERVER_RUN_CALLBACKS, false, __FUNCTION__));
+	CSteamGameServerRunCallbacksCall* playCall = dynamic_cast<CSteamGameServerRunCallbacksCall*>(getNextCall(false, false, ECF_STEAMGAMESERVER_RUN_CALLBACKS, true, __func__));
+	CSteamGameServerRunCallbacksCall* playEndCall = dynamic_cast<CSteamGameServerRunCallbacksCall*>(getNextCall(false, true, ECF_STEAMGAMESERVER_RUN_CALLBACKS, false, __func__));
 
 	freeFuncCall(playCall); freeFuncCall(playEndCall);
 }
 
 void CPlayingEngExtInterceptor::SteamAPI_RunCallbacks() {
-	CSteamApiRunCallbacksCall* playCall = dynamic_cast<CSteamApiRunCallbacksCall*>(getNextCall(false, false, ECF_STEAM_API_RUN_CALLBACKS, true, __FUNCTION__));
-	CSteamApiRunCallbacksCall* playEndCall = dynamic_cast<CSteamApiRunCallbacksCall*>(getNextCall(false, true, ECF_STEAM_API_RUN_CALLBACKS, false, __FUNCTION__));
+	CSteamApiRunCallbacksCall* playCall = dynamic_cast<CSteamApiRunCallbacksCall*>(getNextCall(false, false, ECF_STEAM_API_RUN_CALLBACKS, true, __func__));
+	CSteamApiRunCallbacksCall* playEndCall = dynamic_cast<CSteamApiRunCallbacksCall*>(getNextCall(false, true, ECF_STEAM_API_RUN_CALLBACKS, false, __func__));
 
 	freeFuncCall(playCall); freeFuncCall(playEndCall);
 }
 
 void CPlayingEngExtInterceptor::SteamGameServer_Shutdown()
 {
-	CSteamGameServerShutdownCall* playCall = dynamic_cast<CSteamGameServerShutdownCall*>(getNextCall(false, false, ECF_STEAMGAMESERVER_SHUTDOWN, true, __FUNCTION__));
-	CSteamGameServerShutdownCall* playEndCall = dynamic_cast<CSteamGameServerShutdownCall*>(getNextCall(false, true, ECF_STEAMGAMESERVER_SHUTDOWN, false, __FUNCTION__));
+	CSteamGameServerShutdownCall* playCall = dynamic_cast<CSteamGameServerShutdownCall*>(getNextCall(false, false, ECF_STEAMGAMESERVER_SHUTDOWN, true, __func__));
+	CSteamGameServerShutdownCall* playEndCall = dynamic_cast<CSteamGameServerShutdownCall*>(getNextCall(false, true, ECF_STEAMGAMESERVER_SHUTDOWN, false, __func__));
 
 	freeFuncCall(playCall); freeFuncCall(playEndCall);
 }
@@ -670,9 +670,9 @@ void CPlayingEngExtInterceptor::SteamGameServer_Shutdown()
 void CPlayingEngExtInterceptor::SteamAPI_UnregisterCallback(CCallbackBase *pCallback) {
 	int rehldsId = getOrRegisterSteamCallback(pCallback);
 
-	CSteamApiUnregisterCallbackCall* playCall = dynamic_cast<CSteamApiUnregisterCallbackCall*>(getNextCall(false, false, ECF_STEAM_API_UNREGISTER_CALLBACK, true, __FUNCTION__));
-	CSteamApiUnregisterCallbackCall(rehldsId, pCallback).ensureArgsAreEqual(playCall, m_bStrictChecks, __FUNCTION__);
-	CSteamApiUnregisterCallbackCall* playEndCall = dynamic_cast<CSteamApiUnregisterCallbackCall*>(getNextCall(false, true, ECF_STEAM_API_UNREGISTER_CALLBACK, false, __FUNCTION__));
+	CSteamApiUnregisterCallbackCall* playCall = dynamic_cast<CSteamApiUnregisterCallbackCall*>(getNextCall(false, false, ECF_STEAM_API_UNREGISTER_CALLBACK, true, __func__));
+	CSteamApiUnregisterCallbackCall(rehldsId, pCallback).ensureArgsAreEqual(playCall, m_bStrictChecks, __func__);
+	CSteamApiUnregisterCallbackCall* playEndCall = dynamic_cast<CSteamApiUnregisterCallbackCall*>(getNextCall(false, true, ECF_STEAM_API_UNREGISTER_CALLBACK, false, __func__));
 
 	pCallback->SetFlags(playEndCall->m_OutState.m_nCallbackFlags);
 	pCallback->SetICallback(playEndCall->m_OutState.m_iCallback);
@@ -689,63 +689,63 @@ CSteamGameServerPlayingWrapper::CSteamGameServerPlayingWrapper(CPlayingEngExtInt
 }
 
 bool CSteamGameServerPlayingWrapper::InitGameServer(uint32 unIP, uint16 usGamePort, uint16 usQueryPort, uint32 unFlags, AppId_t nGameAppId, const char *pchVersionString) {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 	return false;
 }
 
 void CSteamGameServerPlayingWrapper::SetProduct(const char *pszProduct) {
-	CGameServerSetProductCall* playCall = dynamic_cast<CGameServerSetProductCall*>(m_Player->getNextCall(false, false, ECF_GS_SET_PRODUCT, true, __FUNCTION__));
-	CGameServerSetProductCall(pszProduct).ensureArgsAreEqual(playCall, m_bStrictChecks, __FUNCTION__);
-	CGameServerSetProductCall* playEndCall = dynamic_cast<CGameServerSetProductCall*>(m_Player->getNextCall(false, true, ECF_GS_SET_PRODUCT, false, __FUNCTION__));
+	CGameServerSetProductCall* playCall = dynamic_cast<CGameServerSetProductCall*>(m_Player->getNextCall(false, false, ECF_GS_SET_PRODUCT, true, __func__));
+	CGameServerSetProductCall(pszProduct).ensureArgsAreEqual(playCall, m_bStrictChecks, __func__);
+	CGameServerSetProductCall* playEndCall = dynamic_cast<CGameServerSetProductCall*>(m_Player->getNextCall(false, true, ECF_GS_SET_PRODUCT, false, __func__));
 
 	m_Player->freeFuncCall(playCall); m_Player->freeFuncCall(playEndCall);
 }
 
 void CSteamGameServerPlayingWrapper::SetGameDescription(const char *pszGameDescription) {
-	CGameServerSetGameDescCall* playCall = dynamic_cast<CGameServerSetGameDescCall*>(m_Player->getNextCall(false, false, ECF_GS_SET_GAME_DESC, true, __FUNCTION__));
-	CGameServerSetGameDescCall(pszGameDescription).ensureArgsAreEqual(playCall, m_bStrictChecks, __FUNCTION__);
-	CGameServerSetGameDescCall* playEndCall = dynamic_cast<CGameServerSetGameDescCall*>(m_Player->getNextCall(false, true, ECF_GS_SET_GAME_DESC, false, __FUNCTION__));
+	CGameServerSetGameDescCall* playCall = dynamic_cast<CGameServerSetGameDescCall*>(m_Player->getNextCall(false, false, ECF_GS_SET_GAME_DESC, true, __func__));
+	CGameServerSetGameDescCall(pszGameDescription).ensureArgsAreEqual(playCall, m_bStrictChecks, __func__);
+	CGameServerSetGameDescCall* playEndCall = dynamic_cast<CGameServerSetGameDescCall*>(m_Player->getNextCall(false, true, ECF_GS_SET_GAME_DESC, false, __func__));
 
 	m_Player->freeFuncCall(playCall); m_Player->freeFuncCall(playEndCall);
 }
 
 void CSteamGameServerPlayingWrapper::SetModDir(const char *pszModDir) {
-	CGameServerSetModDirCall* playCall = dynamic_cast<CGameServerSetModDirCall*>(m_Player->getNextCall(false, false, ECF_GS_SET_GAME_DIR, true, __FUNCTION__));
-	CGameServerSetModDirCall(pszModDir).ensureArgsAreEqual(playCall, m_bStrictChecks, __FUNCTION__);
-	CGameServerSetModDirCall* playEndCall = dynamic_cast<CGameServerSetModDirCall*>(m_Player->getNextCall(false, true, ECF_GS_SET_GAME_DIR, false, __FUNCTION__));
+	CGameServerSetModDirCall* playCall = dynamic_cast<CGameServerSetModDirCall*>(m_Player->getNextCall(false, false, ECF_GS_SET_GAME_DIR, true, __func__));
+	CGameServerSetModDirCall(pszModDir).ensureArgsAreEqual(playCall, m_bStrictChecks, __func__);
+	CGameServerSetModDirCall* playEndCall = dynamic_cast<CGameServerSetModDirCall*>(m_Player->getNextCall(false, true, ECF_GS_SET_GAME_DIR, false, __func__));
 
 	m_Player->freeFuncCall(playCall); m_Player->freeFuncCall(playEndCall);
 }
 
 void CSteamGameServerPlayingWrapper::SetDedicatedServer(bool bDedicated) {
-	CGameServerSetDedicatedServerCall* playCall = dynamic_cast<CGameServerSetDedicatedServerCall*>(m_Player->getNextCall(false, false, ECF_GS_SET_DEDICATED_SERVER, true, __FUNCTION__));
-	CGameServerSetDedicatedServerCall(bDedicated).ensureArgsAreEqual(playCall, m_bStrictChecks, __FUNCTION__);
-	CGameServerSetDedicatedServerCall* playEndCall = dynamic_cast<CGameServerSetDedicatedServerCall*>(m_Player->getNextCall(false, true, ECF_GS_SET_DEDICATED_SERVER, false, __FUNCTION__));
+	CGameServerSetDedicatedServerCall* playCall = dynamic_cast<CGameServerSetDedicatedServerCall*>(m_Player->getNextCall(false, false, ECF_GS_SET_DEDICATED_SERVER, true, __func__));
+	CGameServerSetDedicatedServerCall(bDedicated).ensureArgsAreEqual(playCall, m_bStrictChecks, __func__);
+	CGameServerSetDedicatedServerCall* playEndCall = dynamic_cast<CGameServerSetDedicatedServerCall*>(m_Player->getNextCall(false, true, ECF_GS_SET_DEDICATED_SERVER, false, __func__));
 
 	m_Player->freeFuncCall(playCall); m_Player->freeFuncCall(playEndCall);
 }
 
 void CSteamGameServerPlayingWrapper::LogOn(const char *pszAccountName, const char *pszPassword) {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 }
 
 void CSteamGameServerPlayingWrapper::LogOnAnonymous() {
-	CGameServerLogOnAnonymousCall* playCall = dynamic_cast<CGameServerLogOnAnonymousCall*>(m_Player->getNextCall(false, false, ECF_GS_LOG_ON_ANONYMOUS, true, __FUNCTION__));
-	CGameServerLogOnAnonymousCall* playEndCall = dynamic_cast<CGameServerLogOnAnonymousCall*>(m_Player->getNextCall(false, true, ECF_GS_LOG_ON_ANONYMOUS, false, __FUNCTION__));
+	CGameServerLogOnAnonymousCall* playCall = dynamic_cast<CGameServerLogOnAnonymousCall*>(m_Player->getNextCall(false, false, ECF_GS_LOG_ON_ANONYMOUS, true, __func__));
+	CGameServerLogOnAnonymousCall* playEndCall = dynamic_cast<CGameServerLogOnAnonymousCall*>(m_Player->getNextCall(false, true, ECF_GS_LOG_ON_ANONYMOUS, false, __func__));
 
 	m_Player->freeFuncCall(playCall); m_Player->freeFuncCall(playEndCall);
 }
 
 void CSteamGameServerPlayingWrapper::LogOff() {
-	CGameServerLogOffCall* playCall = dynamic_cast<CGameServerLogOffCall*>(m_Player->getNextCall(false, false, ECF_GS_LOGOFF, true, __FUNCTION__));
-	CGameServerLogOffCall* playEndCall = dynamic_cast<CGameServerLogOffCall*>(m_Player->getNextCall(false, true, ECF_GS_LOGOFF, false, __FUNCTION__));
+	CGameServerLogOffCall* playCall = dynamic_cast<CGameServerLogOffCall*>(m_Player->getNextCall(false, false, ECF_GS_LOGOFF, true, __func__));
+	CGameServerLogOffCall* playEndCall = dynamic_cast<CGameServerLogOffCall*>(m_Player->getNextCall(false, true, ECF_GS_LOGOFF, false, __func__));
 
 	m_Player->freeFuncCall(playCall); m_Player->freeFuncCall(playEndCall);
 }
 
 bool CSteamGameServerPlayingWrapper::BLoggedOn() {
-	CGameServerBLoggedOnCall* playCall = dynamic_cast<CGameServerBLoggedOnCall*>(m_Player->getNextCall(false, false, ECF_GS_BLOGGEDON, true, __FUNCTION__));
-	CGameServerBLoggedOnCall* playEndCall = dynamic_cast<CGameServerBLoggedOnCall*>(m_Player->getNextCall(false, true, ECF_GS_BLOGGEDON, false, __FUNCTION__));
+	CGameServerBLoggedOnCall* playCall = dynamic_cast<CGameServerBLoggedOnCall*>(m_Player->getNextCall(false, false, ECF_GS_BLOGGEDON, true, __func__));
+	CGameServerBLoggedOnCall* playEndCall = dynamic_cast<CGameServerBLoggedOnCall*>(m_Player->getNextCall(false, true, ECF_GS_BLOGGEDON, false, __func__));
 
 	bool res = playEndCall->m_Res;
 	m_Player->freeFuncCall(playCall); m_Player->freeFuncCall(playEndCall);
@@ -754,8 +754,8 @@ bool CSteamGameServerPlayingWrapper::BLoggedOn() {
 }
 
 bool CSteamGameServerPlayingWrapper::BSecure() {
-	CGameServerBSecureCall* playCall = dynamic_cast<CGameServerBSecureCall*>(m_Player->getNextCall(false, false, ECF_GS_BSECURE, true, __FUNCTION__));
-	CGameServerBSecureCall* playEndCall = dynamic_cast<CGameServerBSecureCall*>(m_Player->getNextCall(false, true, ECF_GS_BSECURE, false, __FUNCTION__));
+	CGameServerBSecureCall* playCall = dynamic_cast<CGameServerBSecureCall*>(m_Player->getNextCall(false, false, ECF_GS_BSECURE, true, __func__));
+	CGameServerBSecureCall* playEndCall = dynamic_cast<CGameServerBSecureCall*>(m_Player->getNextCall(false, true, ECF_GS_BSECURE, false, __func__));
 
 	bool res = playEndCall->m_Res;
 	m_Player->freeFuncCall(playCall); m_Player->freeFuncCall(playEndCall);
@@ -764,8 +764,8 @@ bool CSteamGameServerPlayingWrapper::BSecure() {
 }
 
 CSteamID CSteamGameServerPlayingWrapper::GetSteamID() {
-	CGameServerGetSteamIdCall* playCall = dynamic_cast<CGameServerGetSteamIdCall*>(m_Player->getNextCall(false, false, ECF_GS_GET_STEAM_ID, true, __FUNCTION__));
-	CGameServerGetSteamIdCall* playEndCall = dynamic_cast<CGameServerGetSteamIdCall*>(m_Player->getNextCall(false, true, ECF_GS_GET_STEAM_ID, false, __FUNCTION__));
+	CGameServerGetSteamIdCall* playCall = dynamic_cast<CGameServerGetSteamIdCall*>(m_Player->getNextCall(false, false, ECF_GS_GET_STEAM_ID, true, __func__));
+	CGameServerGetSteamIdCall* playEndCall = dynamic_cast<CGameServerGetSteamIdCall*>(m_Player->getNextCall(false, true, ECF_GS_GET_STEAM_ID, false, __func__));
 
 	CSteamID res(playEndCall->m_SteamId);
 	m_Player->freeFuncCall(playCall); m_Player->freeFuncCall(playEndCall);
@@ -774,8 +774,8 @@ CSteamID CSteamGameServerPlayingWrapper::GetSteamID() {
 }
 
 bool CSteamGameServerPlayingWrapper::WasRestartRequested() {
-	CGameServerWasRestartRequestedCall* playCall = dynamic_cast<CGameServerWasRestartRequestedCall*>(m_Player->getNextCall(false, false, ECF_GS_WAS_RESTART_REQUESTED, true, __FUNCTION__));
-	CGameServerWasRestartRequestedCall* playEndCall = dynamic_cast<CGameServerWasRestartRequestedCall*>(m_Player->getNextCall(false, true, ECF_GS_WAS_RESTART_REQUESTED, false, __FUNCTION__));
+	CGameServerWasRestartRequestedCall* playCall = dynamic_cast<CGameServerWasRestartRequestedCall*>(m_Player->getNextCall(false, false, ECF_GS_WAS_RESTART_REQUESTED, true, __func__));
+	CGameServerWasRestartRequestedCall* playEndCall = dynamic_cast<CGameServerWasRestartRequestedCall*>(m_Player->getNextCall(false, true, ECF_GS_WAS_RESTART_REQUESTED, false, __func__));
 
 	bool res = playEndCall->m_Result;
 	m_Player->freeFuncCall(playCall); m_Player->freeFuncCall(playEndCall);
@@ -784,84 +784,84 @@ bool CSteamGameServerPlayingWrapper::WasRestartRequested() {
 }
 
 void CSteamGameServerPlayingWrapper::SetMaxPlayerCount(int cPlayersMax) {
-	CGameServerSetMaxPlayersCall* playCall = dynamic_cast<CGameServerSetMaxPlayersCall*>(m_Player->getNextCall(false, false, ECF_GS_SET_MAX_PLAYERS_COUNT, true, __FUNCTION__));
-	CGameServerSetMaxPlayersCall(cPlayersMax).ensureArgsAreEqual(playCall, m_bStrictChecks, __FUNCTION__);
-	CGameServerSetMaxPlayersCall* playEndCall = dynamic_cast<CGameServerSetMaxPlayersCall*>(m_Player->getNextCall(false, true, ECF_GS_SET_MAX_PLAYERS_COUNT, false, __FUNCTION__));
+	CGameServerSetMaxPlayersCall* playCall = dynamic_cast<CGameServerSetMaxPlayersCall*>(m_Player->getNextCall(false, false, ECF_GS_SET_MAX_PLAYERS_COUNT, true, __func__));
+	CGameServerSetMaxPlayersCall(cPlayersMax).ensureArgsAreEqual(playCall, m_bStrictChecks, __func__);
+	CGameServerSetMaxPlayersCall* playEndCall = dynamic_cast<CGameServerSetMaxPlayersCall*>(m_Player->getNextCall(false, true, ECF_GS_SET_MAX_PLAYERS_COUNT, false, __func__));
 
 	m_Player->freeFuncCall(playCall); m_Player->freeFuncCall(playEndCall);
 }
 
 void CSteamGameServerPlayingWrapper::SetBotPlayerCount(int cBotplayers) {
-	CGameServerSetBotCountCall* playCall = dynamic_cast<CGameServerSetBotCountCall*>(m_Player->getNextCall(false, false, ECF_GS_SET_BOT_PLAYERS_COUNT, true, __FUNCTION__));
-	CGameServerSetBotCountCall(cBotplayers).ensureArgsAreEqual(playCall, m_bStrictChecks, __FUNCTION__);
-	CGameServerSetBotCountCall* playEndCall = dynamic_cast<CGameServerSetBotCountCall*>(m_Player->getNextCall(false, true, ECF_GS_SET_BOT_PLAYERS_COUNT, false, __FUNCTION__));
+	CGameServerSetBotCountCall* playCall = dynamic_cast<CGameServerSetBotCountCall*>(m_Player->getNextCall(false, false, ECF_GS_SET_BOT_PLAYERS_COUNT, true, __func__));
+	CGameServerSetBotCountCall(cBotplayers).ensureArgsAreEqual(playCall, m_bStrictChecks, __func__);
+	CGameServerSetBotCountCall* playEndCall = dynamic_cast<CGameServerSetBotCountCall*>(m_Player->getNextCall(false, true, ECF_GS_SET_BOT_PLAYERS_COUNT, false, __func__));
 
 	m_Player->freeFuncCall(playCall); m_Player->freeFuncCall(playEndCall);
 }
 
 void CSteamGameServerPlayingWrapper::SetServerName(const char *pszServerName) {
-	CGameServerSetServerNameCall* playCall = dynamic_cast<CGameServerSetServerNameCall*>(m_Player->getNextCall(false, false, ECF_GS_SET_SERVER_NAME, true, __FUNCTION__));
-	CGameServerSetServerNameCall(pszServerName).ensureArgsAreEqual(playCall, m_bStrictChecks, __FUNCTION__);
-	CGameServerSetServerNameCall* playEndCall = dynamic_cast<CGameServerSetServerNameCall*>(m_Player->getNextCall(false, true, ECF_GS_SET_SERVER_NAME, false, __FUNCTION__));
+	CGameServerSetServerNameCall* playCall = dynamic_cast<CGameServerSetServerNameCall*>(m_Player->getNextCall(false, false, ECF_GS_SET_SERVER_NAME, true, __func__));
+	CGameServerSetServerNameCall(pszServerName).ensureArgsAreEqual(playCall, m_bStrictChecks, __func__);
+	CGameServerSetServerNameCall* playEndCall = dynamic_cast<CGameServerSetServerNameCall*>(m_Player->getNextCall(false, true, ECF_GS_SET_SERVER_NAME, false, __func__));
 
 	m_Player->freeFuncCall(playCall); m_Player->freeFuncCall(playEndCall);
 }
 
 void CSteamGameServerPlayingWrapper::SetMapName(const char *pszMapName) {
-	CGameServerSetMapNameCall* playCall = dynamic_cast<CGameServerSetMapNameCall*>(m_Player->getNextCall(false, false, ECF_GS_SET_MAP_NAME, true, __FUNCTION__));
-	CGameServerSetMapNameCall(pszMapName).ensureArgsAreEqual(playCall, m_bStrictChecks, __FUNCTION__);
-	CGameServerSetMapNameCall* playEndCall = dynamic_cast<CGameServerSetMapNameCall*>(m_Player->getNextCall(false, true, ECF_GS_SET_MAP_NAME, false, __FUNCTION__));
+	CGameServerSetMapNameCall* playCall = dynamic_cast<CGameServerSetMapNameCall*>(m_Player->getNextCall(false, false, ECF_GS_SET_MAP_NAME, true, __func__));
+	CGameServerSetMapNameCall(pszMapName).ensureArgsAreEqual(playCall, m_bStrictChecks, __func__);
+	CGameServerSetMapNameCall* playEndCall = dynamic_cast<CGameServerSetMapNameCall*>(m_Player->getNextCall(false, true, ECF_GS_SET_MAP_NAME, false, __func__));
 
 	m_Player->freeFuncCall(playCall); m_Player->freeFuncCall(playEndCall);
 }
 
 void CSteamGameServerPlayingWrapper::SetPasswordProtected(bool bPasswordProtected) {
-	CGameServerSetPasswordProtectedCall* playCall = dynamic_cast<CGameServerSetPasswordProtectedCall*>(m_Player->getNextCall(false, false, ECF_GS_SET_PASSWORD_PROTECTED, true, __FUNCTION__));
-	CGameServerSetPasswordProtectedCall(bPasswordProtected).ensureArgsAreEqual(playCall, m_bStrictChecks, __FUNCTION__);
-	CGameServerSetPasswordProtectedCall* playEndCall = dynamic_cast<CGameServerSetPasswordProtectedCall*>(m_Player->getNextCall(false, true, ECF_GS_SET_PASSWORD_PROTECTED, false, __FUNCTION__));
+	CGameServerSetPasswordProtectedCall* playCall = dynamic_cast<CGameServerSetPasswordProtectedCall*>(m_Player->getNextCall(false, false, ECF_GS_SET_PASSWORD_PROTECTED, true, __func__));
+	CGameServerSetPasswordProtectedCall(bPasswordProtected).ensureArgsAreEqual(playCall, m_bStrictChecks, __func__);
+	CGameServerSetPasswordProtectedCall* playEndCall = dynamic_cast<CGameServerSetPasswordProtectedCall*>(m_Player->getNextCall(false, true, ECF_GS_SET_PASSWORD_PROTECTED, false, __func__));
 
 	m_Player->freeFuncCall(playCall); m_Player->freeFuncCall(playEndCall);
 }
 
 void CSteamGameServerPlayingWrapper::SetSpectatorPort(uint16 unSpectatorPort) {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 }
 
 void CSteamGameServerPlayingWrapper::SetSpectatorServerName(const char *pszSpectatorServerName) {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 }
 
 void CSteamGameServerPlayingWrapper::ClearAllKeyValues() {
-	CGameServerClearAllKVsCall* playCall = dynamic_cast<CGameServerClearAllKVsCall*>(m_Player->getNextCall(false, false, ECF_GS_CLEAR_ALL_KEY_VALUES, true, __FUNCTION__));
-	CGameServerClearAllKVsCall* playEndCall = dynamic_cast<CGameServerClearAllKVsCall*>(m_Player->getNextCall(false, true, ECF_GS_CLEAR_ALL_KEY_VALUES, false, __FUNCTION__));
+	CGameServerClearAllKVsCall* playCall = dynamic_cast<CGameServerClearAllKVsCall*>(m_Player->getNextCall(false, false, ECF_GS_CLEAR_ALL_KEY_VALUES, true, __func__));
+	CGameServerClearAllKVsCall* playEndCall = dynamic_cast<CGameServerClearAllKVsCall*>(m_Player->getNextCall(false, true, ECF_GS_CLEAR_ALL_KEY_VALUES, false, __func__));
 
 	m_Player->freeFuncCall(playCall); m_Player->freeFuncCall(playEndCall);
 }
 
 void CSteamGameServerPlayingWrapper::SetKeyValue(const char *pKey, const char *pValue) {
-	CGameServerSetKeyValueCall* playCall = dynamic_cast<CGameServerSetKeyValueCall*>(m_Player->getNextCall(false, false, ECF_GS_SET_KEY_VALUE, true, __FUNCTION__));
-	CGameServerSetKeyValueCall(pKey, pValue).ensureArgsAreEqual(playCall, m_bStrictChecks, __FUNCTION__);
-	CGameServerSetKeyValueCall* playEndCall = dynamic_cast<CGameServerSetKeyValueCall*>(m_Player->getNextCall(false, true, ECF_GS_SET_KEY_VALUE, false, __FUNCTION__));
+	CGameServerSetKeyValueCall* playCall = dynamic_cast<CGameServerSetKeyValueCall*>(m_Player->getNextCall(false, false, ECF_GS_SET_KEY_VALUE, true, __func__));
+	CGameServerSetKeyValueCall(pKey, pValue).ensureArgsAreEqual(playCall, m_bStrictChecks, __func__);
+	CGameServerSetKeyValueCall* playEndCall = dynamic_cast<CGameServerSetKeyValueCall*>(m_Player->getNextCall(false, true, ECF_GS_SET_KEY_VALUE, false, __func__));
 
 	m_Player->freeFuncCall(playCall); m_Player->freeFuncCall(playEndCall);
 }
 
 void CSteamGameServerPlayingWrapper::SetGameTags(const char *pchGameTags) {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 }
 
 void CSteamGameServerPlayingWrapper::SetGameData(const char *pchGameData) {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 }
 
 void CSteamGameServerPlayingWrapper::SetRegion(const char *pszRegion) {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 }
 
 bool CSteamGameServerPlayingWrapper::SendUserConnectAndAuthenticate(uint32 unIPClient, const void *pvAuthBlob, uint32 cubAuthBlobSize, CSteamID *pSteamIDUser) {
-	CGameServerSendUserConnectAndAuthenticateCall* playCall = dynamic_cast<CGameServerSendUserConnectAndAuthenticateCall*>(m_Player->getNextCall(false, false, ECF_GS_SEND_USER_CONNECT_AND_AUTHENTICATE, true, __FUNCTION__));
-	CGameServerSendUserConnectAndAuthenticateCall(unIPClient, pvAuthBlob, cubAuthBlobSize).ensureArgsAreEqual(playCall, m_bStrictChecks, __FUNCTION__);
-	CGameServerSendUserConnectAndAuthenticateCall* playEndCall = dynamic_cast<CGameServerSendUserConnectAndAuthenticateCall*>(m_Player->getNextCall(false, true, ECF_GS_SEND_USER_CONNECT_AND_AUTHENTICATE, false, __FUNCTION__));
+	CGameServerSendUserConnectAndAuthenticateCall* playCall = dynamic_cast<CGameServerSendUserConnectAndAuthenticateCall*>(m_Player->getNextCall(false, false, ECF_GS_SEND_USER_CONNECT_AND_AUTHENTICATE, true, __func__));
+	CGameServerSendUserConnectAndAuthenticateCall(unIPClient, pvAuthBlob, cubAuthBlobSize).ensureArgsAreEqual(playCall, m_bStrictChecks, __func__);
+	CGameServerSendUserConnectAndAuthenticateCall* playEndCall = dynamic_cast<CGameServerSendUserConnectAndAuthenticateCall*>(m_Player->getNextCall(false, true, ECF_GS_SEND_USER_CONNECT_AND_AUTHENTICATE, false, __func__));
 
 	bool res = playEndCall->m_Res;
 	*pSteamIDUser = CSteamID(playEndCall->m_OutSteamId);
@@ -871,8 +871,8 @@ bool CSteamGameServerPlayingWrapper::SendUserConnectAndAuthenticate(uint32 unIPC
 }
 
 CSteamID CSteamGameServerPlayingWrapper::CreateUnauthenticatedUserConnection() {
-	CGameServerCreateUnauthUserConnectionCall* playCall = dynamic_cast<CGameServerCreateUnauthUserConnectionCall*>(m_Player->getNextCall(false, false, ECF_GS_CREATE_UNAUTH_USER_CONNECTION, true, __FUNCTION__));
-	CGameServerCreateUnauthUserConnectionCall* playEndCall = dynamic_cast<CGameServerCreateUnauthUserConnectionCall*>(m_Player->getNextCall(false, true, ECF_GS_CREATE_UNAUTH_USER_CONNECTION, false, __FUNCTION__));
+	CGameServerCreateUnauthUserConnectionCall* playCall = dynamic_cast<CGameServerCreateUnauthUserConnectionCall*>(m_Player->getNextCall(false, false, ECF_GS_CREATE_UNAUTH_USER_CONNECTION, true, __func__));
+	CGameServerCreateUnauthUserConnectionCall* playEndCall = dynamic_cast<CGameServerCreateUnauthUserConnectionCall*>(m_Player->getNextCall(false, true, ECF_GS_CREATE_UNAUTH_USER_CONNECTION, false, __func__));
 
 	CSteamID res = playEndCall->m_SteamId;
 	m_Player->freeFuncCall(playCall); m_Player->freeFuncCall(playEndCall);
@@ -881,17 +881,17 @@ CSteamID CSteamGameServerPlayingWrapper::CreateUnauthenticatedUserConnection() {
 }
 
 void CSteamGameServerPlayingWrapper::SendUserDisconnect(CSteamID steamIDUser) {
-	CGameServerSendUserDisconnectCall* playCall = dynamic_cast<CGameServerSendUserDisconnectCall*>(m_Player->getNextCall(false, false, ECF_GS_SEND_USER_DISCONNECT, true, __FUNCTION__));
-	CGameServerSendUserDisconnectCall(steamIDUser).ensureArgsAreEqual(playCall, m_bStrictChecks, __FUNCTION__);
-	CGameServerSendUserDisconnectCall* playEndCall = dynamic_cast<CGameServerSendUserDisconnectCall*>(m_Player->getNextCall(false, true, ECF_GS_SEND_USER_DISCONNECT, false, __FUNCTION__));
+	CGameServerSendUserDisconnectCall* playCall = dynamic_cast<CGameServerSendUserDisconnectCall*>(m_Player->getNextCall(false, false, ECF_GS_SEND_USER_DISCONNECT, true, __func__));
+	CGameServerSendUserDisconnectCall(steamIDUser).ensureArgsAreEqual(playCall, m_bStrictChecks, __func__);
+	CGameServerSendUserDisconnectCall* playEndCall = dynamic_cast<CGameServerSendUserDisconnectCall*>(m_Player->getNextCall(false, true, ECF_GS_SEND_USER_DISCONNECT, false, __func__));
 
 	m_Player->freeFuncCall(playCall); m_Player->freeFuncCall(playEndCall);
 }
 
 bool CSteamGameServerPlayingWrapper::BUpdateUserData(CSteamID steamIDUser, const char *pchPlayerName, uint32 uScore) {
-	CGameServerBUpdateUserDataCall* playCall = dynamic_cast<CGameServerBUpdateUserDataCall*>(m_Player->getNextCall(false, false, ECF_GS_BUPDATE_USER_DATA, true, __FUNCTION__));
-	CGameServerBUpdateUserDataCall(steamIDUser, pchPlayerName, uScore).ensureArgsAreEqual(playCall, m_bStrictChecks, __FUNCTION__);
-	CGameServerBUpdateUserDataCall* playEndCall = dynamic_cast<CGameServerBUpdateUserDataCall*>(m_Player->getNextCall(false, true, ECF_GS_BUPDATE_USER_DATA, false, __FUNCTION__));
+	CGameServerBUpdateUserDataCall* playCall = dynamic_cast<CGameServerBUpdateUserDataCall*>(m_Player->getNextCall(false, false, ECF_GS_BUPDATE_USER_DATA, true, __func__));
+	CGameServerBUpdateUserDataCall(steamIDUser, pchPlayerName, uScore).ensureArgsAreEqual(playCall, m_bStrictChecks, __func__);
+	CGameServerBUpdateUserDataCall* playEndCall = dynamic_cast<CGameServerBUpdateUserDataCall*>(m_Player->getNextCall(false, true, ECF_GS_BUPDATE_USER_DATA, false, __func__));
 
 	bool res = playEndCall->m_Res;
 	m_Player->freeFuncCall(playCall); m_Player->freeFuncCall(playEndCall);
@@ -900,51 +900,51 @@ bool CSteamGameServerPlayingWrapper::BUpdateUserData(CSteamID steamIDUser, const
 }
 
 HAuthTicket CSteamGameServerPlayingWrapper::GetAuthSessionTicket(void *pTicket, int cbMaxTicket, uint32 *pcbTicket) {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 	return k_HAuthTicketInvalid;
 }
 
 EBeginAuthSessionResult CSteamGameServerPlayingWrapper::BeginAuthSession(const void *pAuthTicket, int cbAuthTicket, CSteamID steamID) {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 	return k_EBeginAuthSessionResultInvalidTicket;
 }
 
 void CSteamGameServerPlayingWrapper::EndAuthSession(CSteamID steamID) {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 }
 
 void CSteamGameServerPlayingWrapper::CancelAuthTicket(HAuthTicket hAuthTicket) {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 }
 
 EUserHasLicenseForAppResult CSteamGameServerPlayingWrapper::UserHasLicenseForApp(CSteamID steamID, AppId_t appID) {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 	return k_EUserHasLicenseResultHasLicense;
 }
 
 bool CSteamGameServerPlayingWrapper::RequestUserGroupStatus(CSteamID steamIDUser, CSteamID steamIDGroup) {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 	return false;
 }
 
 void CSteamGameServerPlayingWrapper::GetGameplayStats() {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 }
 
 SteamAPICall_t CSteamGameServerPlayingWrapper::GetServerReputation() {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 	return k_uAPICallInvalid;
 }
 
 uint32 CSteamGameServerPlayingWrapper::GetPublicIP() {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 	return 0;
 }
 
 bool CSteamGameServerPlayingWrapper::HandleIncomingPacket(const void *pData, int cbData, uint32 srcIP, uint16 srcPort) {
-	CGameServerHandleIncomingPacketCall* playCall = dynamic_cast<CGameServerHandleIncomingPacketCall*>(m_Player->getNextCall(false, false, ECF_GS_HANDLE_INCOMING_PACKET, true, __FUNCTION__));
-	CGameServerHandleIncomingPacketCall(pData, cbData, srcIP, srcPort).ensureArgsAreEqual(playCall, m_bStrictChecks, __FUNCTION__);
-	CGameServerHandleIncomingPacketCall* playEndCall = dynamic_cast<CGameServerHandleIncomingPacketCall*>(m_Player->getNextCall(false, true, ECF_GS_HANDLE_INCOMING_PACKET, false, __FUNCTION__));
+	CGameServerHandleIncomingPacketCall* playCall = dynamic_cast<CGameServerHandleIncomingPacketCall*>(m_Player->getNextCall(false, false, ECF_GS_HANDLE_INCOMING_PACKET, true, __func__));
+	CGameServerHandleIncomingPacketCall(pData, cbData, srcIP, srcPort).ensureArgsAreEqual(playCall, m_bStrictChecks, __func__);
+	CGameServerHandleIncomingPacketCall* playEndCall = dynamic_cast<CGameServerHandleIncomingPacketCall*>(m_Player->getNextCall(false, true, ECF_GS_HANDLE_INCOMING_PACKET, false, __func__));
 
 	bool res = playEndCall->m_Res;
 	m_Player->freeFuncCall(playCall); m_Player->freeFuncCall(playEndCall);
@@ -953,9 +953,9 @@ bool CSteamGameServerPlayingWrapper::HandleIncomingPacket(const void *pData, int
 }
 
 int CSteamGameServerPlayingWrapper::GetNextOutgoingPacket(void *pOut, int cbMaxOut, uint32 *pNetAdr, uint16 *pPort) {
-	CGameServerGetNextOutgoingPacketCall* playCall = dynamic_cast<CGameServerGetNextOutgoingPacketCall*>(m_Player->getNextCall(false, false, ECF_GS_GET_NEXT_OUTGOING_PACKET, true, __FUNCTION__));
-	CGameServerGetNextOutgoingPacketCall(cbMaxOut).ensureArgsAreEqual(playCall, m_bStrictChecks, __FUNCTION__);
-	CGameServerGetNextOutgoingPacketCall* playEndCall = dynamic_cast<CGameServerGetNextOutgoingPacketCall*>(m_Player->getNextCall(false, true, ECF_GS_GET_NEXT_OUTGOING_PACKET, false, __FUNCTION__));
+	CGameServerGetNextOutgoingPacketCall* playCall = dynamic_cast<CGameServerGetNextOutgoingPacketCall*>(m_Player->getNextCall(false, false, ECF_GS_GET_NEXT_OUTGOING_PACKET, true, __func__));
+	CGameServerGetNextOutgoingPacketCall(cbMaxOut).ensureArgsAreEqual(playCall, m_bStrictChecks, __func__);
+	CGameServerGetNextOutgoingPacketCall* playEndCall = dynamic_cast<CGameServerGetNextOutgoingPacketCall*>(m_Player->getNextCall(false, true, ECF_GS_GET_NEXT_OUTGOING_PACKET, false, __func__));
 
 	int res = playEndCall->m_Result;
 	*pNetAdr = playEndCall->m_Addr;
@@ -967,32 +967,32 @@ int CSteamGameServerPlayingWrapper::GetNextOutgoingPacket(void *pOut, int cbMaxO
 }
 
 void CSteamGameServerPlayingWrapper::EnableHeartbeats(bool bActive) {
-	CGameServerEnableHeartbeatsCall* playCall = dynamic_cast<CGameServerEnableHeartbeatsCall*>(m_Player->getNextCall(false, false, ECF_GS_ENABLE_HEARTBEATS, true, __FUNCTION__));
-	CGameServerEnableHeartbeatsCall(bActive).ensureArgsAreEqual(playCall, m_bStrictChecks, __FUNCTION__);
-	CGameServerEnableHeartbeatsCall* playEndCall = dynamic_cast<CGameServerEnableHeartbeatsCall*>(m_Player->getNextCall(false, true, ECF_GS_ENABLE_HEARTBEATS, false, __FUNCTION__));
+	CGameServerEnableHeartbeatsCall* playCall = dynamic_cast<CGameServerEnableHeartbeatsCall*>(m_Player->getNextCall(false, false, ECF_GS_ENABLE_HEARTBEATS, true, __func__));
+	CGameServerEnableHeartbeatsCall(bActive).ensureArgsAreEqual(playCall, m_bStrictChecks, __func__);
+	CGameServerEnableHeartbeatsCall* playEndCall = dynamic_cast<CGameServerEnableHeartbeatsCall*>(m_Player->getNextCall(false, true, ECF_GS_ENABLE_HEARTBEATS, false, __func__));
 
 	m_Player->freeFuncCall(playCall); m_Player->freeFuncCall(playEndCall);
 }
 
 void CSteamGameServerPlayingWrapper::SetHeartbeatInterval(int iHeartbeatInterval) {
-	CGameServerSetHeartbeatIntervalCall* playCall = dynamic_cast<CGameServerSetHeartbeatIntervalCall*>(m_Player->getNextCall(false, false, ECF_GS_SET_HEARTBEATS_INTERVAL, true, __FUNCTION__));
-	CGameServerSetHeartbeatIntervalCall(iHeartbeatInterval).ensureArgsAreEqual(playCall, m_bStrictChecks, __FUNCTION__);
-	CGameServerSetHeartbeatIntervalCall* playEndCall = dynamic_cast<CGameServerSetHeartbeatIntervalCall*>(m_Player->getNextCall(false, true, ECF_GS_SET_HEARTBEATS_INTERVAL, false, __FUNCTION__));
+	CGameServerSetHeartbeatIntervalCall* playCall = dynamic_cast<CGameServerSetHeartbeatIntervalCall*>(m_Player->getNextCall(false, false, ECF_GS_SET_HEARTBEATS_INTERVAL, true, __func__));
+	CGameServerSetHeartbeatIntervalCall(iHeartbeatInterval).ensureArgsAreEqual(playCall, m_bStrictChecks, __func__);
+	CGameServerSetHeartbeatIntervalCall* playEndCall = dynamic_cast<CGameServerSetHeartbeatIntervalCall*>(m_Player->getNextCall(false, true, ECF_GS_SET_HEARTBEATS_INTERVAL, false, __func__));
 
 	m_Player->freeFuncCall(playCall); m_Player->freeFuncCall(playEndCall);
 }
 
 void CSteamGameServerPlayingWrapper::ForceHeartbeat() {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 }
 
 SteamAPICall_t CSteamGameServerPlayingWrapper::AssociateWithClan(CSteamID steamIDClan) {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 	return k_uAPICallInvalid;
 }
 
 SteamAPICall_t CSteamGameServerPlayingWrapper::ComputeNewPlayerCompatibility(CSteamID steamIDNewPlayer) {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 	return k_uAPICallInvalid;
 }
 
@@ -1008,93 +1008,93 @@ CSteamAppsPlayingWrapper::CSteamAppsPlayingWrapper(CPlayingEngExtInterceptor* pl
 }
 
 bool CSteamAppsPlayingWrapper::BIsSubscribed() {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 	return false;
 }
 
 bool CSteamAppsPlayingWrapper::BIsLowViolence() {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 	return false;
 }
 
 bool CSteamAppsPlayingWrapper::BIsCybercafe() {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 	return false;
 }
 
 bool CSteamAppsPlayingWrapper::BIsVACBanned() {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 	return false;
 }
 
 const char* CSteamAppsPlayingWrapper::GetCurrentGameLanguage() {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 	return "";
 }
 
 const char* CSteamAppsPlayingWrapper::GetAvailableGameLanguages() {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 	return "";
 }
 
 bool CSteamAppsPlayingWrapper::BIsSubscribedApp(AppId_t appID) {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 	return false;
 }
 
 bool CSteamAppsPlayingWrapper::BIsDlcInstalled(AppId_t appID) {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 	return false;
 }
 
 uint32 CSteamAppsPlayingWrapper::GetEarliestPurchaseUnixTime(AppId_t nAppID) {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 	return 0;
 }
 
 bool CSteamAppsPlayingWrapper::BIsSubscribedFromFreeWeekend() {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 	return false;
 }
 
 int CSteamAppsPlayingWrapper::GetDLCCount() {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 	return 0;
 }
 
 bool CSteamAppsPlayingWrapper::BGetDLCDataByIndex(int iDLC, AppId_t *pAppID, bool *pbAvailable, char *pchName, int cchNameBufferSize) {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 	return false;
 }
 
 void CSteamAppsPlayingWrapper::InstallDLC(AppId_t nAppID) {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 }
 
 void CSteamAppsPlayingWrapper::UninstallDLC(AppId_t nAppID) {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 }
 
 void CSteamAppsPlayingWrapper::RequestAppProofOfPurchaseKey(AppId_t nAppID) {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 }
 
 bool CSteamAppsPlayingWrapper::GetCurrentBetaName(char *pchName, int cchNameBufferSize) {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 	return false;
 }
 
 bool CSteamAppsPlayingWrapper::MarkContentCorrupt(bool bMissingFilesOnly) {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 	return false;
 }
 
 uint32 CSteamAppsPlayingWrapper::GetInstalledDepots(DepotId_t *pvecDepots, uint32 cMaxDepots) {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 	return 0;
 }
 
 uint32 CSteamAppsPlayingWrapper::GetAppInstallDir(AppId_t appID, char *pchFolder, uint32 cchFolderBufferSize) {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 	return 0;
 }

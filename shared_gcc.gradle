@@ -1,0 +1,62 @@
+import org.doomedsociety.gradlecpp.cfg.BinaryKind
+import org.doomedsociety.gradlecpp.gcc.GccToolchainConfig
+import org.doomedsociety.gradlecpp.gcc.OptimizationLevel
+
+rootProject.ext.createGccConfig = { boolean release, BinaryKind binKind ->
+	GccToolchainConfig cfg
+	if (release) {
+		cfg = new GccToolchainConfig(
+				compilerOptions: new GccToolchainConfig.CompilerOptions(
+						optimizationLevel: OptimizationLevel.LEVEL_3,
+						stackProtector: false,
+						//interProceduralOptimizations: true,
+
+						noBuiltIn: true,
+
+						//intelExtensions: false,
+						//asmBlocks: true,
+
+						positionIndependentCode: false
+				),
+
+				linkerOptions: new GccToolchainConfig.LinkerOptions(
+						//interProceduralOptimizations: true,
+						stripSymbolTable: true,
+						staticLibGcc: true,
+						//staticIntel: true,
+						staticLibStdCpp: true,
+				),
+
+				librarianOptions: new GccToolchainConfig.LibrarianOptions(
+
+				)
+		)
+	} else {
+		//debug
+		cfg = new GccToolchainConfig(
+				compilerOptions: new GccToolchainConfig.CompilerOptions(
+						optimizationLevel: OptimizationLevel.DISABLE,
+						stackProtector: true,
+						//interProceduralOptimizations: false,
+
+						noBuiltIn: true,
+						//intelExtensions: false,
+						//asmBlocks: true
+				),
+
+				linkerOptions: new GccToolchainConfig.LinkerOptions(
+						//interProceduralOptimizations: false,
+						stripSymbolTable: false,
+						staticLibGcc: true,
+						//staticIntel: true,
+						staticLibStdCpp: true,
+				),
+
+				librarianOptions: new GccToolchainConfig.LibrarianOptions(
+
+				)
+		)
+	}
+
+	return cfg
+}

@@ -255,7 +255,7 @@ int SV_FlyMove(edict_t *ent, float time, trace_t *steptrace)
 			break;
 
 		if (!trace.ent)
-			Sys_Error("SV_FlyMove: !trace.ent");
+			Sys_Error("%s: !trace.ent", __func__);
 
 		if (trace.plane.normal[2] > 0.7)
 		{
@@ -621,7 +621,7 @@ int SV_PushRotate(edict_t *pusher, float movetime)
 			++num_moved;
 
 			if (num_moved >= g_psv.max_edicts)
-				Sys_Error("Out of edicts in simulator!\n");
+				Sys_Error("%s: Out of edicts in simulator!\n", __func__);
 
 			vec3_t start, end, push, move;
 
@@ -1392,7 +1392,7 @@ void SV_Physics(void)
 			break;
 
 		default:
-			Sys_Error("SV_Physics: %s bad movetype %d", &pr_strings[ent->v.classname], ent->v.movetype);
+			Sys_Error("%s: %s bad movetype %d", __func__, &pr_strings[ent->v.classname], ent->v.movetype);
 		}
 
 		if (ent->v.flags & FL_KILLME)
