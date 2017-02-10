@@ -323,6 +323,19 @@ void EXT_FUNC PF_ambientsound_I(edict_t *entity, float *pos, const char *samp, f
 
 void EXT_FUNC PF_sound_I(edict_t *entity, int channel, const char *sample, float volume, float attenuation, int fFlags, int pitch)
 {
+#ifdef REHLDS_FIXES
+#define LocalCheckBounds(var, min, max) \
+	(((min) <= (var) && (var) <= (max)) \
+		? ((void)0) \
+		: Sys_Error("EMIT_SOUND: %s=%g out of bounds " #min "-" #max "\nEntity classname = %s, sound = %s\n", #var, (float)(var), entity->v.classname + pr_strings, sample))
+
+	LocalCheckBounds(volume, 0.0, 1.0);
+	LocalCheckBounds(attenuation, 0.0, 4.0);
+	LocalCheckBounds(channel, 0, 7);
+	LocalCheckBounds(pitch, 0, 255);
+
+#undef LocalCheckBounds
+#else
 	if (volume < 0.0 || volume > 255.0)
 		Sys_Error("EMIT_SOUND: volume = %i", volume);
 	if (attenuation < 0.0 || attenuation > 4.0)
@@ -331,6 +344,8 @@ void EXT_FUNC PF_sound_I(edict_t *entity, int channel, const char *sample, float
 		Sys_Error("EMIT_SOUND: channel = %i", channel);
 	if (pitch < 0 || pitch > 255)
 		Sys_Error("EMIT_SOUND: pitch = %i", pitch);
+#endif
+
 	SV_StartSound(0, entity, channel, sample, (int)(volume * 255), attenuation, fFlags, pitch);
 }
 
