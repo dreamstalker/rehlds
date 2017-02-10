@@ -589,7 +589,7 @@ void NET_TransferRawData(sizebuf_t *msg, unsigned char *pStart, int nSize)
 #ifdef REHLDS_CHECKS
 	if (msg->maxsize < nSize)
 	{
-		Sys_Error("%s: data size is bigger than sizebuf maxsize", __FUNCTION__);
+		Sys_Error("%s: data size is bigger than sizebuf maxsize", __func__);
 	}
 #endif // REHLDS_CHECKS
 	Q_memcpy(msg->data, pStart, nSize);
@@ -638,7 +638,7 @@ void NET_SendLoopPacket(netsrc_t sock, int length, void *data, const netadr_t& t
 #ifdef REHLDS_CHECKS
 	if (sizeof(loop->msgs[i].data) < length)
 	{
-		Sys_Error("%s: data size is bigger than message storage size", __FUNCTION__);
+		Sys_Error("%s: data size is bigger than message storage size", __func__);
 	}
 #endif // REHLDS_CHECKS
 
@@ -1004,15 +1004,15 @@ qboolean NET_QueuePacket(netsrc_t sock)
 			{
 				if (err == WSAEMSGSIZE)
 				{
-					Con_DPrintf("%s: Ignoring oversized network message\n", __FUNCTION__);
+					Con_DPrintf("%s: Ignoring oversized network message\n", __func__);
 				}
 				else
 				{
 					if (g_pcls.state != ca_dedicated)
 					{
-						Sys_Error("%s: %s", __FUNCTION__, NET_ErrorString(err));
+						Sys_Error("%s: %s", __func__, NET_ErrorString(err));
 					}
-					Con_Printf("%s: %s\n", __FUNCTION__, NET_ErrorString(err));
+					Con_Printf("%s: %s\n", __func__, NET_ErrorString(err));
 				}
 			}
 			continue;
@@ -1022,7 +1022,7 @@ qboolean NET_QueuePacket(netsrc_t sock)
 		if (ret != MAX_UDP_PACKET)
 			break;
 
-		Con_NetPrintf("%s: Oversize packet from %s\n", __FUNCTION__, NET_AdrToString(in_from));
+		Con_NetPrintf("%s: Oversize packet from %s\n", __func__, NET_AdrToString(in_from));
 	}
 
 	if (ret == -1 || ret == MAX_UDP_PACKET) {
@@ -1169,7 +1169,7 @@ void NET_StartThread(void)
 		if (!net_thread_initialized)
 		{
 			net_thread_initialized = TRUE;
-			Sys_Error("%s: -net_thread is not reversed yet", __FUNCTION__);
+			Sys_Error("%s: -net_thread is not reversed yet", __func__);
 #ifdef _WIN32
 			/*
 			InitializeCriticalSection(&net_cs);
@@ -1179,7 +1179,7 @@ void NET_StartThread(void)
 				DeleteCriticalSection(&net_cs);
 				net_thread_initialized = 0;
 				use_thread = 0;
-				Sys_Error("%s: Couldn't initialize network thread, run without -net_thread\n", __FUNCTION__);
+				Sys_Error("%s: Couldn't initialize network thread, run without -net_thread\n", __func__);
 			}
 			*/
 #endif // _WIN32
@@ -1200,7 +1200,7 @@ void NET_StopThread(void)
 			*/
 #endif // _WIN32
 			net_thread_initialized = FALSE;
-			Sys_Error("%s: -net_thread is not reversed yet", __FUNCTION__);
+			Sys_Error("%s: -net_thread is not reversed yet", __func__);
 		}
 	}
 }
@@ -1467,7 +1467,7 @@ void NET_SendPacket(netsrc_t sock, int length, void *data, const netadr_t& to)
 #endif // _WIN32
 	else
 	{
-		Sys_Error("%s: bad address type", __FUNCTION__);
+		Sys_Error("%s: bad address type", __func__);
 	}
 
 	NetadrToSockadr(&to, &addr);
@@ -1495,17 +1495,17 @@ void NET_SendPacket(netsrc_t sock, int length, void *data, const netadr_t& to)
 		// let dedicated servers continue after errors
 		if (g_pcls.state == ca_dedicated)
 		{
-			Con_Printf("%s: ERROR: %s\n", __FUNCTION__, NET_ErrorString(err));
+			Con_Printf("%s: ERROR: %s\n", __func__, NET_ErrorString(err));
 		}
 		else
 		{
 			if (err == WSAEADDRNOTAVAIL || err == WSAENOBUFS)
 			{
-				Con_DPrintf("%s: Warning: %s : %s\n", __FUNCTION__, NET_ErrorString(err), NET_AdrToString(to));
+				Con_DPrintf("%s: Warning: %s : %s\n", __func__, NET_ErrorString(err), NET_AdrToString(to));
 			}
 			else
 			{
-				Sys_Error("%s: ERROR: %s\n", __FUNCTION__, NET_ErrorString(err));
+				Sys_Error("%s: ERROR: %s\n", __func__, NET_ErrorString(err));
 			}
 		}
 	}
@@ -1668,7 +1668,7 @@ void NET_OpenIP(void)
 		if (!ip_sockets[NS_SERVER] && dedicated)
 #endif
 		{
-			Sys_Error("%s: Couldn't allocate dedicated server IP port %d.", __FUNCTION__, port);
+			Sys_Error("%s: Couldn't allocate dedicated server IP port %d.", __func__, port);
 		}
 		sv_port = port;
 	}

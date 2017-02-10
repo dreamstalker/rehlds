@@ -63,7 +63,7 @@ void Cbuf_AddText(char *text)
 
 	if (cmd_text.cursize + len >= cmd_text.maxsize)
 	{
-		Con_Printf("%s: overflow\n", __FUNCTION__);
+		Con_Printf("%s: overflow\n", __func__);
 		return;
 	}
 
@@ -81,7 +81,7 @@ void Cbuf_InsertText(char *text)
 
 	if (cmd_text.cursize + addLen >= cmd_text.maxsize)
 	{
-		Con_Printf("%s: overflow\n", __FUNCTION__);
+		Con_Printf("%s: overflow\n", __func__);
 		return;
 	}
 
@@ -119,7 +119,7 @@ void Cbuf_InsertTextLines(char *text)
 
 	if (cmd_text.cursize + addLen + 2 >= cmd_text.maxsize)
 	{
-		Con_Printf("%s: overflow\n", __FUNCTION__);
+		Con_Printf("%s: overflow\n", __func__);
 		return;
 	}
 
@@ -721,20 +721,20 @@ void Cmd_AddCommand(const char *cmd_name, xcommand_t function)
 
 	if (host_initialized)
 	{
-		Sys_Error("%s: called after host_initialized", __FUNCTION__);
+		Sys_Error("%s: called after host_initialized", __func__);
 	}
 
 	// Check in variables list
 	if (Cvar_FindVar(cmd_name) != NULL)
 	{
-		Con_Printf("%s: \"%s\" already defined as a var\n", __FUNCTION__, cmd_name);
+		Con_Printf("%s: \"%s\" already defined as a var\n", __func__, cmd_name);
 		return;
 	}
 
 	// Check if this command is already defined
 	if (Cmd_Exists(cmd_name))
 	{
-		Con_Printf("%s: \"%s\" already defined\n", __FUNCTION__, cmd_name);
+		Con_Printf("%s: \"%s\" already defined\n", __func__, cmd_name);
 		return;
 	}
 
@@ -755,14 +755,14 @@ void Cmd_AddMallocCommand(const char *cmd_name, xcommand_t function, int flag)
 	// Check in variables list
 	if (Cvar_FindVar(cmd_name) != NULL)
 	{
-		Con_Printf("%s: \"%s\" already defined as a var\n", __FUNCTION__, cmd_name);
+		Con_Printf("%s: \"%s\" already defined as a var\n", __func__, cmd_name);
 		return;
 	}
 
 	// Check if this command is already defined
 	if (Cmd_Exists(cmd_name))
 	{
-		Con_Printf("%s: \"%s\" already defined\n", __FUNCTION__, cmd_name);
+		Con_Printf("%s: \"%s\" already defined\n", __func__, cmd_name);
 		return;
 	}
 
@@ -1010,7 +1010,7 @@ qboolean Cmd_ForwardToServerInternal(sizebuf_t *pBuf)
 	char tempData[4096], buffername[64];
 	sizebuf_t tempBuf;
 
-	Q_sprintf(buffername, "%s::%s", __FUNCTION__, nameof_variable(tempBuf));
+	Q_sprintf(buffername, "%s::%s", __func__, nameof_variable(tempBuf));
 
 	tempBuf.buffername = buffername;
 	tempBuf.data = (byte *)tempData;
@@ -1063,7 +1063,7 @@ NOXREF int Cmd_CheckParm(char *parm)
 
 	if (!parm)
 	{
-		Sys_Error("%s: NULL", __FUNCTION__);
+		Sys_Error("%s: NULL", __func__);
 	}
 
 	int c = Cmd_Argc();

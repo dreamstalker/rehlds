@@ -62,7 +62,7 @@ void Netchan_UnlinkFragment(fragbuf_t *buf, fragbuf_t **list)
 
 	if (list == nullptr)
 	{
-		Con_Printf("%s: Asked to unlink fragment from empty list, ignored\n", __FUNCTION__);
+		Con_Printf("%s: Asked to unlink fragment from empty list, ignored\n", __func__);
 		return;
 	}
 
@@ -85,7 +85,7 @@ void Netchan_UnlinkFragment(fragbuf_t *buf, fragbuf_t **list)
 		search = search->next;
 	}
 
-	Con_Printf("%s: Couldn't find fragment\n", __FUNCTION__);
+	Con_Printf("%s: Couldn't find fragment\n", __func__);
 }
 
 void Netchan_OutOfBand(netsrc_t sock, netadr_t adr, int length, byte *data)
@@ -167,7 +167,7 @@ void Netchan_Clear(netchan_t *chan)
 
 	if (chan->reliable_length)
 	{
-		Con_DPrintf("%s: reliable length not 0, reliable_sequence: %d, incoming_reliable_acknowledged: %d\n", __FUNCTION__, chan->reliable_length, chan->incoming_reliable_acknowledged);
+		Con_DPrintf("%s: reliable length not 0, reliable_sequence: %d, incoming_reliable_acknowledged: %d\n", __func__, chan->reliable_length, chan->incoming_reliable_acknowledged);
 		chan->reliable_sequence ^= 1;
 		chan->reliable_length = 0;
 	}
@@ -1158,7 +1158,7 @@ void Netchan_CreateFileFragmentsFromBuffer(qboolean server, netchan_t *chan, con
 			if (server)
 				SV_DropClient(host_client, 0, "Malloc problem");
 			else
-				rehlds_syserror("%s:Reverse me: client-side code", __FUNCTION__);
+				rehlds_syserror("%s:Reverse me: client-side code", __func__);
 
 #ifdef REHLDS_FIXES
 			if (bCompressed) {
@@ -1358,7 +1358,7 @@ int Netchan_CreateFileFragments_(qboolean server, netchan_t *chan, const char *f
 			}
 			else
 			{
-				rehlds_syserror("%s: Reverse clientside code", __FUNCTION__);
+				rehlds_syserror("%s: Reverse clientside code", __func__);
 				return 0;
 			}
 		}

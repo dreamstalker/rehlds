@@ -1715,7 +1715,7 @@ void EntityInit(edict_t *pEdict, int className)
 {
 	ENTITYINIT pEntityInit;
 	if (!className)
-		Sys_Error("%s: Bad class!!\n", __FUNCTION__);
+		Sys_Error("%s: Bad class!!\n", __func__);
 
 	ReleaseEntityDLLFields(pEdict);
 	InitEntityDLLFields(pEdict);
@@ -1935,7 +1935,7 @@ int LoadGamestate(char *level, int createPlayers)
 				else
 				{
 					if (!(pEntInfo->flags & FENTTABLE_PLAYER))
-						Sys_Error("%s: ENTITY IS NOT A PLAYER: %d\n", __FUNCTION__, i);
+						Sys_Error("%s: ENTITY IS NOT A PLAYER: %d\n", __func__, i);
 
 					pent = g_psvs.clients[pEntInfo->id - 1].edict;
 					if (createPlayers && pent)
@@ -2048,7 +2048,7 @@ int CreateEntityList(SAVERESTOREDATA *pSaveData, int levelMask)
 					if (pent && !pent->free)
 					{
 						if (!(pEntInfo->flags & FENTTABLE_PLAYER))
-							Sys_Error("%s: ENTITY IS NOT A PLAYER: %d\n", __FUNCTION__, i);
+							Sys_Error("%s: ENTITY IS NOT A PLAYER: %d\n", __func__, i);
 
 						if (cl->active)
 							EntityInit(pent, pEntInfo->classname);
@@ -2339,7 +2339,7 @@ void Host_Changelevel2_f(void)
 	FS_LogLevelLoadStarted(level);
 
 	if (!SV_SpawnServer(FALSE, level, startspot))
-		Sys_Error("%s: Couldn't load map %s\n", __FUNCTION__, level);
+		Sys_Error("%s: Couldn't load map %s\n", __func__, level);
 
 	if (pSaveData)
 		SaveExit(pSaveData);

@@ -347,7 +347,7 @@ NOXREF void TextMessageParse(unsigned char *pMemFile, int fileSize)
 	while (memfgets(pMemFile, fileSize, &filePos, buf, 512) != NULL)
 	{
 		if(messageCount >= MAX_MESSAGES)
-			Sys_Error("%s: messageCount >= MAX_MESSAGES", __FUNCTION__);
+			Sys_Error("%s: messageCount >= MAX_MESSAGES", __func__);
 
 		TrimSpace(buf, trim);
 		switch (mode)

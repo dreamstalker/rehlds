@@ -79,9 +79,6 @@
 	#include <sys/types.h>
 	#include <sys/sysinfo.h>
 	#include <unistd.h>
-
-	// Deail with stupid macro in kernel.h
-	#undef __FUNCTION__
 #endif // _WIN32
 
 #include <string>
@@ -129,11 +126,6 @@
 		VirtualFree(ptr, 0, MEM_RELEASE);
 	}
 #else // _WIN32
-	#ifdef __FUNCTION__
-		#undef __FUNCTION__
-	#endif
-	#define __FUNCTION__ __func__
-
 	#ifndef PAGESIZE
 		#define PAGESIZE 4096
 	#endif

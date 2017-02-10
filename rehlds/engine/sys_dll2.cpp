@@ -203,7 +203,7 @@ void Sys_CheckOSVersion(void)
 	Q_memset(&verInfo, 0, sizeof(verInfo));
 	verInfo.dwOSVersionInfoSize = sizeof(verInfo);
 	if (!GetVersionEx(&verInfo))
-		Sys_Error("%s: Couldn't get OS info", __FUNCTION__);
+		Sys_Error("%s: Couldn't get OS info", __func__);
 
 	g_WinNTOrHigher = verInfo.dwMajorVersion >= 4;
 	if (verInfo.dwPlatformId == 1 && verInfo.dwMajorVersion == 4)
@@ -348,7 +348,7 @@ void Sys_InitMemory(void)
 		if (lpBuffer.dwTotalPhys)
 		{
 			if (lpBuffer.dwTotalPhys < FIFTEEN_MB)
-				Sys_Error("%s: Available memory less than 15MB!!! %i", __FUNCTION__, host_parms.memsize);
+				Sys_Error("%s: Available memory less than 15MB!!! %i", __func__, host_parms.memsize);
 
 			host_parms.memsize = (int)(lpBuffer.dwTotalPhys >> 1);
 			if (host_parms.memsize < MINIMUM_WIN_MEMORY)
@@ -376,7 +376,7 @@ void Sys_InitMemory(void)
 #endif // _WIN32
 
 	if (!host_parms.membase)
-		Sys_Error("%s: Unable to allocate %.2f MB\n", __FUNCTION__, (float)host_parms.memsize / (1024.0f * 1024.0f));
+		Sys_Error("%s: Unable to allocate %.2f MB\n", __func__, (float)host_parms.memsize / (1024.0f * 1024.0f));
 }
 
 void Sys_ShutdownMemory(void)

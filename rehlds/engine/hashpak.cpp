@@ -72,7 +72,7 @@ qboolean HPAK_GetDataPointer(char *pakname, struct resource_s *pResource, unsign
 			{
 				pbuf = (byte *)Mem_Malloc(p->datasize);
 				if (!pbuf)
-					Sys_Error("%s: Error allocating %i bytes for hpak!", __FUNCTION__, p->datasize);
+					Sys_Error("%s: Error allocating %i bytes for hpak!", __func__, p->datasize);
 				Q_memcpy((void *)pbuf, p->data, p->datasize);
 				*pbuffer = pbuf;
 			}
@@ -173,7 +173,7 @@ void HPAK_AddToQueue(char *pakname, struct resource_s *pResource, void *pData, F
 {
 	hash_pack_queue_t *n = (hash_pack_queue_t *)Mem_Malloc(sizeof(hash_pack_queue_t));
 	if (!n)
-		Sys_Error("%s: Unable to allocate %i bytes for hpak queue!", __FUNCTION__, sizeof(hash_pack_queue_t));
+		Sys_Error("%s: Unable to allocate %i bytes for hpak queue!", __func__, sizeof(hash_pack_queue_t));
 
 	Q_memset(n, 0, sizeof(hash_pack_queue_t));
 	n->pakname = Mem_Strdup(pakname);
@@ -181,7 +181,7 @@ void HPAK_AddToQueue(char *pakname, struct resource_s *pResource, void *pData, F
 	n->datasize = pResource->nDownloadSize;
 	n->data = Mem_Malloc(pResource->nDownloadSize);
 	if (!n->data)
-		Sys_Error("%s: Unable to allocate %i bytes for hpak queue!", __FUNCTION__, n->datasize);
+		Sys_Error("%s: Unable to allocate %i bytes for hpak queue!", __func__, n->datasize);
 
 	if (pData)
 	{
@@ -192,7 +192,7 @@ void HPAK_AddToQueue(char *pakname, struct resource_s *pResource, void *pData, F
 	else
 	{
 		if (!fpSource)
-			Sys_Error("%s: Add to Queue called without data or file pointer!", __FUNCTION__);
+			Sys_Error("%s: Add to Queue called without data or file pointer!", __func__);
 		FS_Read(n->data, n->datasize, 1, fpSource);
 		n->next = gp_hpak_queue;
 		gp_hpak_queue = n;
@@ -422,7 +422,7 @@ void HPAK_RemoveLump(char *pakname, resource_t *pResource)
 
 	if (pakname == NULL || *pakname == '\0' || pResource == NULL)
 	{
-		Con_Printf("%s:  Invalid arguments\n", __FUNCTION__);
+		Con_Printf("%s:  Invalid arguments\n", __func__);
 		return;
 	}
 	HPAK_FlushHostQueue();

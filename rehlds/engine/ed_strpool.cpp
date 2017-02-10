@@ -40,7 +40,7 @@ char* Ed_StrPool_Alloc(const char* origStr) {
 	unsigned int len = Q_strlen(origStr) + 1;
 
 	if (len >= ARRAYSIZE(str)) {
-		Sys_Error("%s: Too long string allocated: %s", __FUNCTION__, origStr);
+		Sys_Error("%s: Too long string allocated: %s", __func__, origStr);
 	}
 
 	Q_strcpy(str, origStr);

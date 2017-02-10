@@ -327,7 +327,7 @@ delta_t *SV_LookupDelta(char *name)
 		p = p->next;
 	}
 
-	Sys_Error("%s: Couldn't find delta for %s\n", __FUNCTION__, name);
+	Sys_Error("%s: Couldn't find delta for %s\n", __func__, name);
 
 	return NULL;
 }
@@ -423,7 +423,7 @@ void SV_ReallocateDynamicData(void)
 {
 	if (!g_psv.max_edicts)
 	{
-		Con_DPrintf("%s: sv.max_edicts == 0\n", __FUNCTION__);
+		Con_DPrintf("%s: sv.max_edicts == 0\n", __func__);
 		return;
 	}
 
@@ -784,22 +784,22 @@ qboolean SV_BuildSoundMsg(edict_t *entity, int channel, const char *sample, int 
 
 	if (volume < 0 || volume > 255)
 	{
-		Con_Printf("%s: volume = %i", __FUNCTION__, volume);
+		Con_Printf("%s: volume = %i", __func__, volume);
 		volume = (volume < 0) ? 0 : 255;
 	}
 	if (attenuation < 0.0f || attenuation > 4.0f)
 	{
-		Con_Printf("%s: attenuation = %f", __FUNCTION__, attenuation);
+		Con_Printf("%s: attenuation = %f", __func__, attenuation);
 		attenuation = (attenuation < 0.0f) ? 0.0f : 4.0f;
 	}
 	if (channel < 0 || channel > 7)
 	{
-		Con_Printf("%s: channel = %i", __FUNCTION__, channel);
+		Con_Printf("%s: channel = %i", __func__, channel);
 		channel = (channel < 0) ? CHAN_AUTO : CHAN_NETWORKVOICE_BASE;
 	}
 	if (pitch < 0 || pitch > 255)
 	{
-		Con_Printf("%s: pitch = %i", __FUNCTION__, pitch);
+		Con_Printf("%s: pitch = %i", __func__, pitch);
 		pitch = (pitch < 0) ? 0 : 255;
 	}
 
@@ -811,7 +811,7 @@ qboolean SV_BuildSoundMsg(edict_t *entity, int channel, const char *sample, int 
 		sound_num = Q_atoi(sample + 1);
 		if (sound_num >= CVOXFILESENTENCEMAX)
 		{
-			Con_Printf("%s: invalid sentence number: %s", __FUNCTION__, sample + 1);
+			Con_Printf("%s: invalid sentence number: %s", __func__, sample + 1);
 			return FALSE;
 		}
 	}
@@ -825,7 +825,7 @@ qboolean SV_BuildSoundMsg(edict_t *entity, int channel, const char *sample, int 
 		sound_num = SV_LookupSoundIndex(sample);
 		if (!sound_num || !g_psv.sound_precache[sound_num])
 		{
-			Con_Printf("%s: %s not precached (%d)\n", __FUNCTION__, sample, sound_num);
+			Con_Printf("%s: %s not precached (%d)\n", __func__, sample, sound_num);
 			return FALSE;
 		}
 	}
@@ -934,7 +934,7 @@ void SV_AddSampleToHashedLookupTable(const char *pszSample, int iSampleIndex)
 			index = 0;
 
 		if (index == starting_index)
-			Sys_Error("%s: NO FREE SLOTS IN SOUND LOOKUP TABLE", __FUNCTION__);
+			Sys_Error("%s: NO FREE SLOTS IN SOUND LOOKUP TABLE", __func__);
 	}
 
 	g_psv.sound_precache_hashedlookup[index] = iSampleIndex;
@@ -1857,7 +1857,7 @@ int EXT_FUNC SV_CheckProtocol_internal(netadr_t *adr, int nProtocol)
 {
 	if (adr == NULL)
 	{
-		Sys_Error("%s:  Null address\n", __FUNCTION__);
+		Sys_Error("%s:  Null address\n", __func__);
 	}
 
 	if (nProtocol == PROTOCOL_VERSION)
@@ -1910,7 +1910,7 @@ bool EXT_FUNC SV_CheckChallenge_api(const netadr_t &adr, int nChallengeValue) {
 int SV_CheckChallenge(netadr_t *adr, int nChallengeValue)
 {
 	if (!adr)
-		Sys_Error("%s:  Null address\n", __FUNCTION__);
+		Sys_Error("%s:  Null address\n", __func__);
 
 	if (NET_IsLocalAddress(*adr))
 		return 1;
@@ -2655,19 +2655,19 @@ void SV_ResetModInfo(void)
 	nFileSize = FS_Size(hLibListFile);
 	if (!nFileSize || (signed int)nFileSize > 256 * 1024)
 	{
-		Sys_Error("%s: Game listing file size is bogus [%s: size %i]", __FUNCTION__, "liblist.gam", nFileSize);
+		Sys_Error("%s: Game listing file size is bogus [%s: size %i]", __func__, "liblist.gam", nFileSize);
 	}
 
 	pszInputStream = (char *)Mem_Malloc(nFileSize + 1);
 	if (!pszInputStream)
 	{
-		Sys_Error("%s: Could not allocate space for game listing file of %i bytes", __FUNCTION__, nFileSize + 1);
+		Sys_Error("%s: Could not allocate space for game listing file of %i bytes", __func__, nFileSize + 1);
 	}
 
 	nBytesRead = FS_Read(pszInputStream, nFileSize, 1, hLibListFile);
 	if (nBytesRead != nFileSize)
 	{
-		Sys_Error("%s: Error reading in game listing file, expected %i bytes, read %i", __FUNCTION__, nFileSize, nBytesRead);
+		Sys_Error("%s: Error reading in game listing file, expected %i bytes, read %i", __func__, nFileSize, nBytesRead);
 	}
 
 	pszInputStream[nFileSize] = 0;
@@ -5064,7 +5064,7 @@ int SV_ModelIndex(const char *name)
 	};
 #endif
 
-	Sys_Error("%s: SV_ModelIndex: model %s not precached", __FUNCTION__, name);
+	Sys_Error("%s: SV_ModelIndex: model %s not precached", __func__, name);
 }
 
 void EXT_FUNC SV_AddResource(resourcetype_t type, const char *name, int size, unsigned char flags, int index)
@@ -5076,7 +5076,7 @@ void EXT_FUNC SV_AddResource(resourcetype_t type, const char *name, int size, un
 	if (g_psv.num_resources >= MAX_RESOURCE_LIST)
 #endif // REHLDS_FIXES
 	{
-		Sys_Error("%s: Too many resources on server.", __FUNCTION__);
+		Sys_Error("%s: Too many resources on server.", __func__);
 	}
 
 #ifdef REHLDS_FIXES
@@ -5552,7 +5552,7 @@ void SV_BroadcastCommand(char *fmt, ...)
 	MSG_WriteByte(&msg, svc_stufftext);
 	MSG_WriteString(&msg, string);
 	if (msg.flags & SIZEBUF_OVERFLOWED)
-		Sys_Error("%s: Overflowed on %s, %i is max size\n", __FUNCTION__, string, msg.maxsize);
+		Sys_Error("%s: Overflowed on %s, %i is max size\n", __func__, string, msg.maxsize);
 
 	for (int i = 0; i < g_psvs.maxclients; ++i)
 	{
@@ -6463,7 +6463,7 @@ void SV_BanId_f(void)
 		}
 		if (id == NULL)
 		{
-			Con_Printf("%s:  Couldn't find #userid %u\n", __FUNCTION__, search);
+			Con_Printf("%s:  Couldn't find #userid %u\n", __func__, search);
 			return;
 		}
 	}
@@ -6492,7 +6492,7 @@ void SV_BanId_f(void)
 
 		if (id == NULL)
 		{
-			Con_Printf("%s:  Couldn't resolve uniqueid %s.\n", __FUNCTION__, idstring);
+			Con_Printf("%s:  Couldn't resolve uniqueid %s.\n", __func__, idstring);
 			Con_Printf("Usage:  banid <minutes> <uniqueid or #userid> { kick }\n");
 			Con_Printf("Use 0 minutes for permanent\n");
 			return;
@@ -6510,7 +6510,7 @@ void SV_BanId_f(void)
 	{
 		if (numuserfilters >= MAX_USERFILTERS)
 		{
-			Con_Printf("%s:  User filter list is full\n", __FUNCTION__);
+			Con_Printf("%s:  User filter list is full\n", __func__);
 			return;
 		}
 		numuserfilters++;
@@ -6797,7 +6797,7 @@ void SV_RemoveId_f(void)
 
 	if (!idstring[0])
 	{
-		Con_Printf("%s:  Id string is empty!\n", __FUNCTION__);
+		Con_Printf("%s:  Id string is empty!\n", __func__);
 		return;
 	}
 
@@ -6806,7 +6806,7 @@ void SV_RemoveId_f(void)
 		int slot = Q_atoi(&idstring[1]);
 		if (slot <= 0 || slot > numuserfilters)
 		{
-			Con_Printf("%s:  invalid slot #%i\n", __FUNCTION__, slot);
+			Con_Printf("%s:  invalid slot #%i\n", __func__, slot);
 			return;
 		}
 		slot--;
@@ -7650,7 +7650,7 @@ void SV_RegisterDelta(char *name, char *loadfile)
 {
 	delta_t *pdesc = NULL;
 	if (!DELTA_Load(name, &pdesc, loadfile))
-		Sys_Error("%s: Error parsing %s!!!\n", __FUNCTION__, loadfile);
+		Sys_Error("%s: Error parsing %s!!!\n", __func__, loadfile);
 
 	delta_info_t *p = (delta_info_t *)Mem_ZeroMalloc(sizeof(delta_info_t));
 	p->loadfile = Mem_Strdup(loadfile);
@@ -7677,32 +7677,32 @@ void SV_InitDeltas(void)
 
 	g_pplayerdelta = SV_LookupDelta("entity_state_player_t");
 	if (!g_pplayerdelta)
-		Sys_Error("%s: No entity_state_player_t encoder on server!\n", __FUNCTION__);
+		Sys_Error("%s: No entity_state_player_t encoder on server!\n", __func__);
 
 	g_pentitydelta = SV_LookupDelta("entity_state_t");
 	if (!g_pentitydelta)
-		Sys_Error("%s: No entity_state_t encoder on server!\n", __FUNCTION__);
+		Sys_Error("%s: No entity_state_t encoder on server!\n", __func__);
 
 	g_pcustomentitydelta = SV_LookupDelta("custom_entity_state_t");
 	if (!g_pcustomentitydelta)
-		Sys_Error("%s: No custom_entity_state_t encoder on server!\n", __FUNCTION__);
+		Sys_Error("%s: No custom_entity_state_t encoder on server!\n", __func__);
 
 	g_pclientdelta = SV_LookupDelta("clientdata_t");
 	if (!g_pclientdelta)
-		Sys_Error("%s: No clientdata_t encoder on server!\n", __FUNCTION__);
+		Sys_Error("%s: No clientdata_t encoder on server!\n", __func__);
 
 	g_pweapondelta = SV_LookupDelta("weapon_data_t");
 	if (!g_pweapondelta)
-		Sys_Error("%s: No weapon_data_t encoder on server!\n", __FUNCTION__);
+		Sys_Error("%s: No weapon_data_t encoder on server!\n", __func__);
 
 	g_peventdelta = SV_LookupDelta("event_t");
 	if (!g_peventdelta)
-		Sys_Error("%s: No event_t encoder on server!\n", __FUNCTION__);
+		Sys_Error("%s: No event_t encoder on server!\n", __func__);
 
 #ifdef REHLDS_OPT_PEDANTIC
 	g_pusercmddelta = SV_LookupDelta("usercmd_t");
 	if (!g_pusercmddelta)
-		Sys_Error("%s: No usercmd_t encoder on server!\n", __FUNCTION__);
+		Sys_Error("%s: No usercmd_t encoder on server!\n", __func__);
 #endif
 
 #if defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)

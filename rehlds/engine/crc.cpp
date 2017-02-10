@@ -133,7 +133,7 @@ byte COM_BlockSequenceCRCByte(byte *base, int length, int sequence)
 	CRC32_t crc;
 
 	if (sequence < 0)
-		Sys_Error("%s: sequence < 0\n", __FUNCTION__);
+		Sys_Error("%s: sequence < 0\n", __func__);
 	p = (byte *)pulCRCTable + sequence % 0x3FC;
 	if (length > 60)
 		length = 60;

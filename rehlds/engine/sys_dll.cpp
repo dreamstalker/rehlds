@@ -263,7 +263,7 @@ void __cdecl Sys_InitHardwareTimer()
 	Sys_InitFPUControlWords();
 
 	if (!CRehldsPlatformHolder::get()->QueryPerfFreq(&perfFreq))
-		Sys_Error("%s: No hardware timer available", __FUNCTION__);
+		Sys_Error("%s: No hardware timer available", __func__);
 
 	perfHighPart = perfFreq.HighPart;
 	perfLowPart = perfFreq.LowPart;
@@ -308,7 +308,7 @@ const char *Sys_FindFirst(const char *path, char *basename)
 {
 	if (g_hfind != -1)
 	{
-		Sys_Error("%s: called without close", __FUNCTION__);
+		Sys_Error("%s: called without close", __func__);
 	}
 
 	const char *psz = FS_FindFirst(path, &g_hfind, 0);
@@ -334,7 +334,7 @@ const char *Sys_FindFirstPathID(const char *path, char *pathid)
 	//const char *psz;//unused?
 	if (g_hfind != -1)
 	{
-		Sys_Error("%s: called without close", __FUNCTION__);
+		Sys_Error("%s: called without close", __func__);
 	}
 
 	return FS_FindFirst(path, &g_hfind, pathid);
@@ -406,7 +406,7 @@ NOXREF void Sys_MakeCodeWriteable(uint32 startaddr, uint32 length)
 	NOXREFCHECK;
 #ifdef _WIN32
 	if (!VirtualProtect((LPVOID)startaddr, length, PAGE_EXECUTE_READWRITE, (PDWORD)&length))
-		Sys_Error("%s: Protection change failed.", __FUNCTION__);
+		Sys_Error("%s: Protection change failed.", __func__);
 #endif // _WIN32
 }
 
@@ -905,15 +905,15 @@ void LoadEntityDLLs(const char *szBaseDir)
 		nFileSize = FS_Size(hLibListFile);
 		nFileSize2 = nFileSize;
 		if (!nFileSize || (signed int)nFileSize > 262144)
-			Sys_Error("%s: Game listing file size is bogus [%s: size %i]", __FUNCTION__, "liblist.gam", nFileSize);
+			Sys_Error("%s: Game listing file size is bogus [%s: size %i]", __func__, "liblist.gam", nFileSize);
 
 		pszInputStream = (char *)Mem_Malloc(nFileSize + 1);
 		if (!pszInputStream)
-			Sys_Error("%s: Could not allocate space for game listing file of %i bytes", __FUNCTION__, nFileSize2 + 1);
+			Sys_Error("%s: Could not allocate space for game listing file of %i bytes", __func__, nFileSize2 + 1);
 
 		nBytesRead = FS_Read(pszInputStream, nFileSize2, 1, hLibListFile);
 		if (nBytesRead != nFileSize2)
-			Sys_Error("%s: Error reading in game listing file, expected %i bytes, read %i", __FUNCTION__, nFileSize2, nBytesRead);
+			Sys_Error("%s: Error reading in game listing file, expected %i bytes, read %i", __func__, nFileSize2, nBytesRead);
 
 		pszInputStream[nFileSize2] = 0;
 		pStreamPos = pszInputStream;

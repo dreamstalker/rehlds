@@ -326,7 +326,7 @@ delta_description_t *DELTA_FindField(delta_t *pFields, const char *pszField)
 		}
 	}
 
-	Con_Printf("%s:  Warning, couldn't find %s\n", __FUNCTION__, pszField);
+	Con_Printf("%s:  Warning, couldn't find %s\n", __func__, pszField);
 	return NULL;
 }
 
@@ -343,7 +343,7 @@ int EXT_FUNC DELTA_FindFieldIndex(struct delta_s *pFields, const char *fieldname
 		}
 	}
 
-	Con_Printf("%s:  Warning, couldn't find %s\n", __FUNCTION__, fieldname);
+	Con_Printf("%s:  Warning, couldn't find %s\n", __func__, fieldname);
 	return -1;
 }
 
@@ -471,7 +471,7 @@ int DELTA_TestDelta(unsigned char *from, unsigned char *to, delta_t *pFields)
 			}
 			break;
 		default:
-			Con_Printf("%s: Bad field type %i\n", __FUNCTION__, fieldType);
+			Con_Printf("%s: Bad field type %i\n", __func__, fieldType);
 			break;
 		}
 
@@ -559,7 +559,7 @@ void DELTA_MarkSendFields(unsigned char *from, unsigned char *to, delta_t *pFiel
 				pTest->flags |= FDT_MARK;
 			break;
 		default:
-			Con_Printf("%s: Bad field type %i\n", __FUNCTION__, fieldType);
+			Con_Printf("%s: Bad field type %i\n", __func__, fieldType);
 			break;
 		}
 	}
@@ -715,7 +715,7 @@ void DELTA_WriteMarkedFields(unsigned char *from, unsigned char *to, delta_t *pF
 			MSG_WriteBitString((const char *)&to[pTest->fieldOffset]);
 			break;
 		default:
-			Con_Printf("%s: unknown send field type\n", __FUNCTION__);
+			Con_Printf("%s: unknown send field type\n", __func__);
 			break;
 		}
 	}
@@ -843,7 +843,7 @@ int DELTA_ParseDelta(unsigned char *from, unsigned char *to, delta_t *pFields)
 				Q_strcpy((char *)&to[pTest->fieldOffset], (char *)&from[pTest->fieldOffset]);
 				break;
 			default:
-				Con_Printf("%s: unparseable field type %i\n", __FUNCTION__, fieldType);
+				Con_Printf("%s: unparseable field type %i\n", __func__, fieldType);
 			}
 			continue;
 		}
@@ -985,7 +985,7 @@ int DELTA_ParseDelta(unsigned char *from, unsigned char *to, delta_t *pFields)
 			} while (c);
 			break;
 		default:
-			Con_Printf("%s: unparseable field type %i\n", __FUNCTION__, fieldType);
+			Con_Printf("%s: unparseable field type %i\n", __func__, fieldType);
 			break;
 		}
 	}
@@ -1085,7 +1085,7 @@ delta_t *DELTA_BuildFromLinks(delta_link_t **pplinks)
 
 #ifdef REHLDS_FIXES
 	if (count > DELTA_MAX_FIELDS)
-		Sys_Error("%s: Too many fields in delta description %i (MAX %i)\n", __FUNCTION__, count, DELTA_MAX_FIELDS);
+		Sys_Error("%s: Too many fields in delta description %i (MAX %i)\n", __func__, count, DELTA_MAX_FIELDS);
 #endif
 
 	pdesc = (delta_description_t *)Mem_ZeroMalloc(sizeof(delta_description_t) * count);
@@ -1116,7 +1116,7 @@ int DELTA_FindOffset(int count, delta_definition_t *pdef, char *fieldname)
 		}
 	}
 
-	Sys_Error("%s: Couldn't find offset for %s!!!\n", __FUNCTION__, fieldname);
+	Sys_Error("%s: Couldn't find offset for %s!!!\n", __func__, fieldname);
 }
 
 qboolean DELTA_ParseType(delta_description_t *pdelta, char **pstream)
@@ -1150,11 +1150,11 @@ qboolean DELTA_ParseType(delta_description_t *pdelta, char **pstream)
 		else if (!Q_stricmp(com_token, "DT_STRING"))
 			pdelta->fieldType |= DT_STRING;
 		else
-			Sys_Error("%s:  Unknown type or type flag %s\n", __FUNCTION__, com_token);
+			Sys_Error("%s:  Unknown type or type flag %s\n", __func__, com_token);
 	}
 
 	// We are hit the end of the stream
-	Sys_Error("%s:  Expecting fieldtype info\n", __FUNCTION__);	// Was Con_Printf here
+	Sys_Error("%s:  Expecting fieldtype info\n", __func__);	// Was Con_Printf here
 	return FALSE;
 }
 
@@ -1167,7 +1167,7 @@ qboolean DELTA_ParseField(int count, delta_definition_t *pdefinition, delta_link
 	{
 		if (Q_stricmp(com_token, "DEFINE_DELTA_POST"))
 		{
-			Sys_Error("%s:  Expecting DEFINE_*, got %s\n", __FUNCTION__, com_token);
+			Sys_Error("%s:  Expecting DEFINE_*, got %s\n", __func__, com_token);
 		}
 		readpost = 1;
 	}
@@ -1175,13 +1175,13 @@ qboolean DELTA_ParseField(int count, delta_definition_t *pdefinition, delta_link
 	*pstream = COM_Parse(*pstream);
 	if (Q_stricmp(com_token, "("))
 	{
-		Sys_Error("%s:  Expecting (, got %s\n", __FUNCTION__, com_token);
+		Sys_Error("%s:  Expecting (, got %s\n", __func__, com_token);
 	}
 
 	*pstream = COM_Parse(*pstream);
 	if (com_token[0] == 0)
 	{
-		Sys_Error("%s:  Expecting fieldname\n", __FUNCTION__);
+		Sys_Error("%s:  Expecting fieldname\n", __func__);
 	}
 
 	Q_strncpy(pField->delta->fieldName, com_token, 31);
@@ -1215,7 +1215,7 @@ qboolean DELTA_ParseField(int count, delta_definition_t *pdefinition, delta_link
 	*pstream = COM_Parse(*pstream);
 	if (Q_stricmp(com_token, ")"))
 	{
-		Sys_Error("%s:  Expecting ), got %s\n", __FUNCTION__, com_token);	// Was Con_Printf here
+		Sys_Error("%s:  Expecting ), got %s\n", __func__, com_token);	// Was Con_Printf here
 		return FALSE;
 	}
 
@@ -1309,7 +1309,7 @@ void DELTA_SkipDescription(char **pstream)
 		*pstream = COM_Parse(*pstream);
 		if (com_token[0] == 0)
 		{
-			Sys_Error("%s: Error during description skip", __FUNCTION__);
+			Sys_Error("%s: Error during description skip", __func__);
 		}
 	} while (Q_stricmp(com_token, "}"));
 }
@@ -1363,13 +1363,13 @@ qboolean DELTA_ParseDescription(char *name, delta_t **ppdesc, char *pstream)
 
 	if (!ppdesc)
 	{
-		Sys_Error("%s: called with no delta_description_t\n", __FUNCTION__);
+		Sys_Error("%s: called with no delta_description_t\n", __func__);
 	}
 	*ppdesc = 0;
 
 	if (!pstream)
 	{
-		Sys_Error("%s: called with no data stream\n", __FUNCTION__);
+		Sys_Error("%s: called with no data stream\n", __func__);
 	}
 
 	while (true)
@@ -1389,14 +1389,14 @@ qboolean DELTA_ParseDescription(char *name, delta_t **ppdesc, char *pstream)
 			pdefinition = DELTA_FindDefinition(com_token, &count);
 			if (!pdefinition)
 			{
-				Sys_Error("%s:  Unknown data type:  %s\n", __FUNCTION__, com_token);
+				Sys_Error("%s:  Unknown data type:  %s\n", __func__, com_token);
 			}
 
 			// Parse source of conditional encoder
 			pstream = COM_Parse(pstream);
 			if (com_token[0] == 0)
 			{
-				Sys_Error("%s:  Unknown encoder :  %s\nValid values:\nnone\ngamedll funcname\nclientdll funcname\n", __FUNCTION__, com_token);
+				Sys_Error("%s:  Unknown encoder :  %s\nValid values:\nnone\ngamedll funcname\nclientdll funcname\n", __func__, com_token);
 			}
 			if (Q_stricmp(com_token, "none"))
 			{
@@ -1407,7 +1407,7 @@ qboolean DELTA_ParseDescription(char *name, delta_t **ppdesc, char *pstream)
 				pstream = COM_Parse(pstream);
 				if (com_token[0] == 0)
 				{
-					Sys_Error("%s:  Expecting encoder\n", __FUNCTION__);
+					Sys_Error("%s:  Expecting encoder\n", __func__);
 				}
 
 				Q_strncpy(encoder, com_token, sizeof(encoder)-1);
@@ -1428,7 +1428,7 @@ qboolean DELTA_ParseDescription(char *name, delta_t **ppdesc, char *pstream)
 				}
 				if (Q_stricmp(com_token, "{"))
 				{
-					Sys_Error("%s:  Expecting {, got %s\n", __FUNCTION__, com_token);	// Was Con_Printf here
+					Sys_Error("%s:  Expecting {, got %s\n", __func__, com_token);	// Was Con_Printf here
 					return FALSE;
 				}
 				if (!DELTA_ParseOneField(&pstream, &links, count, pdefinition))
@@ -1459,7 +1459,7 @@ qboolean DELTA_Load(char *name, delta_t **ppdesc, char *pszFile)
 	pbuf = (char *)COM_LoadFile(pszFile, 5, 0);
 	if (!pbuf)
 	{
-		Sys_Error("%s:  Couldn't load file %s\n", __FUNCTION__, pszFile);
+		Sys_Error("%s:  Couldn't load file %s\n", __func__, pszFile);
 	}
 
 	bret = DELTA_ParseDescription(name, ppdesc, pbuf);

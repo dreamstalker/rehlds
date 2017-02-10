@@ -116,7 +116,7 @@ float anglemod(float a)
 
 void BOPS_Error(void)
 {
-	Sys_Error("%s: Bad signbits", __FUNCTION__);
+	Sys_Error("%s: Bad signbits", __func__);
 }
 
 #ifdef REHLDS_OPT_PEDANTIC

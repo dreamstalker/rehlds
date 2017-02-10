@@ -420,13 +420,13 @@ void ProcessModuleData(Module *module)
 	int i = 0;
 	PIMAGE_DOS_HEADER dosHeader = (PIMAGE_DOS_HEADER)module->base;
 	if (dosHeader->e_magic != IMAGE_DOS_SIGNATURE) {
-		rehlds_syserror("%s: Invalid DOS header signature", __FUNCTION__);
+		rehlds_syserror("%s: Invalid DOS header signature", __func__);
 		return;
 	}
 
 	PIMAGE_NT_HEADERS NTHeaders = (PIMAGE_NT_HEADERS)((size_t)module->base + dosHeader->e_lfanew);
 	if (NTHeaders->Signature != 0x4550) {
-		rehlds_syserror("%s: Invalid NT header signature", __FUNCTION__);
+		rehlds_syserror("%s: Invalid NT header signature", __func__);
 		return;
 	}
 
@@ -440,7 +440,7 @@ void ProcessModuleData(Module *module)
 	}
 
 	if (CodeSection == NULL) {
-		rehlds_syserror("%s: Code section not found", __FUNCTION__);
+		rehlds_syserror("%s: Code section not found", __func__);
 		return;
 	}
 

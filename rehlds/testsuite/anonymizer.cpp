@@ -16,7 +16,7 @@ void* CSteamCallbackAnonymizingWrapper::Anonymize(void* data) {
 	{
 		static GSClientApprove_t cbdata;
 		cbdata = *(GSClientApprove_t*)data;
-		cbdata.m_SteamID = m_Anonymizer->Real2FakeSteamId(cbdata.m_SteamID, __FUNCTION__);
+		cbdata.m_SteamID = m_Anonymizer->Real2FakeSteamId(cbdata.m_SteamID, __func__);
 		return &cbdata;
 	}
 
@@ -24,7 +24,7 @@ void* CSteamCallbackAnonymizingWrapper::Anonymize(void* data) {
 	{
 		static GSClientDeny_t cbdata;
 		cbdata = *(GSClientDeny_t*)data;
-		cbdata.m_SteamID = m_Anonymizer->Real2FakeSteamId(cbdata.m_SteamID, __FUNCTION__);
+		cbdata.m_SteamID = m_Anonymizer->Real2FakeSteamId(cbdata.m_SteamID, __func__);
 		return &cbdata;
 	}
 
@@ -32,7 +32,7 @@ void* CSteamCallbackAnonymizingWrapper::Anonymize(void* data) {
 	{
 		static GSClientKick_t cbdata;
 		cbdata = *(GSClientKick_t*)data;
-		cbdata.m_SteamID = m_Anonymizer->Real2FakeSteamId(cbdata.m_SteamID, __FUNCTION__);
+		cbdata.m_SteamID = m_Anonymizer->Real2FakeSteamId(cbdata.m_SteamID, __func__);
 		return &cbdata;
 	}
 
@@ -42,22 +42,22 @@ void* CSteamCallbackAnonymizingWrapper::Anonymize(void* data) {
 		return data;
 
 	default:
-		rehlds_syserror("%s: unsupported callback %u", __FUNCTION__, m_iCallback);
+		rehlds_syserror("%s: unsupported callback %u", __func__, m_iCallback);
 	}
 
 	return NULL;
 }
 
 void* CSteamCallbackAnonymizingWrapper::Anonymize(void* data, bool bIOFailure, SteamAPICall_t hSteamAPICall) {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 	return NULL;
 }
 
 
 void CSteamCallbackAnonymizingWrapper::Run(void *pvParam)
 {
-	if (m_Wrapped->GetICallback() != this->GetICallback()) rehlds_syserror("%s: iCallback desync", __FUNCTION__);
-	if (m_Wrapped->GetFlags() != this->GetFlags()) rehlds_syserror("%s: flags desync", __FUNCTION__);
+	if (m_Wrapped->GetICallback() != this->GetICallback()) rehlds_syserror("%s: iCallback desync", __func__);
+	if (m_Wrapped->GetFlags() != this->GetFlags()) rehlds_syserror("%s: flags desync", __func__);
 
 	m_Wrapped->Run(Anonymize(pvParam));
 	this->SetFlags(m_Wrapped->GetFlags());
@@ -66,8 +66,8 @@ void CSteamCallbackAnonymizingWrapper::Run(void *pvParam)
 
 void CSteamCallbackAnonymizingWrapper::Run(void *pvParam, bool bIOFailure, SteamAPICall_t hSteamAPICall)
 {
-	if (m_Wrapped->GetICallback() != this->GetICallback()) rehlds_syserror("%s: iCallback desync", __FUNCTION__);
-	if (m_Wrapped->GetFlags() != this->GetFlags()) rehlds_syserror("%s: flags desync", __FUNCTION__);
+	if (m_Wrapped->GetICallback() != this->GetICallback()) rehlds_syserror("%s: iCallback desync", __func__);
+	if (m_Wrapped->GetFlags() != this->GetFlags()) rehlds_syserror("%s: flags desync", __func__);
 
 	m_Wrapped->Run(Anonymize(pvParam, bIOFailure, hSteamAPICall), bIOFailure, hSteamAPICall);
 	this->SetFlags(m_Wrapped->GetFlags());
@@ -91,25 +91,25 @@ CSteamAppsAnonymizingWrapper::CSteamAppsAnonymizingWrapper(ISteamApps* original,
 
 bool CSteamAppsAnonymizingWrapper::BIsSubscribed()
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 	return false;
 }
 
 bool CSteamAppsAnonymizingWrapper::BIsLowViolence()
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 	return false;
 }
 
 bool CSteamAppsAnonymizingWrapper::BIsCybercafe()
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 	return false;
 }
 
 bool CSteamAppsAnonymizingWrapper::BIsVACBanned()
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 	return false;
 }
 
@@ -121,82 +121,82 @@ const char* CSteamAppsAnonymizingWrapper::GetCurrentGameLanguage()
 
 const char* CSteamAppsAnonymizingWrapper::GetAvailableGameLanguages()
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 	return NULL;
 }
 
 bool CSteamAppsAnonymizingWrapper::BIsSubscribedApp(AppId_t appID)
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 	return false;
 }
 
 bool CSteamAppsAnonymizingWrapper::BIsDlcInstalled(AppId_t appID)
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 	return false;
 }
 
 uint32 CSteamAppsAnonymizingWrapper::GetEarliestPurchaseUnixTime(AppId_t nAppID)
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 	return 0;
 }
 
 bool CSteamAppsAnonymizingWrapper::BIsSubscribedFromFreeWeekend()
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 	return false;
 }
 
 int CSteamAppsAnonymizingWrapper::GetDLCCount()
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 	return 0;
 }
 
 bool CSteamAppsAnonymizingWrapper::BGetDLCDataByIndex(int iDLC, AppId_t *pAppID, bool *pbAvailable, char *pchName, int cchNameBufferSize)
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 	return false;
 }
 
 void CSteamAppsAnonymizingWrapper::InstallDLC(AppId_t nAppID)
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 }
 
 void CSteamAppsAnonymizingWrapper::UninstallDLC(AppId_t nAppID)
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 }
 
 void CSteamAppsAnonymizingWrapper::RequestAppProofOfPurchaseKey(AppId_t nAppID)
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 }
 
 bool CSteamAppsAnonymizingWrapper::GetCurrentBetaName(char *pchName, int cchNameBufferSize)
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 	return false;
 }
 
 bool CSteamAppsAnonymizingWrapper::MarkContentCorrupt(bool bMissingFilesOnly)
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 	return false;
 }
 
 uint32 CSteamAppsAnonymizingWrapper::GetInstalledDepots(DepotId_t *pvecDepots, uint32 cMaxDepots)
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 	return 0;
 }
 
 uint32 CSteamAppsAnonymizingWrapper::GetAppInstallDir(AppId_t appID, char *pchFolder, uint32 cchFolderBufferSize)
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 	return 0;
 }
 
@@ -213,7 +213,7 @@ CSteamGameServerAnonymizingWrapper::CSteamGameServerAnonymizingWrapper(ISteamGam
 
 bool CSteamGameServerAnonymizingWrapper::InitGameServer(uint32 unIP, uint16 usGamePort, uint16 usQueryPort, uint32 unFlags, AppId_t nGameAppId, const char *pchVersionString)
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 	return false;
 }
 
@@ -239,7 +239,7 @@ void CSteamGameServerAnonymizingWrapper::SetDedicatedServer(bool bDedicated)
 
 void CSteamGameServerAnonymizingWrapper::LogOn(const char *pszAccountName, const char *pszPassword)
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 }
 
 void CSteamGameServerAnonymizingWrapper::LogOnAnonymous()
@@ -303,12 +303,12 @@ void CSteamGameServerAnonymizingWrapper::SetPasswordProtected(bool bPasswordProt
 
 void CSteamGameServerAnonymizingWrapper::SetSpectatorPort(uint16 unSpectatorPort)
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 }
 
 void CSteamGameServerAnonymizingWrapper::SetSpectatorServerName(const char *pszSpectatorServerName)
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 }
 
 void CSteamGameServerAnonymizingWrapper::ClearAllKeyValues()
@@ -323,25 +323,25 @@ void CSteamGameServerAnonymizingWrapper::SetKeyValue(const char *pKey, const cha
 
 void CSteamGameServerAnonymizingWrapper::SetGameTags(const char *pchGameTags)
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 }
 
 void CSteamGameServerAnonymizingWrapper::SetGameData(const char *pchGameData)
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 }
 
 void CSteamGameServerAnonymizingWrapper::SetRegion(const char *pszRegion)
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 }
 
 bool CSteamGameServerAnonymizingWrapper::SendUserConnectAndAuthenticate(uint32 unIPClient, const void *pvAuthBlob, uint32 cubAuthBlobSize, CSteamID *pSteamIDUser)
 {
-	uint32 realIp = m_Anonymizer->Fake2RealIp(ntohl(unIPClient), __FUNCTION__);
+	uint32 realIp = m_Anonymizer->Fake2RealIp(ntohl(unIPClient), __func__);
 	bool res = m_Wrapped->SendUserConnectAndAuthenticate(htonl(realIp), pvAuthBlob, cubAuthBlobSize, pSteamIDUser);
 	if (res) {
-		*pSteamIDUser = m_Anonymizer->Real2FakeSteamId(*pSteamIDUser, __FUNCTION__);
+		*pSteamIDUser = m_Anonymizer->Real2FakeSteamId(*pSteamIDUser, __func__);
 	}
 	return res;
 }
@@ -354,14 +354,14 @@ CSteamID CSteamGameServerAnonymizingWrapper::CreateUnauthenticatedUserConnection
 
 void CSteamGameServerAnonymizingWrapper::SendUserDisconnect(CSteamID steamIDUser)
 {
-	CSteamID real = m_Anonymizer->Fake2RealSteamId(steamIDUser, __FUNCTION__);
+	CSteamID real = m_Anonymizer->Fake2RealSteamId(steamIDUser, __func__);
 	m_Wrapped->SendUserDisconnect(real);
 }
 
 bool CSteamGameServerAnonymizingWrapper::BUpdateUserData(CSteamID steamIDUser, const char *pchPlayerName, uint32 uScore)
 {
-	CSteamID real = steamIDUser.BAnonAccount() ? steamIDUser : m_Anonymizer->Fake2RealSteamId(steamIDUser, __FUNCTION__);
-	std::string realName = m_Anonymizer->Fake2RealName(pchPlayerName, __FUNCTION__);
+	CSteamID real = steamIDUser.BAnonAccount() ? steamIDUser : m_Anonymizer->Fake2RealSteamId(steamIDUser, __func__);
+	std::string realName = m_Anonymizer->Fake2RealName(pchPlayerName, __func__);
 
 	bool res = m_Wrapped->BUpdateUserData(real, realName.c_str(), uScore);
 	return res;
@@ -369,58 +369,58 @@ bool CSteamGameServerAnonymizingWrapper::BUpdateUserData(CSteamID steamIDUser, c
 
 HAuthTicket CSteamGameServerAnonymizingWrapper::GetAuthSessionTicket(void *pTicket, int cbMaxTicket, uint32 *pcbTicket)
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 	return k_HAuthTicketInvalid;
 }
 
 EBeginAuthSessionResult CSteamGameServerAnonymizingWrapper::BeginAuthSession(const void *pAuthTicket, int cbAuthTicket, CSteamID steamID)
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 	return k_EBeginAuthSessionResultInvalidTicket;
 }
 
 void CSteamGameServerAnonymizingWrapper::EndAuthSession(CSteamID steamID)
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 }
 
 void CSteamGameServerAnonymizingWrapper::CancelAuthTicket(HAuthTicket hAuthTicket)
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 }
 
 EUserHasLicenseForAppResult CSteamGameServerAnonymizingWrapper::UserHasLicenseForApp(CSteamID steamID, AppId_t appID)
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 	return k_EUserHasLicenseResultDoesNotHaveLicense;
 }
 
 bool CSteamGameServerAnonymizingWrapper::RequestUserGroupStatus(CSteamID steamIDUser, CSteamID steamIDGroup)
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 	return false;
 }
 
 void CSteamGameServerAnonymizingWrapper::GetGameplayStats()
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 }
 
 SteamAPICall_t CSteamGameServerAnonymizingWrapper::GetServerReputation()
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 	return k_uAPICallInvalid;
 }
 
 uint32 CSteamGameServerAnonymizingWrapper::GetPublicIP()
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 	return 0;
 }
 
 bool CSteamGameServerAnonymizingWrapper::HandleIncomingPacket(const void *pData, int cbData, uint32 srcIP, uint16 srcPort)
 {
-	uint32 realIp = m_Anonymizer->Fake2RealIp(htonl(srcIP), __FUNCTION__);
+	uint32 realIp = m_Anonymizer->Fake2RealIp(htonl(srcIP), __func__);
 	
 	bool res;
 	if (m_Anonymizer->m_OriginalConnectPacketLen) {
@@ -438,7 +438,7 @@ int CSteamGameServerAnonymizingWrapper::GetNextOutgoingPacket(void *pOut, int cb
 {
 	int res = m_Wrapped->GetNextOutgoingPacket(pOut, cbMaxOut, pNetAdr, pPort);
 	if (res > 0) {
-		uint32 fakeIp = m_Anonymizer->Real2FakeIp(ntohl(*pNetAdr), __FUNCTION__);
+		uint32 fakeIp = m_Anonymizer->Real2FakeIp(ntohl(*pNetAdr), __func__);
 		*pNetAdr = htonl(fakeIp);
 
 		//Clear players list
@@ -466,18 +466,18 @@ void CSteamGameServerAnonymizingWrapper::SetHeartbeatInterval(int iHeartbeatInte
 
 void CSteamGameServerAnonymizingWrapper::ForceHeartbeat()
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 }
 
 SteamAPICall_t CSteamGameServerAnonymizingWrapper::AssociateWithClan(CSteamID steamIDClan)
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 	return k_uAPICallInvalid;
 }
 
 SteamAPICall_t CSteamGameServerAnonymizingWrapper::ComputeNewPlayerCompatibility(CSteamID steamIDNewPlayer)
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 	return k_uAPICallInvalid;
 }
 
@@ -598,7 +598,7 @@ int CAnonymizingEngExtInterceptor::recvfrom(SOCKET s, char* buf, int len, int fl
 {
 	int res = m_BasePlatform->recvfrom(s, buf, len, flags, from, fromlen);
 	if (res > 0) {
-		Real2FakeSockaddr(from, __FUNCTION__);
+		Real2FakeSockaddr(from, __func__);
 		if (res > 4 && (*(uint32*)buf) == 0xFFFFFFFF) {
 			unsigned int localLen = res;
 			ProcessConnectionlessPacket((uint8*)buf, &localLen);
@@ -613,7 +613,7 @@ int CAnonymizingEngExtInterceptor::sendto(SOCKET s, const char* buf, int len, in
 
 	sockaddr saddr;
 	memcpy(&saddr, to, sizeof(sockaddr_in));
-	Fake2RealSockaddr(&saddr, __FUNCTION__);
+	Fake2RealSockaddr(&saddr, __func__);
 
 	int res = m_BasePlatform->sendto(s, buf, len, flags, &saddr, tolen);
 	return res;
@@ -639,7 +639,7 @@ int CAnonymizingEngExtInterceptor::WSAGetLastError()
 
 struct hostent* CAnonymizingEngExtInterceptor::gethostbyname(const char *name)
 {
-	auto s = Fake2RealHost(name, __FUNCTION__);
+	auto s = Fake2RealHost(name, __func__);
 	struct hostent* res = m_BasePlatform->gethostbyname(s.c_str());
 	return res;
 }
@@ -648,7 +648,7 @@ int CAnonymizingEngExtInterceptor::gethostname(char *name, int namelen)
 {
 	int res = m_BasePlatform->gethostname(name, namelen);
 	if (res == 0) {
-		auto s = Real2FakeHost(name, __FUNCTION__);
+		auto s = Real2FakeHost(name, __func__);
 		strncpy(name, s.c_str(), namelen);
 		name[namelen - 1] = 0;
 	}
@@ -675,8 +675,8 @@ void CAnonymizingEngExtInterceptor::SteamAPI_RegisterCallback(CCallbackBase *pCa
 {
 	CSteamCallbackAnonymizingWrapper* wrappee = getOrCreateCallbackWrapper(pCallback);
 
-	if (wrappee->GetFlags() != pCallback->GetFlags()) rehlds_syserror("%s: flags desync", __FUNCTION__);
-	//if (wrappee->GetICallback() != pCallback->GetICallback()) rehlds_syserror("%s: flags desync", __FUNCTION__);
+	if (wrappee->GetFlags() != pCallback->GetFlags()) rehlds_syserror("%s: flags desync", __func__);
+	//if (wrappee->GetICallback() != pCallback->GetICallback()) rehlds_syserror("%s: flags desync", __func__);
 
 	m_BasePlatform->SteamAPI_RegisterCallback(wrappee, iCallback);
 
@@ -695,8 +695,8 @@ void CAnonymizingEngExtInterceptor::SteamAPI_UnregisterCallResult(class CCallbac
 {
 	CSteamCallbackAnonymizingWrapper* wrappee = getOrCreateCallbackWrapper(pCallback);
 
-	if (wrappee->GetFlags() != pCallback->GetFlags()) rehlds_syserror("%s: flags desync", __FUNCTION__);
-	if (wrappee->GetICallback() != pCallback->GetICallback()) rehlds_syserror("%s: flags desync", __FUNCTION__);
+	if (wrappee->GetFlags() != pCallback->GetFlags()) rehlds_syserror("%s: flags desync", __func__);
+	if (wrappee->GetICallback() != pCallback->GetICallback()) rehlds_syserror("%s: flags desync", __func__);
 
 	m_BasePlatform->SteamAPI_UnregisterCallResult(wrappee, hAPICall);
 
@@ -768,8 +768,8 @@ void CAnonymizingEngExtInterceptor::SteamAPI_UnregisterCallback(CCallbackBase *p
 {
 	CSteamCallbackAnonymizingWrapper* wrappee = getOrCreateCallbackWrapper(pCallback);
 
-	if (wrappee->GetFlags() != pCallback->GetFlags()) rehlds_syserror("%s: flags desync", __FUNCTION__);
-	if (wrappee->GetICallback() != pCallback->GetICallback()) rehlds_syserror("%s: flags desync", __FUNCTION__);
+	if (wrappee->GetFlags() != pCallback->GetFlags()) rehlds_syserror("%s: flags desync", __func__);
+	if (wrappee->GetICallback() != pCallback->GetICallback()) rehlds_syserror("%s: flags desync", __func__);
 
 	m_BasePlatform->SteamAPI_UnregisterCallback(wrappee);
 
@@ -782,11 +782,11 @@ void CAnonymizingEngExtInterceptor::AnonymizeAddr(const char* real, const char* 
 	netadr_t fakeAdr;
 
 	if (!NET_StringToAdr(real, &realAdr)) {
-		rehlds_syserror("%s: Invalid address %s", __FUNCTION__, realAdr);
+		rehlds_syserror("%s: Invalid address %s", __func__, realAdr);
 	}
 
 	if (!NET_StringToAdr(fake, &fakeAdr)) {
-		rehlds_syserror("%s: Invalid address %s", __FUNCTION__, realAdr);
+		rehlds_syserror("%s: Invalid address %s", __func__, realAdr);
 	}
 
 	AnonymizeAddr(realAdr, fakeAdr);
@@ -945,7 +945,7 @@ void CAnonymizingEngExtInterceptor::ProcessConnectPacket(uint8* data, unsigned i
 
 	bool isSteam = (3 == atoi(Info_ValueForKey(protinfo, "prot")));
 
-	std::string newName = Real2FakeName(Info_ValueForKey(origuserinfo, "name"), __FUNCTION__);
+	std::string newName = Real2FakeName(Info_ValueForKey(origuserinfo, "name"), __func__);
 	Info_SetValueForKey(origuserinfo, "name", newName.c_str(), MAX_INFO_STRING);
 
 	userinfo[0] = 0;

@@ -11,7 +11,7 @@ CRehldsRuntimeConfig::CRehldsRuntimeConfig()
 
 void CRehldsRuntimeConfig::parseFromCommandLine(const char* cmdLine) {
 	char localBuf[2048];
-	if (strlen(cmdLine) >= sizeof(localBuf)) rehlds_syserror("%s: too long cmdline", __FUNCTION__);
+	if (strlen(cmdLine) >= sizeof(localBuf)) rehlds_syserror("%s: too long cmdline", __func__);
 
 	strcpy(localBuf, cmdLine);
 	char* cpos = localBuf;
@@ -23,7 +23,7 @@ void CRehldsRuntimeConfig::parseFromCommandLine(const char* cmdLine) {
 		if (!strcmp(token, "--rehlds-test-record"))
 		{
 			const char* fname = getNextToken(&cpos);
-			if (fname == NULL) rehlds_syserror("%s: usage: --rehlds-test-record <filename>", __FUNCTION__);
+			if (fname == NULL) rehlds_syserror("%s: usage: --rehlds-test-record <filename>", __func__);
 			strncpy(testRecordingFileName, fname, sizeof(testRecordingFileName));
 			testRecordingFileName[sizeof(testRecordingFileName) - 1] = 0;
 			testPlayerMode = TPM_RECORD;
@@ -31,7 +31,7 @@ void CRehldsRuntimeConfig::parseFromCommandLine(const char* cmdLine) {
 		else if (!strcmp(token, "--rehlds-test-play"))
 		{
 			const char* fname = getNextToken(&cpos);
-			if (fname == NULL) rehlds_syserror("%s: usage: --rehlds-test-play <filename>", __FUNCTION__);
+			if (fname == NULL) rehlds_syserror("%s: usage: --rehlds-test-play <filename>", __func__);
 			strncpy(testRecordingFileName, fname, sizeof(testRecordingFileName));
 			testRecordingFileName[sizeof(testRecordingFileName) - 1] = 0;
 			testPlayerMode = TPM_PLAY;
@@ -39,7 +39,7 @@ void CRehldsRuntimeConfig::parseFromCommandLine(const char* cmdLine) {
 		else if (!strcmp(token, "--rehlds-test-anon"))
 		{
 			const char* fname = getNextToken(&cpos);
-			if (fname == NULL) rehlds_syserror("%s: usage: --rehlds-test-anon <filename>", __FUNCTION__);
+			if (fname == NULL) rehlds_syserror("%s: usage: --rehlds-test-anon <filename>", __func__);
 			strncpy(testRecordingFileName, fname, sizeof(testRecordingFileName));
 			testRecordingFileName[sizeof(testRecordingFileName) - 1] = 0;
 			testPlayerMode = TPM_ANONYMIZE;

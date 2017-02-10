@@ -90,7 +90,7 @@ void SV_ClearResourceLists(client_t *cl)
 {
 	if (!cl)
 	{
-		Sys_Error("%s: SV_ClearResourceLists with NULL client!", __FUNCTION__);
+		Sys_Error("%s: SV_ClearResourceLists with NULL client!", __func__);
 	}
 
 	SV_ClearResourceList(&cl->resourcesneeded);
@@ -165,7 +165,7 @@ void SV_Customization(client_t *pPlayer, resource_t *pResource, qboolean bSkipPl
 	}
 	if (i == g_psvs.maxclients)
 	{
-		Sys_Error("%s: Couldn't find player index for customization.", __FUNCTION__);
+		Sys_Error("%s: Couldn't find player index for customization.", __func__);
 	}
 
 	nPlayerNumber = i;

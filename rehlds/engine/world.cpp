@@ -164,7 +164,7 @@ struct hull_s *SV_HullForBsp(edict_t *ent, const vec_t *mins, const vec_t *maxs,
 
 	model = Mod_Handle(ent->v.modelindex);
 	if (!model || model->type != mod_brush)
-		Sys_Error("%s: Hit a %s with no model (%s)", __FUNCTION__, &pr_strings[ent->v.classname], &pr_strings[ent->v.model]);
+		Sys_Error("%s: Hit a %s with no model (%s)", __func__, &pr_strings[ent->v.classname], &pr_strings[ent->v.model]);
 
 	float xSize = maxs[0] - mins[0];
 	if (xSize > 8.0f)
@@ -220,7 +220,7 @@ hull_t *SV_HullForEntity(edict_t *ent, const vec_t *mins, const vec_t *maxs, vec
 	if (ent->v.solid == SOLID_BSP)
 	{
 		if (ent->v.movetype != MOVETYPE_PUSH && ent->v.movetype != MOVETYPE_PUSHSTEP)
-			Sys_Error("%s: SOLID_BSP without MOVETYPE_PUSH", __FUNCTION__);
+			Sys_Error("%s: SOLID_BSP without MOVETYPE_PUSH", __func__);
 
 		return SV_HullForBsp(ent, mins, maxs, offset);
 	}
@@ -602,7 +602,7 @@ int SV_HullPointContents(hull_t *hull, int num, const vec_t *p)
 	while (i >= 0)
 	{
 		if (hull->firstclipnode > i || hull->lastclipnode < i)
-			Sys_Error("%s: bad node number", __FUNCTION__);
+			Sys_Error("%s: bad node number", __func__);
 		node = &hull->clipnodes[i];
 		plane = &hull->planes[node->planenum];
 		if (plane->type > 2)
@@ -753,7 +753,7 @@ qboolean SV_RecursiveHullCheck(hull_t *hull, int num, float p1f, float p2f, cons
 	if (num >= 0)
 	{
 		if (num < hull->firstclipnode || num > hull->lastclipnode || !hull->planes)
-			Sys_Error("%s: bad node number", __FUNCTION__);
+			Sys_Error("%s: bad node number", __func__);
 
 		node = &hull->clipnodes[num];
 		plane = &hull->planes[hull->clipnodes[num].planenum];
@@ -893,7 +893,7 @@ qboolean SV_RecursiveHullCheck(hull_t *hull, int num, float p1f, float p2f, cons
 		pdif = p2f - p1f;
 
 		if (num < hull->firstclipnode || num > hull->lastclipnode || !hull->planes)
-			Sys_Error("%s: bad node number", __FUNCTION__);
+			Sys_Error("%s: bad node number", __func__);
 
 		node = &hull->clipnodes[num];
 		plane = &hull->planes[hull->clipnodes[num].planenum];
@@ -1185,7 +1185,7 @@ void SV_ClipToLinks(areanode_t *node, moveclip_t *clip)
 			continue;
 
 		if (touch->v.solid == SOLID_TRIGGER)
-			Sys_Error("%s: Trigger in clipping list", __FUNCTION__);
+			Sys_Error("%s: Trigger in clipping list", __func__);
 
 		if (gNewDLLFunctions.pfnShouldCollide && !gNewDLLFunctions.pfnShouldCollide(touch, clip->passedict))
 #ifdef REHLDS_FIXES

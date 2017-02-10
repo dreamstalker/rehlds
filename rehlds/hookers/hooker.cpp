@@ -44,7 +44,7 @@ void *GetOriginalFuncAddrOrDie(const char *funcName)
 			return (void*) cfh->originalAddress;
 	}
 
-	rehlds_syserror("%s: Could not find function '%s'", __FUNCTION__, funcName);
+	rehlds_syserror("%s: Could not find function '%s'", __func__, funcName);
 	return NULL;
 }
 
@@ -67,7 +67,7 @@ void *GetFuncRefAddrOrDie(const char *funcName)
 			return (void*)cfh->originalAddress;
 	}
 
-	rehlds_syserror("%s: Could not find function '%s'", __FUNCTION__, funcName);
+	rehlds_syserror("%s: Could not find function '%s'", __func__, funcName);
 	return NULL;
 }
 
@@ -98,7 +98,7 @@ int HookEngine(size_t addr)
 		if (!GetAddress(&g_EngineModule, (Address*)refData, g_BaseOffset))
 		{
 #if _DEBUG
-			printf("%s: symbol not found \"%s\", symbol index: %i\n", __FUNCTION__, refData->symbolName, refData->symbolIndex);
+			printf("%s: symbol not found \"%s\", symbol index: %i\n", __func__, refData->symbolName, refData->symbolIndex);
 			success = false;
 #endif
 		}
@@ -111,7 +111,7 @@ int HookEngine(size_t addr)
 		if (!GetAddress(&g_EngineModule, (Address*)refFunc, g_BaseOffset))
 		{
 #if _DEBUG
-			printf("%s: symbol not found \"%s\", symbol index: %i\n", __FUNCTION__, refData->symbolName, refData->symbolIndex);
+			printf("%s: symbol not found \"%s\", symbol index: %i\n", __func__, refData->symbolName, refData->symbolIndex);
 			success = false;
 #endif
 		}
@@ -124,7 +124,7 @@ int HookEngine(size_t addr)
 		if (!GetAddress(&g_EngineModule, (Address*)hookFunc, g_BaseOffset))
 		{
 #if _DEBUG
-			printf("%s: symbol not found \"%s\", symbol index: %i\n", __FUNCTION__, refData->symbolName, refData->symbolIndex);
+			printf("%s: symbol not found \"%s\", symbol index: %i\n", __func__, refData->symbolName, refData->symbolIndex);
 			success = false;
 #endif
 		}
@@ -134,7 +134,7 @@ int HookEngine(size_t addr)
 	if (!success)
 	{
 #if _DEBUG
-		printf("%s: failed to hook engine!\n", __FUNCTION__);
+		printf("%s: failed to hook engine!\n", __func__);
 #endif
 		return (FALSE);
 	}
