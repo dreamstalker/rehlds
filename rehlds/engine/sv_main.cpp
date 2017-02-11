@@ -710,7 +710,7 @@ void SV_FindModelNumbers(void)
 
 		// use case-sensitive names to increase performance
 #ifdef REHLDS_FIXES
-		if (!Q_stricmp(g_psv.model_precache[i], "models/player.mdl"))
+		if (!Q_strcmp(g_psv.model_precache[i], "models/player.mdl"))
 			sv_playermodel = i;
 #else
 		if (!Q_stricmp(g_psv.model_precache[i], "models/player.mdl"))
