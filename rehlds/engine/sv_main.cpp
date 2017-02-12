@@ -5471,25 +5471,12 @@ void SV_CreateBaseline(void)
 				* This inconsistency in the interface between gamedll and engine leads to exposure of some data from stack of caller function to vector's elements in gamedll, which, in turn,
 				* leads to inconsistent behavior (since stack data may contain pointers) across different systems.
 				*/
-#ifdef REHLDS_FIXES
-				/*
-				* Fixed function call.
-				*/
-				typedef void CreateBaseline_t(int player, int eindex, struct entity_state_s *baseline, struct edict_s *entity, int playermodelindex, vec_t player_mins0, vec_t player_mins1, vec_t player_mins2, vec_t player_maxs0, vec_t player_maxs1, vec_t player_maxs2);
-				((CreateBaseline_t*)gEntityInterface.pfnCreateBaseline)(player, entnum, &(g_psv.baselines[entnum]), svent, sv_playermodel, player_mins[0][0], player_mins[0][1], player_mins[0][2], player_maxs[0][0], player_maxs[0][1], player_maxs[0][2]);
-#else // REHLDS_FIXES
 				/*
 				* This function call emulates swds.dll behavior, i.e. it sends the same garbage when invoking CreateBaseline as swds.dll does.
 				* This is required since not emulating this behavior will break rehlds test demos.
 				*/
 				typedef void CreateBaseline_t(int player, int eindex, struct entity_state_s *baseline, struct edict_s *entity, int playermodelindex, vec3_t player_mins, vec3_t player_maxs, int dummy1, int dummy2, int dummy3, int dummy4);
 				((CreateBaseline_t*)gEntityInterface.pfnCreateBaseline)(player, entnum, &(g_psv.baselines[entnum]), svent, sv_playermodel, player_mins[0], player_maxs[0], 0, 0, 1, 0);
-
-				/*
-				* Bugged function call that is used in the original engine. Just for a reference.
-				*/
-				//gEntityInterface.pfnCreateBaseline(player, entnum, &(g_psv.baselines[entnum]), svent, sv_playermodel, player_mins[0], player_maxs[0]);
-#endif // REHLDS_FIXES
 
 				sv_lastnum = entnum;
 			}
