@@ -31,6 +31,12 @@
 #include "maintypes.h"
 #include "interface.h"
 
+#ifdef _WIN32
+	#define ENGINE_LIB "swds.dll"
+#else
+	#define ENGINE_LIB "engine_i486.so"
+#endif // _WIN32
+
 class IDedicatedServerAPI : public IBaseInterface
 {
 public:

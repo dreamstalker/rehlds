@@ -2,11 +2,25 @@ import org.doomedsociety.gradlecpp.GradleCppUtils
 import org.apache.commons.io.FilenameUtils
 
 void _copyFileToDir(String from, String to) {
+	if (!project.file(from).exists()) {
+		println 'WARNING: Could not find: ' + from;
+		return;
+	}
+
+	if (!project.file(to).exists()) {
+		project.file(to).mkdirs();
+	}
+
 	def dst = new File(project.file(to), FilenameUtils.getName(from))
 	GradleCppUtils.copyFile(project.file(from), dst, false)
 }
 
 void _copyFile(String from, String to) {
+	if (!project.file(from).exists()) {
+		println 'WARNING: Could not find: ' + from;
+		return;
+	}
+
 	GradleCppUtils.copyFile(project.file(from), project.file(to), false)
 }
 
@@ -22,19 +36,21 @@ task publishPrepareFiles {
 
 		pubRootDir.mkdirs()
 
-		//bugfixed binaries
-		project.file('publish/publishRoot/bin/bugfixed').mkdirs()
+		// bugfixed binaries
 		_copyFileToDir('publish/releaseRehldsFixes/swds.dll', 'publish/publishRoot/bin/bugfixed/')
 		_copyFileToDir('publish/releaseRehldsFixes/swds.pdb', 'publish/publishRoot/bin/bugfixed/')
 		_copyFile('publish/releaseRehldsFixes/libengine_i486.so', 'publish/publishRoot/bin/bugfixed/engine_i486.so')
 
-		//pure binaries
-		project.file('publish/publishRoot/bin/pure').mkdirs()
+		// pure binaries
 		_copyFileToDir('publish/releaseRehldsNofixes/swds.dll', 'publish/publishRoot/bin/pure/')
 		_copyFileToDir('publish/releaseRehldsNofixes/swds.pdb', 'publish/publishRoot/bin/pure/')
 		_copyFile('publish/releaseRehldsNofixes/libengine_i486.so', 'publish/publishRoot/bin/pure/engine_i486.so')
 
-		//hlsdk
+		// dedicated binaries
+		_copyFile('publish/hlds.exe', 'publish/publishRoot/bin/hlds.exe')
+		_copyFile('publish/hlds_linux', 'publish/publishRoot/bin/hlds_linux')
+
+		// hlsdk
 		project.file('publish/publishRoot/hlsdk').mkdirs()
 		copy {
 			from 'rehlds/common'
@@ -58,8 +74,7 @@ task publishPrepareFiles {
 			into 'publish/publishRoot/hlsdk/engine'
 		}
 
-		//flightrecorder
-
+		// flightrecorder
 		def flightRecJarTask = project(':flightrec/decoder').tasks.getByName('uberjar')
 		println flightRecJarTask
 		println flightRecJarTask.class.name

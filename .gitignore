@@ -15,11 +15,11 @@
 **/msvc/*.suo
 **/msvc/*.db
 **/msvc/*.opendb
+**/msvc/PublishPath*.txt
 **/msvc/ipch
 **/msvc/.vs
 
 rehlds/version/appversion.h
-rehlds/msvc/PublishPath*.txt
 rehlds/_rehldsTestImg
 rehlds/_dev
 publish

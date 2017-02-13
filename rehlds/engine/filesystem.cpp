@@ -51,7 +51,7 @@ bool FileSystem_LoadDLL(CreateInterfaceFn filesystemFactory)
 {
 	if (!filesystemFactory)
 	{
-		g_pFileSystemModule = Sys_LoadModule(FILESYSTEM_DLL_NAME);
+		g_pFileSystemModule = Sys_LoadModule(STDIO_FILESYSTEM_LIB);
 
 		if (g_pFileSystemModule)
 		{

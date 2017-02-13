@@ -1,6 +1,6 @@
 //========= Copyright � 1996-2001, Valve LLC, All rights reserved. ============
 //
-// Purpose: 
+// Purpose:
 //
 // $NoKeywords: $
 //=============================================================================
@@ -15,6 +15,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#ifdef _WIN32
+	#define STDIO_FILESYSTEM_LIB "filesystem_stdio.dll"
+	#define STEAM_FILESYSTEM_LIB "filesystem_steam.dll"
+#else
+	#define STDIO_FILESYSTEM_LIB "filesystem_stdio.so"
+	#define STEAM_FILESYSTEM_LIB "filesystem_steam.so"
+#endif // _WIN32
 
 //-----------------------------------------------------------------------------
 // Forward declarations
@@ -77,7 +84,7 @@ public:
 	// Add paths in priority order (mod dir, game dir, ....)
 	// If one or more .pak files are in the specified directory, then they are
 	//  added after the file system path
-	// If the path is the relative path to a .bsp file, then any previous .bsp file 
+	// If the path is the relative path to a .bsp file, then any previous .bsp file
 	//  override is cleared and the current .bsp is searched for an embedded PAK file
 	//  and this file becomes the highest priority search path ( i.e., it's looked at first
 	//   even before the mod's file system path ).
@@ -121,7 +128,7 @@ public:
 
 	// direct filesystem buffer access
 	// returns a handle to a buffer containing the file data
-	// this is the optimal way to access the complete data for a file, 
+	// this is the optimal way to access the complete data for a file,
 	// since the file preloader has probably already got it in memory
 	virtual void			*GetReadBuffer( FileHandle_t file, int *outBufferSize, bool failIfNotInCache ) = 0;
 	virtual void			ReleaseReadBuffer( FileHandle_t file, void *readBuffer ) = 0;
@@ -174,7 +181,7 @@ public:
 
 	// interface for custom pack files > 4Gb
 	virtual bool			AddPackFile( const char *fullpath, const char *pathID ) = 0;
-	
+
 	// open a file but force the data to come from the steam cache, NOT from disk
 	virtual FileHandle_t	OpenFromCacheForRead( const char *pFileName, const char *pOptions, const char *pathID = 0L ) = 0;
 
