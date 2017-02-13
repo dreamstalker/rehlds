@@ -5475,7 +5475,7 @@ void SV_CreateBaseline(void)
 				* This is true in theory, but in reality things might differs. In Valve's Linux all builds hl.so (and cs.so) expects pointers instead of array elements.
 				* This looks like a flaw in the compilers or some option, because code specifies to pass a class object which should be passed by a value in that case.
 				* And this is correctly happen in MSVC, ICC and modern GCC.
-				* Also, there often will be a metatmod in between that is designed to get and pass pointers.
+				* Also, there often will be a metamod in between that is designed to get and pass pointers.
 				* So, we have no choice but to pass data but reference so functions that expects references don't crash on dereference
 				* and append some fake data for the cases when called function will be the one that expects pass by value.
 				*/
