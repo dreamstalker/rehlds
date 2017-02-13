@@ -181,7 +181,7 @@ BOOL WriteText(LPCTSTR szText)
 	return TRUE;
 }
 
-unsigned _stdcall RequestProc(void *arg)
+unsigned __stdcall RequestProc(void *arg)
 {
 	int *pBuffer;
 	DWORD dwRet;

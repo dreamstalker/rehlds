@@ -104,6 +104,7 @@ int RunServer()
 
 		RunVGUIFrame();
 
+#ifdef _WIN32
 		// TODO: finish me!
 		/*if (g_bVGui)
 		{
@@ -123,6 +124,7 @@ int RunServer()
 				strncpy(szConfigDir, "platform/config", sizeof(szConfigDir));
 			}
 		}*/
+#endif // _WIN32
 
 		RunVGUIFrame();
 
@@ -134,7 +136,7 @@ int RunServer()
 		RunVGUIFrame();
 
 		bool bDone = false;
-		while (1)
+		while (true)
 		{
 			if (bDone)
 				break;
@@ -158,7 +160,6 @@ int RunServer()
 
 			if (gbAppHasBeenTerminated)
 				break;
-
 
 			if (g_bVGui)
 			{

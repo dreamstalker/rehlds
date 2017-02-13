@@ -40,7 +40,7 @@ volatile bool g_bPaused = false;
 
 void CSys::Sleep(int msec)
 {
-	usleep(msec * 1000);
+	Sys_Sleep(msec);
 }
 
 void Sleep_Old(int msec)
