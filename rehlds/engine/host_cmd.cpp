@@ -1839,9 +1839,10 @@ void ParseSaveTables(SAVERESTOREDATA *pSaveData, SAVE_HEADER *pHeader, int updat
 		gEntityInterface.pfnSaveReadFields(pSaveData, "LIGHTSTYLE", &light, gLightstyleDescription, ARRAYSIZE(gLightstyleDescription));
 		if (updateGlobals)
 		{
-			g_psv.lightstyles[light.index] = (char *)Hunk_Alloc(Q_strlen(light.style) + 1);
-			Q_strncpy(g_psv.lightstyles[light.index], light.style, 3);
-			g_psv.lightstyles[light.index][3] = 0;
+			char *val = (char *)Hunk_Alloc(Q_strlen(light.style) + 1);
+			Q_strncpy(val, light.style, 3);
+			val[3] = 0;
+			g_psv.lightstyles[light.index] = val;
 		}
 	}
 }

@@ -161,7 +161,7 @@ void PF_SetClientKeyValue_I(int clientIndex, char *infobuffer, const char *key, 
 int PF_walkmove_I(edict_t *ent, float yaw, float dist, int iMode);
 int PF_droptofloor_I(edict_t *ent);
 int PF_DecalIndex(const char *name);
-void PF_lightstyle_I(int style, char *val);
+void PF_lightstyle_I(int style, const char *val);
 int PF_checkbottom_I(edict_t *pEdict);
 int PF_pointcontents_I(const float *rgflVector);
 void PF_aim_I(edict_t *ent, float speed, float *rgflReturn);

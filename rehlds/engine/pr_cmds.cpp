@@ -1710,7 +1710,7 @@ int EXT_FUNC PF_DecalIndex(const char *name)
 	return -1;
 }
 
-void EXT_FUNC PF_lightstyle_I(int style, char *val)
+void EXT_FUNC PF_lightstyle_I(int style, const char *val)
 {
 	g_psv.lightstyles[style] = val;
 	if (g_psv.state != ss_active)
