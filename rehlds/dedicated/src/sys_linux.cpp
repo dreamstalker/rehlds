@@ -94,7 +94,7 @@ void Sleep_Timer(int msec)
 	g_bPaused = false;
 
 	// set the timer to trigger
-	if (setitimer(ITIMER_REAL, &tm, NULL)) {
+	if (!setitimer(ITIMER_REAL, &tm, NULL)) {
 		// wait for the signal
 		pause();
 	}
