@@ -631,7 +631,7 @@ void Netchan_CheckForCompletion(netchan_t *chan, int stream, int intotalbuffers)
 				Cbuf_AddText(szCommand);
 				return;
 			}
-			Con_Printf("Netchan_CheckForCompletion:  Lost/dropped fragment would cause stall, retrying connection\n");
+			Con_Printf("%s:  Lost/dropped fragment would cause stall, retrying connection\n", __func__);
 			Cbuf_AddText("retry\n");
 		}
 
@@ -1430,7 +1430,7 @@ qboolean Netchan_CopyNormalFragments(netchan_t *chan)
 
 	if (!chan->incomingbufs[FRAG_NORMAL_STREAM])
 	{
-		Con_Printf("Netchan_CopyNormalFragments:  Called with no fragments readied\n");
+		Con_Printf("%s:  Called with no fragments readied\n", __func__);
 		chan->incomingready[FRAG_NORMAL_STREAM] = FALSE;
 		return FALSE;
 	}
@@ -1466,11 +1466,11 @@ qboolean Netchan_CopyNormalFragments(netchan_t *chan)
 	{
 		if (chan->player_slot == 0)
 		{
-			Con_Printf("Netchan_CopyNormalFragments: Incoming overflowed\n");
+			Con_Printf("%s: Incoming overflowed\n", __func__);
 		}
 		else
 		{
-			Con_Printf("Netchan_CopyNormalFragments: Incoming overflowed from %s\n", g_psvs.clients[chan->player_slot - 1].name);
+			Con_Printf("%s: Incoming overflowed from %s\n", __func__, g_psvs.clients[chan->player_slot - 1].name);
 		}
 
 		SZ_Clear(&net_message);
@@ -1517,7 +1517,7 @@ qboolean Netchan_CopyFileFragments(netchan_t *chan)
 	p = chan->incomingbufs[FRAG_FILE_STREAM];
 	if (!p)
 	{
-		Con_Printf("Netchan_CopyFileFragments:  Called with no fragments readied\n");
+		Con_Printf("%s:  Called with no fragments readied\n", __func__);
 		chan->incomingready[FRAG_FILE_STREAM] = FALSE;
 		return FALSE;
 	}

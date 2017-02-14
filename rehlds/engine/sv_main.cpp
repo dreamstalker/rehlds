@@ -3576,13 +3576,13 @@ void SV_ProcessFile(client_t *cl, char *filename)
 
 	if (!bFound)
 	{
-		Con_Printf("SV_ProcessFile:  Unrequested decal\n");
+		Con_Printf("%s:  Unrequested decal\n", __func__);
 		return;
 	}
 
 	if (resource->nDownloadSize != cl->netchan.tempbuffersize)
 	{
-		Con_Printf("SV_ProcessFile:  Downloaded %i bytes for purported %i byte file\n", cl->netchan.tempbuffersize, resource->nDownloadSize);
+		Con_Printf("%s:  Downloaded %i bytes for purported %i byte file\n", __func__, cl->netchan.tempbuffersize, resource->nDownloadSize);
 		return;
 	}
 

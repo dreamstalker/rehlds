@@ -228,22 +228,22 @@ void HPAK_AddLump(qboolean bUseQueue, char *pakname, struct resource_s *pResourc
 
 	if (pakname == NULL)
 	{
-		Con_Printf("HPAK_AddLump called with invalid arguments:  no .pak filename\n");
+		Con_Printf("%s called with invalid arguments:  no .pak filename\n", __func__);
 		return;
 	}
 	if (!pResource)
 	{
-		Con_Printf("HPAK_AddLump called with invalid arguments:  no lump to add\n");
+		Con_Printf("%s called with invalid arguments:  no lump to add\n", __func__);
 		return;
 	}
 	if (!pData && !fpSource)
 	{
-		Con_Printf("HPAK_AddLump called with invalid arguments:  no file handle\n");
+		Con_Printf("%s called with invalid arguments:  no file handle\n", __func__);
 		return;
 	}
 	if (pResource->nDownloadSize < 1024 || (unsigned int)pResource->nDownloadSize > MAX_FILE_SIZE)
 	{
-		Con_Printf("HPAK_AddLump called with bogus lump, size:  %i\n", pResource->nDownloadSize);
+		Con_Printf("%s called with bogus lump, size:  %i\n", __func__, pResource->nDownloadSize);
 		return;
 	}
 	Q_memset(&ctx, 0, sizeof(MD5Context_t));
@@ -264,7 +264,7 @@ void HPAK_AddLump(qboolean bUseQueue, char *pakname, struct resource_s *pResourc
 	MD5Final(md5, &ctx);
 	if (Q_memcmp(pResource->rgucMD5_hash, md5, sizeof(md5)) != 0)
 	{
-		Con_Printf("HPAK_AddLump called with bogus lump, md5 mismatch\n");
+		Con_Printf("%s called with bogus lump, md5 mismatch\n", __func__);
 		Con_Printf("Purported:  %s\n", MD5_Print(pResource->rgucMD5_hash));
 		Con_Printf("Actual   :  %s\n", MD5_Print(md5));
 		Con_Printf("Ignoring lump addition\n");
@@ -312,7 +312,7 @@ void HPAK_AddLump(qboolean bUseQueue, char *pakname, struct resource_s *pResourc
 		FS_Close(iRead);
 		FS_Close(iWrite);
 		FS_Unlink(szTempName);
-		Con_Printf("Invalid .hpk version in HPAK_AddLump\n");
+		Con_Printf("Invalid .hpk version in %s\n", __func__);
 		return;
 	}
 
