@@ -57,7 +57,7 @@ void Cbuf_Init(void)
 
 // As new commands are generated from the console or keybindings,
 // the text is added to the end of the command buffer.
-void Cbuf_AddText(char *text)
+void Cbuf_AddText(const char *text)
 {
 	int len = Q_strlen(text);
 
@@ -73,7 +73,7 @@ void Cbuf_AddText(char *text)
 // When a command wants to issue other commands immediately, the text is
 // inserted at the beginning of the buffer, before any remaining unexecuted
 // commands.
-void Cbuf_InsertText(char *text)
+void Cbuf_InsertText(const char *text)
 {
 
 	int addLen = Q_strlen(text);
@@ -112,7 +112,7 @@ void Cbuf_InsertText(char *text)
 #endif // REHLDS_FIXES
 }
 
-void Cbuf_InsertTextLines(char *text)
+void Cbuf_InsertTextLines(const char *text)
 {
 	int addLen = Q_strlen(text);
 	int currLen = cmd_text.cursize;
@@ -862,7 +862,7 @@ qboolean Cmd_Exists(const char *cmd_name)
 	return FALSE;
 }
 
-NOXREF const char *Cmd_CompleteCommand(char *search, int forward)
+NOXREF const char *Cmd_CompleteCommand(const char *search, int forward)
 {
 	NOXREFCHECK;
 
@@ -1057,7 +1057,7 @@ qboolean Cmd_ForwardToServerUnreliable(void)
 
 // Returns the position (1 to argc-1) in the command's argument list
 // where the given parameter apears, or 0 if not present.
-NOXREF int Cmd_CheckParm(char *parm)
+NOXREF int Cmd_CheckParm(const char *parm)
 {
 	NOXREFCHECK;
 
