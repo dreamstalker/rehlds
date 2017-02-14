@@ -1973,7 +1973,7 @@ NOXREF int COM_ExpandFilename(char *filename)
 	return *filename != 0;
 }
 
-int EXT_FUNC COM_FileSize(char *filename)
+int EXT_FUNC COM_FileSize(const char *filename)
 {
 	FileHandle_t fp;
 	int iSize;
@@ -2385,7 +2385,7 @@ void COM_Log(char *pszFile, char *fmt, ...)
 	}
 }
 
-unsigned char* EXT_FUNC COM_LoadFileForMe(char *filename, int *pLength)
+unsigned char* EXT_FUNC COM_LoadFileForMe(const char *filename, int *pLength)
 {
 	return COM_LoadFile(filename, 5, pLength);
 }
