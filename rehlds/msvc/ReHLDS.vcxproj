@@ -928,7 +928,7 @@
       <AdditionalLibraryDirectories>$(VCInstallDir)UnitTest\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>copy /Y $(ProjectDir)..\lib\steam_api.dll $(OutDir)</Command>
+      <Command>copy /Y "$(ProjectDir)..\lib\steam_api.dll" "$(OutDir)"</Command>
       <Message>Automatic deployment script</Message>
     </PostBuildEvent>
     <CustomBuildStep>
