@@ -31,7 +31,6 @@ unsigned int DELTAJIT_GetFieldSize(delta_description_t* desc) {
 
 	default:
 		Sys_Error("%s: Unknown delta field type %d", __func__, desc->fieldType);
-		return 0;
 	}
 }
 

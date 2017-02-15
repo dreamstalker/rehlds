@@ -1358,7 +1358,7 @@ int Netchan_CreateFileFragments_(qboolean server, netchan_t *chan, const char *f
 			else
 			{
 				rehlds_syserror("%s: Reverse clientside code", __func__);
-				return 0;
+				//return 0;
 			}
 		}
 

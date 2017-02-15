@@ -328,8 +328,6 @@ delta_t *SV_LookupDelta(char *name)
 	}
 
 	Sys_Error("%s: Couldn't find delta for %s\n", __func__, name);
-
-	return NULL;
 }
 
 NOXREF void SV_DownloadingModules(void)
@@ -2111,8 +2109,6 @@ int SV_CheckForDuplicateNames(char *userinfo, qboolean bIsReconnecting, int nExc
 		val = Info_ValueForKey(userinfo, "name");
 		changed = TRUE;
 	}
-
-	return changed;
 }
 
 #ifdef REHLDS_FIXES

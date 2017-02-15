@@ -67,7 +67,6 @@ void* CPlayingEngExtInterceptor::allocFuncCall()
 	}
 
 	rehlds_syserror("%s: running out of free slots", __func__);
-	return NULL;
 }
 
 void CPlayingEngExtInterceptor::freeFuncCall(void* fcall)
@@ -165,7 +164,6 @@ IEngExtCall* CPlayingEngExtInterceptor::getNextCall(bool peek, bool processCallb
 	if (callback != NULL && callback->m_Start) {
 		if (!processCallbacks) {
 			rehlds_syserror("%s: read a callback, but it's not allowed here", __func__);
-			return NULL;
 		}
 
 		while (callback != NULL && callback->m_Start) {
@@ -690,7 +688,7 @@ CSteamGameServerPlayingWrapper::CSteamGameServerPlayingWrapper(CPlayingEngExtInt
 
 bool CSteamGameServerPlayingWrapper::InitGameServer(uint32 unIP, uint16 usGamePort, uint16 usQueryPort, uint32 unFlags, AppId_t nGameAppId, const char *pchVersionString) {
 	rehlds_syserror("%s: not implemented", __func__);
-	return false;
+	//return false;
 }
 
 void CSteamGameServerPlayingWrapper::SetProduct(const char *pszProduct) {
@@ -901,12 +899,12 @@ bool CSteamGameServerPlayingWrapper::BUpdateUserData(CSteamID steamIDUser, const
 
 HAuthTicket CSteamGameServerPlayingWrapper::GetAuthSessionTicket(void *pTicket, int cbMaxTicket, uint32 *pcbTicket) {
 	rehlds_syserror("%s: not implemented", __func__);
-	return k_HAuthTicketInvalid;
+	//return k_HAuthTicketInvalid;
 }
 
 EBeginAuthSessionResult CSteamGameServerPlayingWrapper::BeginAuthSession(const void *pAuthTicket, int cbAuthTicket, CSteamID steamID) {
 	rehlds_syserror("%s: not implemented", __func__);
-	return k_EBeginAuthSessionResultInvalidTicket;
+	//return k_EBeginAuthSessionResultInvalidTicket;
 }
 
 void CSteamGameServerPlayingWrapper::EndAuthSession(CSteamID steamID) {
@@ -919,12 +917,12 @@ void CSteamGameServerPlayingWrapper::CancelAuthTicket(HAuthTicket hAuthTicket) {
 
 EUserHasLicenseForAppResult CSteamGameServerPlayingWrapper::UserHasLicenseForApp(CSteamID steamID, AppId_t appID) {
 	rehlds_syserror("%s: not implemented", __func__);
-	return k_EUserHasLicenseResultHasLicense;
+	//return k_EUserHasLicenseResultHasLicense;
 }
 
 bool CSteamGameServerPlayingWrapper::RequestUserGroupStatus(CSteamID steamIDUser, CSteamID steamIDGroup) {
 	rehlds_syserror("%s: not implemented", __func__);
-	return false;
+	//return false;
 }
 
 void CSteamGameServerPlayingWrapper::GetGameplayStats() {
@@ -933,12 +931,12 @@ void CSteamGameServerPlayingWrapper::GetGameplayStats() {
 
 SteamAPICall_t CSteamGameServerPlayingWrapper::GetServerReputation() {
 	rehlds_syserror("%s: not implemented", __func__);
-	return k_uAPICallInvalid;
+	//return k_uAPICallInvalid;
 }
 
 uint32 CSteamGameServerPlayingWrapper::GetPublicIP() {
 	rehlds_syserror("%s: not implemented", __func__);
-	return 0;
+	//return 0;
 }
 
 bool CSteamGameServerPlayingWrapper::HandleIncomingPacket(const void *pData, int cbData, uint32 srcIP, uint16 srcPort) {
@@ -988,12 +986,12 @@ void CSteamGameServerPlayingWrapper::ForceHeartbeat() {
 
 SteamAPICall_t CSteamGameServerPlayingWrapper::AssociateWithClan(CSteamID steamIDClan) {
 	rehlds_syserror("%s: not implemented", __func__);
-	return k_uAPICallInvalid;
+	//return k_uAPICallInvalid;
 }
 
 SteamAPICall_t CSteamGameServerPlayingWrapper::ComputeNewPlayerCompatibility(CSteamID steamIDNewPlayer) {
 	rehlds_syserror("%s: not implemented", __func__);
-	return k_uAPICallInvalid;
+	//return k_uAPICallInvalid;
 }
 
 
@@ -1009,62 +1007,62 @@ CSteamAppsPlayingWrapper::CSteamAppsPlayingWrapper(CPlayingEngExtInterceptor* pl
 
 bool CSteamAppsPlayingWrapper::BIsSubscribed() {
 	rehlds_syserror("%s: not implemented", __func__);
-	return false;
+	//return false;
 }
 
 bool CSteamAppsPlayingWrapper::BIsLowViolence() {
 	rehlds_syserror("%s: not implemented", __func__);
-	return false;
+	//return false;
 }
 
 bool CSteamAppsPlayingWrapper::BIsCybercafe() {
 	rehlds_syserror("%s: not implemented", __func__);
-	return false;
+	//return false;
 }
 
 bool CSteamAppsPlayingWrapper::BIsVACBanned() {
 	rehlds_syserror("%s: not implemented", __func__);
-	return false;
+	//return false;
 }
 
 const char* CSteamAppsPlayingWrapper::GetCurrentGameLanguage() {
 	rehlds_syserror("%s: not implemented", __func__);
-	return "";
+	//return "";
 }
 
 const char* CSteamAppsPlayingWrapper::GetAvailableGameLanguages() {
 	rehlds_syserror("%s: not implemented", __func__);
-	return "";
+	//return "";
 }
 
 bool CSteamAppsPlayingWrapper::BIsSubscribedApp(AppId_t appID) {
 	rehlds_syserror("%s: not implemented", __func__);
-	return false;
+	//return false;
 }
 
 bool CSteamAppsPlayingWrapper::BIsDlcInstalled(AppId_t appID) {
 	rehlds_syserror("%s: not implemented", __func__);
-	return false;
+	//return false;
 }
 
 uint32 CSteamAppsPlayingWrapper::GetEarliestPurchaseUnixTime(AppId_t nAppID) {
 	rehlds_syserror("%s: not implemented", __func__);
-	return 0;
+	//return 0;
 }
 
 bool CSteamAppsPlayingWrapper::BIsSubscribedFromFreeWeekend() {
 	rehlds_syserror("%s: not implemented", __func__);
-	return false;
+	//return false;
 }
 
 int CSteamAppsPlayingWrapper::GetDLCCount() {
 	rehlds_syserror("%s: not implemented", __func__);
-	return 0;
+	//return 0;
 }
 
 bool CSteamAppsPlayingWrapper::BGetDLCDataByIndex(int iDLC, AppId_t *pAppID, bool *pbAvailable, char *pchName, int cchNameBufferSize) {
 	rehlds_syserror("%s: not implemented", __func__);
-	return false;
+	//return false;
 }
 
 void CSteamAppsPlayingWrapper::InstallDLC(AppId_t nAppID) {
@@ -1081,20 +1079,20 @@ void CSteamAppsPlayingWrapper::RequestAppProofOfPurchaseKey(AppId_t nAppID) {
 
 bool CSteamAppsPlayingWrapper::GetCurrentBetaName(char *pchName, int cchNameBufferSize) {
 	rehlds_syserror("%s: not implemented", __func__);
-	return false;
+	//return false;
 }
 
 bool CSteamAppsPlayingWrapper::MarkContentCorrupt(bool bMissingFilesOnly) {
 	rehlds_syserror("%s: not implemented", __func__);
-	return false;
+	//return false;
 }
 
 uint32 CSteamAppsPlayingWrapper::GetInstalledDepots(DepotId_t *pvecDepots, uint32 cMaxDepots) {
 	rehlds_syserror("%s: not implemented", __func__);
-	return 0;
+	//return 0;
 }
 
 uint32 CSteamAppsPlayingWrapper::GetAppInstallDir(AppId_t appID, char *pchFolder, uint32 cchFolderBufferSize) {
 	rehlds_syserror("%s: not implemented", __func__);
-	return 0;
+	//return 0;
 }

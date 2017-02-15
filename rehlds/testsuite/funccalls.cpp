@@ -3287,6 +3287,5 @@ IEngExtCall* IEngExtCallFactory::createByOpcode(ExtCallFuncs opc, void* buf, int
 
 	default:
 		rehlds_syserror("%s: unknown funccall opcode %d", __func__, opc);
-		return NULL;
 	}
 }
