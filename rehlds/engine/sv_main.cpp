@@ -5490,7 +5490,7 @@ void SV_CreateBaseline(void)
 				* This function call emulates swds.dll behavior, i.e. it sends the same garbage when invoking CreateBaseline as swds.dll does.
 				* This is required since not emulating this behavior will break rehlds test demos.
 				*/
-				typedef void CreateBaseline_t(int player, int eindex, struct entity_state_s *baseline, struct edict_s *entity, int playermodelindex, vec3_t player_mins, vec3_t player_maxs, int dummy1, int dummy2, int dummy3, int dummy4);
+				typedef void CreateBaseline_t(int player_, int eindex_, struct entity_state_s *baseline_, struct edict_s *entity_, int playermodelindex_, vec3_t player_mins_, vec3_t player_maxs_, int dummy1, int dummy2, int dummy3, int dummy4);
 				((CreateBaseline_t*)gEntityInterface.pfnCreateBaseline)(player, entnum, &(g_psv.baselines[entnum]), svent, sv_playermodel, player_mins[0], player_maxs[0], 0, 0, 1, 0);
 
 				sv_lastnum = entnum;
