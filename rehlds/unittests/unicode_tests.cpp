@@ -84,13 +84,13 @@ TEST(UnicodeValidateAndRepair, UNICODE_STRTOOLS, 1000)
 	struct testdata_t {
 		uint8 indata[16];
 		uint8 outdata[16];
-		bool valid;
+		qboolean valid;
 	};
 
 	testdata_t testData[] = {
-		{ { 0x61, 0x62, 0 }, { 0x61, 0x62, 0 }, true },
-		{ { 0x61, 0x81, 0x62, 0 }, { 0x61, 0x62, 0 }, false },
-		{ { 0x81, 0 }, { 0 }, false },
+		{ { 0x61, 0x62, 0 }, { 0x61, 0x62, 0 }, TRUE },
+		{ { 0x61, 0x81, 0x62, 0 }, { 0x61, 0x62, 0 }, FALSE },
+		{ { 0x81, 0 }, { 0 }, FALSE },
 	};
 
 	for (int i = 0; i < ARRAYSIZE(testData); i++) {
@@ -99,7 +99,7 @@ TEST(UnicodeValidateAndRepair, UNICODE_STRTOOLS, 1000)
 		char localbuf[256];
 		strcpy(localbuf, (char*) d->indata);
 
-		bool valid = Q_UnicodeValidate(localbuf);
+		qboolean valid = Q_UnicodeValidate(localbuf);
 		CHECK("UnicodeValidate: invalid result", valid == d->valid);
 
 		Q_UnicodeRepair(localbuf);

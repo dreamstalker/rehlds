@@ -2282,7 +2282,7 @@ AddressRef g_DataRefs[] =
 	{ 0x0208E828, "g_rgRconFailures", (size_t)&pg_rgRconFailures },
 
 	{ 0x01E42FF8, "scr_downloading", (size_t)&pscr_downloading },
-
+#ifndef REHLDS_FIXES
 	{ 0x0208F7B8, "g_bCS_CZ_Flags_Initialized", (size_t)&pg_bCS_CZ_Flags_Initialized },
 	{ 0x0208F7AC, "g_bIsCZero", (size_t)&pg_bIsCZero },
 	{ 0x0208F7B4, "g_bIsCZeroRitual", (size_t)&pg_bIsCZeroRitual },
@@ -2290,7 +2290,7 @@ AddressRef g_DataRefs[] =
 	{ 0x0208F7BC, "g_bIsTFC", (size_t)&pg_bIsTFC },
 	{ 0x0208F7C0, "g_bIsHL1", (size_t)&pg_bIsHL1 },
 	{ 0x0208F7A8, "g_bIsCStrike", (size_t)&pg_bIsCStrike },
-
+#endif
 	{ 0x01FD3E80, "gPAS", (size_t)&pgPAS },
 	{ 0x01FD3E84, "gPVS", (size_t)&pgPVS },
 	{ 0x01FD3A78, "gPVSRowBytes", (size_t)&pgPVSRowBytes },

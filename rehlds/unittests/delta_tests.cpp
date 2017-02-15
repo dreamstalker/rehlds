@@ -52,7 +52,7 @@ NOINLINE void _InitDeltaField(delta_description_t* fieldDesc, int expectedOffset
 	memset(&fieldDesc->stats, 0, sizeof(fieldDesc->stats));
 }
 
-NOINLINE void _FillTestDelta(delta_test_struct_t* data, char val) {
+NOINLINE void _FillTestDelta(delta_test_struct_t* data, unsigned char val) {
 	memset(data, val, sizeof(delta_test_struct_t));
 	data->s_24[ARRAYSIZE(data->s_24) - 1] = 0;
 	data->s_53[ARRAYSIZE(data->s_53) - 1] = 0;
