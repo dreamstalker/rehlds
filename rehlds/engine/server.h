@@ -129,7 +129,7 @@ typedef struct server_s
 	const char *generic_precache[MAX_GENERIC];
 	char generic_precache_names[MAX_GENERIC][64];
 	int num_generic_names;
-	char *lightstyles[MAX_LIGHTSTYLES];
+	const char *lightstyles[MAX_LIGHTSTYLES];
 	int num_edicts;
 	int max_edicts;
 	edict_t *edicts;

@@ -136,7 +136,7 @@ qboolean DELTA_WriteDeltaForceMask(unsigned char *from, unsigned char *to, qbool
 qboolean DELTA_WriteDelta(unsigned char *from, unsigned char *to, qboolean force, delta_t *pFields, void(*callback)(void));
 qboolean _DELTA_WriteDelta(unsigned char *from, unsigned char *to, qboolean force, delta_t *pFields, void(*callback)(void), qboolean sendfields);
 int DELTA_ParseDelta(unsigned char *from, unsigned char *to, delta_t *pFields);
-void DELTA_AddEncoder(char *name, void(*conditionalencode)(struct delta_s *, const unsigned char *, const unsigned char *));
+void DELTA_AddEncoder(const char *name, void(*conditionalencode)(struct delta_s *, const unsigned char *, const unsigned char *));
 void DELTA_ClearEncoders(void);
 encoder_t DELTA_LookupEncoder(char *name);
 int DELTA_CountLinks(delta_link_t *plinks);

@@ -576,7 +576,7 @@ typedef void(*pfnEngDst_pfnGetScreenFade_t)						(struct screenfade_s **);
 typedef void(*pfnEngDst_pfnSetScreenFade_t)						(struct screenfade_s **);
 typedef void(*pfnEngDst_VGui_GetPanel_t)						();
 typedef void(*pfnEngDst_VGui_ViewportPaintBackground_t)			(int **);
-typedef void(*pfnEngDst_COM_LoadFile_t)							(char **, int *, int **);
+typedef void(*pfnEngDst_COM_LoadFile_t)							(const char **, int *, int **);
 typedef void(*pfnEngDst_COM_ParseFile_t)						(char **, char **);
 typedef void(*pfnEngDst_COM_FreeFile_t)							(void **);
 typedef void(*pfnEngDst_IsSpectateOnly_t)						(void);

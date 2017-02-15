@@ -816,7 +816,7 @@ qboolean EXT_FUNC ValidCmd(const char *pCmd)
 	return len && (pCmd[len - 1] == '\n' || pCmd[len - 1] == ';');
 }
 
-void EXT_FUNC PF_stuffcmd_I(edict_t *pEdict, char *szFmt, ...)
+void EXT_FUNC PF_stuffcmd_I(edict_t *pEdict, const char *szFmt, ...)
 {
 	int entnum;
 	client_t *old;
@@ -850,7 +850,7 @@ void EXT_FUNC PF_stuffcmd_I(edict_t *pEdict, char *szFmt, ...)
 	}
 }
 
-void EXT_FUNC PF_localcmd_I(char *str)
+void EXT_FUNC PF_localcmd_I(const char *str)
 {
 	if (ValidCmd(str))
 		Cbuf_AddText(str);
@@ -1457,7 +1457,7 @@ int EXT_FUNC PF_precache_model_I(const char *s)
 }
 
 #ifdef REHLDS_FIXES
-int EXT_FUNC PF_precache_generic_I(char *s)
+int EXT_FUNC PF_precache_generic_I(const char *s)
 {
 	if (!s)
 		Host_Error("%s: NULL pointer", __func__);
@@ -1504,7 +1504,7 @@ int EXT_FUNC PF_precache_generic_I(char *s)
 	return g_rehlds_sv.precachedGenericResourceCount++;
 }
 #else // REHLDS_FIXES
-int EXT_FUNC PF_precache_generic_I(char *s)
+int EXT_FUNC PF_precache_generic_I(const char *s)
 {
 	if (!s)
 		Host_Error("%s: NULL pointer", __func__);
@@ -1544,7 +1544,7 @@ int EXT_FUNC PF_precache_generic_I(char *s)
 }
 #endif // REHLDS_FIXES
 
-int EXT_FUNC PF_IsMapValid_I(char *mapname)
+int EXT_FUNC PF_IsMapValid_I(const char *mapname)
 {
 	char cBuf[260];
 	if (!mapname || Q_strlen(mapname) == 0)
@@ -1710,7 +1710,7 @@ int EXT_FUNC PF_DecalIndex(const char *name)
 	return -1;
 }
 
-void EXT_FUNC PF_lightstyle_I(int style, char *val)
+void EXT_FUNC PF_lightstyle_I(int style, const char *val)
 {
 	g_psv.lightstyles[style] = val;
 	if (g_psv.state != ss_active)
