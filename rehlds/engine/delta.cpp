@@ -39,7 +39,7 @@ typedef struct delta_link_s
 typedef struct delta_definition_s
 {
 	char *fieldName;
-	int fieldOffset;
+	size_t fieldOffset;
 } delta_definition_t;
 
 typedef struct delta_definition_list_s
