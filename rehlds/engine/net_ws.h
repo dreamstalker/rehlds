@@ -207,9 +207,9 @@ extern unsigned char net_message_buffer[NET_MAX_PAYLOAD];
 extern unsigned char in_message_buf[NET_MAX_PAYLOAD];
 extern sizebuf_t in_message;
 extern netadr_t in_from;
-extern int ip_sockets[3];
+extern SOCKET ip_sockets[3];
 #ifdef _WIN32
-extern int ipx_sockets[3];
+extern SOCKET ipx_sockets[3];
 #endif // _WIN32
 extern LONGPACKET gNetSplit;
 extern net_messages_t *messages[3];
@@ -253,12 +253,12 @@ void NET_FreeMsg(net_messages_t *pmsg);
 qboolean NET_GetPacket(netsrc_t sock);
 void NET_AllocateQueues(void);
 void NET_FlushQueues(void);
-int NET_SendLong(netsrc_t sock, int s, const char *buf, int len, int flags, const struct sockaddr *to, int tolen);
+int NET_SendLong(netsrc_t sock, SOCKET s, const char *buf, int len, int flags, const struct sockaddr *to, int tolen);
 void NET_SendPacket_api(unsigned int length, void *data, const netadr_t &to);
 void NET_SendPacket(netsrc_t sock, int length, void *data, const netadr_t& to);
-int NET_IPSocket(char *net_interface, int port, qboolean multicast);
+SOCKET NET_IPSocket(char *net_interface, int port, qboolean multicast);
 void NET_OpenIP(void);
-int NET_IPXSocket(int hostshort);
+SOCKET NET_IPXSocket(int hostshort);
 void NET_OpenIPX(void);
 void NET_GetLocalAddress(void);
 int NET_IsConfigured(void);
