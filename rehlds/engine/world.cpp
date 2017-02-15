@@ -181,7 +181,6 @@ struct hull_s *SV_HullForBsp(edict_t *ent, const vec_t *mins, const vec_t *maxs,
 			else
 				hull = &model->hulls[3];
 		}
-// TODO: add cvar for this?
 #ifdef REHLDS_FIXES
 		if (sv_rehlds_hull_centering.value && mins[0] + maxs[0] == 0.0f)
 			offset[0] = 0.0f;
