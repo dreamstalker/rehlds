@@ -44,10 +44,10 @@ typedef ALIGN16 unsigned int aivec4_t[4];
 // conversion multiplier
 const avec4_t deg2rad =
 {
-	M_PI / 180.f,
-	M_PI / 180.f,
-	M_PI / 180.f,
-	M_PI / 180.f
+	(float)M_PI / 180.f,
+	(float)M_PI / 180.f,
+	(float)M_PI / 180.f,
+	(float)M_PI / 180.f
 };
 
 const aivec4_t negmask[4] =
