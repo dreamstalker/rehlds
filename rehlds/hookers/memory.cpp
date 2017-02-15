@@ -417,31 +417,27 @@ size_t HIDDEN FindSymbol(Module *module, const char* symbolName, int index)
 #ifdef _WIN32
 void ProcessModuleData(Module *module)
 {
-	int i = 0;
 	PIMAGE_DOS_HEADER dosHeader = (PIMAGE_DOS_HEADER)module->base;
 	if (dosHeader->e_magic != IMAGE_DOS_SIGNATURE) {
 		rehlds_syserror("%s: Invalid DOS header signature", __func__);
-		return;
 	}
 
 	PIMAGE_NT_HEADERS NTHeaders = (PIMAGE_NT_HEADERS)((size_t)module->base + dosHeader->e_lfanew);
 	if (NTHeaders->Signature != 0x4550) {
 		rehlds_syserror("%s: Invalid NT header signature", __func__);
-		return;
 	}
 
 	PIMAGE_SECTION_HEADER cSection = (PIMAGE_SECTION_HEADER)((size_t)(&NTHeaders->OptionalHeader) + NTHeaders->FileHeader.SizeOfOptionalHeader);
 
 	PIMAGE_SECTION_HEADER CodeSection = NULL;
 
-	for (i = 0; i < NTHeaders->FileHeader.NumberOfSections; i++, cSection++) {
+	for (int i = 0; i < NTHeaders->FileHeader.NumberOfSections; i++, cSection++) {
 		if (cSection->VirtualAddress == NTHeaders->OptionalHeader.BaseOfCode)
 			CodeSection = cSection;
 	}
 
 	if (CodeSection == NULL) {
 		rehlds_syserror("%s: Code section not found", __func__);
-		return;
 	}
 
 	module->codeSection.start = (uint32)module->base + CodeSection->VirtualAddress;

@@ -1053,20 +1053,15 @@ int EXT_FUNC PF_precache_sound_I(const char *s)
 			"Reduce the number of brush models and/or regular models in the map to correct this.", __func__,
 			s, MAX_SOUNDS);
 	}
-	else
-	{
-		// precaching not enabled. check if already exists.
-		for (i = 0; i < MAX_SOUNDS; i++)
-		{
-			if (g_psv.sound_precache[i] && !Q_stricmp(g_psv.sound_precache[i], s))
-				return i;
-		}
 
-		Host_Error("%s: '%s' Precache can only be done in spawn functions", __func__, s);
+	// precaching not enabled. check if already exists.
+	for (i = 0; i < MAX_SOUNDS; i++)
+	{
+		if (g_psv.sound_precache[i] && !Q_stricmp(g_psv.sound_precache[i], s))
+			return i;
 	}
 
-	// unreach
-	return -1;
+	Host_Error("%s: '%s' Precache can only be done in spawn functions", __func__, s);
 }
 
 unsigned short EXT_FUNC EV_Precache(int type, const char *psz)

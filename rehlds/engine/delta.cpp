@@ -419,7 +419,7 @@ int DELTA_TestDelta(unsigned char *from, unsigned char *to, delta_t *pFields)
 	delta_description_t *pTest;
 	int fieldType;
 	int fieldCount = pFields->fieldCount;
-	int length;
+	int length = 0;
 	int different;
 	int neededBits = 0;
 	int highestBit = -1;
@@ -1155,7 +1155,6 @@ qboolean DELTA_ParseType(delta_description_t *pdelta, char **pstream)
 
 	// We are hit the end of the stream
 	Sys_Error("%s:  Expecting fieldtype info\n", __func__);	// Was Con_Printf here
-	return FALSE;
 }
 
 qboolean DELTA_ParseField(int count, delta_definition_t *pdefinition, delta_link_t *pField, char **pstream)
@@ -1216,7 +1215,6 @@ qboolean DELTA_ParseField(int count, delta_definition_t *pdefinition, delta_link
 	if (Q_stricmp(com_token, ")"))
 	{
 		Sys_Error("%s:  Expecting ), got %s\n", __func__, com_token);	// Was Con_Printf here
-		return FALSE;
 	}
 
 	*pstream = COM_Parse(*pstream);
@@ -1429,7 +1427,6 @@ qboolean DELTA_ParseDescription(char *name, delta_t **ppdesc, char *pstream)
 				if (Q_stricmp(com_token, "{"))
 				{
 					Sys_Error("%s:  Expecting {, got %s\n", __func__, com_token);	// Was Con_Printf here
-					return FALSE;
 				}
 				if (!DELTA_ParseOneField(&pstream, &links, count, pdefinition))
 				{

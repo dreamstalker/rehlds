@@ -45,7 +45,6 @@ void *GetOriginalFuncAddrOrDie(const char *funcName)
 	}
 
 	rehlds_syserror("%s: Could not find function '%s'", __func__, funcName);
-	return NULL;
 }
 
 void *GetOriginalFuncAddrOrDefault(const char *funcName, void *def)
@@ -68,7 +67,6 @@ void *GetFuncRefAddrOrDie(const char *funcName)
 	}
 
 	rehlds_syserror("%s: Could not find function '%s'", __func__, funcName);
-	return NULL;
 }
 
 void *GetFuncRefAddrOrDefault(const char *funcName, void *def)

@@ -2,7 +2,7 @@
 
 
 /* ============================================================================
-                                external function hooks
+								external function hooks
  ============================================================================*/
 uint32 __cdecl time_hooked(uint32* pTime)
 {
@@ -145,13 +145,13 @@ bool __cdecl SteamAPI_Init_hooked()
 ISteamUser* __cdecl SteamUser_hooked()
 {
 	rehlds_syserror("%s: not implemented", __func__);
-	return NULL;
+	//return NULL;
 }
 
 ISteamFriends* __cdecl SteamFriends_hooked()
 {
 	rehlds_syserror("%s: not implemented", __func__);
-	return NULL;
+	//return NULL;
 }
 
 void __cdecl SteamGameServer_RunCallbacks_hooked()
@@ -197,7 +197,7 @@ void __cdecl SteamAPI_RegisterCallResult_hooked(class CCallbackBase *pCallback, 
 ISteamHTTP* __cdecl SteamHTTP_hooked()
 {
 	rehlds_syserror("%s: not implemented", __func__);
-	return NULL;
+	//return NULL;
 }
 
 void __cdecl SteamAPI_UnregisterCallResult_hooked(class CCallbackBase *pCallback, SteamAPICall_t hAPICall)
@@ -216,7 +216,7 @@ void __cdecl SteamAPI_UseBreakpadCrashHandler_hooked(char const *pchVersion, cha
 }
 
 /* ============================================================================
-                               Hooks installation
+							   Hooks installation
  ============================================================================*/
 HMODULE getModuleHandleOrDie(const char* moduleName) {
 	HMODULE res = GetModuleHandleA(moduleName);
