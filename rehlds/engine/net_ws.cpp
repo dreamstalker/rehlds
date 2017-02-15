@@ -1929,7 +1929,7 @@ void NET_Config(qboolean multiplayer)
 #ifdef _WIN32
 				CRehldsPlatformHolder::get()->closesocket(ip_sockets[sock]);
 #else //_WIN32
-				SOCKET_CLOSE(ip_sockets[i]);
+				SOCKET_CLOSE(ip_sockets[sock]);
 #endif //_WIN32
 				ip_sockets[sock] = INV_SOCK;
 			}
