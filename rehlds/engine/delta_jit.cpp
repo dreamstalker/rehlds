@@ -128,7 +128,7 @@ void DELTAJIT_CreateDescription(delta_t* delta, deltajitdata_t &jitdesc) {
 class CUniqueLabel {
 public:
 	CUniqueLabel(const char* name) : m_name(name) {
-		m_name += m_unique_index++;
+		m_name += std::to_string(m_unique_index++);
 	}
 
 	operator std::string&() {
