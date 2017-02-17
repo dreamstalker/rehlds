@@ -433,7 +433,7 @@ pmtrace_t _PM_PlayerTrace(vec_t *start, vec_t *end, int traceFlags, int numphyse
 					continue;
 
 
-				if (pe->studiomodel->type == mod_studio && (pe->studiomodel->flags & 0x200 || (pmove->usehull == 2 && !(traceFlags & PM_STUDIO_BOX))))
+				if (pe->studiomodel->type == mod_studio && (pe->studiomodel->flags & STUDIO_TRACE_HITBOX || (pmove->usehull == 2 && !(traceFlags & PM_STUDIO_BOX))))
 				{
 					hull = PM_HullForStudioModel(pe->studiomodel, offset, pe->frame, pe->sequence, pe->angles, pe->origin, pe->controller, pe->blending, &pNumHulls);
 				}
