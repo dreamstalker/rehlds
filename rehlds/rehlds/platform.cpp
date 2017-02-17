@@ -114,12 +114,78 @@ int CSimplePlatform::closesocket(SOCKET s) {
 #endif
 }
 
+int GetCurrentMillisecond()
+{
+#ifdef _WIN32
+	return 0;
+#else
+	timeval tv;
+	gettimeofday(&tv, nullptr);
+	return (int)tv.tv_usec / 1000;
+#endif
+}
+
+void WriteNetInside(const char *tempBuffer, size_t tempBufferLen) {
+	static FILE *file = nullptr;
+	if (!file) {
+		file = fopen("cstrike/netlog.txt", "wb");
+	}
+	static char buffer[1 * 1024 * 1024];
+	static size_t currentBufferSize = 0;
+
+	if (currentBufferSize + tempBufferLen > ARRAYSIZE(buffer) - 1) {
+		fwrite(buffer, sizeof(buffer[0]), currentBufferSize, file);
+		currentBufferSize = 0;
+	}
+
+	strcpy(&buffer[currentBufferSize], tempBuffer);
+	currentBufferSize += tempBufferLen;
+}
+
+template <typename ...TArgs>
+void WriteNet(const char *format, TArgs&&... args) {
+	char tempBuffer[256];
+	size_t tempBufferLen = sprintf(tempBuffer, format, std::forward<TArgs>(args)...);
+
+	WriteNetInside(tempBuffer, tempBufferLen);
+}
+
 int CSimplePlatform::recvfrom(SOCKET s, char* buf, int len, int flags, struct sockaddr* from, socklen_t *fromlen) {
-	return ::recvfrom(s, buf, len, flags, from, fromlen);
+	int ret = ::recvfrom(s, buf, len, flags, from, fromlen);
+
+#ifdef REHLDS_FIXES
+	if (ret >= 0) {
+		time_t ltime;
+		tm *today;
+		::time(&ltime);
+		today = ::localtime(&ltime);
+
+		netadr_t netFrom;
+		SockadrToNetadr(from, &netFrom);
+
+		WriteNet("%02i:%02i:%02i.%03i <- %s, sz=%d, s=%d\n", today->tm_hour, today->tm_min, today->tm_sec, GetCurrentMillisecond(), NET_AdrToString(netFrom), ret, s);
+	}
+#endif
+
+	return ret;
 }
 
 int CSimplePlatform::sendto(SOCKET s, const char* buf, int len, int flags, const struct sockaddr* to, int tolen) {
-	return ::sendto(s, buf, len, flags, to, tolen);
+	int ret = ::sendto(s, buf, len, flags, to, tolen);
+
+#ifdef REHLDS_FIXES
+	time_t ltime;
+	tm *today;
+	::time(&ltime);
+	today = ::localtime(&ltime);
+
+	netadr_t netTo;
+	SockadrToNetadr(to, &netTo);
+
+	WriteNet("%02i:%02i:%02i.%03i -> %s, sz=%d(%d), s=%d\n", today->tm_hour, today->tm_min, today->tm_sec, GetCurrentMillisecond(), NET_AdrToString(netTo), len, ret, s);
+#endif
+
+	return ret;
 }
 
 int CSimplePlatform::bind(SOCKET s, const struct sockaddr* addr, int namelen) {
