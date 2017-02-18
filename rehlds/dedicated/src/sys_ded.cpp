@@ -136,11 +136,8 @@ int RunServer()
 		RunVGUIFrame();
 
 		bool bDone = false;
-		while (true)
+		while (!bDone)
 		{
-			if (bDone)
-				break;
-
 			// Running really fast, yield some time to other apps
 			sys->Sleep(1);
 

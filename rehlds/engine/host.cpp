@@ -824,7 +824,7 @@ void Host_Speeds(double *time)
 	}
 
 #ifndef SWDS
-	if (cl_gg.value != 0.0f)
+	if (cl_gg.value != 0.0f)	// cvar_t cl_gamegauge
 	{
 		//sub_1D10B2D
 		CL_GGSpeeds(time[3]);
@@ -970,7 +970,7 @@ int Host_Frame(float time, int iState, int *stateInfo)
 		time1 = Sys_FloatTime();
 
 	_Host_Frame(time);
-	if (host_profile.value != 0.0)
+	if (host_profile.value != 0.0f)
 		time2 = Sys_FloatTime();
 
 	if (giStateInfo)
@@ -980,7 +980,7 @@ int Host_Frame(float time, int iState, int *stateInfo)
 		Cbuf_Execute();
 	}
 
-	if (host_profile.value != 0.0)
+	if (host_profile.value != 0.0f)
 	{
 		static double timetotal;
 		static int timecount;
