@@ -26,11 +26,7 @@
 *
 */
 
-#ifndef SV_PHYS_H
-#define SV_PHYS_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #include "maintypes.h"
 #include "model.h"
@@ -84,5 +80,3 @@ void PF_WaterMove(edict_t *pSelf);
 void SV_Physics_Step(edict_t *ent);
 void SV_Physics(void);
 trace_t SV_Trace_Toss(edict_t *ent, edict_t *ignore);
-
-#endif // SV_PHYS_H

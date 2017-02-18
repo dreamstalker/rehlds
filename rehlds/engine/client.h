@@ -26,11 +26,7 @@
 *
 */
 
-#ifndef CLIENT_H
-#define CLIENT_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #include "maintypes.h"
 #include "common.h"
@@ -351,5 +347,3 @@ int GetTimesTutorMessageShown(int id);
 void RegisterTutorMessageShown(int mid);
 void ResetTutorMessageDecayData(void);
 void SetCareerAudioState(int state);
-
-#endif // CLIENT_H

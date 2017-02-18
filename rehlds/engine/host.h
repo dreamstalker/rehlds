@@ -26,11 +26,7 @@
 *
 */
 
-#ifndef HOST_H
-#define HOST_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #include "maintypes.h"
 #include "filesystem_internal.h"
@@ -150,5 +146,3 @@ qboolean Host_IsServerActive(void);
 void Host_Version(void);
 int Host_Init(quakeparms_t *parms);
 void Host_Shutdown(void);
-
-#endif // HOST_H

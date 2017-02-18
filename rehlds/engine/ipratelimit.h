@@ -26,11 +26,7 @@
 *
 */
 
-#ifndef IPRATELIMIT_H
-#define IPRATELIMIT_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #include "maintypes.h"
 #include "net.h"
@@ -70,5 +66,3 @@ private:
 };
 
 //extern bool (__fastcall *pCIPRateLimit__CheckIP)(CIPRateLimit *obj, int none, netadr_t adr);
-
-#endif // IPRATELIMIT_H

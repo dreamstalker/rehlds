@@ -26,11 +26,7 @@
 *
 */
 
-#ifndef MODINFO_H
-#define MODINFO_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #include "maintypes.h"
 
@@ -56,5 +52,3 @@ typedef struct modinfo_s
 	int num_edicts;
 	qboolean clientcrccheck;
 } modinfo_t;
-
-#endif // MODINFO_H

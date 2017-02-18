@@ -26,11 +26,7 @@
 *
 */
 
-#ifndef SV_LOG_H
-#define SV_LOG_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #include "maintypes.h"
 
@@ -54,5 +50,3 @@ void SV_SetLogAddress_f(void);
 void SV_AddLogAddress_f(void);
 void SV_DelLogAddress_f(void);
 void SV_ServerLog_f(void);
-
-#endif // SV_LOG_H

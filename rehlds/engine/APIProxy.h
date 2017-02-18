@@ -1,5 +1,4 @@
-#ifndef __APIPROXY__
-#define __APIPROXY__
+#pragma once
 
 #include "netadr.h"
 #include "Sequence.h"
@@ -934,6 +933,3 @@ typedef struct validator_s
 #define k_nChecksumCompensator 0x36a8f09c	// Don't change this value: it's hardcorded in cdll_int.cpp, 
 
 #define k_nModuleVersionCur 0x43210004
-
-
-#endif // __APIPROXY__

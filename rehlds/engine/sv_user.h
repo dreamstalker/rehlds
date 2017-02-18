@@ -26,11 +26,7 @@
 *
 */
 
-#ifndef SV_USER_H
-#define SV_USER_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #include "maintypes.h"
 #include "server.h"
@@ -151,5 +147,3 @@ qboolean SV_SetPlayer(int idnum);
 void SV_ShowServerinfo_f(void);
 void SV_SendEnts_f(void);
 void SV_FullUpdate_f(void);
-
-#endif // SV_USER_H

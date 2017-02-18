@@ -26,11 +26,7 @@
 *
 */
 
-#ifndef DECAL_H
-#define DECAL_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #include "maintypes.h"
 #include "model.h"
@@ -99,5 +95,3 @@ qboolean Draw_ValidateCustomLogo(cachewad_t *wad, unsigned char *data, lumpinfo_
 qboolean Draw_CacheLoadFromCustom(char *clean, cachewad_t *wad, void *raw, int rawsize, cachepic_t *pic);
 NOXREF int Draw_CacheIndex(cachewad_t *wad, char *path);
 NOXREF int Draw_CacheFindIndex(cachewad_t *wad, char *path);
-
-#endif // DECAL_H

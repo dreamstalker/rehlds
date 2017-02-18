@@ -25,6 +25,7 @@
 *    version.
 *
 */
+
 #pragma once
 
 #include "maintypes.h"
@@ -39,8 +40,4 @@ extern int(*pCheckIP)(netadr_t adr);
 
 extern class CIPRateLimit rateChecker;
 
-
 int CheckIP(netadr_t adr);
-
-
-

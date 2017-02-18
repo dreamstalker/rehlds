@@ -26,17 +26,12 @@
 *
 */
 
-#ifndef GS_NET_H
-#define GS_NET_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #include "maintypes.h"
 #include "common.h"
 #include "enums.h"
 #include "netadr.h"
-
 
 #define PROTOCOL_VERSION		48
 
@@ -403,5 +398,3 @@ typedef struct netchan_s
 #else // REHLDS_FIXES
 #define Con_NetPrintf Con_Printf
 #endif // REHLDS_FIXES
-
-#endif // GS_NET_H

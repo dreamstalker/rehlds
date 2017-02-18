@@ -26,11 +26,7 @@
 *
 */
 
-#ifndef EVENT_H
-#define EVENT_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 typedef struct event_s
 {
@@ -39,5 +35,3 @@ typedef struct event_s
 	int filesize;
 	const char *pszScript;
 } event_t;
-
-#endif // EVENT_H

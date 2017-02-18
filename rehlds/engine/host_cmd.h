@@ -26,11 +26,7 @@
 *
 */
 
-#ifndef HOST_CMD_H
-#define HOST_CMD_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #include "maintypes.h"
 #include "eiface.h"
@@ -212,5 +208,3 @@ void Host_Crash_f(void);
 void Host_InitCommands(void);
 void SV_CheckBlendingInterface(void);
 void SV_CheckSaveGameCommentInterface(void);
-
-#endif // HOST_CMD_H

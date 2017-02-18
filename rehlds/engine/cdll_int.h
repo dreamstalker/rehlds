@@ -18,7 +18,7 @@
 // 4-23-98  
 // JOHN:  client dll interface declarations
 //
-#pragma once 
+#pragma once
 
 #ifdef __cplusplus
 extern "C" {
@@ -462,4 +462,3 @@ extern void NullDst(void);
 #ifdef __cplusplus
 }
 #endif
-
