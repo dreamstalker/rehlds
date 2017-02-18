@@ -26,11 +26,9 @@
 *
 */
 
-#ifndef INST_BASELINE_H
-#define INST_BASELINE_H
-#ifdef _WIN32
 #pragma once
-#endif
+#ifndef REHLDS_INST_BASELINE_H
+#define REHLDS_INST_BASELINE_H
 
 #include "entity_state.h"
 
@@ -43,4 +41,4 @@ typedef struct extra_baselines_s
 	entity_state_t baseline[NUM_BASELINES];
 } extra_baselines_t;
 
-#endif // INST_BASELINE_H
+#endif // REHLDS_INST_BASELINE_H

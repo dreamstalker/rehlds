@@ -25,7 +25,10 @@
 *    version.
 *
 */
+
 #pragma once
+#ifndef REHLDS_MODEL_REHLDS_H
+#define REHLDS_MODEL_REHLDS_H
 
 /*
 
@@ -116,3 +119,5 @@ void Mod_Print(void);
 NOXREF void Mod_ChangeGame(void);
 model_t *Mod_Handle(int modelindex);
 modtype_t Mod_GetType(int modelindex);
+
+#endif // REHLDS_MODEL_REHLDS_H

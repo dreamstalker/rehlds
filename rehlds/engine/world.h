@@ -26,11 +26,9 @@
 *
 */
 
-#ifndef WORLD_H
-#define WORLD_H
-#ifdef _WIN32
 #pragma once
-#endif
+#ifndef REHLDS_WORLD_H
+#define REHLDS_WORLD_H
 
 #include "maintypes.h"
 #include "model.h"
@@ -119,4 +117,4 @@ trace_t SV_Move(const vec_t *start, const vec_t *mins, const vec_t *maxs, const 
 trace_t SV_Move_Point(const vec_t *start, const vec_t *end, int type, edict_t *passedict);
 #endif // REHLDS_OPT_PEDANTIC
 
-#endif // WORLD_H
+#endif // REHLDS_WORLD_H

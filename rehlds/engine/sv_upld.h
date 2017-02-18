@@ -26,14 +26,11 @@
 *
 */
 
-#ifndef SV_UPLD__H
-#define SV_UPLD__H
-#ifdef _WIN32
 #pragma once
-#endif
+#ifndef REHLDS_SV_UPLD_H
+#define REHLDS_SV_UPLD_H
 
 #include "maintypes.h"
-
 
 qboolean SV_CheckFile(sizebuf_t *msg, char *filename);
 void SV_ClearResourceLists(client_t *cl);
@@ -49,6 +46,6 @@ void SV_RequestMissingResourcesFromClients(void);
 qboolean SV_UploadComplete(client_t *cl);
 void SV_BatchUploadRequest(client_t *cl);
 qboolean SV_RequestMissingResources(void);
- void SV_ParseResourceList(client_t *pSenderClient);
+void SV_ParseResourceList(client_t *pSenderClient);
 
-#endif // SV_UPLD__H
+#endif // REHLDS_SV_UPLD_H

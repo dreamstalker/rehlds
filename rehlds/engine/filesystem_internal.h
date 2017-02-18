@@ -26,11 +26,9 @@
 *
 */
 
-#ifndef _FILESYSTEM_INTERNAL_H
-#define _FILESYSTEM_INTERNAL_H
-#ifdef _WIN32
 #pragma once
-#endif
+#ifndef REHLDS_FILESYSTEM_INTERNAL_H
+#define REHLDS_FILESYSTEM_INTERNAL_H
 
 #include "maintypes.h"
 #include "FileSystem.h"
@@ -89,5 +87,4 @@ void FS_Unlink(const char *filename);
 void FS_Rename(const char *originalName, const char *newName);
 void *FS_LoadLibrary(const char *dllName);
 
-#endif // _FILESYSTEM_INTERNAL_H
-
+#endif // REHLDS_FILESYSTEM_INTERNAL_H

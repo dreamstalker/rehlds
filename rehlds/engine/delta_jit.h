@@ -1,4 +1,6 @@
 #pragma once
+#ifndef REHLDS_DELTA_JIT_H
+#define REHLDS_DELTA_JIT_H
 
 #include "maintypes.h"
 
@@ -79,3 +81,5 @@ extern qboolean DELTAJit_IsFieldMarked(delta_t* pFields, int fieldNumber);
 extern uint64 DELTAJit_GetOriginalMask(delta_t* pFields);
 
 extern uint64 DELTAJit_GetMaskU64(delta_t* pFields);
+
+#endif // REHLDS_DELTA_JIT_H

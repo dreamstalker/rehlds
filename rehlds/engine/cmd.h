@@ -25,7 +25,10 @@
 *    version.
 *
 */
+
 #pragma once
+#ifndef REHLDS_CMD_H
+#define REHLDS_CMD_H
 
 #include "maintypes.h"
 #include "common.h"
@@ -122,3 +125,5 @@ void Cmd_ForwardToServer(void);
 qboolean Cmd_ForwardToServerUnreliable(void);
 NOXREF int Cmd_CheckParm(const char *parm);
 void Cmd_CmdList_f(void);
+
+#endif // REHLDS_CMD_H

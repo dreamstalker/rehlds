@@ -27,6 +27,8 @@
 */
 
 #pragma once
+#ifndef REHLDS_VID_NULL_H
+#define REHLDS_VID_NULL_H
 
 #include "maintypes.h"
 
@@ -60,3 +62,5 @@ void R_InitTextures(void);
 void StartLoadingProgressBar(const char *loadingType, int numProgressPoints);
 void ContinueLoadingProgressBar(const char *loadingType, int progressPoint, float progressFraction);
 void SetLoadingProgressBarStatusText(const char *statusText);
+
+#endif // REHLDS_VID_NULL_H

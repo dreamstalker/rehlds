@@ -29,6 +29,8 @@ misrepresented as being the original software.
 (this is the zlib license)
 */
 #pragma once
+#ifndef REHLDS_SSE_MATHFUN_H
+#define REHLDS_SSE_MATHFUN_H
 
 #include <xmmintrin.h>
 
@@ -118,3 +120,5 @@ extern v4sf exp_ps(v4sf x);
 extern v4sf sin_ps(v4sf x);
 extern v4sf cos_ps(v4sf x);
 extern void sincos_ps(v4sf x, v4sf *s, v4sf *c);
+
+#endif // REHLDS_SSE_MATHFUN_H

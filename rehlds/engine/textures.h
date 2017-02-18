@@ -26,11 +26,9 @@
 *
 */
 
-#ifndef TEXTURES_H
-#define TEXTURES_H
-#ifdef _WIN32
 #pragma once
-#endif
+#ifndef REHLDS_TEXTURES_H
+#define REHLDS_TEXTURES_H
 
 #include "maintypes.h"
 #include "wad.h"
@@ -81,4 +79,4 @@ int TEX_LoadLump(char *name, unsigned char *dest);
 int FindMiptex(char *name);
 void TEX_AddAnimatingTextures(void);
 
-#endif // TEXTURES_H
+#endif // REHLDS_TEXTURES_H

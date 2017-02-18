@@ -26,11 +26,9 @@
 *
 */
 
-#ifndef SV_PMOVE_H
-#define SV_PMOVE_H
-#ifdef _WIN32
 #pragma once
-#endif
+#ifndef REHLDS_SV_PMOVE_H
+#define REHLDS_SV_PMOVE_H
 
 #include "maintypes.h"
 
@@ -38,4 +36,4 @@ void PM_SV_PlaybackEventFull(int flags, int clientindex, unsigned short eventind
 void PM_SV_PlaySound(int channel, const char  *sample, float volume, float attenuation, int fFlags, int pitch);
 const char *PM_SV_TraceTexture(int ground, vec_t *vstart, vec_t *vend);
 
-#endif // SV_PMOVE_H
+#endif REHLDS_SV_PMOVE_H

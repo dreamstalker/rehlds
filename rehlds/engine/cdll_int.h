@@ -18,7 +18,9 @@
 // 4-23-98  
 // JOHN:  client dll interface declarations
 //
-#pragma once 
+#pragma once
+#ifndef REHLDS_CDLL_INT_H
+#define REHLDS_CDLL_INT_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -463,3 +465,4 @@ extern void NullDst(void);
 }
 #endif
 
+#endif // REHLDS_CDLL_INT_H

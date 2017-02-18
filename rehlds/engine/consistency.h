@@ -26,11 +26,9 @@
 *
 */
 
-#ifndef CONSISTENCY_H
-#define CONSISTENCY_H
-#ifdef _WIN32
 #pragma once
-#endif
+#ifndef REHLDS_CONSISTENCY_H
+#define REHLDS_CONSISTENCY_H
 
 #define MAX_CONSISTENCY_LIST	512
 
@@ -45,4 +43,4 @@ typedef struct consistency_s
 	float maxs[3];
 } consistency_t;
 
-#endif // CONSISTENCY_H
+#endif // REHLDS_CONSISTENCY_H

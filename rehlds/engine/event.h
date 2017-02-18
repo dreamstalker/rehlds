@@ -26,11 +26,9 @@
 *
 */
 
-#ifndef EVENT_H
-#define EVENT_H
-#ifdef _WIN32
 #pragma once
-#endif
+#ifndef REHLDS_EVENT_H
+#define REHLDS_EVENT_H
 
 typedef struct event_s
 {
@@ -40,4 +38,4 @@ typedef struct event_s
 	const char *pszScript;
 } event_t;
 
-#endif // EVENT_H
+#endif // REHLDS_EVENT_H

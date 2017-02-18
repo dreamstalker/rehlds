@@ -1,4 +1,3 @@
-#pragma once
 /*
 *
 *    This program is free software; you can redistribute it and/or modify it
@@ -26,6 +25,11 @@
 *    version.
 *
 */
+
+#pragma once
+#ifndef REHLDS_COMMON_H
+#define REHLDS_COMMON_H
+
 #include "common_rehlds.h"
 #include "bspfile.h"
 #include "FileSystem.h"
@@ -347,3 +351,5 @@ void COM_UnMunge2(unsigned char *data, int len, int seq);
 void COM_Munge3(unsigned char *data, int len, int seq);
 NOXREF void COM_UnMunge3(unsigned char *data, int len, int seq);
 unsigned int COM_GetApproxWavePlayLength(const char *filepath);
+
+#endif // REHLDS_COMMON_H

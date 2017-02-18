@@ -26,11 +26,9 @@
 *
 */
 
-#ifndef MATHLIB_E_H
-#define MATHLIB_E_H
-#ifdef _WIN32
 #pragma once
-#endif
+#ifndef REHLDS_MATHLIB_E_H
+#define REHLDS_MATHLIB_E_H
 
 #include "maintypes.h"
 #include "model.h"
@@ -40,7 +38,7 @@
 // left / right
 #define	YAW		1
 // fall over
-#define	ROLL	2 
+#define	ROLL	2
 
 #define RAD2DEG(x)	((float)(x) * (float)(180.f / M_PI))
 #define DEG2RAD(x)	((float)(x) * (float)(M_PI / 180.f))
@@ -48,7 +46,6 @@
 #ifdef HOOK_ENGINE
 #define vec3_origin (*pvec3_origin)
 #endif // HOOK_ENGINE
-
 
 extern vec3_t vec3_origin;
 
@@ -147,4 +144,4 @@ NOBODY void FloorDivMod(double numer, double denom, int *quotient, int *rem);
 NOBODY int GreatestCommonDivisor(int i1, int i2);
 NOBODY fixed16_t Invert24To16(fixed16_t val);
 
-#endif // MATHLIB_E_H
+#endif // REHLDS_MATHLIB_E_H

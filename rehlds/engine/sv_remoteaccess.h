@@ -25,7 +25,10 @@
 *    version.
 *
 */
+
 #pragma once
+#ifndef REHLDS_SV_REMOTEACCESS_H
+#define REHLDS_SV_REMOTEACCESS_H
 
 #include "maintypes.h"
 #include "IGameServerData.h"
@@ -72,3 +75,5 @@ public:
 extern class CServerRemoteAccess g_ServerRemoteAccess;
 
 extern void NotifyDedicatedServerUI(const char *message);
+
+#endif // REHLDS_SV_REMOTEACCESS_H

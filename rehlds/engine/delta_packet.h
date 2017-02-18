@@ -26,11 +26,9 @@
 *
 */
 
-#ifndef DELTA_PACKET_H
-#define DELTA_PACKET_H
-#ifdef _WIN32
 #pragma once
-#endif
+#ifndef REHLDS_DELTA_PACKET_H
+#define REHLDS_DELTA_PACKET_H
 
 #include "entity_state.h"
 
@@ -41,4 +39,4 @@ typedef struct packet_entities_s
 	entity_state_t *entities;
 } packet_entities_t;
 
-#endif // DELTA_PACKET_H
+#endif // REHLDS_DELTA_PACKET_H

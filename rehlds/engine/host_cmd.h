@@ -26,11 +26,9 @@
 *
 */
 
-#ifndef HOST_CMD_H
-#define HOST_CMD_H
-#ifdef _WIN32
 #pragma once
-#endif
+#ifndef REHLDS_HOST_CMD_H
+#define REHLDS_HOST_CMD_H
 
 #include "maintypes.h"
 #include "eiface.h"
@@ -213,4 +211,4 @@ void Host_InitCommands(void);
 void SV_CheckBlendingInterface(void);
 void SV_CheckSaveGameCommentInterface(void);
 
-#endif // HOST_CMD_H
+#endif // REHLDS_HOST_CMD_H

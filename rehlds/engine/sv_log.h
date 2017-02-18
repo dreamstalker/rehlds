@@ -26,11 +26,9 @@
 *
 */
 
-#ifndef SV_LOG_H
-#define SV_LOG_H
-#ifdef _WIN32
 #pragma once
-#endif
+#ifndef REHLDS_SV_LOG_H
+#define REHLDS_SV_LOG_H
 
 #include "maintypes.h"
 
@@ -55,4 +53,4 @@ void SV_AddLogAddress_f(void);
 void SV_DelLogAddress_f(void);
 void SV_ServerLog_f(void);
 
-#endif // SV_LOG_H
+#endif // REHLDS_SV_LOG_H

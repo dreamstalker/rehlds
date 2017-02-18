@@ -26,11 +26,9 @@
 *
 */
 
-#ifndef SV_USER_H
-#define SV_USER_H
-#ifdef _WIN32
 #pragma once
-#endif
+#ifndef REHLDS_SV_USER_H
+#define REHLDS_SV_USER_H
 
 #include "maintypes.h"
 #include "server.h"
@@ -152,4 +150,4 @@ void SV_ShowServerinfo_f(void);
 void SV_SendEnts_f(void);
 void SV_FullUpdate_f(void);
 
-#endif // SV_USER_H
+#endif // REHLDS_SV_USER_H

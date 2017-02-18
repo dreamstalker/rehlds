@@ -26,11 +26,9 @@
 *
 */
 
-#ifndef CMODEL_H
-#define CMODEL_H
-#ifdef _WIN32
 #pragma once
-#endif
+#ifndef REHLDS_CMODEL_H
+#define REHLDS_CMODEL_H
 
 #include "maintypes.h"
 #include "model.h"
@@ -64,4 +62,4 @@ void CM_FreePAS(void);
 void CM_CalcPAS(model_t *pModel);
 qboolean CM_HeadnodeVisible(mnode_t *node, unsigned char *visbits, int *first_visible_leafnum);
 
-#endif // CMODEL_H
+#endif // REHLDS_CMODEL_H

@@ -26,11 +26,9 @@
 *
 */
 
-#ifndef FILESYSTEM__H
-#define FILESYSTEM__H
-#ifdef _WIN32
 #pragma once
-#endif
+#ifndef REHLDS_FILESYSTEM__H
+#define REHLDS_FILESYSTEM__H
 
 #include "maintypes.h"
 #include "iregistry.h"
@@ -66,6 +64,6 @@ void CheckLiblistForFallbackDir(const char *pGameDir, bool bLanguage, const char
 int FileSystem_SetGameDirectory(const char *pDefaultDir, const char *pGameDir);
 int FileSystem_AddFallbackGameDir(const char *pGameDir);
 int FileSystem_Init(char *basedir, void *voidfilesystemFactory);
-void FileSystem_Shutdown(void); 
+void FileSystem_Shutdown(void);
 
-#endif // FILESYSTEM__H
+#endif // REHLDS_FILESYSTEM__H

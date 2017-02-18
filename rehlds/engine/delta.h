@@ -25,7 +25,10 @@
 *    version.
 *
 */
+
 #pragma once
+#ifndef REHLDS_DELTA_H
+#define REHLDS_DELTA_H
 
 #include "maintypes.h"
 
@@ -163,3 +166,5 @@ void DELTA_PrintStats(const char *name, delta_t *p);
 void DELTA_DumpStats_f(void);
 void DELTA_Init(void);
 void DELTA_Shutdown(void);
+
+#endif // REHLDS_DELTA_H

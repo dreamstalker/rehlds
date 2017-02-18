@@ -1,5 +1,6 @@
-#ifndef __APIPROXY__
-#define __APIPROXY__
+#pragma once
+#ifndef REHLDS_APIPROXY_H
+#define REHLDS_APIPROXY_H
 
 #include "netadr.h"
 #include "Sequence.h"
@@ -935,5 +936,4 @@ typedef struct validator_s
 
 #define k_nModuleVersionCur 0x43210004
 
-
-#endif // __APIPROXY__
+#endif // REHLDS_APIPROXY_H

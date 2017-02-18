@@ -25,7 +25,10 @@
 *    version.
 *
 */
+
 #pragma once
+#ifndef REHLDS_IPRATELIMITWRAPPER_H
+#define REHLDS_IPRATELIMITWRAPPER_H
 
 #include "maintypes.h"
 #include "net.h"
@@ -39,8 +42,6 @@ extern int(*pCheckIP)(netadr_t adr);
 
 extern class CIPRateLimit rateChecker;
 
-
 int CheckIP(netadr_t adr);
 
-
-
+#endif // REHLDS_IPRATELIMITWRAPPER_H

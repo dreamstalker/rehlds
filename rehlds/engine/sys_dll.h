@@ -25,7 +25,10 @@
 *    version.
 *
 */
+
 #pragma once
+#ifndef REHLDS_SYS_DLL_H
+#define REHLDS_SYS_DLL_H
 
 #include "maintypes.h"
 #include "modinfo.h"
@@ -199,3 +202,5 @@ void Con_DebugLog(const char *file, const char *fmt, ...);
 void Con_Printf(const char *fmt, ...);
 void Con_SafePrintf(const char *fmt, ...);
 void Con_DPrintf(const char *fmt, ...);
+
+#endif // REHLDS_SYS_DLL_H

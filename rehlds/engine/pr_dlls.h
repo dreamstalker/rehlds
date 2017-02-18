@@ -26,11 +26,9 @@
 *
 */
 
-#ifndef PR_DLLS_H
-#define PR_DLLS_H
-#ifdef _WIN32
 #pragma once
-#endif
+#ifndef REHLDS_PR_DLLS_H
+#define REHLDS_PR_DLLS_H
 
 #include "maintypes.h"
 #include "eiface.h"
@@ -52,4 +50,4 @@ typedef void(*ENTITYINIT)(struct entvars_s *);
 typedef void(*DISPATCHFUNCTION)(struct entvars_s *, void *);
 typedef void(*FIELDIOFUNCTION)(SAVERESTOREDATA *, const char *, void *, TYPEDESCRIPTION *, int);
 
-#endif // PR_DLLS_H
+#endif // REHLDS_PR_DLLS_H
