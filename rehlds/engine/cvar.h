@@ -26,16 +26,13 @@
 *
 */
 
-#ifndef CVAR_H
-#define CVAR_H
-#ifdef _WIN32
 #pragma once
-#endif
+#ifndef REHLDS_CVAR_H
+#define REHLDS_CVAR_H
 
 #include "maintypes.h"
 #include "cvardef.h"
 #include "FileSystem.h"
-
 
 #define MAX_CVAR_VALUE 1024
 
@@ -68,4 +65,4 @@ NOXREF int Cvar_CountServerVariables(void);
 void Cvar_UnlinkExternals(void);
 void Cvar_CmdInit(void);
 
-#endif // CVAR_H
+#endif // REHLDS_CVAR_H

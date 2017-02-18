@@ -26,11 +26,9 @@
 *
 */
 
-#ifndef HASHPAK_H
-#define HASHPAK_H
-#ifdef _WIN32
 #pragma once
-#endif
+#ifndef REHLDS_HASHPAK_H
+#define REHLDS_HASHPAK_H
 
 #include "maintypes.h"
 #include "custom.h"
@@ -102,4 +100,4 @@ void HPAK_CheckSize(char *pakname);
 void HPAK_ValidatePak(char *fullpakname);
 void HPAK_CheckIntegrity(char *pakname);
 
-#endif // HASHPAK_H
+#endif // REHLDS_HASHPAK_H

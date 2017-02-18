@@ -26,11 +26,9 @@
 *
 */
 
-#ifndef DECAL_H
-#define DECAL_H
-#ifdef _WIN32
 #pragma once
-#endif
+#ifndef REHLDS_DECAL_H
+#define REHLDS_DECAL_H
 
 #include "maintypes.h"
 #include "model.h"
@@ -100,4 +98,4 @@ qboolean Draw_CacheLoadFromCustom(char *clean, cachewad_t *wad, void *raw, int r
 NOXREF int Draw_CacheIndex(cachewad_t *wad, char *path);
 NOXREF int Draw_CacheFindIndex(cachewad_t *wad, char *path);
 
-#endif // DECAL_H
+#endif // REHLDS_DECAL_H

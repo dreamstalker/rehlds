@@ -26,11 +26,9 @@
 *
 */
 
-#ifndef ZONE_H
-#define ZONE_H
-#ifdef _WIN32
 #pragma once
-#endif
+#ifndef REHLDS_ZONE_H
+#define REHLDS_ZONE_H
 
 #include "maintypes.h"
 
@@ -107,4 +105,4 @@ void Memory_Init(void *buf, int size);
 NOXREF NOBODY void Cache_Print_Models_And_Totals(void);
 NOXREF NOBODY void Cache_Print_Sounds_And_Totals(void);
 
-#endif // ZONE_H
+#endif // REHLDS_ZONE_H

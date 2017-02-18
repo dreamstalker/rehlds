@@ -26,11 +26,9 @@
 *
 */
 
-#ifndef TMESSAGE_H
-#define TMESSAGE_H
-#ifdef _WIN32
 #pragma once
-#endif
+#ifndef REHLDS_TMESSAGE_H
+#define REHLDS_TMESSAGE_H
 
 #include "maintypes.h"
 
@@ -84,4 +82,4 @@ NOXREF void TextMessageShutdown(void);
 NOXREF void TextMessageInit(void);
 NOXREF client_textmessage_t *TextMessageGet(const char *pName);
 
-#endif // TMESSAGE_H
+#endif // REHLDS_TMESSAGE_H

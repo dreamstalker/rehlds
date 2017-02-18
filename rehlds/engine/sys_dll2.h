@@ -26,11 +26,9 @@
 *
 */
 
-#ifndef SYS_DLL2_H
-#define SYS_DLL2_H
-#ifdef _WIN32
 #pragma once
-#endif
+#ifndef REHLDS_SYS_DLL2_H
+#define REHLDS_SYS_DLL2_H
 
 #include "maintypes.h"
 #include "interface.h"
@@ -121,4 +119,4 @@ void ClearIOStates();
 // TODO: Needs rechecking
 //NOXREF int BuildMapCycleListHints(char **hints);
 
-#endif // SYS_DLL2_H
+#endif // REHLDS_SYS_DLL2_H

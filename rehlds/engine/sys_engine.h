@@ -27,7 +27,8 @@
 */
 
 #pragma once
-
+#ifndef REHLDS_SYS_ENGINE_H
+#define REHLDS_SYS_ENGINE_H
 
 #include "maintypes.h"
 #include "igame.h"
@@ -99,3 +100,5 @@ public:
 	int GetQuitting_noVirt();
 	void SetQuitting_noVirt(int quittype);
 };
+
+#endif // REHLDS_SYS_ENGINE_H

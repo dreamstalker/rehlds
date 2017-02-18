@@ -27,6 +27,8 @@
 */
 
 #pragma once
+#ifndef REHLDS_IGAME_H
+#define REHLDS_IGAME_H
 
 #include "maintypes.h"
 
@@ -50,3 +52,5 @@ public:
 	virtual void SetCursorVisible(bool bState) = 0;
 
 };
+
+#endif // REHLDS_IGAME_H

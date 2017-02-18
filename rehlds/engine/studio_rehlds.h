@@ -14,7 +14,11 @@
 *    along with this program; if not, write to the Free Software Foundation,
 *    Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
+
 #pragma once
+#ifndef REHLDS_STUDIO_REHLDS_H
+#define REHLDS_STUDIO_REHLDS_H
+
 #include "studio.h"
 #include "model.h"
 #include "r_studioint.h"
@@ -105,3 +109,5 @@ void R_StudioAccumulateBoneVerts(vec_t *mins, vec_t *maxs, int *vertcount, vec_t
 int R_StudioComputeBounds(unsigned char *pBuffer, float *mins, float *maxs);
 int R_GetStudioBounds(const char *filename, float *mins, float *maxs);
 void R_ResetSvBlending(void);
+
+#endif // REHLDS_STUDIO_REHLDS_H

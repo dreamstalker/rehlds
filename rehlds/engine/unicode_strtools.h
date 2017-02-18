@@ -26,11 +26,9 @@
 *
 */
 
-#ifndef UNICODE_STR_TOOLS_H
-#define UNICODE_STR_TOOLS_H
-#ifdef _WIN32
 #pragma once
-#endif
+#ifndef REHLDS_UNICODE_STRTOOLS_H
+#define REHLDS_UNICODE_STRTOOLS_H
 
 #include "maintypes.h"
 
@@ -65,4 +63,4 @@ qboolean Q_StripUnprintableAndSpace(char *pch);;
 qboolean V_UTF8ToUChar32(const char *pUTF8_, uchar32 *uValueOut);
 int Q_UnicodeRepair(char *pUTF8);
 
-#endif // UNICODE_STR_TOOLS_H
+#endif // REHLDS_UNICODE_STRTOOLS_H

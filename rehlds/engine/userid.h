@@ -26,7 +26,10 @@
 *
 */
 
-
 #pragma once
+#ifndef REHLDS_USERID_H
+#define REHLDS_USERID_H
 
 #include "userid_rehlds.h"
+
+#endif // REHLDS_USERID_H

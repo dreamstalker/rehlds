@@ -26,11 +26,9 @@
 *
 */
 
-#ifndef SERVER_H
-#define SERVER_H
-#ifdef _WIN32
 #pragma once
-#endif
+#ifndef REHLDS_SERVER_H
+#define REHLDS_SERVER_H
 
 #include "maintypes.h"
 
@@ -81,6 +79,7 @@
 #define MSG_FL_ONE				BIT(7)	// Send to single client
 
 #define RESOURCE_INDEX_BITS 12
+
 #ifdef REHLDS_FIXES
 #define RESOURCE_MAX_COUNT  (1 << RESOURCE_INDEX_BITS)
 #endif // REHLDS_FIXES
@@ -805,4 +804,4 @@ int GetGameAppID(void);
 qboolean IsGameSubscribed(const char *gameName);
 NOXREF qboolean BIsValveGame(void);
 
-#endif // SERVER_H
+#endif // REHLDS_SERVER_H

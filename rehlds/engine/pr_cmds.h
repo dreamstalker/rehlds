@@ -26,11 +26,9 @@
 *
 */
 
-#ifndef PR_CMDS_H
-#define PR_CMDS_H
-#ifdef _WIN32
 #pragma once
-#endif
+#ifndef REHLDS_PR_CMDS_H
+#define REHLDS_PR_CMDS_H
 
 #include "maintypes.h"
 #include "const.h"
@@ -39,9 +37,9 @@
 #include "common.h"
 #include "server.h"
 
-
 #define MAX_RANDOM_RANGE 0x7FFFFFFFUL
 
+// TODO: Make enum with bits
 #define AMBIENT_SOUND_STATIC			0	// medium radius attenuation
 #define AMBIENT_SOUND_EVERYWHERE		1
 #define AMBIENT_SOUND_SMALLRADIUS		2
@@ -216,4 +214,4 @@ void QueryClientCvarValue2(const edict_t *player, const char *cvarName, int requ
 int hudCheckParm(char *parm, char **ppnext);
 int EngCheckParm(const char *pchCmdLineToken, char **pchNextVal);
 
-#endif // PR_CMDS_H
+#endif // REHLDS_PR_CMDS_H

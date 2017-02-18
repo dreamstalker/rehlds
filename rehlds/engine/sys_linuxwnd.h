@@ -27,6 +27,8 @@
 */
 
 #pragma once
+#ifndef REHLDS_SYS_LINUXWND_H
+#define REHLDS_SYS_LINUXWND_H
 
 #include "maintypes.h"
 #include "igame.h"
@@ -71,3 +73,5 @@ public:
 	void PlayAVIAndWait_noVirt(const char *aviFile);
 	void SetCursorVisible_noVirt(bool bState);
 };
+
+#endif // REHLDS_SYS_LINUXWND_H

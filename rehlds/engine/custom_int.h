@@ -12,10 +12,17 @@
 *   without written permission from Valve LLC.
 *
 ****/
+
 // Customization.h
+
 #pragma once
+#ifndef REHLDS_CUSTOM_INT_H
+#define REHLDS_CUSTOM_INT_H
+
 #include "custom.h"
 
 void		COM_ClearCustomizationList( struct customization_s *pHead, qboolean bCleanDecals);
 qboolean	COM_CreateCustomization( struct customization_s *pListHead, struct resource_s *pResource, int playernumber, int flags, struct customization_s **pCustomization, int *nLumps ); 
 int			COM_SizeofResourceList ( struct resource_s *pList, struct resourceinfo_s *ri );
+
+#endif // REHLDS_CUSTOM_INT_H

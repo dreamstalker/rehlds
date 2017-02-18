@@ -26,11 +26,9 @@
 *
 */
 
-#ifndef L_STUDIO_H
-#define L_STUDIO_H
-#ifdef _WIN32
 #pragma once
-#endif
+#ifndef REHLDS_L_STUDIO_H
+#define REHLDS_L_STUDIO_H
 
 #include "maintypes.h"
 #include "studio_rehlds.h"
@@ -47,7 +45,6 @@
 
 //extern int giTextureSize;
 
-
 void Mod_LoadStudioModel(model_t * mod, void * buffer);
 
-#endif // L_STUDIO_H
+#endif // REHLDS_L_STUDIO_H

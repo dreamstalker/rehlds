@@ -26,17 +26,14 @@
 *
 */
 
-#ifndef PMOVETST_H
-#define PMOVETST_H
-#ifdef _WIN32
 #pragma once
-#endif
+#ifndef REHLDS_PMOVETST_H
+#define REHLDS_PMOVETST_H
 
 #include "maintypes.h"
 #include "pm_defs.h"
 #include "model.h"
 #include "world.h"
-
 
 #ifdef HOOK_ENGINE
 #define g_contentsresult (*pg_contentsresult)
@@ -49,8 +46,6 @@ extern int g_contentsresult;
 extern hull_t box_hull_0;
 extern box_clipnodes_t box_clipnodes_0;
 extern box_planes_t box_planes_0;
-
-
 
 float PM_TraceModel(physent_t *pEnt, vec_t *start, vec_t *end, trace_t *trace);
 void PM_GetModelBounds(struct model_s *mod, vec_t *mins, vec_t *maxs);
@@ -74,4 +69,4 @@ struct pmtrace_s *PM_TraceLine(float *start, float *end, int flags, int usehull,
 struct pmtrace_s *PM_TraceLineEx(float *start, float *end, int flags, int usehull, int(*pfnIgnore)(physent_t *));
 qboolean PM_RecursiveHullCheck(hull_t *hull, int num, float p1f, float p2f, const vec_t *p1, const vec_t *p2, pmtrace_t *trace);
 
-#endif // PMOVETST_H
+#endif // REHLDS_PMOVETST_H

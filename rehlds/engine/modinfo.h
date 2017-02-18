@@ -26,11 +26,9 @@
 *
 */
 
-#ifndef MODINFO_H
-#define MODINFO_H
-#ifdef _WIN32
 #pragma once
-#endif
+#ifndef REHLDS_MODINFO_H
+#define REHLDS_MODINFO_H
 
 #include "maintypes.h"
 
@@ -57,4 +55,4 @@ typedef struct modinfo_s
 	qboolean clientcrccheck;
 } modinfo_t;
 
-#endif // MODINFO_H
+#endif // REHLDS_MODINFO_H

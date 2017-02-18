@@ -26,11 +26,9 @@
 *
 */
 
-#ifndef CLIENT_H
-#define CLIENT_H
-#ifdef _WIN32
 #pragma once
-#endif
+#ifndef REHLDS_CLIENT_H
+#define REHLDS_CLIENT_H
 
 #include "maintypes.h"
 #include "common.h"
@@ -352,4 +350,4 @@ void RegisterTutorMessageShown(int mid);
 void ResetTutorMessageDecayData(void);
 void SetCareerAudioState(int state);
 
-#endif // CLIENT_H
+#endif // REHLDS_CLIENT_H

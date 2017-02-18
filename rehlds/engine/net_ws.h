@@ -26,11 +26,9 @@
 *
 */
 
-#ifndef NET_WS_H
-#define NET_WS_H
-#ifdef _WIN32
 #pragma once
-#endif
+#ifndef REHLDS_NET_WS_H
+#define REHLDS_NET_WS_H
 
 #include "maintypes.h"
 #include "enums.h"
@@ -270,4 +268,4 @@ void NET_Shutdown(void);
 qboolean NET_JoinGroup(netsrc_t sock, netadr_t& addr);
 qboolean NET_LeaveGroup(netsrc_t sock, netadr_t& addr);
 
-#endif // NET_WS_H
+#endif // REHLDS_NET_WS_H

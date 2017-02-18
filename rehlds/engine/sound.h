@@ -26,11 +26,9 @@
 *
 */
 
-#ifndef SOUND_H
-#define SOUND_H
-#ifdef _WIN32
 #pragma once
-#endif
+#ifndef REHLDS_SOUND_H
+#define REHLDS_SOUND_H
 
 #include "quakedef.h"
 
@@ -70,4 +68,4 @@ void Voice_Deinit();
 void Voice_Idle(float frametime);
 qboolean Voice_RecordStop();
 
-#endif // SOUND_H
+#endif // REHLDS_SOUND_H

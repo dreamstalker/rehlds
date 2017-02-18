@@ -26,11 +26,9 @@
 *
 */
 
-#ifndef IENGINE_H
-#define IENGINE_H
-#ifdef _WIN32
 #pragma once
-#endif
+#ifndef REHLDS_IENGINE_H
+#define REHLDS_IENGINE_H
 
 #include "maintypes.h"
 
@@ -70,4 +68,4 @@ public:
 
 extern IEngine *eng;
 
-#endif // IENGINE_H
+#endif // REHLDS_IENGINE_H

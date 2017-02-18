@@ -26,11 +26,9 @@
 *
 */
 
-#ifndef SERVER_STATIC_H
-#define SERVER_STATIC_H
-#ifdef _WIN32
 #pragma once
-#endif
+#ifndef REHLDS_SERVER_STATIC_H
+#define REHLDS_SERVER_STATIC_H
 
 #include "maintypes.h"
 #include "netadr.h"
@@ -76,4 +74,4 @@ typedef struct server_static_s
 	qboolean isSecure;
 } server_static_t;
 
-#endif // SERVER_STATIC_H
+#endif // REHLDS_SERVER_STATIC_H

@@ -26,11 +26,9 @@
 *
 */
 
-#ifndef PMOVE_H
-#define PMOVE_H
-#ifdef _WIN32
 #pragma once
-#endif
+#ifndef REHLDS_PMOVE_H
+#define REHLDS_PMOVE_H
 
 #include "maintypes.h"
 #include "cvar.h"
@@ -62,4 +60,4 @@ qboolean PM_AddToTouched(pmtrace_t tr, vec_t *impactvelocity);
 void PM_StuckTouch(int hitent, pmtrace_t *ptraceresult);
 void PM_Init(playermove_t *ppm);
 
-#endif // PMOVE_H
+#endif // REHLDS_PMOVE_H

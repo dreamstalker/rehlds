@@ -26,11 +26,9 @@
 *
 */
 
-#ifndef FILTER_H
-#define FILTER_H
-#ifdef _WIN32
 #pragma once
-#endif
+#ifndef REHLDS_FILTER_H
+#define REHLDS_FILTER_H
 
 #include "userid.h"
 
@@ -63,4 +61,4 @@ typedef struct userfilter_s
 	float banTime;
 } userfilter_t;
 
-#endif // FILTER_H
+#endif // REHLDS_FILTER_H

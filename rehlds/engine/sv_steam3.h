@@ -26,11 +26,9 @@
 *
 */
 
-#ifndef SV_STEAM3_H
-#define SV_STEAM3_H
-#ifdef _WIN32
 #pragma once
-#endif
+#ifndef REHLDS_SV_STEAM3_H
+#define REHLDS_SV_STEAM3_H
 
 #include "maintypes.h"
 #include "common.h"
@@ -168,4 +166,4 @@ CSteam3Client *Steam3Client();
 void Master_SetMaster_f();
 void Steam_HandleIncomingPacket(byte *data, int len, int fromip, uint16 port);
 
-#endif // SV_STEAM3_H
+#endif // REHLDS_SV_STEAM3_H

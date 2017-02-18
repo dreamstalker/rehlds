@@ -26,17 +26,15 @@
 *
 */
 
-#ifndef INFO__H
-#define INFO__H
-#ifdef _WIN32
 #pragma once
-#endif
+#ifndef REHLDS_INFO_H
+#define REHLDS_INFO_H
 
 #include "maintypes.h"
 
-
 // Max key/value length (with a NULL char)
 #define MAX_KV_LEN 127
+
 // Key + value + 2 x slash + NULL
 #define MAX_INFO_STRING 256
 
@@ -61,4 +59,4 @@ qboolean Info_IsValid(const char *s);
 void Info_CollectFields(char *destInfo, const char *srcInfo, const char *collectedKeysOfFields);
 #endif
 
-#endif // INFO__H
+#endif // REHLDS_INFO_H

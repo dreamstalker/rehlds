@@ -26,11 +26,9 @@
 *
 */
 
-#ifndef HOST_H
-#define HOST_H
-#ifdef _WIN32
 #pragma once
-#endif
+#ifndef REHLDS_HOST_H
+#define REHLDS_HOST_H
 
 #include "maintypes.h"
 #include "filesystem_internal.h"
@@ -151,4 +149,4 @@ void Host_Version(void);
 int Host_Init(quakeparms_t *parms);
 void Host_Shutdown(void);
 
-#endif // HOST_H
+#endif // REHLDS_HOST_H

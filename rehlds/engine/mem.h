@@ -26,12 +26,9 @@
 *
 */
 
-#ifndef MEM__H
-#define MEM__H
-#ifdef _WIN32
 #pragma once
-#endif
-
+#ifndef REHLDS_MEM_H
+#define REHLDS_MEM_H
 
 void *Mem_Malloc(size_t size);
 void *Mem_ZeroMalloc(size_t size);
@@ -40,4 +37,4 @@ void *Mem_Calloc(int num, size_t size);
 char *Mem_Strdup(const char *strSource);
 void Mem_Free(void *p);
 
-#endif // MEM__H
+#endif // REHLDS_MEM_H
