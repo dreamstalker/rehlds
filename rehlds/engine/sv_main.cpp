@@ -4722,10 +4722,16 @@ qboolean SV_SendClientDatagram(client_t *client)
 
 void SV_UpdateUserInfo(client_t *client)
 {
+#ifndef REHLDS_FIXES
 	client->sendinfo = FALSE;
 	client->sendinfo_time = realtime + 1.0;
+#endif
 	SV_ExtractFromUserinfo(client);
 	SV_SendFullClientUpdateForAll(client);
+#ifdef REHLDS_FIXES
+	client->sendinfo = FALSE;
+	client->sendinfo_time = realtime + 1.0;
+#endif
 }
 
 void SV_UpdateToReliableMessages(void)
