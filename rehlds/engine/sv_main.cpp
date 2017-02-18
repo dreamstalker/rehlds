@@ -6639,7 +6639,11 @@ void Host_Kick_f(void)
 
 	if (Cmd_Argc() <= 1)
 	{
+#ifdef REHLDS_FIXES
+		Con_Printf("usage:  kick < name > | < # userid > [reason]\n");
+#else
 		Con_Printf("usage:  kick < name > | < # userid >\n");
+#endif
 		return;
 	}
 
