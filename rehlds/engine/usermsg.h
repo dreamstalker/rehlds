@@ -26,11 +26,7 @@
 *
 */
 
-#ifndef USERMSG_H
-#define USERMSG_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #include "maintypes.h"
 #include "quakedef.h"
@@ -43,5 +39,3 @@ typedef struct _UserMsg
 	struct _UserMsg *next;
 	pfnUserMsgHook pfn;
 } UserMsg;
-
-#endif // USERMSG_H

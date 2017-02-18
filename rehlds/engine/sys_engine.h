@@ -28,7 +28,6 @@
 
 #pragma once
 
-
 #include "maintypes.h"
 #include "igame.h"
 #include "iengine.h"

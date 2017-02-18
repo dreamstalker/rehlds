@@ -26,16 +26,11 @@
 *
 */
 
-#ifndef NET_CHAN_H
-#define NET_CHAN_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #include "maintypes.h"
 #include "cvar.h"
 #include "net.h"
-
 
 #ifdef HOOK_ENGINE
 
@@ -62,8 +57,6 @@ extern cvar_t net_drawslider;
 extern cvar_t net_chokeloopback;
 extern cvar_t sv_filetransfercompression;
 extern cvar_t sv_filetransfermaxsize;
-
-
 
 void Netchan_UnlinkFragment(fragbuf_t *buf, fragbuf_t **list);
 void Netchan_OutOfBand(netsrc_t sock, netadr_t adr, int length, byte *data);
@@ -100,5 +93,3 @@ NOXREF void Netchan_UpdateProgress(netchan_t *chan);
 void Netchan_Init(void);
 NOXREF qboolean Netchan_CompressPacket(sizebuf_t *chan);
 NOXREF qboolean Netchan_DecompressPacket(sizebuf_t *chan);
-
-#endif // NET_CHAN_H

@@ -26,11 +26,7 @@
 *
 */
 
-#ifndef TRACEINIT_H
-#define TRACEINIT_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #include "utlvector.h"
 
@@ -79,5 +75,3 @@ extern CInitTracker g_InitTracker;
 
 void TraceInit(const char *i, const char *s, int listnum);
 void TraceShutdown(const char *s, int listnum);
-
-#endif // TRACEINIT_H

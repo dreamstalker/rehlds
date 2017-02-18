@@ -1,4 +1,3 @@
-#pragma once
 /*
 *
 *    This program is free software; you can redistribute it and/or modify it
@@ -26,6 +25,9 @@
 *    version.
 *
 */
+
+#pragma once
+
 #include "common_rehlds.h"
 #include "bspfile.h"
 #include "FileSystem.h"

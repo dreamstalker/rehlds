@@ -26,11 +26,7 @@
 *
 */
 
-#ifndef WAD_H
-#define WAD_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #include "maintypes.h"
 
@@ -87,5 +83,3 @@ void *W_GetLumpName(int wad, char *name);
 NOXREF void *W_GetLumpNum(int wad, int num);
 void W_Shutdown(void);
 void SwapPic(qpic_t *pic);
-
-#endif // WAD_H

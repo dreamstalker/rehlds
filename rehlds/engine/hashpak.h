@@ -26,11 +26,7 @@
 *
 */
 
-#ifndef HASHPAK_H
-#define HASHPAK_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #include "maintypes.h"
 #include "custom.h"
@@ -101,5 +97,3 @@ NOXREF char *HPAK_GetItem(int item);
 void HPAK_CheckSize(char *pakname);
 void HPAK_ValidatePak(char *fullpakname);
 void HPAK_CheckIntegrity(char *pakname);
-
-#endif // HASHPAK_H

@@ -26,11 +26,7 @@
 *
 */
 
-#ifndef ZONE_H
-#define ZONE_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #include "maintypes.h"
 
@@ -106,5 +102,3 @@ void *Cache_Alloc(cache_user_t *c, int size, char *name);
 void Memory_Init(void *buf, int size);
 NOXREF NOBODY void Cache_Print_Models_And_Totals(void);
 NOXREF NOBODY void Cache_Print_Sounds_And_Totals(void);
-
-#endif // ZONE_H

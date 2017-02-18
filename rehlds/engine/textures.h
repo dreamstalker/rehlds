@@ -26,11 +26,7 @@
 *
 */
 
-#ifndef TEXTURES_H
-#define TEXTURES_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #include "maintypes.h"
 #include "wad.h"
@@ -80,5 +76,3 @@ void TEX_CleanupWadInfo(void);
 int TEX_LoadLump(char *name, unsigned char *dest);
 int FindMiptex(char *name);
 void TEX_AddAnimatingTextures(void);
-
-#endif // TEXTURES_H

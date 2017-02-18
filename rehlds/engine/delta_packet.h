@@ -26,11 +26,7 @@
 *
 */
 
-#ifndef DELTA_PACKET_H
-#define DELTA_PACKET_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #include "entity_state.h"
 
@@ -40,5 +36,3 @@ typedef struct packet_entities_s
 	unsigned char flags[32];
 	entity_state_t *entities;
 } packet_entities_t;
-
-#endif // DELTA_PACKET_H

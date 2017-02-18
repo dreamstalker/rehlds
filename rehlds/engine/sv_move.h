@@ -26,11 +26,7 @@
 *
 */
 
-#ifndef SV_MOVE_H
-#define SV_MOVE_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #include "maintypes.h"
 #include "server.h"
@@ -58,5 +54,3 @@ NOXREF qboolean SV_CloseEnough(edict_t *ent, edict_t *goal, float dist);
 NOXREF qboolean SV_ReachedGoal(edict_t *ent, vec_t *vecGoal, float flDist);
 void SV_NewChaseDir2(edict_t *actor, vec_t *vecGoal, float dist);
 void SV_MoveToOrigin_I(edict_t *ent, const float *pflGoal, float dist, int iStrafe);
-
-#endif // SV_MOVE_H
