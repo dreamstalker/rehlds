@@ -730,7 +730,7 @@ qboolean PM_RecursiveHullCheck(hull_t *hull, int num, float p1f, float p2f, cons
 		return 0;
 	}
 
-	while (1)
+	while (true)
 	{
 		midf = (float)(midf - 0.05);
 		if (midf < 0.0)
@@ -773,7 +773,7 @@ qboolean PM_RecursiveHullCheck(hull_t *hull, int num, float p1f, float p2f, cons
 
 	float DIST_EPSILON = 0.03125f;
 
-	while (1)
+	while (true)
 	{
 		if (num < 0)
 		{
@@ -896,7 +896,7 @@ qboolean PM_RecursiveHullCheck(hull_t *hull, int num, float p1f, float p2f, cons
 			return 0;
 		}
 
-		while (1)
+		while (true)
 		{
 			midf = (float)(midf - 0.05);
 			if (midf < 0.0)
@@ -923,7 +923,5 @@ qboolean PM_RecursiveHullCheck(hull_t *hull, int num, float p1f, float p2f, cons
 		Con_DPrintf("Trace backed up past 0.0.\n");
 		return 0;
 	}
-
-	return 0;
 }
 #endif // REHLDS_OPT_PEDANTIC
