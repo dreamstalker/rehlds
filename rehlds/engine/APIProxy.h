@@ -910,12 +910,13 @@ typedef struct modfuncs_s
 	int m_nVoid9;
 } modfuncs_t;
 
-
-#define k_nEngineVersion15Base		0
-#define k_nEngineVersion15Patch		1
-#define k_nEngineVersion16Base		2
-#define k_nEngineVersion16Validated	3		// 1.6 engine with built-in validation
-
+enum
+{
+	k_nEngineVersion15Base	= 0,
+	k_nEngineVersion15Patch,
+	k_nEngineVersion16Base,
+	k_nEngineVersion16Validated	// 1.6 engine with built-in validation
+};
 
 typedef struct validator_s
 {

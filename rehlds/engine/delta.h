@@ -32,15 +32,19 @@
 
 #define DELTA_MAX_FIELDS		56		// 7*8
 
-#define DT_BYTE				BIT(0)		// A byte
-#define DT_SHORT			BIT(1)		// 2 byte field
-#define DT_FLOAT			BIT(2)		// A floating point field
-#define DT_INTEGER			BIT(3)		// 4 byte integer
-#define DT_ANGLE			BIT(4)		// A floating point angle
-#define DT_TIMEWINDOW_8			BIT(5)		// A floating point timestamp relative to server time
-#define DT_TIMEWINDOW_BIG		BIT(6)		// A floating point timestamp relative to server time (with more precision and custom multiplier)
-#define DT_STRING			BIT(7)		// A null terminated string, sent as 8 byte chars
-#define DT_SIGNED			BIT(31)		// sign modificator
+enum
+{
+	DT_BYTE				= BIT(0),	// A byte
+	DT_SHORT			= BIT(1),	// 2 byte field
+	DT_FLOAT			= BIT(2),	// A floating point field
+	DT_INTEGER			= BIT(3),	// 4 byte integer
+	DT_ANGLE			= BIT(4),	// A floating point angle
+	DT_TIMEWINDOW_8		= BIT(5),	// A floating point timestamp relative to server time
+	DT_TIMEWINDOW_BIG	= BIT(6),	// A floating point timestamp relative to server time (with more precision and custom multiplier)
+	DT_STRING			= BIT(7),	// A null terminated string, sent as 8 byte chars
+	
+	DT_SIGNED			= BIT(31)	// sign modificator
+};
 
 #define FDT_MARK			BIT(0)		// Delta mark for sending
 

@@ -40,9 +40,12 @@ cachewad_t ad_wad;
 mod_known_info_t mod_known_info[MAX_KNOWN_MODELS];
 
 // values for model_t's needload
-#define NL_PRESENT	0
-#define NL_NEEDS_LOADED	1
-#define NL_UNREFERENCED	2
+enum
+{
+	NL_PRESENT = 0,
+	NL_NEEDS_LOADED,
+	NL_UNREFERENCED
+};
 
 void SW_Mod_Init(void)
 {

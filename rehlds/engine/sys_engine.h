@@ -32,9 +32,8 @@
 #include "igame.h"
 #include "iengine.h"
 
-// sleep time when not focus
-#define NOT_FOCUS_SLEEP	50
-#define MINIMIZED_SLEEP 20
+const int MINIMIZED_SLEEP = 20;
+const int NOT_FOCUS_SLEEP = 50;	// sleep time when not focus
 
 #ifdef HOOK_ENGINE
 #define game (*pgame)

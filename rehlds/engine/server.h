@@ -59,22 +59,28 @@
 #define DEFAULT_SOUND_PACKET_PITCH			100
 
 // Sound flags
-#define SND_FL_VOLUME			BIT(0)	// send volume
-#define SND_FL_ATTENUATION		BIT(1)	// send attenuation
-#define SND_FL_LARGE_INDEX		BIT(2)	// send sound number as short instead of byte
-#define SND_FL_PITCH			BIT(3)	// send pitch
-#define SND_FL_SENTENCE			BIT(4)	// set if sound num is actually a sentence num
-#define SND_FL_STOP				BIT(5)	// stop the sound
-#define SND_FL_CHANGE_VOL		BIT(6)	// change sound vol
-#define SND_FL_CHANGE_PITCH		BIT(7)	// change sound pitch
-#define SND_FL_SPAWNING			BIT(8)	// we're spawning, used in some cases for ambients (not sent across network)
+enum
+{
+	SND_FL_VOLUME			= BIT(0),	// send volume
+	SND_FL_ATTENUATION		= BIT(1),	// send attenuation
+	SND_FL_LARGE_INDEX		= BIT(2),	// send sound number as short instead of byte
+	SND_FL_PITCH			= BIT(3),	// send pitch
+	SND_FL_SENTENCE			= BIT(4),	// set if sound num is actually a sentence num
+	SND_FL_STOP				= BIT(5),	// stop the sound
+	SND_FL_CHANGE_VOL		= BIT(6),	// change sound vol
+	SND_FL_CHANGE_PITCH		= BIT(7),	// change sound pitch
+	SND_FL_SPAWNING			= BIT(8)	// we're spawning, used in some cases for ambients (not sent across network)
+};
 
 // Message send destination flags
-#define MSG_FL_NONE				0		// No flags
-#define MSG_FL_BROADCAST		BIT(0)	// Broadcast?
-#define MSG_FL_PVS				BIT(1)	// Send to PVS
-#define MSG_FL_PAS				BIT(2)	// Send to PAS
-#define MSG_FL_ONE				BIT(7)	// Send to single client
+enum
+{
+	MSG_FL_NONE			= 0,		// No flags
+	MSG_FL_BROADCAST	= BIT(0),	// Broadcast?
+	MSG_FL_PVS			= BIT(1),	// Send to PVS
+	MSG_FL_PAS			= BIT(2),	// Send to PAS
+	MSG_FL_ONE			= BIT(7),	// Send to single client
+};
 
 #define RESOURCE_INDEX_BITS 12
 
