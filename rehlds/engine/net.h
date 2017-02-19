@@ -82,7 +82,13 @@
 #define M2A_CHALLENGE			's'	// + challenge value
 
 // 0 == regular, 1 == file stream
-#define MAX_STREAMS		2
+enum
+{
+	FRAG_NORMAL_STREAM = 0,
+	FRAG_FILE_STREAM,
+	
+	MAX_STREAMS
+};
 
 // Flow control bytes per second limits
 #define MAX_RATE		100000.0f
@@ -214,10 +220,13 @@ typedef enum clc_commands_e
 	clc_endoflist = 255,
 } clc_commands_t;
 
-#define MAX_FLOWS 2
-
-#define FLOW_OUTGOING 0
-#define FLOW_INCOMING 1
+enum
+{
+	FLOW_OUTGOING = 0,
+	FLOW_INCOMING,
+	
+	MAX_FLOWS
+};
 
 // Message data
 typedef struct flowstats_s
@@ -267,9 +276,6 @@ typedef struct flow_s
 
 #define UDP_HEADER_SIZE 28
 #define MAX_RELIABLE_PAYLOAD 1200
-
-#define FRAG_NORMAL_STREAM	0
-#define FRAG_FILE_STREAM	1
 
 #define MAKE_FRAGID(id,count)	( ( ( id & 0xffff ) << 16 ) | ( count & 0xffff ) )
 #define FRAG_GETID(fragid)		( ( fragid >> 16 ) & 0xffff )

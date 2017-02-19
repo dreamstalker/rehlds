@@ -32,8 +32,11 @@ extern "C" {
 
 typedef int HSPRITE_t;	// handle to a graphic
 
-#define SCRINFO_SCREENFLASH 1
-#define SCRINFO_STRETCHED	2
+enum
+{
+	SCRINFO_SCREENFLASH = 1,
+	SCRINFO_STRETCHED
+};
 
 typedef struct SCREENINFO_s
 {

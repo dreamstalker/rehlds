@@ -31,12 +31,12 @@
 #include "maintypes.h"
 #include "model.h"
 
-// up / down
-#define	PITCH	0
-// left / right
-#define	YAW		1
-// fall over
-#define	ROLL	2
+enum
+{
+	PITCH = 0,	// up / down
+	YAW,		// left / right
+	ROLL		// fall over
+};
 
 #define RAD2DEG(x)	((float)(x) * (float)(180.f / M_PI))
 #define DEG2RAD(x)	((float)(x) * (float)(M_PI / 180.f))

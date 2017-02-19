@@ -37,14 +37,17 @@
 
 #define MAX_RANDOM_RANGE 0x7FFFFFFFUL
 
-// TODO: Make enum with bits
-#define AMBIENT_SOUND_STATIC			0	// medium radius attenuation
-#define AMBIENT_SOUND_EVERYWHERE		1
-#define AMBIENT_SOUND_SMALLRADIUS		2
-#define AMBIENT_SOUND_MEDIUMRADIUS		4
-#define AMBIENT_SOUND_LARGERADIUS		8
-#define AMBIENT_SOUND_START_SILENT		16
-#define AMBIENT_SOUND_NOT_LOOPING		32
+// Ambient sound flags
+enum
+{
+	AMBIENT_SOUND_STATIC		= 0,	// medium radius attenuation
+	AMBIENT_SOUND_EVERYWHERE	= BIT(0),
+	AMBIENT_SOUND_SMALLRADIUS	= BIT(1),
+	AMBIENT_SOUND_MEDIUMRADIUS	= BIT(2),
+	AMBIENT_SOUND_LARGERADIUS	= BIT(3),
+	AMBIENT_SOUND_START_SILENT	= BIT(4),
+	AMBIENT_SOUND_NOT_LOOPING	= BIT(5)
+};
 
 #define SPEAKER_START_SILENT			1	// wait for trigger 'on' to start announcements
 
@@ -88,8 +91,11 @@ extern vec3_t vec_origin;
 
 extern int r_visframecount;
 
-#define GROUP_OP_AND	0
-#define GROUP_OP_NAND	1
+enum
+{
+	GROUP_OP_AND = 0,
+	GROUP_OP_NAND
+};
 
 void PF_makevectors_I(const float *rgflVector);
 float PF_Time(void);
