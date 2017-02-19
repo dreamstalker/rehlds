@@ -2530,7 +2530,7 @@ struct Frontend
 #endif
 	void rcl(const Reg8& dst, const Reg8& shift)	{AppendInstr(I_RCL, 0xD2, 0, Imm8(2), RW(dst), Dummy(R(shift),cl));}
 	void rcl(const Mem8& dst, const Reg8& shift)	{AppendInstr(I_RCL, 0xD2, 0, Imm8(2), RW(dst), Dummy(R(shift),cl));}
- 	void rcl(const Reg8& dst, const Imm8& shift)	{shift.GetImm() == 1 ? AppendInstr(I_RCL, 0xD0, 0, Imm8(2), RW(dst)) : AppendInstr(I_RCL, 0xC0, 0, Imm8(2), RW(dst), shift);}
+	void rcl(const Reg8& dst, const Imm8& shift)	{shift.GetImm() == 1 ? AppendInstr(I_RCL, 0xD0, 0, Imm8(2), RW(dst)) : AppendInstr(I_RCL, 0xC0, 0, Imm8(2), RW(dst), shift);}
 	void rcl(const Mem8& dst, const Imm8& shift)	{shift.GetImm() == 1 ? AppendInstr(I_RCL, 0xD0, 0, Imm8(2), RW(dst)) : AppendInstr(I_RCL, 0xC0, 0, Imm8(2), RW(dst), shift);}
 	void rcr(const Reg8& dst, const Reg8& shift)	{AppendInstr(I_RCR, 0xD2, 0, Imm8(3), RW(dst), Dummy(R(shift),cl));}
 	void rcr(const Mem8& dst, const Reg8& shift)	{AppendInstr(I_RCR, 0xD2, 0, Imm8(3), RW(dst), Dummy(R(shift),cl));}
