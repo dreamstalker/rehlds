@@ -14,9 +14,9 @@ TEST(IsSafeFileExtension, SecurityChecks, 1000)
 		{"radio/go.wav", true},
 		{"radio/go.WAV", true},
 		{"textures.wad", true},
-		{"!QWERTY", true},
 #ifdef REHLDS_FIXES
-		{"file.dll2", true},
+		{"!QWERTY", true},
+		//{"file.dll2", true}, TODO
 #else
 		{"file.dll2", false},
 #endif
