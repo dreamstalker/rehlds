@@ -7327,7 +7327,10 @@ qboolean IsSafeFileToDownload(const char *filename)
 
 	first = Q_strchr(lwrfilename, '.');
 #ifdef REHLDS_FIXES
-	last = Q_strrchr(first, '.');
+	if(first)
+		last = Q_strrchr(first, '.');
+	else
+		last = nullptr;
 #else
 	last = Q_strrchr(lwrfilename, '.');
 #endif
@@ -7335,9 +7338,11 @@ qboolean IsSafeFileToDownload(const char *filename)
 	if (lwrfilename[0] == '/'
 		|| Q_strstr(lwrfilename, "\\")
 		|| Q_strstr(lwrfilename, ":")
+#ifndef REHLDS_FIXES // Redundant check
 		|| Q_strstr(lwrfilename, "..")
+#endif
 		|| Q_strstr(lwrfilename, "~")
-		|| first != last
+		|| first != last // This and below line make sure that dot count is always equal to one
 		|| !first
 		|| Q_strlen(first) != 4
 		|| Q_strstr(lwrfilename, "halflife.wad")
@@ -7353,8 +7358,8 @@ qboolean IsSafeFileToDownload(const char *filename)
 		|| Q_strcmp(first, ".dll") == 0
 		|| Q_strcmp(first, ".ini") == 0
 		|| Q_strcmp(first, ".log") == 0
-//		|| Q_strcmp(lwrfilename, ".so") == 0 // Extension length must be 4 to get here
-//		|| Q_strcmp(lwrfilename, ".dylib") == 0
+//		|| Q_strcmp(first, ".so") == 0 // We can't get here, because of extension length check
+//		|| Q_strcmp(first, ".dylib") == 0
 		|| Q_strcmp(first, ".sys") == 0)
 #else
 		|| Q_strstr(lwrfilename, ".cfg")
