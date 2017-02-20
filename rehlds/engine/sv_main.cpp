@@ -7303,7 +7303,7 @@ void SV_FailDownload(const char *filename)
 qboolean IsSafeFileToDownload(const char *filename)
 {
 	char *first;
-	char *last; // TODO: Why do we need first/last ?
+	char *last;
 
 	char lwrfilename[MAX_PATH];
 
@@ -7338,9 +7338,11 @@ qboolean IsSafeFileToDownload(const char *filename)
 	if (lwrfilename[0] == '/'
 		|| Q_strstr(lwrfilename, "\\")
 		|| Q_strstr(lwrfilename, ":")
+#ifndef REHLDS_FIXES // Redundant check
 		|| Q_strstr(lwrfilename, "..")
+#endif
 		|| Q_strstr(lwrfilename, "~")
-		|| first != last
+		|| first != last // This and above line make sure that dot count is always equal to one
 		|| !first
 		|| Q_strlen(first) != 4
 		|| Q_strstr(lwrfilename, "halflife.wad")
