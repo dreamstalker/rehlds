@@ -7327,7 +7327,10 @@ qboolean IsSafeFileToDownload(const char *filename)
 
 	first = Q_strchr(lwrfilename, '.');
 #ifdef REHLDS_FIXES
-	last = Q_strrchr(first, '.');
+	if(first)
+		last = Q_strrchr(first, '.');
+	else
+		last = nullptr;
 #else
 	last = Q_strrchr(lwrfilename, '.');
 #endif
