@@ -586,7 +586,7 @@ void Cmd_CvarList_f(void)
 		{
 			// Open log
 			int i;
-			for (i = 0; i < 100; i++)
+			for (i = 0; i < MAX_CVARLIST_FILES; i++)
 			{
 				Q_snprintf(szTemp, ARRAYSIZE(szTemp) - 1, "cvarlist%02d.txt", i);
 				szTemp[ARRAYSIZE(szTemp) - 1] = 0;
@@ -599,7 +599,7 @@ void Cmd_CvarList_f(void)
 				FS_Close(fp);
 			}
 
-			if (i >= 100)
+			if (i >= MAX_CVARLIST_FILES)
 			{
 				Con_Printf("Can't cvarlist! Too many existing cvarlist output files in the gamedir!\n");
 				return;
