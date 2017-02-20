@@ -7342,7 +7342,7 @@ qboolean IsSafeFileToDownload(const char *filename)
 		|| Q_strstr(lwrfilename, "..")
 #endif
 		|| Q_strstr(lwrfilename, "~")
-		|| first != last // This and above line make sure that dot count is always equal to one
+		|| first != last // This and below line make sure that dot count is always equal to one
 		|| !first
 		|| Q_strlen(first) != 4
 		|| Q_strstr(lwrfilename, "halflife.wad")
