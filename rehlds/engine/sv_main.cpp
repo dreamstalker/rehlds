@@ -7303,7 +7303,7 @@ void SV_FailDownload(const char *filename)
 qboolean IsSafeFileToDownload(const char *filename)
 {
 	char *first;
-	char *last;
+	char *last; // TODO: Why do we need first/last ?
 
 	char lwrfilename[MAX_PATH];
 
@@ -7356,8 +7356,8 @@ qboolean IsSafeFileToDownload(const char *filename)
 		|| Q_strcmp(first, ".dll") == 0
 		|| Q_strcmp(first, ".ini") == 0
 		|| Q_strcmp(first, ".log") == 0
-//		|| Q_strcmp(lwrfilename, ".so") == 0 // Extension length must be 4 to get here
-//		|| Q_strcmp(lwrfilename, ".dylib") == 0
+//		|| Q_strcmp(first, ".so") == 0 // Extension length must be 4 to get here
+//		|| Q_strcmp(first, ".dylib") == 0
 		|| Q_strcmp(first, ".sys") == 0)
 #else
 		|| Q_strstr(lwrfilename, ".cfg")
