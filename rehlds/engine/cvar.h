@@ -34,6 +34,15 @@
 
 #define MAX_CVAR_VALUE 1024
 
+#ifdef REHLDS_FIXES
+
+#define MAX_CVARLIST_FILES 100
+#if (MAX_CVARLIST_FILES < 0 || MAX_CVARLIST_FILES > 100) // Code in Cmd_CvarList_f handles only value between 0-99
+#error "MAX_CVARLIST_FILES value is out of bound"
+#endif
+ 
+#endif
+
 #ifdef HOOK_ENGINE
 #define cvar_vars (*pcvar_vars)
 #endif // HOOK_ENGINE
