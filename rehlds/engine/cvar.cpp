@@ -586,7 +586,7 @@ void Cmd_CvarList_f(void)
 		{
 			// Open log
 			int i;
-			for (i = 0; i < MAX_CVARLIST_FILES; i++)		
+			for (i = 0; i < MAX_CVARLIST_FILES; i++)	
 			{
 				Q_snprintf(szTemp, ARRAYSIZE(szTemp) - 1, "cvarlist%02d.txt", i);
 				szTemp[ARRAYSIZE(szTemp) - 1] = 0;
