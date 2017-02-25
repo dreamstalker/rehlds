@@ -518,8 +518,9 @@ void Host_Status_Printf(qboolean conprint, qboolean log, char *fmt, ...)
 {
 	va_list argptr;
 	char string[4096];
+#ifndef REHLDS_FIXES
 	char szfile[260];
-
+#endif
 	va_start(argptr, fmt);
 	vsprintf(string, fmt, argptr);
 	va_end(argptr);
@@ -531,8 +532,12 @@ void Host_Status_Printf(qboolean conprint, qboolean log, char *fmt, ...)
 
 	if (log)
 	{
+#ifdef REHLDS_FIXES
+		COM_Log("status.log", "%s", string);
+#else
 		Q_snprintf(szfile, sizeof(szfile), "%s", "status.log");
 		COM_Log(szfile, "%s", string);
+#endif
 	}
 }
 
