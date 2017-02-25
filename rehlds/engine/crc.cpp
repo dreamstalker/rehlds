@@ -554,6 +554,15 @@ BOOL MD5_Hash_File(unsigned char digest[16], char *pszFileName, BOOL bUsefopen, 
 
 char *MD5_Print(unsigned char hash[16])
 {
+#ifdef REHLDS_FIXES
+	static char szReturn[33]; // Maximum output is 32 characters
+	Q_snprintf(
+	szReturn, sizeof(szReturn), 
+	"%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x",
+	hash[0], hash[1], hash[2], hash[3], hash[4], hash[5], hash[6], hash[7],
+	hash[8], hash[9], hash[10], hash[11], hash[12], hash[13], hash[14], hash[15]	
+	);
+#else
 	static char szReturn[64];
 	char szChunk[10];
 	int i;
@@ -565,6 +574,6 @@ char *MD5_Print(unsigned char hash[16])
 		Q_snprintf(szChunk, sizeof(szChunk), "%02x", hash[i]);
 		Q_strncat(szReturn, szChunk, sizeof(szReturn) - Q_strlen(szReturn) - 1);
 	}
-
+#endif
 	return szReturn;
 }
