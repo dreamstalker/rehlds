@@ -1076,31 +1076,6 @@ DLL_EXPORT int NET_Sleep_Timeout(void)
 	fd_set fdset;
 	FD_ZERO(&fdset);
 
-	int number = 0;
-
-	for (int sock = 0; sock < 3; sock++)
-	{
-		SOCKET net_socket = ip_sockets[sock];
-		if (net_socket != INV_SOCK)
-		{
-			FD_SET(net_socket, &fdset);
-
-			if (number < net_socket)
-				number = net_socket;
-		}
-
-#ifdef _WIN32
-		net_socket = ipx_sockets[sock];
-		if (net_socket != INV_SOCK)
-		{
-			FD_SET(net_socket, &fdset);
-
-			if (number < net_socket)
-				number = net_socket;
-		}
-#endif // _WIN32
-	}
-
 	struct timeval tv;
 	tv.tv_sec = 0;
 	tv.tv_usec = (1000 / fps) * 1000; // TODO: entirely bad code, fix it completely
@@ -1110,6 +1085,30 @@ DLL_EXPORT int NET_Sleep_Timeout(void)
 	int res;
 	if (numFrames > 0 && numFrames % staggerFrames)
 	{
+		int number = 0;
+
+		for (int sock = 0; sock < 3; sock++)
+		{
+			SOCKET net_socket = ip_sockets[sock];
+			if (net_socket != INV_SOCK)
+			{
+				FD_SET(net_socket, &fdset);
+
+				if (number < net_socket)
+					number = net_socket;
+			}
+
+#ifdef _WIN32
+			net_socket = ipx_sockets[sock];
+			if (net_socket != INV_SOCK)
+			{
+				FD_SET(net_socket, &fdset);
+
+				if (number < net_socket)
+					number = net_socket;
+			}
+#endif // _WIN32
+		} 
 		res = select(number + 1, &fdset, 0, 0, &tv);
 	}
 	else
