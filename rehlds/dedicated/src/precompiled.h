@@ -11,12 +11,16 @@
 #include "engine_hlds_api.h"
 #include "idedicatedexports.h"
 #include "icommandline.h"
+#include "isys.h"
+#include "dll_state.h"
 
 #ifdef LAUNCHER_FIXES
 struct DLL_FUNCTIONS;
 #include "cvardef.h"
 #include "rehlds_api.h"
 #endif
+
+#include "dedicated.h"
 
 #include "sys_ded.h"
 #include "icommandline.h"
@@ -28,4 +32,6 @@ struct DLL_FUNCTIONS;
 
 #ifdef _WIN32
 	#include "conproc.h"
+#else
+	#include <signal.h>
 #endif // _WIN32

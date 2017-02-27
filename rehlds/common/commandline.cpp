@@ -321,30 +321,28 @@ const char *CCommandLine::CheckParm(const char *psz, char **ppszValue) const
 		return nullptr;
 
 	char *pret = strstr(m_pszCmdLine, psz);
-	if (!pret || !ppszValue)
-		return nullptr;
+	if (pret && ppszValue) {
+		*ppszValue = nullptr;
 
-	*ppszValue = nullptr;
+		// find the next whitespace
+		char *p1 = pret;
+		do {
+			++p1;
+		} while (*p1 != ' ' && *p1);
 
-	// find the next whitespace
-	char *p1 = pret;
-	do {
-		++p1;
-	} while (*p1 != ' ' && *p1);
+		int i = 0;
+		char *p2 = p1 + 1;
 
-	int i = 0;
-	char *p2 = p1 + 1;
+		do {
+			if (p2[i] == '\0' || p2[i] == ' ')
+				break;
 
-	do {
-		if (p2[i] == '\0' || p2[i] == ' ')
-			break;
+			sz[i++] = p2[i];
+		} while (i < sizeof(sz));
 
-		sz[i++] = p2[i];
+		sz[i] = '\0';
+		*ppszValue = sz;
 	}
-	while (i < sizeof(sz));
-
-	sz[i] = '\0';
-	*ppszValue = sz;
 	return pret;
 }
 
