@@ -17,10 +17,10 @@ TEST(IsSafeFileExtension, SecurityChecks, 1000)
 #ifdef REHLDS_FIXES
 		{"!QWERTY", true},
 		//{"file.dll2", true}, TODO
+		//{"noext", false},
 #else
 		{"file.dll2", false},
 #endif
-		{"noext", false},
 		{"/home/file.txt", false},
 		{"C:/Windows/file.txt", false},
 		{"models\\terror.mdl", false},
