@@ -1053,17 +1053,12 @@ qboolean NET_QueuePacket(netsrc_t sock)
 
 DLL_EXPORT int NET_Sleep_Timeout(void)
 {
-	fd_set fdset;
-	struct timeval tv;
-	int number;
-	int fps;
 	static int32 lasttime;
 	static int numFrames;
 	static int staggerFrames;
-	int32 curtime;
 
-	fps = (int)sys_ticrate.value;
-	curtime = (int)Sys_FloatTime();
+	int fps = (int)sys_ticrate.value;
+	int32 curtime = (int)Sys_FloatTime();
 	if (lasttime)
 	{
 		if (curtime - lasttime > 1)
@@ -1077,9 +1072,11 @@ DLL_EXPORT int NET_Sleep_Timeout(void)
 	{
 		lasttime = curtime;
 	}
-
+	
+	fd_set fdset;
 	FD_ZERO(&fdset);
-	number = 0;
+
+	int number = 0;
 
 	for (int sock = 0; sock < 3; sock++)
 	{
@@ -1104,8 +1101,9 @@ DLL_EXPORT int NET_Sleep_Timeout(void)
 #endif // _WIN32
 	}
 
+	struct timeval tv;
 	tv.tv_sec = 0;
-	tv.tv_usec = (1000 / fps) * 1000; // entirely bad code, later I will fix it completely
+	tv.tv_usec = (1000 / fps) * 1000; // TODO: entirely bad code, fix it completely
 	if (tv.tv_usec <= 0)
 		tv.tv_usec = 1;
 
