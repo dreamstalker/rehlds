@@ -16,11 +16,15 @@ TEST(IsSafeFileExtension, SecurityChecks, 1000)
 		{"textures.wad", true},
 #ifdef REHLDS_FIXES
 		{"!QWERTY", true},
-		//{"file.dll2", true}, TODO
+		// TODO:
+		//{"file.dll2", true},
 		//{"noext", false},
+		//{".hidden", false},
+		//{"subdir/.hidden", false},
 #else
 		{"file.dll2", false},
 #endif
+		{"../file.txt", false},
 		{"/home/file.txt", false},
 		{"C:/Windows/file.txt", false},
 		{"models\\terror.mdl", false},
