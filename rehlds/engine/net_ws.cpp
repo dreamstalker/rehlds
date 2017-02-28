@@ -2010,7 +2010,7 @@ void NET_Init(void)
 	Cvar_RegisterVariable(&net_scale);
 	Cvar_RegisterVariable(&net_graphpos);
 
-	if (COM_CheckParm("-netthread"))|
+	if (COM_CheckParm("-netthread"))
 	{
 		use_thread = 1;
 		Sys_Error("%s: -netthread is not reversed yet", __func__);
