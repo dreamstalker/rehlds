@@ -414,6 +414,9 @@
     <ClInclude Include="..\common\crc.h">
       <Filter>common</Filter>
     </ClInclude>
+    <ClInclude Include="..\common\md5.h">
+      <Filter>common</Filter>
+    </ClInclude>
     <ClInclude Include="..\common\cvardef.h">
       <Filter>common</Filter>
     </ClInclude>

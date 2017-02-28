@@ -72,6 +72,7 @@
 #include "vid_null.h"
 #include "l_studio.h"
 #include "crc.h"
+#include "md5.h"
 #include "sv_remoteaccess.h"
 #include "sv_upld.h"
 #include "com_custom.h"
