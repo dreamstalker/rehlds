@@ -5869,7 +5869,11 @@ void EXT_FUNC SV_ActivateServer_internal(int runPhysics)
 		}
 	}
 	HPAK_FlushHostQueue();
+#ifdef REHLDS_FIXES
 	if (Host_IsSinglePlayerGame())
+#else
+	if (g_psvs.maxclients <= 1)
+#endif
 		Con_DPrintf("Game Started\n");
 	else
 		Con_DPrintf("%i player server started\n",g_psvs.maxclients);
