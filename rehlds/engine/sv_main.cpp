@@ -6104,7 +6104,11 @@ int SV_SpawnServer(qboolean bIsDemo, char *server, char *startspot)
 	}
 	ContinueLoadingProgressBar("Server", 6, 0.0);
 
+#ifdef REHLDS_FIXES	
 	if (Host_IsSinglePlayerGame())
+#else
+	if (g_psvs.maxclients <= 1)
+#endif
 		g_psv.worldmapCRC = 0;
 	else
 	{
