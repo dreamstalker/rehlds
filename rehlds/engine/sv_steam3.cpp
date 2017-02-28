@@ -427,7 +427,7 @@ void CSteam3Server::RunFrame()
 #ifdef REHLDS_FIXES
 	if (Host_IsSinglePlayerGame())
 #else
-	g_psvs.maxclients <= 1
+	if(g_psvs.maxclients <= 1)
 #endif
 		return;
 
