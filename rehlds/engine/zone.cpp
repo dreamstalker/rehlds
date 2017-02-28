@@ -789,7 +789,11 @@ void Cache_Force_Flush(void)
 
 void Cache_Flush(void)
 {
+#ifdef REHLDS_FIXES
 	if (Host_IsSinglePlayerGame() || allow_cheats)
+#else
+	if (g_pcl.maxclients <= 1 || allow_cheats)
+#endif
 	{
 		Cache_Force_Flush();
 	}
