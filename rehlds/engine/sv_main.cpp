@@ -6004,8 +6004,11 @@ int SV_SpawnServer(qboolean bIsDemo, char *server, char *startspot)
 
 	pr_strings = gNullString;
 	gGlobalVariables.pStringBase = gNullString;
-
+#ifdef REHLDS_FIXES
 	if (Host_IsSinglePlayerGame())
+#else
+	if (g_psvs.maxclients == 1)
+#endif
 		Cvar_SetValue("sv_clienttrace", 1.0);
 
 	g_psv.max_edicts = COM_EntsForPlayerSlots(g_psvs.maxclients);
