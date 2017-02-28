@@ -5843,7 +5843,11 @@ void EXT_FUNC SV_ActivateServer_internal(int runPhysics)
 		if (!cl->fakeclient && (cl->active || cl->connected))
 		{
 			Netchan_Clear(&cl->netchan);
+#ifdef REHLDS_FIXES
 			if (!Host_IsSinglePlayerGame())
+#else
+			if (g_psvs.maxclients > 1)
+#endif
 			{
 				SV_BuildReconnect(&cl->netchan.message);
 				Netchan_Transmit(&cl->netchan, 0, NULL);
