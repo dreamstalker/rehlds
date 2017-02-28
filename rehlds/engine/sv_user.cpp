@@ -821,7 +821,13 @@ void SV_RunCmd(usercmd_t *ucmd, int random_seed)
 		sv_player->v.clbasevelocity[2] = sv_player->v.basevelocity[2];
 	}
 	pmove->server = 1;
+
+#ifdef REHLDS_FIXES
 	pmove->multiplayer = (qboolean)(!Host_IsSinglePlayerGame());
+#else
+	pmove->multiplayer = (qboolean)(g_psvs.maxclients > 1);
+#endif
+	
 	pmove->time = float(1000.0 * host_client->svtimebase);
 	pmove->usehull = (sv_player->v.flags & 0x4000) != 0;
 	pmove->maxspeed = sv_maxspeed.value;
