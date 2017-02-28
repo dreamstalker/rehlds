@@ -342,7 +342,14 @@ void SV_SendConsistencyList(sizebuf_t *msg)
 {
 	host_client->has_force_unmodified = FALSE;
 
-	if (Host_IsSinglePlayerGame() || mp_consistency.value == 0.0f || g_psv.num_consistency == 0 || host_client->proxy)
+
+	if (
+#ifdef REHLDS_FIXES
+		Host_IsSinglePlayerGame() 
+#else
+		g_psvs.maxclients == 1
+#endif	
+		|| mp_consistency.value == 0.0f || g_psv.num_consistency == 0 || host_client->proxy)
 	{
 		MSG_WriteBits(0, 1);
 		return;
