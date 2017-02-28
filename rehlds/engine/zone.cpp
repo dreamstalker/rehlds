@@ -789,7 +789,7 @@ void Cache_Force_Flush(void)
 
 void Cache_Flush(void)
 {
-	if (g_pcl.maxclients <= 1 || allow_cheats)
+	if (Host_IsSinglePlayerGame() || allow_cheats)
 	{
 		Cache_Force_Flush();
 	}

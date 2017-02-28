@@ -342,7 +342,7 @@ void SV_SendConsistencyList(sizebuf_t *msg)
 {
 	host_client->has_force_unmodified = FALSE;
 
-	if (g_psvs.maxclients == 1 || mp_consistency.value == 0.0f || g_psv.num_consistency == 0 || host_client->proxy)
+	if (Host_IsSinglePlayerGame() || mp_consistency.value == 0.0f || g_psv.num_consistency == 0 || host_client->proxy)
 	{
 		MSG_WriteBits(0, 1);
 		return;
@@ -814,7 +814,7 @@ void SV_RunCmd(usercmd_t *ucmd, int random_seed)
 		sv_player->v.clbasevelocity[2] = sv_player->v.basevelocity[2];
 	}
 	pmove->server = 1;
-	pmove->multiplayer = (qboolean)(g_psvs.maxclients > 1);
+	pmove->multiplayer = (qboolean)(!Host_IsSinglePlayerGame());
 	pmove->time = float(1000.0 * host_client->svtimebase);
 	pmove->usehull = (sv_player->v.flags & 0x4000) != 0;
 	pmove->maxspeed = sv_maxspeed.value;

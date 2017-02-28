@@ -313,7 +313,7 @@ void CSteam3Server::Activate()
 		}
 		else
 		{
-			if (!gfNoMasterServer && g_psvs.maxclients > 1)
+			if (!gfNoMasterServer && !Host_IsSinglePlayerGame())
 			{
 				CRehldsPlatformHolder::get()->SteamGameServer()->EnableHeartbeats(true);
 				double fMasterHeartbeatTimeout = 200.0;
@@ -419,7 +419,7 @@ void CSteam3Server::RunFrame()
 	static double s_fLastRunCallback;
 	static double s_fLastRunSendPackets;
 
-	if (g_psvs.maxclients <= 1)
+	if (Host_IsSinglePlayerGame())
 		return;
 
 	fCurTime = Sys_FloatTime();
