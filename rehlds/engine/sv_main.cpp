@@ -5815,7 +5815,11 @@ void EXT_FUNC SV_ActivateServer_internal(int runPhysics)
 	}
 	else
 	{
+#ifdef REHLDS_FIXES
 		if (Host_IsSinglePlayerGame())
+#else
+		if (g_psvs.maxclients <= 1)
+#endif
 		{
 			host_frametime = 0.1;
 			SV_Physics();
