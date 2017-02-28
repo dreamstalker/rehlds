@@ -32,7 +32,7 @@
 CRITICAL_SECTION net_cs;
 #endif // _WIN32
 
-qboolean \_initialized;
+qboolean net_thread_initialized;
 
 loopback_t loopbacks[2];
 packetlag_t g_pLagData[3];	// List of lag structures, if fakelag is set.
