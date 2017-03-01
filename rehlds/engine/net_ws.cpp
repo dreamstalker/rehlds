@@ -1053,17 +1053,12 @@ qboolean NET_QueuePacket(netsrc_t sock)
 
 DLL_EXPORT int NET_Sleep_Timeout(void)
 {
-	fd_set fdset;
-	struct timeval tv;
-	int number;
-	int fps;
 	static int32 lasttime;
 	static int numFrames;
 	static int staggerFrames;
-	int32 curtime;
 
-	fps = (int)sys_ticrate.value;
-	curtime = (int)Sys_FloatTime();
+	int fps = (int)sys_ticrate.value;
+	int32 curtime = (int)Sys_FloatTime();
 	if (lasttime)
 	{
 		if (curtime - lasttime > 1)
@@ -1077,41 +1072,43 @@ DLL_EXPORT int NET_Sleep_Timeout(void)
 	{
 		lasttime = curtime;
 	}
-
+	
+	fd_set fdset;
 	FD_ZERO(&fdset);
-	number = 0;
 
-	for (int sock = 0; sock < 3; sock++)
-	{
-		SOCKET net_socket = ip_sockets[sock];
-		if (net_socket != INV_SOCK)
-		{
-			FD_SET(net_socket, &fdset);
-
-			if (number < net_socket)
-				number = net_socket;
-		}
-
-#ifdef _WIN32
-		net_socket = ipx_sockets[sock];
-		if (net_socket != INV_SOCK)
-		{
-			FD_SET(net_socket, &fdset);
-
-			if (number < net_socket)
-				number = net_socket;
-		}
-#endif // _WIN32
-	}
-
+	struct timeval tv;
 	tv.tv_sec = 0;
-	tv.tv_usec = (1000 / fps) * 1000; // entirely bad code, later I will fix it completely
+	tv.tv_usec = (1000 / fps) * 1000; // TODO: entirely bad code, fix it completely
 	if (tv.tv_usec <= 0)
 		tv.tv_usec = 1;
 
 	int res;
 	if (numFrames > 0 && numFrames % staggerFrames)
 	{
+		int number = 0;
+
+		for (int sock = 0; sock < 3; sock++)
+		{
+			SOCKET net_socket = ip_sockets[sock];
+			if (net_socket != INV_SOCK)
+			{
+				FD_SET(net_socket, &fdset);
+
+				if (number < net_socket)
+					number = net_socket;
+			}
+
+#ifdef _WIN32
+			net_socket = ipx_sockets[sock];
+			if (net_socket != INV_SOCK)
+			{
+				FD_SET(net_socket, &fdset);
+
+				if (number < net_socket)
+					number = net_socket;
+			}
+#endif // _WIN32
+		} 
 		res = select(number + 1, &fdset, 0, 0, &tv);
 	}
 	else
