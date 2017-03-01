@@ -349,6 +349,9 @@
     <ClCompile Include="..\engine\sse_mathfun.cpp">
       <Filter>engine</Filter>
     </ClCompile>
+    <ClCompile Include="..\unittests\security_tests.cpp">
+      <Filter>unittests</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\hookers\memory.h">
