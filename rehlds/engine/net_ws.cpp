@@ -1164,7 +1164,7 @@ void NET_StartThread(void)
 		if (!net_thread_initialized)
 		{
 			net_thread_initialized = TRUE;
-			Sys_Error("%s: -net_thread is not reversed yet", __func__);
+			Sys_Error("%s: -netthread is not reversed yet", __func__);
 #ifdef _WIN32
 			/*
 			InitializeCriticalSection(&net_cs);
@@ -1174,7 +1174,7 @@ void NET_StartThread(void)
 				DeleteCriticalSection(&net_cs);
 				net_thread_initialized = 0;
 				use_thread = 0;
-				Sys_Error("%s: Couldn't initialize network thread, run without -net_thread\n", __func__);
+				Sys_Error("%s: Couldn't initialize network thread, run without -netthread\n", __func__);
 			}
 			*/
 #endif // _WIN32
@@ -1195,7 +1195,7 @@ void NET_StopThread(void)
 			*/
 #endif // _WIN32
 			net_thread_initialized = FALSE;
-			Sys_Error("%s: -net_thread is not reversed yet", __func__);
+			Sys_Error("%s: -netthread is not reversed yet", __func__);
 		}
 	}
 }
@@ -2008,8 +2008,10 @@ void NET_Init(void)
 	Cvar_RegisterVariable(&net_graphpos);
 
 	if (COM_CheckParm("-netthread"))
+	{
 		use_thread = 1;
-
+		Sys_Error("%s: -netthread is not reversed yet", __func__);
+	}
 	if (COM_CheckParm("-netsleep"))
 		net_sleepforever = 0;
 
