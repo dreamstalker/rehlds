@@ -1023,18 +1023,9 @@ void CheckGore(void)
 qboolean Host_IsSinglePlayerGame(void)
 {
 	if (g_psv.active)
-#ifdef REHLDS_FIXES
-		return g_psvs.maxclients <= 1;
-#else
 		return g_psvs.maxclients == 1;
-#endif
 	else
-#ifdef REHLDS_FIXES
-		return g_pcl.maxclients <= 1;
-#else
 		return g_pcl.maxclients == 1;
-#endif
-
 }
 
 qboolean Host_IsServerActive(void)
