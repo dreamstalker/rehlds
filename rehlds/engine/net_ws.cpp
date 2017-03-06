@@ -1066,7 +1066,7 @@ DLL_EXPORT int NET_Sleep_Timeout(void)
 	if (curtime - lasttime > 1)
 	{
 		acceleratedFrames = 0;
-		lasstime = curtime;
+		lasttime = curtime;
 	}
 
 	int fps = max(1, (int)sys_ticrate.value); // Prevent division to 0
