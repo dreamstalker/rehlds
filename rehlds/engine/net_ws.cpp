@@ -111,6 +111,9 @@ cvar_t net_graph = { "net_graph", "0", FCVAR_ARCHIVE, 0.0f, NULL };
 cvar_t net_graphwidth = { "net_graphwidth", "150", 0, 0.0f, NULL };
 cvar_t net_scale = { "net_scale", "5", FCVAR_ARCHIVE, 0.0f, NULL };
 cvar_t net_graphpos = { "net_graphpos", "1", FCVAR_ARCHIVE, 0.0f, NULL };
+#ifdef REHLDS_FIXES
+cvar_t sv_rehlds_max_accelerated_frames = { "sv_rehlds_max_accelerated_frames", "-1", 0, -1.0f, NULL };
+#endif
 
 #else // HOOK_ENGINE
 
@@ -1050,15 +1053,31 @@ qboolean NET_QueuePacket(netsrc_t sock)
 
 	return NET_GetLong(in_message.data, ret, &in_message.cursize);
 }
-
 DLL_EXPORT int NET_Sleep_Timeout(void)
 {
+#ifdef REHLDS_FIXES
+	static int64 lasttime = 0;
+	int64 curtime = (int)Sys_FloatTime();
+
+	if(!lasttime)
+		lasttime = curtime;
+
+	static int acceleratedFrames = 0;
+	if (curtime - lasttime > 1)
+	{
+		acceleratedFrames = 0;
+		lasstime = curtime;
+	}
+
+	int fps = max(1, (int)sys_ticrate.value); // Prevent division to 0
+#else
 	static int32 lasttime = 0;
 	static int numFrames = 0;
 	static int staggerFrames = 0;
 
 	int fps = (int)sys_ticrate.value;
 	int32 curtime = (int)Sys_FloatTime();
+
 	if (lasttime)
 	{
 		if (curtime - lasttime > 1)
@@ -1072,15 +1091,25 @@ DLL_EXPORT int NET_Sleep_Timeout(void)
 	{
 		lasttime = curtime;
 	}
+#endif
 
 	struct timeval tv;
 	tv.tv_sec = 0;
+#ifdef REHLDS_FIXES
+	tv.tv_usec = Q_clamp((1000 / fps) * 1000, 1, 1000000 - 1);
+#else
 	tv.tv_usec = (1000 / fps) * 1000; // TODO: entirely bad code, fix it completely
 	if (tv.tv_usec <= 0)
 		tv.tv_usec = 1;
+#endif
 
 	int res = 0;
+#ifdef REHLDS_FIXES
+	float maxAcceleratedFrames = sv_rehlds_max_accelerated_frames.value;
+	if (maxAcceleratedFrames < 0 ||acceleratedFrames <= maxAcceleratedFrames)
+#else
 	if (numFrames > 0 && numFrames % staggerFrames)
+#endif	
 	{
 		int number = 0;
 
@@ -1110,12 +1139,18 @@ DLL_EXPORT int NET_Sleep_Timeout(void)
 #endif // _WIN32
 		} 
 		res = select(number + 1, &fdset, NULL, NULL, &tv);
+#ifdef REHLDS_FIXES
+		if(res > 0) // -1 on error, greater zero if socket became readable
+			acceleratedFrames++;	
+#endif
 	}
 	else
 	{
 		res = select(0, NULL, NULL, NULL, &tv);
 	}
+#ifndef REHLDS_FIXES
 	--numFrames;
+#endif
 	return res;
 }
 
@@ -2006,6 +2041,9 @@ void NET_Init(void)
 	Cvar_RegisterVariable(&net_graphwidth);
 	Cvar_RegisterVariable(&net_scale);
 	Cvar_RegisterVariable(&net_graphpos);
+#ifdef REHLDS_FIXES
+	Cvar_RegisterVariable(&sv_rehlds_max_accelerated_frames);
+#endif
 
 	if (COM_CheckParm("-netthread"))
 	{
