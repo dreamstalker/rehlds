@@ -1056,8 +1056,8 @@ qboolean NET_QueuePacket(netsrc_t sock)
 DLL_EXPORT int NET_Sleep_Timeout(void)
 {
 #ifdef REHLDS_FIXES
-	static int64 lasttime = 0;
-	int64 curtime = (int)Sys_FloatTime();
+	static int32 lasttime = 0;
+	int32 curtime = (int32)Sys_FloatTime();
 
 	if(!lasttime)
 		lasttime = curtime;
@@ -1065,7 +1065,6 @@ DLL_EXPORT int NET_Sleep_Timeout(void)
 	static int acceleratedFrames = 0;
 	if (curtime - lasttime > 1)
 	{
-		Con_Prinf("I'm called once a sec!\n");
 		acceleratedFrames = 0;
 		lasttime = curtime;
 	}
@@ -1081,7 +1080,7 @@ DLL_EXPORT int NET_Sleep_Timeout(void)
 
 	if (lasttime)
 	{
-		if (curtime - lasttime > 1)
+		if (curtime - lasttime >= 1)
 		{
 			lasttime = curtime;
 			numFrames = fps;
@@ -1107,7 +1106,7 @@ DLL_EXPORT int NET_Sleep_Timeout(void)
 	int res = 0;
 #ifdef REHLDS_FIXES
 	float maxAcceleratedFrames = sv_rehlds_max_accelerated_frames.value;
-	if (maxAcceleratedFrames < 0 ||acceleratedFrames <= maxAcceleratedFrames)
+	if (maxAcceleratedFrames < 0 || acceleratedFrames <= maxAcceleratedFrames)
 #else
 	if (numFrames > 0 && numFrames % staggerFrames)
 #endif	
@@ -1139,10 +1138,15 @@ DLL_EXPORT int NET_Sleep_Timeout(void)
 			}
 #endif // _WIN32
 		} 
+#ifdef REHLDS_FIXES
+		auto previousUsec = tv.tv_usec; // select(...) changes tv variable to indicate that event happened before timeout
+#endif
 		res = select(number + 1, &fdset, NULL, NULL, &tv);
 #ifdef REHLDS_FIXES
-		if(res > 0) // -1 on error, greater zero if socket became readable
-			acceleratedFrames++;	
+		if(res > 0 && (previousUsec - tv.tv_usec > 1000) ) // res is greater zero if socket became readable
+		{
+			acceleratedFrames++;
+		}		
 #endif
 	}
 	else
