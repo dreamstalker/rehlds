@@ -1096,7 +1096,7 @@ DLL_EXPORT int NET_Sleep_Timeout(void)
 	struct timeval tv;
 	tv.tv_sec = 0;
 #ifdef REHLDS_FIXES
-	tv.tv_usec = Q_clamp( (1000.0f / fps ) * 1000.0f, 1, 1000000 - 1);
+	tv.tv_usec = Q_clamp( (1000 * 1000) / fps, 1, 1000000 - 1);
 #else
 	tv.tv_usec = (1000 / fps) * 1000; // DONE: entirely bad code, fix it completely
 	if (tv.tv_usec <= 0)
