@@ -1085,7 +1085,7 @@ DLL_EXPORT int NET_Sleep_Timeout(void)
 	int res;
 	if (numFrames > 0 && numFrames % staggerFrames)
 	{
-		int number = 0;
+		SOCKET number = 0;
 
 		for (int sock = 0; sock < 3; sock++)
 		{
@@ -1109,7 +1109,7 @@ DLL_EXPORT int NET_Sleep_Timeout(void)
 			}
 #endif // _WIN32
 		} 
-		res = select(number + 1, &fdset, 0, 0, &tv);
+		res = select((int)(number + 1), &fdset, 0, 0, &tv);
 	}
 	else
 	{
@@ -1123,7 +1123,7 @@ int NET_Sleep(void)
 {
 	fd_set fdset;
 	struct timeval tv;
-	int number;
+	SOCKET number;
 
 	FD_ZERO(&fdset);
 	number = 0;
@@ -1154,7 +1154,7 @@ int NET_Sleep(void)
 	tv.tv_sec = 0;
 	tv.tv_usec = 20 * 1000;
 
-	return select(number + 1, &fdset, 0, 0, net_sleepforever == 0 ? &tv : NULL);
+	return select((int)(number + 1), &fdset, 0, 0, net_sleepforever == 0 ? &tv : NULL);
 }
 
 void NET_StartThread(void)
