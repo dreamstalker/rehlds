@@ -172,20 +172,26 @@ void CTextConsole::ReceiveTab()
 	else
 	{
 		int nLongestCmd = 0;
+		int nSmallestCmd = 0;
 		int nCurrentColumn;
 		int nTotalColumns;
 		char szCommonCmd[256];//Should be enough.
 		char szFormatCmd[256];
-		char *pszLongestCmd;
+		char *pszSmallestCmd;
 		char *pszCurrentCmd = (char *)matches.GetFirst();
+		nSmallestCmd = strlen(pszCurrentCmd);
+		pszSmallestCmd = pszCurrentCmd;
 		while (pszCurrentCmd)
 		{
 			if ((int)strlen(pszCurrentCmd) > nLongestCmd)
 			{
 				nLongestCmd = strlen(pszCurrentCmd);
-				pszLongestCmd = pszCurrentCmd;
 			}
-
+			if ((int)strlen(pszCurrentCmd) < nSmallestCmd)
+			{
+				nSmallestCmd = strlen(pszCurrentCmd);
+				pszSmallestCmd = pszCurrentCmd;
+			}
 			pszCurrentCmd = (char *)matches.GetNext();
 		}
 
@@ -193,7 +199,7 @@ void CTextConsole::ReceiveTab()
 		nCurrentColumn = 0;
 
 		Echo("\n");
-		Q_strcpy(szCommonCmd, pszLongestCmd);
+		Q_strcpy(szCommonCmd, pszSmallestCmd);
 		// Would be nice if these were sorted, but not that big a deal
 		pszCurrentCmd = (char *)matches.GetFirst();
 		while (pszCurrentCmd)
