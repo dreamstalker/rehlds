@@ -718,3 +718,9 @@ void Cvar_CmdInit(void)
 {
 	Cmd_AddCommand("cvarlist", Cmd_CvarList_f);
 }
+
+
+cvar_t* EXT_FUNC Cvar_GetFirstCvar(void)
+{
+	return cvar_vars;
+}

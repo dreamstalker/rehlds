@@ -9,5 +9,8 @@ typedef void (*SleepType)(int msec);
 
 extern bool g_bVGui;
 extern IDedicatedServerAPI *engineAPI;
-
+#ifdef LAUNCHER_FIXES
+extern IRehldsApi *rehldsApi;
+extern const RehldsFuncs_t* rehldsFuncs;
+#endif
 #endif // DEDICATED_H

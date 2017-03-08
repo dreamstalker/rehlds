@@ -134,13 +134,36 @@ void CTextConsole::ReceiveBackspace()
 
 void CTextConsole::ReceiveTab()
 {
+#ifndef LAUNCHER_FIXES
 	if (!m_System)
 		return;
-
+#else
+	if (!rehldsFuncs || !m_nConsoleTextLen)
+	{
+		return;
+	}
+#endif
 	ObjectList matches;
 	m_szConsoleText[ m_nConsoleTextLen ] = '\0';
+#ifndef LAUNCHER_FIXES
 	m_System->GetCommandMatches(m_szConsoleText, &matches);
-
+#else
+	for (auto EngCmd = rehldsFuncs->Cmd_GetFirstCmd(); EngCmd; EngCmd = EngCmd->next)
+	{
+		if (!Q_strnicmp(EngCmd->name, m_szConsoleText, m_nConsoleTextLen))
+		{
+			matches.Add((void*)(EngCmd->name));
+		}
+	}
+	for (auto EngCvar = rehldsFuncs->Cvar_GetFirstCvar(); EngCvar; EngCvar = EngCvar->next)
+	{
+		if (!Q_strnicmp(EngCvar->name, m_szConsoleText, m_nConsoleTextLen))
+		{
+			matches.Add((void*)(EngCvar->name));
+		}
+	}
+	//TODO: 
+#endif
 	if (matches.IsEmpty())
 		return;
 

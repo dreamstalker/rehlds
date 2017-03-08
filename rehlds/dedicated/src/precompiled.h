@@ -11,10 +11,17 @@
 #include "idedicatedexports.h"
 #include "icommandline.h"
 
+#ifdef LAUNCHER_FIXES
+struct DLL_FUNCTIONS;
+#include "cvardef.h"
+#include "rehlds_api.h"
+#endif
+
 #include "sys_ded.h"
 #include "icommandline.h"
 #include "textconsole.h"
 #include "vgui/vguihelpers.h"
+
 
 #ifdef _WIN32
 	#include "conproc.h"
