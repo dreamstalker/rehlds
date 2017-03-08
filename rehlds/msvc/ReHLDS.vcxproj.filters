@@ -352,6 +352,9 @@
     <ClCompile Include="..\unittests\security_tests.cpp">
       <Filter>unittests</Filter>
     </ClCompile>
+    <ClCompile Include="..\engine\md5.cpp">
+      <Filter>engine\common</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\hookers\memory.h">

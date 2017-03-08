@@ -65,6 +65,7 @@
     <ClCompile Include="..\engine\ipratelimitWrapper.cpp" />
     <ClCompile Include="..\engine\l_studio.cpp" />
     <ClCompile Include="..\engine\mathlib.cpp" />
+    <ClCompile Include="..\engine\md5.cpp" />
     <ClCompile Include="..\engine\mem.cpp" />
     <ClCompile Include="..\engine\model.cpp" />
     <ClCompile Include="..\engine\module.cpp" />

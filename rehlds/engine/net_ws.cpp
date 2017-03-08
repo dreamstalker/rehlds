@@ -1111,7 +1111,7 @@ DLL_EXPORT int NET_Sleep_Timeout(void)
 	if (numFrames > 0 && numFrames % staggerFrames)
 #endif	
 	{
-		int number = 0;
+		SOCKET number = 0;
 
 		fd_set fdset;
 		FD_ZERO(&fdset);
@@ -1141,7 +1141,7 @@ DLL_EXPORT int NET_Sleep_Timeout(void)
 #ifdef REHLDS_FIXES
 		auto previousUsec = tv.tv_usec; // select(...) changes tv variable to indicate that event happened before timeout
 #endif
-		res = select(number + 1, &fdset, NULL, NULL, &tv);
+		res = select((int)number + 1, &fdset, NULL, NULL, &tv);
 #ifdef REHLDS_FIXES
 		if(res > 0 && (previousUsec - tv.tv_usec > 1000) ) // res is greater zero if socket became readable
 		{
@@ -1163,7 +1163,7 @@ int NET_Sleep(void)
 {
 	fd_set fdset;
 	struct timeval tv;
-	int number;
+	SOCKET number;
 
 	FD_ZERO(&fdset);
 	number = 0;
@@ -1194,7 +1194,7 @@ int NET_Sleep(void)
 	tv.tv_sec = 0;
 	tv.tv_usec = 20 * 1000;
 
-	return select(number + 1, &fdset, 0, 0, net_sleepforever == 0 ? &tv : NULL);
+	return select((int)(number + 1), &fdset, 0, 0, net_sleepforever == 0 ? &tv : NULL);
 }
 
 void NET_StartThread(void)
