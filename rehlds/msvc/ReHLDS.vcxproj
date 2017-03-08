@@ -597,63 +597,73 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v120_xp</PlatformToolset>
+     <PlatformToolset Condition="'$(VisualStudioVersion)' == '12.0'">v120_xp</PlatformToolset>
+     <PlatformToolset Condition="'$(VisualStudioVersion)' == '14.0'">v140_xp</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Swds|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v120_xp</PlatformToolset>
+     <PlatformToolset Condition="'$(VisualStudioVersion)' == '12.0'">v120_xp</PlatformToolset>
+     <PlatformToolset Condition="'$(VisualStudioVersion)' == '14.0'">v140_xp</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Play|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v120_xp</PlatformToolset>
+     <PlatformToolset Condition="'$(VisualStudioVersion)' == '12.0'">v120_xp</PlatformToolset>
+     <PlatformToolset Condition="'$(VisualStudioVersion)' == '14.0'">v140_xp</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Swds Play|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v120_xp</PlatformToolset>
+     <PlatformToolset Condition="'$(VisualStudioVersion)' == '12.0'">v120_xp</PlatformToolset>
+     <PlatformToolset Condition="'$(VisualStudioVersion)' == '14.0'">v140_xp</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Record|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v120_xp</PlatformToolset>
+     <PlatformToolset Condition="'$(VisualStudioVersion)' == '12.0'">v120_xp</PlatformToolset>
+     <PlatformToolset Condition="'$(VisualStudioVersion)' == '14.0'">v140_xp</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Tests|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v120_xp</PlatformToolset>
+     <PlatformToolset Condition="'$(VisualStudioVersion)' == '12.0'">v120_xp</PlatformToolset>
+     <PlatformToolset Condition="'$(VisualStudioVersion)' == '14.0'">v140_xp</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Test Fixes|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v120_xp</PlatformToolset>
+     <PlatformToolset Condition="'$(VisualStudioVersion)' == '12.0'">v120_xp</PlatformToolset>
+     <PlatformToolset Condition="'$(VisualStudioVersion)' == '14.0'">v140_xp</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v120_xp</PlatformToolset>
+     <PlatformToolset Condition="'$(VisualStudioVersion)' == '12.0'">v120_xp</PlatformToolset>
+     <PlatformToolset Condition="'$(VisualStudioVersion)' == '14.0'">v140_xp</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Play|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v120_xp</PlatformToolset>
+     <PlatformToolset Condition="'$(VisualStudioVersion)' == '12.0'">v120_xp</PlatformToolset>
+     <PlatformToolset Condition="'$(VisualStudioVersion)' == '14.0'">v140_xp</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Swds Play|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v120_xp</PlatformToolset>
+     <PlatformToolset Condition="'$(VisualStudioVersion)' == '12.0'">v120_xp</PlatformToolset>
+     <PlatformToolset Condition="'$(VisualStudioVersion)' == '14.0'">v140_xp</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
