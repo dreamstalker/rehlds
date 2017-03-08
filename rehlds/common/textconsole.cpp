@@ -148,20 +148,7 @@ void CTextConsole::ReceiveTab()
 #ifndef LAUNCHER_FIXES
 	m_System->GetCommandMatches(m_szConsoleText, &matches);
 #else
-	for (auto EngCmd = rehldsFuncs->Cmd_GetFirstCmd(); EngCmd; EngCmd = EngCmd->next)
-	{
-		if (!Q_strnicmp(EngCmd->name, m_szConsoleText, m_nConsoleTextLen))
-		{
-			matches.Add((void*)(EngCmd->name));
-		}
-	}
-	for (auto EngCvar = rehldsFuncs->Cvar_GetFirstCvar(); EngCvar; EngCvar = EngCvar->next)
-	{
-		if (!Q_strnicmp(EngCvar->name, m_szConsoleText, m_nConsoleTextLen))
-		{
-			matches.Add((void*)(EngCvar->name));
-		}
-	}
+	rehldsFuncs->GetCommandMatches(m_szConsoleText, &matches);
 #endif
 	if (matches.IsEmpty())
 		return;

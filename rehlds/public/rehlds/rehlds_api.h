@@ -33,6 +33,7 @@
 #include "FlightRecorder.h"
 #include "interface.h"
 #include "model.h"
+#include "ObjectList.h"
 
 #define REHLDS_API_VERSION_MAJOR 3
 #define REHLDS_API_VERSION_MINOR 2
@@ -283,8 +284,7 @@ struct RehldsFuncs_t {
 	void(*SV_UpdateUserInfo)(IGameClient *pGameClient);
 	bool(*StripUnprintableAndSpace)(char *pch);
 	void(*Cmd_RemoveCmd)(const char *cmd_name);
-	cmd_function_t*(*Cmd_GetFirstCmd)(void);
-	cvar_t* (*Cvar_GetFirstCvar)(void);
+	void(*GetCommandMatches)(const char *string, ObjectList *pMatchList);
 };
 
 class IRehldsApi {

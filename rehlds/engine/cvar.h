@@ -63,4 +63,3 @@ void Cmd_CvarList_f(void);
 NOXREF int Cvar_CountServerVariables(void);
 void Cvar_UnlinkExternals(void);
 void Cvar_CmdInit(void);
-cvar_t* EXT_FUNC Cvar_GetFirstCvar(void);
