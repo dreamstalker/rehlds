@@ -523,7 +523,7 @@ void Cmd_Alias_f(void)
 	a->value = CopyString(cmd);
 }
 
-struct cmd_function_s* EXT_FUNC Cmd_GetFirstCmd(void)
+struct cmd_function_s *Cmd_GetFirstCmd(void)
 {
 	return cmd_functions;
 }

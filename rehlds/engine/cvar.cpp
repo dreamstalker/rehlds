@@ -718,4 +718,3 @@ void Cvar_CmdInit(void)
 {
 	Cmd_AddCommand("cvarlist", Cmd_CvarList_f);
 }
-
