@@ -283,7 +283,7 @@ struct RehldsFuncs_t {
 	void(*SV_UpdateUserInfo)(IGameClient *pGameClient);
 	bool(*StripUnprintableAndSpace)(char *pch);
 	void(*Cmd_RemoveCmd)(const char *cmd_name);
-	struct cmd_function_s*(*Cmd_GetFirstCmd)(void);
+	cmd_function_t*(*Cmd_GetFirstCmd)(void);
 	cvar_t* (*Cvar_GetFirstCvar)(void);
 };
 
