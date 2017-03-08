@@ -162,7 +162,6 @@ void CTextConsole::ReceiveTab()
 			matches.Add((void*)(EngCvar->name));
 		}
 	}
-	//TODO: 
 #endif
 	if (matches.IsEmpty())
 		return;
