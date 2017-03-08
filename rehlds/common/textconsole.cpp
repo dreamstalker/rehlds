@@ -174,12 +174,17 @@ void CTextConsole::ReceiveTab()
 		int nLongestCmd = 0;
 		int nCurrentColumn;
 		int nTotalColumns;
-
+		char szCommonCmd[256];//Should be enough.
+		char szFormatCmd[256];
+		char *pszLongestCmd;
 		char *pszCurrentCmd = (char *)matches.GetFirst();
 		while (pszCurrentCmd)
 		{
 			if ((int)strlen(pszCurrentCmd) > nLongestCmd)
+			{
 				nLongestCmd = strlen(pszCurrentCmd);
+				pszLongestCmd = pszCurrentCmd;
+			}
 
 			pszCurrentCmd = (char *)matches.GetNext();
 		}
@@ -188,13 +193,11 @@ void CTextConsole::ReceiveTab()
 		nCurrentColumn = 0;
 
 		Echo("\n");
-
+		Q_strcpy(szCommonCmd, pszLongestCmd);
 		// Would be nice if these were sorted, but not that big a deal
 		pszCurrentCmd = (char *)matches.GetFirst();
-
 		while (pszCurrentCmd)
 		{
-			char szFormatCmd[256];
 			if (++nCurrentColumn > nTotalColumns)
 			{
 				Echo("\n");
@@ -203,17 +206,25 @@ void CTextConsole::ReceiveTab()
 
 			_snprintf(szFormatCmd, sizeof(szFormatCmd), "%-*s ", nLongestCmd, pszCurrentCmd);
 			Echo(szFormatCmd);
-
+			for (char *pCur = pszCurrentCmd, *pCommon = szCommonCmd; (*pCur&&*pCommon); pCur++, pCommon++)
+			{
+				if (*pCur != *pCommon)
+				{
+					*pCommon = 0;
+					break;
+				}
+			}
 			pszCurrentCmd = (char *)matches.GetNext();
 		}
 
 		Echo("\n");
-		Echo(m_szConsoleText);
+		if (Q_strcmp(szCommonCmd, m_szConsoleText))
+		{
+			Q_strcpy(m_szConsoleText, szCommonCmd);
+			m_nConsoleTextLen = Q_strlen(szCommonCmd);	
+		}
 
-		// TODO:
-		// Tack on 'common' chars in all the matches, i.e. if I typed 'con' and all the
-		// matches begin with 'connect_' then print the matches but also complete the
-		// command up to that point at least.
+		Echo(m_szConsoleText);
 	}
 
 	m_nCursorPosition = m_nConsoleTextLen;
