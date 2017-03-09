@@ -1,3 +1,5 @@
+#include "precompiled.h"
+
 #if !defined(_WIN32)
 
 #include "TextConsoleUnix.h"
@@ -15,7 +17,7 @@ CTextConsoleUnix console;
 
 CTextConsoleUnix::~CTextConsoleUnix()
 {
-	ShutDown();
+	CTextConsoleUnix::ShutDown();
 }
 
 bool CTextConsoleUnix::Init(IBaseSystem *system)
@@ -76,8 +78,8 @@ void CTextConsoleUnix::ShutDown()
 {
 	sigset_t block_ttou;
 
- 	sigemptyset(&block_ttou);
- 	sigaddset(&block_ttou, SIGTTOU);
+	sigemptyset(&block_ttou);
+	sigaddset(&block_ttou, SIGTTOU);
 	sigprocmask(SIG_BLOCK, &block_ttou, NULL);
 	tcsetattr(STDIN_FILENO, TCSANOW, &termStored);
 	sigprocmask(SIG_UNBLOCK, &block_ttou, NULL);
