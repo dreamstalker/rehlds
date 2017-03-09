@@ -1,3 +1,5 @@
+#include "precompiled.h"
+
 #ifdef _WIN32
 #include "SteamAppStartup.h"
 
