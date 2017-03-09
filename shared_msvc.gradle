@@ -119,5 +119,22 @@ rootProject.ext.createMsvcConfig = { boolean release, BinaryKind binKind ->
 		}
 	}
 
+	// Detect and setup UCRT paths
+    def ucrtInfo = "getucrtinfo.bat".execute().text
+	def m = ucrtInfo =~ /^(.*)\r\n(.*)?$/
+	if (!m.find()) {
+		return cfg
+	}
+	def kitPath = m.group(1)
+	def ucrtVersion = m.group(2)
+	def ucrtCheckFile = new File("${kitPath}Include/${ucrtVersion}/ucrt/stdio.h");
+	if (!ucrtCheckFile.exists()) {
+		return cfg
+	}
+
+	cfg.compilerOptions.args "/FS", "/I${kitPath}Include/${ucrtVersion}/ucrt";
+	cfg.linkerOptions.args("/LIBPATH:${kitPath}Lib/${ucrtVersion}/ucrt/x86");
+
 	return cfg
 }
+
