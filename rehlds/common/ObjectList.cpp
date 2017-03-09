@@ -1,4 +1,4 @@
-#include "ObjectList.h"
+#include "precompiled.h"
 
 ObjectList::ObjectList()
 {
@@ -8,7 +8,7 @@ ObjectList::ObjectList()
 
 ObjectList::~ObjectList()
 {
-	Clear(false);
+	ObjectList::Clear(false);
 }
 
 bool ObjectList::AddHead(void *newObject)

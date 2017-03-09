@@ -87,16 +87,34 @@ model {
 						srcDir "src"
 						include "**/*.cpp"
 						exclude "precompiled.cpp"
-
 						if (GradleCppUtils.windows) {
 							exclude "sys_linux.cpp"
 						} else {
 							exclude "sys_window.cpp", "conproc.cpp"
 						}
 					}
-
 					exportedHeaders {
 						srcDirs "vgui"
+					}
+				}
+				dedicated_common(CppSourceSet) {
+					source {
+						srcDir "../common"
+						include "ObjectList.cpp"
+						include "SteamAppStartUp.cpp"
+						include "textconsole.cpp"
+						if (GradleCppUtils.windows) {
+							include "TextConsoleWin32.cpp"
+						}
+						else {
+							include "TextConsoleUnix.cpp"
+						}
+					}
+				}
+				dedicated_engine(CppSourceSet) {
+					source {
+						srcDir "../engine"
+						include "mem.cpp"
 					}
 				}
 				dedicated_pch(CppSourceSet) {
@@ -105,7 +123,6 @@ model {
 						include "precompiled.cpp"
 					}
 				}
-
 				rc {
 					source {
 						srcDir "msvc"

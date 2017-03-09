@@ -1,8 +1,4 @@
-﻿#include <stdio.h>
-#include <port.h>
-
-#include "textconsole.h"
-#include "ObjectList.h"
+﻿#include "precompiled.h"
 
 bool CTextConsole::Init(IBaseSystem *system)
 {

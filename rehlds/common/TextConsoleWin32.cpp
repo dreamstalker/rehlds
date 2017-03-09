@@ -1,5 +1,6 @@
+#include "precompiled.h"
+
 #if defined(_WIN32)
-#include "TextConsoleWin32.h"
 
 CTextConsoleWin32 console;
 
@@ -46,7 +47,7 @@ HWND GetConsoleHwnd()
 
 CTextConsoleWin32::~CTextConsoleWin32()
 {
-	ShutDown();
+	CTextConsoleWin32::ShutDown();
 }
 
 bool CTextConsoleWin32::Init(IBaseSystem *system)
@@ -56,7 +57,7 @@ bool CTextConsoleWin32::Init(IBaseSystem *system)
 
 	SetTitle(m_System ? m_System->GetName() : "Console");
 
-  	hinput = GetStdHandle(STD_INPUT_HANDLE);
+	hinput = GetStdHandle(STD_INPUT_HANDLE);
 	houtput = GetStdHandle(STD_OUTPUT_HANDLE);
 
 	if (!SetConsoleCtrlHandler(&ConsoleHandlerRoutine, TRUE))

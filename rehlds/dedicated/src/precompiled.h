@@ -6,6 +6,7 @@
 #include "FileSystem.h"
 
 #include "common.h"
+#include "mem.h"
 
 #include "engine_hlds_api.h"
 #include "idedicatedexports.h"
@@ -22,6 +23,8 @@ struct DLL_FUNCTIONS;
 #include "textconsole.h"
 #include "vgui/vguihelpers.h"
 
+#include "IObjectContainer.h"
+#include "ObjectList.h"
 
 #ifdef _WIN32
 	#include "conproc.h"
