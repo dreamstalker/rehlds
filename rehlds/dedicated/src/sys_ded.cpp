@@ -8,6 +8,10 @@ bool gbAppHasBeenTerminated = false;
 
 CSysModule *g_pEngineModule = nullptr;
 IDedicatedServerAPI *engineAPI = nullptr;
+#ifdef LAUNCHER_FIXES
+IRehldsApi *rehldsApi = nullptr;
+const RehldsFuncs_t* rehldsFuncs = nullptr;
+#endif
 
 IFileSystem *g_pFileSystemInterface = nullptr;
 CSysModule *g_pFileSystemModule = nullptr;
@@ -92,8 +96,23 @@ int RunServer()
 		RunVGUIFrame();
 
 		if (engineFactory)
+		{
 			engineAPI = (IDedicatedServerAPI *)engineFactory(VENGINE_HLDS_API_VERSION, NULL);
-
+#ifdef LAUNCHER_FIXES
+			rehldsApi = (IRehldsApi *)engineFactory(VREHLDS_HLDS_API_VERSION, NULL);
+			if (rehldsApi)
+			{
+				if (rehldsApi->GetMajorVersion() != REHLDS_API_VERSION_MAJOR || rehldsApi->GetMinorVersion() < REHLDS_API_VERSION_MINOR)
+				{
+					rehldsApi = nullptr;
+				}
+				else
+				{
+					rehldsFuncs = rehldsApi->GetFuncs();
+				}
+			}
+#endif
+		}
 		RunVGUIFrame();
 		if (!engineAPI)
 			return -1;

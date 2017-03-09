@@ -158,6 +158,29 @@ void EXT_FUNC Rehlds_RegisterPluginApi(const char *name, void *impl) {
 	api->impl = impl;
 }
 
+void EXT_FUNC GetCommandMatches_api(const char *string, ObjectList *pMatchList)
+{
+	if (!string || !string[0])
+	{
+		return;
+	}
+	auto TextLen = Q_strlen(string);
+	for (auto EngCmd = Cmd_GetFirstCmd(); EngCmd; EngCmd = EngCmd->next)
+	{
+		if (!Q_strnicmp(EngCmd->name, string, TextLen))
+		{
+			pMatchList->Add((void*)(EngCmd->name));
+		}
+	}
+	for (auto EngCvar = GetCvarVars_api(); EngCvar; EngCvar = EngCvar->next)
+	{
+		if (!Q_strnicmp(EngCvar->name, string, TextLen))
+		{
+			pMatchList->Add((void*)(EngCvar->name));
+		}
+	}
+}
+
 CRehldsServerStatic g_RehldsServerStatic;
 CRehldsServerData g_RehldsServerData;
 CRehldsHookchains g_RehldsHookchains;
@@ -211,7 +234,8 @@ RehldsFuncs_t g_RehldsApiFuncs =
 	&SV_EmitSound2_api,
 	&SV_UpdateUserInfo_api,
 	&StripUnprintableAndSpace_api,
-	&Cmd_RemoveCmd
+	&Cmd_RemoveCmd,
+	&GetCommandMatches_api
 };
 
 bool EXT_FUNC SV_EmitSound2_internal(edict_t *entity, IGameClient *pReceiver, int channel, const char *sample, float volume, float attenuation, int flags, int pitch, int emitFlags, const float *pOrigin)
