@@ -10,6 +10,7 @@ import org.gradle.nativeplatform.NativeExecutableBinarySpec
 apply plugin: 'cpp'
 apply plugin: 'windows-resources'
 apply plugin: IccCompilerPlugin
+apply plugin: GccCompilerPlugin
 
 List<Task> getRcCompileTasks(NativeBinarySpec binary)
 {
@@ -70,9 +71,11 @@ model {
 	}
 
 	toolChains {
-		visualCpp(VisualCpp) {
-		}
-		icc(Icc) {
+		visualCpp(VisualCpp)
+		if (project.hasProperty("useGcc")) {
+			gcc(Gcc)
+		} else {
+			icc(Icc)
 		}
 	}
 
