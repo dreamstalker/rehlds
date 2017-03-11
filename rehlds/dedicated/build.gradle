@@ -20,6 +20,8 @@ List<Task> getRcCompileTasks(NativeBinarySpec binary)
 }
 
 void setupToolchain(NativeBinarySpec b) {
+	boolean useGcc = project.hasProperty("useGcc")
+
 	def cfg = rootProject.createToolchainConfig(b);
 	cfg.projectInclude(project, '/src', '/../engine', '/../common', '/../public', '/../public/rehlds');
 
