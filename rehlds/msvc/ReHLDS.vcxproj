@@ -499,6 +499,8 @@
     <ClInclude Include="..\public\rehlds\hookchains.h" />
     <ClInclude Include="..\public\rehlds\keydefs.h" />
     <ClInclude Include="..\public\rehlds\maintypes.h" />
+    <ClInclude Include="..\public\rehlds\model.h" />
+    <ClInclude Include="..\public\rehlds\modelgen.h" />
     <ClInclude Include="..\public\rehlds\osconfig.h" />
     <ClInclude Include="..\public\rehlds\progdefs.h" />
     <ClInclude Include="..\public\rehlds\progs.h" />
@@ -506,7 +508,9 @@
     <ClInclude Include="..\public\rehlds\rehlds_interfaces.h" />
     <ClInclude Include="..\public\rehlds\Sequence.h" />
     <ClInclude Include="..\public\rehlds\shake.h" />
+    <ClInclude Include="..\public\rehlds\spritegn.h" />
     <ClInclude Include="..\public\rehlds\static_map.h" />
+    <ClInclude Include="..\public\rehlds\studio.h" />
     <ClInclude Include="..\public\rehlds\sys_shared.h" />
     <ClInclude Include="..\public\rehlds\userid_rehlds.h" />
     <ClInclude Include="..\public\savegame_version.h" />

@@ -1080,6 +1080,18 @@
     <ClInclude Include="..\engine\sse_mathfun.h">
       <Filter>engine</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\rehlds\model.h">
+      <Filter>public\rehlds</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\rehlds\modelgen.h">
+      <Filter>public\rehlds</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\rehlds\spritegn.h">
+      <Filter>public\rehlds</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\rehlds\studio.h">
+      <Filter>public\rehlds</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\linux\appversion.sh">

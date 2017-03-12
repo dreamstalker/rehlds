@@ -241,12 +241,6 @@ typedef struct client_s
 	int m_sendrescount;
 } client_t;
 
-typedef enum sv_delta_s
-{
-	sv_packet_nodelta,
-	sv_packet_delta,
-} sv_delta_t;
-
 enum
 {
 	SND_ANYPLAYER,
