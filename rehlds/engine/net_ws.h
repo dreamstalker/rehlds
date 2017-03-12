@@ -54,6 +54,8 @@
 #define NUM_MSG_QUEUES 40
 #define MSG_QUEUE_SIZE 1536
 
+#define NET_HEADER_FLAG_SPLITPACKET	-2
+
 typedef struct loopmsg_s
 {
 	unsigned char data[NET_MAX_MESSAGE];

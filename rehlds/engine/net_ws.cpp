@@ -1028,7 +1028,7 @@ qboolean NET_QueuePacket(netsrc_t sock)
 
 	NET_TransferRawData(&in_message, buf, ret);
 
-	if (*(uint32 *)in_message.data != 0xFFFFFFFE)
+	if (*(int32 *)in_message.data != NET_HEADER_FLAG_SPLITPACKET)
 	{
 		return NET_LagPacket(1, sock, &in_from, &in_message);
 	}
@@ -1350,7 +1350,7 @@ int NET_SendLong(netsrc_t sock, SOCKET s, const char *buf, int len, int flags, c
 		}
 
 		pPacket = (SPLITPACKET *)packet;
-		pPacket->netID = -2;
+		pPacket->netID = NET_HEADER_FLAG_SPLITPACKET;
 		pPacket->sequenceNumber = gSequenceNumber;
 		packetNumber = 0;
 		totalSent = 0;
