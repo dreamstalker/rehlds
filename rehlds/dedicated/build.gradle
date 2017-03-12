@@ -62,6 +62,7 @@ void setupToolchain(NativeBinarySpec b) {
 		cfg.compilerOptions.args '-fno-exceptions'
 		cfg.linkerOptions.stripSymbolTable = false;
 		cfg.linkerOptions.staticLibStdCpp = false;
+		cfg.extraLibs 'dl'
 	}
 
 	ToolchainConfigUtils.apply(project, cfg, b);
