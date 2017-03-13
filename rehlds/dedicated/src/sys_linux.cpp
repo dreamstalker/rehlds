@@ -61,14 +61,7 @@ void Sleep_Select(int msec)
 
 void Sleep_Net(int msec)
 {
-	if (NET_Sleep_Timeout)
-	{
-		NET_Sleep_Timeout();
-		return;
-	}
-
-	// NET_Sleep_Timeout isn't hooked yet, fallback to the old method
-	Sleep_Old(msec);
+	NET_Sleep_Timeout();
 }
 
 // linux runs on a 100Hz scheduling clock, so the minimum latency from
@@ -275,11 +268,11 @@ int main(int argc, char *argv[])
 			Sys_Sleep = Sleep_Select;
 			break;
 		case 3:
-			Sys_Sleep = Sleep_Net;
-
 			// we Sys_GetProcAddress NET_Sleep() from
 			//engine_i486.so later in this function
 			NET_Sleep_Timeout = (NET_Sleep_t)Sys_GetProcAddress(g_pEngineModule, "NET_Sleep_Timeout");
+			if (NET_Sleep_Timeout != nullptr)
+				Sys_Sleep = Sleep_Net;
 			break;
 		// just in case
 		default:

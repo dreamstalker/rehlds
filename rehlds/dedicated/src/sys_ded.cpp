@@ -80,19 +80,21 @@ char *UTIL_GetBaseDir()
 int RunServer()
 {
 #ifdef _WIN32
-	// TODO: finish me!
-	/*if (g_bVGui)
+	if (g_bVGui)
 	{
-		vgui::ivgui()->SetSleep(0);
-	}*/
+		// TODO: finish VGUI
+		//vgui::ivgui()->SetSleep(0);
+	}
 #endif
 
+	int iret = 0;
 	while (true)
 	{
 		if (gbAppHasBeenTerminated)
-			break;
+			return iret;
 
 		CreateInterfaceFn engineFactory = Sys_GetFactory(g_pEngineModule);
+
 		RunVGUIFrame();
 
 		if (engineFactory)
@@ -113,21 +115,22 @@ int RunServer()
 			}
 #endif
 		}
+
 		RunVGUIFrame();
+
 		if (!engineAPI)
 			return -1;
 
-		if (!engineAPI->Init(UTIL_GetBaseDir(), (char *)CommandLine()->GetCmdLine(), Sys_GetFactoryThis(), g_FilesystemFactoryFn)) {
+		if (!engineAPI->Init(UTIL_GetBaseDir(), (char *)CommandLine()->GetCmdLine(), Sys_GetFactoryThis(), g_FilesystemFactoryFn))
 			return -1;
-		}
 
 		RunVGUIFrame();
 
 #ifdef _WIN32
-		// TODO: finish me!
-		/*if (g_bVGui)
+		if (g_bVGui)
 		{
-			g_pFileSystemInterface->AddSearchPath("platform", "PLATFORM");
+			// TODO: finish VGUI
+			/*g_pFileSystemInterface->AddSearchPath("platform", "PLATFORM");
 
 			// find our configuration directory
 			char szConfigDir[512];
@@ -141,56 +144,57 @@ int RunServer()
 			{
 				// we're not running steam, so just put the config dir under the platform
 				strncpy(szConfigDir, "platform/config", sizeof(szConfigDir));
-			}
-		}*/
+			}*/
+		}
 #endif // _WIN32
 
 		RunVGUIFrame();
 
-		if (gpszCvars) {
+		if (gpszCvars)
 			engineAPI->AddConsoleText(gpszCvars);
-		}
 
 		VGUIFinishedConfig();
 		RunVGUIFrame();
 
-		bool bDone = false;
-		while (!bDone)
+		while (true)
 		{
+#ifdef _WIN32
+			if (g_bVGui)
+				RunVGUIFrame();
+#endif // _WIN32
+
 			// Running really fast, yield some time to other apps
 			sys->Sleep(1);
 
 #ifdef _WIN32
-			MSG msg;
-			while (PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE))
+			if (!g_bVGui)
 			{
-				if (!GetMessage(&msg, NULL, 0, 0))
+				bool bDone = false;
+				MSG msg;
+				while (PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE))
 				{
-					bDone = true;
-					break;
+					if (!GetMessage(&msg, NULL, 0, 0))
+					{
+						bDone = true;
+						break;
+					}
+
+					TranslateMessage(&msg);
+					DispatchMessage(&msg);
 				}
 
-				TranslateMessage(&msg);
-				DispatchMessage(&msg);
+				if (gbAppHasBeenTerminated || bDone)
+					break;
 			}
 
-			if (gbAppHasBeenTerminated)
-				break;
-
-			if (g_bVGui)
-			{
-				RunVGUIFrame();
-			}
-			else
+			if (!g_bVGui)
 #endif // _WIN32
 			{
 				ProcessConsoleInput();
 			}
 
 			if (!engineAPI->RunFrame())
-			{
-				bDone = true;
-			}
+				break;
 
 			sys->UpdateStatus(0 /* don't force */);
 		}
@@ -206,13 +210,11 @@ int RunServer()
 			console.ShutDown();
 		}
 
-		auto iret = engineAPI->Shutdown();
+		iret = engineAPI->Shutdown();
 		Sys_UnloadModule(g_pEngineModule);
 		VGUIFinishedConfig();
 
 		if (iret == DLL_CLOSE)
 			return iret;
 	}
-
-	return 0;
 }
