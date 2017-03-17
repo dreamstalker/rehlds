@@ -207,7 +207,7 @@ typedef struct enginefuncs_s
 	void        (*pfnGetGameDir)            (char *szGetGameDir);
 	void		(*pfnCvar_RegisterVariable) (cvar_t *variable);
 	void        (*pfnFadeClientVolume)      (const edict_t *pEdict, int fadePercent, int fadeOutSeconds, int holdTime, int fadeInSeconds);
-	void        (*pfnSetClientMaxspeed)     (edict_t *pEdict, float fNewMaxspeed);
+	void        (*pfnSetClientMaxspeed)     (const edict_t *pEdict, float fNewMaxspeed);
 	edict_t *	(*pfnCreateFakeClient)		(const char *netname);	// returns NULL if fake client can't be created
 	void		(*pfnRunPlayerMove)			(edict_t *fakeclient, const float *viewangles, float forwardmove, float sidemove, float upmove, unsigned short buttons, byte impulse, byte msec );
 	int			(*pfnNumberOfEntities)		(void);
@@ -235,7 +235,7 @@ typedef struct enginefuncs_s
 	unsigned char *(*pfnSetFatPVS)			( float *org );
 	unsigned char *(*pfnSetFatPAS)			( float *org );
 
-	int			(*pfnCheckVisibility )		( edict_t *entity, unsigned char *pset );
+	int			(*pfnCheckVisibility )		( const edict_t *entity, unsigned char *pset );
 
 	void		(*pfnDeltaSetField)			( struct delta_s *pFields, const char *fieldname );
 	void		(*pfnDeltaUnsetField)		( struct delta_s *pFields, const char *fieldname );
