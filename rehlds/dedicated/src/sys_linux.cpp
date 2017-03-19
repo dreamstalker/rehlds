@@ -185,7 +185,7 @@ long CSys::LoadLibrary(char *lib)
 	char cwd[1024];
 	char absolute_lib[1024];
 
-	if (!getcwd(cwd, sizeof cwd))
+	if (!getcwd(cwd, sizeof(cwd)))
 		ErrorMessage(1, "Sys_LoadLibrary: Couldn't determine current directory.");
 
 	if (cwd[strlen(cwd) - 1] == '/')
@@ -285,7 +285,7 @@ void Sys_PrepareConsoleInput()
 
 int main(int argc, char *argv[])
 {
-	_snprintf(g_szEXEName, sizeof g_szEXEName, "%s", argv[0]);
+	_snprintf(g_szEXEName, sizeof(g_szEXEName), "%s", argv[0]);
 	char* cmdline = BuildCmdLine(argc, argv);
 	StartServer(cmdline);
 

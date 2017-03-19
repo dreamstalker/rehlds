@@ -56,7 +56,7 @@ void ProcessConsoleInput()
 	if (inputLine)
 	{
 		char szBuf[256];
-		_snprintf(szBuf, sizeof szBuf, "%s\n", inputLine);
+		_snprintf(szBuf, sizeof(szBuf), "%s\n", inputLine);
 		engineAPI->AddConsoleText(szBuf);
 	}
 }
@@ -72,6 +72,8 @@ int RunEngine()
 	if (g_bVGui)
 	{
 		// TODO: finish VGUI
+		//vgui::ivgui()->SetSleep(0);
+	}
 #endif
 
 	CreateInterfaceFn engineFactory = Sys_GetFactory(g_pEngineModule);
@@ -136,7 +138,6 @@ int RunEngine()
 		sys->Sleep(1);
 
 		Sys_PrepareConsoleInput();
-
 
 		if (g_bAppHasBeenTerminated)
 			break;

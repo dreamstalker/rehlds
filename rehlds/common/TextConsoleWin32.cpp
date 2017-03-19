@@ -217,7 +217,7 @@ int CTextConsoleWin32::GetWidth()
 void CTextConsoleWin32::SetStatusLine(char *pszStatus)
 {
 	strncpy(statusline, pszStatus, sizeof(statusline) - 1);
-	statusline[sizeof statusline - 2] = '\0';
+	statusline[sizeof(statusline) - 2] = '\0';
 	UpdateStatus();
 }
 
