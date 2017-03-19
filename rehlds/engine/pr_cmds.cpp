@@ -113,7 +113,7 @@ void EXT_FUNC SetMinMaxSize(edict_t *e, const float *min, const float *max, qboo
 	e->v.size[0] = max[0] - min[0];
 	e->v.size[1] = max[1] - min[1];
 	e->v.size[2] = max[2] - min[2];
-	SV_LinkEdict(e, 0);
+	SV_LinkEdict(e, FALSE);
 }
 
 void EXT_FUNC PF_setsize_I(edict_t *e, const float *rgflMin, const float *rgflMax)
@@ -1687,7 +1687,7 @@ int EXT_FUNC PF_droptofloor_I(edict_t *ent)
 	ent->v.origin[0] = trace.endpos[0];
 	ent->v.origin[1] = trace.endpos[1];
 	ent->v.origin[2] = trace.endpos[2];
-	SV_LinkEdict(ent, 0);
+	SV_LinkEdict(ent, FALSE);
 	ent->v.flags |= FL_ONGROUND;
 	ent->v.groundentity = trace.ent;
 

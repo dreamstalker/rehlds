@@ -962,7 +962,7 @@ void SV_RunCmd(usercmd_t *ucmd, int random_seed)
 	SetMinMaxSize(sv_player, player_mins[pmove->usehull], player_maxs[pmove->usehull], 0);
 	if (host_client->edict->v.solid)
 	{
-		SV_LinkEdict(sv_player, 1);
+		SV_LinkEdict(sv_player, TRUE);
 		vec3_t vel;
 
 		vel[0] = sv_player->v.velocity[0];
@@ -1345,7 +1345,7 @@ void SV_SetupMove(client_t *_host_client)
 			cl->edict->v.origin[0] = origin[0];
 			cl->edict->v.origin[1] = origin[1];
 			cl->edict->v.origin[2] = origin[2];
-			SV_LinkEdict(cl->edict, 0);
+			SV_LinkEdict(cl->edict, FALSE);
 			pos->needrelink = 1;
 		}
 	}
@@ -1393,7 +1393,7 @@ void SV_RestoreMove(client_t *_host_client)
 			cli->edict->v.origin[0] = pos->oldorg[0];
 			cli->edict->v.origin[1] = pos->oldorg[1];
 			cli->edict->v.origin[2] = pos->oldorg[2];
-			SV_LinkEdict(cli->edict, 0);
+			SV_LinkEdict(cli->edict, FALSE);
 		}
 	}
 }

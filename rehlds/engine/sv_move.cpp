@@ -147,7 +147,7 @@ qboolean SV_movetest(edict_t *ent, vec_t *move, qboolean relink)
 			ent->v.origin[1] = ent->v.origin[1] + move[1];
 			ent->v.origin[2] = ent->v.origin[2] + move[2];
 			if (relink)
-				SV_LinkEdict(ent, 1);
+				SV_LinkEdict(ent, TRUE);
 
 			ent->v.flags &= ~FL_ONGROUND;
 			return 1;
@@ -178,7 +178,7 @@ qboolean SV_movetest(edict_t *ent, vec_t *move, qboolean relink)
 	}
 
 	if (relink)
-		SV_LinkEdict(ent, 1);
+		SV_LinkEdict(ent, TRUE);
 
 	return 1;
 }
@@ -240,7 +240,7 @@ qboolean SV_movestep(edict_t *ent, vec_t *move, qboolean relink)
 		ent->v.origin[1] = trace.endpos[1];
 		ent->v.origin[2] = trace.endpos[2];
 		if (relink)
-			SV_LinkEdict(ent, 1);
+			SV_LinkEdict(ent, TRUE);
 
 		return 1;
 	}
@@ -285,7 +285,7 @@ qboolean SV_movestep(edict_t *ent, vec_t *move, qboolean relink)
 		}
 
 		if (relink)
-			SV_LinkEdict(ent, 1);
+			SV_LinkEdict(ent, TRUE);
 
 		return 1;
 	}
@@ -297,7 +297,7 @@ qboolean SV_movestep(edict_t *ent, vec_t *move, qboolean relink)
 	ent->v.origin[1] += move[1];
 	ent->v.origin[2] += move[2];
 	if (relink)
-		SV_LinkEdict(ent, 1);
+		SV_LinkEdict(ent, TRUE);
 
 	ent->v.flags &= ~FL_ONGROUND;
 	return 1;
@@ -312,12 +312,12 @@ qboolean SV_StepDirection(edict_t *ent, float yaw, float dist)
 	move[2] = 0;
 	if (SV_movestep(ent, move, 0))
 	{
-		SV_LinkEdict(ent, 1);
+		SV_LinkEdict(ent, TRUE);
 		return 1;
 	}
 	else
 	{
-		SV_LinkEdict(ent, 1);
+		SV_LinkEdict(ent, TRUE);
 		return 0;
 	}
 }
@@ -326,12 +326,12 @@ qboolean SV_FlyDirection(edict_t *ent, vec_t *direction)
 {
 	if (SV_movestep(ent, direction, 0))
 	{
-		SV_LinkEdict(ent, 1);
+		SV_LinkEdict(ent, TRUE);
 		return 1;
 	}
 	else
 	{
-		SV_LinkEdict(ent, 1);
+		SV_LinkEdict(ent, TRUE);
 		return 0;
 	}
 }
