@@ -520,8 +520,8 @@ void SV_DropClient_internal(client_t *cl, qboolean crash, const char *string)
 	cl->proxy = FALSE;
 	COM_ClearCustomizationList(&cl->customdata, FALSE);
 #ifdef REHLDS_FIXES
-	// Reset flags
-	cl->edict->v.flags = 0;
+	// Reset flags, leave FL_DORMANT used by CS
+	cl->edict->v.flags &= FL_DORMANT;
 	// Since the edict doesn't get deleted, fix it so it doesn't interfere.
 	cl->edict->v.takedamage = DAMAGE_NO;	// don't attract autoaim
 	cl->edict->v.solid = SOLID_NOT;
