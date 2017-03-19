@@ -59,3 +59,4 @@
 #include "rehlds_security.h"
 
 #include "dlls/cdll_dll.h"
+#include "hltv.h"
