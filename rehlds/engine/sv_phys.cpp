@@ -425,7 +425,7 @@ trace_t SV_PushEntity(edict_t *ent, vec_t *push)
 		ent->v.origin[2] = trace.endpos[2];
 	}
 
-	SV_LinkEdict(ent, 1);
+	SV_LinkEdict(ent, TRUE);
 	if (trace.ent)
 		SV_Impact(ent, trace.ent, &trace);
 
@@ -459,7 +459,7 @@ void SV_PushMove(edict_t *pusher, float movetime)
 	}
 
 	pusher->v.ltime = movetime + pusher->v.ltime;
-	SV_LinkEdict(pusher, 0);
+	SV_LinkEdict(pusher, FALSE);
 
 	if (pusher->v.solid == SOLID_NOT)
 		return;
@@ -524,12 +524,12 @@ void SV_PushMove(edict_t *pusher, float movetime)
 			check->v.origin[0] = entorigin[0];
 			check->v.origin[1] = entorigin[1];
 			check->v.origin[2] = entorigin[2];
-			SV_LinkEdict(check, 1);
+			SV_LinkEdict(check, TRUE);
 
 			pusher->v.origin[0] = pushorig[0];
 			pusher->v.origin[1] = pushorig[1];
 			pusher->v.origin[2] = pushorig[2];
-			SV_LinkEdict(pusher, 0);
+			SV_LinkEdict(pusher, FALSE);
 
 			pusher->v.ltime = pusher->v.ltime - movetime;
 			gEntityInterface.pfnBlocked(pusher, check);
@@ -540,7 +540,7 @@ void SV_PushMove(edict_t *pusher, float movetime)
 				g_moved_edict[e]->v.origin[1] = g_moved_from[e][1];
 				g_moved_edict[e]->v.origin[2] = g_moved_from[e][2];
 
-				SV_LinkEdict(g_moved_edict[e], 0);
+				SV_LinkEdict(g_moved_edict[e], FALSE);
 			}
 			return;
 		}
@@ -580,7 +580,7 @@ int SV_PushRotate(edict_t *pusher, float movetime)
 	AngleVectorsTranspose(pusher->v.angles, forwardNow, rightNow, upNow);
 	pusher->v.ltime = movetime + pusher->v.ltime;
 
-	SV_LinkEdict(pusher, 0);
+	SV_LinkEdict(pusher, FALSE);
 	if (pusher->v.solid == SOLID_NOT)
 		return 1;
 
@@ -687,12 +687,12 @@ int SV_PushRotate(edict_t *pusher, float movetime)
 			check->v.origin[0] = entorig[0];
 			check->v.origin[1] = entorig[1];
 			check->v.origin[2] = entorig[2];
-			SV_LinkEdict(check, 1);
+			SV_LinkEdict(check, TRUE);
 
 			pusher->v.angles[0] = pushorig[0];
 			pusher->v.angles[1] = pushorig[1];
 			pusher->v.angles[2] = pushorig[2];
-			SV_LinkEdict(pusher, 0);
+			SV_LinkEdict(pusher, FALSE);
 
 			pusher->v.ltime = pusher->v.ltime - movetime;
 			gEntityInterface.pfnBlocked(pusher, check);
@@ -715,7 +715,7 @@ int SV_PushRotate(edict_t *pusher, float movetime)
 						//movedEnt->v.angles[2] = movedEnt->v.angles[2]; //TODO: V570 The 'movedEnt->v.angles[2]' variable is assigned to itself.
 					}
 				}
-				SV_LinkEdict(movedEnt, 0);
+				SV_LinkEdict(movedEnt, FALSE);
 			}
 
 			return 0;
@@ -916,7 +916,7 @@ void SV_Physics_Follow(edict_t *ent)
 			ent->v.origin[0] = ent->v.aiment->v.origin[0] + ent->v.v_angle[0];
 			ent->v.origin[1] = ent->v.aiment->v.origin[1] + ent->v.v_angle[1];
 			ent->v.origin[2] = ent->v.aiment->v.origin[2] + ent->v.v_angle[2];
-			SV_LinkEdict(ent, 1);
+			SV_LinkEdict(ent, TRUE);
 		}
 		else
 		{
@@ -932,7 +932,7 @@ void SV_Physics_Noclip(edict_t *ent)
 	{
 		VectorMA(ent->v.angles, (float)host_frametime, ent->v.avelocity, ent->v.angles);
 		VectorMA(ent->v.origin, (float)host_frametime, ent->v.velocity, ent->v.origin);
-		SV_LinkEdict(ent, 0);
+		SV_LinkEdict(ent, FALSE);
 	}
 }
 
@@ -1314,7 +1314,7 @@ void SV_Physics_Step(edict_t *ent)
 				}
 			}
 		};
-		SV_LinkEdict(ent, 1);
+		SV_LinkEdict(ent, TRUE);
 	}
 	SV_RunThink(ent);
 	SV_CheckWaterTransition(ent);
@@ -1331,7 +1331,7 @@ void SV_Physics(void)
 			continue;
 
 		if (gGlobalVariables.force_retouch != 0.0)
-			SV_LinkEdict(ent, 1);
+			SV_LinkEdict(ent, TRUE);
 
 		if (i > 0 && i <= g_psvs.maxclients)
 			continue;
