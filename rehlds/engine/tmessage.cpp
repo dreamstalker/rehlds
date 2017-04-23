@@ -119,7 +119,7 @@ int IsComment(char *pText)
 		return TRUE;
 
 #ifdef REHLDS_FIXES
-	if((pText[0] == '/' && pText[1] == '/') || !pText[0])
+	if ((pText[0] == '/' && pText[1] == '/') || !pText[0])
 		return TRUE;
 #else
 	int length = Q_strlen(pText);
