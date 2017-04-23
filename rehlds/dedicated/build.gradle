@@ -59,9 +59,8 @@ void setupToolchain(NativeBinarySpec b) {
 		} else {
 			cfg.compilerOptions.args '-Qoption,cpp,--treat_func_as_string_literal_cpp', '-fno-rtti'
 		}
+
 		cfg.compilerOptions.args '-fno-exceptions'
-		cfg.linkerOptions.stripSymbolTable = false;
-		cfg.linkerOptions.staticLibStdCpp = false;
 		cfg.extraLibs 'dl'
 	}
 

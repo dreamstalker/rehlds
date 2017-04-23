@@ -7,51 +7,51 @@ TEST(IsSafeFileExtension, SecurityChecks, 1000)
 	struct testdata_t
 	{
 		const char* filename;
-		bool safe;
+		qboolean safe;
 	};
 
 	testdata_t testdata[] = {
-		{"radio/go.wav", true},
-		{"radio/go.WAV", true},
-		{"textures.wad", true},
+		{"radio/go.wav", TRUE},
+		{"radio/go.WAV", TRUE},
+		{"textures.wad", TRUE},
 #ifdef REHLDS_FIXES
-		{"!QWERTY", true},
+		{"!QWERTY", TRUE},
 		// TODO:
-		//{"file.dll2", true},
-		//{"noext", false},
-		//{".hidden", false},
-		//{"subdir/.hidden", false},
+		//{"file.dll2", TRUE},
+		//{"noext", FALSE},
+		//{".hidden", FALSE},
+		//{"subdir/.hidden", FALSE},
 #else
-		{"file.dll2", false},
+		{"file.dll2", FALSE},
 #endif
-		{"../file.txt", false},
-		{"/home/file.txt", false},
-		{"C:/Windows/file.txt", false},
-		{"models\\terror.mdl", false},
-		{"file~.mdl", false},
-		{"file.wav.", false},
-		{"file.dll.txt", false},
-		{"halflife.wad", false},
-		{"pak0.pak", false},
-		{"xeno.wad", false},
-		{"file.cfg", false},
-		{"file.lst", false},
-		{"file.exe", false},
-		{"file.vbs", false},
-		{"file.com", false},
-		{"file.bat", false},
-		{"file.dll", false},
-		{"file.ini", false},
-		{"file.log", false},
-		{"file.so", false},
-		{"file.dylib", false},
-		{"file.sys", false},
-		{"file.SYS", false},
+		{"../file.txt", FALSE},
+		{"/home/file.txt", FALSE},
+		{"C:/Windows/file.txt", FALSE},
+		{"models\\terror.mdl", FALSE},
+		{"file~.mdl", FALSE},
+		{"file.wav.", FALSE},
+		{"file.dll.txt", FALSE},
+		{"halflife.wad", FALSE},
+		{"pak0.pak", FALSE},
+		{"xeno.wad", FALSE},
+		{"file.cfg", FALSE},
+		{"file.lst", FALSE},
+		{"file.exe", FALSE},
+		{"file.vbs", FALSE},
+		{"file.com", FALSE},
+		{"file.bat", FALSE},
+		{"file.dll", FALSE},
+		{"file.ini", FALSE},
+		{"file.log", FALSE},
+		{"file.so", FALSE},
+		{"file.dylib", FALSE},
+		{"file.sys", FALSE},
+		{"file.SYS", FALSE},
 	};
 
 	for (int i = 0; i < ARRAYSIZE(testdata); i++) {
 		testdata_t* d = &testdata[i];
-		bool result = IsSafeFileToDownload(d->filename);
+		qboolean result = IsSafeFileToDownload(d->filename);
 
 		char msg[256];
 		Q_snprintf(msg, sizeof msg, "IsSafeFileToDownload(%s) check", d->filename);

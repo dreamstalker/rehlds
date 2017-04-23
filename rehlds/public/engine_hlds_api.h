@@ -28,7 +28,6 @@
 
 #pragma once
 
-#include "maintypes.h"
 #include "interface.h"
 
 #ifdef _WIN32

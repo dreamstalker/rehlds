@@ -28,48 +28,20 @@
 
 #pragma once
 
-#include "ObjectList.h"
-#include "IBaseSystem.h"
-
-// C4250 - 'class1' : inherits 'BaseSystemModule::member' via dominance
-#pragma warning(disable:4250)
-
-class BaseSystemModule: virtual public ISystemModule {
+// Interface to engine command line
+class ICommandLine {
 public:
-	BaseSystemModule() : m_State(MODULE_UNDEFINED) {}
-	virtual ~BaseSystemModule() {}
+	virtual void CreateCmdLine(const char *commandline) = 0;
+	virtual void CreateCmdLine(int argc, const char **argv) = 0;
+	virtual const char *GetCmdLine() const = 0;
 
-	virtual bool Init(IBaseSystem *system, int serial, char *name);
-	virtual void RunFrame(double time);
-	virtual void ReceiveSignal(ISystemModule *module, unsigned int signal, void *data);
-	virtual void ExecuteCommand(int commandID, char *commandLine);
-	virtual void RegisterListener(ISystemModule *module);
-	virtual void RemoveListener(ISystemModule *module);
-	virtual IBaseSystem *GetSystem();
-	virtual int GetSerial();
-	virtual char *GetStatusLine();
-	virtual char *GetType();
-	virtual char *GetName();
+	// Check whether a particular parameter exists
+	virtual	const char *CheckParm(const char *psz, char **ppszValue = nullptr) const = 0;
+	virtual void RemoveParm(const char *pszParm) = 0;
+	virtual void AppendParm(const char *pszParm, const char *pszValues) = 0;
 
-	enum ModuleState {
-		MODULE_UNDEFINED = 0,
-		MODULE_INITIALIZING,
-		MODULE_CONNECTING,
-		MODULE_RUNNING,
-		MODULE_DISCONNECTED
-	};
-
-	virtual int GetState();
-	virtual int GetVersion();
-	virtual void ShutDown();
-	virtual char *COM_GetBaseDir() { return ""; }
-	void FireSignal(unsigned int signal, void *data = nullptr);
-
-protected:
-	IBaseSystem *m_System;
-	ObjectList m_Listener;
-	char m_Name[255];
-	unsigned int m_State;
-	unsigned int m_Serial;
-	double m_SystemTime;
+	virtual void SetParm(const char *pszParm, const char *pszValues) = 0;
+	virtual void SetParm(const char *pszParm, int iValue) = 0;
 };
+
+ICommandLine *CommandLine();

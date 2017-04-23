@@ -26,50 +26,45 @@
 *
 */
 
-#pragma once
+#include "precompiled.h"
 
-#include "ObjectList.h"
-#include "IBaseSystem.h"
+#ifdef _WIN32
 
-// C4250 - 'class1' : inherits 'BaseSystemModule::member' via dominance
-#pragma warning(disable:4250)
+// DLL entry point
+BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
+{
+	if (fdwReason == DLL_PROCESS_ATTACH)
+	{
+		g_RehldsRuntimeConfig.parseFromCommandLine(GetCommandLineA());
 
-class BaseSystemModule: virtual public ISystemModule {
-public:
-	BaseSystemModule() : m_State(MODULE_UNDEFINED) {}
-	virtual ~BaseSystemModule() {}
+#ifdef _WIN32
+		Module hlds_exe;
+		if (!FindModuleByName("hlds.exe", &hlds_exe))
+			printf("%s: launcher is not hlds.exe, tests playing/recording disabled!\n", __func__);
+		else
+			TestSuite_Init(NULL, &hlds_exe, NULL);
 
-	virtual bool Init(IBaseSystem *system, int serial, char *name);
-	virtual void RunFrame(double time);
-	virtual void ReceiveSignal(ISystemModule *module, unsigned int signal, void *data);
-	virtual void ExecuteCommand(int commandID, char *commandLine);
-	virtual void RegisterListener(ISystemModule *module);
-	virtual void RemoveListener(ISystemModule *module);
-	virtual IBaseSystem *GetSystem();
-	virtual int GetSerial();
-	virtual char *GetStatusLine();
-	virtual char *GetType();
-	virtual char *GetName();
+		Rehlds_Debug_Init(NULL);
+#endif
 
-	enum ModuleState {
-		MODULE_UNDEFINED = 0,
-		MODULE_INITIALIZING,
-		MODULE_CONNECTING,
-		MODULE_RUNNING,
-		MODULE_DISCONNECTED
-	};
+	}
+	else if (fdwReason == DLL_PROCESS_DETACH)
+	{
 
-	virtual int GetState();
-	virtual int GetVersion();
-	virtual void ShutDown();
-	virtual char *COM_GetBaseDir() { return ""; }
-	void FireSignal(unsigned int signal, void *data = nullptr);
+	}
+	return TRUE;
+}
 
-protected:
-	IBaseSystem *m_System;
-	ObjectList m_Listener;
-	char m_Name[255];
-	unsigned int m_State;
-	unsigned int m_Serial;
-	double m_SystemTime;
-};
+#else // _WIN32
+
+void __attribute__((constructor)) DllMainLoad()
+{
+
+}
+
+void __attribute__((destructor)) DllMainUnload()
+{
+
+}
+
+#endif // _WIN32

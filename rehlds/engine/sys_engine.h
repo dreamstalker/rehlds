@@ -77,23 +77,4 @@ public:
 	virtual bool CheckDoneTrapping(int& buttons, int& keys);
 	virtual int GetQuitting();
 	virtual void SetQuitting(int quittype);
-
-	// non-virtual function's of wrap for hooks a virtual
-	// Only need to HOOK_ENGINE
-	bool Load_noVirt(bool dedicated, char *rootDir, char *cmdLine);
-	void Unload_noVirt();
-	void SetState_noVirt(int iState);
-	int GetState_noVirt();
-	void SetSubState_noVirt(int iSubstate);
-	int GetSubState_noVirt();
-	int Frame_noVirt();
-	double GetFrameTime_noVirt();
-	double GetCurTime_noVirt();
-	void TrapKey_Event_noVirt(int key, bool down);
-	void TrapMouse_Event_noVirt(int buttons, bool down);
-	void StartTrapMode_noVirt();
-	bool IsTrapping_noVirt();
-	bool CheckDoneTrapping_noVirt(int& buttons, int& keys);
-	int GetQuitting_noVirt();
-	void SetQuitting_noVirt(int quittype);
 };

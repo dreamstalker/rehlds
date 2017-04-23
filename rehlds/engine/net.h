@@ -86,7 +86,7 @@ enum
 {
 	FRAG_NORMAL_STREAM = 0,
 	FRAG_FILE_STREAM,
-	
+
 	MAX_STREAMS
 };
 
@@ -224,7 +224,7 @@ enum
 {
 	FLOW_OUTGOING = 0,
 	FLOW_INCOMING,
-	
+
 	MAX_FLOWS
 };
 

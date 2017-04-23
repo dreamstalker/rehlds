@@ -52,9 +52,6 @@ public:
 	virtual void WriteDataRequest(const void *buffer, int bufferSize);
 	virtual int ReadDataResponse(void *data, int len);
 
-	void WriteDataRequest_noVirt(const void *buffer, int bufferSize);
-	int ReadDataResponse_noVirt(void *data, int len);
-
 	void SendMessageToAdminUI(const char *message);
 	void RequestValue(int requestID, const char *variable);
 	void SetValue(const char *variable, const char *value);

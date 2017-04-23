@@ -1,9 +1,12 @@
-#include "TokenLine.h"
-#include <string.h>
+#include "precompiled.h"
 
 TokenLine::TokenLine()
 {
+	memset(m_token, 0, sizeof(m_token));
+	memset(m_fullLine, 0, sizeof(m_fullLine));
+	memset(m_tokenBuffer, 0, sizeof(m_tokenBuffer));
 
+	m_tokenNumber = 0;
 }
 
 TokenLine::TokenLine(char *string)
@@ -22,22 +25,20 @@ bool TokenLine::SetLine(const char *newLine)
 
 	if (!newLine || (strlen(newLine) >= (MAX_LINE_CHARS - 1)))
 	{
-		memset(m_fullLine, 0, MAX_LINE_CHARS);
-		memset(m_tokenBuffer, 0, MAX_LINE_CHARS);
+		memset(m_fullLine, 0, sizeof(m_fullLine));
+		memset(m_tokenBuffer, 0, sizeof(m_tokenBuffer));
 		return false;
 	}
 
-	strncpy(m_fullLine, newLine, MAX_LINE_CHARS - 1);
-	m_fullLine[MAX_LINE_CHARS - 1] = '\0';
-
-	strncpy(m_tokenBuffer, newLine, MAX_LINE_CHARS - 1);
-	m_tokenBuffer[MAX_LINE_CHARS - 1] = '\0';
+	strcopy(m_fullLine, newLine);
+	strcopy(m_tokenBuffer, newLine);
 
 	// parse tokens
 	char *charPointer = m_tokenBuffer;
 	while (*charPointer && (m_tokenNumber < MAX_LINE_TOKENS))
 	{
-		while (*charPointer && ((*charPointer <= 32) || (*charPointer > 126)))
+		// skip nonprintable chars
+		while (*charPointer && ((*charPointer <= ' ') || (*charPointer > '~')))
 			charPointer++;
 
 		if (*charPointer)

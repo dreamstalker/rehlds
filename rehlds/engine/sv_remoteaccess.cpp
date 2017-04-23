@@ -37,16 +37,6 @@ CServerRemoteAccess::CServerRemoteAccess() {
 
 void CServerRemoteAccess::WriteDataRequest(const void *buffer, int bufferSize)
 {
-	WriteDataRequest_noVirt(buffer, bufferSize);
-}
-
-int CServerRemoteAccess::ReadDataResponse(void *data, int len)
-{
-	return ReadDataResponse_noVirt(data, len);
-}
-
-void CServerRemoteAccess::WriteDataRequest_noVirt(const void *buffer, int bufferSize)
-{
 	int requestID;
 	int requestType;
 	char value[256];
@@ -78,7 +68,7 @@ void CServerRemoteAccess::WriteDataRequest_noVirt(const void *buffer, int buffer
 	}
 }
 
-int CServerRemoteAccess::ReadDataResponse_noVirt(void *data, int len)
+int CServerRemoteAccess::ReadDataResponse(void *data, int len)
 {
 	int i = m_ResponsePackets.Head();
 	if (!m_ResponsePackets.IsValidIndex(i))

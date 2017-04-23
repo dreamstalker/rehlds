@@ -26,50 +26,58 @@
 *
 */
 
-#pragma once
+#include "common.h"
+#include "keys.h"
+#include "decal.h"
+#include "delta.h"
+#include "delta_jit.h"
+#include "server.h"
+#include "sys_dll.h"
+#include "sys_dll2.h"
+#include "sys_engine.h"
+#include "zone.h"
+#include "client.h"
+#include "cmd.h"
+#include "cvar.h"
+#include "filesystem_internal.h"
+#include "mem.h"
+#include "unicode_strtools.h"
+#include "host.h"
+#include "filesystem_.h"
+#include "info.h"
+#include "iregistry.h"
+#include "cmodel.h"
+#include "model_rehlds.h"
+#include "sv_log.h"
+#include "sv_steam3.h"
+#include "host_cmd.h"
+#include "sv_user.h"
+#include "pmove.h"
+#include "pmovetst.h"
+#include "pr_edict.h"
+#include "pr_cmds.h"
+#include "mathlib_e.h"
+#include "world.h"
+#include "sv_phys.h"
+#include "sv_move.h"
+#include "sv_pmove.h"
+#include "studio_rehlds.h"
+#include "net_ws.h"
+#include "net_chan.h"
 
-#include "ObjectList.h"
-#include "IBaseSystem.h"
-
-// C4250 - 'class1' : inherits 'BaseSystemModule::member' via dominance
-#pragma warning(disable:4250)
-
-class BaseSystemModule: virtual public ISystemModule {
-public:
-	BaseSystemModule() : m_State(MODULE_UNDEFINED) {}
-	virtual ~BaseSystemModule() {}
-
-	virtual bool Init(IBaseSystem *system, int serial, char *name);
-	virtual void RunFrame(double time);
-	virtual void ReceiveSignal(ISystemModule *module, unsigned int signal, void *data);
-	virtual void ExecuteCommand(int commandID, char *commandLine);
-	virtual void RegisterListener(ISystemModule *module);
-	virtual void RemoveListener(ISystemModule *module);
-	virtual IBaseSystem *GetSystem();
-	virtual int GetSerial();
-	virtual char *GetStatusLine();
-	virtual char *GetType();
-	virtual char *GetName();
-
-	enum ModuleState {
-		MODULE_UNDEFINED = 0,
-		MODULE_INITIALIZING,
-		MODULE_CONNECTING,
-		MODULE_RUNNING,
-		MODULE_DISCONNECTED
-	};
-
-	virtual int GetState();
-	virtual int GetVersion();
-	virtual void ShutDown();
-	virtual char *COM_GetBaseDir() { return ""; }
-	void FireSignal(unsigned int signal, void *data = nullptr);
-
-protected:
-	IBaseSystem *m_System;
-	ObjectList m_Listener;
-	char m_Name[255];
-	unsigned int m_State;
-	unsigned int m_Serial;
-	double m_SystemTime;
-};
+#include "tmessage.h"
+#include "traceinit.h"
+#include "wad.h"
+#include "textures.h"
+#include "vid_null.h"
+#include "l_studio.h"
+#include "crc.h"
+#include "md5.h"
+#include "sv_remoteaccess.h"
+#include "sv_upld.h"
+#include "com_custom.h"
+#include "hashpak.h"
+#include "ipratelimit.h"
+#include "ipratelimitWrapper.h"
+#include "savegame_version.h"
+#include "sys_linuxwnd.h"

@@ -133,48 +133,55 @@ void *Sys_GetProcAddress( void *pModuleHandle, const char *pName )
 // Input  : *pModuleName - filename of the component
 // Output : opaque handle to the module (hides system dependency)
 //-----------------------------------------------------------------------------
-CSysModule *Sys_LoadModule( const char *pModuleName )
+CSysModule *Sys_LoadModule(const char *pModuleName)
 {
-#if defined ( _WIN32 )
-	HMODULE hDLL = LoadLibrary( pModuleName );
+#if defined (_WIN32)
+	HMODULE hDLL = LoadLibrary(pModuleName);
 #else
 	HMODULE hDLL  = NULL;
-	char szAbsoluteModuleName[1024];
-	szAbsoluteModuleName[0] = 0;
-	if ( pModuleName[0] != '/' )
+	if (pModuleName[0] != '/')
 	{
 		char szCwd[1024];
 		char szAbsoluteModuleName[1024];
 
-		getcwd( szCwd, sizeof( szCwd ) );
-		if ( szCwd[ strlen( szCwd ) - 1 ] == '/' )
-			szCwd[ strlen( szCwd ) - 1 ] = 0;
+		getcwd(szCwd, sizeof(szCwd));
+		if (szCwd[strlen(szCwd) - 1] == '/')
+			szCwd[strlen(szCwd) - 1] = '\0';
 
-		_snprintf( szAbsoluteModuleName, sizeof(szAbsoluteModuleName), "%s/%s", szCwd, pModuleName );
-
-		hDLL = dlopen( szAbsoluteModuleName, RTLD_NOW );
+		_snprintf(szAbsoluteModuleName, sizeof(szAbsoluteModuleName), "%s/%s", szCwd, pModuleName);
+		hDLL = dlopen(szAbsoluteModuleName, RTLD_NOW);
 	}
 	else
 	{
-		_snprintf( szAbsoluteModuleName, sizeof(szAbsoluteModuleName), "%s", pModuleName );
-		 hDLL = dlopen( pModuleName, RTLD_NOW );
+		hDLL = dlopen(pModuleName, RTLD_NOW);
 	}
 #endif
 
-	if( !hDLL )
+	if(!hDLL)
 	{
-		char str[512];
-#if defined ( _WIN32 )
-		_snprintf( str, sizeof(str), "%s.dll", pModuleName );
-		hDLL = LoadLibrary( str );
+		char szPathModule[MAX_PATH];
+		char szModuleName[64];
+
+		strncpy(szModuleName, pModuleName, sizeof szModuleName - 1);
+		szModuleName[sizeof szModuleName - 1] = '\0';
+
+		// remove extension if provided.
+		char *ext = strrchr(szModuleName, '.');
+		if (ext) {
+			*ext = '\0';
+		}
+
+#if defined (_WIN32)
+		_snprintf(szPathModule, sizeof(szPathModule), "%s.dll", szModuleName);
+		hDLL = LoadLibrary(szPathModule);
 #elif defined(OSX)
-		printf("Error:%s\n",dlerror());
-		_snprintf( str, sizeof(str), "%s.dylib", szAbsoluteModuleName );
-		hDLL = dlopen(str, RTLD_NOW);		
+		printf("Error: %s\n", dlerror());
+		_snprintf(szPathModule, sizeof(szPathModule), "%s.dylib", szModuleName);
+		hDLL = dlopen(szPathModule, RTLD_NOW);		
 #else
-		printf("Error:%s\n",dlerror());
-		_snprintf( str, sizeof(str), "%s.so", szAbsoluteModuleName );
-		hDLL = dlopen(str, RTLD_NOW);
+		printf("Error: %s\n", dlerror());
+		_snprintf(szPathModule, sizeof(szPathModule), "%s.so", szModuleName);
+		hDLL = dlopen(szPathModule, RTLD_NOW);
 #endif
 	}
 

@@ -120,7 +120,7 @@ rootProject.ext.createMsvcConfig = { boolean release, BinaryKind binKind ->
 	}
 
 	// Detect and setup UCRT paths
-    def ucrtInfo = "getucrtinfo.bat".execute().text
+	def ucrtInfo = "getucrtinfo.bat".execute().text
 	def m = ucrtInfo =~ /^(.*)\r\n(.*)?$/
 	if (!m.find()) {
 		return cfg

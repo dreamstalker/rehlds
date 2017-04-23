@@ -28,8 +28,6 @@
 
 #include "precompiled.h"
 
-bool (CSteam3Server::*pNotifyClientConnect)(client_t *client, const void *pvSteam2Key, uint32 ucbSteam2Key) = &CSteam3Server::NotifyClientConnect;
-
 void CSteam3Server::OnGSPolicyResponse(GSPolicyResponse_t *pPolicyResponse)
 {
 	if (CRehldsPlatformHolder::get()->SteamGameServer()->BSecure())
@@ -47,7 +45,7 @@ void CSteam3Server::OnLogonSuccess(SteamServersConnected_t *pLogonSuccess)
 	}
 	else
 	{
-		m_bLogOnResult = 1;
+		m_bLogOnResult = true;
 		if (!m_bLanOnly)
 			Con_Printf("Connection to Steam servers successful.\n");
 	}
@@ -107,12 +105,12 @@ void CSteam3Server::OnGSClientDenyHelper(client_t *cl, EDenyReason eDenyReason, 
 		break;
 
 	case k_EDenyNotLoggedOn:
-		if (!this->m_bLanOnly)
+		if (!m_bLanOnly)
 			SV_DropClient(cl, 0, "No Steam logon\n");
 		break;
 
 	case k_EDenyLoggedInElseWhere:
-		if (!this->m_bLanOnly)
+		if (!m_bLanOnly)
 			SV_DropClient(cl, 0, "This Steam account is being used in another location\n");
 		break;
 
@@ -144,12 +142,12 @@ void CSteam3Server::OnGSClientDenyHelper(client_t *cl, EDenyReason eDenyReason, 
 		break;
 
 	case k_EDenySteamConnectionLost:
-		if (!this->m_bLanOnly)
+		if (!m_bLanOnly)
 			SV_DropClient(cl, 0, "Steam connection lost\n");
 		break;
 
 	case k_EDenySteamConnectionError:
-		if (!this->m_bLanOnly)
+		if (!m_bLanOnly)
 			SV_DropClient(cl, 0, "Unable to connect to Steam\n");
 		break;
 
@@ -158,7 +156,7 @@ void CSteam3Server::OnGSClientDenyHelper(client_t *cl, EDenyReason eDenyReason, 
 		break;
 
 	case k_EDenySteamValidationStalled:
-		if (this->m_bLanOnly)
+		if (m_bLanOnly)
 			cl->network_userid.m_SteamID = 1;
 		break;
 
@@ -253,7 +251,7 @@ void CSteam3Server::Activate()
 	if (m_bLoggedOn)
 	{
 		bLanOnly = sv_lan.value != 0.0;
-		if (this->m_bLanOnly != bLanOnly)
+		if (m_bLanOnly != bLanOnly)
 		{
 			m_bLanOnly = bLanOnly;
 			m_bWantToBeSecure = !COM_CheckParm("-insecure") && !bLanOnly;
@@ -261,7 +259,7 @@ void CSteam3Server::Activate()
 	}
 	else
 	{
-		m_bLoggedOn = 1;
+		m_bLoggedOn = true;
 		unIP = 0;
 		usSteamPort = 26900;
 		argSteamPort = COM_CheckParm("-sport");
@@ -333,13 +331,13 @@ void CSteam3Server::Activate()
 
 void CSteam3Server::Shutdown()
 {
-	if (this->m_bLoggedOn)
+	if (m_bLoggedOn)
 	{
 		SteamGameServer()->EnableHeartbeats(0);
 		SteamGameServer()->LogOff();
 
 		SteamGameServer_Shutdown();
-		this->m_bLoggedOn = false;
+		m_bLoggedOn = false;
 	}
 }
 
@@ -524,10 +522,10 @@ void CSteam3Server::SendUpdatedServerDetails()
 
 void CSteam3Client::Shutdown()
 {
-	if (this->m_bLoggedOn)
+	if (m_bLoggedOn)
 	{
 		SteamAPI_Shutdown();
-		this->m_bLoggedOn = false;
+		m_bLoggedOn = false;
 	}
 }
 
@@ -879,7 +877,6 @@ void Master_SetMaster_f()
 		return;
 	}
 
-
 	pszCmd = Cmd_Argv(1);
 	if (!pszCmd || !pszCmd[0])
 		return;
@@ -890,14 +887,14 @@ void Master_SetMaster_f()
 		{
 			if (gfNoMasterServer)
 			{
-				gfNoMasterServer = 0;
+				gfNoMasterServer = FALSE;
 				CRehldsPlatformHolder::get()->SteamGameServer()->EnableHeartbeats(gfNoMasterServer != 0);
 			}
 		}
 	}
 	else
 	{
-		gfNoMasterServer = 1;
+		gfNoMasterServer = TRUE;
 		CRehldsPlatformHolder::get()->SteamGameServer()->EnableHeartbeats(gfNoMasterServer != 0);
 	}
 }
