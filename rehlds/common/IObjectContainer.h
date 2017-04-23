@@ -41,7 +41,7 @@ public:
  	virtual void *GetFirst() = 0;
 	virtual void *GetNext() = 0;
 
-	virtual int CountElements() = 0;;
+	virtual int CountElements() = 0;
 	virtual bool Contains(void *object) = 0;
 	virtual bool IsEmpty() = 0;
 };

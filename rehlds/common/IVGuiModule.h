@@ -41,7 +41,7 @@ public:
 
 	// called after all the modules have been initialized
 	// modules should use this time to link to all the other module interfaces
-	virtual bool PostInitialize(CreateInterfaceFn *modules, int factoryCount) = 0;
+	virtual bool PostInitialize(CreateInterfaceFn *modules = nullptr, int factoryCount = 0) = 0;
 
 	// called when the module is selected from the menu or otherwise activated
 	virtual bool Activate() = 0;

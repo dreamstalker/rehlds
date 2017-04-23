@@ -58,5 +58,6 @@ rootProject.ext.createIccConfig = { boolean release, BinaryKind binKind ->
 		)
 	}
 
+	cfg.singleDefines('LINUX')
 	return cfg
 }

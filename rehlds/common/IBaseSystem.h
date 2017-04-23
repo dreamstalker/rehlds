@@ -28,6 +28,14 @@
 
 #pragma once
 
+#if defined(_WIN32)
+	#define LIBRARY_PREFIX "dll"
+#elif defined(OSX)
+	#define LIBRARY_PREFIX "dylib"
+#else
+	#define LIBRARY_PREFIX "so"
+#endif
+
 #include "ISystemModule.h"
 #include "IVGuiModule.h"
 
@@ -77,5 +85,7 @@ public:
 	virtual bool RemoveModule(ISystemModule *module) = 0;
 
 	virtual void Stop() = 0;
-	virtual char *COM_GetBaseDir() = 0;
+	virtual char *GetBaseDir() = 0;
 };
+
+#define BASESYSTEM_INTERFACE_VERSION "basesystem002"

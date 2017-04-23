@@ -62,7 +62,7 @@ public:
 	virtual int GetState();
 	virtual int GetVersion();
 	virtual void ShutDown();
-	virtual char *COM_GetBaseDir() { return ""; }
+	virtual char *GetBaseDir() { return ""; }
 	void FireSignal(unsigned int signal, void *data = nullptr);
 
 protected:

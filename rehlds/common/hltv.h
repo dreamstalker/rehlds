@@ -42,7 +42,6 @@
 
 #define DRC_CMD_LAST				15
 
-
 // DRC_CMD_EVENT event flags
 #define DRC_FLAG_PRIO_MASK		0x0F	// priorities between 0 and 15 (15 most important)
 #define DRC_FLAG_SIDE			(1<<4)	//
@@ -52,7 +51,6 @@
 #define DRC_FLAG_INTRO			(1<<8)	// is a introduction scene
 #define DRC_FLAG_FINAL			(1<<9)	// is a final scene
 #define DRC_FLAG_NO_RANDOM		(1<<10)	// don't randomize event data
-
 
 // DRC_CMD_WAYPOINT flags
 #define DRC_FLAG_STARTPATH		1	// end with speed 0.0

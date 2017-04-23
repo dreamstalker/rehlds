@@ -227,7 +227,7 @@ NOXREF void Z_Print(memzone_t *zone)
 	memblock_t *block;
 	Con_Printf("zone size: %i  location: %p\n", mainzone->size, mainzone);
 
-	for (block = zone->blocklist.next;; block = block->next)
+	for (block = zone->blocklist.next; ; block = block->next)
 	{
 		Con_Printf("block:%p    size:%7i    tag:%3i\n", block, block->size, block->tag);
 
@@ -257,7 +257,7 @@ void Z_CheckHeap(void)
 {
 	memblock_t *block;
 
-	for (block = mainzone->blocklist.next;; block = block->next)
+	for (block = mainzone->blocklist.next; ; block = block->next)
 	{
 		if (block->next == &mainzone->blocklist)
 		{

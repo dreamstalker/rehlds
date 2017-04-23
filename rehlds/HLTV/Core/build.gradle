@@ -1,0 +1,154 @@
+import org.doomedsociety.gradlecpp.cfg.ToolchainConfigUtils
+import org.doomedsociety.gradlecpp.msvc.MsvcToolchainConfig
+import org.doomedsociety.gradlecpp.toolchain.icc.Icc
+import org.doomedsociety.gradlecpp.toolchain.icc.IccCompilerPlugin
+import org.doomedsociety.gradlecpp.gcc.GccToolchainConfig
+import org.gradle.nativeplatform.NativeBinarySpec
+import org.gradle.nativeplatform.NativeLibrarySpec
+import org.gradle.nativeplatform.toolchain.VisualCpp
+
+apply plugin: 'cpp'
+apply plugin: IccCompilerPlugin
+apply plugin: GccCompilerPlugin
+
+project.ext.dep_bzip2 = project(':dep/bzip2')
+
+void setupToolchain(NativeBinarySpec b) {
+	def cfg = rootProject.createToolchainConfig(b);
+	cfg.projectInclude(project, '/..', '/../..', '/src', '/../../common', '/../../engine', '/../../public', '/../../public/rehlds', '/../../pm_shared');
+	cfg.projectInclude(dep_bzip2, '/include')
+
+	cfg.singleDefines 'USE_BREAKPAD_HANDLER', 'HLTV', 'CORE_MODULE'
+
+	if (cfg instanceof MsvcToolchainConfig) {
+		cfg.compilerOptions.pchConfig = new MsvcToolchainConfig.PrecompiledHeadersConfig(
+			enabled: true,
+			pchHeader: 'precompiled.h',
+			pchSourceSet: 'core_pch'
+		);
+
+		cfg.singleDefines('_CRT_SECURE_NO_WARNINGS')
+		cfg.compilerOptions.args '/Ob2', '/Oi', '/GF'
+		cfg.extraLibs "ws2_32.lib", "psapi.lib"
+	}
+	else if (cfg instanceof GccToolchainConfig) {
+		cfg.compilerOptions.pchConfig = new GccToolchainConfig.PrecompilerHeaderOptions(
+			enabled: true,
+			pchSourceSet: 'core_pch'
+		);
+
+		cfg.compilerOptions.languageStandard = 'c++0x'
+		cfg.defines([
+			'_strdup': 'strdup',
+			'_stricmp': 'strcasecmp',
+			'_strnicmp': 'strncasecmp',
+			'_vsnprintf': 'vsnprintf',
+			'_snprintf': 'snprintf',
+		]);
+
+		cfg.compilerOptions.args '-Qoption,cpp,--treat_func_as_string_literal_cpp', '-fno-exceptions'
+	}
+
+	ToolchainConfigUtils.apply(project, cfg, b);
+}
+
+model {
+	buildTypes {
+		release
+	}
+
+	platforms {
+		x86 {
+			architecture "x86"
+		}
+	}
+
+	toolChains {
+		visualCpp(VisualCpp) {
+		}
+		icc(Icc) {
+		}
+	}
+
+	components {
+		core(NativeLibrarySpec) {
+			targetPlatform 'x86'
+			baseName 'core'
+
+			sources {
+				core_main(CppSourceSet) {
+					source {
+						srcDir "src"
+						include "**/*.cpp"
+						exclude "precompiled.cpp"
+					}
+
+					lib project: ':dep/bzip2', library: 'bzip2', linkage: 'static'
+				}
+
+				core_common(CppSourceSet) {
+					source {
+						srcDirs "../../common", "../common"
+
+						// common
+						include "BaseSystemModule.cpp"
+						include "ObjectDictionary.cpp"
+						include "ObjectList.cpp"
+						include "TokenLine.cpp"
+
+						// HLTV common
+						include "BitBuffer.cpp"
+						include "byteorder.cpp"
+						include "common.cpp"
+						include "DemoFile.cpp"
+						include "DirectorCmd.cpp"
+						include "InfoString.cpp"
+						include "mathlib.cpp"
+						include "md5.cpp"
+						include "munge.cpp"
+						include "NetAddress.cpp"
+						include "NetChannel.cpp"
+						include "random.cpp"
+					}
+				}
+
+				core_engine(CppSourceSet) {
+					source {
+						srcDir "../../engine"
+						include "mem.cpp"
+					}
+				}
+
+				core_pch(CppSourceSet) {
+					source {
+						srcDir "src"
+						include "precompiled.cpp"
+
+						lib project: ':dep/bzip2', library: 'bzip2', linkage: 'static'
+					}
+				}
+			}
+
+			binaries.all {
+				NativeBinarySpec b -> project.setupToolchain(b)
+			}
+		}
+	}
+}
+
+task buildFixes {
+	dependsOn binaries.withType(SharedLibraryBinarySpec).matching { SharedLibraryBinarySpec blib ->
+		blib.buildable && blib.buildType.name == 'release'
+	}
+}
+
+task buildRelease {
+	dependsOn binaries.withType(SharedLibraryBinarySpec).matching { SharedLibraryBinarySpec blib ->
+		blib.buildable && blib.buildType.name == 'release'
+	}
+}
+
+// prevent static lib building
+binaries.withType(StaticLibraryBinarySpec) { binary ->
+	buildable = false
+}
