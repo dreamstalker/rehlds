@@ -142,7 +142,11 @@ int IsEndOfText(char *pText)
 
 int IsWhiteSpace(char space)
 {
+#ifdef REHLDS_FIXES
+	return isspace(space);
+#else
 	return space == ' ' || space == '\t' || space == '\r' || space == '\n';
+#endif	
 }
 
 NOXREF const char *SkipSpace(const char *pText)
