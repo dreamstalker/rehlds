@@ -49,7 +49,11 @@ int gMsgDest;
 int gMsgType;
 qboolean gMsgStarted;
 vec3_t gMsgOrigin;
+#ifdef REHLDS_FIXES
+std::default_random_engine g_random_engine;
+#else
 int32 idum;
+#endif
 int g_groupop;
 int g_groupmask;
 unsigned char checkpvs[1024];
@@ -2346,6 +2350,10 @@ void EXT_FUNC PF_changelevel_I(const char *s1, const char *s2)
 
 void SeedRandomNumberGenerator(void)
 {
+#ifdef REHLDS_FIXES
+	std::random_device rd;
+	g_random_engine.seed(rd());
+#else
 	idum = -(int)CRehldsPlatformHolder::get()->time(NULL);
 	if (idum > 1000)
 	{
@@ -2355,7 +2363,10 @@ void SeedRandomNumberGenerator(void)
 	{
 		idum -= 22261048;
 	}
+#endif
 }
+
+#ifndef REHLDS_FIXES
 
 #define IA 16807
 #define IM 2147483647
@@ -2363,7 +2374,6 @@ void SeedRandomNumberGenerator(void)
 #define IR 2836
 #define NTAB 32
 #define NDIV (1+(IM-1)/NTAB)
-
 int32 ran1(void)
 {
 	int j;
@@ -2404,6 +2414,7 @@ float fran1(void)
 	if (temp > RNMX) return (float)RNMX;
 	else return temp;
 }
+#endif // REHLDS_FIXES
 
 float EXT_FUNC RandomFloat(float flLow, float flHigh)
 {
@@ -2411,8 +2422,13 @@ float EXT_FUNC RandomFloat(float flLow, float flHigh)
 	g_engdstAddrs.pfnRandomFloat(&flLow, &flHigh);
 #endif
 
+#ifdef REHLDS_FIXES
+	std::uniform_real_distribution<float> d(flLow, flHigh);
+	return d(g_random_engine); // float in [low, high]
+#else
 	float fl = fran1(); // float in [0,1)
 	return (fl * (flHigh - flLow)) + flLow; // float in [low,high)
+#endif
 }
 
 int32 EXT_FUNC RandomLong(int32 lLow, int32 lHigh)
@@ -2421,6 +2437,10 @@ int32 EXT_FUNC RandomLong(int32 lLow, int32 lHigh)
 	g_engdstAddrs.pfnRandomLong(&lLow, &lHigh);
 #endif
 
+#ifdef REHLDS_FIXES
+	std::uniform_int_distribution<int32> d(lLow, lHigh);
+	return d(g_random_engine);
+#else
 	unsigned long maxAcceptable;
 	unsigned long x = lHigh - lLow + 1;
 	unsigned long n;
@@ -2444,6 +2464,7 @@ int32 EXT_FUNC RandomLong(int32 lLow, int32 lHigh)
 	} while (n > maxAcceptable);
 
 	return lLow + (n % x);
+#endif
 }
 
 void EXT_FUNC PF_FadeVolume(const edict_t *clientent, int fadePercent, int fadeOutSeconds, int holdTime, int fadeInSeconds)
