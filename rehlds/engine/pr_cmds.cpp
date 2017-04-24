@@ -28,6 +28,10 @@
 
 #include "precompiled.h"
 
+#ifdef REHLDS_FIXES
+#include <random>
+#endif
+
 vec_t gHullMins[4][3] = {
 		{ 0.0f,   0.0f,   0.0f },
 		{ -16.0f, -16.0f, -36.0f },
