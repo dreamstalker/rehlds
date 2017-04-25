@@ -828,7 +828,7 @@ void EXT_FUNC PF_stuffcmd_I(edict_t *pEdict, const char *szFmt, ...)
 	Q_vsnprintf(szOut, sizeof(szOut), szFmt, argptr);
 	va_end(argptr);
 
-	szOut[1023] = 0;
+	szOut[sizeof(szOut) - 1] = 0;
 	if (entnum < 1 || entnum > g_psvs.maxclients)
 	{
 		Con_Printf("\n!!!\n\nStuffCmd:  Some entity tried to stuff '%s' to console "
