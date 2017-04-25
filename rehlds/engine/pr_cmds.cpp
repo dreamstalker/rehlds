@@ -2562,7 +2562,7 @@ const char* EXT_FUNC PF_GetPhysicsInfoString(const edict_t *pClient)
 	int entnum = NUM_FOR_EDICT(pClient);
 	if (entnum < 1 || entnum > g_psvs.maxclients)
 	{
-		Con_Printf("tried to PF_GetPhysicsInfoString a non-client\n");
+		Con_Printf("tried to %s a non-client\n", func);
 		return "";
 	}
 
@@ -2575,7 +2575,7 @@ const char* EXT_FUNC PF_GetPhysicsKeyValue(const edict_t *pClient, const char *k
 	int entnum = NUM_FOR_EDICT(pClient);
 	if (entnum < 1 || entnum > g_psvs.maxclients)
 	{
-		Con_Printf("tried to PF_GetPhysicsKeyValue a non-client\n");
+		Con_Printf("tried to %s a non-client\n", func);
 		return "";
 	}
 
@@ -2587,7 +2587,7 @@ void EXT_FUNC PF_SetPhysicsKeyValue(const edict_t *pClient, const char *key, con
 {
 	int entnum = NUM_FOR_EDICT(pClient);
 	if (entnum < 1 || entnum > g_psvs.maxclients)
-		Con_Printf("tried to PF_SetPhysicsKeyValue a non-client\n");
+		Con_Printf("tried to %s a non-client\n", func);
 
 	client_t* client = &g_psvs.clients[entnum - 1];
 	Info_SetValueForKey(client->physinfo, key, value, MAX_INFO_STRING);
@@ -2607,7 +2607,7 @@ int EXT_FUNC PF_CanSkipPlayer(const edict_t *pClient)
 	int entnum = NUM_FOR_EDICT(pClient);
 	if (entnum < 1 || entnum > g_psvs.maxclients)
 	{
-		Con_Printf("tried to PF_CanSkipPlayer a non-client\n");
+		Con_Printf("tried to %s a non-client\n", func);
 		return 0;
 	}
 
@@ -2700,7 +2700,7 @@ void EXT_FUNC PF_GetPlayerStats(const edict_t *pClient, int *ping, int *packet_l
 	int c = NUM_FOR_EDICT(pClient);
 	if (c < 1 || c > g_psvs.maxclients)
 	{
-		Con_Printf("tried to PF_GetPlayerStats a non-client\n");
+		Con_Printf("tried to %s a non-client\n", func);
 		return;
 	}
 
@@ -2769,7 +2769,7 @@ void EXT_FUNC QueryClientCvarValue(const edict_t *player, const char *cvarName)
 		if (gNewDLLFunctions.pfnCvarValue)
 			gNewDLLFunctions.pfnCvarValue(player, "Bad Player");
 
-		Con_Printf("tried to QueryClientCvarValue a non-client\n");
+		Con_Printf("tried to %s a non-client\n", func);
 		return;
 	}
 	client_t *client = &g_psvs.clients[entnum - 1];
@@ -2785,7 +2785,11 @@ void EXT_FUNC QueryClientCvarValue2(const edict_t *player, const char *cvarName,
 		if (gNewDLLFunctions.pfnCvarValue2)
 			gNewDLLFunctions.pfnCvarValue2(player, requestID, cvarName, "Bad Player");
 
+#ifdef REHLDS_FIXES
+		Con_Printf("tried to %s a non-client\n", func);
+#else
 		Con_Printf("tried to QueryClientCvarValue a non-client\n");
+#endif
 		return;
 	}
 	client_t *client = &g_psvs.clients[entnum - 1];
