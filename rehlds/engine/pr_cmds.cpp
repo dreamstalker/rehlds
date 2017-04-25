@@ -2098,7 +2098,7 @@ void EXT_FUNC PF_MessageBegin_I(int msg_dest, int msg_type, const float *pOrigin
 			gMsgOrigin[1] = pOrigin[1];
 			gMsgOrigin[2] = pOrigin[2];
 		}
-		
+
 		//No idea why is it called here
 		//Host_IsSinglePlayerGame();
 	}
