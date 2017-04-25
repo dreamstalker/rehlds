@@ -1541,11 +1541,15 @@ int EXT_FUNC PF_precache_generic_I(const char *s)
 
 int EXT_FUNC PF_IsMapValid_I(const char *mapname)
 {
+#ifdef REHLDS_FIXES
+	char cBuf[42];
+	if (!mapname || mapname[0] == '\0')
+#else
 	char cBuf[260];
 	if (!mapname || Q_strlen(mapname) == 0)
+#endif
 		return 0;
-
-
+	
 	Q_snprintf(cBuf, sizeof(cBuf), "maps/%.32s.bsp", mapname);
 	return FS_FileExists(cBuf);
 }
