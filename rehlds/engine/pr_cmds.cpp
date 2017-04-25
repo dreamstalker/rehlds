@@ -1019,8 +1019,6 @@ qboolean EXT_FUNC PR_IsEmptyString(const char *s)
 
 int EXT_FUNC PF_precache_sound_I(const char *s)
 {
-	int i;
-
 	if (!s)
 		Host_Error("%s: NULL pointer", __func__);
 
@@ -1034,7 +1032,7 @@ int EXT_FUNC PF_precache_sound_I(const char *s)
 	{
 		g_psv.sound_precache_hashedlookup_built = 0;
 
-		for (i = 0; i < MAX_SOUNDS; i++)
+		for (int i = 0; i < MAX_SOUNDS; i++)
 		{
 			if (!g_psv.sound_precache[i])
 			{
@@ -1057,7 +1055,7 @@ int EXT_FUNC PF_precache_sound_I(const char *s)
 	}
 
 	// precaching not enabled. check if already exists.
-	for (i = 0; i < MAX_SOUNDS; i++)
+	for (int i = 0; i < MAX_SOUNDS; i++)
 	{
 		if (g_psv.sound_precache[i] && !Q_stricmp(g_psv.sound_precache[i], s))
 			return i;
@@ -1741,7 +1739,6 @@ void EXT_FUNC PF_aim_I(edict_t *ent, float speed, float *rgflReturn)
 	vec3_t dir;
 	vec3_t end;
 	vec3_t bestdir;
-	int j;
 	trace_t tr;
 	float dist;
 	float bestdist;
@@ -1790,7 +1787,7 @@ void EXT_FUNC PF_aim_I(edict_t *ent, float speed, float *rgflReturn)
 		if (ent->v.team > 0 && ent->v.team == check->v.team)
 			continue;
 
-		for (j = 0; j < 3; j++)
+		for (int j = 0; j < 3; j++)
 		{
 			end[j] = (check->v.maxs[j] + check->v.mins[j]) * 0.75 + check->v.origin[j] + ent->v.view_ofs[j] * 0.0;
 		}
