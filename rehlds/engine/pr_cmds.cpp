@@ -2099,9 +2099,10 @@ void EXT_FUNC PF_MessageBegin_I(int msg_dest, int msg_type, const float *pOrigin
 			gMsgOrigin[1] = pOrigin[1];
 			gMsgOrigin[2] = pOrigin[2];
 		}
-
+#ifndef REHLDS_FIXES
 		//No idea why is it called here
-		//Host_IsSinglePlayerGame();
+		Host_IsSinglePlayerGame();
+#endif
 	}
 
 	gMsgBuffer.flags = SIZEBUF_ALLOW_OVERFLOW;
@@ -2523,10 +2524,12 @@ const char* EXT_FUNC PF_GetPlayerAuthId(edict_t *e)
 			Q_strcpy(szAuthID[count], "BOT");
 		}
 //		AUTH_IDTYPE_LOCAL is handled inside SV_GetIDString(), no need to do it here
-//		else if (cl->network_userid.idtype == AUTH_IDTYPE_LOCAL)
-//		{
-//			Q_strcpy(szAuthID[count], "HLTV");
-//		}
+#ifndef REHLDS_FIXES
+		else if (cl->network_userid.idtype == AUTH_IDTYPE_LOCAL)
+		{
+			Q_strcpy(szAuthID[count], "HLTV");
+		}
+#endif
 		else
 		{
 			Q_snprintf(szAuthID[count], sizeof(szAuthID[count]) - 1, "%s", SV_GetClientIDString(cl));
