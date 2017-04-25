@@ -977,6 +977,8 @@ int EXT_FUNC iGetIndex(const char *pszField)
 	IGETINDEX_CHECK_FIELD(noise3);
 	IGETINDEX_CHECK_FIELD(globalname);
 
+	#undef IGETINDEX_CHECK_FIELD
+
 	return -1;
 }
 
