@@ -458,7 +458,11 @@ void R_StudioCalcBonePosition(int frame, float s, mstudiobone_t *pbone, mstudioa
 				}
 			}
 		}
+#ifdef REHLDS_FIXES
+		if (adj && pbone->bonecontroller[j] != -1)
+#else
 		if (pbone->bonecontroller[j] != -1)
+#endif
 		{
 			pos[j] += adj[pbone->bonecontroller[j]];
 		}
