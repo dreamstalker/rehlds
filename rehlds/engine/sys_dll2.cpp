@@ -524,10 +524,7 @@ int Sys_InitGame(char *lpOrgCmdLine, char *pBaseDir, void *pwnd, int bIsDedicate
 		ClientDLL_ActivateMouse();
 
 	char MessageText[512];
-	const char en_US[12];
-
-	Q_strcpy(en_US, "en_US.UTF-8");
-	en_US[16] = 0;
+	const char en_US[] = "en_US.UTF-8";
 
 	char *cat = setlocale(6, NULL);
 	if (!cat)
