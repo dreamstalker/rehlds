@@ -1023,14 +1023,14 @@ qboolean NET_QueuePacket(netsrc_t sock)
 
 	if (ret == -1 || ret == MAX_UDP_PACKET)
 	{
-		return NET_LagPacket(0, sock, 0, 0);
+		return NET_LagPacket(FALSE, sock, NULL, NULL);
 	}
 
 	NET_TransferRawData(&in_message, buf, ret);
 
 	if (*(int32 *)in_message.data != NET_HEADER_FLAG_SPLITPACKET)
 	{
-		return NET_LagPacket(1, sock, &in_from, &in_message);
+		return NET_LagPacket(TRUE, sock, &in_from, &in_message);
 	}
 
 	if (in_message.cursize < 9)
@@ -1249,7 +1249,7 @@ qboolean NET_GetPacket(netsrc_t sock)
 	NET_ThreadLock();
 	if (NET_GetLoopPacket(sock, &in_from, &in_message))
 	{
-		bret = NET_LagPacket(1, sock, &in_from, &in_message);
+		bret = NET_LagPacket(TRUE, sock, &in_from, &in_message);
 	}
 	else
 	{
@@ -1257,11 +1257,11 @@ qboolean NET_GetPacket(netsrc_t sock)
 		{
 			bret = NET_QueuePacket(sock);
 			if (!bret)
-				bret = NET_LagPacket(0, sock, 0, 0);
+				bret = NET_LagPacket(FALSE, sock, NULL, NULL);
 		}
 		else
 		{
-			bret = NET_LagPacket(0, sock, 0, 0);
+			bret = NET_LagPacket(TRUE, sock, NULL, NULL);
 		}
 	}
 
