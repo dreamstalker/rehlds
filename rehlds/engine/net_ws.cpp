@@ -784,7 +784,11 @@ qboolean NET_LagPacket(qboolean newdata, netsrc_t sock, netadr_t *from, sizebuf_
 	}
 
 	curtime = realtime;
+#ifdef REHLDS_FIXES
+	if (newdata && data)
+#else
 	if (newdata)
+#endif
 	{
 		if (fakeloss.value != 0.0)
 		{
