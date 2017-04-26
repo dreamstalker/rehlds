@@ -36,7 +36,8 @@
 #include "engine_launcher_api.h"
 #include "idedicatedexports.h"
 
-#define FIFTEEN_MB			(15 * 1024 * 1024)
+const int FIFTEEN_MB = (15 * 1024 * 1024);
+
 #define MINIMUM_WIN_MEMORY		0x0e00000
 #define WARNING_MEMORY			0x0200000
 #define MAXIMUM_WIN_MEMORY		0x8000000 // Ask for 128 MB max

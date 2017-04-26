@@ -199,7 +199,7 @@ void CSys::Printf(char *fmt, ...)
 	ConsoleOutput(szText);
 }
 
-#define MAX_LINUX_CMDLINE 2048
+const int MAX_LINUX_CMDLINE = 2048;
 static char linuxCmdline[ MAX_LINUX_CMDLINE ];
 
 void BuildCmdLine(int argc, char **argv)

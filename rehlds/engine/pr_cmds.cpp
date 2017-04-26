@@ -2361,11 +2361,13 @@ void SeedRandomNumberGenerator(void)
 	}
 }
 
-#define IA 16807
-#define IM 2147483647
-#define IQ 127773
-#define IR 2836
-#define NTAB 32
+const int IA = 16807;
+const int IM = 2147483647;
+const int IQ = 127773;
+const int IR = 2836;
+
+const int NTAB = 32;
+
 #define NDIV (1+(IM-1)/NTAB)
 
 int32 ran1(void)

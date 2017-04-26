@@ -31,7 +31,7 @@
 #include "maintypes.h"
 #include "wad.h"
 
-#define MAX_MAP_TEXTURES 512
+const int MAX_MAP_TEXTURES = 512;
 
 typedef struct texlumpinfo_s
 {

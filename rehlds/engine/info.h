@@ -31,17 +31,17 @@
 #include "maintypes.h"
 
 // Max key/value length (with a NULL char)
-#define MAX_KV_LEN 127
+const int MAX_KV_LEN = 127;
 
 // Key + value + 2 x slash + NULL
-#define MAX_INFO_STRING 256
+const int MAX_INFO_STRING = 256;
 
-#define INFO_MAX_BUFFER_VALUES 4
+const int INFO_MAX_BUFFER_VALUES = 4;
 
 #ifdef REHLDS_FIXES
-#define MAX_LOCALINFO 4096
+const int MAX_LOCALINFO = 4096;
 #else
-#define MAX_LOCALINFO MAX_INFO_STRING * 128
+const int MAX_LOCALINFO = MAX_INFO_STRING * 128;
 #endif // REHLDS_FIXES
 
 const char *Info_ValueForKey(const char *s, const char *key);

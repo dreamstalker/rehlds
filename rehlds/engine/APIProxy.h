@@ -8,7 +8,7 @@
 #include "enums.h"
 #endif
 
-#define MAX_ALIAS_NAME 32
+const int MAX_ALIAS_NAME = 32;
 
 typedef struct cmdalias_s
 {
