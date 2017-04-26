@@ -1090,7 +1090,7 @@ int R_StudioComputeBounds(unsigned char *pBuffer, float *mins, float *maxs)
 			for (int f = 0; f < num_frames; ++f)
 			{
 				vec3_t bonepos;
-				R_StudioCalcBonePosition(f, 0.0, &pbones[bone], panim, 0, bonepos);
+				R_StudioCalcBonePosition(f, 0.0, &pbones[bone], panim, NULL, bonepos);
 				R_StudioBoundBone(bone_mins, bone_maxs, &bone_count, bonepos);
 			}
 		}
