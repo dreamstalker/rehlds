@@ -625,9 +625,17 @@ double Sys_FloatTime(void)
 	if ( !bInitialized )
 	{
 		bInitialized = true;
+#ifdef REHLDS_FIXES
+		clock_gettime(CLOCK_MONOTONIC_RAW, &start_time);
+#else
 		clock_gettime(CLOCK_MONOTONIC, &start_time);
+#endif		
 	}
+#ifdef REHLDS_FIXES
+	clock_gettime(CLOCK_MONOTONIC_RAW, &now);
+#else
 	clock_gettime(CLOCK_MONOTONIC, &now);
+#endif
 	return (now.tv_sec - start_time.tv_sec) + now.tv_nsec * 0.000000001;
 }
 
