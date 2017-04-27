@@ -619,15 +619,15 @@ double EXT_FUNC Sys_FloatTime(void)
 double Sys_FloatTime(void)
 {
 	static struct timespec start_time;
-	static bool bInitialized;
+	static bool bInitialized = false;
 	struct timespec now;
 
 	if ( !bInitialized )
 	{
-		bInitialized = 1;
-		clock_gettime(1, &start_time);
+		bInitialized = true;
+		clock_gettime(CLOCK_MONOTONIC, &start_time);
 	}
-	clock_gettime(1, &now);
+	clock_gettime(CLOCK_MONOTONIC, &now);
 	return (now.tv_sec - start_time.tv_sec) + now.tv_nsec * 0.000000001;
 }
 
