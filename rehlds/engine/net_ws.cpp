@@ -1265,7 +1265,7 @@ qboolean NET_GetPacket(netsrc_t sock)
 		}
 		else
 		{
-			bret = NET_LagPacket(TRUE, sock, NULL, NULL);
+			bret = NET_LagPacket(FALSE, sock, NULL, NULL);
 		}
 	}
 
