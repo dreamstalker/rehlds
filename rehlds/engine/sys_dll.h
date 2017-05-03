@@ -52,7 +52,7 @@
 #endif
 
 
-#define MAX_DISCONNECT_REASON 256
+const int MAX_DISCONNECT_REASON = 256;
 
 
 #ifdef HOOK_ENGINE

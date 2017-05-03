@@ -3239,8 +3239,8 @@ void SV_BeginRedirect(redirect_t rd, netadr_t *addr)
 	outputbuf[0] = 0;
 }
 
-#define MAX_RCON_FAILURES_STORAGE 32
-#define MAX_RCON_FAILURES 20
+const int MAX_RCON_FAILURES_STORAGE = 32;
+const int MAX_RCON_FAILURES = 20;
 
 typedef struct rcon_failure_s
 {

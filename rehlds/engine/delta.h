@@ -30,7 +30,7 @@
 
 #include "maintypes.h"
 
-#define DELTA_MAX_FIELDS		56		// 7*8
+const int DELTA_MAX_FIELDS = 56;	// 7*8
 
 enum
 {
@@ -46,7 +46,7 @@ enum
 	DT_SIGNED			= BIT(31)	// sign modificator
 };
 
-#define FDT_MARK			BIT(0)		// Delta mark for sending
+const int FDT_MARK = BIT(0);		// Delta mark for sending
 
 typedef struct delta_s delta_t;
 typedef void(*encoder_t)(delta_t *, const unsigned char *, const unsigned char *);

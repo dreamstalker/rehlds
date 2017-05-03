@@ -30,7 +30,7 @@
 
 #include "entity_state.h"
 
-#define NUM_BASELINES 64
+const int NUM_BASELINES = 64;
 
 typedef struct extra_baselines_s
 {

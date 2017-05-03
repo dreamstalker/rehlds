@@ -32,8 +32,9 @@
 #include "model.h"
 #include "wad.h"
 
-#define MAX_DECALS				512
-#define DECAL_EXTRASIZE				sizeof(texture_t) - sizeof(miptex_t)
+const int MAX_DECALS = 512;
+
+#define DECAL_EXTRASIZE sizeof(texture_t) - sizeof(miptex_t)
 
 typedef struct decalname_s
 {

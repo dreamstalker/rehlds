@@ -30,8 +30,8 @@
 
 #include "maintypes.h"
 
-#define DELTAJIT_MAX_BLOCKS 32
-#define DELTAJIT_MAX_FIELDS 56
+const int DELTAJIT_MAX_BLOCKS = 32;
+const int DELTAJIT_MAX_FIELDS = 56;
 
 struct deltajit_field {
 	unsigned int id;

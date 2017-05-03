@@ -1,6 +1,6 @@
 #include "precompiled.h"
 
-#define REHLDS_DEBUG_MAX_EDICTS 2048
+const int REHLDS_DEBUG_MAX_EDICTS = 2048;
 
 uint32 calcFloatChecksum(uint32 crc, const float* pFloat) {
 	uint32 sVal = *reinterpret_cast<const uint32*>(pFloat);

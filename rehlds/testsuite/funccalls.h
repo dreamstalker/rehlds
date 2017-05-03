@@ -10,8 +10,8 @@
 #include <iostream>
 #include <fstream>
 
-#define HOSTENT_DATA_MAX_ALIASES 10
-#define HOSTENT_DATA_MAX_ADDRS 32
+const int HOSTENT_DATA_MAX_ALIASES = 10;
+const int HOSTENT_DATA_MAX_ADDRS = 32;
 
 struct hostent_data_t {
 	char hostName[256];

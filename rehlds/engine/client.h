@@ -46,8 +46,8 @@
 #include "model.h"
 #include "kbutton.h"
 
-#define MAX_SCOREBOARDNAME	32
-#define MAX_DEMOS		32
+const int MAX_SCOREBOARDNAME = 32;
+const int MAX_DEMOS = 32;
 
 typedef enum cactive_e
 {
