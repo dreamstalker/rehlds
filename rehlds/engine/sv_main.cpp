@@ -3239,8 +3239,8 @@ void SV_BeginRedirect(redirect_t rd, netadr_t *addr)
 	outputbuf[0] = 0;
 }
 
-#define MAX_RCON_FAILURES_STORAGE 32
-#define MAX_RCON_FAILURES 20
+const int MAX_RCON_FAILURES_STORAGE = 32;
+const int MAX_RCON_FAILURES = 20;
 
 typedef struct rcon_failure_s
 {
@@ -4329,8 +4329,12 @@ int SV_CreatePacketEntities_internal(sv_delta_t type, client_t *client, packet_e
 			else
 				newindex = 9999;
 		}
-
+		
+#ifdef REHLDS_FIXES
+		if (oldnum < oldmax && from)
+#else
 		if (oldnum < oldmax)
+#endif
 			oldindex = from->entities[oldnum].number;
 		else
 			oldindex = 9999;

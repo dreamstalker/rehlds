@@ -33,53 +33,53 @@
 #include "enums.h"
 #include "netadr.h"
 
-#define PROTOCOL_VERSION		48
+const int PROTOCOL_VERSION		= 48;
 
 // MAX_CHALLENGES is made large to prevent a denial
 //  of service attack that could cycle all of them
 //  out before legitimate users connected
 #ifdef REHLDS_OPT_PEDANTIC
-#define MAX_CHALLENGES			64
+const int MAX_CHALLENGES		= 64;
 #else
-#define MAX_CHALLENGES			1024
+const int MAX_CHALLENGES		= 1024;
 #endif // REHLDS_OPT_PEDANTIC
 
 // Client connection is initiated by requesting a challenge value
 //  the server sends this value back
-#define S2C_CHALLENGE			'A'	// + challenge value
+const char S2C_CHALLENGE		= 'A';	// + challenge value
 
 // Send a userid, client remote address, is this server secure and engine build number
-#define S2C_CONNECTION          'B'
+const char S2C_CONNECTION       = 'B';
 
 // HLMaster rejected a server's connection because the server needs to be updated
-#define M2S_REQUESTRESTART		'O'
+const char M2S_REQUESTRESTART	= 'O';
 
 // send a log event as key value
-#define S2A_LOGSTRING			'R'
+const char S2A_LOGSTRING		= 'R';
 
 // Send a log string
-#define S2A_LOGKEY			'S'
+const char S2A_LOGKEY			= 'S';
 
 // Basic information about the server
-#define A2S_INFO			'T'
+const char A2S_INFO				= 'T';
 
 // Details about each player on the server
-#define A2S_PLAYER			'U'
+const char A2S_PLAYER			= 'U';
 
 // The rules the server is using
-#define A2S_RULES			'V'
+const char A2S_RULES			= 'V';
 
 // Another user is requesting a challenge value from this machine
-#define A2A_GETCHALLENGE		'W'	// Request challenge # from another machine
+const char A2A_GETCHALLENGE		= 'W';	// Request challenge # from another machine
 
 // Generic Ping Request
-#define	A2A_PING			'i'	// respond with an A2A_ACK
+const char A2A_PING				= 'i';	// respond with an A2A_ACK
 
 // Generic Ack
-#define	A2A_ACK				'j'	// general acknowledgement without info
+const char A2A_ACK				= 'j';	// general acknowledgement without info
 
 // Challenge response from master
-#define M2A_CHALLENGE			's'	// + challenge value
+const char M2A_CHALLENGE		= 's';	// + challenge value
 
 // 0 == regular, 1 == file stream
 enum
@@ -91,25 +91,25 @@ enum
 };
 
 // Flow control bytes per second limits
-#define MAX_RATE		100000.0f
-#define MIN_RATE		1000.0f
+const float MAX_RATE		= 100000.0f;
+const float MIN_RATE		= 1000.0f;
 
 // Default data rate
-#define DEFAULT_RATE	(9999.0f)
+const float DEFAULT_RATE	= 9999.0f;
 
 // NETWORKING INFO
 
 // Max size of udp packet payload
-#define	MAX_UDP_PACKET	4010 // 9 bytes SPLITHEADER + 4000 payload?
+const int MAX_UDP_PACKET	= 4010; // 9 bytes SPLITHEADER + 4000 payload?
 
 // Max length of a reliable message
-#define	MAX_MSGLEN		3990 // 10 reserved for fragheader?
+const int MAX_MSGLEN		= 3990; // 10 reserved for fragheader?
 
 // Max length of unreliable message
-#define	MAX_DATAGRAM	4000
+const int MAX_DATAGRAM		= 4000;
 
 // This is the packet payload without any header bytes (which are attached for actual sending)
-#define NET_MAX_PAYLOAD 65536
+const int NET_MAX_PAYLOAD	= 65536;
 
 // This is the payload plus any header info (excluding UDP header)
 
@@ -123,19 +123,19 @@ enum
 //  short (startpos)
 //  short (length)
 // }
-#define HEADER_BYTES ( 8 + MAX_STREAMS * 9 )
+#define HEADER_BYTES (8 + MAX_STREAMS * 9)
 
 // Pad a number so it lies on an N byte boundary.
 // So PAD_NUMBER(0,4) is 0 and PAD_NUMBER(1,4) is 4
 #define PAD_NUMBER(number, boundary) \
-	( ((number) + ((boundary)-1)) / (boundary) ) * (boundary)
+	(((number) + ((boundary) - 1)) / (boundary)) * (boundary)
 
 // Pad this to next higher 16 byte boundary
 // This is the largest packet that can come in/out over the wire, before processing the header
 //  bytes will be stripped by the networking channel layer
 //#define NET_MAX_MESSAGE PAD_NUMBER( ( MAX_MSGLEN + HEADER_BYTES ), 16 )
 // This is currently used value in the engine. TODO: define above gives 4016, check it why.
-#define NET_MAX_MESSAGE 4037
+const int NET_MAX_MESSAGE = 4037;
 
 
 typedef enum svc_commands_e
@@ -237,7 +237,7 @@ typedef struct flowstats_s
 	double time;
 } flowstats_t;
 
-#define MAX_LATENT 32
+const int MAX_LATENT = 32;
 
 typedef struct flow_s
 {
@@ -252,19 +252,20 @@ typedef struct flow_s
 	float avgkbytespersec;
 } flow_t;
 
-#define FRAGMENT_C2S_MIN_SIZE 16
-#define FRAGMENT_S2C_MIN_SIZE 256
-#define FRAGMENT_S2C_MAX_SIZE 1024
-#define CLIENT_FRAGMENT_SIZE_ONCONNECT 128
-#define CUSTOMIZATION_MAX_SIZE 20480
+const int FRAGMENT_C2S_MIN_SIZE = 16;
+const int FRAGMENT_S2C_MIN_SIZE = 256;
+const int FRAGMENT_S2C_MAX_SIZE = 1024;
+
+const int CLIENT_FRAGMENT_SIZE_ONCONNECT = 128;
+const int CUSTOMIZATION_MAX_SIZE = 20480;
 
 #ifndef REHLDS_FIXES
 // Size of fragmentation buffer internal buffers
-#define FRAGMENT_MAX_SIZE 1400
+const int FRAGMENT_MAX_SIZE = 1400;
 
-#define MAX_FRAGMENTS 25000
+const int MAX_FRAGMENTS = 25000;
 #else
-#define FRAGMENT_MAX_SIZE 1024
+const int FRAGMENT_MAX_SIZE = 1024;
 
 // Client sends normal fragments only while connecting
 #define MAX_NORMAL_FRAGMENTS (NET_MAX_PAYLOAD / CLIENT_FRAGMENT_SIZE_ONCONNECT)
@@ -274,12 +275,12 @@ typedef struct flow_s
 #define MAX_FILE_FRAGMENTS (CUSTOMIZATION_MAX_SIZE / FRAGMENT_C2S_MIN_SIZE)
 #endif
 
-#define UDP_HEADER_SIZE 28
-#define MAX_RELIABLE_PAYLOAD 1200
+const int UDP_HEADER_SIZE = 28;
+const int MAX_RELIABLE_PAYLOAD = 1200;
 
-#define MAKE_FRAGID(id,count)	( ( ( id & 0xffff ) << 16 ) | ( count & 0xffff ) )
-#define FRAG_GETID(fragid)		( ( fragid >> 16 ) & 0xffff )
-#define FRAG_GETCOUNT(fragid)	( fragid & 0xffff )
+#define MAKE_FRAGID(id,count)	((( id & 0xffff) << 16) | (count & 0xffff))
+#define FRAG_GETID(fragid)		((fragid >> 16) & 0xffff)
+#define FRAG_GETCOUNT(fragid)	(fragid & 0xffff)
 
 // Generic fragment structure
 typedef struct fragbuf_s

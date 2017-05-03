@@ -30,19 +30,19 @@
 
 #include "maintypes.h"
 
-#define DEMO_MESSAGE		"__DEMOMESSAGE__"
-#define NETWORK_MESSAGE1	"__NETMESSAGE__1"
-#define NETWORK_MESSAGE2	"__NETMESSAGE__2"
-#define NETWORK_MESSAGE3	"__NETMESSAGE__3"
-#define NETWORK_MESSAGE4	"__NETMESSAGE__4"
+static const char *DEMO_MESSAGE		= "__DEMOMESSAGE__";
+static const char *NETWORK_MESSAGE1	= "__NETMESSAGE__1";
+static const char *NETWORK_MESSAGE2	= "__NETMESSAGE__2";
+static const char *NETWORK_MESSAGE3	= "__NETMESSAGE__3";
+static const char *NETWORK_MESSAGE4	= "__NETMESSAGE__4";
 
-#define MAX_NETMESSAGE		4
+const int MAX_NETMESSAGE = 4;
 
-#define MSGFILE_NAME	0
-#define MSGFILE_TEXT	1
+const int MSGFILE_NAME	= 0;
+const int MSGFILE_TEXT	= 1;
 
-#define NAME_HEAP_SIZE	16384
-#define MAX_MESSAGES	1000
+const int NAME_HEAP_SIZE	= 16384;
+const int MAX_MESSAGES		= 1000;
 
 #ifdef HOOK_ENGINE
 

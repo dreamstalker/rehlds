@@ -36,9 +36,9 @@
 All command/alias names are case insensitive! Arguments not.
 */
 
-#define MAX_CMD_BUFFER	16384
-#define MAX_CMD_TOKENS	80
-#define MAX_CMD_LINE	1024
+const int MAX_CMD_BUFFER = 16384;
+const int MAX_CMD_TOKENS = 80;
+const int MAX_CMD_LINE   = 1024;
 
 /*
 

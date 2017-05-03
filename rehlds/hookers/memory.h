@@ -31,7 +31,7 @@
 
 #include "osconfig.h"
 
-#define MAX_PATTERN 128
+const int MAX_PATTERN = 128;
 
 struct Section;
 struct Section

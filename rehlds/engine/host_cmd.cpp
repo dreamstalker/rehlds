@@ -2929,8 +2929,9 @@ void Host_VoiceRecordStop_f(void)
 	}
 }
 
-void Host_Crash_f(void)
+NOXREF void Host_Crash_f(void)
 {
+	NOXREFCHECK;
 	int *p = NULL;
 	*p = 0xffffffff;
 }

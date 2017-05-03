@@ -32,11 +32,11 @@ IBaseInterface *CreateFileSystemInterface();
 InterfaceReg iface = InterfaceReg(CreateFileSystemInterface, "VFileSystem009");
 
 #ifdef _WIN32
-#define ORIGINAL_ENGINE_DLL_NAME "swds.dll"
-#define ORIGINAL_FILESYSTEM_DLL_NAME "filesystem_stdio2.dll"
+const char *ORIGINAL_ENGINE_DLL_NAME = "swds.dll";
+const char *ORIGINAL_FILESYSTEM_DLL_NAME = "filesystem_stdio2.dll";
 #else
-#define ORIGINAL_ENGINE_DLL_NAME "engine_i486.so"
-#define ORIGINAL_FILESYSTEM_DLL_NAME "filesystem_stdio2.so"
+const char *ORIGINAL_ENGINE_DLL_NAME = "engine_i486.so";
+const char *ORIGINAL_FILESYSTEM_DLL_NAME = "filesystem_stdio2.so";
 #endif
 
 CSysModule *g_pOriginalFileSystemModule = NULL;

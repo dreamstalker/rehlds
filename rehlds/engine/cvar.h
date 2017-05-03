@@ -32,8 +32,8 @@
 #include "cvardef.h"
 #include "FileSystem.h"
 
-#define MAX_CVAR_VALUE 1024
-#define MAX_CVARLIST_FILES 100
+const int MAX_CVAR_VALUE     = 1024;
+const int MAX_CVARLIST_FILES = 100;
 
 #ifdef HOOK_ENGINE
 #define cvar_vars (*pcvar_vars)

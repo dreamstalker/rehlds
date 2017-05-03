@@ -37,7 +37,7 @@
 #include "vmodes.h"
 #include "cdll_int.h"
 
-#define MAX_DISCONNECT_REASON 256
+const int MAX_DISCONNECT_REASON = 256;
 
 #ifdef HOOK_ENGINE
 #define g_hfind (*pg_hfind)

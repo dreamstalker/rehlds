@@ -2792,7 +2792,7 @@ typedef struct
 	unsigned short wBitsPerSample;
 } FormatChunk;
 
-#define WAVE_HEADER_LENGTH 128
+const int WAVE_HEADER_LENGTH = 128;
 
 unsigned int EXT_FUNC COM_GetApproxWavePlayLength(const char *filepath)
 {
