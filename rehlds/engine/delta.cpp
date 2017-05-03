@@ -462,12 +462,12 @@ int DELTA_TestDelta(unsigned char *from, unsigned char *to, delta_t *pFields)
 			st2 = (char*)&to[pTest->fieldOffset];
 			if (!(!*st1 && !*st2 || *st1 && *st2 && !Q_stricmp(st1, st2)))	// Not sure why it is case insensitive, but it looks so
 			{
-#ifdef REHLDS_FIXES
+#ifndef REHLDS_FIXES
+				pTest->flags |= FDT_MARK;
+#endif // REHLDS_FIXES
+
 				different = TRUE;
 				length = Q_strlen(st2) * 8;
-#else // REHLDS_FIXES
-				length = Q_strlen(st2);
-#endif // REHLDS_FIXES
 			}
 			break;
 		default:
