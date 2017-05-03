@@ -68,7 +68,7 @@ typedef struct wadlist_s
 typedef struct wadlist_s wadlist_t;
 typedef struct lumpinfo_s lumpinfo_t;
 
-#define NUM_WADS 2
+const int NUM_WADS = 2;
 
 #ifdef HOOK_ENGINE
 #define wads (*pwads)
