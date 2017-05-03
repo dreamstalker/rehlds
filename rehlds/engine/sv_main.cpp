@@ -1408,7 +1408,7 @@ void SV_WriteClientdataToMessage(client_t *client, sizebuf_t *msg)
 #ifdef REHLDS_FIXES
 			// So, HL and CS games send absolute gametime in these vars, DMC and Ricochet games don't send absolute gametime
 			// TODO: idk about other games
-			// FIXME: there is a loss of precision, because gamedll has already written float gametime in them 
+			// FIXME: there is a loss of precision, because gamedll has already written float gametime in them
 			if (sv_rehlds_local_gametime.value != 0.0f)
 			{
 				auto convertGlobalGameTimeToLocal =
@@ -5259,7 +5259,7 @@ void SV_CreateGenericResources(void)
 				Con_Printf("Can't precache .dll files:  %s\n", com_token);
 			else
 				successful = true;
-				
+
 		}
 		else
 			successful = true;
@@ -5646,7 +5646,7 @@ void SetCStrikeFlags(void)
 			g_eGameType = GT_CZero;
 #else
 			g_bIsCZero = 1;
-#endif			
+#endif
 		}
 		else if (!Q_stricmp(com_gamedir, "czeror"))
 		{
@@ -5654,7 +5654,7 @@ void SetCStrikeFlags(void)
 			g_eGameType = GT_CZeroRitual;
 #else
 			g_bIsCZeroRitual = 1;
-#endif		
+#endif
 		}
 		else if (!Q_stricmp(com_gamedir, "terror"))
 		{
@@ -5662,7 +5662,7 @@ void SetCStrikeFlags(void)
 			g_eGameType = GT_TerrorStrike;
 #else
 			g_bIsTerrorStrike = 1;
-#endif		
+#endif
 		}
 		else if (!Q_stricmp(com_gamedir, "tfc"))
 		{
@@ -5670,7 +5670,7 @@ void SetCStrikeFlags(void)
 			g_eGameType = GT_TFC;
 #else
 			g_bIsTFC = 1;
-#endif	
+#endif
 		}
 
 #ifndef REHLDS_FIXES

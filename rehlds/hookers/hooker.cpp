@@ -28,13 +28,14 @@
 
 #include "precompiled.h"
 
+Module g_Module = { NULL, NULL, NULL, NULL };
 
-HIDDEN Module g_EngineModule = { NULL, NULL, NULL, NULL };
-
-extern const size_t g_BaseOffset;
-extern FunctionHook g_FunctionHooks[];
-extern AddressRef g_FunctionRefs[];
-extern AddressRef g_DataRefs[];
+// Offset where module assumed be loaded to ajust hooks offsets. NULL for the Linux to trigger symbols searching.
+#ifdef _WIN32
+const size_t g_BaseOffset = 0x01D00000;
+#else
+const size_t g_BaseOffset = NULL;
+#endif
 
 void *GetOriginalFuncAddrOrDie(const char *funcName)
 {
@@ -80,10 +81,9 @@ void *GetFuncRefAddrOrDefault(const char *funcName, void *def)
 	return def;
 }
 
-int HookEngine(size_t addr)
+int HookModule(const char *pszAppName, size_t addr)
 {
-	if (addr == NULL || !FindModuleByAddress(addr, &g_EngineModule))
-	{
+	if (addr == NULL || !FindModuleByAddress(addr, &g_Module)) {
 		return (FALSE);
 	}
 
@@ -93,7 +93,7 @@ int HookEngine(size_t addr)
 	AddressRef *refData = g_DataRefs;
 	while (refData->symbolName != NULL)
 	{
-		if (!GetAddress(&g_EngineModule, (Address*)refData, g_BaseOffset))
+		if (!GetAddress(&g_Module, (Address*)refData, g_BaseOffset))
 		{
 #if _DEBUG
 			printf("%s: symbol not found \"%s\", symbol index: %i\n", __func__, refData->symbolName, refData->symbolIndex);
@@ -106,7 +106,7 @@ int HookEngine(size_t addr)
 	AddressRef *refFunc = g_FunctionRefs;
 	while (refFunc->symbolName != NULL)
 	{
-		if (!GetAddress(&g_EngineModule, (Address*)refFunc, g_BaseOffset))
+		if (!GetAddress(&g_Module, (Address*)refFunc, g_BaseOffset))
 		{
 #if _DEBUG
 			printf("%s: symbol not found \"%s\", symbol index: %i\n", __func__, refData->symbolName, refData->symbolIndex);
@@ -119,7 +119,7 @@ int HookEngine(size_t addr)
 	FunctionHook *hookFunc = g_FunctionHooks;
 	while (hookFunc->handlerFunc != NULL)
 	{
-		if (!GetAddress(&g_EngineModule, (Address*)hookFunc, g_BaseOffset))
+		if (!GetAddress(&g_Module, (Address*)hookFunc, g_BaseOffset))
 		{
 #if _DEBUG
 			printf("%s: symbol not found \"%s\", symbol index: %i\n", __func__, refData->symbolName, refData->symbolIndex);
@@ -132,24 +132,23 @@ int HookEngine(size_t addr)
 	if (!success)
 	{
 #if _DEBUG
-		printf("%s: failed to hook engine!\n", __func__);
+		printf("%s: failed to hook module!\n", __func__);
 #endif
 		return (FALSE);
 	}
 
-#ifdef _WIN32
-	Module hlds_exe;
-	if (!FindModuleByName("hlds.exe", &hlds_exe))
-		printf("%s: launcher is not hlds.exe, tests playing/recording is disabled!\n", __FUNCTION__);
+#if defined(_WIN32) && defined(HOOK_ENGINE)
+	Module application;
+	if (!FindModuleByName(pszAppName, &application))
+		printf("%s: launcher is not %s, tests playing/recording is disabled!\n", __func__, pszAppName);
 	else
-		TestSuite_Init(&g_EngineModule, &hlds_exe, g_FunctionRefs);
+		TestSuite_Init(&g_Module, &application, g_FunctionRefs);
 #endif
-
 
 	refData = g_DataRefs;
 	while (refData->addressRef != NULL)
 	{
-		if (!FindDataRef(&g_EngineModule, refData))
+		if (!FindDataRef(&g_Module, refData))
 			return (FALSE);
 		refData++;
 	}
@@ -157,26 +156,89 @@ int HookEngine(size_t addr)
 	refFunc = g_FunctionRefs;
 	while (refFunc->addressRef != NULL)
 	{
-		if (!FindDataRef(&g_EngineModule, refFunc))
+		if (!FindDataRef(&g_Module, refFunc))
 			return (FALSE);
 		refFunc++;
 	}
 
+#ifdef HOOK_ENGINE
 	// Actually hook all things
 	if (!g_RehldsRuntimeConfig.disableAllHooks)
+#endif // SWDS
 	{
 		hookFunc = g_FunctionHooks;
 		while (hookFunc->handlerFunc != NULL)
 		{
-			if (!HookFunction(&g_EngineModule, hookFunc))
+			if (!HookFunction(&g_Module, hookFunc))
 				return (FALSE);
 			hookFunc++;
 		}
 	}
 
-#ifdef _WIN32
-	Rehlds_Debug_Init(&g_EngineModule);
-#endif
+#if defined(_WIN32) && defined(HOOK_ENGINE)
+	Rehlds_Debug_Init(&g_Module);
+#endif // _WIN32
 
 	return (TRUE);
+}
+
+#ifdef _WIN32
+
+void *malloc_wrapper(size_t size) {
+	void *res = malloc(size);
+#ifdef HOOK_ENGINE
+	//Rehlds_Debug_logAlloc(size, res);
+#endif // HOOK_ENGINE
+	return res;
+}
+
+void *realloc_wrapper(void *orig, size_t newSize) {
+	void *res = realloc(orig, newSize);
+#ifdef HOOK_ENGINE
+	//Rehlds_Debug_logRealloc(newSize, orig, res);
+#endif // HOOK_ENGINE
+	return res;
+}
+
+void free_wrapper(void *mem) {
+#ifdef HOOK_ENGINE
+	//Rehlds_Debug_logFree(mem);
+#endif // HOOK_ENGINE
+	free(mem);
+}
+
+void *calloc_wrapper(size_t count, size_t size) {
+	void *res = calloc(count, size);
+#ifdef HOOK_ENGINE
+	//Rehlds_Debug_logAlloc(size * count, res);
+#endif // HOOK_ENGINE
+	return res;
+}
+
+void *__nh_malloc_wrapper(size_t sz, int unk) {
+	void *res = malloc(sz);
+#ifdef HOOK_ENGINE
+	//Rehlds_Debug_logAlloc(sz, res);
+#endif // HOOK_ENGINE
+	return res;
+}
+
+char *strdup_wrapper(const char *s) {
+	return _strdup(s);
+}
+
+#endif // _WIN32
+
+void logf(const char *fmt, ...)
+{
+	va_list argptr;
+	static char string[8192];
+
+	va_start(argptr, fmt);
+	_vsnprintf(string, sizeof(string), fmt, argptr);
+	string[sizeof(string) - 1] = 0;
+
+	FILE *fl = fopen("hooker.log", "a");
+	fprintf(fl, "%s\n", string);
+	fclose(fl);
 }

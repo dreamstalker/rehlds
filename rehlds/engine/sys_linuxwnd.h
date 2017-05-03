@@ -53,21 +53,4 @@ public:
 	virtual void PlayStartupVideos();
 	virtual void PlayAVIAndWait(const char *aviFile);
 	virtual void SetCursorVisible(bool bState);
-
-	// non-virtual function's of wrap for hooks a virtual
-	// Only need to HOOK_ENGINE
-	bool Init_noVirt(void *pvInstance);
-	bool Shutdown_noVirt();
-	bool CreateGameWindow_noVirt();
-	void SleepUntilInput_noVirt(int time);
-	HWND GetMainWindow_noVirt();
-	HWND * GetMainWindowAddress_noVirt();
-	void SetWindowXY_noVirt(int x, int y);
-	void SetWindowSize_noVirt(int w, int h);
-	void GetWindowRect_noVirt(int *x, int *y, int *w, int *h);
-	bool IsActiveApp_noVirt();
-	bool IsMultiplayer_noVirt();
-	void PlayStartupVideos_noVirt();
-	void PlayAVIAndWait_noVirt(const char *aviFile);
-	void SetCursorVisible_noVirt(bool bState);
 };

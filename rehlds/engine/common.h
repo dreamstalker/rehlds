@@ -220,8 +220,25 @@ NOBODY uint64 Q_strtoull(char *str);
 
 #endif // Q_functions
 
-//strcpy that works correctly with overlapping src and dst buffers
-char* strcpy_safe(char* dst, char* src);
+template <size_t N>
+char *strcopy(char (&dest)[N], const char *src) {
+	Q_strncpy(dest, src, N - 1);
+	dest[N - 1] = '\0';
+	return dest;
+}
+
+inline char *strncopy(char *dest, const char *src, size_t n) {
+	Q_strncpy(dest, src, n - 1);
+	dest[n - 1] = '\0';
+	return dest;
+}
+
+// strcpy that works correctly with overlapping src and dst buffers
+inline char *strcpy_safe(char *dst, char *src) {
+	int len = Q_strlen(src);
+	Q_memmove(dst, src, len + 1);
+	return dst;
+}
 
 int build_number(void);
 char *Info_Serverinfo(void);

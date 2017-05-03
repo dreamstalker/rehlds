@@ -57,6 +57,6 @@ int Q_UChar32ToUTF8(uchar32 uVal, char * pUTF8Out);
 int Q_UChar32ToUTF8Len(uchar32 uVal);
 qboolean Q_UnicodeValidate(const char *pUTF8);
 char *Q_UnicodeAdvance(char *pUTF8, int nChars);
-qboolean Q_StripUnprintableAndSpace(char *pch);;
+qboolean Q_StripUnprintableAndSpace(char *pch);
 qboolean V_UTF8ToUChar32(const char *pUTF8_, uchar32 *uValueOut);
 int Q_UnicodeRepair(char *pUTF8);

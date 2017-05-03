@@ -92,7 +92,7 @@ void EXPORT F(IEngineAPI **api)
 {
 	CreateInterfaceFn fn;
 	fn = Sys_GetFactoryThis();
-	*api = (IEngineAPI *)fn("VENGINE_LAUNCHER_API_VERSION002", NULL);
+	*api = (IEngineAPI *)fn(VENGINE_LAUNCHER_API_VERSION, NULL);
 }
 
 void Sys_GetCDKey(char *pszCDKey, int *nLength, int *bDedicated)
@@ -571,25 +571,18 @@ void ClearIOStates(void)
 #endif // SWDS
 }
 
-
-class CEngineAPI : public IEngineAPI
+class CEngineAPI: public IEngineAPI
 {
 public:
-
 	int Run(void *instance, char *basedir, char *cmdline, char *postRestartCmdLineArgs, CreateInterfaceFn launcherFactory, CreateInterfaceFn filesystemFactory)
 	{
 		return 0;
 	}
 };
 
-CEngineAPI g_CEngineAPI;
-
-IBaseInterface *CreateCEngineAPI(void)
-{
-	return &g_CEngineAPI;
-};
-
-InterfaceReg g_CreateCEngineAPI = InterfaceReg(CreateCEngineAPI, "VENGINE_LAUNCHER_API_VERSION002");
+#ifndef HOOK_ENGINE
+EXPOSE_SINGLE_INTERFACE(CEngineAPI, IEngineAPI, VENGINE_LAUNCHER_API_VERSION);
+#endif // HOOK_ENGINE
 
 // TODO: Needs rechecking
 /*
@@ -664,11 +657,6 @@ NOXREF int BuildMapCycleListHints(char **hints)
 
 bool CDedicatedServerAPI::Init(char *basedir, char *cmdline, CreateInterfaceFn launcherFactory, CreateInterfaceFn filesystemFactory)
 {
-	return Init_noVirt(basedir, cmdline, launcherFactory, filesystemFactory);
-}
-
-bool CDedicatedServerAPI::Init_noVirt(char *basedir, char *cmdline, CreateInterfaceFn launcherFactory, CreateInterfaceFn filesystemFactory)
-{
 	dedicated_ = (IDedicatedExports *)launcherFactory(VENGINE_DEDICATEDEXPORTS_API_VERSION, NULL);
 	if (!dedicated_)
 		return false;
@@ -706,12 +694,7 @@ bool CDedicatedServerAPI::Init_noVirt(char *basedir, char *cmdline, CreateInterf
 	return false;
 }
 
-int CDedicatedServerAPI::Shutdown(void)
-{
-	return Shutdown_noVirt();
-}
-
-int CDedicatedServerAPI::Shutdown_noVirt(void)
+int CDedicatedServerAPI::Shutdown()
 {
 	eng->Unload();
 	game->Shutdown();
@@ -726,12 +709,7 @@ int CDedicatedServerAPI::Shutdown_noVirt(void)
 	return giActive;
 }
 
-bool CDedicatedServerAPI::RunFrame(void)
-{
-	return RunFrame_noVirt();
-}
-
-bool CDedicatedServerAPI::RunFrame_noVirt(void)
+bool CDedicatedServerAPI::RunFrame()
 {
 	if (eng->GetQuitting())
 		return false;
@@ -742,27 +720,14 @@ bool CDedicatedServerAPI::RunFrame_noVirt(void)
 
 void CDedicatedServerAPI::AddConsoleText(char *text)
 {
-	AddConsoleText_noVirt(text);
-}
-
-void CDedicatedServerAPI::AddConsoleText_noVirt(char *text)
-{
 	Cbuf_AddText(text);
 }
 
 void CDedicatedServerAPI::UpdateStatus(float *fps, int *nActive, int *nMaxPlayers, char *pszMap)
 {
-	UpdateStatus_noVirt(fps, nActive, nMaxPlayers, pszMap);
-}
-
-void CDedicatedServerAPI::UpdateStatus_noVirt(float *fps, int *nActive, int *nMaxPlayers, char *pszMap)
-{
 	Host_GetHostInfo(fps, nActive, NULL, nMaxPlayers, pszMap);
 }
 
 #ifndef HOOK_ENGINE
-
 EXPOSE_SINGLE_INTERFACE(CDedicatedServerAPI, IDedicatedServerAPI, VENGINE_HLDS_API_VERSION);
-
 #endif // HOOK_ENGINE
-

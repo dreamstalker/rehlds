@@ -19,7 +19,6 @@ struct DLL_FUNCTIONS;
 #endif
 
 #include "sys_ded.h"
-#include "icommandline.h"
 #include "textconsole.h"
 #include "vgui/vguihelpers.h"
 

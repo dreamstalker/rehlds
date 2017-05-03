@@ -73,14 +73,6 @@ public:
 	virtual bool RunFrame();
 	virtual void AddConsoleText(char *text);
 	virtual void UpdateStatus(float *fps, int *nActive, int *nMaxPlayers, char *pszMap);
-
-	// non-virtual function's of wrap for hooks a virtual
-	// Only need to HOOK_ENGINE
-	bool Init_noVirt(char *basedir, char *cmdline, CreateInterfaceFn launcherFactory, CreateInterfaceFn filesystemFactory);
-	int Shutdown_noVirt();
-	bool RunFrame_noVirt();
-	void AddConsoleText_noVirt(char *text);
-	void UpdateStatus_noVirt(float *fps, int *nActive, int *nMaxPlayers, char *pszMap);
 };
 
 const char *GetCurrentSteamAppName();

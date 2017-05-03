@@ -79,14 +79,14 @@ const char A2A_PING				= 'i';	// respond with an A2A_ACK
 const char A2A_ACK				= 'j';	// general acknowledgement without info
 
 // Challenge response from master
-const char M2A_CHALLENGE			= 's';	// + challenge value
+const char M2A_CHALLENGE		= 's';	// + challenge value
 
 // 0 == regular, 1 == file stream
 enum
 {
 	FRAG_NORMAL_STREAM = 0,
 	FRAG_FILE_STREAM,
-	
+
 	MAX_STREAMS
 };
 
@@ -95,7 +95,7 @@ const float MAX_RATE		= 100000.0f;
 const float MIN_RATE		= 1000.0f;
 
 // Default data rate
-const float DEFAULT_RATE	= (9999.0f);
+const float DEFAULT_RATE	= 9999.0f;
 
 // NETWORKING INFO
 
@@ -123,12 +123,12 @@ const int NET_MAX_PAYLOAD	= 65536;
 //  short (startpos)
 //  short (length)
 // }
-#define HEADER_BYTES ( 8 + MAX_STREAMS * 9 )
+#define HEADER_BYTES (8 + MAX_STREAMS * 9)
 
 // Pad a number so it lies on an N byte boundary.
 // So PAD_NUMBER(0,4) is 0 and PAD_NUMBER(1,4) is 4
 #define PAD_NUMBER(number, boundary) \
-	( ((number) + ((boundary)-1)) / (boundary) ) * (boundary)
+	(((number) + ((boundary) - 1)) / (boundary)) * (boundary)
 
 // Pad this to next higher 16 byte boundary
 // This is the largest packet that can come in/out over the wire, before processing the header
@@ -224,7 +224,7 @@ enum
 {
 	FLOW_OUTGOING = 0,
 	FLOW_INCOMING,
-	
+
 	MAX_FLOWS
 };
 
@@ -278,9 +278,9 @@ const int FRAGMENT_MAX_SIZE = 1024;
 const int UDP_HEADER_SIZE = 28;
 const int MAX_RELIABLE_PAYLOAD = 1200;
 
-#define MAKE_FRAGID(id,count)	( ( ( id & 0xffff ) << 16 ) | ( count & 0xffff ) )
-#define FRAG_GETID(fragid)		( ( fragid >> 16 ) & 0xffff )
-#define FRAG_GETCOUNT(fragid)	( fragid & 0xffff )
+#define MAKE_FRAGID(id,count)	((( id & 0xffff) << 16) | (count & 0xffff))
+#define FRAG_GETID(fragid)		((fragid >> 16) & 0xffff)
+#define FRAG_GETCOUNT(fragid)	(fragid & 0xffff)
 
 // Generic fragment structure
 typedef struct fragbuf_s

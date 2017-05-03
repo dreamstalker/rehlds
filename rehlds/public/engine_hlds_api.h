@@ -28,7 +28,6 @@
 
 #pragma once
 
-#include "maintypes.h"
 #include "interface.h"
 
 #ifdef _WIN32
@@ -40,10 +39,9 @@
 class IDedicatedServerAPI : public IBaseInterface
 {
 public:
-
 	virtual bool Init(char *basedir, char *cmdline, CreateInterfaceFn launcherFactory, CreateInterfaceFn filesystemFactory) = 0;
-	virtual int Shutdown(void) = 0;
-	virtual bool RunFrame(void) = 0;
+	virtual int Shutdown() = 0;
+	virtual bool RunFrame() = 0;
 	virtual void AddConsoleText(char *text) = 0;
 	virtual void UpdateStatus(float *fps, int *nActive, int *nMaxPlayers, char *pszMap) = 0;
 };
