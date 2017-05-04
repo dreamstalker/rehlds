@@ -832,7 +832,8 @@ void Proxy::Broadcast(byte *data, int length, int groupType, bool isReliable)
 	IClient *client = (IClient *)m_Clients.GetFirst();
 	while (client)
 	{
-		if (((groupType & GROUP_CLIENT) && client->GetClientType() == TYPE_CLIENT)
+		if (client->IsActive()
+			&& ((groupType & GROUP_CLIENT) && client->GetClientType() == TYPE_CLIENT)
 			|| ((groupType & GROUP_PROXY) && client->GetClientType() == TYPE_PROXY)
 			|| ((groupType & GROUP_VOICE) && client->IsHearingVoices())
 			|| ((groupType & GROUP_CHAT) && client->HasChatEnabled()))
