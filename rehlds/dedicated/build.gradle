@@ -114,6 +114,7 @@ model {
 						include "ObjectList.cpp"
 						include "SteamAppStartUp.cpp"
 						include "textconsole.cpp"
+						include "commandline.cpp"
 						if (GradleCppUtils.windows) {
 							include "TextConsoleWin32.cpp"
 						}
