@@ -31,8 +31,8 @@
 #include "maintypes.h"
 
 // TODO: I think this defines must be in /common/
-#define NUM_EDICTS				900
-#define MAX_NAME				32
+const int NUM_EDICTS = 900;
+const int MAX_NAME   = 32;
 
 #include "custom_int.h"
 #include "crc.h"
@@ -54,9 +54,9 @@
 #include "inst_baseline.h"
 #include "net_ws.h"
 
-#define DEFAULT_SOUND_PACKET_VOLUME			255
-#define DEFAULT_SOUND_PACKET_ATTENUATION	1.0f
-#define DEFAULT_SOUND_PACKET_PITCH			100
+const int DEFAULT_SOUND_PACKET_VOLUME			= 255;
+const float DEFAULT_SOUND_PACKET_ATTENUATION	= 1.0f;
+const int DEFAULT_SOUND_PACKET_PITCH			= 100;
 
 // Sound flags
 enum
@@ -82,10 +82,10 @@ enum
 	MSG_FL_ONE			= BIT(7),	// Send to single client
 };
 
-#define RESOURCE_INDEX_BITS 12
+const int RESOURCE_INDEX_BITS = 12;
 
 #ifdef REHLDS_FIXES
-#define RESOURCE_MAX_COUNT  (1 << RESOURCE_INDEX_BITS)
+const int RESOURCE_MAX_COUNT = BIT(RESOURCE_INDEX_BITS);
 #endif // REHLDS_FIXES
 
 typedef enum redirect_e
@@ -240,12 +240,6 @@ typedef struct client_s
 	double m_lastvoicetime;
 	int m_sendrescount;
 } client_t;
-
-typedef enum sv_delta_s
-{
-	sv_packet_nodelta,
-	sv_packet_delta,
-} sv_delta_t;
 
 enum
 {
@@ -536,6 +530,7 @@ extern cvar_t sv_rcon_condebug;
 extern cvar_t sv_rehlds_userinfo_transmitted_fields;
 extern cvar_t sv_rehlds_attachedentities_playeranimationspeed_fix;
 extern cvar_t sv_rehlds_local_gametime;
+extern cvar_t sv_rehlds_send_mapcycle;
 #endif
 extern int sv_playermodel;
 

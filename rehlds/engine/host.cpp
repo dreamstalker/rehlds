@@ -519,6 +519,16 @@ void SV_DropClient_internal(client_t *cl, qboolean crash, const char *string)
 	cl->connection_started = realtime;
 	cl->proxy = FALSE;
 	COM_ClearCustomizationList(&cl->customdata, FALSE);
+#ifdef REHLDS_FIXES
+	if (cl->edict)
+	{
+		// Reset flags, leave FL_DORMANT used by CS
+		cl->edict->v.flags &= FL_DORMANT;
+		// Since the edict doesn't get deleted, fix it so it doesn't interfere.
+		cl->edict->v.takedamage = DAMAGE_NO;	// don't attract autoaim
+		cl->edict->v.solid = SOLID_NOT;
+	}
+#endif // REHLDS_FIXES
 	cl->edict = NULL;
 	Q_memset(cl->userinfo, 0, sizeof(cl->userinfo));
 	Q_memset(cl->physinfo, 0, sizeof(cl->physinfo));

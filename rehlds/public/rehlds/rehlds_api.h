@@ -33,9 +33,10 @@
 #include "FlightRecorder.h"
 #include "interface.h"
 #include "model.h"
+#include "ObjectList.h"
 
 #define REHLDS_API_VERSION_MAJOR 3
-#define REHLDS_API_VERSION_MINOR 1
+#define REHLDS_API_VERSION_MINOR 2
 
 //Steam_NotifyClientConnect hook
 typedef IHookChain<qboolean, IGameClient*, const void*, unsigned int> IRehldsHook_Steam_NotifyClientConnect;
@@ -267,7 +268,7 @@ struct RehldsFuncs_t {
 	cvar_t*(*GetCvarVars)();
 	int (*SV_GetChallenge)(const netadr_t& adr);
 	void (*SV_AddResource)(resourcetype_t type, const char *name, int size, unsigned char flags, int index);
-	int(*MSG_ReadShort)(void);
+	int(*MSG_ReadShort)();
 	int(*MSG_ReadBuf)(int iSize, void *pbuf);
 	void(*MSG_WriteBuf)(sizebuf_t *sb, int iSize, void *buf);
 	void(*MSG_WriteByte)(sizebuf_t *sb, int c);
@@ -283,6 +284,7 @@ struct RehldsFuncs_t {
 	void(*SV_UpdateUserInfo)(IGameClient *pGameClient);
 	bool(*StripUnprintableAndSpace)(char *pch);
 	void(*Cmd_RemoveCmd)(const char *cmd_name);
+	void(*GetCommandMatches)(const char *string, ObjectList *pMatchList);
 };
 
 class IRehldsApi {

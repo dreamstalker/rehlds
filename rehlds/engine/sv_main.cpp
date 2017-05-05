@@ -312,6 +312,7 @@ cvar_t sv_rcon_condebug = { "sv_rcon_condebug", "1", 0, 1.0f, nullptr };
 cvar_t sv_rehlds_userinfo_transmitted_fields = { "sv_rehlds_userinfo_transmitted_fields", "", 0, 0.0f, nullptr };
 cvar_t sv_rehlds_attachedentities_playeranimationspeed_fix = {"sv_rehlds_attachedentities_playeranimationspeed_fix", "0", 0, 0.0f, nullptr};
 cvar_t sv_rehlds_local_gametime = {"sv_rehlds_local_gametime", "0", 0, 0.0f, nullptr};
+cvar_t sv_rehlds_send_mapcycle = { "sv_rehlds_send_mapcycle", "0", 0, 0.0f, nullptr };
 #endif
 
 delta_t *SV_LookupDelta(char *name)
@@ -1219,23 +1220,34 @@ void SV_SendServerinfo_internal(sizebuf_t *msg, client_t *client)
 	MSG_WriteString(msg, Cvar_VariableString("hostname"));
 	MSG_WriteString(msg, g_psv.modelname);
 
-	int len = 0;
-	unsigned char *mapcyclelist = COM_LoadFileForMe(mapcyclefile.string, &len);
 #ifdef REHLDS_FIXES
-	if (mapcyclelist && len)
+	if (sv_rehlds_send_mapcycle.value)
 	{
-		MSG_WriteString(msg, (const char *)mapcyclelist);
+		int len = 0;
+		unsigned char *mapcyclelist = COM_LoadFileForMe(mapcyclefile.string, &len);
+		if (mapcyclelist && len)
+		{
+			// Trim to 8190 (see MSG_ReadString, also 1 less than expected - see READ_STRING in HLSDK), otherwise client will be unable to parse message
+			mapcyclelist[8190] = 0;
+			MSG_WriteString(msg, (const char *)mapcyclelist);
+		}
+		else
+		{
+			MSG_WriteString(msg, "mapcycle failure");
+		}
+		// FIXED: Mem leak.
+		if (mapcyclelist)
+		{
+			COM_FreeFile(mapcyclelist);
+		}
 	}
 	else
 	{
-		MSG_WriteString(msg, "mapcycle failure");
-	}
-	// FIXED: Mem leak.
-	if (mapcyclelist)
-	{
-		COM_FreeFile(mapcyclelist);
+		MSG_WriteString(msg, "");
 	}
 #else // REHLDS_FIXES
+	int len = 0;
+	unsigned char *mapcyclelist = COM_LoadFileForMe(mapcyclefile.string, &len);
 	if (mapcyclelist && len)
 	{
 		MSG_WriteString(msg, (const char *)mapcyclelist);
@@ -1246,6 +1258,8 @@ void SV_SendServerinfo_internal(sizebuf_t *msg, client_t *client)
 		MSG_WriteString(msg, "mapcycle failure");
 	}
 #endif // REHLDS_FIXES
+
+	// isVAC2Secure
 	MSG_WriteByte(msg, 0);
 
 	MSG_WriteByte(msg, svc_sendextrainfo);
@@ -1394,7 +1408,7 @@ void SV_WriteClientdataToMessage(client_t *client, sizebuf_t *msg)
 #ifdef REHLDS_FIXES
 			// So, HL and CS games send absolute gametime in these vars, DMC and Ricochet games don't send absolute gametime
 			// TODO: idk about other games
-			// FIXME: there is a loss of precision, because gamedll has already written float gametime in them 
+			// FIXME: there is a loss of precision, because gamedll has already written float gametime in them
 			if (sv_rehlds_local_gametime.value != 0.0f)
 			{
 				auto convertGlobalGameTimeToLocal =
@@ -1997,7 +2011,7 @@ int EXT_FUNC SV_FinishCertificateCheck_internal(netadr_t *adr, int nAuthProtocol
 
 	const char *val = Info_ValueForKey(userinfo, "*hltv");
 
-	if (val[0] == 0 || Q_atoi(val) != 1)
+	if (val[0] == 0 || Q_atoi(val) != TYPE_PROXY)
 	{
 		SV_RejectConnection(adr, "Invalid CD Key.\n");
 		return 0;
@@ -2240,10 +2254,10 @@ int SV_CheckUserInfo(netadr_t *adr, char *userinfo, qboolean bIsReconnecting, in
 
 	switch (Q_atoi(s))
 	{
-	case 0:
+	case TYPE_CLIENT:
 		return 1;
 
-	case 1:
+	case TYPE_PROXY:
 		SV_CountProxies(&proxies);
 		if (proxies >= sv_proxies.value && !bIsReconnecting)
 		{
@@ -2252,7 +2266,7 @@ int SV_CheckUserInfo(netadr_t *adr, char *userinfo, qboolean bIsReconnecting, in
 		}
 		return 1;
 
-	case 3:
+	case TYPE_COMMENTATOR:
 		SV_RejectConnection(adr, "Please connect to HLTV master proxy.\n");
 		return 0;
 
@@ -2456,7 +2470,7 @@ void EXT_FUNC SV_ConnectClient_internal(void)
 			SV_RejectConnection(&adr, "Invalid validation type\n");
 			return;
 		}
-		if (Q_atoi(val) != 1)
+		if (Q_atoi(val) != TYPE_PROXY)
 		{
 			SV_RejectConnection(&adr, "Invalid validation type\n");
 			return;
@@ -3225,8 +3239,8 @@ void SV_BeginRedirect(redirect_t rd, netadr_t *addr)
 	outputbuf[0] = 0;
 }
 
-#define MAX_RCON_FAILURES_STORAGE 32
-#define MAX_RCON_FAILURES 20
+const int MAX_RCON_FAILURES_STORAGE = 32;
+const int MAX_RCON_FAILURES = 20;
 
 typedef struct rcon_failure_s
 {
@@ -4315,8 +4329,12 @@ int SV_CreatePacketEntities_internal(sv_delta_t type, client_t *client, packet_e
 			else
 				newindex = 9999;
 		}
-
+		
+#ifdef REHLDS_FIXES
+		if (oldnum < oldmax && from)
+#else
 		if (oldnum < oldmax)
+#endif
 			oldindex = from->entities[oldnum].number;
 		else
 			oldindex = 9999;
@@ -5037,7 +5055,7 @@ void SV_ExtractFromUserinfo(client_t *cl)
 	cl->lc = val[0] != 0 ? Q_atoi(val) != 0 : 0;
 
 	val = Info_ValueForKey(userinfo, "*hltv");
-	cl->proxy = val[0] != 0 ? Q_atoi(val) == 1 : 0;
+	cl->proxy = val[0] != 0 ? Q_atoi(val) == TYPE_PROXY : 0;
 
 	SV_CheckUpdateRate(&cl->next_messageinterval);
 	SV_CheckRate(cl);
@@ -5241,7 +5259,7 @@ void SV_CreateGenericResources(void)
 				Con_Printf("Can't precache .dll files:  %s\n", com_token);
 			else
 				successful = true;
-				
+
 		}
 		else
 			successful = true;
@@ -5628,7 +5646,7 @@ void SetCStrikeFlags(void)
 			g_eGameType = GT_CZero;
 #else
 			g_bIsCZero = 1;
-#endif			
+#endif
 		}
 		else if (!Q_stricmp(com_gamedir, "czeror"))
 		{
@@ -5636,7 +5654,7 @@ void SetCStrikeFlags(void)
 			g_eGameType = GT_CZeroRitual;
 #else
 			g_bIsCZeroRitual = 1;
-#endif		
+#endif
 		}
 		else if (!Q_stricmp(com_gamedir, "terror"))
 		{
@@ -5644,7 +5662,7 @@ void SetCStrikeFlags(void)
 			g_eGameType = GT_TerrorStrike;
 #else
 			g_bIsTerrorStrike = 1;
-#endif		
+#endif
 		}
 		else if (!Q_stricmp(com_gamedir, "tfc"))
 		{
@@ -5652,7 +5670,7 @@ void SetCStrikeFlags(void)
 			g_eGameType = GT_TFC;
 #else
 			g_bIsTFC = 1;
-#endif	
+#endif
 		}
 
 #ifndef REHLDS_FIXES
@@ -7905,6 +7923,7 @@ void SV_Init(void)
 	Cvar_RegisterVariable(&sv_rehlds_userinfo_transmitted_fields);
 	Cvar_RegisterVariable(&sv_rehlds_attachedentities_playeranimationspeed_fix);
 	Cvar_RegisterVariable(&sv_rehlds_local_gametime);
+	Cvar_RegisterVariable(&sv_rehlds_send_mapcycle);
 #endif
 
 	for (int i = 0; i < MAX_MODELS; i++)

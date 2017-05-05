@@ -28,7 +28,7 @@
 
 #pragma once
 
-#define MAX_CONSISTENCY_LIST	512
+const int MAX_CONSISTENCY_LIST = 512;
 
 typedef struct consistency_s
 {

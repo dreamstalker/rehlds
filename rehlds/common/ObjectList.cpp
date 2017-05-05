@@ -1,9 +1,37 @@
-#include "ObjectList.h"
+/*
+*
+*    This program is free software; you can redistribute it and/or modify it
+*    under the terms of the GNU General Public License as published by the
+*    Free Software Foundation; either version 2 of the License, or (at
+*    your option) any later version.
+*
+*    This program is distributed in the hope that it will be useful, but
+*    WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+*    General Public License for more details.
+*
+*    You should have received a copy of the GNU General Public License
+*    along with this program; if not, write to the Free Software Foundation,
+*    Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+*
+*    In addition, as a special exception, the author gives permission to
+*    link the code of this program with the Half-Life Game Engine ("HL
+*    Engine") and Modified Game Libraries ("MODs") developed by Valve,
+*    L.L.C ("Valve").  You must obey the GNU General Public License in all
+*    respects for all of the code used other than the HL Engine and MODs
+*    from Valve.  If you modify this file, you may extend this exception
+*    to your version of the file, but you are not obligated to do so.  If
+*    you do not wish to do so, delete this exception statement from your
+*    version.
+*
+*/
+
+#include "precompiled.h"
 
 ObjectList::ObjectList()
 {
-	head = tail = current = nullptr;
-	number = 0;
+	m_head = m_tail = m_current = nullptr;
+	m_number = 0;
 }
 
 ObjectList::~ObjectList()
@@ -23,20 +51,19 @@ bool ObjectList::AddHead(void *newObject)
 	// insert element
 	newElement->object = newObject;
 
-	if (head)
+	if (m_head)
 	{
-		newElement->next = head;
-		head->prev = newElement;
+		newElement->next = m_head;
+		m_head->prev = newElement;
 	}
 
-	head = newElement;
+	m_head = newElement;
 
-	// if list was empty set new tail
-	if (!tail)
-		tail = head;
+	// if list was empty set new m_tail
+	if (!m_tail)
+		m_tail = m_head;
 
-	number++;
-
+	m_number++;
 	return true;
 }
 
@@ -44,23 +71,23 @@ void *ObjectList::RemoveHead()
 {
 	void *retObj;
 
-	// check head is present
-	if (head)
+	// check m_head is present
+	if (m_head)
 	{
-		retObj = head->object;
-		element_t *newHead = head->next;
+		retObj = m_head->object;
+		element_t *newHead = m_head->next;
 		if (newHead)
 			newHead->prev = nullptr;
 
-		// if only one element is in list also update tail
+		// if only one element is in list also update m_tail
 		// if we remove this prev element
-		if (tail == head)
-			tail = nullptr;
+		if (m_tail == m_head)
+			m_tail = nullptr;
 
-		free(head);
-		head = newHead;
+		free(m_head);
+		m_head = newHead;
 
-		number--;
+		m_number--;
 	}
 	else
 		retObj = nullptr;
@@ -80,19 +107,19 @@ bool ObjectList::AddTail(void *newObject)
 	// insert element
 	newElement->object = newObject;
 
-	if (tail)
+	if (m_tail)
 	{
-		newElement->prev = tail;
-		tail->next = newElement;
+		newElement->prev = m_tail;
+		m_tail->next = newElement;
 	}
 
-	tail = newElement;
+	m_tail = newElement;
 
-	// if list was empty set new tail
-	if (!head)
-		head = tail;
+	// if list was empty set new m_tail
+	if (!m_head)
+		m_head = m_tail;
 
-	number++;
+	m_number++;
 	return true;
 }
 
@@ -100,23 +127,23 @@ void *ObjectList::RemoveTail()
 {
 	void *retObj;
 
-	// check tail is present
-	if (tail)
+	// check m_tail is present
+	if (m_tail)
 	{
-		retObj = tail->object;
-		element_t *newTail = tail->prev;
+		retObj = m_tail->object;
+		element_t *newTail = m_tail->prev;
 		if (newTail)
 			newTail->next = nullptr;
 
-		// if only one element is in list also update tail
+		// if only one element is in list also update m_tail
 		// if we remove this prev element
-		if (head == tail)
-			head = nullptr;
+		if (m_head == m_tail)
+			m_head = nullptr;
 
-		free(tail);
-		tail = newTail;
+		free(m_tail);
+		m_tail = newTail;
 
-		number--;
+		m_number--;
 
 	}
 	else
@@ -127,23 +154,23 @@ void *ObjectList::RemoveTail()
 
 bool ObjectList::IsEmpty()
 {
-	return (head == nullptr);
+	return (m_head == nullptr);
 }
 
 int ObjectList::CountElements()
 {
-	return number;
+	return m_number;
 }
 
 bool ObjectList::Contains(void *object)
 {
-	element_t *e = head;
+	element_t *e = m_head;
 
 	while (e && e->object != object) { e = e->next; }
 
 	if (e)
 	{
-		current = e;
+		m_current = e;
 		return true;
 	}
 	else
@@ -155,7 +182,7 @@ bool ObjectList::Contains(void *object)
 void ObjectList::Clear(bool freeElementsMemory)
 {
 	element_t *ne;
-	element_t *e = head;
+	element_t *e = m_head;
 
 	while (e)
 	{
@@ -168,13 +195,13 @@ void ObjectList::Clear(bool freeElementsMemory)
 		e = ne;
 	}
 
-	head = tail = current = nullptr;
-	number = 0;
+	m_head = m_tail = m_current = nullptr;
+	m_number = 0;
 }
 
 bool ObjectList::Remove(void *object)
 {
-	element_t *e = head;
+	element_t *e = m_head;
 
 	while (e && e->object != object) { e = e->next; }
 
@@ -183,12 +210,12 @@ bool ObjectList::Remove(void *object)
 		if (e->prev) e->prev->next = e->next;
 		if (e->next) e->next->prev = e->prev;
 
-		if (head == e) head = e->next;
-		if (tail == e) tail = e->prev;
-		if (current == e) current= e->next;
+		if (m_head == e) m_head = e->next;
+		if (m_tail == e) m_tail = e->prev;
+		if (m_current == e) m_current= e->next;
 
 		free(e);
-		number--;
+		m_number--;
 	}
 
 	return (e != nullptr);
@@ -196,20 +223,20 @@ bool ObjectList::Remove(void *object)
 
 void ObjectList::Init()
 {
-	head = tail = current = nullptr;
-	number = 0;
+	m_head = m_tail = m_current = nullptr;
+	m_number = 0;
 }
 
 void *ObjectList::GetFirst()
 {
-	if (head)
+	if (m_head)
 	{
-		current = head->next;
-		return head->object;
+		m_current = m_head->next;
+		return m_head->object;
 	}
 	else
 	{
-		current = nullptr;
+		m_current = nullptr;
 		return nullptr;
 	}
 }
@@ -217,10 +244,10 @@ void *ObjectList::GetFirst()
 void *ObjectList::GetNext()
 {
 	void *retObj = nullptr;
-	if (current)
+	if (m_current)
 	{
-		retObj = current->object;
-		current = current->next;
+		retObj = m_current->object;
+		m_current = m_current->next;
 	}
 
 	return retObj;

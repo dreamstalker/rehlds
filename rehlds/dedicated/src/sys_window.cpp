@@ -2,31 +2,41 @@
 
 class CSys: public ISys {
 public:
+	CSys();
 	virtual ~CSys();
 
-	void Sleep(int msec);
-	bool GetExecutableName(char *out);
-	void ErrorMessage(int level, const char *msg);
+	void Sleep(int msec) override;
+	bool GetExecutableName(char *out) override;
+	void ErrorMessage(int level, const char *msg) override;
 
-	void WriteStatusText(char *szText);
-	void UpdateStatus(int force);
+	void WriteStatusText(char *szText) override;
+	void UpdateStatus(int force) override;
 
-	long LoadLibrary(char *lib);
-	void FreeLibrary(long library);
+	long LoadLibrary(char *lib) override;
+	void FreeLibrary(long library) override;
 
-	bool CreateConsoleWindow();
-	void DestroyConsoleWindow();
+	bool CreateConsoleWindow() override;
+	void DestroyConsoleWindow() override;
 
-	void ConsoleOutput(char *string);
-	char *ConsoleInput();
-	void Printf(char *fmt, ...);
+	void ConsoleOutput(char *string) override;
+	char *ConsoleInput() override;
+	void Printf(char *fmt, ...) override;
 };
 
 CSys g_Sys;
 ISys *sys = &g_Sys;
 
+CSys::CSys()
+{
+	// Startup winock
+	WORD version = MAKEWORD(2, 0);
+	WSADATA wsaData;
+	WSAStartup(version, &wsaData);
+}
+
 CSys::~CSys()
 {
+	WSACleanup();
 	sys = nullptr;
 }
 
@@ -148,94 +158,51 @@ void CSys::Printf(char *fmt, ...)
 	ConsoleOutput(szText);
 }
 
-int StartServer()
+BOOL WINAPI ConsoleCtrlHandler(DWORD CtrlType)
 {
-	// Startup winock
-	WORD version = MAKEWORD(2, 0);
-	WSADATA wsaData;
-	WSAStartup(version, &wsaData);
-
-	CommandLine()->CreateCmdLine(GetCommandLine());
-
-	// Load engine
-	g_pEngineModule = Sys_LoadModule(ENGINE_LIB);
-	if (!g_pEngineModule)
-	{
-		MessageBox(NULL, "Unable to load engine, image is corrupt.", "Half-Life Dedicated Server Error", MB_OK);
-		return -1;
+	switch (CtrlType) {
+	case CTRL_C_EVENT:
+	case CTRL_BREAK_EVENT:
+	case CTRL_CLOSE_EVENT:
+	case CTRL_LOGOFF_EVENT:
+	case CTRL_SHUTDOWN_EVENT:
+		g_bAppHasBeenTerminated = true;
+		return TRUE;
+	default:
+		break;
 	}
 
-	g_pFileSystemModule = Sys_LoadModule(STDIO_FILESYSTEM_LIB);
+	return FALSE;
+}
 
-	// Get FileSystem interface
-	g_FilesystemFactoryFn = Sys_GetFactory(g_pFileSystemModule);
-	if (!g_FilesystemFactoryFn)
-		return -1;
+bool Sys_SetupConsole()
+{
+	console.SetColor(FOREGROUND_RED | FOREGROUND_INTENSITY);
 
-	IFileSystem *pFullFileSystem = (IFileSystem *)g_FilesystemFactoryFn(FILESYSTEM_INTERFACE_VERSION, NULL);
-	if (!pFullFileSystem)
-		return -1;
-
-	pFullFileSystem->Mount();
-
-	char *pszValue = nullptr;
-	if (CommandLine()->CheckParm("-steam")
-	|| (CommandLine()->CheckParm("-console", &pszValue) && !pszValue)) {
-		g_bVGui = true;
-		StartVGUI();
+	if (!SetConsoleCtrlHandler(ConsoleCtrlHandler, TRUE)) {
+		sys->ErrorMessage(0, "Unable to set control handler.");
+		return false;
 	}
-	else
-	{
-		if (!console.Init()) {
-			MessageBox(NULL, "Failed to initialize console.", "Half-Life Dedicated Server Error", MB_OK);
-			return 0;
+
+	return true;
+}
+
+void Sys_PrepareConsoleInput()
+{
+	MSG msg;
+	while (PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE)) {
+		if (!GetMessage(&msg, NULL, 0, 0)) {
+			break;
 		}
 
-		if (!sys->CreateConsoleWindow()) {
-			return 0;
-		}
-
-		console.SetColor(FOREGROUND_RED | FOREGROUND_INTENSITY);
-
-		if (!SetConsoleCtrlHandler(MyHandlerRoutine, TRUE)) {
-			MessageBox(NULL, "Unable to set control handler", "Half-Life Dedicated Server Error", MB_OK);
-			return 0;
-		}
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
 	}
+}
 
-	gbAppHasBeenTerminated = false;
-	Load3rdParty();
-
-	// TODO: finish me!
-	/*// run vgui
-	if (g_bVGui)
-	{
-		while (VGUIIsInConfig()	&& VGUIIsRunning())
-		{
-			RunVGUIFrame();
-		}
-	}
-	else*/
-	{
-		RunServer();
-	}
-
-	if (gpszCvars)
-		free(gpszCvars);
-
-	if (pFullFileSystem)
-		pFullFileSystem->Unmount();
-
-	Sys_UnloadModule(g_pFileSystemModule);
-
-	if (hDLLThirdParty)
-	{
-		Sys_UnloadModule((CSysModule *)hDLLThirdParty);
-		hDLLThirdParty = 0L;
-	}
-
-	WSACleanup();
-	return 0;
+void Sys_InitPingboost()
+{
+	
 }
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
@@ -243,24 +210,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	if (ShouldLaunchAppViaSteam(lpCmdLine, STDIO_FILESYSTEM_LIB, STDIO_FILESYSTEM_LIB))
 		return 0;
 
-	auto command = CommandLineToArgvW(GetCommandLineW(), (int *)&lpCmdLine);
-	auto ret = StartServer();
-	LocalFree(command);
+	//auto command = CommandLineToArgvW(GetCommandLineW(), (int *)&lpCmdLine);
+	auto ret = StartServer(lpCmdLine);
+	//LocalFree(command);
 	return ret;
-}
-
-BOOL WINAPI MyHandlerRoutine(DWORD CtrlType)
-{
-	switch (CtrlType)
-	{
-	case CTRL_C_EVENT:
-	case CTRL_BREAK_EVENT:
-	case CTRL_CLOSE_EVENT:
-	case CTRL_LOGOFF_EVENT:
-	case CTRL_SHUTDOWN_EVENT:
-		gbAppHasBeenTerminated = true;
-		return TRUE;
-	}
-
-	return FALSE;
 }

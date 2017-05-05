@@ -35,7 +35,7 @@ CRITICAL_SECTION net_cs;
 qboolean net_thread_initialized;
 
 loopback_t loopbacks[2];
-packetlag_t g_pLagData[3];	// List of lag structures, if fakelag is set.
+packetlag_t g_pLagData[NS_MAX];	// List of lag structures, if fakelag is set.
 float gFakeLag;
 int net_configured;
 #ifdef _WIN32
@@ -63,21 +63,21 @@ netadr_t in_from;
 #endif
 
 #ifndef HOOK_ENGINE
-SOCKET ip_sockets[3] = { INV_SOCK, INV_SOCK, INV_SOCK };
+SOCKET ip_sockets[NS_MAX] = { INV_SOCK, INV_SOCK, INV_SOCK };
 #else
-SOCKET ip_sockets[3];
+SOCKET ip_sockets[NS_MAX];
 #endif
 
 #ifdef _WIN32
 #ifndef HOOK_ENGINE
-SOCKET ipx_sockets[3] = { INV_SOCK, INV_SOCK, INV_SOCK };
+SOCKET ipx_sockets[NS_MAX] = { INV_SOCK, INV_SOCK, INV_SOCK };
 #else
-SOCKET ipx_sockets[3];
+SOCKET ipx_sockets[NS_MAX];
 #endif
 #endif // _WIN32
 
 LONGPACKET gNetSplit;
-net_messages_t *messages[3];
+net_messages_t *messages[NS_MAX];
 net_messages_t *normalqueue;
 //void *hNetThread;
 //int32 dwNetThreadId;
@@ -778,7 +778,7 @@ qboolean NET_LagPacket(qboolean newdata, netsrc_t sock, netadr_t *from, sizebuf_
 	packetlag_t *pPacket;
 	float curtime;
 	int ninterval;
-	static int losscount[3];
+	static int losscount[NS_MAX];
 
 	if (gFakeLag <= 0.0)
 	{
@@ -787,7 +787,11 @@ qboolean NET_LagPacket(qboolean newdata, netsrc_t sock, netadr_t *from, sizebuf_
 	}
 
 	curtime = realtime;
+#ifdef REHLDS_FIXES
+	if (newdata && data)
+#else
 	if (newdata)
+#endif
 	{
 		if (fakeloss.value != 0.0)
 		{
@@ -1026,14 +1030,14 @@ qboolean NET_QueuePacket(netsrc_t sock)
 
 	if (ret == -1 || ret == MAX_UDP_PACKET)
 	{
-		return NET_LagPacket(0, sock, 0, 0);
+		return NET_LagPacket(FALSE, sock, NULL, NULL);
 	}
 
 	NET_TransferRawData(&in_message, buf, ret);
 
-	if (*(uint32 *)in_message.data != 0xFFFFFFFE)
+	if (*(int32 *)in_message.data != NET_HEADER_FLAG_SPLITPACKET)
 	{
-		return NET_LagPacket(1, sock, &in_from, &in_message);
+		return NET_LagPacket(TRUE, sock, &in_from, &in_message);
 	}
 
 	if (in_message.cursize < 9)
@@ -1116,7 +1120,7 @@ DLL_EXPORT int NET_Sleep_Timeout(void)
 		fd_set fdset;
 		FD_ZERO(&fdset);
 
-		for (int sock = 0; sock < 3; sock++)
+		for (int sock = 0; sock < NS_MAX; sock++)
 		{
 			SOCKET net_socket = ip_sockets[sock];
 			if (net_socket != INV_SOCK)
@@ -1141,7 +1145,7 @@ DLL_EXPORT int NET_Sleep_Timeout(void)
 #ifdef REHLDS_FIXES
 		auto previousUsec = tv.tv_usec; // select(...) changes tv variable to indicate that event happened before timeout
 #endif
-		res = select((int)number + 1, &fdset, NULL, NULL, &tv);
+		res = select((int)(number + 1), &fdset, NULL, NULL, &tv);
 #ifdef REHLDS_FIXES
 		if(res > 0 && (previousUsec - tv.tv_usec > 1000) ) // res is greater zero if socket became readable
 		{
@@ -1168,7 +1172,7 @@ int NET_Sleep(void)
 	FD_ZERO(&fdset);
 	number = 0;
 
-	for (int sock = 0; sock < 3; sock++)
+	for (int sock = 0; sock < NS_MAX; sock++)
 	{
 		SOCKET net_socket = ip_sockets[sock];
 		if (net_socket != INV_SOCK)
@@ -1194,7 +1198,7 @@ int NET_Sleep(void)
 	tv.tv_sec = 0;
 	tv.tv_usec = 20 * 1000;
 
-	return select((int)(number + 1), &fdset, 0, 0, net_sleepforever == 0 ? &tv : NULL);
+	return select((int)(number + 1), &fdset, NULL, NULL, net_sleepforever == 0 ? &tv : NULL);
 }
 
 void NET_StartThread(void)
@@ -1289,7 +1293,7 @@ qboolean NET_GetPacket(netsrc_t sock)
 	NET_ThreadLock();
 	if (NET_GetLoopPacket(sock, &in_from, &in_message))
 	{
-		bret = NET_LagPacket(1, sock, &in_from, &in_message);
+		bret = NET_LagPacket(TRUE, sock, &in_from, &in_message);
 	}
 	else
 	{
@@ -1297,11 +1301,11 @@ qboolean NET_GetPacket(netsrc_t sock)
 		{
 			bret = NET_QueuePacket(sock);
 			if (!bret)
-				bret = NET_LagPacket(0, sock, 0, 0);
+				bret = NET_LagPacket(FALSE, sock, NULL, NULL);
 		}
 		else
 		{
-			bret = NET_LagPacket(0, sock, 0, 0);
+			bret = NET_LagPacket(FALSE, sock, NULL, NULL);
 		}
 	}
 
@@ -1346,7 +1350,7 @@ void NET_AllocateQueues(void)
 
 void NET_FlushQueues(void)
 {
-	for (int i = 0; i < 3; i++)
+	for (int i = 0; i < NS_MAX; i++)
 	{
 		net_messages_t *p = messages[i];
 		while (p)
@@ -1390,7 +1394,7 @@ int NET_SendLong(netsrc_t sock, SOCKET s, const char *buf, int len, int flags, c
 		}
 
 		pPacket = (SPLITPACKET *)packet;
-		pPacket->netID = -2;
+		pPacket->netID = NET_HEADER_FLAG_SPLITPACKET;
 		pPacket->sequenceNumber = gSequenceNumber;
 		packetNumber = 0;
 		totalSent = 0;
@@ -1959,7 +1963,7 @@ void NET_Config(qboolean multiplayer)
 	{
 		NET_ThreadLock();
 
-		for (int sock = 0; sock < 3; sock++)
+		for (int sock = 0; sock < NS_MAX; sock++)
 		{
 			if (ip_sockets[sock] != INV_SOCK)
 			{
@@ -2084,7 +2088,7 @@ void NET_Init(void)
 	in_message.flags = 0;
 	in_message.buffername = "in_message";
 
-	for (int i = 0; i < 3; i++)
+	for (int i = 0; i < NS_MAX; i++)
 	{
 		g_pLagData[i].pPrev = &g_pLagData[i];
 		g_pLagData[i].pNext = &g_pLagData[i];

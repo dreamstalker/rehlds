@@ -35,6 +35,9 @@ box_planes_t box_planes;
 beam_planes_t beam_planes;
 areanode_t sv_areanodes[32];
 int sv_numareanodes;
+#ifdef REHLDS_FIXES
+static link_t *touchLinksNext = NULL;
+#endif // REHLDS_FIXES
 
 cvar_t sv_force_ent_intersection = { "sv_force_ent_intersection", "0", 0, 0.0f, NULL };
 
@@ -46,6 +49,12 @@ void ClearLink(link_t *l)
 
 void RemoveLink(link_t *l)
 {
+#ifdef REHLDS_FIXES
+	if (touchLinksNext == l)
+	{
+		touchLinksNext = l->next;
+	}
+#endif // REHLDS_FIXES
 	l->next->prev = l->prev;
 	l->prev->next = l->next;
 }
@@ -56,6 +65,12 @@ void InsertLinkBefore(link_t *l, link_t *before)
 	l->prev = before->prev;
 	l->next->prev = l;
 	l->prev->next = l;
+#ifdef REHLDS_FIXES
+	if (touchLinksNext == before)
+	{
+		touchLinksNext = l;
+	}
+#endif // REHLDS_FIXES
 }
 
 NOXREF void InsertLinkAfter(link_t *l, link_t *after)
@@ -308,11 +323,13 @@ void SV_UnlinkEdict(edict_t *ent)
 void SV_TouchLinks(edict_t *ent, areanode_t *node)
 {
 	edict_t *touch;
-	link_t *next;
+#ifndef REHLDS_FIXES
+	link_t *touchLinksNext;
+#endif // REHLDS_FIXES
 
-	for (link_t *l = node->trigger_edicts.next; l != &node->trigger_edicts; l = next)
+	for (link_t *l = node->trigger_edicts.next; l != &node->trigger_edicts; l = touchLinksNext)
 	{
-		next = l->next;
+		touchLinksNext = l->next;
 		touch = (edict_t *)((char *)l - offsetof(edict_t, area));
 		if (touch == ent)
 			continue;
@@ -363,6 +380,9 @@ void SV_TouchLinks(edict_t *ent, areanode_t *node)
 			gEntityInterface.pfnTouch(touch, ent);
 		}
 	}
+#ifdef REHLDS_FIXES
+	touchLinksNext = NULL;
+#endif // REHLDS_FIXES
 
 	if (node->axis != -1)
 	{
@@ -562,7 +582,7 @@ void SV_LinkEdict(edict_t *ent, qboolean touch_triggers)
 	}
 
 	node = sv_areanodes;
-	while (1)
+	while (true)
 	{
 		if (node->axis == -1)
 			break;
@@ -625,7 +645,7 @@ int SV_LinkContents(areanode_t *node, const vec_t *pos)
 
 #ifdef REHLDS_OPT_PEDANTIC
 	// unroll tail recursion
-	while (1)
+	while (true)
 #endif
 	{
 		for (l = node->solid_edicts.next; l != &node->solid_edicts; l = next)
@@ -834,7 +854,7 @@ qboolean SV_RecursiveHullCheck(hull_t *hull, int num, float p1f, float p2f, cons
 						if (midf < 0.0f)
 							break;
 						frac = pdif * midf + p1f;
-						mid[0] = (p2[0] - p1[1]) * midf + p1[0];
+						mid[0] = (p2[0] - p1[0]) * midf + p1[0];
 						mid[1] = (p2[1] - p1[1]) * midf + p1[1];
 						mid[2] = (p2[2] - p1[2]) * midf + p1[2];
 					}
@@ -988,7 +1008,7 @@ qboolean SV_RecursiveHullCheck(hull_t *hull, int num, float p1f, float p2f, cons
 						if (midf < 0.0f)
 							break;
 						frac = pdif * midf + p1f;
-						mid[0] = (p2[0] - p1[1]) * midf + p1[0];
+						mid[0] = (p2[0] - p1[0]) * midf + p1[0];
 						mid[1] = (p2[1] - p1[1]) * midf + p1[1];
 						mid[2] = (p2[2] - p1[2]) * midf + p1[2];
 					}

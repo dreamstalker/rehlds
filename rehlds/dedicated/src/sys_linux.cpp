@@ -2,6 +2,7 @@
 
 class CSys: public ISys {
 public:
+	CSys();
 	virtual ~CSys();
 
 	void Sleep(int msec);
@@ -28,6 +29,20 @@ char g_szEXEName[MAX_PATH];
 
 SleepType Sys_Sleep;
 NET_Sleep_t NET_Sleep_Timeout = NULL;
+
+CSys::CSys()
+{
+	char *fname;
+	if (CommandLine()->CheckParm("-pidfile", &fname) && fname) {
+		FILE *pidFile = fopen(fname, "w");
+		if (pidFile) {
+			fprintf(pidFile, "%i\n", getpid());
+			fclose(pidFile);
+		}
+		else
+			printf("Warning: unable to open pidfile (%s)\n", fname);
+	}
+}
 
 CSys::~CSys()
 {
@@ -61,15 +76,8 @@ void Sleep_Select(int msec)
 
 void Sleep_Net(int msec)
 {
-	if (NET_Sleep_Timeout)
-	{
 		NET_Sleep_Timeout();
-		return;
 	}
-
-	// NET_Sleep_Timeout isn't hooked yet, fallback to the old method
-	Sleep_Old(msec);
-}
 
 // linux runs on a 100Hz scheduling clock, so the minimum latency from
 // usleep is 10msec. However, people want lower latency than this..
@@ -118,6 +126,37 @@ void alarmFunc(int num)
 		setitimer(ITIMER_REAL, &itim, 0);
 	}
 
+}
+
+void Sys_InitPingboost()
+{
+	Sys_Sleep = Sleep_Old;
+
+	char *pPingType;
+	int type;
+	if (CommandLine()->CheckParm("-pingboost", &pPingType) && pPingType) {
+		type = atoi(pPingType);
+		switch (type) {
+		case 1:
+		signal(SIGALRM, alarmFunc);
+		Sys_Sleep = Sleep_Timer;
+		break;
+		case 2:
+		Sys_Sleep = Sleep_Select;
+		break;
+		case 3:
+		Sys_Sleep = Sleep_Net;
+
+		// we Sys_GetProcAddress NET_Sleep() from
+		//engine_i486.so later in this function
+		NET_Sleep_Timeout = (NET_Sleep_t)Sys_GetProcAddress(g_pEngineModule, "NET_Sleep_Timeout");
+		break;
+		// just in case
+		default:
+		Sys_Sleep = Sleep_Old;
+		break;
+		}
+	}
 }
 
 bool CSys::GetExecutableName(char *out)
@@ -206,15 +245,14 @@ void CSys::Printf(char *fmt, ...)
 	ConsoleOutput(szText);
 }
 
-#define MAX_LINUX_CMDLINE 2048
-static char linuxCmdline[ MAX_LINUX_CMDLINE ];
+const int MAX_LINUX_CMDLINE = 2048;
+static char linuxCmdline[MAX_LINUX_CMDLINE];
 
-void BuildCmdLine(int argc, char **argv)
+char* BuildCmdLine(int argc, char **argv)
 {
-	int len;
-	int i;
+	int len = 0;
 
-	for (len = 0, i = 1; i < argc; i++)
+	for (int i = 1; i < argc; i++)
 	{
 		len += strlen(argv[i]) + 1;
 	}
@@ -223,112 +261,33 @@ void BuildCmdLine(int argc, char **argv)
 	{
 		printf("command line too long, %i max\n", MAX_LINUX_CMDLINE);
 		exit(-1);
-		return;
 	}
 
 	linuxCmdline[0] = '\0';
-	for (i = 1; i < argc; i++)
+	for (int i = 1; i < argc; i++)
 	{
 		if (i > 1) {
 			strcat(linuxCmdline, " ");
 		}
 
-		strcat(linuxCmdline, argv[ i ]);
+		strcat(linuxCmdline, argv[i]);
 	}
 }
 
-char *GetCommandLine()
+bool Sys_SetupConsole()
 {
-	return linuxCmdline;
+	return true;
+}
+
+void Sys_PrepareConsoleInput()
+{
 }
 
 int main(int argc, char *argv[])
 {
 	_snprintf(g_szEXEName, sizeof(g_szEXEName), "%s", argv[0]);
-	BuildCmdLine(argc, argv);
+	char* cmdline = BuildCmdLine(argc, argv);
+	StartServer(cmdline);
 
-	CommandLine()->CreateCmdLine(::GetCommandLine());
-	CommandLine()->AppendParm("-steam", NULL);
-
-	// Load engine
-	g_pEngineModule = Sys_LoadModule(ENGINE_LIB);
-	if (!g_pEngineModule)
-	{
-		sys->ErrorMessage(1, "Unable to load engine, image is corrupt.");
-		return -1;
-	}
-
-	Sys_Sleep = Sleep_Old;
-
-	char *pPingType;
-	int type;
-	if (CommandLine()->CheckParm("-pingboost", &pPingType) && pPingType)
-	{
-		type = atoi(pPingType);
-		switch (type)
-		{
-		case 1:
-			signal(SIGALRM, alarmFunc);
-			Sys_Sleep = Sleep_Timer;
-			break;
-		case 2:
-			Sys_Sleep = Sleep_Select;
-			break;
-		case 3:
-			Sys_Sleep = Sleep_Net;
-
-			// we Sys_GetProcAddress NET_Sleep() from
-			//engine_i486.so later in this function
-			NET_Sleep_Timeout = (NET_Sleep_t)Sys_GetProcAddress(g_pEngineModule, "NET_Sleep_Timeout");
-			break;
-		// just in case
-		default:
-			Sys_Sleep = Sleep_Old;
-			break;
-		}
-	}
-
-	char *fsmodule;
-	if (CommandLine()->CheckParm("-pidfile", &fsmodule) && fsmodule)
-	{
-		FILE *pidFile = fopen(fsmodule, "w");
-		if (pidFile) {
-			fprintf(pidFile, "%i\n", getpid());
-			fclose(pidFile);
-		}
-		else
-			printf("Warning: unable to open pidfile (%s)\n", pPingType);
-	}
-
-	g_pFileSystemModule = Sys_LoadModule(STDIO_FILESYSTEM_LIB);
-
-	// Get FileSystem interface
-	g_FilesystemFactoryFn = Sys_GetFactory(g_pFileSystemModule);
-	if (!g_FilesystemFactoryFn)
-		return -1;
-
-	IFileSystem *pFullFileSystem = (IFileSystem *)g_FilesystemFactoryFn(FILESYSTEM_INTERFACE_VERSION, NULL);
-	if (!pFullFileSystem)
-		return -1;
-
-	pFullFileSystem->Mount();
-
-	if (!console.Init()) {
-		puts("Failed to initilise console.");
-		return 0;
-	}
-
-	gbAppHasBeenTerminated = false;
-	RunServer();
-
-	if (gpszCvars)
-		free(gpszCvars);
-
-	if (pFullFileSystem)
-		pFullFileSystem->Unmount();
-
-	Sys_UnloadModule(g_pFileSystemModule);
-
-	exit(0);
 	return 0;
 }

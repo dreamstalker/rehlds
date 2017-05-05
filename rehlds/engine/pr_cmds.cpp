@@ -113,7 +113,7 @@ void EXT_FUNC SetMinMaxSize(edict_t *e, const float *min, const float *max, qboo
 	e->v.size[0] = max[0] - min[0];
 	e->v.size[1] = max[1] - min[1];
 	e->v.size[2] = max[2] - min[2];
-	SV_LinkEdict(e, 0);
+	SV_LinkEdict(e, FALSE);
 }
 
 void EXT_FUNC PF_setsize_I(edict_t *e, const float *rgflMin, const float *rgflMax)
@@ -828,7 +828,7 @@ void EXT_FUNC PF_stuffcmd_I(edict_t *pEdict, const char *szFmt, ...)
 	Q_vsnprintf(szOut, sizeof(szOut), szFmt, argptr);
 	va_end(argptr);
 
-	szOut[1023] = 0;
+	szOut[sizeof(szOut) - 1] = 0;
 	if (entnum < 1 || entnum > g_psvs.maxclients)
 	{
 		Con_Printf("\n!!!\n\nStuffCmd:  Some entity tried to stuff '%s' to console "
@@ -977,6 +977,8 @@ int EXT_FUNC iGetIndex(const char *pszField)
 	IGETINDEX_CHECK_FIELD(noise3);
 	IGETINDEX_CHECK_FIELD(globalname);
 
+	#undef IGETINDEX_CHECK_FIELD
+
 	return -1;
 }
 
@@ -1017,8 +1019,6 @@ qboolean EXT_FUNC PR_IsEmptyString(const char *s)
 
 int EXT_FUNC PF_precache_sound_I(const char *s)
 {
-	int i;
-
 	if (!s)
 		Host_Error("%s: NULL pointer", __func__);
 
@@ -1032,7 +1032,7 @@ int EXT_FUNC PF_precache_sound_I(const char *s)
 	{
 		g_psv.sound_precache_hashedlookup_built = 0;
 
-		for (i = 0; i < MAX_SOUNDS; i++)
+		for (int i = 0; i < MAX_SOUNDS; i++)
 		{
 			if (!g_psv.sound_precache[i])
 			{
@@ -1055,7 +1055,7 @@ int EXT_FUNC PF_precache_sound_I(const char *s)
 	}
 
 	// precaching not enabled. check if already exists.
-	for (i = 0; i < MAX_SOUNDS; i++)
+	for (int i = 0; i < MAX_SOUNDS; i++)
 	{
 		if (g_psv.sound_precache[i] && !Q_stricmp(g_psv.sound_precache[i], s))
 			return i;
@@ -1541,11 +1541,15 @@ int EXT_FUNC PF_precache_generic_I(const char *s)
 
 int EXT_FUNC PF_IsMapValid_I(const char *mapname)
 {
+#ifdef REHLDS_FIXES
+	char cBuf[42];
+	if (!mapname || mapname[0] == '\0')
+#else
 	char cBuf[260];
 	if (!mapname || Q_strlen(mapname) == 0)
+#endif
 		return 0;
-
-
+	
 	Q_snprintf(cBuf, sizeof(cBuf), "maps/%.32s.bsp", mapname);
 	return FS_FileExists(cBuf);
 }
@@ -1687,7 +1691,7 @@ int EXT_FUNC PF_droptofloor_I(edict_t *ent)
 	ent->v.origin[0] = trace.endpos[0];
 	ent->v.origin[1] = trace.endpos[1];
 	ent->v.origin[2] = trace.endpos[2];
-	SV_LinkEdict(ent, 0);
+	SV_LinkEdict(ent, FALSE);
 	ent->v.flags |= FL_ONGROUND;
 	ent->v.groundentity = trace.ent;
 
@@ -1739,7 +1743,6 @@ void EXT_FUNC PF_aim_I(edict_t *ent, float speed, float *rgflReturn)
 	vec3_t dir;
 	vec3_t end;
 	vec3_t bestdir;
-	int j;
 	trace_t tr;
 	float dist;
 	float bestdist;
@@ -1788,7 +1791,7 @@ void EXT_FUNC PF_aim_I(edict_t *ent, float speed, float *rgflReturn)
 		if (ent->v.team > 0 && ent->v.team == check->v.team)
 			continue;
 
-		for (j = 0; j < 3; j++)
+		for (int j = 0; j < 3; j++)
 		{
 			end[j] = (check->v.maxs[j] + check->v.mins[j]) * 0.75 + check->v.origin[j] + ent->v.view_ofs[j] * 0.0;
 		}
@@ -2099,9 +2102,10 @@ void EXT_FUNC PF_MessageBegin_I(int msg_dest, int msg_type, const float *pOrigin
 			gMsgOrigin[1] = pOrigin[1];
 			gMsgOrigin[2] = pOrigin[2];
 		}
-
+#ifndef REHLDS_FIXES
 		//No idea why is it called here
-		//Host_IsSinglePlayerGame();
+		Host_IsSinglePlayerGame();
+#endif
 	}
 
 	gMsgBuffer.flags = SIZEBUF_ALLOW_OVERFLOW;
@@ -2357,11 +2361,13 @@ void SeedRandomNumberGenerator(void)
 	}
 }
 
-#define IA 16807
-#define IM 2147483647
-#define IQ 127773
-#define IR 2836
-#define NTAB 32
+const int IA = 16807;
+const int IM = 2147483647;
+const int IQ = 127773;
+const int IR = 2836;
+
+const int NTAB = 32;
+
 #define NDIV (1+(IM-1)/NTAB)
 
 int32 ran1(void)
@@ -2523,10 +2529,12 @@ const char* EXT_FUNC PF_GetPlayerAuthId(edict_t *e)
 			Q_strcpy(szAuthID[count], "BOT");
 		}
 //		AUTH_IDTYPE_LOCAL is handled inside SV_GetIDString(), no need to do it here
-//		else if (cl->network_userid.idtype == AUTH_IDTYPE_LOCAL)
-//		{
-//			Q_strcpy(szAuthID[count], "HLTV");
-//		}
+#ifndef REHLDS_FIXES
+		else if (cl->network_userid.idtype == AUTH_IDTYPE_LOCAL)
+		{
+			Q_strcpy(szAuthID[count], "HLTV");
+		}
+#endif
 		else
 		{
 			Q_snprintf(szAuthID[count], sizeof(szAuthID[count]) - 1, "%s", SV_GetClientIDString(cl));
@@ -2560,7 +2568,7 @@ const char* EXT_FUNC PF_GetPhysicsInfoString(const edict_t *pClient)
 	int entnum = NUM_FOR_EDICT(pClient);
 	if (entnum < 1 || entnum > g_psvs.maxclients)
 	{
-		Con_Printf("tried to PF_GetPhysicsInfoString a non-client\n");
+		Con_Printf("tried to %s a non-client\n", __func__);
 		return "";
 	}
 
@@ -2573,7 +2581,7 @@ const char* EXT_FUNC PF_GetPhysicsKeyValue(const edict_t *pClient, const char *k
 	int entnum = NUM_FOR_EDICT(pClient);
 	if (entnum < 1 || entnum > g_psvs.maxclients)
 	{
-		Con_Printf("tried to PF_GetPhysicsKeyValue a non-client\n");
+		Con_Printf("tried to %s a non-client\n", __func__);
 		return "";
 	}
 
@@ -2585,7 +2593,7 @@ void EXT_FUNC PF_SetPhysicsKeyValue(const edict_t *pClient, const char *key, con
 {
 	int entnum = NUM_FOR_EDICT(pClient);
 	if (entnum < 1 || entnum > g_psvs.maxclients)
-		Con_Printf("tried to PF_SetPhysicsKeyValue a non-client\n");
+		Con_Printf("tried to %s a non-client\n", __func__);
 
 	client_t* client = &g_psvs.clients[entnum - 1];
 	Info_SetValueForKey(client->physinfo, key, value, MAX_INFO_STRING);
@@ -2605,7 +2613,7 @@ int EXT_FUNC PF_CanSkipPlayer(const edict_t *pClient)
 	int entnum = NUM_FOR_EDICT(pClient);
 	if (entnum < 1 || entnum > g_psvs.maxclients)
 	{
-		Con_Printf("tried to PF_CanSkipPlayer a non-client\n");
+		Con_Printf("tried to %s a non-client\n", __func__);
 		return 0;
 	}
 
@@ -2698,7 +2706,7 @@ void EXT_FUNC PF_GetPlayerStats(const edict_t *pClient, int *ping, int *packet_l
 	int c = NUM_FOR_EDICT(pClient);
 	if (c < 1 || c > g_psvs.maxclients)
 	{
-		Con_Printf("tried to PF_GetPlayerStats a non-client\n");
+		Con_Printf("tried to %s a non-client\n", __func__);
 		return;
 	}
 
@@ -2767,7 +2775,7 @@ void EXT_FUNC QueryClientCvarValue(const edict_t *player, const char *cvarName)
 		if (gNewDLLFunctions.pfnCvarValue)
 			gNewDLLFunctions.pfnCvarValue(player, "Bad Player");
 
-		Con_Printf("tried to QueryClientCvarValue a non-client\n");
+		Con_Printf("tried to %s a non-client\n", __func__);
 		return;
 	}
 	client_t *client = &g_psvs.clients[entnum - 1];
@@ -2783,7 +2791,11 @@ void EXT_FUNC QueryClientCvarValue2(const edict_t *player, const char *cvarName,
 		if (gNewDLLFunctions.pfnCvarValue2)
 			gNewDLLFunctions.pfnCvarValue2(player, requestID, cvarName, "Bad Player");
 
+#ifdef REHLDS_FIXES
+		Con_Printf("tried to %s a non-client\n", __func__);
+#else
 		Con_Printf("tried to QueryClientCvarValue a non-client\n");
+#endif
 		return;
 	}
 	client_t *client = &g_psvs.clients[entnum - 1];

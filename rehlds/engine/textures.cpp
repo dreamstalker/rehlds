@@ -139,7 +139,7 @@ qboolean TEX_InitFromWad(char *path)
 			SafeRead(texfile, &lumpinfo[nTexLumps], sizeof(lumpinfo_t));
 			CleanupName(lumpinfo[nTexLumps].lump.name, lumpinfo[nTexLumps].lump.name);
 			lumpinfo[nTexLumps].lump.filepos = LittleLong(lumpinfo[nTexLumps].lump.filepos);
-			lumpinfo[nTexLumps].lump.disksize = LittleLong(lumpinfo[nTexLumps].lump.disksize);;
+			lumpinfo[nTexLumps].lump.disksize = LittleLong(lumpinfo[nTexLumps].lump.disksize);
 			lumpinfo[nTexLumps].iTexFile = nTexFiles - 1;
 		}
 

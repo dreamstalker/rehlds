@@ -176,7 +176,7 @@ void setupToolchain(NativeBinarySpec b) {
 	if (!unitTestExecutable && !swdsLib) {
 		cfg.singleDefines 'HOOK_ENGINE'
 	}
-	
+
 	if (unitTestExecutable) {
 		cfg.singleDefines 'REHLDS_UNIT_TESTS'
 	}
@@ -194,22 +194,26 @@ void setupToolchain(NativeBinarySpec b) {
 
 class RehldsSrc {
 	static void rehlds_src(def h) {
-		h.rehlds_src(CppSourceSet) {
+		h.rehlds_engine(CppSourceSet) {
 			source {
-				srcDirs "engine", "rehlds", "public", "version"
+				srcDirs "engine", "rehlds", "version"
 				if (GradleCppUtils.windows) srcDirs "testsuite"
 
 				include "**/*.cpp"
 				exclude "precompiled.cpp"
-				exclude GradleCppUtils.windows ? "tier0/platform_linux.cpp" : "tier0/platform_win32.cpp"
-				exclude "interface.cpp", "rehlds/crc32c.cpp", "rehlds/sys_shared.cpp"
 			}
-
+		}
+		h.rehlds_public(CppSourceSet) {
+			source {
+				srcDirs "public"
+				include "registry.cpp", "steamid.cpp", "utlbuffer.cpp", "tier0/dbg.cpp"
+			}
+		}
+		h.rehlds_memory(CppSourceSet) {
 			source {
 				srcDirs "hookers"
-				include "**/*.cpp"
-				exclude "6132_hooker.cpp", "hooker.cpp", "main.cpp", "main_swds.cpp"
-				if (!GradleCppUtils.windows) exclude "rehlds_debug.cpp"
+				include "memory.cpp"
+				if (GradleCppUtils.windows) include "rehlds_debug.cpp"
 			}
 		}
 	}
@@ -227,7 +231,7 @@ class RehldsSrc {
 		h.rehlds_hooker_src(CppSourceSet) {
 			source {
 				srcDirs "hookers"
-				include "6132_hooker.cpp", "hooker.cpp"
+				include "engine/hooklist.cpp", "hooker.cpp"
 			}
 		}
 	}
@@ -236,7 +240,7 @@ class RehldsSrc {
 		h.rehlds_hooker_main_src(CppSourceSet) {
 			source {
 				srcDirs "hookers"
-				include "main.cpp"
+				include "engine/main.cpp"
 			}
 		}
 	}
@@ -244,8 +248,8 @@ class RehldsSrc {
 	static void rehlds_swds_main_src(def h) {
 		h.rehlds_swds_main_src(CppSourceSet) {
 			source {
-				srcDirs "hookers"
-				include "main_swds.cpp"
+				srcDir "hookers"
+				include "engine/main_swds.cpp"
 			}
 		}
 	}

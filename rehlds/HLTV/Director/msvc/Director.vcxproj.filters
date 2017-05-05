@@ -1,0 +1,108 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{e86d9738-6b9c-4a2d-ba74-454526be3b1c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HLTV">
+      <UniqueIdentifier>{b2fdbdd6-d164-4470-97e9-b454d0dc7b0f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HLTV\common">
+      <UniqueIdentifier>{722c9b02-95dc-410f-a5b4-955878646049}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="engine">
+      <UniqueIdentifier>{33779299-5f45-402f-a52f-888505614cbe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common">
+      <UniqueIdentifier>{188c9b98-4976-4512-9313-8c3ffe3d0249}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\Director.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\precompiled.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\public_amalgamation.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\common.cpp">
+      <Filter>HLTV\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\random.cpp">
+      <Filter>HLTV\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\BitBuffer.cpp">
+      <Filter>HLTV\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\DirectorCmd.cpp">
+      <Filter>HLTV\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\byteorder.cpp">
+      <Filter>HLTV\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\mathlib.cpp">
+      <Filter>HLTV\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\common\BaseSystemModule.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\common\ObjectDictionary.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\common\ObjectList.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\common\TokenLine.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\engine\mem.cpp">
+      <Filter>engine</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\Director.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\DirectorNull.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\precompiled.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\common_hltv.h">
+      <Filter>HLTV\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\random.h">
+      <Filter>HLTV\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\BitBuffer.h">
+      <Filter>HLTV\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\DirectorCmd.h">
+      <Filter>HLTV\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\byteorder.h">
+      <Filter>HLTV\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\mathlib_internal.h">
+      <Filter>HLTV\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\BaseSystemModule.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\ObjectDictionary.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\ObjectList.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\TokenLine.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\engine\mem.h">
+      <Filter>engine</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

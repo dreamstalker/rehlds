@@ -21,11 +21,10 @@
 #include "RehldsRuntimeConfig.h"
 #include "rehlds_debug.h"
 
-#ifdef HOOK_ENGINE
-#include "hooker.h"
-#endif
+// Hook stuff
+#include "hookers/engine/hooklist.h"
 
-//valve libs stuff
+// Valve libs stuff
 #include "tier0/platform.h"
 #include "tier0/dbg.h"
 
@@ -37,7 +36,7 @@
 
 #include "iosutil.h"
 
-//testsuite
+// Testsuite
 #include "testsuite.h"
 #include "funccalls.h"
 #include "recorder.h"
@@ -59,3 +58,4 @@
 #include "rehlds_security.h"
 
 #include "dlls/cdll_dll.h"
+#include "hltv.h"

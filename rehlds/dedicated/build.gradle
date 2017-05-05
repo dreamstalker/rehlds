@@ -10,6 +10,7 @@ import org.gradle.nativeplatform.NativeExecutableBinarySpec
 apply plugin: 'cpp'
 apply plugin: 'windows-resources'
 apply plugin: IccCompilerPlugin
+apply plugin: GccCompilerPlugin
 
 List<Task> getRcCompileTasks(NativeBinarySpec binary)
 {
@@ -19,6 +20,8 @@ List<Task> getRcCompileTasks(NativeBinarySpec binary)
 }
 
 void setupToolchain(NativeBinarySpec b) {
+	boolean useGcc = project.hasProperty("useGcc")
+
 	def cfg = rootProject.createToolchainConfig(b);
 	cfg.projectInclude(project, '/src', '/../engine', '/../common', '/../public', '/../public/rehlds');
 
@@ -36,11 +39,12 @@ void setupToolchain(NativeBinarySpec b) {
 		cfg.extraLibs "ws2_32.lib", "winmm.lib", "user32.lib", "advapi32.lib", "shell32.lib"
 	}
 	else if (cfg instanceof GccToolchainConfig) {
-		cfg.compilerOptions.pchConfig = new GccToolchainConfig.PrecompilerHeaderOptions(
-			enabled: true,
-			pchSourceSet: 'dedicated_pch'
-		);
-
+		if (!useGcc) {
+			cfg.compilerOptions.pchConfig = new GccToolchainConfig.PrecompilerHeaderOptions(
+				enabled: true,
+				pchSourceSet: 'dedicated_pch'
+			);
+		}
 		cfg.compilerOptions.languageStandard = 'c++0x'
 		cfg.defines([
 			'_strdup': 'strdup',
@@ -49,10 +53,15 @@ void setupToolchain(NativeBinarySpec b) {
 			'_vsnprintf': 'vsnprintf',
 			'_snprintf': 'snprintf',
 		]);
+		if (useGcc) {
+			// MMX, SSE, SSE2, SSE3, SSSE3, SSE4.1, SSE4.2, POPCNT, AVX, AES and PCLMUL instruction set support.
+			cfg.compilerOptions.args '-march=sandybridge', '-Wno-write-strings'
+		} else {
+			cfg.compilerOptions.args '-Qoption,cpp,--treat_func_as_string_literal_cpp', '-fno-rtti'
+		}
 
-		cfg.linkerOptions.stripSymbolTable = false;
-		cfg.linkerOptions.staticLibStdCpp = false;
-		cfg.compilerOptions.args '-Qoption,cpp,--treat_func_as_string_literal_cpp', '-fno-rtti', '-fno-exceptions'
+		cfg.compilerOptions.args '-fno-exceptions'
+		cfg.extraLibs 'dl'
 	}
 
 	ToolchainConfigUtils.apply(project, cfg, b);
@@ -70,9 +79,11 @@ model {
 	}
 
 	toolChains {
-		visualCpp(VisualCpp) {
-		}
-		icc(Icc) {
+		visualCpp(VisualCpp)
+		if (project.hasProperty("useGcc")) {
+			gcc(Gcc)
+		} else {
+			icc(Icc)
 		}
 	}
 
@@ -87,16 +98,35 @@ model {
 						srcDir "src"
 						include "**/*.cpp"
 						exclude "precompiled.cpp"
-
 						if (GradleCppUtils.windows) {
 							exclude "sys_linux.cpp"
 						} else {
 							exclude "sys_window.cpp", "conproc.cpp"
 						}
 					}
-
 					exportedHeaders {
 						srcDirs "vgui"
+					}
+				}
+				dedicated_common(CppSourceSet) {
+					source {
+						srcDir "../common"
+						include "ObjectList.cpp"
+						include "SteamAppStartUp.cpp"
+						include "textconsole.cpp"
+						include "commandline.cpp"
+						if (GradleCppUtils.windows) {
+							include "TextConsoleWin32.cpp"
+						}
+						else {
+							include "TextConsoleUnix.cpp"
+						}
+					}
+				}
+				dedicated_engine(CppSourceSet) {
+					source {
+						srcDir "../engine"
+						include "mem.cpp"
 					}
 				}
 				dedicated_pch(CppSourceSet) {
@@ -105,7 +135,6 @@ model {
 						include "precompiled.cpp"
 					}
 				}
-
 				rc {
 					source {
 						srcDir "msvc"

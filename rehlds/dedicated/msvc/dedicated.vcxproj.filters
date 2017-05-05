@@ -8,6 +8,12 @@
     <Filter Include="src\vgui">
       <UniqueIdentifier>{711de26d-f116-48c0-96c0-5d4189574ad1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\common">
+      <UniqueIdentifier>{c464f3ce-2fb5-4a0e-bda1-388b49b46871}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\engine">
+      <UniqueIdentifier>{565e56ff-60b6-4708-9749-010284e122a1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h" />
@@ -31,9 +37,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\commandline.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\dbg.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -59,6 +62,27 @@
       <Filter>src\vgui</Filter>
     </ClCompile>
     <ClCompile Include="..\src\dedicated_exports.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\ObjectList.cpp">
+      <Filter>src\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\TextConsoleUnix.cpp">
+      <Filter>src\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\TextConsoleWin32.cpp">
+      <Filter>src\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\textconsole.cpp">
+      <Filter>src\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\SteamAppStartUp.cpp">
+      <Filter>src\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\mem.cpp">
+      <Filter>src\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\commandline.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>

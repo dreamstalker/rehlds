@@ -1,11 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
-      <ParseFiles>false</ParseFiles>
-    </Filter>
     <Filter Include="Resource Files">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
@@ -61,15 +56,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\hookers\memory.cpp">
-      <Filter>hookers</Filter>
-    </ClCompile>
-    <ClCompile Include="..\hookers\hooker.cpp">
-      <Filter>hookers</Filter>
-    </ClCompile>
-    <ClCompile Include="..\hookers\6132_hooker.cpp">
-      <Filter>hookers</Filter>
-    </ClCompile>
     <ClCompile Include="..\engine\common.cpp">
       <Filter>engine\common</Filter>
     </ClCompile>
@@ -105,9 +91,6 @@
     </ClCompile>
     <ClCompile Include="..\engine\cvar.cpp">
       <Filter>engine\common</Filter>
-    </ClCompile>
-    <ClCompile Include="..\hookers\main.cpp">
-      <Filter>hookers</Filter>
     </ClCompile>
     <ClCompile Include="..\public\interface.cpp">
       <Filter>public</Filter>
@@ -202,9 +185,6 @@
     <ClCompile Include="..\engine\hashpak.cpp">
       <Filter>engine\common</Filter>
     </ClCompile>
-    <ClCompile Include="..\hookers\rehlds_debug.cpp">
-      <Filter>hookers</Filter>
-    </ClCompile>
     <ClCompile Include="..\unittests\TestRunner.cpp">
       <Filter>unittests</Filter>
     </ClCompile>
@@ -289,9 +269,6 @@
     <ClCompile Include="..\engine\traceinit.cpp">
       <Filter>engine\common</Filter>
     </ClCompile>
-    <ClCompile Include="..\hookers\main_swds.cpp">
-      <Filter>hookers</Filter>
-    </ClCompile>
     <ClCompile Include="..\rehlds\hookchains_impl.cpp">
       <Filter>rehlds</Filter>
     </ClCompile>
@@ -355,19 +332,28 @@
     <ClCompile Include="..\engine\md5.cpp">
       <Filter>engine\common</Filter>
     </ClCompile>
+    <ClCompile Include="..\hookers\engine\hooklist.cpp">
+      <Filter>hookers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\hookers\engine\main.cpp">
+      <Filter>hookers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\hookers\engine\main_swds.cpp">
+      <Filter>hookers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\hookers\memory.cpp">
+      <Filter>hookers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\hookers\rehlds_debug.cpp">
+      <Filter>hookers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\hookers\memory.h">
-      <Filter>hookers</Filter>
-    </ClInclude>
     <ClInclude Include="..\version\version.h">
       <Filter>version</Filter>
     </ClInclude>
     <ClInclude Include="..\engine\common.h">
       <Filter>engine\common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\hookers\engine.h">
-      <Filter>hookers</Filter>
     </ClInclude>
     <ClInclude Include="..\engine\sys_dll.h">
       <Filter>engine\common</Filter>
@@ -738,14 +724,8 @@
     <ClInclude Include="..\engine\hashpak.h">
       <Filter>engine\common</Filter>
     </ClInclude>
-    <ClInclude Include="..\hookers\rehlds_debug.h">
-      <Filter>hookers</Filter>
-    </ClInclude>
     <ClInclude Include="..\rehlds\precompiled.h">
       <Filter>rehlds</Filter>
-    </ClInclude>
-    <ClInclude Include="..\hookers\hooker.h">
-      <Filter>hookers</Filter>
     </ClInclude>
     <ClInclude Include="..\engine\tmessage.h">
       <Filter>engine\common</Filter>
@@ -1079,6 +1059,30 @@
     </ClInclude>
     <ClInclude Include="..\engine\sse_mathfun.h">
       <Filter>engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\rehlds\model.h">
+      <Filter>public\rehlds</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\rehlds\modelgen.h">
+      <Filter>public\rehlds</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\rehlds\spritegn.h">
+      <Filter>public\rehlds</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\rehlds\studio.h">
+      <Filter>public\rehlds</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hookers\engine\hooklist.h">
+      <Filter>hookers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rehlds\engine.h">
+      <Filter>rehlds</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hookers\memory.h">
+      <Filter>hookers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hookers\rehlds_debug.h">
+      <Filter>hookers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

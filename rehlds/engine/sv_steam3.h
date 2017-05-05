@@ -127,8 +127,6 @@ public:
 extern CSteam3Server *s_Steam3Server;
 extern CSteam3Client s_Steam3Client;
 
-extern bool (CSteam3Server::*pNotifyClientConnect)(client_t *client, const void *pvSteam2Key, uint32 ucbSteam2Key);
-
 uint64 ISteamGameServer_CreateUnauthenticatedUserConnection();
 bool ISteamGameServer_BUpdateUserData(uint64 steamid, const char *netname, uint32 score);
 bool ISteamApps_BIsSubscribedApp(uint32 appid);

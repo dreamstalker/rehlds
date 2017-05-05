@@ -102,7 +102,7 @@ typedef struct module_s
 #include "in_buttons.h"
 #endif
 
-#define CLDLL_INTERFACE_VERSION		7
+const int CLDLL_INTERFACE_VERSION = 7;
 
 extern void LoadSecurityModuleFromDisk(char * pszDllName);
 extern void LoadSecurityModuleFromMemory( unsigned char * pCode, int nSize );

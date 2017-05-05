@@ -1,8 +1,32 @@
-﻿#include <stdio.h>
-#include <port.h>
+﻿/*
+*
+*    This program is free software; you can redistribute it and/or modify it
+*    under the terms of the GNU General Public License as published by the
+*    Free Software Foundation; either version 2 of the License, or (at
+*    your option) any later version.
+*
+*    This program is distributed in the hope that it will be useful, but
+*    WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+*    General Public License for more details.
+*
+*    You should have received a copy of the GNU General Public License
+*    along with this program; if not, write to the Free Software Foundation,
+*    Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+*
+*    In addition, as a special exception, the author gives permission to
+*    link the code of this program with the Half-Life Game Engine ("HL
+*    Engine") and Modified Game Libraries ("MODs") developed by Valve,
+*    L.L.C ("Valve").  You must obey the GNU General Public License in all
+*    respects for all of the code used other than the HL Engine and MODs
+*    from Valve.  If you modify this file, you may extend this exception
+*    to your version of the file, but you are not obligated to do so.  If
+*    you do not wish to do so, delete this exception statement from your
+*    version.
+*
+*/
 
-#include "textconsole.h"
-#include "ObjectList.h"
+#include "precompiled.h"
 
 bool CTextConsole::Init(IBaseSystem *system)
 {
@@ -134,13 +158,22 @@ void CTextConsole::ReceiveBackspace()
 
 void CTextConsole::ReceiveTab()
 {
+#ifndef LAUNCHER_FIXES
 	if (!m_System)
 		return;
-
+#else
+	if (!rehldsFuncs || !m_nConsoleTextLen)
+	{
+		return;
+	}
+#endif
 	ObjectList matches;
 	m_szConsoleText[ m_nConsoleTextLen ] = '\0';
+#ifndef LAUNCHER_FIXES
 	m_System->GetCommandMatches(m_szConsoleText, &matches);
-
+#else
+	rehldsFuncs->GetCommandMatches(m_szConsoleText, &matches);
+#endif
 	if (matches.IsEmpty())
 		return;
 
@@ -163,15 +196,26 @@ void CTextConsole::ReceiveTab()
 	else
 	{
 		int nLongestCmd = 0;
+		int nSmallestCmd = 0;
 		int nCurrentColumn;
 		int nTotalColumns;
-
+		char szCommonCmd[256];//Should be enough.
+		char szFormatCmd[256];
+		char *pszSmallestCmd;
 		char *pszCurrentCmd = (char *)matches.GetFirst();
+		nSmallestCmd = strlen(pszCurrentCmd);
+		pszSmallestCmd = pszCurrentCmd;
 		while (pszCurrentCmd)
 		{
 			if ((int)strlen(pszCurrentCmd) > nLongestCmd)
+			{
 				nLongestCmd = strlen(pszCurrentCmd);
-
+			}
+			if ((int)strlen(pszCurrentCmd) < nSmallestCmd)
+			{
+				nSmallestCmd = strlen(pszCurrentCmd);
+				pszSmallestCmd = pszCurrentCmd;
+			}
 			pszCurrentCmd = (char *)matches.GetNext();
 		}
 
@@ -179,13 +223,11 @@ void CTextConsole::ReceiveTab()
 		nCurrentColumn = 0;
 
 		Echo("\n");
-
+		Q_strcpy(szCommonCmd, pszSmallestCmd);
 		// Would be nice if these were sorted, but not that big a deal
 		pszCurrentCmd = (char *)matches.GetFirst();
-
 		while (pszCurrentCmd)
 		{
-			char szFormatCmd[256];
 			if (++nCurrentColumn > nTotalColumns)
 			{
 				Echo("\n");
@@ -194,17 +236,25 @@ void CTextConsole::ReceiveTab()
 
 			_snprintf(szFormatCmd, sizeof(szFormatCmd), "%-*s ", nLongestCmd, pszCurrentCmd);
 			Echo(szFormatCmd);
-
+			for (char *pCur = pszCurrentCmd, *pCommon = szCommonCmd; (*pCur&&*pCommon); pCur++, pCommon++)
+			{
+				if (*pCur != *pCommon)
+				{
+					*pCommon = 0;
+					break;
+				}
+			}
 			pszCurrentCmd = (char *)matches.GetNext();
 		}
 
 		Echo("\n");
-		Echo(m_szConsoleText);
+		if (Q_strcmp(szCommonCmd, m_szConsoleText))
+		{
+			Q_strcpy(m_szConsoleText, szCommonCmd);
+			m_nConsoleTextLen = Q_strlen(szCommonCmd);
+		}
 
-		// TODO:
-		// Tack on 'common' chars in all the matches, i.e. if I typed 'con' and all the
-		// matches begin with 'connect_' then print the matches but also complete the
-		// command up to that point at least.
+		Echo(m_szConsoleText);
 	}
 
 	m_nCursorPosition = m_nConsoleTextLen;

@@ -46,13 +46,15 @@
 
 #endif // _WIN32
 
-#define MAX_ROUTEABLE_PACKET	1400
+const int MAX_ROUTEABLE_PACKET = 1400;
 
 #define SPLIT_SIZE				(MAX_ROUTEABLE_PACKET - sizeof(SPLITPACKET))
 
 // Create general message queues
-#define NUM_MSG_QUEUES 40
-#define MSG_QUEUE_SIZE 1536
+const int NUM_MSG_QUEUES = 40;
+const int MSG_QUEUE_SIZE = 1536;
+
+const int NET_HEADER_FLAG_SPLITPACKET = -2;
 
 typedef struct loopmsg_s
 {
@@ -60,7 +62,7 @@ typedef struct loopmsg_s
 	int datalen;
 } loopmsg_t;
 
-#define MAX_LOOPBACK 4
+const int MAX_LOOPBACK = 4;
 
 typedef struct loopback_s
 {
@@ -108,7 +110,7 @@ typedef struct SPLITPACKET_t
 } SPLITPACKET;
 #pragma pack(pop)
 
-#define NET_WS_MAX_FRAGMENTS 5
+const int NET_WS_MAX_FRAGMENTS = 5;
 
 #ifdef HOOK_ENGINE
 #define net_thread_initialized (*pnet_thread_initialized)

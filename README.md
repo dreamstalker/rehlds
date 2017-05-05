@@ -47,6 +47,7 @@ Bugfixed version of rehlds contains an additional cvars:
 <li>sv_rehlds_movecmdrate_avg_punish // Time in minutes for which the player will be banned (0 - Permanent, use a negative number for a kick). Default: 5
 <li>sv_rehlds_movecmdrate_max_burst // Max burst level of 'move' cmds for ban. Default: 2500
 <li>sv_rehlds_movecmdrate_burst_punish // Time in minutes for which the player will be banned (0 - Permanent, use a negative number for a kick). Default: 5
+<li>sv_rehlds_send_mapcycle <1|0> // Send mapcycle.txt in serverinfo message (HLDS behavior, but it is unused on the client). Default: 0
 <li>sv_rehlds_stringcmdrate_max_avg // Max average level of 'string' cmds for ban. Default: 80
 <li>sv_rehlds_stringcmdrate_avg_punish // Time in minutes for which the player will be banned (0 - Permanent, use a negative number for a kick). Default: 5
 <li>sv_rehlds_stringcmdrate_max_burst // Max burst level of 'string' cmds for ban. Default: 400
@@ -64,7 +65,7 @@ There are several software requirements for building rehlds:
 </ol>
 
 ### Checking requirements
-####JDK version
+#### JDK version
 Windows<pre>&gt; %JAVA_HOME%\bin\javac -version
 javac 1.8.0_25
 </pre>
@@ -74,15 +75,15 @@ Linux
 javac 1.7.0_65
 </pre>
 
-####Visual Studio
+#### Visual Studio
 Help -> About
 
-####ICC
+#### ICC
 <pre>$ icc --version
 icc (ICC) 15.0.1 20141023
 </pre>
 
-####GCC
+#### GCC
 <pre>$ gcc --version
 gcc (Debian 4.9.2-10) 4.9.2
 </pre>

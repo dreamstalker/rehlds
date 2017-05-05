@@ -36,7 +36,8 @@
 #include "engine_launcher_api.h"
 #include "idedicatedexports.h"
 
-#define FIFTEEN_MB			(15 * 1024 * 1024)
+const int FIFTEEN_MB = (15 * 1024 * 1024);
+
 #define MINIMUM_WIN_MEMORY		0x0e00000
 #define WARNING_MEMORY			0x0200000
 #define MAXIMUM_WIN_MEMORY		0x8000000 // Ask for 128 MB max
@@ -72,14 +73,6 @@ public:
 	virtual bool RunFrame();
 	virtual void AddConsoleText(char *text);
 	virtual void UpdateStatus(float *fps, int *nActive, int *nMaxPlayers, char *pszMap);
-
-	// non-virtual function's of wrap for hooks a virtual
-	// Only need to HOOK_ENGINE
-	bool Init_noVirt(char *basedir, char *cmdline, CreateInterfaceFn launcherFactory, CreateInterfaceFn filesystemFactory);
-	int Shutdown_noVirt();
-	bool RunFrame_noVirt();
-	void AddConsoleText_noVirt(char *text);
-	void UpdateStatus_noVirt(float *fps, int *nActive, int *nMaxPlayers, char *pszMap);
 };
 
 const char *GetCurrentSteamAppName();

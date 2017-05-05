@@ -172,6 +172,10 @@
 	#define SOCKET_AGAIN() (errno == EAGAIN)
 	#define SOCKET_ERROR -1
 
+	inline int ioctlsocket(int fd, int cmd, unsigned int *argp) { return ioctl(fd, cmd, argp); }
+	inline int closesocket(int fd) { return close(fd); }
+	inline int WSAGetLastError() { return errno; }
+
 	inline void* sys_allocmem(unsigned int size) {
 		return mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 	}

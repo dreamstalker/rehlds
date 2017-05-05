@@ -1,0 +1,13 @@
+evaluationDependsOn(':rehlds/HLTV/Console');
+evaluationDependsOn(':rehlds/HLTV/Core');
+evaluationDependsOn(':rehlds/HLTV/DemoPlayer');
+evaluationDependsOn(':rehlds/HLTV/Director');
+evaluationDependsOn(':rehlds/HLTV/Proxy');
+
+task build {
+	dependsOn project(':rehlds/HLTV/Console').tasks.build,
+		project(':rehlds/HLTV/Core').tasks.build,
+		project(':rehlds/HLTV/DemoPlayer').tasks.build,
+		project(':rehlds/HLTV/Director').tasks.build,
+		project(':rehlds/HLTV/Proxy').tasks.build
+}

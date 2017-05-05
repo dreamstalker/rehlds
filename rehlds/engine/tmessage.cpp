@@ -115,17 +115,19 @@ char* EXT_FUNC memfgets(unsigned char *pMemFile, int fileSize, int *pFilePos, ch
 
 int IsComment(char *pText)
 {
-	int length;
 	if (!pText)
-	{
 		return TRUE;
-	}
 
-	length = Q_strlen(pText);
-	if (length >= 2 && pText[0] == '/' && pText[1] == '/' || length <= 0)
+#ifdef REHLDS_FIXES
+	if ((pText[0] == '/' && pText[1] == '/') || !pText[0])
+		return TRUE;
+#else
+	int length = Q_strlen(pText);
+	if ((length >= 2 && pText[0] == '/' && pText[1] == '/') || length <= 0)
 	{
 		return TRUE;
-	}
+	}	
+#endif
 
 	return FALSE;
 }
