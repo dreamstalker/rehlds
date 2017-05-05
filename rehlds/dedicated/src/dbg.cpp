@@ -33,9 +33,8 @@ inline void CPerformanceCounter::InitializePerformanceCounter()
 
 	// get 32 out of the 64 time bits such that we have around
 	// 1 microsecond resolution
-	unsigned int lowpart, highpart;
-	lowpart = (unsigned int)performanceFreq.LowPart;
-	highpart = (unsigned int)performanceFreq.HighPart;
+	auto lowpart = performanceFreq.LowPart;
+	auto highpart = performanceFreq.HighPart;
 	m_iLowShift = 0;
 
 	while (highpart || (lowpart > 2000000.0))
@@ -46,7 +45,7 @@ inline void CPerformanceCounter::InitializePerformanceCounter()
 		highpart >>= 1;
 	}
 
-	m_flPerfCounterFreq = 1.0 / (double)lowpart;
+	m_flPerfCounterFreq = 1.0 / lowpart;
 
 #endif // _WIN32
 }
@@ -59,18 +58,16 @@ inline double CPerformanceCounter::GetCurTime()
 	static unsigned int oldtime;
 	static int first = 1;
 	LARGE_INTEGER PerformanceCount;
-	unsigned int temp, t2;
-	double time;
+	unsigned int temp;
 
 	QueryPerformanceCounter(&PerformanceCount);
 	if (m_iLowShift == 0)
 	{
-		temp = (unsigned int)PerformanceCount.LowPart;
+		temp = PerformanceCount.LowPart;
 	}
 	else
 	{
-		temp = ((unsigned int)PerformanceCount.LowPart >> m_iLowShift) |
-			((unsigned int)PerformanceCount.HighPart << (32 - m_iLowShift));
+		temp = (PerformanceCount.LowPart >> m_iLowShift) | (PerformanceCount.HighPart << (32 - m_iLowShift));
 	}
 
 	if (first)
@@ -88,12 +85,8 @@ inline double CPerformanceCounter::GetCurTime()
 		}
 		else
 		{
-			t2 = temp - oldtime;
-
-			time = (double)t2 * m_flPerfCounterFreq;
 			oldtime = temp;
-
-			m_flCurrentTime += time;
+			m_flCurrentTime += (temp - oldtime) * m_flPerfCounterFreq;
 
 			if (m_flCurrentTime == m_flLastCurrentTime)
 			{

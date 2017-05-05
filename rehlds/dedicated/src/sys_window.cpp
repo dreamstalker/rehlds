@@ -47,7 +47,7 @@ void CSys::Sleep(int msec)
 
 bool CSys::GetExecutableName(char *out)
 {
-	if (!::GetModuleFileName((HINSTANCE)GetModuleHandle(NULL), out, 256))
+	if (!::GetModuleFileName((HINSTANCE)GetModuleHandle(nullptr), out, 256))
 		return false;
 
 	return true;
@@ -67,7 +67,6 @@ void CSys::WriteStatusText(char *szText)
 void CSys::UpdateStatus(int force)
 {
 	static double tLast = 0.0;
-	double tCurrent;
 	char szStatus[256];
 	int n, nMax;
 	char szMap[32];
@@ -76,7 +75,7 @@ void CSys::UpdateStatus(int force)
 	if (!engineAPI)
 		return;
 
-	tCurrent = (double)timeGetTime() * 0.001;
+	double tCurrent = timeGetTime() * 0.001;
 	engineAPI->UpdateStatus(&fps, &n, &nMax, szMap);
 
 	if (!force)
@@ -190,8 +189,8 @@ bool Sys_SetupConsole()
 void Sys_PrepareConsoleInput()
 {
 	MSG msg;
-	while (PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE)) {
-		if (!GetMessage(&msg, NULL, 0, 0)) {
+	while (PeekMessage(&msg, nullptr, 0, 0, PM_NOREMOVE)) {
+		if (!GetMessage(&msg, nullptr, 0, 0)) {
 			break;
 		}
 

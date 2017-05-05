@@ -83,7 +83,7 @@ int RunEngine()
 	{
 		engineAPI = (IDedicatedServerAPI *)engineFactory(VENGINE_HLDS_API_VERSION, nullptr);
 #ifdef LAUNCHER_FIXES
-		rehldsApi = (IRehldsApi *)engineFactory(VREHLDS_HLDS_API_VERSION, NULL);
+		rehldsApi = (IRehldsApi *)engineFactory(VREHLDS_HLDS_API_VERSION, nullptr);
 		if (rehldsApi)
 		{
 			if (rehldsApi->GetMajorVersion() != REHLDS_API_VERSION_MAJOR || rehldsApi->GetMinorVersion() < REHLDS_API_VERSION_MINOR)

@@ -10,9 +10,7 @@ static HANDLE hStdin;
 BOOL SetConsoleCXCY(HANDLE hStdout, int cx, int cy)
 {
 	CONSOLE_SCREEN_BUFFER_INFO info;
-	COORD coordMax;
-
-	coordMax = GetLargestConsoleWindowSize(hStdout);
+	COORD coordMax = GetLargestConsoleWindowSize(hStdout);
 
 	if (cy > coordMax.Y)
 		cy = coordMax.Y;
@@ -113,12 +111,11 @@ BOOL ReadText(LPTSTR pszText, int iBeginLine, int iEndLine)
 {
 	COORD coord;
 	DWORD dwRead;
-	BOOL bRet;
 
 	coord.X = 0;
 	coord.Y = iBeginLine;
 
-	bRet = ReadConsoleOutputCharacter(hStdout, pszText, 80 * (iEndLine - iBeginLine + 1), coord, &dwRead);
+	BOOL bRet = ReadConsoleOutputCharacter(hStdout, pszText, 80 * (iEndLine - iBeginLine + 1), coord, &dwRead);
 
 	// Make sure it's null terminated.
 	if (bRet)
@@ -183,23 +180,21 @@ BOOL WriteText(LPCTSTR szText)
 
 unsigned __stdcall RequestProc(void *arg)
 {
-	int *pBuffer;
-	DWORD dwRet;
 	HANDLE heventWait[2];
 	int iBeginLine, iEndLine;
 
 	heventWait[0] = heventParentSend;
 	heventWait[1] = heventDone;
 
-	while (1)
+	for (;;)
 	{
-		dwRet = WaitForMultipleObjects(2, heventWait, FALSE, INFINITE);
+		DWORD dwRet = WaitForMultipleObjects(2, heventWait, FALSE, INFINITE);
 
 		// heventDone fired, so we're exiting.
 		if (dwRet == WAIT_OBJECT_0 + 1)
 			break;
 
-		pBuffer = (int *)GetMappedBuffer(hfileBuffer);
+		int* pBuffer = (int *)GetMappedBuffer(hfileBuffer);
 
 		// hfileBuffer is invalid. Just leave.
 		if (!pBuffer)
@@ -284,14 +279,14 @@ void InitConProc()
 	heventChildSend = heventChild;
 
 	// So we'll know when to go away.
-	heventDone = CreateEvent(NULL, FALSE, FALSE, NULL);
+	heventDone = CreateEvent(nullptr, FALSE, FALSE, nullptr);
 	if (!heventDone)
 	{
 		sys->Printf("InitConProc:  Couldn't create heventDone\n");
 		return;
 	}
 
-	if (!_beginthreadex(NULL, 0, RequestProc, NULL, 0, &threadAddr))
+	if (!_beginthreadex(nullptr, 0, RequestProc, nullptr, 0, &threadAddr))
 	{
 		CloseHandle(heventDone);
 		sys->Printf("InitConProc:  Couldn't create third party thread\n");

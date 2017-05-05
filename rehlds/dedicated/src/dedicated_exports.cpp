@@ -2,7 +2,7 @@
 
 class CDedicatedExports: IDedicatedExports {
 public:
-	void Sys_Printf(char *text);
+	void Sys_Printf(char *text) override;
 };
 
 EXPOSE_SINGLE_INTERFACE(CDedicatedExports, IDedicatedExports, VENGINE_DEDICATEDEXPORTS_API_VERSION);
