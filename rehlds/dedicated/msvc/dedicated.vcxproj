@@ -154,6 +154,7 @@
     <ResourceCompile Include="dedicated.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\common\commandline.cpp" />
     <ClCompile Include="..\..\common\ObjectList.cpp" />
     <ClCompile Include="..\..\common\SteamAppStartUp.cpp" />
     <ClCompile Include="..\..\common\textconsole.cpp" />
@@ -163,7 +164,6 @@
     </ClCompile>
     <ClCompile Include="..\..\common\TextConsoleWin32.cpp" />
     <ClCompile Include="..\..\engine\mem.cpp" />
-    <ClCompile Include="..\src\commandline.cpp" />
     <ClCompile Include="..\src\conproc.cpp" />
     <ClCompile Include="..\src\dbg.cpp" />
     <ClCompile Include="..\src\dedicated_exports.cpp" />

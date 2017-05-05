@@ -1,6 +1,6 @@
 #include "precompiled.h"
 
-class CDedicatedExports: IDedicatedExports {
+class CDedicatedExports: public IDedicatedExports {
 public:
 	void Sys_Printf(char *text);
 };

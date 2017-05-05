@@ -59,9 +59,8 @@ void setupToolchain(NativeBinarySpec b) {
 		} else {
 			cfg.compilerOptions.args '-Qoption,cpp,--treat_func_as_string_literal_cpp', '-fno-rtti'
 		}
+
 		cfg.compilerOptions.args '-fno-exceptions'
-		cfg.linkerOptions.stripSymbolTable = false;
-		cfg.linkerOptions.staticLibStdCpp = false;
 		cfg.extraLibs 'dl'
 	}
 
@@ -115,6 +114,7 @@ model {
 						include "ObjectList.cpp"
 						include "SteamAppStartUp.cpp"
 						include "textconsole.cpp"
+						include "commandline.cpp"
 						if (GradleCppUtils.windows) {
 							include "TextConsoleWin32.cpp"
 						}

@@ -1,8 +1,8 @@
 #pragma once
 #ifdef _WIN32
 
-#define TESTPLAYER_FUNCTREE_DEPTH 8
-#define TESTPLAYER_FUNCCALL_MAXSIZE 17000
+const int TESTPLAYER_FUNCTREE_DEPTH = 8;
+const int TESTPLAYER_FUNCCALL_MAXSIZE = 17000;
 
 #include "osconfig.h"
 #include "funccalls.h"

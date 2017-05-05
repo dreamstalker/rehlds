@@ -10,8 +10,8 @@
 #include <fstream>
 #include <unordered_map>
 
-#define TESTSUITE_PROTOCOL_VERSION_MINOR 5
-#define TESTSUITE_PROTOCOL_VERSION_MAJOR 0
+const int TESTSUITE_PROTOCOL_VERSION_MINOR = 5;
+const int TESTSUITE_PROTOCOL_VERSION_MAJOR = 0;
 
 void TestSuite_Init(const Module* engine, const Module* executable, const AddressRef* funcRefs);
 

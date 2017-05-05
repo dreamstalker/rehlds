@@ -126,7 +126,7 @@ int BoxOnPlaneSide(vec_t *emins, vec_t *emaxs, mplane_t *p)
 	int		sides = 0;
 
 	__m128 emin = _mm_loadu_ps(emins);
-	__m128 emax = _mm_loadu_ps(emaxs);;
+	__m128 emax = _mm_loadu_ps(emaxs);
 	avec4_t d1, d2;
 
 	// general case

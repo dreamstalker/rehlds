@@ -1,0 +1,106 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{9111aa50-a4d2-45d9-8e74-ae8045065799}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="game_shared">
+      <UniqueIdentifier>{753dfdd8-0143-4b2f-8da1-0d60981a1388}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HLTV">
+      <UniqueIdentifier>{2fbfe7d4-1a55-4e00-a1d0-7a0fea11bdc1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HLTV\common">
+      <UniqueIdentifier>{36d6fd93-a7f4-4f53-9a15-9983679abe00}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common">
+      <UniqueIdentifier>{26672827-46c9-4080-babb-f002c2e71cf8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="engine">
+      <UniqueIdentifier>{6b303ee4-f4a5-4e82-8a4d-a374240de8d0}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\precompiled.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\System.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\game_shared\bitvec.h">
+      <Filter>game_shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\game_shared\perf_counter.h">
+      <Filter>game_shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\game_shared\voice_common.h">
+      <Filter>game_shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\common_hltv.h">
+      <Filter>HLTV\common</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="..\..\common\random.h">
+      <Filter>HLTV\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\BaseSystemModule.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\ObjectList.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\textconsole.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\TokenLine.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\engine\mem.h">
+      <Filter>engine</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\precompiled.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\public_amalgamation.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\System.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\common.cpp">
+      <Filter>HLTV\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\random.cpp">
+      <Filter>HLTV\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\common\BaseSystemModule.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\common\ObjectList.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\common\textconsole.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\common\TextConsoleUnix.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\common\TextConsoleWin32.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\common\TokenLine.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\engine\mem.cpp">
+      <Filter>engine</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="hltv.rc" />
+  </ItemGroup>
+</Project>

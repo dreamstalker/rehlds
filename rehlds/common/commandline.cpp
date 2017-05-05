@@ -322,7 +322,7 @@ const char *CCommandLine::CheckParm(const char *psz, char **ppszValue) const
 
 	char *pret = strstr(m_pszCmdLine, psz);
 	if (!pret || !ppszValue)
-		return nullptr;
+		return pret;
 
 	*ppszValue = nullptr;
 
@@ -340,11 +340,11 @@ const char *CCommandLine::CheckParm(const char *psz, char **ppszValue) const
 			break;
 
 		sz[i++] = p2[i];
-	}
-	while (i < sizeof(sz));
+	} while (i < sizeof(sz));
 
 	sz[i] = '\0';
 	*ppszValue = sz;
+	
 	return pret;
 }
 

@@ -34,7 +34,7 @@
 #include "server.h"
 #include "rehlds_api.h"
 
-#define MAX_COMMAND_LINE_PARAMS 50
+const int MAX_COMMAND_LINE_PARAMS = 50;
 
 typedef struct quakeparms_s
 {

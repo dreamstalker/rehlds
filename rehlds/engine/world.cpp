@@ -854,7 +854,7 @@ qboolean SV_RecursiveHullCheck(hull_t *hull, int num, float p1f, float p2f, cons
 						if (midf < 0.0f)
 							break;
 						frac = pdif * midf + p1f;
-						mid[0] = (p2[0] - p1[1]) * midf + p1[0];
+						mid[0] = (p2[0] - p1[0]) * midf + p1[0];
 						mid[1] = (p2[1] - p1[1]) * midf + p1[1];
 						mid[2] = (p2[2] - p1[2]) * midf + p1[2];
 					}
@@ -1008,7 +1008,7 @@ qboolean SV_RecursiveHullCheck(hull_t *hull, int num, float p1f, float p2f, cons
 						if (midf < 0.0f)
 							break;
 						frac = pdif * midf + p1f;
-						mid[0] = (p2[0] - p1[1]) * midf + p1[0];
+						mid[0] = (p2[0] - p1[0]) * midf + p1[0];
 						mid[1] = (p2[1] - p1[1]) * midf + p1[1];
 						mid[2] = (p2[2] - p1[2]) * midf + p1[2];
 					}

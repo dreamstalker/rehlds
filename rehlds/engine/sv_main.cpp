@@ -1408,7 +1408,7 @@ void SV_WriteClientdataToMessage(client_t *client, sizebuf_t *msg)
 #ifdef REHLDS_FIXES
 			// So, HL and CS games send absolute gametime in these vars, DMC and Ricochet games don't send absolute gametime
 			// TODO: idk about other games
-			// FIXME: there is a loss of precision, because gamedll has already written float gametime in them 
+			// FIXME: there is a loss of precision, because gamedll has already written float gametime in them
 			if (sv_rehlds_local_gametime.value != 0.0f)
 			{
 				auto convertGlobalGameTimeToLocal =
@@ -3239,8 +3239,8 @@ void SV_BeginRedirect(redirect_t rd, netadr_t *addr)
 	outputbuf[0] = 0;
 }
 
-#define MAX_RCON_FAILURES_STORAGE 32
-#define MAX_RCON_FAILURES 20
+const int MAX_RCON_FAILURES_STORAGE = 32;
+const int MAX_RCON_FAILURES = 20;
 
 typedef struct rcon_failure_s
 {
@@ -4329,8 +4329,12 @@ int SV_CreatePacketEntities_internal(sv_delta_t type, client_t *client, packet_e
 			else
 				newindex = 9999;
 		}
-
+		
+#ifdef REHLDS_FIXES
+		if (oldnum < oldmax && from)
+#else
 		if (oldnum < oldmax)
+#endif
 			oldindex = from->entities[oldnum].number;
 		else
 			oldindex = 9999;
@@ -5255,7 +5259,7 @@ void SV_CreateGenericResources(void)
 				Con_Printf("Can't precache .dll files:  %s\n", com_token);
 			else
 				successful = true;
-				
+
 		}
 		else
 			successful = true;
@@ -5642,7 +5646,7 @@ void SetCStrikeFlags(void)
 			g_eGameType = GT_CZero;
 #else
 			g_bIsCZero = 1;
-#endif			
+#endif
 		}
 		else if (!Q_stricmp(com_gamedir, "czeror"))
 		{
@@ -5650,7 +5654,7 @@ void SetCStrikeFlags(void)
 			g_eGameType = GT_CZeroRitual;
 #else
 			g_bIsCZeroRitual = 1;
-#endif		
+#endif
 		}
 		else if (!Q_stricmp(com_gamedir, "terror"))
 		{
@@ -5658,7 +5662,7 @@ void SetCStrikeFlags(void)
 			g_eGameType = GT_TerrorStrike;
 #else
 			g_bIsTerrorStrike = 1;
-#endif		
+#endif
 		}
 		else if (!Q_stricmp(com_gamedir, "tfc"))
 		{
@@ -5666,7 +5670,7 @@ void SetCStrikeFlags(void)
 			g_eGameType = GT_TFC;
 #else
 			g_bIsTFC = 1;
-#endif	
+#endif
 		}
 
 #ifndef REHLDS_FIXES

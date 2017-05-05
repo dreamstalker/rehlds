@@ -46,7 +46,7 @@ all big things are allocated on the hunk.
 */
 
 #define ZONEID 0x001d4a11
-#define MINFRAGMENT 64
+const int MINFRAGMENT = 64;
 
 typedef struct memblock_s
 {
@@ -227,7 +227,7 @@ NOXREF void Z_Print(memzone_t *zone)
 	memblock_t *block;
 	Con_Printf("zone size: %i  location: %p\n", mainzone->size, mainzone);
 
-	for (block = zone->blocklist.next;; block = block->next)
+	for (block = zone->blocklist.next; ; block = block->next)
 	{
 		Con_Printf("block:%p    size:%7i    tag:%3i\n", block, block->size, block->tag);
 
@@ -257,7 +257,7 @@ void Z_CheckHeap(void)
 {
 	memblock_t *block;
 
-	for (block = mainzone->blocklist.next;; block = block->next)
+	for (block = mainzone->blocklist.next; ; block = block->next)
 	{
 		if (block->next == &mainzone->blocklist)
 		{
@@ -285,7 +285,7 @@ void Z_CheckHeap(void)
 
 #ifndef Hunk_Functions_region
 
-#define HUNK_NAME_LEN 64
+const int HUNK_NAME_LEN = 64;
 #define HUNK_SENTINEL 0x1df001ed
 
 typedef struct hunk_s
@@ -579,7 +579,7 @@ CACHE MEMORY
 ===============================================================================
 */
 
-#define CACHE_NAME_LEN 64
+const int CACHE_NAME_LEN = 64;
 
 typedef struct cache_system_s
 {
@@ -1118,7 +1118,7 @@ NOXREF void Cache_Print_Models_And_Totals(void)
 	FS_Close(file);
 }
 
-#define MAX_SFX	1024
+const int MAX_SFX = 1024;
 
 NOXREF void Cache_Print_Sounds_And_Totals(void)
 {

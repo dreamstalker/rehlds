@@ -1,6 +1,6 @@
-//========= Copyright © 1996-2002, Valve LLC, All rights reserved. ============
+//========= Copyright Â© 1996-2002, Valve LLC, All rights reserved. ============
 //
-// Purpose: 
+// Purpose:
 //
 // $NoKeywords: $
 //=============================================================================
@@ -13,12 +13,13 @@
 
 #define TYPE_CLIENT				0	// client is a normal HL client (default)
 #define TYPE_PROXY				1	// client is another proxy
+#define TYPE_DIRECTOR			2
 #define TYPE_COMMENTATOR		3	// client is a commentator
 #define TYPE_DEMO				4	// client is a demo file
 
 // sub commands of svc_hltv:
 #define HLTV_ACTIVE				0	// tells client that he's an spectator and will get director commands
-#define HLTV_STATUS				1	// send status infos about proxy 
+#define HLTV_STATUS				1	// send status infos about proxy
 #define HLTV_LISTEN				2	// tell client to listen to a multicast stream
 
 // director command types:
@@ -41,17 +42,15 @@
 
 #define DRC_CMD_LAST				15
 
-
 // DRC_CMD_EVENT event flags
 #define DRC_FLAG_PRIO_MASK		0x0F	// priorities between 0 and 15 (15 most important)
-#define DRC_FLAG_SIDE			(1<<4)	// 
+#define DRC_FLAG_SIDE			(1<<4)	//
 #define DRC_FLAG_DRAMATIC		(1<<5)	// is a dramatic scene
 #define DRC_FLAG_SLOWMOTION		(1<<6)  // would look good in SloMo
 #define DRC_FLAG_FACEPLAYER		(1<<7)  // player is doning something (reload/defuse bomb etc)
 #define DRC_FLAG_INTRO			(1<<8)	// is a introduction scene
 #define DRC_FLAG_FINAL			(1<<9)	// is a final scene
 #define DRC_FLAG_NO_RANDOM		(1<<10)	// don't randomize event data
-
 
 // DRC_CMD_WAYPOINT flags
 #define DRC_FLAG_STARTPATH		1	// end with speed 0.0

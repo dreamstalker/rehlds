@@ -33,7 +33,7 @@
 
 
 // Looks like no more than 8096 visibility leafs per world model
-#define MODEL_MAX_PVS 1024
+const int MODEL_MAX_PVS = 1024;
 
 
 #ifdef HOOK_ENGINE

@@ -26,14 +26,16 @@
 *
 */
 
-#ifndef ENGINE_LAUNCHER_API_H
-#define ENGINE_LAUNCHER_API_H
-#ifdef _WIN32
 #pragma once
-#endif
 
-#include "maintypes.h"
 #include "interface.h"
+
+#ifdef _WIN32
+	#define ENGINE_CLIENT_LIB        "hw.dll"	// OpenGL/D3D video mode
+	#define ENGINE_CLIENT_SOFT_LIB   "sw.dll"	// Software video mode
+#else
+	#define ENGINE_CLIENT_LIB        "hw.so"
+#endif // _WIN32
 
 class IEngineAPI : public IBaseInterface
 {
@@ -41,4 +43,4 @@ public:
 	virtual int Run(void *instance, char *basedir, char *cmdline, char *postRestartCmdLineArgs, CreateInterfaceFn launcherFactory, CreateInterfaceFn filesystemFactory) = 0;
 };
 
-#endif // ENGINE_LAUNCHER_API_H
+#define VENGINE_LAUNCHER_API_VERSION "VENGINE_LAUNCHER_API_VERSION002"

@@ -37,9 +37,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\commandline.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\dbg.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -84,6 +81,9 @@
     </ClCompile>
     <ClCompile Include="..\..\engine\mem.cpp">
       <Filter>src\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\commandline.cpp">
+      <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

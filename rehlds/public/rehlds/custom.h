@@ -1,9 +1,9 @@
 /***
 *
 *	Copyright (c) 1996-2002, Valve LLC. All rights reserved.
-*	
-*	This product contains software technology licensed from Id 
-*	Software, Inc. ("Id Technology").  Id Technology (c) 1996 Id Software, Inc. 
+*
+*	This product contains software technology licensed from Id
+*	Software, Inc. ("Id Technology").  Id Technology (c) 1996 Id Software, Inc.
 *	All Rights Reserved.
 *
 *   Use, distribution, and modification of this source code and/or resulting
@@ -63,7 +63,14 @@ typedef struct resourceinfo_s
 
 typedef struct resource_s
 {
+#ifdef HOOK_HLTV
+	// NOTE HLTV: array szFileName declared on 260 cell,
+	// this changes necessary for compatibility hookers.
+	char              szFileName[MAX_PATH];
+#else
 	char              szFileName[MAX_QPATH]; // File name to download/precache.
+#endif // HOOK_HLTV
+
 	resourcetype_t    type;                // t_sound, t_skin, t_model, t_decal.
 	int               nIndex;              // For t_decals
 	int               nDownloadSize;       // Size in Bytes if this must be downloaded.
@@ -75,14 +82,19 @@ typedef struct resource_s
 
 	unsigned char	  rguc_reserved[ 32 ]; // For future expansion
 	struct resource_s *pNext;              // Next in chain.
+
+#if !defined(HLTV)
 	struct resource_s *pPrev;
+#else
+	unsigned char *data;
+#endif // !defined(HLTV)
 } resource_t;
 
 typedef struct customization_s
 {
 	qboolean bInUse;     // Is this customization in use;
 	resource_t resource; // The resource_t for this customization
-	qboolean bTranslated; // Has the raw data been translated into a useable format?  
+	qboolean bTranslated; // Has the raw data been translated into a useable format?
 						   //  (e.g., raw decal .wad make into texture_t *)
 	int        nUserData1; // Customization specific data
 	int        nUserData2; // Customization specific data

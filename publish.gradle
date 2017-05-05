@@ -35,20 +35,32 @@ task publishPrepareFiles {
 		}
 
 		pubRootDir.mkdirs()
+		project.file('publish/publishRoot/bin/win32/valve/dlls').mkdirs()
+		project.file('publish/publishRoot/bin/linux32/valve/dlls').mkdirs()
 
 		// bugfixed binaries
-		_copyFileToDir('publish/releaseRehldsFixes/swds.dll', 'publish/publishRoot/bin/bugfixed/')
-		_copyFileToDir('publish/releaseRehldsFixes/swds.pdb', 'publish/publishRoot/bin/bugfixed/')
-		_copyFile('publish/releaseRehldsFixes/libengine_i486.so', 'publish/publishRoot/bin/bugfixed/engine_i486.so')
-
-		// pure binaries
-		_copyFileToDir('publish/releaseRehldsNofixes/swds.dll', 'publish/publishRoot/bin/pure/')
-		_copyFileToDir('publish/releaseRehldsNofixes/swds.pdb', 'publish/publishRoot/bin/pure/')
-		_copyFile('publish/releaseRehldsNofixes/libengine_i486.so', 'publish/publishRoot/bin/pure/engine_i486.so')
+		_copyFile('publish/releaseRehldsFixes/swds.dll', 'publish/publishRoot/bin/win32/swds.dll')
+		_copyFile('publish/releaseRehldsFixes/libengine_i486.so', 'publish/publishRoot/bin/linux32/engine_i486.so')
 
 		// dedicated binaries
-		_copyFile('publish/hlds.exe', 'publish/publishRoot/bin/hlds.exe')
-		_copyFile('publish/hlds_linux', 'publish/publishRoot/bin/hlds_linux')
+		_copyFile('publish/hlds.exe', 'publish/publishRoot/bin/win32/hlds.exe')
+		_copyFile('publish/hlds_linux', 'publish/publishRoot/bin/linux32/hlds_linux')
+
+		// HLTV binaries
+		_copyFile('publish/hltv.exe', 'publish/publishRoot/bin/win32/hltv.exe')
+		_copyFile('publish/hltv', 'publish/publishRoot/bin/linux32/hltv')
+
+		_copyFile('publish/core.dll', 'publish/publishRoot/bin/win32/core.dll')
+		_copyFile('publish/libcore.so', 'publish/publishRoot/bin/linux32/core.so')
+
+		_copyFile('publish/proxy.dll', 'publish/publishRoot/bin/win32/proxy.dll')
+		_copyFile('publish/libproxy.so', 'publish/publishRoot/bin/linux32/proxy.so')
+
+		_copyFile('publish/demoplayer.dll', 'publish/publishRoot/bin/win32/demoplayer.dll')
+		_copyFile('publish/libdemoplayer.so', 'publish/publishRoot/bin/linux32/demoplayer.so')
+
+		_copyFile('publish/director.dll', 'publish/publishRoot/bin/win32/valve/dlls/director.dll')
+		_copyFile('publish/libdirector.so', 'publish/publishRoot/bin/linux32/valve/dlls/director.so')
 
 		// hlsdk
 		project.file('publish/publishRoot/hlsdk').mkdirs()
