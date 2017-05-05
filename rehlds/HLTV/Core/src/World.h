@@ -139,7 +139,7 @@ public:
 
 private:
 	int CompressFrame(frame_t *from, BitBuffer *stream);
-	int ParseDeltaHeader(BitBuffer *stream, bool *remove, bool *custom, int *numbase, bool *newbl, int *newblindex, bool full, int *offset);
+	int ParseDeltaHeader(BitBuffer *stream, bool &remove, bool &custom, int &numbase, bool &newbl, int &newblindex, bool full, int &offset);
 	void SetDirector(IDirector *director);
 	void SetTimeScale(float scale);
 	void SetGameGroupAddress(NetAddress *addr);
@@ -244,7 +244,7 @@ protected:
 	} player_info_t;
 
 	player_info_t m_Players[MAX_CLIENTS];
-	unsigned char m_EntityBuffer[87040];
+	unsigned char m_EntityBuffer[MAX_PACKET_ENTITIES * sizeof(entity_state_t)];
 
 	entity_state_t m_BaseLines[MAX_ENTITIES];
 	int m_MaxBaseLines;

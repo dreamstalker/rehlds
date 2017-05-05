@@ -316,7 +316,6 @@ Some parameters can only be set in the command line:
 -maxfps <n>         - sets maximum system cycles per seconds (default "100")
 -highpriority    - starts the HLTV proxy as high priority process
 -multicastttl <n>   - sets the Time-To-Live value for multicast packets
--steam           - proxy enables special Steam support
 -dev             - developer mode
 </pre>
 

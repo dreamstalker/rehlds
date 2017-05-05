@@ -1508,7 +1508,7 @@ void Server::ParseDeltaPacketEntities()
 {
 	int entnum = m_Instream->ReadShort();
 	if (entnum > MAX_PACKET_ENTITIES) {
-		m_System->Errorf("Server::ParsePacketEntities: entnum > MAX_PACKET_ENTITIES.\n");
+		m_System->Errorf("Server::ParseDeltaPacketEntities: entnum > MAX_PACKET_ENTITIES.\n");
 	}
 
 	m_Frame.delta = 0;
