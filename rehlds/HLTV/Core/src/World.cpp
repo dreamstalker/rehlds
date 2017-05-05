@@ -1060,65 +1060,65 @@ void World::ParseClientData(BitBuffer *stream, unsigned int deltaSeqNr, BitBuffe
 	}
 }
 
-int World::ParseDeltaHeader(BitBuffer *stream, bool *remove, bool *custom, int *numbase, bool *newbl, int *newblindex, bool full, int *offset)
+int World::ParseDeltaHeader(BitBuffer *stream, bool &remove, bool &custom, int &numbase, bool &newbl, int &newblindex, bool full, int &offset)
 {
 	int num;
+	bool isdelta, isnext;
 
-	*custom = false;
-	*newbl = false;
+	offset = 0;
+	custom = false;
+	newbl = false;
 
 	if (full)
 	{
-		*remove = false;
-
-		if (stream->ReadBit() != 0)
-		{
-			num = *numbase + 1;
-		}
-		else if (stream->ReadBit() == 0)
-		{
-			num = stream->ReadBits(6) + *numbase;
-		}
-		else
-		{
-			num = stream->ReadBits(11);
-		}
+		isdelta = stream->ReadBit() ? true : false;
+		remove = false;
 	}
 	else
 	{
-		*remove = stream->ReadBit() != 0;
-
-		if (stream->ReadBit() == 0)
-			num = stream->ReadBits(6) + *numbase;
-		else
-			num = stream->ReadBits(11);
+		isdelta = false;
+		remove = stream->ReadBit() ? true : false;
 	}
 
-	*numbase = num;
-
-	if (!*remove)
+	if (isdelta)
 	{
-		*custom = stream->ReadBit() != 0;
+		num = numbase + 1;
+	}
+	else
+	{
+		if (stream->ReadBit())
+		{
+			num = stream->ReadBits(11);
+		}
+		else
+		{
+			int delta = stream->ReadBits(6);
+			num = delta + numbase;
+		}
+	}
+
+	numbase = num;
+
+	if (!remove)
+	{
+		custom = stream->ReadBit() ? true : false;
+
 		if (m_MaxInstanced_BaseLine)
 		{
-			*newbl = stream->ReadBit() != 0;
-			if (*newbl)
-				*newblindex = stream->ReadBits(6);
-		}
-		else
-		{
-			*newbl = false;
+			isnext = stream->ReadBit() ? true : false;
+			if (isnext)
+			{
+				newbl = true;
+				newblindex = stream->ReadBits(6);
+			}
 		}
 
-		if (!full || *newbl)
+		if (full && !newbl)
 		{
-			*offset = 0;
-		}
-		else
-		{
-			*offset = stream->ReadBit();
-			if (*offset) {
-				*offset = stream->ReadBits(6);
+			isnext = stream->ReadBit() ? true : false;
+			if (isnext)
+			{
+				offset = stream->ReadBits(6);
 			}
 		}
 	}
@@ -1498,7 +1498,7 @@ bool World::UncompressEntitiesFromStream(frame_t *frame, BitBuffer *stream, unsi
 
 	while (stream->PeekBits(16))
 	{
-		newnum = ParseDeltaHeader(stream, &remove, &custom, &numbase, &newbl, &newblindex, false, &offset);
+		newnum = ParseDeltaHeader(stream, remove, custom, numbase, newbl, newblindex, false, offset);
 
 		if ((unsigned)oldindex < deltaFrame.entitynum)
 			oldnum = deltaEntity[oldindex].number;
@@ -1634,7 +1634,7 @@ bool World::UncompressEntitiesFromStream(frame_t *frame, BitBuffer *stream)
 			break;
 		}
 
-		num = ParseDeltaHeader(stream, &remove, &custom, &numbase, &newbl, &newblindex, true, &offset);
+		num = ParseDeltaHeader(stream, remove, custom, numbase, newbl, newblindex, true, offset);
 		if (num >= MAX_ENTITIES)
 		{
 			m_System->Errorf("World::GetUncompressedFrame: entity number %i >= MAX_ENTITIES\n", num);
@@ -1662,7 +1662,7 @@ bool World::UncompressEntitiesFromStream(frame_t *frame, BitBuffer *stream)
 			baseline = &m_BaseLines[num];
 		}
 
-		entities[num].entityType = custom ? ENTITY_BEAM : ENTITY_NORMAL;
+		entities[newindex].entityType = custom ? ENTITY_BEAM : ENTITY_NORMAL;
 
 		delta_t *delta = GetDeltaEncoder(num, custom);
 		m_Delta.ParseDelta(stream, (byte *)baseline, (byte *)&entities[newindex], delta);

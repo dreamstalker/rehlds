@@ -644,12 +644,6 @@ void System::Sleep(int msec)
 bool System::InitFileSystem()
 {
 	char *filesystemmodule = STDIO_FILESYSTEM_LIB;
-#ifdef _WIN32
-	if (CheckParam("-steam")) {
-		filesystemmodule = STEAM_FILESYSTEM_LIB;
-	}
-#endif // _WIN32
-
 	m_FileSystemModule = Sys_LoadModule(filesystemmodule);
 	if (!m_FileSystemModule)
 	{

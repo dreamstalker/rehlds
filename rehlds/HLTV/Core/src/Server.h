@@ -234,7 +234,7 @@ protected:
 	char m_CDKey[32];
 	int m_AuthProtocol;
 	frame_t m_Frame;
-	unsigned char m_EntityBuffer[87040];
+	unsigned char m_EntityBuffer[MAX_PACKET_ENTITIES * sizeof(entity_state_t)];
 	int m_Rate;
 	int m_UpdateRate;
 	float m_Time;
