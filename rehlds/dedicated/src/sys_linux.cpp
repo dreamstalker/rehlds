@@ -272,6 +272,8 @@ char* BuildCmdLine(int argc, char **argv)
 
 		strcat(linuxCmdline, argv[i]);
 	}
+
+	return linuxCmdline;
 }
 
 bool Sys_SetupConsole()
