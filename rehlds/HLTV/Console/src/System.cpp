@@ -1016,7 +1016,7 @@ System::library_t *System::GetLibrary(char *name)
 	_snprintf(lib->name, sizeof(lib->name), "%s." LIBRARY_PREFIX, fixedname);
 	lib->handle = (CSysModule *)Sys_LoadModule(lib->name);
 	if (!lib->handle) {
-		DPrintf("ERROR! System::GetLibrary: coulnd't load library (%s).\n", lib->name);
+		DPrintf("WARNING! System::GetLibrary: coulnd't load library (%s).\n", lib->name);
 		free(lib);
 		return nullptr;
 	}

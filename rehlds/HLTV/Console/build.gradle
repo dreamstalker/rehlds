@@ -31,7 +31,9 @@ void setupToolchain(NativeBinarySpec b) {
 			pchSourceSet: 'hltv_pch'
 		);
 
-		cfg.singleDefines('_CRT_SECURE_NO_WARNINGS')
+		cfg.singleDefines('_CRT_SECURE_NO_WARNINGS');
+
+		cfg.linkerOptions.args('/SUBSYSTEM:WINDOWS,5.01');
 		cfg.compilerOptions.args '/Ob2', '/Oi', '/GF', '/GR-'
 		cfg.extraLibs "user32.lib"
 	}
