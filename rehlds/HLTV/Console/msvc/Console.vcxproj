@@ -129,6 +129,7 @@
       <PreprocessorDefinitions>HLTV;WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir)\..\src;$(ProjectDir)\..\..\;$(ProjectDir)\..\..\..\;$(ProjectDir)\..\..\..\common;$(ProjectDir)\..\..\..\engine;$(ProjectDir)\..\..\..\public;$(ProjectDir)\..\..\..\public\rehlds;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>precompiled.h</PrecompiledHeaderFile>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -159,6 +160,7 @@
       <PreprocessorDefinitions>HLTV;WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir)\..\src;$(ProjectDir)\..\..\;$(ProjectDir)\..\..\..\;$(ProjectDir)\..\..\..\common;$(ProjectDir)\..\..\..\engine;$(ProjectDir)\..\..\..\public;$(ProjectDir)\..\..\..\public\rehlds;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>precompiled.h</PrecompiledHeaderFile>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
