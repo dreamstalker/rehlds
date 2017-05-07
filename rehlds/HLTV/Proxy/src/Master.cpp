@@ -132,7 +132,7 @@ void Master::RunFrame(double time)
 					SteamGameServer()->SetGameDescription("hltv");
 					SteamGameServer()->SetModDir(world->GetGameDir());
 					SteamGameServer()->SetDedicatedServer(true);
-					SteamGameServer()->SetSpectatorPort(netAdr->m_Port);
+					SteamGameServer()->SetSpectatorPort(htons(netAdr->m_Port));
 					SteamGameServer()->LogOnAnonymous();
 
 					SteamGameServer()->EnableHeartbeats(true);
