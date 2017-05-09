@@ -432,7 +432,7 @@ void DemoFile::ReadDemoPacket(BitBuffer *demoData, demo_info_t *demoInfo)
 	while (readNextCmd)
 	{
 		unsigned int curpos = m_FileSystem->Tell(m_FileHandle);
-		if (m_FileSystem->Read(&cmd, sizeof(unsigned char), m_FileHandle) != 1) {
+		if (m_FileSystem->Read(&cmd, sizeof(unsigned char), m_FileHandle) != sizeof(unsigned char)) {
 			StopPlayBack();
 			return;
 		}
@@ -478,10 +478,14 @@ void DemoFile::ReadDemoPacket(BitBuffer *demoData, demo_info_t *demoInfo)
 			break;
 		}
 		case DEM_EVENT:
-			msglen = sizeof(int) + sizeof(int) + sizeof(float) + sizeof(event_args_t);
+			msglen = sizeof(int)			// flags
+					+ sizeof(int)			// idx
+					+ sizeof(float)			// delay
+					+ sizeof(event_args_t);	// eargs
 			break;
 		case DEM_WEAPONANIM:
-			msglen = sizeof(int) + sizeof(int);
+			msglen = sizeof(int)	// anim
+					+ sizeof(int);	// body
 			break;
 		case DEM_PLAYSOUND:
 		{
@@ -490,7 +494,11 @@ void DemoFile::ReadDemoPacket(BitBuffer *demoData, demo_info_t *demoInfo)
 
 			m_FileSystem->Read(&sampleSize, sizeof(int), m_FileHandle);
 			sampleSize = _LittleLong(sampleSize);
-			msglen = sampleSize + sizeof(float) + sizeof(float) + sizeof(int) + sizeof(int);
+			msglen = sampleSize
+					+ sizeof(float)	// attenuation
+					+ sizeof(float)	// volume
+					+ sizeof(int)	// flags
+					+ sizeof(int);	// pitch
 			break;
 		}
 		case DEM_PAYLOAD:
@@ -529,7 +537,7 @@ void DemoFile::ReadDemoPacket(BitBuffer *demoData, demo_info_t *demoInfo)
 	ReadSequenceInfo();
 
 	int length;
-	if (m_FileSystem->Read(&length, sizeof(int), m_FileHandle) != 4) {
+	if (m_FileSystem->Read(&length, sizeof(int), m_FileHandle) != sizeof(int)) {
 		m_System->DPrintf("WARNING! DemoFile::ReadDemoPacket: Bad demo length.\n");
 		StopPlayBack();
 		return;
