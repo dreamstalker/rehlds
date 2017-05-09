@@ -39,7 +39,7 @@
 #include "vmodes.h"
 #include "cdll_int.h"
 
-const int MAX_DEMO_ENTRY = 92;
+const int MAX_DEMO_ENTRY = 1024;
 
 const int DEMO_PROTOCOL  = 5;
 

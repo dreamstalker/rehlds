@@ -363,10 +363,10 @@ bool DemoFile::LoadDemo(char *demoname)
 	m_FileSystem->Read(&m_EntryNumber, sizeof(int), m_FileHandle);
 	m_CurrentEntry = 0;
 
-	if (m_EntryNumber > 0 && m_EntryNumber <= 1024)
+	if (m_EntryNumber > 0 && m_EntryNumber <= MAX_DEMO_ENTRY)
 	{
-		m_Entries = (demoentry_t *)Mem_ZeroMalloc(m_EntryNumber * MAX_DEMO_ENTRY);
-		m_FileSystem->Read(m_Entries, m_EntryNumber * MAX_DEMO_ENTRY, m_FileHandle);
+		m_Entries = (demoentry_t *)Mem_ZeroMalloc(sizeof(demoentry_t) * m_EntryNumber);
+		m_FileSystem->Read(m_Entries, sizeof(demoentry_t) * m_EntryNumber, m_FileHandle);
 		m_FileSystem->Seek(m_FileHandle, m_Entries[m_CurrentEntry].nOffset, FILESYSTEM_SEEK_HEAD);
 	}
 	else
