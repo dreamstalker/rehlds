@@ -260,21 +260,21 @@ bool DemoFile::StartRecording(char *newName)
 	}
 
 	memset(&m_demoHeader, 0, sizeof(m_demoHeader));
-	strcopy(m_demoHeader.szFileStamp, "HLDEMO");
+	strcpy(m_demoHeader.szFileStamp, "HLDEMO");
 
 	COM_FileBase(m_World->GetLevelName(), m_demoHeader.szMapName);
 	COM_FileBase(m_World->GetGameDir(), m_demoHeader.szDllDir);
 
 	m_demoHeader.mapCRC = 0;
-	m_demoHeader.nDemoProtocol = DEMO_VERSION;
+	m_demoHeader.nDemoProtocol = DEMO_PROTOCOL;
 	m_demoHeader.nNetProtocolVersion = PROTOCOL_VERSION;
 	m_demoHeader.nDirectoryOffset = 0;
 	m_FileSystem->Write(&m_demoHeader, sizeof(m_demoHeader), m_FileHandle);
 
 	memset(&m_loadEntry, 0, sizeof(m_loadEntry));
-	strcopy(m_loadEntry.szDescription, "LOADING");
+	strcpy(m_loadEntry.szDescription, "LOADING");
 
-	m_loadEntry.nEntryType = 0;
+	m_loadEntry.nEntryType = DEMO_STARTUP;
 	m_loadEntry.nOffset = m_FileSystem->Tell(m_FileHandle);
 
 	m_frameCount = 0;
@@ -295,7 +295,8 @@ bool DemoFile::StartRecording(char *newName)
 
 	memset(&m_gameEntry, 0, sizeof(m_gameEntry));
 	_snprintf(m_gameEntry.szDescription, sizeof(m_gameEntry.szDescription), "Playback");
-	m_gameEntry.nEntryType = 1;
+
+	m_gameEntry.nEntryType = DEMO_NORMAL;
 	m_gameEntry.nOffset = m_FileSystem->Tell(m_FileHandle);
 
 	b = 2;
@@ -353,7 +354,7 @@ bool DemoFile::LoadDemo(char *demoname)
 		return false;
 	}
 
-	if (m_demoHeader.nNetProtocolVersion != PROTOCOL_VERSION || m_demoHeader.nDemoProtocol != DEMO_VERSION) {
+	if (m_demoHeader.nNetProtocolVersion != PROTOCOL_VERSION || m_demoHeader.nDemoProtocol != DEMO_PROTOCOL) {
 		m_System->Printf("WARNING! %s has an outdated demo format.\n", m_FileName);
 	}
 
@@ -419,7 +420,7 @@ void DemoFile::ReadDemoPacket(BitBuffer *demoData, demo_info_t *demoInfo)
 		return;
 	}
 
-	int msglen;
+	int msglen; // command length in bytes
 	unsigned char msgbuf[MAX_POSSIBLE_MSG];
 	float time;
 	unsigned char cmd;
@@ -431,7 +432,7 @@ void DemoFile::ReadDemoPacket(BitBuffer *demoData, demo_info_t *demoInfo)
 	while (readNextCmd)
 	{
 		unsigned int curpos = m_FileSystem->Tell(m_FileHandle);
-		if (m_FileSystem->Read(&cmd, sizeof(unsigned char), m_FileHandle) != 1) {
+		if (m_FileSystem->Read(&cmd, sizeof(unsigned char), m_FileHandle) != sizeof(unsigned char)) {
 			StopPlayBack();
 			return;
 		}
@@ -442,7 +443,7 @@ void DemoFile::ReadDemoPacket(BitBuffer *demoData, demo_info_t *demoInfo)
 		m_FileSystem->Read(&frame, sizeof(int), m_FileHandle);
 		frame = _LittleLong(frame);
 
-		if (cmd && cmd != 5) {
+		if (cmd && cmd != DEM_READ) {
 			m_nextReadTime = m_startTime + time;
 		}
 
@@ -453,19 +454,18 @@ void DemoFile::ReadDemoPacket(BitBuffer *demoData, demo_info_t *demoInfo)
 
 		msglen = 0;
 
-		// TODO: Find out or guess the names of the opcode
 		switch (cmd)
 		{
-		case 2:
+		case DEM_START_TIME:
 			m_startTime = (float)m_System->GetTime();
 			break;
-		case 3:
-			msglen = 64;
+		case DEM_STRING:
+			msglen = sizeof(char [64]);
 			break;
-		case 4:
-			msglen = 32;
+		case DEM_CLIENTDATA:
+			msglen = sizeof(client_data_t);
 			break;
-		case 5:
+		case DEM_READ:
 		{
 			if (++m_CurrentEntry >= m_EntryNumber) {
 				StopPlayBack();
@@ -477,23 +477,31 @@ void DemoFile::ReadDemoPacket(BitBuffer *demoData, demo_info_t *demoInfo)
 			}
 			break;
 		}
-		case 6:
-			msglen = 84;
+		case DEM_EVENT:
+			msglen = sizeof(int)			// flags
+					+ sizeof(int)			// idx
+					+ sizeof(float)			// delay
+					+ sizeof(event_args_t);	// eargs
 			break;
-		case 7:
-			msglen = 8;
+		case DEM_WEAPONANIM:
+			msglen = sizeof(int)	// anim
+					+ sizeof(int);	// body
 			break;
-		case 8:
+		case DEM_PLAYSOUND:
 		{
 			m_FileSystem->Read(&channel, sizeof(int), m_FileHandle);
 			channel = _LittleLong(channel);
 
 			m_FileSystem->Read(&sampleSize, sizeof(int), m_FileHandle);
 			sampleSize = _LittleLong(sampleSize);
-			msglen = sampleSize + 16;
+			msglen = sampleSize
+					+ sizeof(float)	// attenuation
+					+ sizeof(float)	// volume
+					+ sizeof(int)	// flags
+					+ sizeof(int);	// pitch
 			break;
 		}
-		case 9:
+		case DEM_PAYLOAD:
 		{
 			m_FileSystem->Read(&msglen, sizeof(int), m_FileHandle);
 			msglen = _LittleLong(msglen);
@@ -512,11 +520,11 @@ void DemoFile::ReadDemoPacket(BitBuffer *demoData, demo_info_t *demoInfo)
 
 			switch (cmd)
 			{
-			case 8:
+			case DEM_PLAYSOUND:
 				demoData->WriteLong(channel);
 				demoData->WriteLong(sampleSize);
 				break;
-			case 9:
+			case DEM_PAYLOAD:
 				demoData->WriteLong(msglen);
 				break;
 			}
@@ -529,7 +537,7 @@ void DemoFile::ReadDemoPacket(BitBuffer *demoData, demo_info_t *demoInfo)
 	ReadSequenceInfo();
 
 	int length;
-	if (m_FileSystem->Read(&length, sizeof(int), m_FileHandle) != 4) {
+	if (m_FileSystem->Read(&length, sizeof(int), m_FileHandle) != sizeof(int)) {
 		m_System->DPrintf("WARNING! DemoFile::ReadDemoPacket: Bad demo length.\n");
 		StopPlayBack();
 		return;

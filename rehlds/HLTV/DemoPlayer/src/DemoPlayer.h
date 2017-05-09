@@ -133,16 +133,6 @@ protected:
 	void WriteSpawn(BitBuffer *stream);
 	void ReindexCommands();
 	void WriteCameraPath(DirectorCmd *, BitBuffer *stream);
-
-	enum DemoCmds {
-		DEMO_STRINCMD = 3,
-		DEMO_CLIENTDATA = 4,
-		DEMO_EVENT = 6,
-		DEMO_WEAPONANIM = 7,
-		DEMO_PLAYSOUND = 8,
-		DEMO_DATA = 9
-	};
-
 	void ExecuteDemoFileCommands(BitBuffer *stream);
 
 private:

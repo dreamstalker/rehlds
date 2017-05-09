@@ -955,7 +955,7 @@ void DemoPlayer::ExecuteDemoFileCommands(BitBuffer *stream)
 	{
 		switch (cmd)
 		{
-		case DEMO_STRINCMD:
+		case DEM_STRING:
 		{
 			char szCmdName[64];
 			stream->ReadBuf(sizeof(szCmdName), szCmdName);
@@ -963,14 +963,14 @@ void DemoPlayer::ExecuteDemoFileCommands(BitBuffer *stream)
 			m_Engine->Cbuf_AddText("\n");
 			break;
 		}
-		case DEMO_CLIENTDATA:
+		case DEM_CLIENTDATA:
 		{
 			client_data_t cdat;
 			stream->ReadBuf(sizeof(cdat), &cdat);
 			m_Engine->DemoUpdateClientData(&cdat);
 			break;
 		}
-		case DEMO_EVENT:
+		case DEM_EVENT:
 		{
 			int flags   = _LittleLong(stream->ReadLong());
 			int idx     = _LittleLong(stream->ReadLong());
@@ -982,7 +982,7 @@ void DemoPlayer::ExecuteDemoFileCommands(BitBuffer *stream)
 			m_Engine->CL_QueueEvent(flags, idx, delay, &eargs);
 			break;
 		}
-		case DEMO_WEAPONANIM:
+		case DEM_WEAPONANIM:
 		{
 			int anim = _LittleLong(stream->ReadLong());
 			int body = _LittleLong(stream->ReadLong());
@@ -990,7 +990,7 @@ void DemoPlayer::ExecuteDemoFileCommands(BitBuffer *stream)
 			m_Engine->HudWeaponAnim(anim, body);
 			break;
 		}
-		case DEMO_PLAYSOUND:
+		case DEM_PLAYSOUND:
 		{
 			int channel = stream->ReadLong();
 			int sampleSize = stream->ReadLong();
@@ -1007,7 +1007,7 @@ void DemoPlayer::ExecuteDemoFileCommands(BitBuffer *stream)
 			m_Engine->CL_DemoPlaySound(channel, sample, attenuation, volume, flags, pitch);
 			break;
 		}
-		case DEMO_DATA:
+		case DEM_PAYLOAD:
 		{
 			unsigned char data[32768];
 			memset(data, 0, sizeof(data));

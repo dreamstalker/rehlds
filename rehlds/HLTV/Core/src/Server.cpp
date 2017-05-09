@@ -175,13 +175,13 @@ void Server::SetGameDirectory(const char *defaultDir, const char *gameDir)
 
 	if (gameDir && _stricmp(gameDir, defaultDir) != 0)
 	{
-		sprintf(temp, "%s/%s", GetBaseDir(), gameDir);
+		sprintf(temp, "%s/%s", m_System->GetBaseDir(), gameDir);
 		m_FileSystem->AddSearchPath(temp, "GAME");
 	}
 
-	sprintf(temp, "%s/%s", GetBaseDir(), defaultDir);
+	sprintf(temp, "%s/%s", m_System->GetBaseDir(), defaultDir);
 	m_FileSystem->AddSearchPath(temp, "DEFAULTGAME");
-	m_FileSystem->AddSearchPath(GetBaseDir(), "ROOT");
+	m_FileSystem->AddSearchPath(m_System->GetBaseDir(), "ROOT");
 }
 
 void Server::ExecuteCommand(int commandID, char *commandLine)
