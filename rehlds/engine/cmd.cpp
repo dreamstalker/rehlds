@@ -782,10 +782,8 @@ NOXREF void Cmd_AddHUDCommand(const char *cmd_name, xcommand_t function)
 	Cmd_AddMallocCommand(cmd_name, function, FCMD_HUD_COMMAND);
 }
 
-NOXREF void Cmd_AddWrapperCommand(const char *cmd_name, xcommand_t function)
+void Cmd_AddWrapperCommand(const char *cmd_name, xcommand_t function)
 {
-	NOXREFCHECK;
-
 	Cmd_AddMallocCommand(cmd_name, function, FCMD_WRAPPER_COMMAND);
 }
 

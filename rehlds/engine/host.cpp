@@ -893,7 +893,7 @@ void _Host_Frame(float time)
 	}
 #endif //REHLDS_FLIGHT_REC
 
-	//SystemWrapper_RunFrame(host_frametime);
+	SystemWrapper_RunFrame(host_frametime);
 
 	if (g_modfuncs.m_pfnFrameBegin)
 		g_modfuncs.m_pfnFrameBegin();
@@ -1019,7 +1019,7 @@ int Host_Frame(float time, int iState, int *stateInfo)
 void CheckGore(void)
 {
 	float fValue = bLowViolenceBuild ? 0.0f : 1.0f;
-	
+
 	Cvar_SetValue("violence_hblood", fValue);
 	Cvar_SetValue("violence_hgibs", fValue);
 	Cvar_SetValue("violence_ablood", fValue);
@@ -1156,7 +1156,7 @@ int Host_Init(quakeparms_t *parms)
 	Netchan_Init();
 	DELTA_Init();
 	SV_Init();
-	//SystemWrapper_Init();
+	SystemWrapper_Init();
 	Host_Version();
 
 	//Rehlds Security
@@ -1263,7 +1263,7 @@ void Host_Shutdown(void)
 		SV_ClearFrames(&pclient->frames);
 
 	SV_Shutdown();
-	//SystemWrapper_ShutDown();
+	SystemWrapper_ShutDown();
 	NET_Shutdown();
 	S_Shutdown();
 	Con_Shutdown();

@@ -101,6 +101,7 @@
 #define IpratelimitWrapper_region
 #define Sys_engine
 #define Sys_linuxwind
+//#define SystemWrapper_region
 
 //#define Function_References_region
 //#define Data_References_region
@@ -1930,6 +1931,89 @@ FunctionHook g_FunctionHooks[] =
 
 #endif // Sys_linuxwind
 
+#ifndef SystemWrapper_region
+
+	HOOK_DEF(0x01DA5CB0, SystemWrapper_Init),
+	HOOK_DEF(0x01DA5CD0, SystemWrapper_RunFrame),
+	HOOK_DEF(0x01DA5CF0, SystemWrapper_ShutDown),
+	HOOK_DEF(0x01DA5D00, SystemWrapper_LoadModule),		// NOXREF
+	HOOK_DEF(0x01DA5D30, SystemWrapper_ExecuteString),
+	HOOK_DEF(0x01DA5D50, SystemWrapper_CommandForwarder),
+
+	// virtual functions
+	HOOK_SYMBOL_VIRTUAL_DEF(0x01DA7120, "_ZN13SystemWrapper4InitEP11IBaseSystemiPc", SystemWrapper::Init),
+	HOOK_SYMBOL_VIRTUAL_DEF(0x01DA7130, "_ZN13SystemWrapper8RunFrameEd", SystemWrapper::RunFrame),
+	HOOK_SYMBOL_VIRTUAL_DEF(0x01DA7150, "_ZN13SystemWrapper14ExecuteCommandEiPc", SystemWrapper::ExecuteCommand),
+	HOOK_SYMBOL_VIRTUAL_DEF(0x01DA71A0, "_ZN13SystemWrapper13GetStatusLineEv", SystemWrapper::GetStatusLine),
+	HOOK_SYMBOL_VIRTUAL_DEF(0x01DA71B0, "_ZN13SystemWrapper7GetTypeEv", SystemWrapper::GetType),
+	HOOK_SYMBOL_VIRTUAL_DEF(0x01DA71E0, "_ZN13SystemWrapper8ShutDownEv", SystemWrapper::ShutDown),
+
+	HOOK_SYMBOL_VIRTUAL_DEF(0x01DA6730, "_ZN13SystemWrapper7GetTimeEv", SystemWrapper::GetTime),
+	HOOK_SYMBOL_VIRTUAL_DEF(0x01DA6950, "_ZN13SystemWrapper7GetTickEv", SystemWrapper::GetTick),
+	HOOK_SYMBOL_VIRTUAL_DEF(0x01DA6FA0, "_ZN13SystemWrapper6SetFPSEf", SystemWrapper::SetFPS),
+	HOOK_SYMBOL_VIRTUAL_DEF(0x01DA6750, "_ZN13SystemWrapper6PrintfEPcz", SystemWrapper::Printf),
+	HOOK_SYMBOL_VIRTUAL_DEF(0x01DA6820, "_ZN13SystemWrapper7DPrintfEPcz", SystemWrapper::DPrintf),
+	HOOK_SYMBOL_VIRTUAL_DEF(0x01DA6740, "_ZN13SystemWrapper14RedirectOutputEPci", SystemWrapper::RedirectOutput),
+	HOOK_SYMBOL_VIRTUAL_DEF(0x01DA6900, "_ZN13SystemWrapper13GetFileSystemEv", SystemWrapper::GetFileSystem),
+	HOOK_SYMBOL_VIRTUAL_DEF(0x01DA6910, "_ZN13SystemWrapper8LoadFileEPKcPi", SystemWrapper::LoadFile),
+	HOOK_SYMBOL_VIRTUAL_DEF(0x01DA6930, "_ZN13SystemWrapper8FreeFileEPh", SystemWrapper::FreeFile),
+	HOOK_SYMBOL_VIRTUAL_DEF(0x01DA6710, "_ZN13SystemWrapper8SetTitleEPc", SystemWrapper::SetTitle),
+	HOOK_SYMBOL_VIRTUAL_DEF(0x01DA6720, "_ZN13SystemWrapper13SetStatusLineEPc", SystemWrapper::SetStatusLine),
+	HOOK_SYMBOL_VIRTUAL_DEF(0x01DA6FB0, "_ZN13SystemWrapper11ShowConsoleEb", SystemWrapper::ShowConsole),
+	HOOK_SYMBOL_VIRTUAL_DEF(0x01DA6A90, "_ZN13SystemWrapper10LogConsoleEPc", SystemWrapper::LogConsole),
+	HOOK_SYMBOL_VIRTUAL_DEF(0x01DA6AD0, "_ZN13SystemWrapper8InitVGUIEP11IVGuiModule", SystemWrapper::InitVGUI),
+#ifdef _WIN32
+	HOOK_SYMBOL_VIRTUAL_DEF(0x01DA6AC0, "_ZN13SystemWrapper8GetPanelEv", SystemWrapper::GetPanel),
+#endif // _WIN32
+	HOOK_SYMBOL_VIRTUAL_DEF(0x01DA6850, "_ZN13SystemWrapper15RegisterCommandEPcP13ISystemModulei", SystemWrapper::RegisterCommand),
+	HOOK_SYMBOL_VIRTUAL_DEF(0x01DA69F0, "_ZN13SystemWrapper17GetCommandMatchesEPcP10ObjectList", SystemWrapper::GetCommandMatches),
+	HOOK_SYMBOL_VIRTUAL_DEF(0x01DA6CA0, "_ZN13SystemWrapper13ExecuteStringEPc", SystemWrapper::ExecuteString),
+	HOOK_SYMBOL_VIRTUAL_DEF(0x01DA67E0, "_ZN13SystemWrapper11ExecuteFileEPc", SystemWrapper::ExecuteFile),
+	HOOK_SYMBOL_VIRTUAL_DEF(0x01DA6200, "_ZN13SystemWrapper6ErrorfEPcz", SystemWrapper::Errorf),
+	HOOK_SYMBOL_VIRTUAL_DEF(0x01DA61C0, "_ZN13SystemWrapper10CheckParamEPc", SystemWrapper::CheckParam),
+	HOOK_SYMBOL_VIRTUAL_DEF(0x01DA6AE0, "_ZN13SystemWrapper9AddModuleEP13ISystemModulePc", SystemWrapper::AddModule),
+	HOOK_SYMBOL_VIRTUAL_DEF(0x01DA6B50, "_ZN13SystemWrapper9GetModuleEPcS0_S0_", SystemWrapper::GetModule),
+	HOOK_SYMBOL_VIRTUAL_DEF(0x01DA6BD0, "_ZN13SystemWrapper12RemoveModuleEP13ISystemModule", SystemWrapper::RemoveModule),
+	HOOK_SYMBOL_VIRTUAL_DEF(0x01DA6300, "_ZN13SystemWrapper4StopEv", SystemWrapper::Stop),
+	HOOK_SYMBOL_VIRTUAL_DEF(0x01DA6FC0, "_ZN13SystemWrapper14COM_GetBaseDirEv", SystemWrapper::GetBaseDir),
+
+	HOOK_SYMBOLDEF(0x01DA6D60, "_ZN13SystemWrapper15DispatchCommandEPc", SystemWrapper::DispatchCommand),
+	HOOK_SYMBOLDEF(0x01DA65C0, "_ZN13SystemWrapper10GetLibraryEPc", SystemWrapper::GetLibrary),
+	HOOK_SYMBOLDEF(0x01DA6A10, "_ZN13SystemWrapper10FindModuleEPcS0_", SystemWrapper::FindModule),
+	HOOK_SYMBOLDEF(0x01DA6960, "_ZN13SystemWrapper11CMD_ModulesEPc", SystemWrapper::CMD_Modules),
+	HOOK_SYMBOLDEF(0x01DA6420, "_ZN13SystemWrapper14CMD_LoadModuleEPc", SystemWrapper::CMD_LoadModule),
+	HOOK_SYMBOLDEF(0x01DA64E0, "_ZN13SystemWrapper16CMD_UnloadModuleEPc", SystemWrapper::CMD_UnloadModule),
+
+	HOOK_SYMBOL_VIRTUAL_DEF(0x01DA6E40, "_ZN13EngineWrapper4InitEP11IBaseSystemiPc", EngineWrapper::Init),
+	HOOK_SYMBOL_VIRTUAL_DEF(0x01DA6E70, "_ZN13EngineWrapper8RunFrameEd", EngineWrapper::RunFrame),
+	HOOK_SYMBOL_VIRTUAL_DEF(0x01DA6EF0, "_ZN13EngineWrapper13ReceiveSignalEP13ISystemModulejPv", EngineWrapper::ReceiveSignal),
+	HOOK_SYMBOL_VIRTUAL_DEF(0x01DA6E90, "_ZN13EngineWrapper14ExecuteCommandEiPc", EngineWrapper::ExecuteCommand),
+	HOOK_SYMBOL_VIRTUAL_DEF(0x01DA6F10, "_ZN13EngineWrapper16RegisterListenerEP13ISystemModule", EngineWrapper::RegisterListener),
+	HOOK_SYMBOL_VIRTUAL_DEF(0x01DA6F30, "_ZN13EngineWrapper14RemoveListenerEP13ISystemModule", EngineWrapper::RemoveListener),
+	HOOK_SYMBOL_VIRTUAL_DEF(0x01DA6F50, "_ZN13EngineWrapper9GetSystemEv", EngineWrapper::GetSystem),
+	HOOK_SYMBOL_VIRTUAL_DEF(0x01DA6F60, "_ZN13EngineWrapper9GetSerialEv", EngineWrapper::GetSerial),
+	HOOK_SYMBOL_VIRTUAL_DEF(0x01DA5EC0, "_ZN13EngineWrapper13GetStatusLineEv", EngineWrapper::GetStatusLine),
+	HOOK_SYMBOL_VIRTUAL_DEF(0x01DA5EB0, "_ZN13EngineWrapper7GetTypeEv", EngineWrapper::GetType),
+	HOOK_SYMBOL_VIRTUAL_DEF(0x01DA6F70, "_ZN13EngineWrapper7GetNameEv", EngineWrapper::GetName),
+	HOOK_SYMBOL_VIRTUAL_DEF(0x01DA6F80, "_ZN13EngineWrapper8GetStateEv", EngineWrapper::GetState),
+	HOOK_SYMBOL_VIRTUAL_DEF(0x01DA6F90, "_ZN13EngineWrapper10GetVersionEv", EngineWrapper::GetVersion),
+	HOOK_SYMBOL_VIRTUAL_DEF(0x01DA6E60, "_ZN13EngineWrapper8ShutDownEv", EngineWrapper::ShutDown),
+
+	HOOK_SYMBOL_VIRTUAL_DEF(0x01DA5ED0, "_ZN13EngineWrapper13GetViewOriginEPf", EngineWrapper::GetViewOrigin),
+	HOOK_SYMBOL_VIRTUAL_DEF(0x01DA5F00, "_ZN13EngineWrapper13GetViewAnglesEPf", EngineWrapper::GetViewAngles),
+	HOOK_SYMBOL_VIRTUAL_DEF(0x01DA6070, "_ZN13EngineWrapper14GetTraceEntityEv", EngineWrapper::GetTraceEntity),
+	HOOK_SYMBOL_VIRTUAL_DEF(0x01DA5F30, "_ZN13EngineWrapper12GetCvarFloatEPc", EngineWrapper::GetCvarFloat),
+	HOOK_SYMBOL_VIRTUAL_DEF(0x01DA5F60, "_ZN13EngineWrapper13GetCvarStringEPc", EngineWrapper::GetCvarString),
+	HOOK_SYMBOL_VIRTUAL_DEF(0x01DA5F80, "_ZN13EngineWrapper7SetCvarEPcS0_", EngineWrapper::SetCvar),
+	HOOK_SYMBOL_VIRTUAL_DEF(0x01DA5FA0, "_ZN13EngineWrapper12Cbuf_AddTextEPc", EngineWrapper::Cbuf_AddText),
+	HOOK_SYMBOL_VIRTUAL_DEF(0x01DA5FC0, "_ZN13EngineWrapper20DemoUpdateClientDataEP13client_data_s", EngineWrapper::DemoUpdateClientData),
+	HOOK_SYMBOL_VIRTUAL_DEF(0x01DA5FE0, "_ZN13EngineWrapper13CL_QueueEventEiifP12event_args_s", EngineWrapper::CL_QueueEvent),
+	HOOK_SYMBOL_VIRTUAL_DEF(0x01DA6000, "_ZN13EngineWrapper13HudWeaponAnimEii", EngineWrapper::HudWeaponAnim),
+	HOOK_SYMBOL_VIRTUAL_DEF(0x01DA6020, "_ZN13EngineWrapper16CL_DemoPlaySoundEiPcffii", EngineWrapper::CL_DemoPlaySound),
+	HOOK_SYMBOL_VIRTUAL_DEF(0x01DA6050, "_ZN13EngineWrapper24ClientDLL_ReadDemoBufferEiPh", EngineWrapper::ClientDLL_ReadDemoBuffer),
+
+#endif // SystemWrapper_region
+
 	{ NULL, NULL, NULL },
 };
 
@@ -2420,6 +2504,7 @@ AddressRef g_DataRefs[] =
 	GLOBALVAR_LINK(0x01E4B3F0, "szReslistsBaseDir", pszReslistsBaseDir),
 	GLOBALVAR_LINK(0x01E4B3FC, "szReslistsExt", pszReslistsExt),
 	GLOBALVAR_LINK(0x02095C98, "g_InitTracker", pg_InitTracker),
+	GLOBALVAR_LINK(0x020935A0, "gSystemWrapper", pgSystemWrapper),
 
 #ifndef _WIN32
 	//GLOBALVAR_LINK(0x0, "gHasMMXTechnology", pgHasMMXTechnology),

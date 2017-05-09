@@ -16,13 +16,14 @@
 #include "ed_strpool.h"
 
 #include "memory.h"
+
+// Hook stuff
+#include "hookers/engine/hooklist.h"
+
 #include "engine.h"
 #include "platform.h"
 #include "RehldsRuntimeConfig.h"
 #include "rehlds_debug.h"
-
-// Hook stuff
-#include "hookers/engine/hooklist.h"
 
 // Valve libs stuff
 #include "tier0/platform.h"

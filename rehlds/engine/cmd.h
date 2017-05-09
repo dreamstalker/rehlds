@@ -108,7 +108,7 @@ cmd_function_t *Cmd_FindCmdPrev(const char *cmd_name);
 void Cmd_AddCommand(const char *cmd_name, xcommand_t function);
 void Cmd_AddMallocCommand(const char *cmd_name, xcommand_t function, int flag);
 NOXREF void Cmd_AddHUDCommand(const char *cmd_name, xcommand_t function);
-NOXREF void Cmd_AddWrapperCommand(const char *cmd_name, xcommand_t function);
+void Cmd_AddWrapperCommand(const char *cmd_name, xcommand_t function);
 void Cmd_AddGameCommand(const char *cmd_name, xcommand_t function);
 void Cmd_RemoveCmd(const char *cmd_name);
 void Cmd_RemoveMallocedCmds(int flag);

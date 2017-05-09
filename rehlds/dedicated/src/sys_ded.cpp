@@ -1,3 +1,31 @@
+/*
+*
+*    This program is free software; you can redistribute it and/or modify it
+*    under the terms of the GNU General Public License as published by the
+*    Free Software Foundation; either version 2 of the License, or (at
+*    your option) any later version.
+*
+*    This program is distributed in the hope that it will be useful, but
+*    WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+*    General Public License for more details.
+*
+*    You should have received a copy of the GNU General Public License
+*    along with this program; if not, write to the Free Software Foundation,
+*    Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+*
+*    In addition, as a special exception, the author gives permission to
+*    link the code of this program with the Half-Life Game Engine ("HL
+*    Engine") and Modified Game Libraries ("MODs") developed by Valve,
+*    L.L.C ("Valve").  You must obey the GNU General Public License in all
+*    respects for all of the code used other than the HL Engine and MODs
+*    from Valve.  If you modify this file, you may extend this exception
+*    to your version of the file, but you are not obligated to do so.  If
+*    you do not wish to do so, delete this exception statement from your
+*    version.
+*
+*/
+
 #include "precompiled.h"
 
 bool g_bVGui = false;
@@ -6,10 +34,6 @@ bool g_bAppHasBeenTerminated = false;
 
 CSysModule *g_pEngineModule = nullptr;
 IDedicatedServerAPI *engineAPI = nullptr;
-#ifdef LAUNCHER_FIXES
-IRehldsApi *rehldsApi = nullptr;
-const RehldsFuncs_t* rehldsFuncs = nullptr;
-#endif
 
 IFileSystem *g_pFileSystemInterface = nullptr;
 CSysModule *g_pFileSystemModule = nullptr;
@@ -79,28 +103,24 @@ int RunEngine()
 	CreateInterfaceFn engineFactory = Sys_GetFactory(g_pEngineModule);
 	RunVGUIFrame();
 
-	if (engineFactory)
-	{
+	if (engineFactory) {
 		engineAPI = (IDedicatedServerAPI *)engineFactory(VENGINE_HLDS_API_VERSION, nullptr);
-#ifdef LAUNCHER_FIXES
-		rehldsApi = (IRehldsApi *)engineFactory(VREHLDS_HLDS_API_VERSION, NULL);
-		if (rehldsApi)
-		{
-			if (rehldsApi->GetMajorVersion() != REHLDS_API_VERSION_MAJOR || rehldsApi->GetMinorVersion() < REHLDS_API_VERSION_MINOR)
-			{
-				rehldsApi = nullptr;
-			}
-			else
-			{
-				rehldsFuncs = rehldsApi->GetFuncs();
-			}
-		}
-#endif
 	}
+
 	RunVGUIFrame();
 	if (!engineAPI || !engineAPI->Init(UTIL_GetBaseDir(), (char *)CommandLine()->GetCmdLine(), Sys_GetFactoryThis(), g_FilesystemFactoryFn)) {
 		return LAUNCHER_ERROR;
 	}
+
+#ifdef LAUNCHER_FIXES
+	if (engineFactory)
+	{
+		ISystemModule *pSystemWrapper = (ISystemModule *)engineFactory(BASESYSTEM_INTERFACE_VERSION, nullptr);
+		if (pSystemWrapper) {
+			console.InitSystem(pSystemWrapper->GetSystem());
+		}
+	}
+#endif // LANUCHER_FIXES
 
 	RunVGUIFrame();
 
@@ -256,7 +276,6 @@ int StartServer(char* cmdline)
 #endif
 		{
 			int ret = RunEngine();
-
 			if (ret == LAUNCHER_ERROR) {
 				sys->ErrorMessage(0, "Failed to launch engine.\n");
 				return LAUNCHER_ERROR;

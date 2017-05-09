@@ -99,7 +99,7 @@ bool CTextConsoleUnix::Init(IBaseSystem *system)
 	tcsetattr(STDIN_FILENO, TCSANOW, &termNew);
 	sigprocmask(SIG_UNBLOCK, &block_ttou, NULL);
 
-	return CTextConsole::Init();
+	return CTextConsole::Init(system);
 }
 
 void CTextConsoleUnix::ShutDown()

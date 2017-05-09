@@ -216,6 +216,12 @@ class RehldsSrc {
 				if (GradleCppUtils.windows) include "rehlds_debug.cpp"
 			}
 		}
+		h.rehlds_common(CppSourceSet) {
+			source {
+				srcDirs "common"
+				include "BaseSystemModule.cpp", "ObjectList.cpp", "TokenLine.cpp"
+			}
+		}
 	}
 
 	static void rehlds_pch(def h) {

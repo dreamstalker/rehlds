@@ -1,3 +1,31 @@
+/*
+*
+*    This program is free software; you can redistribute it and/or modify it
+*    under the terms of the GNU General Public License as published by the
+*    Free Software Foundation; either version 2 of the License, or (at
+*    your option) any later version.
+*
+*    This program is distributed in the hope that it will be useful, but
+*    WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+*    General Public License for more details.
+*
+*    You should have received a copy of the GNU General Public License
+*    along with this program; if not, write to the Free Software Foundation,
+*    Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+*
+*    In addition, as a special exception, the author gives permission to
+*    link the code of this program with the Half-Life Game Engine ("HL
+*    Engine") and Modified Game Libraries ("MODs") developed by Valve,
+*    L.L.C ("Valve").  You must obey the GNU General Public License in all
+*    respects for all of the code used other than the HL Engine and MODs
+*    from Valve.  If you modify this file, you may extend this exception
+*    to your version of the file, but you are not obligated to do so.  If
+*    you do not wish to do so, delete this exception statement from your
+*    version.
+*
+*/
+
 #include "precompiled.h"
 
 class CSys: public ISys {
@@ -5,22 +33,22 @@ public:
 	CSys();
 	virtual ~CSys();
 
-	void Sleep(int msec);
-	bool GetExecutableName(char *out);
-	NORETURN void ErrorMessage(int level, const char *msg);
+	void Sleep(int msec) override;
+	bool GetExecutableName(char *out) override;
+	NORETURN void ErrorMessage(int level, const char *msg) override;
 
-	void WriteStatusText(char *szText);
-	void UpdateStatus(int force);
+	void WriteStatusText(char *szText) override;
+	void UpdateStatus(int force) override;
 
-	long LoadLibrary(char *lib);
-	void FreeLibrary(long library);
+	long LoadLibrary(char *lib) override;
+	void FreeLibrary(long library) override;
 
-	bool CreateConsoleWindow();
-	void DestroyConsoleWindow();
+	bool CreateConsoleWindow() override;
+	void DestroyConsoleWindow() override;
 
-	void ConsoleOutput(char *string);
-	char *ConsoleInput();
-	void Printf(char *fmt, ...);
+	void ConsoleOutput(char *string) override;
+	char *ConsoleInput() override;
+	void Printf(char *fmt, ...) override;
 };
 
 CSys g_Sys;
@@ -71,13 +99,13 @@ void Sleep_Select(int msec)
 	tv.tv_sec = 0;
 	tv.tv_usec = 1000 * msec;
 
-	select(1, NULL, NULL, NULL, &tv);
+	select(1, nullptr, nullptr, nullptr, &tv);
 }
 
 void Sleep_Net(int msec)
 {
 		NET_Sleep_Timeout();
-	}
+}
 
 // linux runs on a 100Hz scheduling clock, so the minimum latency from
 // usleep is 10msec. However, people want lower latency than this..
@@ -102,7 +130,7 @@ void Sleep_Timer(int msec)
 	g_bPaused = false;
 
 	// set the timer to trigger
-	if (!setitimer(ITIMER_REAL, &tm, NULL)) {
+	if (!setitimer(ITIMER_REAL, &tm, nullptr)) {
 		// wait for the signal
 		pause();
 	}
@@ -133,28 +161,27 @@ void Sys_InitPingboost()
 	Sys_Sleep = Sleep_Old;
 
 	char *pPingType;
-	int type;
 	if (CommandLine()->CheckParm("-pingboost", &pPingType) && pPingType) {
-		type = atoi(pPingType);
+		int type = atoi(pPingType);
 		switch (type) {
 		case 1:
-		signal(SIGALRM, alarmFunc);
-		Sys_Sleep = Sleep_Timer;
-		break;
+			signal(SIGALRM, alarmFunc);
+			Sys_Sleep = Sleep_Timer;
+			break;
 		case 2:
-		Sys_Sleep = Sleep_Select;
-		break;
+			Sys_Sleep = Sleep_Select;
+			break;
 		case 3:
-		Sys_Sleep = Sleep_Net;
+			Sys_Sleep = Sleep_Net;
 
-		// we Sys_GetProcAddress NET_Sleep() from
-		//engine_i486.so later in this function
-		NET_Sleep_Timeout = (NET_Sleep_t)Sys_GetProcAddress(g_pEngineModule, "NET_Sleep_Timeout");
-		break;
+			// we Sys_GetProcAddress NET_Sleep() from
+			//engine_i486.so later in this function
+			NET_Sleep_Timeout = (NET_Sleep_t)Sys_GetProcAddress(g_pEngineModule, "NET_Sleep_Timeout");
+			break;
 		// just in case
 		default:
-		Sys_Sleep = Sleep_Old;
-		break;
+			Sys_Sleep = Sleep_Old;
+			break;
 		}
 	}
 }

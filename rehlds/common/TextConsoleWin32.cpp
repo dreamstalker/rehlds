@@ -89,8 +89,7 @@ bool CTextConsoleWin32::Init(IBaseSystem *system)
 	hinput = GetStdHandle(STD_INPUT_HANDLE);
 	houtput = GetStdHandle(STD_OUTPUT_HANDLE);
 
-	if (!SetConsoleCtrlHandler(&ConsoleHandlerRoutine, TRUE))
-	{
+	if (!SetConsoleCtrlHandler(&ConsoleHandlerRoutine, TRUE)) {
 		Print("WARNING! TextConsole::Init: Could not attach console hook.\n");
 	}
 
@@ -122,8 +121,9 @@ char *CTextConsoleWin32::GetLine()
 
 		if (!GetNumberOfConsoleInputEvents(hinput, &numevents))
 		{
-			if (m_System)
-				m_System->Errorf("CTextConsoleWin32::GetLine: !GetNumberOfConsoleInputEvents");
+			if (m_System) {
+				m_System->Errorf("CTextConsoleWin32::GetLine: !GetNumberOfConsoleInputEvents\n");
+			}
 
 			return nullptr;
 		}
@@ -133,8 +133,10 @@ char *CTextConsoleWin32::GetLine()
 
 		if (!ReadConsoleInput(hinput, recs, ARRAYSIZE(recs), &numread))
 		{
-			if (m_System)
-				m_System->Errorf("CTextConsoleWin32::GetLine: !ReadConsoleInput");
+			if (m_System) {
+				m_System->Errorf("CTextConsoleWin32::GetLine: !ReadConsoleInput\n");
+			}
+
 			return nullptr;
 		}
 
