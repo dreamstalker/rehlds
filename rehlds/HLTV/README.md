@@ -308,7 +308,7 @@ Lots of these commands are boolean switches, were 1 is meaning ON and 0 is respe
 The console does auto-completion by hitting `TAB`.
 All commands in the config file `hltv.cfg` are executed during startup.
 
-Some parameters can only be set in the command line:
+### Command-line parameters
 <pre>
 -port <n>           - sets the HLTV proxy port that spectators connect to (default "27020" )
 -ip <IP>             - forces the proxy to use this IP on a multihomed host

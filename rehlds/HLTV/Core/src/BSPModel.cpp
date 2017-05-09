@@ -35,6 +35,7 @@ void BSPModel::Init(IBaseSystem *system)
 	m_currentLeaf = nullptr;
 	m_base = nullptr;
 	m_wadpath = nullptr;
+	m_IsMinimal = false;
 
 	memset(&m_model, 0, sizeof(m_model));
 	memset(m_novis, 0xFF, sizeof(m_novis));
@@ -48,6 +49,7 @@ bool BSPModel::Load(const char *name, bool minimal)
 		return false;
 	}
 
+	m_IsMinimal = minimal;
 	return LoadFromBuffer(buffer, length, COM_SkipPath((char *)name));
 }
 
@@ -411,7 +413,6 @@ bool BSPModel::InPVS(vec_t *point)
 void BSPModel::Clear()
 {
 	#define FREE_FIELD(field) if (field) { free(field); }
-
 	FREE_FIELD(m_model.leafs);
 	FREE_FIELD(m_model.nodes);
 	FREE_FIELD(m_model.planes);
@@ -437,6 +438,7 @@ void BSPModel::Clear()
 	}
 
 	FREE_FIELD(m_wadpath);
+	#undef FREE_FIELD
 
 	memset(&m_model, 0, sizeof(m_model));
 

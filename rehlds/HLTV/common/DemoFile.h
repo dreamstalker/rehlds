@@ -33,34 +33,52 @@
 
 #include "usercmd.h"
 #include "ref_params.h"
+#include "event_args.h"
 #include "common/ServerInfo.h"
 
 #include "vmodes.h"
 #include "cdll_int.h"
 
-#define DEMO_VERSION		5
-#define MAX_DEMO_ENTRY		92
+const int MAX_DEMO_ENTRY = 92;
+
+const int DEMO_PROTOCOL  = 5;
+
+const int DEMO_STARTUP   = 0;	// this lump contains startup info needed to spawn into the server
+const int DEMO_NORMAL    = 1;	// this lump contains playback info of messages, etc., needed during playback.
+
+enum DemoCmd {
+	DEM_UNKNOWN = 0,
+	DEM_NOREWIND,				// startup message
+	DEM_START_TIME,
+	DEM_STRING,
+	DEM_CLIENTDATA,
+	DEM_READ,
+	DEM_EVENT,
+	DEM_WEAPONANIM,
+	DEM_PLAYSOUND,
+	DEM_PAYLOAD
+};
 
 typedef struct demoheader_s {
 	char szFileStamp[6];
-	int nDemoProtocol;
-	int nNetProtocolVersion;
-	char szMapName[260];
-	char szDllDir[260];
+	int nDemoProtocol;			// should be DEMO_PROTOCOL
+	int nNetProtocolVersion;	// should be PROTOCOL_VERSION
+	char szMapName[260];		// name of map
+	char szDllDir[260];			// name of game directory
 	CRC32_t mapCRC;
-	int nDirectoryOffset;
+	int nDirectoryOffset;		// offset of Entry Directory.
 
 } demoheader_t;
 
 typedef struct demoentry_s {
-	int nEntryType;
+	int nEntryType;				// DEMO_STARTUP or DEMO_NORMAL
 	char szDescription[64];
 	int nFlags;
 	int nCDTrack;
-	float fTrackTime;
-	int nFrames;
-	int nOffset;
-	int nFileLength;
+	float fTrackTime;			// time of track
+	int nFrames;				// # of frames in track
+	int nOffset;				// file offset of track data
+	int nFileLength;			// length of track
 } demoentry_t;
 
 typedef struct demo_info_s {
@@ -110,6 +128,7 @@ private:
 		DEMO_PLAYING,
 		DEMO_RECORDING
 	};
+
 	int m_DemoState;
 	unsigned int m_frameCount;
 	FileHandle_t m_FileHandle;
