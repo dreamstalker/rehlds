@@ -54,6 +54,11 @@ bool CTextConsole::Init(IBaseSystem *system)
 	return true;
 }
 
+void CTextConsole::InitSystem(IBaseSystem *system)
+{
+	m_System = system;
+}
+
 void CTextConsole::SetVisible(bool visible)
 {
 	m_ConsoleVisible = visible;
@@ -158,22 +163,13 @@ void CTextConsole::ReceiveBackspace()
 
 void CTextConsole::ReceiveTab()
 {
-#ifndef LAUNCHER_FIXES
 	if (!m_System)
 		return;
-#else
-	if (!rehldsFuncs || !m_nConsoleTextLen)
-	{
-		return;
-	}
-#endif
+
 	ObjectList matches;
 	m_szConsoleText[ m_nConsoleTextLen ] = '\0';
-#ifndef LAUNCHER_FIXES
 	m_System->GetCommandMatches(m_szConsoleText, &matches);
-#else
-	rehldsFuncs->GetCommandMatches(m_szConsoleText, &matches);
-#endif
+
 	if (matches.IsEmpty())
 		return;
 
@@ -199,7 +195,7 @@ void CTextConsole::ReceiveTab()
 		int nSmallestCmd = 0;
 		int nCurrentColumn;
 		int nTotalColumns;
-		char szCommonCmd[256];//Should be enough.
+		char szCommonCmd[256]; // Should be enough.
 		char szFormatCmd[256];
 		char *pszSmallestCmd;
 		char *pszCurrentCmd = (char *)matches.GetFirst();
@@ -224,6 +220,7 @@ void CTextConsole::ReceiveTab()
 
 		Echo("\n");
 		Q_strcpy(szCommonCmd, pszSmallestCmd);
+
 		// Would be nice if these were sorted, but not that big a deal
 		pszCurrentCmd = (char *)matches.GetFirst();
 		while (pszCurrentCmd)
@@ -236,7 +233,7 @@ void CTextConsole::ReceiveTab()
 
 			_snprintf(szFormatCmd, sizeof(szFormatCmd), "%-*s ", nLongestCmd, pszCurrentCmd);
 			Echo(szFormatCmd);
-			for (char *pCur = pszCurrentCmd, *pCommon = szCommonCmd; (*pCur&&*pCommon); pCur++, pCommon++)
+			for (char *pCur = pszCurrentCmd, *pCommon = szCommonCmd; (*pCur && *pCommon); pCur++, pCommon++)
 			{
 				if (*pCur != *pCommon)
 				{
@@ -244,6 +241,7 @@ void CTextConsole::ReceiveTab()
 					break;
 				}
 			}
+
 			pszCurrentCmd = (char *)matches.GetNext();
 		}
 

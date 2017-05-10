@@ -13,13 +13,6 @@
 #include "icommandline.h"
 #include "isys.h"
 #include "dll_state.h"
-
-#ifdef LAUNCHER_FIXES
-struct DLL_FUNCTIONS;
-#include "cvardef.h"
-#include "rehlds_api.h"
-#endif
-
 #include "dedicated.h"
 
 #include "sys_ded.h"

@@ -54,14 +54,16 @@ public:
 	virtual void SetVisible(bool visible);
 	virtual bool IsVisible();
 
+	void InitSystem(IBaseSystem *system);
+
 protected:
 	char m_szConsoleText[MAX_CONSOLE_TEXTLEN];			// console text buffer
-	int m_nConsoleTextLen;						// console textbuffer length
-	int m_nCursorPosition;						// position in the current input line
+	int m_nConsoleTextLen;								// console textbuffer length
+	int m_nCursorPosition;								// position in the current input line
 
 	// Saved input data when scrolling back through command history
-	char m_szSavedConsoleText[MAX_CONSOLE_TEXTLEN];			// console text buffer
-	int m_nSavedConsoleTextLen;					// console textbuffer length
+	char m_szSavedConsoleText[MAX_CONSOLE_TEXTLEN];		// console text buffer
+	int m_nSavedConsoleTextLen;							// console textbuffer length
 
 	char m_aszLineBuffer[MAX_BUFFER_LINES][MAX_CONSOLE_TEXTLEN];	// command buffer last MAX_BUFFER_LINES commands
 	int m_nInputLine;						// Current line being entered

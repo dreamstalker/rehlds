@@ -347,6 +347,18 @@
     <ClCompile Include="..\hookers\rehlds_debug.cpp">
       <Filter>hookers</Filter>
     </ClCompile>
+    <ClCompile Include="..\common\BaseSystemModule.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\ObjectList.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\TokenLine.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\engine\SystemWrapper.cpp">
+      <Filter>engine\common</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\version\version.h">
@@ -1083,6 +1095,9 @@
     </ClInclude>
     <ClInclude Include="..\hookers\rehlds_debug.h">
       <Filter>hookers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\SystemWrapper.h">
+      <Filter>engine\common</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

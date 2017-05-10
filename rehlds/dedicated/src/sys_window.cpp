@@ -1,4 +1,32 @@
-﻿#include "precompiled.h"
+﻿/*
+*
+*    This program is free software; you can redistribute it and/or modify it
+*    under the terms of the GNU General Public License as published by the
+*    Free Software Foundation; either version 2 of the License, or (at
+*    your option) any later version.
+*
+*    This program is distributed in the hope that it will be useful, but
+*    WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+*    General Public License for more details.
+*
+*    You should have received a copy of the GNU General Public License
+*    along with this program; if not, write to the Free Software Foundation,
+*    Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+*
+*    In addition, as a special exception, the author gives permission to
+*    link the code of this program with the Half-Life Game Engine ("HL
+*    Engine") and Modified Game Libraries ("MODs") developed by Valve,
+*    L.L.C ("Valve").  You must obey the GNU General Public License in all
+*    respects for all of the code used other than the HL Engine and MODs
+*    from Valve.  If you modify this file, you may extend this exception
+*    to your version of the file, but you are not obligated to do so.  If
+*    you do not wish to do so, delete this exception statement from your
+*    version.
+*
+*/
+
+#include "precompiled.h"
 
 class CSys: public ISys {
 public:
@@ -47,7 +75,7 @@ void CSys::Sleep(int msec)
 
 bool CSys::GetExecutableName(char *out)
 {
-	if (!::GetModuleFileName((HINSTANCE)GetModuleHandle(NULL), out, 256))
+	if (!::GetModuleFileName((HINSTANCE)GetModuleHandle(nullptr), out, 256))
 		return false;
 
 	return true;
@@ -55,7 +83,7 @@ bool CSys::GetExecutableName(char *out)
 
 void CSys::ErrorMessage(int level, const char *msg)
 {
-	MessageBox(NULL, msg, "Half-Life Dedicated Server Error", MB_OK);
+	MessageBox(nullptr, msg, "Half-Life Dedicated Server Error", MB_OK);
 	PostQuitMessage(0);
 }
 
@@ -67,7 +95,6 @@ void CSys::WriteStatusText(char *szText)
 void CSys::UpdateStatus(int force)
 {
 	static double tLast = 0.0;
-	double tCurrent;
 	char szStatus[256];
 	int n, nMax;
 	char szMap[32];
@@ -76,7 +103,7 @@ void CSys::UpdateStatus(int force)
 	if (!engineAPI)
 		return;
 
-	tCurrent = (double)timeGetTime() * 0.001;
+	double tCurrent = timeGetTime() * 0.001;
 	engineAPI->UpdateStatus(&fps, &n, &nMax, szMap);
 
 	if (!force)
@@ -190,8 +217,8 @@ bool Sys_SetupConsole()
 void Sys_PrepareConsoleInput()
 {
 	MSG msg;
-	while (PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE)) {
-		if (!GetMessage(&msg, NULL, 0, 0)) {
+	while (PeekMessage(&msg, nullptr, 0, 0, PM_NOREMOVE)) {
+		if (!GetMessage(&msg, nullptr, 0, 0)) {
 			break;
 		}
 
@@ -202,7 +229,7 @@ void Sys_PrepareConsoleInput()
 
 void Sys_InitPingboost()
 {
-	
+	;
 }
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)

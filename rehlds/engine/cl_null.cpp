@@ -106,13 +106,38 @@ void CL_VoiceIdle(void) { }
 void PollDInputDevices(void) { }
 void CL_KeepConnectionActive(void) { }
 void CL_UpdateModuleC(void) { }
-int EXT_FUNC VGuiWrap2_IsInCareerMatch(void) { return 0; }
-void VguiWrap2_GetCareerUI(void) { }
-int EXT_FUNC VGuiWrap2_GetLocalizedStringLength(const char *label) { return 0; }
-void VGuiWrap2_LoadingStarted(const char *resourceType, const char *resourceName) {}
 void EXT_FUNC ConstructTutorMessageDecayBuffer(int *buffer, int bufferLength) { }
 void EXT_FUNC ProcessTutorMessageDecayBuffer(int *buffer, int bufferLength) { }
 int EXT_FUNC GetTimesTutorMessageShown(int id) { return -1; }
 void EXT_FUNC RegisterTutorMessageShown(int mid) { }
 void EXT_FUNC ResetTutorMessageDecayData(void) { }
 void SetCareerAudioState(int state) { }
+
+void *VguiWrap2_GetCareerUI() { return NULL; }
+void VguiWrap2_GetMouseDelta(int *x, int *y) {}
+int EXT_FUNC VGuiWrap2_GetLocalizedStringLength(const char *label) { return 0; }
+int EXT_FUNC VGuiWrap2_IsInCareerMatch() { return 0; }
+int VGuiWrap2_IsConsoleVisible() { return 0; }
+int VGuiWrap2_Key_Event(int down, int keynum, const char *pszCurrentBinding) { return 0; }
+int VGuiWrap2_GameUIKeyPressed() { return 0; }
+int VGuiWrap2_IsGameUIVisible() { return 0; }
+int VGuiWrap2_CallEngineSurfaceAppHandler(void *event, void *userData) { return 0; }
+int VGuiWrap2_UseVGUI1() { return 0; }
+void *VGuiWrap2_GetPanel() { return NULL; }
+void VGuiWrap2_NotifyOfServerConnect(const char *game, int IP, int port) {}
+void VGuiWrap2_LoadingFinished(const char *resourceType, const char *resourceName) {}
+void VGuiWrap2_LoadingStarted(const char *resourceType, const char *resourceName) {}
+void VGuiWrap2_ConDPrintf(const char *msg) {}
+void VGuiWrap2_Startup() {}
+void VGuiWrap2_ConPrintf(const char *msg) {}
+void VGuiWrap2_ClearConsole() {}
+void VGuiWrap2_HideConsole() {}
+void VGuiWrap2_ShowDemoPlayer() {}
+void VGuiWrap2_ShowConsole() {}
+void VGuiWrap2_HideGameUI() {}
+void VGuiWrap2_NotifyOfServerDisconnect() {}
+void VGuiWrap2_Paint() {}
+void VGuiWrap2_SetVisible(int state) {}
+void VGuiWrap2_GetMouse() {}
+void VGuiWrap2_ReleaseMouse() {}
+void VGuiWrap2_Shutdown() {}

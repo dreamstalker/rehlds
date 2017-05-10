@@ -43,6 +43,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\common\BaseSystemModule.cpp" />
+    <ClCompile Include="..\common\ObjectList.cpp" />
+    <ClCompile Include="..\common\TokenLine.cpp" />
     <ClCompile Include="..\engine\buildnum.cpp" />
     <ClCompile Include="..\engine\cl_null.cpp" />
     <ClCompile Include="..\engine\cmd.cpp" />
@@ -88,6 +91,7 @@
     <ClCompile Include="..\engine\sv_steam3.cpp" />
     <ClCompile Include="..\engine\sv_upld.cpp" />
     <ClCompile Include="..\engine\sv_user.cpp" />
+    <ClCompile Include="..\engine\SystemWrapper.cpp" />
     <ClCompile Include="..\engine\sys_dll.cpp" />
     <ClCompile Include="..\engine\sys_dll2.cpp" />
     <ClCompile Include="..\engine\sys_engine.cpp" />
@@ -445,6 +449,7 @@
     <ClInclude Include="..\engine\sv_steam3.h" />
     <ClInclude Include="..\engine\sv_upld.h" />
     <ClInclude Include="..\engine\sv_user.h" />
+    <ClInclude Include="..\engine\SystemWrapper.h" />
     <ClInclude Include="..\engine\sys_dll.h" />
     <ClInclude Include="..\engine\sys_dll2.h" />
     <ClInclude Include="..\engine\iengine.h" />

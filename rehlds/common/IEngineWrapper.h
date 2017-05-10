@@ -29,9 +29,12 @@
 #pragma once
 
 #include "event_args.h"
+#include "vmodes.h"
 #include "cdll_int.h"
 
 class IBaseSystem;
+class ISystemModule;
+
 class IEngineWrapper {
 public:
 	virtual ~IEngineWrapper() {}
@@ -64,7 +67,7 @@ public:
 	virtual void DemoUpdateClientData(client_data_t *cdat) = 0;
 	virtual void CL_QueueEvent(int flags, int index, float delay, event_args_t *pargs) = 0;
 	virtual void HudWeaponAnim(int iAnim, int body) = 0;
-	virtual void CL_DemoPlaySound(int channel, char* sample, float attenuation, float volume, int flags, int pitch) = 0;
+	virtual void CL_DemoPlaySound(int channel, char *sample, float attenuation, float volume, int flags, int pitch) = 0;
 	virtual void ClientDLL_ReadDemoBuffer(int size, unsigned char *buffer) = 0;
 };
 

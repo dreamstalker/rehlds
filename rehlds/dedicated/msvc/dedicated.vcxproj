@@ -59,7 +59,7 @@
       <PreprocessorDefinitions>WIN32;LAUNCHER_FIXES;_DEBUG;DEDICATED;_CRT_SECURE_NO_WARNINGS;USE_BREAKPAD_HANDLER;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\;$(ProjectDir)..\src\;$(ProjectDir)..\..\common;$(ProjectDir)..\..\engine;$(ProjectDir)..\..\public;$(ProjectDir)..\..\public\rehlds;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\src;$(ProjectDir)..\..\;$(ProjectDir)..\..\common;$(ProjectDir)..\..\engine;$(ProjectDir)..\..\public;$(ProjectDir)..\..\public\rehlds;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>precompiled.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
@@ -100,7 +100,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;LAUNCHER_FIXES;NDEBUG;DEDICATED;_CRT_SECURE_NO_WARNINGS;USE_BREAKPAD_HANDLER;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\;$(ProjectDir)..\..\common;$(ProjectDir)..\..\engine;$(ProjectDir)..\..\public;$(ProjectDir)..\..\public\rehlds;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\src;$(ProjectDir)..\..\;$(ProjectDir)..\..\common;$(ProjectDir)..\..\engine;$(ProjectDir)..\..\public;$(ProjectDir)..\..\public\rehlds;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
@@ -142,8 +142,15 @@
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\common\ObjectList.h" />
+    <ClInclude Include="..\..\common\SteamAppStartUp.h" />
+    <ClInclude Include="..\..\common\textconsole.h" />
+    <ClInclude Include="..\..\common\TextConsoleUnix.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\..\common\TextConsoleWin32.h" />
     <ClInclude Include="..\src\conproc.h" />
-    <ClInclude Include="..\src\dbg.h" />
     <ClInclude Include="..\src\dedicated.h" />
     <ClInclude Include="..\src\precompiled.h" />
     <ClInclude Include="..\src\sys_ded.h" />
@@ -165,7 +172,6 @@
     <ClCompile Include="..\..\common\TextConsoleWin32.cpp" />
     <ClCompile Include="..\..\engine\mem.cpp" />
     <ClCompile Include="..\src\conproc.cpp" />
-    <ClCompile Include="..\src\dbg.cpp" />
     <ClCompile Include="..\src\dedicated_exports.cpp" />
     <ClCompile Include="..\src\precompiled.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

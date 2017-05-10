@@ -1,18 +1,44 @@
+/*
+*
+*    This program is free software; you can redistribute it and/or modify it
+*    under the terms of the GNU General Public License as published by the
+*    Free Software Foundation; either version 2 of the License, or (at
+*    your option) any later version.
+*
+*    This program is distributed in the hope that it will be useful, but
+*    WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+*    General Public License for more details.
+*
+*    You should have received a copy of the GNU General Public License
+*    along with this program; if not, write to the Free Software Foundation,
+*    Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+*
+*    In addition, as a special exception, the author gives permission to
+*    link the code of this program with the Half-Life Game Engine ("HL
+*    Engine") and Modified Game Libraries ("MODs") developed by Valve,
+*    L.L.C ("Valve").  You must obey the GNU General Public License in all
+*    respects for all of the code used other than the HL Engine and MODs
+*    from Valve.  If you modify this file, you may extend this exception
+*    to your version of the file, but you are not obligated to do so.  If
+*    you do not wish to do so, delete this exception statement from your
+*    version.
+*
+*/
+
 #include "precompiled.h"
 
-static HANDLE heventDone;
-static HANDLE hfileBuffer;
-static HANDLE heventChildSend;
-static HANDLE heventParentSend;
-static HANDLE hStdout;
-static HANDLE hStdin;
+HANDLE heventDone;
+HANDLE hfileBuffer;
+HANDLE heventChildSend;
+HANDLE heventParentSend;
+HANDLE hStdout;
+HANDLE hStdin;
 
 BOOL SetConsoleCXCY(HANDLE hStdout, int cx, int cy)
 {
 	CONSOLE_SCREEN_BUFFER_INFO info;
-	COORD coordMax;
-
-	coordMax = GetLargestConsoleWindowSize(hStdout);
+	COORD coordMax = GetLargestConsoleWindowSize(hStdout);
 
 	if (cy > coordMax.Y)
 		cy = coordMax.Y;
@@ -113,12 +139,11 @@ BOOL ReadText(LPTSTR pszText, int iBeginLine, int iEndLine)
 {
 	COORD coord;
 	DWORD dwRead;
-	BOOL bRet;
 
 	coord.X = 0;
 	coord.Y = iBeginLine;
 
-	bRet = ReadConsoleOutputCharacter(hStdout, pszText, 80 * (iEndLine - iBeginLine + 1), coord, &dwRead);
+	BOOL bRet = ReadConsoleOutputCharacter(hStdout, pszText, 80 * (iEndLine - iBeginLine + 1), coord, &dwRead);
 
 	// Make sure it's null terminated.
 	if (bRet)
@@ -183,23 +208,21 @@ BOOL WriteText(LPCTSTR szText)
 
 unsigned __stdcall RequestProc(void *arg)
 {
-	int *pBuffer;
-	DWORD dwRet;
 	HANDLE heventWait[2];
 	int iBeginLine, iEndLine;
 
 	heventWait[0] = heventParentSend;
 	heventWait[1] = heventDone;
 
-	while (1)
+	while (true)
 	{
-		dwRet = WaitForMultipleObjects(2, heventWait, FALSE, INFINITE);
+		DWORD dwRet = WaitForMultipleObjects(2, heventWait, FALSE, INFINITE);
 
 		// heventDone fired, so we're exiting.
 		if (dwRet == WAIT_OBJECT_0 + 1)
 			break;
 
-		pBuffer = (int *)GetMappedBuffer(hfileBuffer);
+		int *pBuffer = (int *)GetMappedBuffer(hfileBuffer);
 
 		// hfileBuffer is invalid. Just leave.
 		if (!pBuffer)
@@ -284,14 +307,14 @@ void InitConProc()
 	heventChildSend = heventChild;
 
 	// So we'll know when to go away.
-	heventDone = CreateEvent(NULL, FALSE, FALSE, NULL);
+	heventDone = CreateEvent(nullptr, FALSE, FALSE, nullptr);
 	if (!heventDone)
 	{
 		sys->Printf("InitConProc:  Couldn't create heventDone\n");
 		return;
 	}
 
-	if (!_beginthreadex(NULL, 0, RequestProc, NULL, 0, &threadAddr))
+	if (!_beginthreadex(nullptr, 0, RequestProc, nullptr, 0, &threadAddr))
 	{
 		CloseHandle(heventDone);
 		sys->Printf("InitConProc:  Couldn't create third party thread\n");
