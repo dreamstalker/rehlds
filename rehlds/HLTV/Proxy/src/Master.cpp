@@ -43,10 +43,16 @@ Master::GameToAppIDMapItem_t Master::m_GameToAppIDMap[] =
 	{ GAME_APPID_CSTRIKE_BETA, "cstrike_beta" }
 };
 
-Master::Master() :
-	m_flMasterUpdateTime(0),
-	m_bSteamInitialized(false)
+Master::Master()
 {
+	m_Proxy = nullptr;
+	m_MasterSocket = nullptr;
+
+	m_NoMaster = false;
+	m_bMasterLoaded = false;
+	m_bSteamInitialized = false;
+
+	m_flMasterUpdateTime = 0;
 }
 
 int Master::GetGameAppID(const char *gamedir) const

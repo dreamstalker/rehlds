@@ -560,7 +560,9 @@ void BaseClient::WriteDatagram(double time, frame_t *frame)
 	if (m_ClientChannel.m_unreliableStream.IsOverflowed()) {
 		m_System->DPrintf("Unreliable data stream overflow.\n");
 		m_ClientChannel.m_unreliableStream.Clear();
-		m_LastFrameSeqNr = 0;
+
+		// FIXME: V519 The 'm_LastFrameSeqNr' variable is assigned values twice successively.
+		// m_LastFrameSeqNr = 0;
 	}
 
 	m_LastFrameSeqNr = frame->seqnr;
@@ -633,12 +635,13 @@ void BaseClient::ParseMove(NetPacket *packet)
 
 void BaseClient::SetName(char *newName)
 {
-	char temp[32];
+	char temp[1024];
 	COM_RemoveEvilChars(newName);
 	COM_TrimSpace(newName, temp);
 
-	if (strlen(temp) > sizeof(temp) - 1) {
-		temp[sizeof(temp) - 1] = '\0';
+	const int len = sizeof(m_ClientName);
+	if (strlen(temp) >= len) {
+		temp[len] = '\0';
 	}
 
 	if (!temp[0] || !_stricmp(temp, "console")) {

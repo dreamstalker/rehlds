@@ -28,6 +28,15 @@
 
 #include "precompiled.h"
 
+Network::Network()
+{
+	m_NoDNS = false;
+	m_IsMultihomed = false;
+
+	m_FakeLoss = 0;
+	m_LastStatsUpdateTime = 0;
+}
+
 bool Network::Init(IBaseSystem *system, int serial, char *name)
 {
 	BaseSystemModule::Init(system, serial, name);

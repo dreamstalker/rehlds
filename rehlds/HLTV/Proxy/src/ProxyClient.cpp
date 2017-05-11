@@ -28,6 +28,16 @@
 
 #include "precompiled.h"
 
+ProxyClient::ProxyClient(IProxy *proxy)
+{
+	m_Proxy = proxy;
+
+	m_ChatEnabled = false;
+	m_LastChatTime = 0;
+	m_LastCheerTime = 0;
+	m_NextDecalTime = 0;
+}
+
 void ProxyClient::ShutDown()
 {
 	char *clientTypeString[] = { "Spectator", "Relay Proxy", "Director", "Commentator", "Fake Client" };

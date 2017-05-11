@@ -28,6 +28,14 @@
 
 #include "precompiled.h"
 
+FakeClient::FakeClient()
+{
+	m_Network = nullptr;
+	m_World = nullptr;
+	m_Server = nullptr;
+	m_Socket = nullptr;
+}
+
 bool FakeClient::Init(IBaseSystem *system, int serial, char *name)
 {
 	BaseSystemModule::Init(system, serial, name);

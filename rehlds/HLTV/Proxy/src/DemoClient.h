@@ -32,7 +32,7 @@
 
 class DemoClient: public IClient, public BaseSystemModule {
 public:
-	DemoClient() {}
+	DemoClient();
 	virtual ~DemoClient() {}
 
 	bool Init(IBaseSystem *system, int serial, char *name);

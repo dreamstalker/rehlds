@@ -44,7 +44,7 @@ typedef struct proxyInfo_s {
 class IProxy;
 class Status: public BaseSystemModule {
 public:
-	Status() {}
+	Status();
 	virtual ~Status() {}
 
 	bool Init(IBaseSystem *system, int serial, char *name);

@@ -66,7 +66,7 @@ InfoString::InfoString(char *string)
 InfoString::~InfoString()
 {
 	if (m_String) {
-		free(m_String);
+		Mem_Free(m_String);
 		m_String = nullptr;
 	}
 }
@@ -100,7 +100,7 @@ void InfoString::SetMaxSize(unsigned int maxSize)
 			newBuffer[maxSize - 1] = '\0';
 		}
 
-		free(m_String);
+		Mem_Free(m_String);
 	}
 
 	m_MaxSize = maxSize;
@@ -398,7 +398,7 @@ bool InfoString::SetValueForStarKey(const char *key, const char *value)
 	// Remove current key/value and return if we doesn't specified to set a value
 	RemoveKey(key);
 
-	if (!value || !strlen(value)) {
+	if (!strlen(value)) {
 		return true;
 	}
 

@@ -28,6 +28,17 @@
 
 #include "precompiled.h"
 
+Status::Status()
+{
+	m_Proxy = nullptr;
+
+	m_NextUpdateTime = 0;
+	m_NumberOfProxies = 0;
+	m_NumberOfSlots = 0;
+	m_NumberOfSpectators = 0;
+	m_MaxNumberOfSpectators = 0;
+}
+
 bool Status::Init(IBaseSystem *system, int serial, char *name)
 {
 	BaseSystemModule::Init(system, serial, name);
@@ -259,7 +270,7 @@ void Status::GetLocalStats(int &proxies, int &slots, int &spectators)
 		if (m_SystemTime > proxy->time + 64)
 		{
 			m_Proxies.Remove(proxy);
-			free(proxy);
+			Mem_Free(proxy);
 		}
 		else
 		{

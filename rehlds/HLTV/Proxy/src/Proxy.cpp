@@ -198,8 +198,9 @@ bool Proxy::Init(IBaseSystem *system, int serial, char *name)
 	m_InfoString.Resize(2080);
 	m_NextInfoMessagesUpdate = 0;
 
+	m_RconAddress.Clear();
+
 	// Clear buffers
-	memset(&m_RconAddress, 0, sizeof(m_RconAddress));
 	memset(m_RconPassword, 0, sizeof(m_RconPassword));
 	memset(m_AdminPassword, 0, sizeof(m_AdminPassword));
 	memset(m_ProxyPassword, 0, sizeof(m_ProxyPassword));
@@ -389,7 +390,7 @@ void Proxy::CMD_Ping(char *cmdLine)
 	}
 
 	if (!to.m_Port) {
-		to.SetPort_(atoi("27015"));
+		to.SetPort(atoi("27015"));
 	}
 
 	m_Socket->OutOfBandPrintf(&to, "ping");
@@ -469,7 +470,7 @@ void Proxy::ReplyConnect(NetAddress *to, int protocol, int challenge, char *prot
 	if (type == TYPE_CLIENT && m_DispatchMode != DISPATCH_OFF)
 	{
 		float ratio = m_Status.GetBestRelayProxy(&relayProxy);
-		float myRatio = m_Clients.CountElements() / m_MaxClients * 1.25f;
+		float myRatio = (float)(m_Clients.CountElements() / m_MaxClients) * 1.25f;
 		if (myRatio > 1) {
 			myRatio = 1;
 		}
@@ -739,7 +740,7 @@ bool Proxy::WriteSignonData(int type, BitBuffer *stream)
 		stream->WriteString(COM_VarArgs("%s\n", m_SignonCommands));
 	}
 
-	float ex_interp = (1 / GetMaxUpdateRate()) + 0.05f;
+	float ex_interp = (float)(1 / GetMaxUpdateRate()) + 0.05f;
 	stream->WriteByte(svc_stufftext);
 	stream->WriteString(COM_VarArgs("ex_interp %.2f\n", ex_interp));
 
@@ -946,7 +947,7 @@ void Proxy::CMD_Connect(char *cmdLine)
 	}
 
 	if (!address.m_Port) {
-		address.SetPort_(atoi("27015"));
+		address.SetPort(atoi("27015"));
 	}
 
 	Reset();
@@ -1237,7 +1238,7 @@ void Proxy::CMD_RconAddress(char *cmdLine)
 
 	m_Network->ResolveAddress(params.GetToken(1), &m_RconAddress);
 	if (!m_RconAddress.m_Port) {
-		m_RconAddress.SetPort_(atoi("27015"));
+		m_RconAddress.SetPort(atoi("27015"));
 	}
 }
 
@@ -2027,7 +2028,7 @@ resource_t *Proxy::LoadResourceFromFile(char *fileName, resourcetype_t type)
 	}
 
 	m_System->Printf("WARNING! Failed to load resource file %s.\n", fileName);
-	free(newresource);
+	Mem_Free(newresource);
 	return nullptr;
 }
 
@@ -2041,7 +2042,7 @@ void Proxy::FreeResource(resource_t *resource)
 		m_System->FreeFile(resource->data);
 	}
 
-	free(resource);
+	Mem_Free(resource);
 }
 
 void Proxy::ClearResources()
@@ -2169,7 +2170,7 @@ bool Proxy::IsBanned(NetAddress *adr)
 	while (bannedAdr)
 	{
 		if (adr->EqualBase(bannedAdr)) {
-			return bannedAdr != nullptr;
+			return true;
 		}
 
 		bannedAdr = (NetAddress *)m_BannList.GetNext();
@@ -2249,13 +2250,13 @@ void Proxy::CMD_Bann(char *cmdLine)
 	if (!(m_Network->ResolveAddress(params.GetToken(1), adr)))
 	{
 		m_System->Printf("Couldn't resolve IP \x02%s\"\n", params.GetToken(1));
-		free(adr);
+		Mem_Free(adr);
 		return;
 	}
 
 	if (IsBanned(adr)) {
 		m_System->Printf("IP already banned.\n");
-		free(adr);
+		Mem_Free(adr);
 		return;
 	}
 

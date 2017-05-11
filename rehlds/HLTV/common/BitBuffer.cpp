@@ -162,7 +162,7 @@ void BitBuffer::Reset()
 void BitBuffer::Free()
 {
 	if (m_Data && m_OwnData) {
-		free(m_Data);
+		Mem_Free(m_Data);
 	}
 
 	m_Data = nullptr;

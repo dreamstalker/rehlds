@@ -115,7 +115,7 @@ int StartVGUI()
 		// make sure we get the right version
 		adminFactory = Sys_GetFactory(g_hAdminServerModule);
 		g_pAdminServer = (IAdminServer *)adminFactory(ADMINSERVER_INTERFACE_VERSION, nullptr);
-		g_pAdminVGuiModule = (IVGuiModule *)adminFactory("VGuiModuleAdminServer001", nullptr);
+		g_pAdminVGuiModule = (IVGuiModule *)adminFactory(VGUIMODULE_INTERFACE_VERSION, nullptr);
 		Assert(g_pAdminServer != nullptr);
 		Assert(g_pAdminVGuiModule != nullptr);
 		if (!g_pAdminServer || !g_pAdminVGuiModule)

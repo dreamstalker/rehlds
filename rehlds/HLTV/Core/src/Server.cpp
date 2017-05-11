@@ -108,7 +108,7 @@ bool Server::Init(IBaseSystem *system, int serial, char *name)
 	m_DelayReconnect = true;
 	m_Protocol = PROTOCOL_VERSION;
 
-	m_UserInfo.SetMaxSize(256);
+	m_UserInfo.SetMaxSize(MAX_INFO_STRING);
 	m_UserInfo.SetValueForKey("name", "HLTV Proxy");
 	m_UserInfo.SetValueForKey("cl_lw", "1");
 	m_UserInfo.SetValueForKey("cl_lc", "1");
@@ -119,6 +119,7 @@ bool Server::Init(IBaseSystem *system, int serial, char *name)
 	m_IsGameServer = false;
 	m_IsVoiceBlocking = false;
 	m_ServerSocket = nullptr;
+
 	m_ServerChannel.Create(system);
 	m_ServerInfo.SetMaxSize(512);
 
@@ -227,6 +228,7 @@ void Server::ShutDown()
 
 	Disconnect();
 	m_ServerChannel.Close();
+
 	m_ReliableData.Free();
 	m_UnreliableData.Free();
 	m_VoiceData.Free();
@@ -367,7 +369,7 @@ void Server::ProcessMessage(unsigned int seqNr)
 	{
 		if (m_Instream->IsOverflowed()) {
 			m_System->Printf("WARNING! Server::ProcessMessage: packet read overflow.\n");
-			return;
+			break;
 		}
 
 		int cmd = m_Instream->ReadByte();
@@ -883,11 +885,11 @@ void Server::ParseSetView()
 	{
 		m_ReliableData.WriteByte(svc_setview);
 		m_ReliableData.WriteBuf(m_Instream->CurrentByte(), 2);
-		m_ReliableData.SkipBytes(2);
+		m_Instream->SkipBytes(2);
 	}
 	else
 	{
-		m_System->Errorf("Server::ParseAddAngle: unexpected server state.\n");
+		m_System->Errorf("Server::ParseSetView: unexpected server state.\n");
 	}
 }
 
@@ -938,8 +940,9 @@ void Server::ParseNewUserMsg()
 		iSize = -1;
 	}
 
-	char name[16];
-	m_Instream->ReadBuf(sizeof(name), name);
+	char name[17];
+	m_Instream->ReadBuf(sizeof(name) - 1, name);
+	name[sizeof(name) - 1] = '\0';
 
 	m_System->DPrintf("Adding user message:%s(%i).\n", name, iMsg);
 	m_World->AddUserMessage(iMsg, iSize, name);
@@ -1323,7 +1326,7 @@ void Server::ParseFileTransferFailed()
 		return;
 	}
 
-	m_System->Printf("WARNING! Downloading \"%s\" failed.\n", name);
+	m_System->Printf("WARNING! Server::ParseFileTransferFailed: Downloading \"%s\" failed.\n", name);
 }
 
 void Server::ParseSignonNum()
@@ -1378,12 +1381,12 @@ void Server::ParseCustomization()
 	resource->pNext = nullptr;
 
 	if (resource->ucFlags & RES_CUSTOM) {
-		m_Instream->ReadBuf(16, resource->rgucMD5_hash);
+		m_Instream->ReadBuf(sizeof(resource->rgucMD5_hash), resource->rgucMD5_hash);
 	}
 
 	resource->playernum = index;
 	m_System->DPrintf("Ignoring player customization (%s).\n", resource->szFileName);
-	free(resource);
+	Mem_Free(resource);
 }
 
 void Server::ClearFrame(bool completely)
@@ -1422,7 +1425,7 @@ bool Server::ParseUserMessage(int cmd)
 {
 	UserMsg *usermsg = m_World->GetUserMsg(cmd);
 	if (!usermsg) {
-		m_System->Printf("WARNING! Server::ProcessMessage: unknown user message (%i).\n", cmd);
+		m_System->Printf("WARNING! Server::ParseUserMessage: unknown user message (%i).\n", cmd);
 		return false;
 	}
 
@@ -1539,7 +1542,7 @@ void Server::ParseSound()
 	m_Instream->StartBitMode();
 
 	vec3_t pos;
-	unsigned char *start = this->m_Instream->m_CurByte;
+	unsigned char *start = this->m_Instream->CurrentByte();
 	int field_mask = m_Instream->ReadBits(9);
 
 	if (field_mask & SND_FL_VOLUME) {
@@ -1564,20 +1567,21 @@ void Server::ParseSound()
 
 	m_Instream->EndBitMode();
 
-	m_UnreliableData.WriteByte(6);
-	m_UnreliableData.WriteBuf(start, m_Instream->m_CurByte - start);
+	m_UnreliableData.WriteByte(svc_sound);
+	m_UnreliableData.WriteBuf(start, m_Instream->CurrentByte() - start);
 }
 
 void Server::ParseEvent()
 {
 	m_Instream->StartBitMode();
 
-	m_Frame.events = m_Instream->m_CurByte;
+	m_Frame.events = m_Instream->CurrentByte();
 	m_Frame.eventnum = m_Instream->ReadBits(5);
 
 	for (unsigned int i = 0; i < m_Frame.eventnum; i++)
 	{
 		m_Instream->SkipBits(10);
+
 		if (m_Instream->ReadBit())
 			m_Instream->SkipBits(11);
 
@@ -1594,10 +1598,10 @@ void Server::ParseEvent()
 
 void Server::ParseStopSound()
 {
-	int i = m_Instream->ReadShort();
+	int entityIndex = m_Instream->ReadShort();
 
 	m_UnreliableData.WriteByte(svc_stopsound);
-	m_UnreliableData.WriteShort(i);
+	m_UnreliableData.WriteShort(entityIndex);
 }
 
 void Server::ParsePings()
@@ -2059,7 +2063,11 @@ void Server::ParseCenterPrint()
 		m_UnreliableData.WriteString(string);
 	}
 	else {
-		m_System->Errorf("Server::ParseStuffText: unexpected state.\n");
+		m_System->Errorf("Server::ParseCenterPrint: unexpected state.\n");
+	}
+
+	if (string[0]) {
+		m_System->DPrintf(">>%s\n", string);
 	}
 }
 
@@ -2189,7 +2197,7 @@ void Server::ParseTimeScale()
 	{
 		m_System->Printf("Server::ParseTimeScale: invalid during signon.\n");
 	}
-	else if (m_ServerState == SERVER_RUNNING && m_ServerState == SERVER_INTERMISSION)
+	else if (m_ServerState == SERVER_RUNNING || m_ServerState == SERVER_INTERMISSION)
 	{
 		m_ReliableData.WriteByte(svc_timescale);
 		m_ReliableData.WriteFloat(timescale);

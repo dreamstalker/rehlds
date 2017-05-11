@@ -84,7 +84,7 @@ void *ObjectList::RemoveHead()
 		if (m_tail == m_head)
 			m_tail = nullptr;
 
-		free(m_head);
+		Mem_Free(m_head);
 		m_head = newHead;
 
 		m_number--;
@@ -140,7 +140,7 @@ void *ObjectList::RemoveTail()
 		if (m_head == m_tail)
 			m_head = nullptr;
 
-		free(m_tail);
+		Mem_Free(m_tail);
 		m_tail = newTail;
 
 		m_number--;
@@ -189,9 +189,9 @@ void ObjectList::Clear(bool freeElementsMemory)
 		ne = e->next;
 
 		if (freeElementsMemory && e->object)
-			free(e->object);
+			Mem_Free(e->object);
 
-		free(e);
+		Mem_Free(e);
 		e = ne;
 	}
 
@@ -214,7 +214,7 @@ bool ObjectList::Remove(void *object)
 		if (m_tail == e) m_tail = e->prev;
 		if (m_current == e) m_current= e->next;
 
-		free(e);
+		Mem_Free(e);
 		m_number--;
 	}
 

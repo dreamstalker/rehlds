@@ -31,6 +31,8 @@
 #include "netadr.h"
 #include "BitBuffer.h"
 
+#undef SetPort
+
 class NetAddress {
 public:
 	NetAddress();
@@ -51,7 +53,7 @@ public:
 	bool Equal(NetAddress *a);
 	bool FromSockadr(struct sockaddr *s);
 	void ToSockadr(struct sockaddr *s);
-	void SetPort_(int16 port);
+	void SetPort(int16 port);
 	void ToStream(BitBuffer *stream);
 	void FromStream(BitBuffer *stream);
 

@@ -39,8 +39,8 @@ bool World::Init(IBaseSystem *system, int serial, char *name)
 		SetName(WORLD_INTERFACE_VERSION);
 	}
 
-	m_ClientUserMsgs = 0;
-	m_ResourcesList = 0;
+	m_ClientUserMsgs = nullptr;
+	m_ResourcesList = nullptr;
 	m_ResourcesNum = 0;
 	m_Protocol = PROTOCOL_VERSION;
 
@@ -99,13 +99,13 @@ void World::ShutDown()
 
 	if (m_DeltaCache)
 	{
-		free(m_DeltaCache);
+		Mem_Free(m_DeltaCache);
 		m_DeltaCache = nullptr;
 	}
 
 	if (m_FrameCache)
 	{
-		free(m_FrameCache);
+		Mem_Free(m_FrameCache);
 		m_FrameCache = nullptr;
 	}
 
@@ -161,7 +161,7 @@ void World::ClearUserMessages()
 	for (pList = m_ClientUserMsgs; pList; pList = pNext)
 	{
 		pNext = pList->next;
-		free(pList);
+		Mem_Free(pList);
 	}
 
 	m_ClientUserMsgs = nullptr;
@@ -193,7 +193,7 @@ bool World::AddUserMessage(int msgNumber, int size, char *name)
 
 	if (!bFound)
 	{
-		UserMsg *pumsg = (UserMsg *)malloc(sizeof(UserMsg));
+		UserMsg *pumsg = (UserMsg *)Mem_Malloc(sizeof(UserMsg));
 		memcpy(pumsg, &umsg, sizeof(*pumsg));
 		pumsg->next = m_ClientUserMsgs;
 		m_ClientUserMsgs = pumsg;
@@ -258,7 +258,7 @@ void World::ClearResources()
 	resource_t *res, *next;
 	for (res = m_ResourcesList; res; res = next) {
 		next = res->pNext;
-		free(res);
+		Mem_Free(res);
 	}
 
 	m_ResourcesList = nullptr;
@@ -755,7 +755,7 @@ int World::AddFrame(frame_t *newFrame)
 		maxFrameSize += sizeof(demo_info_t);
 	}
 
-	pdata = (unsigned char *)malloc(maxFrameSize);
+	pdata = (unsigned char *)Mem_ZeroMalloc(maxFrameSize);
 
 	currentFrame->data = pdata;
 	currentFrame->delta = -1;
@@ -1446,7 +1446,7 @@ bool World::AddSignonData(unsigned char type, unsigned char *data, int size)
 	m_SignonData.WriteByte(type);
 	m_SignonData.WriteBuf(data, size);
 
-	return m_SignonData.m_Overflowed;
+	return m_SignonData.IsOverflowed();
 }
 
 int World::FindUserMsgByName(char *name)
@@ -1742,10 +1742,10 @@ int World::RemoveFrames(unsigned int startSeqNr, unsigned int endSeqNr)
 		m_FramesByTime.Remove(frame);
 
 		if (frame->data) {
-			free(frame->data);
+			Mem_Free(frame->data);
 		}
 
-		free(frame);
+		Mem_Free(frame);
 		frame = (frame_t *)m_Frames.FindExactKey(++nextseqnr);
 	}
 
@@ -1787,10 +1787,10 @@ void World::ClearFrames()
 	while (frame)
 	{
 		if (frame->data) {
-			free(frame->data);
+			Mem_Free(frame->data);
 		}
 
-		free(frame);
+		Mem_Free(frame);
 		frame = (frame_t *)m_Frames.GetNext();
 	}
 
@@ -1910,7 +1910,6 @@ void World::ParseDeltaDescription(BitBuffer *stream)
 
 	char szDesc[256];
 	strcopy(szDesc, s);
-
 	m_System->DPrintf("Reading delta description for: %s.\n", s);
 
 	delta_t **ppdelta = m_Delta.LookupRegistration(szDesc);
@@ -1924,7 +1923,7 @@ void World::ParseDeltaDescription(BitBuffer *stream)
 	*ppdelta = (delta_t *)Mem_ZeroMalloc(sizeof(delta_t));
 	pdesc = (delta_description_t *)Mem_ZeroMalloc(sizeof(delta_description_t) * c);
 
-	(*ppdelta)->dynamic = 1;
+	(*ppdelta)->dynamic = TRUE;
 	(*ppdelta)->fieldCount = c;
 
 	for (int i = 0; i < c; i++) {
@@ -2122,8 +2121,8 @@ bool World::SaveAsDemo(char *filename, IDirector *director)
 	}
 
 	m_WorldTime = frame->time;
-	demoChannel.Create(m_System, 0, 0);
-	demoFile.Init(this, 0, &demoChannel);
+	demoChannel.Create(m_System);
+	demoFile.Init(this, nullptr, &demoChannel);
 
 	if (!demoFile.StartRecording(filename)) {
 		return false;
@@ -2171,6 +2170,8 @@ bool World::SaveAsDemo(char *filename, IDirector *director)
 		}
 	}
 
+	demoFile.CloseFile();
+	demoChannel.Clear();
 	return true;
 }
 
