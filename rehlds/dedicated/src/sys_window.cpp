@@ -56,7 +56,7 @@ ISys *sys = &g_Sys;
 
 CSys::CSys()
 {
-	// Startup winock
+	// Startup winsock
 	WORD version = MAKEWORD(2, 0);
 	WSADATA wsaData;
 	WSAStartup(version, &wsaData);
@@ -228,6 +228,11 @@ void Sys_PrepareConsoleInput()
 }
 
 void Sys_InitPingboost()
+{
+	;
+}
+
+void Sys_WriteProcessIdFile()
 {
 	;
 }

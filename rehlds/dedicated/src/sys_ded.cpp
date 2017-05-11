@@ -153,7 +153,8 @@ int RunEngine()
 	RunVGUIFrame();
 
 	bool bDone = false;
-	while (!bDone) {
+	while (!bDone)
+	{
 		// Running really fast, yield some time to other apps
 		sys->Sleep(1);
 
@@ -205,14 +206,15 @@ int StartServer(char* cmdline)
 		CommandLine()->CreateCmdLine(cmdline);
 		CommandLine()->AppendParm("-steam", nullptr);
 
-		Sys_InitPingboost();
-
 		// Load engine
 		g_pEngineModule = Sys_LoadModule(ENGINE_LIB);
 		if (!g_pEngineModule) {
 			sys->ErrorMessage(0, "Unable to load engine, image is corrupt.");
 			return LAUNCHER_ERROR;
 		}
+
+		Sys_InitPingboost();
+		Sys_WriteProcessIdFile();
 
 		// Load filesystem
 		g_pFileSystemModule = Sys_LoadModule(STDIO_FILESYSTEM_LIB);
@@ -240,8 +242,7 @@ int StartServer(char* cmdline)
 
 		// Init VGUI or Console mode
 #ifdef VGUI
-		char *pszValue = nullptr;
-		if (!CommandLine()->CheckParm("-console", &pszValue)) {
+		if (!CommandLine()->CheckParm("-console")) {
 			g_bVGui = true;
 			StartVGUI();
 		}
@@ -258,8 +259,9 @@ int StartServer(char* cmdline)
 				return LAUNCHER_ERROR;
 			}
 
-			if (!Sys_SetupConsole())
+			if (!Sys_SetupConsole()) {
 				return LAUNCHER_ERROR;
+			}
 		}
 
 #ifdef VGUI
@@ -267,10 +269,9 @@ int StartServer(char* cmdline)
 		/*// run vgui
 		if (g_bVGui)
 		{
-		while (VGUIIsInConfig()	&& VGUIIsRunning())
-		{
-		RunVGUIFrame();
-		}
+			while (VGUIIsInConfig()	&& VGUIIsRunning()) {
+				RunVGUIFrame();
+			}
 		}
 		else*/
 #endif

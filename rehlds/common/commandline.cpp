@@ -320,11 +320,12 @@ const char *CCommandLine::CheckParm(const char *psz, char **ppszValue) const
 	if (!m_pszCmdLine)
 		return nullptr;
 
+	if (ppszValue)
+		*ppszValue = nullptr;
+
 	char *pret = strstr(m_pszCmdLine, psz);
 	if (!pret || !ppszValue)
 		return pret;
-
-	*ppszValue = nullptr;
 
 	// find the next whitespace
 	char *p1 = pret;
