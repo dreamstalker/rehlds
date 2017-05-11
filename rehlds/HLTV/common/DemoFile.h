@@ -46,7 +46,6 @@ const int DEMO_PROTOCOL  = 5;
 const int DEMO_STARTUP   = 0;	// this lump contains startup info needed to spawn into the server
 const int DEMO_NORMAL    = 1;	// this lump contains playback info of messages, etc., needed during playback.
 
-#undef PlaySound
 enum class DemoCmd : unsigned char {
 	Unknown = 0,
 	NoRewind,					// startup message

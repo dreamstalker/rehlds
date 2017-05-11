@@ -24,6 +24,7 @@
 
 #ifdef _WIN32
 	#include "conproc.h"
+	#include <mmsystem.h> // timeGetTime
 #else
 	#include <signal.h>
 #endif // _WIN32

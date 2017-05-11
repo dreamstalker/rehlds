@@ -31,8 +31,6 @@
 #include "netadr.h"
 #include "BitBuffer.h"
 
-#undef SetPort
-
 class NetAddress {
 public:
 	NetAddress();
