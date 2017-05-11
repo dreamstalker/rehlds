@@ -56,20 +56,10 @@ ISys *sys = &g_Sys;
 char g_szEXEName[MAX_PATH];
 
 SleepType Sys_Sleep;
-NET_Sleep_t NET_Sleep_Timeout = NULL;
+NET_Sleep_t NET_Sleep_Timeout = nullptr;
 
 CSys::CSys()
 {
-	char *fname;
-	if (CommandLine()->CheckParm("-pidfile", &fname) && fname) {
-		FILE *pidFile = fopen(fname, "w");
-		if (pidFile) {
-			fprintf(pidFile, "%i\n", getpid());
-			fclose(pidFile);
-		}
-		else
-			printf("Warning: unable to open pidfile (%s)\n", fname);
-	}
 }
 
 CSys::~CSys()
@@ -184,6 +174,23 @@ void Sys_InitPingboost()
 			break;
 		}
 	}
+}
+
+void Sys_WriteProcessIdFile()
+{
+	char *fname;
+	if (!CommandLine()->CheckParm("-pidfile", &fname) || !fname) {
+		return;
+	}
+
+	FILE *pidFile = fopen(fname, "w");
+	if (!pidFile) {
+		printf("Warning: unable to open pidfile (%s)\n", fname);
+		return;
+	}
+
+	fprintf(pidFile, "%i\n", getpid());
+	fclose(pidFile);
 }
 
 bool CSys::GetExecutableName(char *out)

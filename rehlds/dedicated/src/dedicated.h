@@ -28,10 +28,6 @@
 
 #pragma once
 
-#ifdef _WIN32
-#define VGUI
-#endif
-
 #define LAUNCHER_ERROR	-1
 #define LAUNCHER_OK		0
 
@@ -44,3 +40,4 @@ extern IDedicatedServerAPI *engineAPI;
 bool Sys_SetupConsole();
 void Sys_PrepareConsoleInput();
 void Sys_InitPingboost();
+void Sys_WriteProcessIdFile();

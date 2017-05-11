@@ -58,7 +58,7 @@ int StartVGUI()
 	const int numFactories = 4;
 	if (!InitializeVGui(&ifaceFactory, numFactories))
 	{
-		MessageBox(NULL, "Fatal Error: Could not initialize vgui.", "Steam - Fatal Error", MB_OK | MB_ICONERROR);
+		MessageBox(nullptr, "Fatal Error: Could not initialize vgui.", "Steam - Fatal Error", MB_OK | MB_ICONERROR);
 		return -1;
 	}
 
@@ -90,7 +90,7 @@ int StartVGUI()
 	vgui::surface()->SetEmbeddedPanel(g_pMainPanel->GetVPanel());
 
 	// load the scheme
-	vgui::scheme()->LoadSchemeFromFile("Resource/TrackerScheme.res", NULL);
+	vgui::scheme()->LoadSchemeFromFile("Resource/TrackerScheme.res", nullptr);
 
 	// localization
 	vgui::localize()->AddFile("Resource/platform_%language%.txt");
@@ -103,8 +103,8 @@ int StartVGUI()
 	// load the module
 	g_pFullFileSystem->GetLocalCopy("Platform/Admin/AdminServer.dll");
 	g_hAdminServerModule = Sys_LoadModule("Platform/Admin/AdminServer.dll");
-	Assert(g_hAdminServerModule != NULL);
-	CreateInterfaceFn adminFactory = NULL;
+	Assert(g_hAdminServerModule != nullptr);
+	CreateInterfaceFn adminFactory = nullptr;
 
 	if (!g_hAdminServerModule)
 	{
@@ -114,10 +114,10 @@ int StartVGUI()
 	{
 		// make sure we get the right version
 		adminFactory = Sys_GetFactory(g_hAdminServerModule);
-		g_pAdminServer = (IAdminServer *)adminFactory(ADMINSERVER_INTERFACE_VERSION, NULL);
-		g_pAdminVGuiModule = (IVGuiModule *)adminFactory("VGuiModuleAdminServer001", NULL);
-		Assert(g_pAdminServer != NULL);
-		Assert(g_pAdminVGuiModule != NULL);
+		g_pAdminServer = (IAdminServer *)adminFactory(ADMINSERVER_INTERFACE_VERSION, nullptr);
+		g_pAdminVGuiModule = (IVGuiModule *)adminFactory("VGuiModuleAdminServer001", nullptr);
+		Assert(g_pAdminServer != nullptr);
+		Assert(g_pAdminVGuiModule != nullptr);
 		if (!g_pAdminServer || !g_pAdminVGuiModule)
 		{
 			vgui::ivgui()->DPrintf2("Admin Error: module version (Admin/AdminServer.dll, %s) invalid, not loading\n", IMANAGESERVER_INTERFACE_VERSION);
