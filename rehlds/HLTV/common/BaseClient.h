@@ -151,15 +151,16 @@ protected:
 	};
 	static clc_func_s m_ClientFuncs[];
 
+	enum { MAX_USER_INFO = 256, MAX_SCOREBOARD_NAME = 32 };
+
 	IWorld *m_World;
 	INetSocket *m_Socket;
 	NetChannel m_ClientChannel;
 
 	int m_ClientType;
 	int m_ClientState;
-	char m_ClientName[32];
+	char m_ClientName[MAX_SCOREBOARD_NAME];
 
-	enum { MAX_USER_INFO = 256 };
 	InfoString m_Userinfo;
 	unsigned int m_LastFrameSeqNr;
 	unsigned int m_DeltaFrameSeqNr;

@@ -46,21 +46,22 @@ const int DEMO_PROTOCOL  = 5;
 const int DEMO_STARTUP   = 0;	// this lump contains startup info needed to spawn into the server
 const int DEMO_NORMAL    = 1;	// this lump contains playback info of messages, etc., needed during playback.
 
-enum DemoCmd {
-	DEM_UNKNOWN = 0,
-	DEM_NOREWIND,				// startup message
-	DEM_START_TIME,
-	DEM_STRING,
-	DEM_CLIENTDATA,
-	DEM_READ,
-	DEM_EVENT,
-	DEM_WEAPONANIM,
-	DEM_PLAYSOUND,
-	DEM_PAYLOAD
+#undef PlaySound
+enum class DemoCmd : unsigned char {
+	Unknown = 0,
+	NoRewind,					// startup message
+	StartTime,
+	StringCmd,
+	ClientData,
+	Read,
+	Event,
+	WeaponAnim,
+	PlaySound,
+	PayLoad
 };
 
 typedef struct demoheader_s {
-	char szFileStamp[6];
+	char szFileStamp[8];
 	int nDemoProtocol;			// should be DEMO_PROTOCOL
 	int nNetProtocolVersion;	// should be PROTOCOL_VERSION
 	char szMapName[260];		// name of map

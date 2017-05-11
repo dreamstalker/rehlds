@@ -28,12 +28,12 @@
 
 #include "precompiled.h"
 
-NetAddress::NetAddress()
+NetAddress::NetAddress() :
+	m_Port(0), m_IP(), m_String()
 {
-	memset(this, 0, sizeof(NetAddress));
 }
 
-void NetAddress::SetPort_(int16 port)
+void NetAddress::SetPort(int16 port)
 {
 	m_Port = htons(port);
 }

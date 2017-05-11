@@ -44,7 +44,7 @@ ObjectDictionary::ObjectDictionary()
 ObjectDictionary::~ObjectDictionary()
 {
 	if (m_entries) {
-		free(m_entries);
+		Mem_Free(m_entries);
 	}
 }
 
@@ -56,7 +56,7 @@ void ObjectDictionary::Clear(bool freeObjectssMemory)
 		{
 			void *obj = m_entries[i].object;
 			if (obj) {
-				free(obj);
+				Mem_Free(obj);
 			}
 		}
 	}
@@ -177,7 +177,7 @@ bool ObjectDictionary::RemoveIndex(int index, bool freeObjectMemory)
 	entry_t *e2 = &m_entries[index + 1];
 
 	if (freeObjectMemory && e1->object)
-		free(e1->object);
+		Mem_Free(e1->object);
 
 	while (p != e1)
 	{
@@ -281,7 +281,7 @@ bool ObjectDictionary::CheckSize()
 
 	if (newSize != m_maxSize)
 	{
-		entry_t *newEntries = (entry_t *)malloc(sizeof(entry_t) * newSize);
+		entry_t *newEntries = (entry_t *)Mem_Malloc(sizeof(entry_t) * newSize);
 		if (!newEntries)
 			return false;
 
@@ -290,7 +290,7 @@ bool ObjectDictionary::CheckSize()
 		if (m_entries && m_size)
 		{
 			memcpy(newEntries, m_entries, sizeof(entry_t) * m_size);
-			free(m_entries);
+			Mem_Free(m_entries);
 		}
 
 		m_entries = newEntries;

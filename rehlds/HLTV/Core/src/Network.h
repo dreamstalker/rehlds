@@ -82,7 +82,7 @@
 class NetSocket;
 class Network: public BaseSystemModule, public INetwork {
 public:
-	Network() {}
+	Network();
 	virtual ~Network() {}
 
 	bool Init(IBaseSystem *system, int serial, char *name);

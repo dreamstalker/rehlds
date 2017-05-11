@@ -28,6 +28,17 @@
 
 #include "precompiled.h"
 
+
+BaseSystemModule::BaseSystemModule()
+{
+	m_System = nullptr;
+	m_Serial = 0;
+	m_SystemTime = 0;
+	m_State = MODULE_UNDEFINED;
+
+	memset(m_Name, 0, sizeof(m_Name));
+}
+
 char *BaseSystemModule::GetName()
 {
 	return m_Name;

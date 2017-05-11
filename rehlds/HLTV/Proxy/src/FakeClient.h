@@ -37,7 +37,7 @@ class INetSocket;
 
 class FakeClient: public BaseSystemModule {
 public:
-	FakeClient() {}
+	FakeClient();
 	virtual ~FakeClient() {}
 
 	bool Init(IBaseSystem *system, int serial, char *name);

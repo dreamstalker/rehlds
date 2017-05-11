@@ -1013,8 +1013,8 @@ void Delta::ClearEncoders()
 	while (p)
 	{
 		n = p->next;
-		free(p->name);
-		free(p);
+		Mem_Free(p->name);
+		Mem_Free(p);
 		p = n;
 	}
 
@@ -1070,7 +1070,7 @@ void Delta::ClearLinks(delta_link_t **plinks)
 	while (p)
 	{
 		n = p->next;
-		free(p);
+		Mem_Free(p);
 		p = n;
 	}
 	*plinks = 0;
@@ -1097,13 +1097,13 @@ delta_t *Delta::BuildFromLinks(delta_link_t **pplinks)
 	for (p = *pplinks, pcur = pdesc; p; p = p->next, pcur++)
 	{
 		memcpy(pcur, p->delta, sizeof(delta_description_t));
-		free(p->delta);
+		Mem_Free(p->delta);
 		p->delta = 0;
 	}
 
 	ClearLinks(pplinks);
 
-	pdelta->dynamic = 1;
+	pdelta->dynamic = TRUE;
 	pdelta->fieldCount = count;
 	pdelta->pdd = pdesc;
 
@@ -1238,10 +1238,10 @@ void Delta::FreeDescription(delta_t **ppdesc)
 	if (ppdesc && *ppdesc)
 	{
 		if ((*ppdesc)->dynamic) {
-			free((*ppdesc)->pdd);
+			Mem_Free((*ppdesc)->pdd);
 		}
 
-		free(*ppdesc);
+		Mem_Free(*ppdesc);
 		*ppdesc = nullptr;
 	}
 }
@@ -1276,8 +1276,8 @@ void Delta::ClearDefinitions()
 	while (p)
 	{
 		n = p->next;
-		free(p->ptypename);
-		free(p);
+		Mem_Free(p->ptypename);
+		Mem_Free(p);
 		p = n;
 	}
 
@@ -1456,7 +1456,7 @@ bool Delta::Load(char *name, delta_t **ppdesc, char *pszFile)
 	}
 
 	bool res = ParseDescription(name, ppdesc, pbuf);
-	free(pbuf);
+	Mem_Free(pbuf);
 	return res;
 }
 
@@ -1475,13 +1475,13 @@ void Delta::ClearRegistrations()
 	while (p)
 	{
 		n = p->next;
-		free(p->name);
+		Mem_Free(p->name);
 
 		if (p->pdesc) {
 			FreeDescription(&p->pdesc);
 		}
 
-		free(p);
+		Mem_Free(p);
 		p = n;
 	}
 

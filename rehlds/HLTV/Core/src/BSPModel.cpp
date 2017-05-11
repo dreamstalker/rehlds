@@ -412,7 +412,7 @@ bool BSPModel::InPVS(vec_t *point)
 
 void BSPModel::Clear()
 {
-	#define FREE_FIELD(field) if (field) { free(field); }
+	#define FREE_FIELD(field) if (field) { Mem_Free(field); }
 	FREE_FIELD(m_model.leafs);
 	FREE_FIELD(m_model.nodes);
 	FREE_FIELD(m_model.planes);
@@ -833,28 +833,25 @@ void BSPModel::LoadEntities(lump_t *l)
 	m_model.entities = (char *)Mem_ZeroMalloc(l->filelen);
 	memcpy(m_model.entities, (const void *)(m_base + l->fileofs), l->filelen);
 
-	if (m_model.entities)
+	char *pszInputStream = COM_Parse(m_model.entities);
+	if (*pszInputStream)
 	{
-		char *pszInputStream = COM_Parse(m_model.entities);
-		if (*pszInputStream)
+		while (com_token[0] != '}')
 		{
-			while (com_token[0] != '}')
+			if (!strcmp(com_token, "wad"))
 			{
-				if (!strcmp(com_token, "wad"))
-				{
-					COM_Parse(pszInputStream);
-					if (m_wadpath) {
-						free(m_wadpath);
-					}
-
-					m_wadpath = _strdup(com_token);
-					return;
+				COM_Parse(pszInputStream);
+				if (m_wadpath) {
+					Mem_Free(m_wadpath);
 				}
 
-				pszInputStream = COM_Parse(pszInputStream);
-				if (!*pszInputStream)
-					return;
+				m_wadpath = _strdup(com_token);
+				return;
 			}
+
+			pszInputStream = COM_Parse(pszInputStream);
+			if (!*pszInputStream)
+				return;
 		}
 	}
 }

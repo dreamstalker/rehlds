@@ -36,7 +36,7 @@
 
 class BaseSystemModule: virtual public ISystemModule {
 public:
-	BaseSystemModule() : m_State(MODULE_UNDEFINED) {}
+	BaseSystemModule();
 	virtual ~BaseSystemModule() {}
 
 	virtual bool Init(IBaseSystem *system, int serial, char *name);

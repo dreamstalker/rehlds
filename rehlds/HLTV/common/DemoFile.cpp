@@ -106,7 +106,7 @@ void DemoFile::CloseFile()
 
 	if (m_Entries)
 	{
-		free(m_Entries);
+		Mem_Free(m_Entries);
 		m_Entries = nullptr;
 	}
 
@@ -423,7 +423,7 @@ void DemoFile::ReadDemoPacket(BitBuffer *demoData, demo_info_t *demoInfo)
 	int msglen; // command length in bytes
 	unsigned char msgbuf[MAX_POSSIBLE_MSG];
 	float time;
-	unsigned char cmd;
+	DemoCmd cmd;
 	int frame;
 	int channel;
 	int sampleSize;
@@ -432,18 +432,18 @@ void DemoFile::ReadDemoPacket(BitBuffer *demoData, demo_info_t *demoInfo)
 	while (readNextCmd)
 	{
 		unsigned int curpos = m_FileSystem->Tell(m_FileHandle);
-		if (m_FileSystem->Read(&cmd, sizeof(unsigned char), m_FileHandle) != sizeof(unsigned char)) {
+		if (m_FileSystem->Read(&cmd, sizeof(cmd), m_FileHandle) != sizeof(cmd)) {
 			StopPlayBack();
 			return;
 		}
 
-		m_FileSystem->Read(&time, sizeof(float), m_FileHandle);
+		m_FileSystem->Read(&time, sizeof(time), m_FileHandle);
 		time = _LittleFloat(time);
 
-		m_FileSystem->Read(&frame, sizeof(int), m_FileHandle);
+		m_FileSystem->Read(&frame, sizeof(frame), m_FileHandle);
 		frame = _LittleLong(frame);
 
-		if (cmd && cmd != DEM_READ) {
+		if (cmd != DemoCmd::Unknown && cmd != DemoCmd::Read) {
 			m_nextReadTime = m_startTime + time;
 		}
 
@@ -456,16 +456,16 @@ void DemoFile::ReadDemoPacket(BitBuffer *demoData, demo_info_t *demoInfo)
 
 		switch (cmd)
 		{
-		case DEM_START_TIME:
+		case DemoCmd::StartTime:
 			m_startTime = (float)m_System->GetTime();
 			break;
-		case DEM_STRING:
+		case DemoCmd::StringCmd:
 			msglen = sizeof(char [64]);
 			break;
-		case DEM_CLIENTDATA:
+		case DemoCmd::ClientData:
 			msglen = sizeof(client_data_t);
 			break;
-		case DEM_READ:
+		case DemoCmd::Read:
 		{
 			if (++m_CurrentEntry >= m_EntryNumber) {
 				StopPlayBack();
@@ -477,22 +477,22 @@ void DemoFile::ReadDemoPacket(BitBuffer *demoData, demo_info_t *demoInfo)
 			}
 			break;
 		}
-		case DEM_EVENT:
+		case DemoCmd::Event:
 			msglen = sizeof(int)			// flags
 					+ sizeof(int)			// idx
 					+ sizeof(float)			// delay
 					+ sizeof(event_args_t);	// eargs
 			break;
-		case DEM_WEAPONANIM:
+		case DemoCmd::WeaponAnim:
 			msglen = sizeof(int)	// anim
 					+ sizeof(int);	// body
 			break;
-		case DEM_PLAYSOUND:
+		case DemoCmd::PlaySound:
 		{
-			m_FileSystem->Read(&channel, sizeof(int), m_FileHandle);
+			m_FileSystem->Read(&channel, sizeof(channel), m_FileHandle);
 			channel = _LittleLong(channel);
 
-			m_FileSystem->Read(&sampleSize, sizeof(int), m_FileHandle);
+			m_FileSystem->Read(&sampleSize, sizeof(sampleSize), m_FileHandle);
 			sampleSize = _LittleLong(sampleSize);
 			msglen = sampleSize
 					+ sizeof(float)	// attenuation
@@ -501,9 +501,9 @@ void DemoFile::ReadDemoPacket(BitBuffer *demoData, demo_info_t *demoInfo)
 					+ sizeof(int);	// pitch
 			break;
 		}
-		case DEM_PAYLOAD:
+		case DemoCmd::PayLoad:
 		{
-			m_FileSystem->Read(&msglen, sizeof(int), m_FileHandle);
+			m_FileSystem->Read(&msglen, sizeof(msglen), m_FileHandle);
 			msglen = _LittleLong(msglen);
 			break;
 		}
@@ -516,15 +516,15 @@ void DemoFile::ReadDemoPacket(BitBuffer *demoData, demo_info_t *demoInfo)
 		{
 			m_FileSystem->Read(msgbuf, msglen, m_FileHandle);
 
-			demoData->WriteByte(cmd);
+			demoData->WriteByte((unsigned char)cmd);
 
 			switch (cmd)
 			{
-			case DEM_PLAYSOUND:
+			case DemoCmd::PlaySound:
 				demoData->WriteLong(channel);
 				demoData->WriteLong(sampleSize);
 				break;
-			case DEM_PAYLOAD:
+			case DemoCmd::PayLoad:
 				demoData->WriteLong(msglen);
 				break;
 			}
@@ -537,7 +537,7 @@ void DemoFile::ReadDemoPacket(BitBuffer *demoData, demo_info_t *demoInfo)
 	ReadSequenceInfo();
 
 	int length;
-	if (m_FileSystem->Read(&length, sizeof(int), m_FileHandle) != sizeof(int)) {
+	if (m_FileSystem->Read(&length, sizeof(length), m_FileHandle) != sizeof(length)) {
 		m_System->DPrintf("WARNING! DemoFile::ReadDemoPacket: Bad demo length.\n");
 		StopPlayBack();
 		return;

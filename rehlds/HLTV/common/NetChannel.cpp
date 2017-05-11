@@ -62,7 +62,7 @@ void NetChannel::UnlinkFragment(fragbuf_t *buf, int stream)
 	if (*list == buf)
 	{
 		*list = buf->next;
-		free(buf);
+		Mem_Free(buf);
 		return;
 	}
 
@@ -72,7 +72,7 @@ void NetChannel::UnlinkFragment(fragbuf_t *buf, int stream)
 		if (search->next == buf)
 		{
 			search->next = buf->next;
-			free(buf);
+			Mem_Free(buf);
 			return;
 		}
 
@@ -115,7 +115,7 @@ void NetChannel::ClearFragbufs(fragbuf_t **ppbuf)
 	while (buf)
 	{
 		n = buf->next;
-		free(buf);
+		Mem_Free(buf);
 		buf = n;
 	}
 
@@ -132,7 +132,7 @@ void NetChannel::ClearFragments()
 		{
 			next = wait->next;
 			ClearFragbufs(&wait->fragbufs);
-			free(wait);
+			Mem_Free(wait);
 			wait = next;
 		}
 		m_waitlist[i] = nullptr;
@@ -155,7 +155,7 @@ void NetChannel::FlushIncoming(int stream)
 	while (p)
 	{
 		n = p->next;
-		free(p);
+		Mem_Free(p);
 		p = n;
 	}
 
@@ -203,7 +203,7 @@ void NetChannel::Clear()
 
 	if (m_tempBuffer)
 	{
-		free(m_tempBuffer);
+		Mem_Free(m_tempBuffer);
 		m_tempBuffer = nullptr;
 	}
 
@@ -664,7 +664,7 @@ void NetChannel::ProcessIncoming(unsigned char *data, int size)
 
 	bool frag_message[MAX_STREAMS] = { false, false };
 	int frag_offset[MAX_STREAMS] = { 0, 0 };
-	int m_frag_length[MAX_STREAMS] = { 0, 0 };
+	int frag_length[MAX_STREAMS] = { 0, 0 };
 
 	bool message_contains_fragments;
 	int net_drop;
@@ -718,7 +718,7 @@ void NetChannel::ProcessIncoming(unsigned char *data, int size)
 				frag_message[i] = true;
 				fragid[i] = message.ReadLong();
 				frag_offset[i] = message.ReadShort();
-				m_frag_length[i] = message.ReadShort();
+				frag_length[i] = message.ReadShort();
 			}
 		}
 	}
@@ -801,8 +801,8 @@ void NetChannel::ProcessIncoming(unsigned char *data, int size)
 				pbuf = FindBufferById(&m_incomingbufs[i], fragid[i], true);
 				if (pbuf)
 				{
-					memcpy(pbuf->data, message.GetData() + message.CurrentSize() + frag_offset[i], m_frag_length[i]);
-					pbuf->size = m_frag_length[i];
+					memcpy(pbuf->data, message.GetData() + message.CurrentSize() + frag_offset[i], frag_length[i]);
+					pbuf->size = frag_length[i];
 				}
 				else
 				{
@@ -815,15 +815,15 @@ void NetChannel::ProcessIncoming(unsigned char *data, int size)
 
 			// Rearrange incoming data to not have the frag stuff in the middle of it
 			int wpos = message.CurrentSize() + frag_offset[i];
-			int rpos = wpos + m_frag_length[i];
+			int rpos = wpos + frag_length[i];
 
 			memmove(message.GetData() + wpos, message.GetData() + rpos, message.GetMaxSize() - rpos);
-			message.m_MaxSize -= m_frag_length[i];
+			message.m_MaxSize -= frag_length[i];
 
 			for (j = i + 1; j < MAX_STREAMS; j++)
 			{
 				// fragments order already validated
-				frag_offset[j] -= m_frag_length[i];
+				frag_offset[j] -= frag_length[i];
 			}
 		}
 	}
@@ -871,7 +871,7 @@ void NetChannel::FragSend()
 		m_fragbufcount[i] = wait->fragbufcount;
 
 		// Throw away wait list
-		free(wait);
+		Mem_Free(wait);
 	}
 }
 
@@ -974,7 +974,7 @@ bool NetChannel::CreateFragmentsFromBuffer(void *buffer, int size, int streamtyp
 		if (!buf)
 		{
 			m_System->Printf("NetChannel::CreateFragmentsFromBuffer:Couldn't allocate fragbuf_t\n");
-			free(wait);
+			Mem_Free(wait);
 			return false;
 		}
 
@@ -1100,7 +1100,7 @@ void NetChannel::CopyNormalFragments()
 		n = p->next;
 		packet->data.WriteBuf(p->data, p->size);
 
-		free(p);
+		Mem_Free(p);
 		p = n;
 	}
 
@@ -1257,7 +1257,7 @@ bool NetChannel::CopyFileFragments()
 	{
 		n = p->next;
 		filecontent.WriteBuf(p->data, p->size);
-		free(p);
+		Mem_Free(p);
 		p = n;
 	}
 

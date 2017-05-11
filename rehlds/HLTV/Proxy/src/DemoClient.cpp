@@ -28,6 +28,18 @@
 
 #include "precompiled.h"
 
+DemoClient::DemoClient()
+{
+	m_Proxy = nullptr;
+	m_World = nullptr;
+
+	m_ClientDelta = 0;
+	m_LastFrameSeqNr = 0;
+	m_IsActive = false;
+
+	memset(m_BaseFileName, 0, sizeof(m_BaseFileName));
+}
+
 bool DemoClient::Init(IBaseSystem *system, int serial, char *name)
 {
 	BaseSystemModule::Init(system, serial, name);

@@ -894,7 +894,6 @@ bool DemoPlayer::LoadGame(char *filename)
 	m_LastClockUpdateTime = 0;
 	m_LastFrameTime = 0;
 	m_PlayerState = DEMOPLAYER_INITIALIZING;
-	m_LastFrameTime = 0;
 	m_MasterMode = true;
 
 	return true;
@@ -953,9 +952,9 @@ void DemoPlayer::ExecuteDemoFileCommands(BitBuffer *stream)
 	unsigned int cmd;
 	while ((cmd = stream->ReadByte()) != -1)
 	{
-		switch (cmd)
+		switch ((DemoCmd)cmd)
 		{
-		case DEM_STRING:
+		case DemoCmd::StringCmd:
 		{
 			char szCmdName[64];
 			stream->ReadBuf(sizeof(szCmdName), szCmdName);
@@ -963,14 +962,14 @@ void DemoPlayer::ExecuteDemoFileCommands(BitBuffer *stream)
 			m_Engine->Cbuf_AddText("\n");
 			break;
 		}
-		case DEM_CLIENTDATA:
+		case DemoCmd::ClientData:
 		{
 			client_data_t cdat;
 			stream->ReadBuf(sizeof(cdat), &cdat);
 			m_Engine->DemoUpdateClientData(&cdat);
 			break;
 		}
-		case DEM_EVENT:
+		case DemoCmd::Event:
 		{
 			int flags   = _LittleLong(stream->ReadLong());
 			int idx     = _LittleLong(stream->ReadLong());
@@ -982,7 +981,7 @@ void DemoPlayer::ExecuteDemoFileCommands(BitBuffer *stream)
 			m_Engine->CL_QueueEvent(flags, idx, delay, &eargs);
 			break;
 		}
-		case DEM_WEAPONANIM:
+		case DemoCmd::WeaponAnim:
 		{
 			int anim = _LittleLong(stream->ReadLong());
 			int body = _LittleLong(stream->ReadLong());
@@ -990,7 +989,7 @@ void DemoPlayer::ExecuteDemoFileCommands(BitBuffer *stream)
 			m_Engine->HudWeaponAnim(anim, body);
 			break;
 		}
-		case DEM_PLAYSOUND:
+		case DemoCmd::PlaySound:
 		{
 			int channel = stream->ReadLong();
 			int sampleSize = stream->ReadLong();
@@ -1007,13 +1006,14 @@ void DemoPlayer::ExecuteDemoFileCommands(BitBuffer *stream)
 			m_Engine->CL_DemoPlaySound(channel, sample, attenuation, volume, flags, pitch);
 			break;
 		}
-		case DEM_PAYLOAD:
+		case DemoCmd::PayLoad:
 		{
 			unsigned char data[32768];
 			memset(data, 0, sizeof(data));
 
 			int length = stream->ReadLong();
 			stream->ReadBuf(length, data);
+
 			m_Engine->ClientDLL_ReadDemoBuffer(length, data);
 			break;
 		}

@@ -49,7 +49,8 @@ char *DirectorCmd::m_CMD_Name[] =
 	"WAYPOINTS"
 };
 
-DirectorCmd::DirectorCmd()
+DirectorCmd::DirectorCmd() :
+	m_Size(0), m_Index(0)
 {
 	Clear();
 }
