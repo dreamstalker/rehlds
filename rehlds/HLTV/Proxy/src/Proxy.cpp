@@ -470,7 +470,7 @@ void Proxy::ReplyConnect(NetAddress *to, int protocol, int challenge, char *prot
 	if (type == TYPE_CLIENT && m_DispatchMode != DISPATCH_OFF)
 	{
 		float ratio = m_Status.GetBestRelayProxy(&relayProxy);
-		float myRatio = (float)(m_Clients.CountElements() / m_MaxClients) * 1.25f;
+		float myRatio = float(m_Clients.CountElements()) / float(m_MaxClients) * 1.25f;
 		if (myRatio > 1) {
 			myRatio = 1;
 		}
@@ -740,7 +740,7 @@ bool Proxy::WriteSignonData(int type, BitBuffer *stream)
 		stream->WriteString(COM_VarArgs("%s\n", m_SignonCommands));
 	}
 
-	float ex_interp = (float)(1 / GetMaxUpdateRate()) + 0.05f;
+	float ex_interp = (1.0f / GetMaxUpdateRate()) + 0.05f;
 	stream->WriteByte(svc_stufftext);
 	stream->WriteString(COM_VarArgs("ex_interp %.2f\n", ex_interp));
 
@@ -1811,7 +1811,7 @@ bool Proxy::CheckDirectorModule()
 	m_Director = dynamic_cast<IDirector *>(m_System->GetModule(DIRECTOR_INTERFACE_VERSION, szAbsoluteLibFilename, "director"));
 	if (m_Director)
 	{
-		m_System->Printf("Using extern director module (%s).\n", szAbsoluteLibFilename);
+		m_System->DPrintf("Using extern director module (%s).\n", szAbsoluteLibFilename);
 		return true;
 	}
 
@@ -2363,7 +2363,7 @@ double Proxy::GetProxyTime()
 void Proxy::IncreaseCheering(int votes)
 {
 	m_CheeringPlayers += votes;
-	float fraction = (float)(m_CheeringPlayers / m_Clients.CountElements());
+	float fraction = float(m_CheeringPlayers) / float(m_Clients.CountElements());
 	if (fraction > 1) {
 		fraction = 1;
 	}
@@ -2496,7 +2496,7 @@ void Proxy::SetClientTime(double time, bool relative)
 void Proxy::SetClientTimeScale(float scale)
 {
 	BitBuffer buf(32);
-	m_ClientTimeScale = clamp(scale, 4.0f, 0.5f);
+	m_ClientTimeScale = clamp(scale, 0.5f, 4.0f);
 
 	buf.WriteByte(svc_timescale);
 	buf.WriteFloat(m_ClientTimeScale);

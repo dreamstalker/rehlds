@@ -231,6 +231,7 @@
     <ClInclude Include="..\..\common\NetAddress.h" />
     <ClInclude Include="..\..\common\net_internal.h" />
     <ClInclude Include="..\..\common\random.h" />
+    <ClInclude Include="..\..\Director\src\Director.h" />
     <ClInclude Include="..\src\DemoClient.h" />
     <ClInclude Include="..\src\FakeClient.h" />
     <ClInclude Include="..\src\Master.h" />

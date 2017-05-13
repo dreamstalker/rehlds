@@ -410,35 +410,40 @@ bool BSPModel::InPVS(vec_t *point)
 	return false;
 }
 
+void BSPModel::Free(void *ptr)
+{
+	if (ptr) {
+		Mem_Free(ptr);
+	}
+}
+
 void BSPModel::Clear()
 {
-	#define FREE_FIELD(field) if (field) { Mem_Free(field); }
-	FREE_FIELD(m_model.leafs);
-	FREE_FIELD(m_model.nodes);
-	FREE_FIELD(m_model.planes);
-	FREE_FIELD(m_model.visdata);
-	FREE_FIELD(m_model.vertexes);
-	FREE_FIELD(m_model.entities);
-	FREE_FIELD(m_model.edges);
-	FREE_FIELD(m_model.lightdata);
-	FREE_FIELD(m_model.surfedges);
-	FREE_FIELD(m_model.surfaces);
-	FREE_FIELD(m_model.marksurfaces);
-	FREE_FIELD(m_model.clipnodes);
-	FREE_FIELD(m_model.hulls[0].clipnodes);
-	FREE_FIELD(m_model.texinfo);
+	Free(m_model.leafs);
+	Free(m_model.nodes);
+	Free(m_model.planes);
+	Free(m_model.visdata);
+	Free(m_model.vertexes);
+	Free(m_model.entities);
+	Free(m_model.edges);
+	Free(m_model.lightdata);
+	Free(m_model.surfedges);
+	Free(m_model.surfaces);
+	Free(m_model.marksurfaces);
+	Free(m_model.clipnodes);
+	Free(m_model.hulls[0].clipnodes);
+	Free(m_model.texinfo);
 
 	if (m_model.textures)
 	{
 		for (int i = 0; i < m_model.numtextures; ++i) {
-			FREE_FIELD(m_model.textures[i]);
+			Free(m_model.textures[i]);
 		}
 
-		FREE_FIELD(m_model.textures);
+		Free(m_model.textures);
 	}
 
-	FREE_FIELD(m_wadpath);
-	#undef FREE_FIELD
+	Free(m_wadpath);
 
 	memset(&m_model, 0, sizeof(m_model));
 

@@ -37,6 +37,14 @@
 //#define Mem_region
 //#define Proxy_region
 //#define BaseClient_region
+//#define ProxyClient_region
+//#define FakeClient_region
+//#define DemoFile_region
+//#define DemoClient_region
+//#define Director_region
+//#define DirectorCmd_region
+//#define Status_region
+//#define InfoString_region
 //#define BitBuffer_region
 //#define NetChannel_region
 //#define Master_region
@@ -207,10 +215,47 @@ FunctionHook g_FunctionHooks[] =
 	HOOK_DEF(0x01D14A50, Proxy::CMD_Region),
 
 	//HOOK_DEF(0x01D12E70, Proxy::GetModVersion),		// NOXREF
-	//HOOK_DEF(0x0, Proxy::CMD_InformPlayers),		// NOXREF
-	//HOOK_DEF(0x0, Proxy::CMD_MaxUpdateRate),		// NOXREF
+	//HOOK_DEF(0x0, Proxy::CMD_InformPlayers),			// NOXREF
+	//HOOK_DEF(0x0, Proxy::CMD_MaxUpdateRate),			// NOXREF
 
 #endif // Proxy_region
+
+#ifndef ProxyClient_region
+
+	// BaseSystemModule
+	HOOK_VIRTUAL_DEF(0x01D16C50, ProxyClient::Init),
+	HOOK_VIRTUAL_DEF(0x01D16D20, ProxyClient::ShutDown),
+
+	// BaseClient
+	HOOK_VIRTUAL_DEF(0x01D16A40, ProxyClient::HasChatEnabled),
+	HOOK_VIRTUAL_DEF(0x01D16B30, ProxyClient::DownloadFile),
+	HOOK_VIRTUAL_DEF(0x01D16920, ProxyClient::SendDatagram),
+	HOOK_VIRTUAL_DEF(0x01D168E0, ProxyClient::ReplySpawn),
+	HOOK_VIRTUAL_DEF(0x01D16770, ProxyClient::UpdateUserInfo),
+	HOOK_VIRTUAL_DEF(0x01D16A50, ProxyClient::ParseVoiceData),
+	HOOK_VIRTUAL_DEF(0x01D16310, ProxyClient::ProcessStringCmd),
+	HOOK_VIRTUAL_DEF(0x01D16850, ProxyClient::ParseHLTV),
+
+#endif // ProxyClient_region
+
+#ifndef FakeClient_region
+
+	// BaseSystemModule
+	HOOK_VIRTUAL_DEF(0x01D09300, FakeClient::Init),
+	HOOK_VIRTUAL_DEF(0x01D09310, FakeClient::RunFrame),
+	HOOK_VIRTUAL_DEF(0x01D09320, FakeClient::ReceiveSignal),
+	HOOK_VIRTUAL_DEF(0x01D09380, FakeClient::GetStatusLine),
+	HOOK_VIRTUAL_DEF(0x01D09390, FakeClient::GetType),
+	HOOK_VIRTUAL_DEF(0x01D093D0, FakeClient::ShutDown),
+
+	// FakeClient
+	HOOK_DEF(0x01D08EA0, FakeClient::SetRate),
+	HOOK_DEF(0x01D08EB0, FakeClient::Connect),
+	HOOK_DEF(0x01D08EE0, FakeClient::Retry),			// NOXREF
+	HOOK_DEF(0x01D08EF0, FakeClient::Say),				// NOXREF
+	HOOK_DEF(0x01D08F50, FakeClient::Disconnect),		// NOXREF
+
+#endif // FakeClient_region
 
 #ifndef BaseClient_region
 
@@ -280,12 +325,12 @@ FunctionHook g_FunctionHooks[] =
 	HOOK_DEF(0x01D03D30, BitBuffer::ConcatBuffer),
 	HOOK_DEF(0x01D03BF0, BitBuffer::SkipBytes),
 	HOOK_DEF(0x01D03040, BitBuffer::CurrentBit),		// NOXREF
-	HOOK_DEF(0x01D038F0, BitBuffer::SpaceLeft),		// NOXREF
-	HOOK_DEF(0x01D03900, BitBuffer::AlignByte),		// NOXREF
+	HOOK_DEF(0x01D038F0, BitBuffer::SpaceLeft),			// NOXREF
+	HOOK_DEF(0x01D03900, BitBuffer::AlignByte),			// NOXREF
 	HOOK_DEF(0x01D03A70, BitBuffer::StartBitMode),		// NOXREF
 	HOOK_DEF(0x01D03A80, BitBuffer::EndBitMode),		// NOXREF
-	HOOK_DEF(0x01D03AC0, BitBuffer::SetBuffer),		// NOXREF
-	HOOK_DEF(0x01D03C20, BitBuffer::SkipBits),		// NOXREF
+	HOOK_DEF(0x01D03AC0, BitBuffer::SetBuffer),			// NOXREF
+	HOOK_DEF(0x01D03C20, BitBuffer::SkipBits),			// NOXREF
 	HOOK_DEF(0x01D03CB0, BitBuffer::SkipString),		// NOXREF
 
 	// Read
@@ -305,9 +350,9 @@ FunctionHook g_FunctionHooks[] =
 	HOOK_DEF(0x01D03AF0, BitBuffer::ReadBitVec3Coord),
 	HOOK_DEF(0x01D03B50, BitBuffer::ReadBitCoord),
 	HOOK_DEF(0x01D03BD0, BitBuffer::ReadCoord),
-	HOOK_DEF(0x01D03420, BitBuffer::ReadAngle),		// NOXREF
+	HOOK_DEF(0x01D03420, BitBuffer::ReadAngle),			// NOXREF
 	HOOK_DEF(0x01D03440, BitBuffer::ReadHiresAngle),	// NOXREF
-	HOOK_DEF(0x01D03920, BitBuffer::ReadSBits),		// NOXREF
+	HOOK_DEF(0x01D03920, BitBuffer::ReadSBits),			// NOXREF
 	HOOK_DEF(0x01D03950, BitBuffer::ReadBitAngle),		// NOXREF
 
 	// Write
@@ -379,7 +424,7 @@ FunctionHook g_FunctionHooks[] =
 	HOOK_DEF(0x01D0D9C0, NetChannel::FreePacket),
 	HOOK_DEF(0x01D0DA30, NetChannel::CopyNormalFragments),
 	HOOK_DEF(0x01D0DBD0, NetChannel::GetFlowStats),
-	HOOK_DEF(0x01D0DBC0, NetChannel::SetConnected),		// NOXREF
+	HOOK_DEF(0x01D0DBC0, NetChannel::SetConnected),			// NOXREF
 	HOOK_DEF(0x01D0DD70, NetChannel::CopyFileFragments),	// NOXREF
 
 #endif // NetChannel_region
@@ -402,6 +447,184 @@ FunctionHook g_FunctionHooks[] =
 
 #endif // Master_region
 
+#ifndef DemoFile_region
+
+	HOOK_DEF(0x01D04F60, MethodThunk<DemoFile>::Destructor),
+	HOOK_DEF(0x01D04F10, MethodThunk<DemoFile>::Constructor),
+
+	HOOK_DEF(0x01D06380, DemoFile::Init),
+	HOOK_DEF(0x01D059D0, DemoFile::LoadDemo),
+	HOOK_DEF(0x01D05D30, DemoFile::StopPlayBack),
+	HOOK_DEF(0x01D056B0, DemoFile::StartRecording),
+	HOOK_DEF(0x01D04FC0, DemoFile::CloseFile),
+	HOOK_DEF(0x01D04F70, DemoFile::Reset),
+	HOOK_DEF(0x01D06370, DemoFile::SetContinuous),		// NOXREF
+	HOOK_DEF(0x01D06360, DemoFile::IsContinuous),		// NOXREF
+	HOOK_DEF(0x01D059C0, DemoFile::IsPlaying),
+	HOOK_DEF(0x01D04FB0, DemoFile::IsRecording),
+	HOOK_DEF(0x01D06350, DemoFile::GetFileName),
+	HOOK_DEF(0x01D05D60, DemoFile::ReadDemoPacket),
+	HOOK_DEF(0x01D053B0, DemoFile::WriteDemoMessage),
+	HOOK_DEF(0x01D05500, DemoFile::WriteUpdateClientData),
+	HOOK_DEF(0x01D055B0, DemoFile::GetDemoTime),
+	HOOK_DEF(0x01D06260, DemoFile::ReadSequenceInfo),
+	HOOK_DEF(0x01D06220, DemoFile::ReadDemoInfo),
+	HOOK_DEF(0x01D052B0, DemoFile::WriteDemoStartup),
+	HOOK_DEF(0x01D051C0, DemoFile::WriteSequenceInfo),
+	HOOK_DEF(0x01D05190, DemoFile::WriteDemoInfo),
+	HOOK_DEF(0x01D055D0, DemoFile::WriteSignonData),
+
+#endif // DemoFile_region
+
+#ifndef DemoClient_region
+
+	// BaseSystemModule
+	HOOK_VIRTUAL_DEF(0x01D04E30, DemoClient::Init),
+	HOOK_VIRTUAL_DEF(0x01D04E40, DemoClient::RunFrame),
+	HOOK_VIRTUAL_DEF(0x01D04EB0, DemoClient::GetStatusLine),
+	HOOK_VIRTUAL_DEF(0x01D04EC0, DemoClient::GetType),
+	HOOK_VIRTUAL_DEF(0x01D04F00, DemoClient::ShutDown),
+
+	// IClient
+	HOOK_VIRTUAL_DEF(0x01D04810, DemoClient::Connect),
+	HOOK_VIRTUAL_DEF(0x01D04D30, DemoClient::Send),
+	HOOK_VIRTUAL_DEF(0x01D04BE0, DemoClient::Disconnect),
+	HOOK_VIRTUAL_DEF(0x01D04800, DemoClient::Reconnect),
+	HOOK_VIRTUAL_DEF(0x01D04D90, DemoClient::SetWorld),
+	HOOK_VIRTUAL_DEF(0x01D047F0, DemoClient::GetClientType),
+	HOOK_VIRTUAL_DEF(0x01D04D60, DemoClient::GetClientName),
+	HOOK_VIRTUAL_DEF(0x01D04D70, DemoClient::GetUserInfo),
+	HOOK_VIRTUAL_DEF(0x01D04CE0, DemoClient::GetAddress),
+	HOOK_VIRTUAL_DEF(0x01D04BD0, DemoClient::IsActive),
+	HOOK_VIRTUAL_DEF(0x01D047C0, DemoClient::IsHearingVoices),
+	HOOK_VIRTUAL_DEF(0x01D047D0, DemoClient::HasChatEnabled),
+
+	HOOK_DEF(0x01D04990, DemoClient::SendDatagram),
+	HOOK_DEF(0x01D04A30, DemoClient::WriteDatagram),
+	HOOK_DEF(0x01D04C70, DemoClient::FinishDemo),
+	HOOK_DEF(0x01D04D80, DemoClient::SetProxy),
+	HOOK_DEF(0x01D04DA0, DemoClient::SetFileName),
+	HOOK_DEF(0x01D04DD0, DemoClient::GetDemoFile),
+
+#endif // DemoClient_region
+
+#ifndef Director_region
+
+	// BaseSystemModule
+	HOOK_VIRTUAL_DEF(0x01D07BC0, Director::Init),
+	HOOK_VIRTUAL_DEF(0x01D07BD0, Director::RunFrame),
+	HOOK_VIRTUAL_DEF(0x01D07BE0, Director::ReceiveSignal),
+	HOOK_VIRTUAL_DEF(0x01D07BF0, Director::ExecuteCommand),
+	HOOK_VIRTUAL_DEF(0x01D07C40, Director::GetStatusLine),
+	HOOK_VIRTUAL_DEF(0x01D07C50, Director::GetType),
+	HOOK_VIRTUAL_DEF(0x01D07C90, Director::ShutDown),
+
+	// IDirector
+	HOOK_VIRTUAL_DEF(0x01D068C0, Director::NewGame),
+	HOOK_VIRTUAL_DEF(0x01D068B0, Director::GetModName),
+	HOOK_VIRTUAL_DEF(0x01D06E10, Director::WriteCommands),
+	HOOK_VIRTUAL_DEF(0x01D07A60, Director::AddCommand),
+	HOOK_VIRTUAL_DEF(0x01D07B50, Director::RemoveCommand),
+	HOOK_VIRTUAL_DEF(0x01D07B60, Director::GetLastCommand),
+	HOOK_VIRTUAL_DEF(0x01D07B40, Director::GetCommands),
+
+	// Director
+	HOOK_DEF(0x01D07910, Director::FindBestEvent),
+	HOOK_DEF(0x01D07690, Director::ExecuteDirectorCommands),
+	HOOK_DEF(0x01D07420, Director::RandomizeCommand),
+	HOOK_DEF(0x01D07280, Director::GetClosestPlayer),
+	HOOK_DEF(0x01D06EC0, Director::AddEvent),
+	HOOK_DEF(0x01D06B50, Director::SmoothRank),
+	HOOK_DEF(0x01D06C40, Director::AnalysePlayer),
+	HOOK_DEF(0x01D06980, Director::AnalyseFrame),
+	HOOK_DEF(0x01D073E0, Director::ClearDirectorCommands),
+	HOOK_DEF(0x01D07110, Director::AddBestMODCut),
+	HOOK_DEF(0x01D06F00, Director::AddBestGenericCut),
+	HOOK_DEF(0x01D06EA0, Director::WriteSignonData),
+	//HOOK_DEF(0x0, Director::WriteProxyStatus),			// NOXREF
+	HOOK_DEF(0x01D07830, Director::CMD_SlowMotion),
+
+#endif // Director_region
+
+#ifndef DirectorCmd_region
+
+	HOOK_DEF(0x01D07D00, DirectorCmd::GetEventData),
+	HOOK_DEF(0x01D07D50, DirectorCmd::GetModeData),
+	HOOK_DEF(0x01D07D80, DirectorCmd::GetChaseData),
+	HOOK_DEF(0x01D07DD0, DirectorCmd::GetInEyeData),
+	HOOK_DEF(0x01D07E00, DirectorCmd::GetMapData),
+	HOOK_DEF(0x01D07E50, DirectorCmd::GetCameraData),
+	HOOK_DEF(0x01D07EE0, DirectorCmd::GetCamPathData),
+	HOOK_DEF(0x01D07F70, DirectorCmd::GetSoundData),
+	HOOK_DEF(0x01D07FB0, DirectorCmd::GetTime),				// NOXREF
+	HOOK_DEF(0x01D07FC0, DirectorCmd::GetType),
+	HOOK_DEF(0x01D07FD0, DirectorCmd::GetName),				// NOXREF
+	HOOK_DEF(0x01D07FE0, DirectorCmd::GetTimeScaleData),
+	HOOK_DEF(0x01D08010, DirectorCmd::GetWayPointsData),
+	HOOK_DEF(0x01D08040, DirectorCmd::GetMessageData),
+	HOOK_DEF(0x01D080E0, DirectorCmd::GetStatusData),
+	HOOK_DEF(0x01D08130, DirectorCmd::GetBannerData),
+	HOOK_DEF(0x01D08170, DirectorCmd::GetStuffTextData),
+	HOOK_DEF(0x01D081B0, DirectorCmd::SetEventData),
+	HOOK_DEF(0x01D081F0, DirectorCmd::SetChaseData),		// NOXREF
+	HOOK_DEF(0x01D08240, DirectorCmd::SetInEyeData),		// NOXREF
+	HOOK_DEF(0x01D08270, DirectorCmd::SetMapData),			// NOXREF
+	HOOK_DEF(0x01D082B0, DirectorCmd::SetStartData),		// NOXREF
+	HOOK_DEF(0x01D082C0, DirectorCmd::SetModeData),			// NOXREF
+	HOOK_DEF(0x01D082F0, DirectorCmd::SetCameraData),		// NOXREF
+	HOOK_DEF(0x01D08370, DirectorCmd::SetCamPathData),		// NOXREF
+	HOOK_DEF(0x01D083F0, DirectorCmd::SetSoundData),
+	HOOK_DEF(0x01D08440, DirectorCmd::SetTimeScaleData),
+	HOOK_DEF(0x01D08470, DirectorCmd::SetTime),
+	HOOK_DEF(0x01D08480, DirectorCmd::SetMessageData),
+	HOOK_DEF(0x01D08520, DirectorCmd::Copy),				// NOXREF
+	HOOK_DEF(0x01D08570, DirectorCmd::SetStatusData),
+	HOOK_DEF(0x01D085B0, DirectorCmd::SetBannerData),
+	HOOK_DEF(0x01D085F0, DirectorCmd::SetStuffTextData),	// NOXREF
+	HOOK_DEF(0x01D08630, DirectorCmd::SetWayPoints),		// NOXREF
+	HOOK_DEF(0x01D08660, DirectorCmd::ReadFromStream),		// NOXREF
+	HOOK_DEF(0x01D088C0, DirectorCmd::WriteToStream),
+	HOOK_DEF(0x01D08920, DirectorCmd::ToString),			// NOXREF
+	HOOK_DEF(0x01D08D50, DirectorCmd::FromString),			// NOXREF
+	HOOK_DEF(0x01D08D60, DirectorCmd::Clear),
+	HOOK_DEF(0x01D08D70, DirectorCmd::Resize),
+
+#endif // DirectorCmd_region
+
+#ifndef Status_region
+
+	// BaseSystemModule
+	HOOK_VIRTUAL_DEF(0x01D178A0, Status::Init),
+	HOOK_VIRTUAL_DEF(0x01D178B0, Status::RunFrame),
+	HOOK_VIRTUAL_DEF(0x01D178D0, Status::ExecuteCommand),
+	HOOK_VIRTUAL_DEF(0x01D17920, Status::GetStatusLine),
+	HOOK_VIRTUAL_DEF(0x01D17930, Status::GetType),
+	HOOK_VIRTUAL_DEF(0x01D17970, Status::ShutDown),
+
+#endif // Status_region
+
+#ifndef InfoString_region
+
+	HOOK_DEF(0x01D09590, MethodThunk<InfoString>::Destructor),
+	HOOK_DEF(0x01D094F0, (MethodThunk<InfoString>::Constructor), void()),
+	HOOK_DEF(0x01D09510, (MethodThunk<InfoString, unsigned int>::Constructor), void(unsigned int)),
+	HOOK_DEF(0x01D09540, (MethodThunk<InfoString, char *>::Constructor), void(char *)),
+	HOOK_DEF(0x01D09480, (MethodThunk<InfoString, char *, unsigned int>::Constructor), void(char *, unsigned int)),
+
+	HOOK_DEF(0x01D095B0, InfoString::SetString),
+	HOOK_DEF(0x01D09600, InfoString::SetMaxSize),
+	HOOK_DEF(0x01D09660, InfoString::GetMaxSize),
+	HOOK_DEF(0x01D09670, InfoString::GetCurrentSize),
+	HOOK_DEF(0x01D09690, InfoString::Clear),
+	HOOK_DEF(0x01D096B0, InfoString::GetString),
+	HOOK_DEF(0x01D096C0, InfoString::ValueForKey),
+	HOOK_DEF(0x01D097B0, InfoString::RemoveKey),
+	HOOK_DEF(0x01D09880, InfoString::RemovePrefixedKeys),
+	HOOK_DEF(0x01D09900, InfoString::SetValueForStarKey),
+	HOOK_DEF(0x01D09AB0, InfoString::SetValueForKey),
+
+#endif // InfoString_region
+
 	{ NULL, NULL, NULL },
 };
 
@@ -417,7 +640,6 @@ AddressRef g_FunctionRefs[] =
 AddressRef g_DataRefs[] =
 {
 #ifndef Data_References_region
-
 
 #endif // Data_References_region
 

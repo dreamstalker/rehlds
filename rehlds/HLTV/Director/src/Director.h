@@ -49,9 +49,9 @@ public:
 	virtual void ShutDown();
 
 	virtual void NewGame(IWorld *world, IProxy *proxy);
-	virtual int AddCommand(DirectorCmd *cmd);
-	virtual void WriteCommands(BitBuffer *stream, float startTime, float endTime);
 	virtual char *GetModName();
+	virtual void WriteCommands(BitBuffer *stream, float startTime, float endTime);
+	virtual int AddCommand(DirectorCmd *cmd);
 	virtual bool RemoveCommand(int index);
 	virtual DirectorCmd *GetLastCommand();
 	virtual IObjectContainer *GetCommands();

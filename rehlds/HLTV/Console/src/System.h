@@ -73,12 +73,10 @@ public:
 	void ShutDown();
 	char *GetBaseDir();
 
-#ifdef _WIN32
-	void BuildCommandLine(char *argv);
-#else
-	void BuildCommandLine(int argc, char **argv);
-#endif // _WIN32
+	int Run();
 	void Sleep(int msec);
+	void BuildCommandLine(char *argv);
+	void BuildCommandLine(int argc, char **argv);
 
 protected:
 	struct command_t {

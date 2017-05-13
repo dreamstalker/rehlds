@@ -191,5 +191,8 @@
     <ClInclude Include="..\..\..\engine\mem.h">
       <Filter>engine</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Director\src\Director.h">
+      <Filter>src</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

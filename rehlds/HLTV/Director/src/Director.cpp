@@ -161,7 +161,7 @@ void Director::NewGame(IWorld *world, IProxy *proxy)
 	m_World = world;
 	m_Proxy = proxy;
 
-	world->RegisterListener(this);
+	m_World->RegisterListener(this);
 	m_WorldModel = m_World->GetWorldModel();
 
 	memset(m_history, 0, sizeof(*m_history) * m_historyLength);
@@ -203,7 +203,7 @@ void Director::AnalyseFrame(frame_t *frame)
 		return;
 	}
 
-	if (m_currentTime)
+	if (!m_currentTime)
 	{
 		m_nextCutTime = frame->time;
 		m_nextCutSeqnr = seqnr;
@@ -224,7 +224,7 @@ void Director::AnalyseFrame(frame_t *frame)
 			continue;
 		}
 
-		playerData_t *player = &now->players[i];
+		playerData_t *player = &now->players[index];
 		player->active = (ent->solid != SOLID_NOT);
 		if (player->active)
 		{
@@ -477,7 +477,7 @@ float Director::AddBestMODCut()
 
 		cmd = new DirectorCmd;
 		cmd->SetTimeScaleData(1.0);
-		cmd->SetTime(timepoint->time + 1.5f);
+		cmd->SetTime(timepoint->time + trailTime);
 		m_Commands.Add(cmd, cmd->GetTime());
 	}
 
@@ -642,7 +642,7 @@ void Director::ExecuteDirectorCommands()
 
 				if (timescale < 1.0)
 				{
-					vec3_t pos = { 0.02f, 0.85f, 0.f };
+					vec3_t pos = { 0.02f, 0.75f, 0.f };
 
 					DirectorCmd slowmo;
 					slowmo.SetMessageData(0, COM_PackRGBA(255, 160, 0, 255), pos, 0.3f, 0.1f, 2, 0, "Slow Motion");
@@ -685,12 +685,14 @@ void Director::CMD_SlowMotion(char *cmdLine)
 
 Director::worldHistory_t *Director::FindBestEvent()
 {
+	const int MAX_BEST_EVENT = 4;
+
 	int i;
 	int nseqMod = m_nextCutSeqnr % m_historyLength;
-	int bestEvent[] = { 0, 0, 0, 0 };
-	int bestEventPrio[] = { 0, 0, 0, 0 };
+	int bestEvent[MAX_BEST_EVENT] = { 0, 0, 0, 0 };
+	int bestEventPrio[MAX_BEST_EVENT] = { 0, 0, 0, 0 };
 
-	for (i = 0; i < 4; i++)
+	for (i = 0; i < MAX_BEST_EVENT; i++)
 	{
 		bestEventPrio[i] = 0;
 		bestEvent[i] = 0;

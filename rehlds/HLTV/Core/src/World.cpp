@@ -1393,7 +1393,7 @@ char *World::GetStatusLine()
 			m_LevelName,
 			COM_FormatTime(m_WorldTime),
 			GetNumPlayers(),
-			(float)m_CacheHits / (float)(m_CacheHits + m_CacheFaults),
+			m_CacheHits / float(m_CacheHits + m_CacheFaults),
 			GetBufferedGameTime());
 	}
 	else

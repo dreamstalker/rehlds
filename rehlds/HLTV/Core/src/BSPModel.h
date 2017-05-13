@@ -83,6 +83,7 @@ private:
 	void DecompressPVS(unsigned char *in, unsigned char *decompressed, int byteCount);
 	unsigned char *DecompressVis(unsigned char *in);
 	void SetParent(mnode_t *node, mnode_t *parent);
+	void Free(void *ptr);
 
 protected:
 	model_t m_model;

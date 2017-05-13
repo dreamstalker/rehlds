@@ -40,18 +40,19 @@ public:
 	char *GetStatusLine();
 	char *GetType();
 	void ShutDown();
+
 	bool Connect(INetSocket *socket = nullptr, NetAddress *adr = nullptr, char *userinfo = "");
+	void Send(unsigned char *data, int length, bool isReliable);
 	void Disconnect(const char *reason);
 	void Reconnect();
 	void SetWorld(IWorld *world);
-	bool IsHearingVoices();
-	bool HasChatEnabled();
-	NetAddress *GetAddress();
 	int GetClientType();
 	char *GetClientName();
 	InfoString *GetUserInfo();
+	NetAddress *GetAddress();
 	bool IsActive();
-	void Send(unsigned char *data, int length, bool isReliable);
+	bool IsHearingVoices();
+	bool HasChatEnabled();
 
 	void SetProxy(IProxy *proxy);
 	void SetFileName(char *fileName);

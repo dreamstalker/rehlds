@@ -36,7 +36,7 @@ class IBaseSystem;
 
 class ProxyClient: public BaseClient {
 public:
-	ProxyClient(IProxy *proxy);
+	ProxyClient(IProxy *proxy = nullptr);
 	virtual ~ProxyClient() {}
 
 	bool Init(IBaseSystem *system, int serial, char *name);

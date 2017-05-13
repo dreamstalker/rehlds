@@ -254,7 +254,11 @@ void Status::ParseStatusReport(NetAddress *from, BitBuffer *stream)
 	proxy->time = float(m_SystemTime);
 	proxy->isPrivate = isPrivate;
 
-	float ratio = (slots > 0 && !isPrivate) ? float(spectators / slots) : 1;
+	float ratio = 1;
+	if (slots > 0 && !isPrivate) {
+		ratio = float(spectators) / float(slots);
+	}
+
 	m_Proxies.ChangeKey(proxy, ratio);
 }
 
@@ -313,7 +317,7 @@ float Status::GetBestRelayProxy(NetAddress *addr)
 	{
 		if (proxy->slots > 0 && proxy->slots >= proxy->spectators && !proxy->isPrivate)
 		{
-			float ratio = float(++proxy->spectators / proxy->slots);
+			float ratio = float(++proxy->spectators) / float(proxy->slots);
 
 			m_Proxies.ChangeKey(proxy, ratio);
 			addr->FromNetAddress(&proxy->address);

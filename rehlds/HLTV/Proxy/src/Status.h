@@ -48,8 +48,8 @@ public:
 	virtual ~Status() {}
 
 	bool Init(IBaseSystem *system, int serial, char *name);
-	void ExecuteCommand(int commandID, char *commandLine);
 	void RunFrame(double time);
+	void ExecuteCommand(int commandID, char *commandLine);
 	char *GetStatusLine();
 	char *GetType();
 	void ShutDown();

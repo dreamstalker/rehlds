@@ -30,19 +30,8 @@
 
 System gSystem;
 
-#ifdef _WIN32
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
-#else
-int main(int argc, char *argv[])
-#endif // _WIN32
+int System::Run()
 {
-#ifdef _WIN32
-	gSystem.BuildCommandLine(lpCmdLine);
-#else
-	gSystem.BuildCommandLine(argc, argv);
-	_snprintf(g_szEXEName, sizeof(g_szEXEName), "%s", argv[0]);
-#endif // _WIN32
-
 	if (!gSystem.Init(&gSystem, 0, "Console"))
 	{
 		gSystem.Sleep(2000);
@@ -600,47 +589,6 @@ void System::ShutDown()
 	m_State = MODULE_DISCONNECTED;
 }
 
-#ifdef _WIN32
-
-void System::BuildCommandLine(char *argv)
-{
-	m_Parameters.SetLine(argv);
-}
-
-#else // _WIN32
-
-#define MAX_LINUX_CMDLINE 2048
-
-void System::BuildCommandLine(int argc, char **argv)
-{
-	int len = 0;
-	char string[MAX_LINUX_CMDLINE];
-
-	for (int i = 1; i < argc && len < MAX_LINUX_CMDLINE; i++)
-	{
-		len += strlen(argv[i]) + 1;
-
-		if (i > 1) {
-			strcat(string, " ");
-		}
-
-		strcat(string, argv[i]);
-	}
-
-	m_Parameters.SetLine(string);
-}
-
-#endif // _WIN32
-
-void System::Sleep(int msec)
-{
-#ifdef _WIN32
-	::Sleep(msec);
-#else
-	usleep(1000 * msec);
-#endif // _WIN32
-}
-
 bool System::InitFileSystem()
 {
 	char *filesystemmodule = STDIO_FILESYSTEM_LIB;
@@ -1139,3 +1087,58 @@ unsigned char *System::LoadFile(const char *name, int *length)
 
 	return buf;
 }
+
+#ifdef _WIN32
+
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
+{
+	gSystem.BuildCommandLine(lpCmdLine);
+	return gSystem.Run();
+}
+
+void System::BuildCommandLine(char *argv)
+{
+	m_Parameters.SetLine(argv);
+}
+
+void System::Sleep(int msec)
+{
+	::Sleep(msec);
+}
+
+#else // _WIN32
+
+int main(int argc, char *argv[])
+{
+	gSystem.BuildCommandLine(argc, argv);
+	_snprintf(g_szEXEName, sizeof(g_szEXEName), "%s", argv[0]);
+	return gSystem.Run();
+}
+
+#define MAX_LINUX_CMDLINE 2048
+
+void System::BuildCommandLine(int argc, char **argv)
+{
+	int len = 0;
+	char string[MAX_LINUX_CMDLINE];
+
+	for (int i = 1; i < argc && len < MAX_LINUX_CMDLINE; i++)
+	{
+		len += strlen(argv[i]) + 1;
+
+		if (i > 1) {
+			strcat(string, " ");
+		}
+
+		strcat(string, argv[i]);
+	}
+
+	m_Parameters.SetLine(string);
+}
+
+void System::Sleep(int msec)
+{
+	usleep(1000 * msec);
+}
+
+#endif // _WIN32
