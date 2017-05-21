@@ -1341,7 +1341,7 @@ bool Proxy::CheckChallenge(NetAddress *from, unsigned int challengeNumber)
 {
 	for (auto& it : m_Challenges)
 	{
-		if (it.adr.Equal(from)) {
+		if (from->EqualBase(&it.adr)) {
 			if (it.challenge == challengeNumber) {
 				return (m_SystemTime - it.time <= 40);
 			}
