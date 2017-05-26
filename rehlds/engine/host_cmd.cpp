@@ -703,12 +703,14 @@ void Host_Status_Formatted_f(void)
 			return;
 		}
 	}
+#ifndef REHLDS_FIXES // Remove Useless Stuff
 	if (Cmd_Argc() == 2 && !Q_stricmp(Cmd_Argv(1), "log"))
 	{
 		Q_snprintf(szfile, sizeof(szfile), "%s", "status.log");
 		_unlink(szfile);
 		log = TRUE;
 	}
+#endif
 
 	bIsSecure = Steam_GSBSecure();
 	Host_Status_Printf(conprint, log, "hostname:  %s\n", Cvar_VariableString("hostname"));
