@@ -1082,7 +1082,7 @@ DLL_EXPORT int NET_Sleep_Timeout(void)
 
 	struct timeval tv;
 	tv.tv_sec = 0;
-	tv.tv_usec = (1000 / fps) * 1000; // TODO: entirely bad code, fix it completely
+	tv.tv_usec = (1000 * 1000) / fps; // TODO: entirely bad code, fix it completely
 	if (tv.tv_usec <= 0)
 		tv.tv_usec = 1;
 
