@@ -720,7 +720,11 @@ qboolean Host_FilterTime(float time)
 			if (fps > 100.0f)
 				fps = 100.0f;
 		}
-		if (g_pcl.maxclients > 1)
+#ifdef REHLDS_FIXES
+		if (!Host_IsSinglePlayerGame())
+#else
+		if(g_pcl.maxclients > 1)
+#endif
 		{
 			if (fps < 20.0f)
 				fps = 20.0f;
@@ -1032,7 +1036,6 @@ qboolean Host_IsSinglePlayerGame(void)
 		return g_psvs.maxclients == 1;
 	else
 		return g_pcl.maxclients == 1;
-
 }
 
 qboolean Host_IsServerActive(void)

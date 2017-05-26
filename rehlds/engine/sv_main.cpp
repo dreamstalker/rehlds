@@ -5833,7 +5833,11 @@ void EXT_FUNC SV_ActivateServer_internal(int runPhysics)
 	}
 	else
 	{
+#ifdef REHLDS_FIXES
+		if (Host_IsSinglePlayerGame())
+#else
 		if (g_psvs.maxclients <= 1)
+#endif
 		{
 			host_frametime = 0.1;
 			SV_Physics();
@@ -5857,7 +5861,11 @@ void EXT_FUNC SV_ActivateServer_internal(int runPhysics)
 		if (!cl->fakeclient && (cl->active || cl->connected))
 		{
 			Netchan_Clear(&cl->netchan);
+#ifdef REHLDS_FIXES
+			if (!Host_IsSinglePlayerGame())
+#else
 			if (g_psvs.maxclients > 1)
+#endif
 			{
 				SV_BuildReconnect(&cl->netchan.message);
 				Netchan_Transmit(&cl->netchan, 0, NULL);
@@ -5879,7 +5887,11 @@ void EXT_FUNC SV_ActivateServer_internal(int runPhysics)
 		}
 	}
 	HPAK_FlushHostQueue();
+#ifdef REHLDS_FIXES
+	if (Host_IsSinglePlayerGame())
+#else
 	if (g_psvs.maxclients <= 1)
+#endif
 		Con_DPrintf("Game Started\n");
 	else
 		Con_DPrintf("%i player server started\n",g_psvs.maxclients);
@@ -6010,8 +6022,11 @@ int SV_SpawnServer(qboolean bIsDemo, char *server, char *startspot)
 
 	pr_strings = gNullString;
 	gGlobalVariables.pStringBase = gNullString;
-
+#ifdef REHLDS_FIXES
+	if (Host_IsSinglePlayerGame())
+#else
 	if (g_psvs.maxclients == 1)
+#endif
 		Cvar_SetValue("sv_clienttrace", 1.0);
 
 	g_psv.max_edicts = COM_EntsForPlayerSlots(g_psvs.maxclients);
@@ -6107,7 +6122,11 @@ int SV_SpawnServer(qboolean bIsDemo, char *server, char *startspot)
 	}
 	ContinueLoadingProgressBar("Server", 6, 0.0);
 
+#ifdef REHLDS_FIXES	
+	if (Host_IsSinglePlayerGame())
+#else
 	if (g_psvs.maxclients <= 1)
+#endif
 		g_psv.worldmapCRC = 0;
 	else
 	{
