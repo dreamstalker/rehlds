@@ -140,7 +140,7 @@ cvar_t net_scale;
 cvar_t net_graphpos;
 
 #endif // HOOK_ENGINE
-
+#pragma region NetThreadStuff
 void NET_ThreadLock(void)
 {
 #ifdef _WIN32
@@ -160,7 +160,8 @@ void NET_ThreadUnlock(void)
 	}
 #endif // _WIN32
 }
-
+#pragma endregion NetThreadStuff
+#pragma region NetTechFuncs
 unsigned short Q_ntohs(unsigned short netshort)
 {
 	return ntohs(netshort);
@@ -591,7 +592,9 @@ char *NET_ErrorString(int code)
 	return strerror(code);
 #endif // _WIN32
 }
+#pragma endregion NetTechFuncs
 
+#pragma region NetTransferFuncs
 void NET_TransferRawData(sizebuf_t *msg, unsigned char *pStart, int nSize)
 {
 #ifdef REHLDS_CHECKS
@@ -1493,7 +1496,7 @@ void NET_SendPacket(netsrc_t sock, int length, void *data, const netadr_t& to)
 		}
 	}
 }
-
+#pragma endregion NetTransferFuncs
 SOCKET NET_IPSocket(char *net_interface, int port, qboolean multicast)
 {
 	SOCKET newsocket;
