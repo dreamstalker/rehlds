@@ -2317,7 +2317,7 @@ void EXT_FUNC SV_ConnectClient_internal(void)
 	char userinfo[1024];
 #endif
 	char protinfo[1024];
-	char cdkey[64];
+	char cdkey[64] = {};
 	const char *s;
 	char name[32];
 	char szRawCertificate[512];
@@ -2508,9 +2508,16 @@ void EXT_FUNC SV_ConnectClient_internal(void)
 	{
 		Con_DPrintf("Client %s connected\nAdr: %s\n", name, NET_AdrToString(host_client->netchan.remote_address));
 	}
+#ifndef REHLDS_OPT_PEDANTIC
 	Q_strncpy(host_client->hashedcdkey, cdkey, 32);
+	host_client->hashedcdkey[32] = '\0';
+#else
+	MD5Context_t ctx;
+	MD5Init(&ctx);
+	MD5Update(&ctx, (unsigned char *)cdkey, sizeof(cdkey));
+	MD5Final((unsigned char *)host_client->hashedcdkey, &ctx);
+#endif
 
-	host_client->hashedcdkey[32] = 0;
 	host_client->active = FALSE;
 	host_client->spawned = FALSE;
 	host_client->connected = TRUE;
@@ -3801,18 +3808,26 @@ int SV_CalcPing(client_t *cl)
 void EXT_FUNC SV_WriteFullClientUpdate_internal(IGameClient *client, char *info, size_t maxlen, sizebuf_t *sb, IGameClient *receiver)
 {
 	client_t* cl = client->GetClient();
-	MD5Context_t ctx;
+
+#ifndef REHLDS_OPT_PEDANTIC
 	unsigned char digest[16];
 
+	MD5Context_t ctx;
 	MD5Init(&ctx);
 	MD5Update(&ctx, (unsigned char*)cl->hashedcdkey, sizeof(cl->hashedcdkey));
 	MD5Final(digest, &ctx);
+#endif
 
 	MSG_WriteByte(sb, svc_updateuserinfo);
 	MSG_WriteByte(sb, cl - g_psvs.clients);
 	MSG_WriteLong(sb, cl->userid);
 	MSG_WriteString(sb, info);
+
+#ifndef REHLDS_OPT_PEDANTIC
 	MSG_WriteBuf(sb, sizeof(digest), digest);
+#else
+	MSG_WriteBuf(sb, 16, cl->hashedcdkey);
+#endif
 }
 
 void SV_SendFullClientUpdateForAll(client_t *client)
