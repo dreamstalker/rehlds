@@ -1301,11 +1301,10 @@ unsigned int Proxy::GetChallengeNumber(NetAddress *host)
 	int i;
 	int oldest = 0;
 	float oldestTime = 9.9999997e37f;
-	const float challengeLife = 40.0f;
 
 	for (i = 0; i < MAX_CHALLENGES; i++)
 	{
-		if (m_Challenges[i].adr.Equal(host)) {
+		if (m_Challenges[i].adr.EqualBase(host)) {
 			break;
 		}
 
@@ -1343,7 +1342,7 @@ bool Proxy::CheckChallenge(NetAddress *from, unsigned int challengeNumber)
 	{
 		if (from->EqualBase(&it.adr)) {
 			if (it.challenge == challengeNumber) {
-				return (m_SystemTime - it.time <= 40);
+				return (m_SystemTime - it.time <= PROXY_CHALLENGE_LIFE);
 			}
 
 			break;
