@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sstream>
+#include <cmath>
 
 void Assertions::StringEquals(std::string message, std::string expected, std::string actual, const char* fileName, long lineNumber) {
 	if (expected != actual) {
@@ -57,7 +58,7 @@ void Assertions::CharEquals(std::string message, char expected, char actual, con
 }
 
 void Assertions::DoubleEquals(std::string message, double expected, double actual, double epsilon, const char* fileName, long lineNumber) {
-	if (abs(expected - actual) > epsilon) {
+	if (std::fabs(expected - actual) > epsilon) {
 		std::stringstream ss;
 		ss << message << " (expected '" << expected << "', got '" << actual << "')";
 		throw TestFailException(ss.str(), std::string(fileName), lineNumber);
