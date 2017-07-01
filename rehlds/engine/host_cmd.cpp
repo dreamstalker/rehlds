@@ -2467,6 +2467,7 @@ void Host_Say(qboolean teamonly)
 	int j;
 	char *p;
 	char text[128];
+	const size_t maxTextLength = sizeof(text) - 1;
 	//qboolean fromServer;//unsued?
 
 	if (g_pcls.state != ca_dedicated)
@@ -2478,7 +2479,7 @@ void Host_Say(qboolean teamonly)
 		return;
 	}
 
-	if (Cmd_Argc () < 2)
+	if (Cmd_Argc() < 2)
 		return;
 
 	p = (char *)Cmd_Args();
@@ -2486,28 +2487,72 @@ void Host_Say(qboolean teamonly)
 		return;
 
 	save = host_client;
+	// Removes quotes, "text" -> text
 	if (*p == '"')
 	{
 		p++;
-		p[Q_strlen(p) - 1] = 0;
+		p[Q_strlen(p) - 1] = '\0';
 	}
 
 #ifdef REHLDS_FIXES
-	// I think '\x01' don't need in TextMsg
+	// We can skip '\x01' cause there is no colors in message
 	Q_snprintf(text, sizeof(text), "<%s> ", Cvar_VariableString("hostname"));
 #else // REHLDS_FIXES
 	Q_snprintf(text, sizeof(text), "%c<%s> ", 1, Cvar_VariableString("hostname"));
 #endif // REHLDS_FIXES
 
-	if (Q_strlen(p) > 63)
-		p[63] = 0;
+	const size_t maxBeginningLength = 63;
+	//if (Q_strlen(p) > maxBeginningLength)
+	{
+		p[maxBeginningLength] = '\0';
+	}
 
-	j = sizeof(text) - 2 - Q_strlen(text);
-	if (Q_strlen(p) > (unsigned int)j)
-		p[j] = 0;
+#ifdef REHLDS_FIXES
+	j = maxTextLength - Q_strlen(text);
+#else // REHLDS_FIXES
+	// 1 cell for '\n'
+	j = maxTextLength - (Q_strlen(text) + 1);
+#endif // REHLDS_FIXES
+	//if (Q_strlen(p) > (unsigned int)j)
+	{
+		p[j] = '\0';
+	}
 
 	Q_strcat(text, p);
+	// '\n' is added by the client, so we can skip it
+#ifndef REHLDS_FIXES
 	Q_strcat(text, "\n");
+#endif // REHLDS_FIXES
+
+#ifdef REHLDS_FIXES
+	char preparedText[128];
+	const size_t preparedTextMaxLength = sizeof(preparedText) - 1;
+	size_t preparedTextLength = 0;
+	for (size_t i = 0; text[i] != '\0'; i++)
+	{
+		if (text[i] == '#' || text[i] == '%')
+		{
+			if (preparedTextLength + 3 > preparedTextMaxLength)
+				break;
+
+			// http://unicode-table.com/blocks/halfwidth-and-fullwidth-forms/
+			preparedText[preparedTextLength++] = char(0xEF);
+			preparedText[preparedTextLength++] = char(0xBC);
+			if (text[i] == '#')
+				preparedText[preparedTextLength++] = char(0x83);
+			else if (text[i] == '%')
+				preparedText[preparedTextLength++] = char(0x85);
+		}
+		else
+		{
+			if (preparedTextLength + 1 > preparedTextMaxLength)
+				break;
+
+			preparedText[preparedTextLength++] = text[i];
+		}
+	}
+	preparedText[preparedTextLength] = '\0';
+#endif // REHLDS_FIXES
 
 	for (j = 0, client = g_psvs.clients; j < g_psvs.maxclients; j++, client++)
 	{
@@ -2516,23 +2561,23 @@ void Host_Say(qboolean teamonly)
 
 		host_client = client;
 
-#ifdef REHLDS_FIXES
-		// Text can be unsafe (format %, localize #) therefore need to send text as argument. TextMsg is used here instead of SayText, because SayText in Half-Life doesn't support arguments.
-		PF_MessageBegin_I(MSG_ONE, RegUserMsg("TextMsg", -1), NULL, &g_psv.edicts[j + 1]);
-		PF_WriteByte_I(HUD_PRINTTALK);
-		PF_WriteString_I("%s");
-		PF_WriteString_I(text);
-		PF_MessageEnd_I();
-#else // REHLDS_FIXES
 		PF_MessageBegin_I(MSG_ONE, RegUserMsg("SayText", -1), NULL, &g_psv.edicts[j + 1]);
 		PF_WriteByte_I(0);
+#ifdef REHLDS_FIXES
+		PF_WriteString_I(preparedText);
+#else // REHLDS_FIXES
 		PF_WriteString_I(text);
-		PF_MessageEnd_I();
 #endif // REHLDS_FIXES
+		PF_MessageEnd_I();
 	}
 
 	host_client = save;
+#ifdef REHLDS_FIXES
+	Sys_Printf("%s\n", text);
+#else // REHLDS_FIXES
+	// Cause we have '\x01' in the beginning
 	Sys_Printf("%s", &text[1]);
+#endif // REHLDS_FIXES
 	Log_Printf("Server say \"%s\"\n", p);
 }
 
