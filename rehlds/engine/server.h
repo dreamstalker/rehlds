@@ -529,6 +529,8 @@ extern cvar_t sv_rehlds_hull_centering;
 extern cvar_t sv_rcon_condebug;
 extern cvar_t sv_rehlds_userinfo_transmitted_fields;
 extern cvar_t sv_rehlds_attachedentities_playeranimationspeed_fix;
+extern cvar_t sv_rehlds_hitboxes_draw;
+extern cvar_t sv_rehlds_hitboxes_draw_groups;
 extern cvar_t sv_rehlds_local_gametime;
 extern cvar_t sv_rehlds_send_mapcycle;
 #endif

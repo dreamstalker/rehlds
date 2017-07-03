@@ -99,13 +99,13 @@ void R_StudioSlerpBones(vec4_t *q1, vec3_t *pos1, vec4_t *q2, vec3_t *pos2, floa
 mstudioanim_t *R_GetAnim(model_t *psubmodel, mstudioseqdesc_t *pseqdesc);
 void SV_StudioSetupBones(model_t *pModel, float frame, int sequence, const vec_t *angles, const vec_t *origin, const unsigned char *pcontroller, const unsigned char *pblending, int iBone, const edict_t *edict);
 void SV_SetStudioHullPlane(mplane_t *pplane, int iBone, int k, float dist);
-hull_t *R_StudioHull(model_t *pModel, float frame, int sequence, const vec_t *angles, const vec_t *origin, const vec_t *size, const unsigned char *pcontroller, const unsigned char *pblending, int *pNumHulls, const edict_t *pEdict, int bSkipShield);
+hull_t *R_StudioHull(model_t *pModel, float frame, int sequence, const vec_t *angles, const vec_t *origin, const vec_t *size, const unsigned char *pcontroller, const unsigned char *pblending, int *pNumHulls, edict_t *pEdict, int bSkipShield);
 int SV_HitgroupForStudioHull(int index);
 NOXREF void R_InitStudioCache(void);
 NOXREF void R_FlushStudioCache(void);
 int R_StudioBodyVariations(model_t *model);
 void R_StudioPlayerBlend(mstudioseqdesc_t *pseqdesc, int *pBlend, float *pPitch);
-hull_t *SV_HullForStudioModel(const edict_t *pEdict, const vec_t *mins, const vec_t *maxs, vec_t *offset, int *pNumHulls);
+hull_t *SV_HullForStudioModel(edict_t *pEdict, const vec_t *mins, const vec_t *maxs, vec_t *offset, int *pNumHulls);
 qboolean DoesSphereIntersect(float *vSphereCenter, float fSphereRadiusSquared, float *vLinePt, float *vLineDir);
 qboolean SV_CheckSphereIntersection(edict_t *ent, const vec_t *start, const vec_t *end);
 void AnimationAutomove(const edict_t *pEdict, float flTime);

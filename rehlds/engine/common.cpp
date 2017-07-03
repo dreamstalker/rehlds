@@ -2833,4 +2833,21 @@ unsigned int EXT_FUNC COM_GetApproxWavePlayLength(const char *filepath)
 	return 0;
 }
 
+int COM_ReadFlags(const char *c)
+{
+	int flags = 0;
+
+	while (*c)
+	{
+		if (*c >= 'a' && *c <= 'z')
+		{
+			flags |= (1 << (*c - 'a'));
+		}
+
+		c++;
+	}
+
+	return flags;
+}
+
 #endif // COM_Functions_region

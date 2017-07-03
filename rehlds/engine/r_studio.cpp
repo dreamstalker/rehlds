@@ -625,7 +625,106 @@ void SV_SetStudioHullPlane(mplane_t *pplane, int iBone, int k, float dist)
 		+ dist;
 }
 
-hull_t *R_StudioHull(model_t *pModel, float frame, int sequence, const vec_t *angles, const vec_t *origin, const vec_t *size, const unsigned char *pcontroller, const unsigned char *pblending, int *pNumHulls, const edict_t *pEdict, int bSkipShield)
+#ifdef REHLDS_FIXES
+void R_DrawHitBox(const mstudiobbox_t &bbox, edict_t *pEdict)
+{
+	vec3_t points[8];
+	for (int m = 0; m < 2; m++)
+	{
+		for (int n = 0; n < 2; n++)
+		{
+			for (int k = 0; k < 2; k++)
+			{
+				int l = m * 4 + n * 2 + k * 1;
+
+				vec3_t mm[2];
+				memcpy(mm[0], bbox.bbmin, sizeof(vec3_t));
+				memcpy(mm[1], bbox.bbmax, sizeof(vec3_t));
+
+				points[l][0] = mm[k][0] * bonetransform[bbox.bone][0][0] +
+									mm[n][1] * bonetransform[bbox.bone][0][1] +
+									mm[m][2] * bonetransform[bbox.bone][0][2] +
+									1.0f * bonetransform[bbox.bone][0][3];
+
+				points[l][1] = mm[k][0] * bonetransform[bbox.bone][1][0] +
+									mm[n][1] * bonetransform[bbox.bone][1][1] +
+									mm[m][2] * bonetransform[bbox.bone][1][2] +
+									1.0f *bonetransform[bbox.bone][1][3];
+
+				points[l][2] = mm[k][0] * bonetransform[bbox.bone][2][0] +
+									mm[n][1] * bonetransform[bbox.bone][2][1] +
+									mm[m][2] * bonetransform[bbox.bone][2][2] +
+									1.0f * bonetransform[bbox.bone][2][3];
+			}
+		}
+	}
+
+	const BYTE colors[][3] = 
+	{
+		{255, 0, 0}, // Red
+		{0, 255, 0}, // Green
+		{0, 0, 255}, // Blue
+		{255, 255, 255}, // White
+		{255, 165, 4}, // Orange
+		{255, 215, 0}, // Gold
+		{135, 38, 87} // Raspberry
+	};
+
+	const int indices[12][2] = {
+		{0, 1},
+		{0, 2},
+		{0, 4},
+		{1, 3},
+		{1, 5},
+		{2, 3},
+		{2, 6},
+		{3, 7},
+		{4, 5},
+		{4, 6},
+		{5, 7},
+		{6, 7}
+	};
+
+	short model_index = SV_ModelIndex("sprites/laserbeam.spr");
+
+	for (int index = 0; index < 12; index++)
+	{
+		sizebuf_t *buffer = &g_psv.multicast;
+
+		MSG_WriteByte(buffer, svc_temp_entity);
+		MSG_WriteByte(buffer, TE_BEAMPOINTS);
+
+		// Start
+		MSG_WriteCoord(buffer, points[ indices[index][0] ][0]);
+		MSG_WriteCoord(buffer, points[ indices[index][0] ][1]);
+		MSG_WriteCoord(buffer, points[ indices[index][0] ][2]);
+
+		// End
+		MSG_WriteCoord(buffer, points[ indices[index][1] ][0]);
+		MSG_WriteCoord(buffer, points[ indices[index][1] ][1]);
+		MSG_WriteCoord(buffer, points[ indices[index][1] ][2]);
+
+		MSG_WriteShort(buffer, model_index);
+		MSG_WriteByte(buffer, 0);
+		MSG_WriteByte(buffer, 0);
+		MSG_WriteByte(buffer, (sv_rehlds_hitboxes_draw.value / 0.1) + 1); // Prevent blinking
+		MSG_WriteByte(buffer, 2);
+		MSG_WriteByte(buffer, 0);
+
+		MSG_WriteByte(buffer, colors[bbox.group][0]);
+		MSG_WriteByte(buffer, colors[bbox.group][1]);
+		MSG_WriteByte(buffer, colors[bbox.group][2]);
+
+		MSG_WriteByte(buffer, 255);	
+		MSG_WriteByte(buffer, 0);
+		
+		SV_Multicast(pEdict, pEdict->v.origin, MSG_FL_ONE | MSG_FL_PVS, FALSE);
+	}
+
+}
+#endif
+
+hull_t *R_StudioHull(model_t *pModel, float frame, int sequence, const vec_t *angles, const vec_t *origin, const vec_t *size, const unsigned char *pcontroller, const unsigned char *pblending, int *pNumHulls, edict_t *pEdict, int bSkipShield)
 {
 	SV_InitStudioHull();
 
@@ -643,6 +742,16 @@ hull_t *R_StudioHull(model_t *pModel, float frame, int sequence, const vec_t *an
 	g_pSvBlendingAPI->SV_StudioSetupBones(pModel, frame, sequence, angles2, origin, pcontroller, pblending, -1, pEdict);
 
 	mstudiobbox_t* pbbox = (mstudiobbox_t *)((char *)pstudiohdr + pstudiohdr->hitboxindex);
+
+#ifdef REHLDS_FIXES
+	auto hitboxes_delay = sv_rehlds_hitboxes_draw.value;
+	int hitboxes_groups = 0;	
+	if (hitboxes_delay >= 0.1f && (gGlobalVariables.time - pEdict->v.ltime) > hitboxes_delay)
+	{
+		hitboxes_groups = COM_ReadFlags(sv_rehlds_hitboxes_draw_groups.string);
+	}
+#endif	
+
 	for (int i = 0; i < pstudiohdr->numhitboxes; i++)
 	{
 		if (bSkipShield && i == 21) continue;
@@ -659,7 +768,19 @@ hull_t *R_StudioHull(model_t *pModel, float frame, int sequence, const vec_t *an
 			plane0->dist += fabs(plane0->normal[0] * size[0]) + fabs(plane0->normal[1] * size[1]) + fabs(plane0->normal[2] * size[2]);
 			plane1->dist -= fabs(plane1->normal[0] * size[0]) + fabs(plane1->normal[1] * size[1]) + fabs(plane1->normal[2] * size[2]);
 		}
+
+#ifdef REHLDS_FIXES
+		if (hitboxes_groups && ((hitboxes_groups << 1) & (1 << pbbox[i].group)) != 0)
+		{
+			R_DrawHitBox(pbbox[i], pEdict);		
+		}
+#endif
 	}
+
+#ifdef REHLDS_FIXES
+	if (hitboxes_groups != 0)
+		pEdict->v.ltime = gGlobalVariables.time;
+#endif
 
 	*pNumHulls = (bSkipShield == 1) ? pstudiohdr->numhitboxes - 1 : pstudiohdr->numhitboxes;
 	if (r_cachestudio.value != 0)
@@ -752,7 +873,7 @@ void R_StudioPlayerBlend(mstudioseqdesc_t *pseqdesc, int *pBlend, float *pPitch)
 	}
 }
 
-hull_t *SV_HullForStudioModel(const edict_t *pEdict, const vec_t *mins, const vec_t *maxs, vec_t *offset, int *pNumHulls)
+hull_t *SV_HullForStudioModel(edict_t *pEdict, const vec_t *mins, const vec_t *maxs, vec_t *offset, int *pNumHulls)
 {
 	qboolean useComplexHull = FALSE;
 	vec3_t size;
