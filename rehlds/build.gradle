@@ -162,8 +162,9 @@ void setupToolchain(NativeBinarySpec b) {
 				'_vsnprintf': 'vsnprintf',
 		])
 		if (useGcc) {
-			// MMX, SSE, SSE2, SSE3, SSSE3, SSE4.1, SSE4.2, POPCNT, AVX, AES and PCLMUL instruction set support.
-			cfg.compilerOptions.args '-march=sandybridge', '-Wno-write-strings'
+			// Produce code optimized for the most common IA32/AMD64/EM64T processors.
+			// As new processors are deployed in the marketplace, the behavior of this option will change.
+			cfg.compilerOptions.args '-mtune=generic', '-Wno-write-strings'
 		} else {
 			cfg.compilerOptions.args '-Qoption,cpp,--treat_func_as_string_literal_cpp', '-fno-rtti'
 		}
