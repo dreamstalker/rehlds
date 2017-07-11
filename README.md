@@ -3,7 +3,7 @@
 Reverse-engineered (and bugfixed) HLDS
 
 ## What is this?
-Rehlds is a result of reverse engineering of original HLDS (build 6152/6153) using DWARF debug info embedded into linux version of HLDS, engine_i486.so
+ReHLDS is a result of reverse engineering of original HLDS (build 6152/6153) using DWARF debug info embedded into linux version of HLDS, engine_i486.so
 
 Along with reverse engineering, a lot of defects and (potential) bugs were found and fixed
 
