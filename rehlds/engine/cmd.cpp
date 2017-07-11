@@ -378,19 +378,28 @@ void Cmd_Exec_f(void)
 	pszFileData[nAddLen] = 0;
 	FS_Close(hFile);
 
+	char *configContents = pszFileData;
+#ifdef REHLDS_FIXES
+	if (configContents[0] == char(0xEF) && configContents[1] == char(0xBB) && configContents[2] == char(0xBF))
+	{
+		configContents += 3;
+		nAddLen -= 3;
+	}
+#endif
+
 	Con_DPrintf("execing %s\n", pszFileName);
 
 	if (cmd_text.cursize + nAddLen + 2 < cmd_text.maxsize)
 	{
-		Cbuf_InsertTextLines(pszFileData);
+		Cbuf_InsertTextLines(configContents);
 	}
 	else
 	{
-		char *pszDataPtr = pszFileData;
+		char *pszDataPtr = configContents;
 		while (true)
 		{
 			Cbuf_Execute();	// TODO: This doesn't obey the rule to first execute commands from the file, and then the others in the buffer
-			pszDataPtr = COM_ParseLine(pszDataPtr);
+			pszDataPtr = COM_ParseLine(pszDataPtr); // TODO: COM_ParseLine can be const char*
 
 			if (com_token[0] == 0)
 			{
