@@ -38,61 +38,6 @@ char *Info_Serverinfo(void)
 	return serverinfo;
 }
 
-#ifdef Q_functions
-
-NOBODY void Q_memset(void *dest, int fill, int count);
-NOBODY void Q_memcpy(void *dest, const void *src, int count);
-NOBODY int Q_memcmp(void *m1, void *m2, int count);
-
-void Q_strcpy(char *dest, const char *src)
-{
-	char *c;
-	const char *s;
-
-	s = src;
-	for (c = dest; s; *c++ = *s++)
-	{
-		if (!c)
-			break;
-		if (!*s)
-			break;
-	}
-	*c = 0;
-}
-
-NOBODY void Q_strncpy(char *dest, const char *src, int count);
-
-int Q_strlen(const char *str)
-{
-	int result = 0;
-	if (str)
-	{
-		if (*str)
-		{
-			while (str[result++ + 1]);
-		}
-	}
-	return result;
-}
-
-
-NOBODY char *Q_strrchr(char *s, char c);
-NOBODY void Q_strcat(char *dest, char *src);
-NOBODY int Q_strcmp(const char *s1, const char *s2);
-NOBODY int Q_strncmp(const char *s1, const char *s2, int count);
-NOBODY int Q_strncasecmp(const char *s1, const char *s2, int n);
-NOBODY int Q_strcasecmp(const char *s1, const char *s2);
-NOBODY int Q_stricmp(const char *s1, const char *s2);
-NOBODY int Q_strnicmp(const char *s1, const char *s2, int n);
-NOBODY int Q_atoi(const char *str);
-NOBODY float Q_atof(const char *str);
-NOBODY char *Q_strlwr(char *src);
-NOBODY int Q_FileNameCmp(char *file1, char *file2);
-NOBODY char *Q_strstr(const char *s1, const char *search);
-NOBODY uint64 Q_strtoull(char *str);
-
-#endif // Q_functions
-
 #ifndef COM_Functions_region
 
 unsigned char COM_Nibble(char c)

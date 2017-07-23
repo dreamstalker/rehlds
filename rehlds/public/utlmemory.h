@@ -1,59 +1,90 @@
-//=========== (C) Copyright 1999 Valve, L.L.C. All rights reserved. ===========
-//
-// The copyright to the contents herein is the property of Valve, L.L.C.
-// The contents may be used and/or copied only with the written permission of
-// Valve, L.L.C., or in accordance with the terms and conditions stipulated in
-// the agreement/contract under which the contents have been supplied.
-//
-// $Header: $
-// $NoKeywords: $
-//
-// A growable memory class.
-//=============================================================================
+/*
+*
+*    This program is free software; you can redistribute it and/or modify it
+*    under the terms of the GNU General Public License as published by the
+*    Free Software Foundation; either version 2 of the License, or (at
+*    your option) any later version.
+*
+*    This program is distributed in the hope that it will be useful, but
+*    WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+*    General Public License for more details.
+*
+*    You should have received a copy of the GNU General Public License
+*    along with this program; if not, write to the Free Software Foundation,
+*    Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+*
+*    In addition, as a special exception, the author gives permission to
+*    link the code of this program with the Half-Life Game Engine ("HL
+*    Engine") and Modified Game Libraries ("MODs") developed by Valve,
+*    L.L.C ("Valve").  You must obey the GNU General Public License in all
+*    respects for all of the code used other than the HL Engine and MODs
+*    from Valve.  If you modify this file, you may extend this exception
+*    to your version of the file, but you are not obligated to do so.  If
+*    you do not wish to do so, delete this exception statement from your
+*    version.
+*
+*/
 
-#ifndef UTLMEMORY_H
-#define UTLMEMORY_H
-
-#ifdef _WIN32
 #pragma once
-#endif
 
 #include "osconfig.h"
 #include "tier0/dbg.h"
 #include <string.h>
-#include "tier0/platform.h"
 
 #pragma warning (disable:4100)
 #pragma warning (disable:4514)
 
-//-----------------------------------------------------------------------------
 // The CUtlMemory class:
 // A growable memory class which doubles in size by default.
-//-----------------------------------------------------------------------------
-template< class T >
+template <class T, class I = int>
 class CUtlMemory
 {
 public:
 	// constructor, destructor
 	CUtlMemory(int nGrowSize = 0, int nInitSize = 0);
-	CUtlMemory(T* pMemory, int numElements);
+	CUtlMemory(T *pMemory, int numElements);
 	~CUtlMemory();
 
+	// Set the size by which the memory grows
+	void Init(int nGrowSize = 0, int nInitSize = 0);
+
+	class Iterator_t
+	{
+	public:
+		Iterator_t(I i) : m_index(i) {}
+		I m_index;
+
+		bool operator==(const Iterator_t it) const { return m_index == it.m_index; }
+		bool operator!=(const Iterator_t it) const { return m_index != it.m_index; }
+	};
+
+	Iterator_t First() const							{ return Iterator_t(IsIdxValid(0) ? 0 : InvalidIndex()); }
+	Iterator_t Next(const Iterator_t &it) const			{ return Iterator_t(IsIdxValid(it.index + 1) ? it.index + 1 : InvalidIndex()); }
+	I GetIndex(const Iterator_t &it) const				{ return it.index; }
+	bool IsIdxAfter(I i, const Iterator_t &it) const	{ return i > it.index; }
+	bool IsValidIterator(const Iterator_t &it) const	{ return IsIdxValid(it.index); }
+	Iterator_t InvalidIterator() const					{ return Iterator_t(InvalidIndex()); }
+
 	// element access
-	T& operator[](int i);
-	T const& operator[](int i) const;
-	T& Element(int i);
-	T const& Element(int i) const;
+	T&			Element(I i);
+	T const&	Element(I i) const;
+	T&			operator[](I i);
+	T const&	operator[](I i) const;
 
 	// Can we use this index?
-	bool IsIdxValid(int i) const;
+	bool IsIdxValid(I i) const;
+
+	// Specify the invalid ('null') index that we'll only return on failure
+	static const I INVALID_INDEX = (I)-1; // For use with COMPILE_TIME_ASSERT
+	static I InvalidIndex() { return INVALID_INDEX; }
 
 	// Gets the base address (can change when adding elements!)
-	T* Base();
-	T const* Base() const;
+	T *Base();
+	T const *Base() const;
 
 	// Attaches the buffer to external memory....
-	void SetExternalBuffer(T* pMemory, int numElements);
+	void SetExternalBuffer(T *pMemory, int numElements);
 
 	// Size
 	int NumAllocated() const;
@@ -80,46 +111,54 @@ private:
 		EXTERNAL_BUFFER_MARKER = -1,
 	};
 
-	T* m_pMemory;
+	T *m_pMemory;
 	int m_nAllocationCount;
 	int m_nGrowSize;
 };
 
-
-//-----------------------------------------------------------------------------
 // constructor, destructor
-//-----------------------------------------------------------------------------
-template< class T >
-CUtlMemory<T>::CUtlMemory(int nGrowSize, int nInitAllocationCount) : m_pMemory(0),
-m_nAllocationCount(nInitAllocationCount), m_nGrowSize(nGrowSize)
+template <class T, class I>
+CUtlMemory<T, I>::CUtlMemory(int nGrowSize, int nInitSize) : m_pMemory(0),
+m_nAllocationCount(nInitSize), m_nGrowSize(nGrowSize)
 {
 	Assert((nGrowSize >= 0) && (nGrowSize != EXTERNAL_BUFFER_MARKER));
 	if (m_nAllocationCount)
 	{
-		m_pMemory = (T*)malloc(m_nAllocationCount * sizeof(T));
+		m_pMemory = (T *)malloc(m_nAllocationCount * sizeof(T));
 	}
 }
 
-template< class T >
-CUtlMemory<T>::CUtlMemory(T* pMemory, int numElements) : m_pMemory(pMemory),
+template <class T, class I>
+CUtlMemory<T, I>::CUtlMemory(T *pMemory, int numElements) : m_pMemory(pMemory),
 m_nAllocationCount(numElements)
 {
 	// Special marker indicating externally supplied memory
 	m_nGrowSize = EXTERNAL_BUFFER_MARKER;
 }
 
-template< class T >
-CUtlMemory<T>::~CUtlMemory()
+template <class T, class I>
+CUtlMemory<T, I>::~CUtlMemory()
 {
 	Purge();
 }
 
+template <class T, class I>
+void CUtlMemory<T,I>::Init(int nGrowSize, int nInitSize)
+{
+	Purge();
 
-//-----------------------------------------------------------------------------
+	m_nGrowSize = nGrowSize;
+	m_nAllocationCount = nInitSize;
+	Assert(nGrowSize >= 0);
+	if (m_nAllocationCount)
+	{
+		m_pMemory = (T *)malloc(m_nAllocationCount * sizeof(T));
+	}
+}
+
 // Attaches the buffer to external memory....
-//-----------------------------------------------------------------------------
-template< class T >
-void CUtlMemory<T>::SetExternalBuffer(T* pMemory, int numElements)
+template <class T, class I>
+void CUtlMemory<T, I>::SetExternalBuffer(T *pMemory, int numElements)
 {
 	// Blow away any existing allocated memory
 	Purge();
@@ -131,110 +170,91 @@ void CUtlMemory<T>::SetExternalBuffer(T* pMemory, int numElements)
 	m_nGrowSize = EXTERNAL_BUFFER_MARKER;
 }
 
-
-//-----------------------------------------------------------------------------
 // element access
-//-----------------------------------------------------------------------------
-template< class T >
-inline T& CUtlMemory<T>::operator[](int i)
+template <class T, class I>
+inline T& CUtlMemory<T, I>::operator[](I i)
 {
 	Assert(IsIdxValid(i));
 	return m_pMemory[i];
 }
 
-template< class T >
-inline T const& CUtlMemory<T>::operator[](int i) const
+template <class T, class I>
+inline T const& CUtlMemory<T, I>::operator[](I i) const
 {
 	Assert(IsIdxValid(i));
 	return m_pMemory[i];
 }
 
-template< class T >
-inline T& CUtlMemory<T>::Element(int i)
+template <class T, class I>
+inline T& CUtlMemory<T, I>::Element(I i)
 {
 	Assert(IsIdxValid(i));
 	return m_pMemory[i];
 }
 
-template< class T >
-inline T const& CUtlMemory<T>::Element(int i) const
+template <class T, class I>
+inline T const& CUtlMemory<T, I>::Element(I i) const
 {
 	Assert(IsIdxValid(i));
 	return m_pMemory[i];
 }
 
-
-//-----------------------------------------------------------------------------
 // is the memory externally allocated?
-//-----------------------------------------------------------------------------
-template< class T >
-bool CUtlMemory<T>::IsExternallyAllocated() const
+template <class T, class I>
+bool CUtlMemory<T, I>::IsExternallyAllocated() const
 {
 	return m_nGrowSize == EXTERNAL_BUFFER_MARKER;
 }
 
-
-template< class T >
-void CUtlMemory<T>::SetGrowSize(int nSize)
+template <class T, class I>
+void CUtlMemory<T, I>::SetGrowSize(int nSize)
 {
 	Assert((nSize >= 0) && (nSize != EXTERNAL_BUFFER_MARKER));
 	m_nGrowSize = nSize;
 }
 
-
-//-----------------------------------------------------------------------------
 // Gets the base address (can change when adding elements!)
-//-----------------------------------------------------------------------------
-template< class T >
-inline T* CUtlMemory<T>::Base()
+template <class T, class I>
+inline T *CUtlMemory<T, I>::Base()
 {
 	return m_pMemory;
 }
 
-template< class T >
-inline T const* CUtlMemory<T>::Base() const
+template <class T, class I>
+inline T const *CUtlMemory<T, I>::Base() const
 {
 	return m_pMemory;
 }
 
-
-//-----------------------------------------------------------------------------
 // Size
-//-----------------------------------------------------------------------------
-template< class T >
-inline int CUtlMemory<T>::NumAllocated() const
+template <class T, class I>
+inline int CUtlMemory<T, I>::NumAllocated() const
 {
 	return m_nAllocationCount;
 }
 
-template< class T >
-inline int CUtlMemory<T>::Count() const
+template <class T, class I>
+inline int CUtlMemory<T, I>::Count() const
 {
 	return m_nAllocationCount;
 }
 
-
-//-----------------------------------------------------------------------------
 // Is element index valid?
-//-----------------------------------------------------------------------------
-template< class T >
-inline bool CUtlMemory<T>::IsIdxValid(int i) const
+template <class T, class I>
+inline bool CUtlMemory<T, I>::IsIdxValid(I i) const
 {
-	return (i >= 0) && (i < m_nAllocationCount);
+	return (((int)i) >= 0) && (((int) i) < m_nAllocationCount);
 }
 
-
-//-----------------------------------------------------------------------------
 // Grows the memory
-//-----------------------------------------------------------------------------
-template< class T >
-void CUtlMemory<T>::Grow(int num)
+template <class T, class I>
+void CUtlMemory<T, I>::Grow(int num)
 {
 	Assert(num > 0);
 
 	if (IsExternallyAllocated())
 	{
-		// Can't grow a buffer whose memory was externally allocated 
+		// Can't grow a buffer whose memory was externally allocated
 		Assert(0);
 		return;
 	}
@@ -265,27 +285,24 @@ void CUtlMemory<T>::Grow(int num)
 
 	if (m_pMemory)
 	{
-		m_pMemory = (T*)realloc(m_pMemory, m_nAllocationCount * sizeof(T));
+		m_pMemory = (T *)realloc(m_pMemory, m_nAllocationCount * sizeof(T));
 	}
 	else
 	{
-		m_pMemory = (T*)malloc(m_nAllocationCount * sizeof(T));
+		m_pMemory = (T *)malloc(m_nAllocationCount * sizeof(T));
 	}
 }
 
-
-//-----------------------------------------------------------------------------
 // Makes sure we've got at least this much memory
-//-----------------------------------------------------------------------------
-template< class T >
-inline void CUtlMemory<T>::EnsureCapacity(int num)
+template <class T, class I>
+inline void CUtlMemory<T, I>::EnsureCapacity(int num)
 {
 	if (m_nAllocationCount >= num)
 		return;
 
 	if (IsExternallyAllocated())
 	{
-		// Can't grow a buffer whose memory was externally allocated 
+		// Can't grow a buffer whose memory was externally allocated
 		Assert(0);
 		return;
 	}
@@ -293,31 +310,25 @@ inline void CUtlMemory<T>::EnsureCapacity(int num)
 	m_nAllocationCount = num;
 	if (m_pMemory)
 	{
-		m_pMemory = (T*)realloc(m_pMemory, m_nAllocationCount * sizeof(T));
+		m_pMemory = (T *)realloc(m_pMemory, m_nAllocationCount * sizeof(T));
 	}
 	else
 	{
-		m_pMemory = (T*)malloc(m_nAllocationCount * sizeof(T));
+		m_pMemory = (T *)malloc(m_nAllocationCount * sizeof(T));
 	}
 }
 
-
-//-----------------------------------------------------------------------------
 // Memory deallocation
-//-----------------------------------------------------------------------------
-template< class T >
-void CUtlMemory<T>::Purge()
+template <class T, class I>
+void CUtlMemory<T, I>::Purge()
 {
 	if (!IsExternallyAllocated())
 	{
 		if (m_pMemory)
 		{
-			free((void*)m_pMemory);
+			free((void *)m_pMemory);
 			m_pMemory = 0;
 		}
 		m_nAllocationCount = 0;
 	}
 }
-
-
-#endif // UTLSTORAGE_H

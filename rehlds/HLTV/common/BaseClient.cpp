@@ -35,7 +35,7 @@ bool BaseClient::Init(IBaseSystem *system, int serial, char *name)
 	}
 
 	if (!name) {
-		strcopy(m_Name, CLIENT_INTERFACE_VERSION);
+		Q_strlcpy(m_Name, CLIENT_INTERFACE_VERSION);
 	}
 
 	SetState(CLIENT_INITIALIZING);
@@ -386,7 +386,7 @@ void BaseClient::UpdateUserInfo(char *userinfostring)
 		m_Userinfo.SetString(userinfostring);
 	}
 
-	strcopy(buffer, m_Userinfo.ValueForKey("name"));
+	Q_strlcpy(buffer, m_Userinfo.ValueForKey("name"));
 
 	SetName(buffer);
 	m_ClientType = atoi(m_Userinfo.ValueForKey("*hltv"));
@@ -648,7 +648,7 @@ void BaseClient::SetName(char *newName)
 		strcpy(temp, "unnamed");
 	}
 
-	strcopy(m_ClientName, temp);
+	Q_strlcpy(m_ClientName, temp);
 	m_Userinfo.SetValueForKey("name", m_ClientName);
 }
 

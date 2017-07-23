@@ -705,7 +705,7 @@ bool BSPModel::LoadFromBuffer(unsigned int *buffer, int length, const char *name
 	int i;
 
 	Clear();
-	strcopy(m_model.name, name);
+	Q_strlcpy(m_model.name, name);
 
 	m_System->DPrintf("Loading model: %s (%i kB)\n", name, length / 1024);
 	m_model.needload = NL_PRESENT;

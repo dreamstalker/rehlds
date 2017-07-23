@@ -30,8 +30,8 @@ bool TokenLine::SetLine(const char *newLine)
 		return false;
 	}
 
-	strcopy(m_fullLine, newLine);
-	strcopy(m_tokenBuffer, newLine);
+	Q_strlcpy(m_fullLine, newLine);
+	Q_strlcpy(m_tokenBuffer, newLine);
 
 	// parse tokens
 	char *charPointer = m_tokenBuffer;

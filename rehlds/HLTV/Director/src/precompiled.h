@@ -4,6 +4,7 @@
 #include "archtypes.h"
 #include "mathlib.h"
 #include "FileSystem.h"
+#include "strtools.h"
 
 #include "TokenLine.h"
 #include "interface.h"

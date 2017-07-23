@@ -29,6 +29,10 @@
       <Configuration>Release Swds Play</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="Release Swds|Win32">
+      <Configuration>Release Swds</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Release|Win32">
       <Configuration>Release</Configuration>
       <Platform>Win32</Platform>
@@ -110,11 +114,13 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Swds Play|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Swds|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Swds Play|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Swds|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\hookers\engine\main.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Swds Play|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Swds|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Swds Play|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Swds|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\hookers\engine\main_swds.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Play|Win32'">true</ExcludedFromBuild>
@@ -136,6 +142,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Play|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Swds Play|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Swds|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Tests|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test Fixes|Win32'">true</ExcludedFromBuild>
     </ClCompile>
@@ -147,6 +154,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Play|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Tests|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Swds Play|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Swds|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Swds Play|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test Fixes|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -161,24 +169,12 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Play|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Swds Play|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Swds|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Tests|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test Fixes|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\public\steamid.cpp" />
     <ClCompile Include="..\public\tier0\dbg.cpp" />
-    <ClCompile Include="..\public\tier0\platform_linux.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Swds|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Play|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Swds Play|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Record|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Play|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Swds Play|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Tests|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test Fixes|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\public\tier0\platform_win32.cpp" />
     <ClCompile Include="..\public\utlbuffer.cpp" />
     <ClCompile Include="..\rehlds\FlightRecorderImpl.cpp" />
     <ClCompile Include="..\rehlds\flight_recorder.cpp" />
@@ -200,9 +196,11 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release Play|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release Swds Play|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release Swds|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">precompiled.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release Play|Win32'">precompiled.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release Swds Play|Win32'">precompiled.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release Swds|Win32'">precompiled.h</PrecompiledHeaderFile>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Tests|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test Fixes|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Tests|Win32'">precompiled.h</PrecompiledHeaderFile>
@@ -225,6 +223,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Play|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Swds Play|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Swds|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\unittests\crc32c_tests.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -235,6 +234,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Play|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Swds Play|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Swds|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\unittests\delta_tests.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -245,6 +245,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Play|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Swds Play|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Swds|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\unittests\info_tests.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -255,6 +256,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Play|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Swds Play|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Swds|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\unittests\mathlib_tests.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -265,6 +267,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Play|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Swds Play|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Swds|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\unittests\rehlds_tests_shared.cpp" />
     <ClCompile Include="..\unittests\security_tests.cpp">
@@ -279,6 +282,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Play|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Swds Play|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Swds|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\unittests\TestRunner.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -289,6 +293,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Play|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Swds Play|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Swds|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\unittests\tmessage_tests.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -299,6 +304,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Play|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Swds Play|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Swds|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\unittests\unicode_tests.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -309,6 +315,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Play|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Swds Play|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Swds|Win32'">true</ExcludedFromBuild>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -477,7 +484,6 @@
     <ClInclude Include="..\public\interface.h" />
     <ClInclude Include="..\public\iosutil.h" />
     <ClInclude Include="..\public\iregistry.h" />
-    <ClInclude Include="..\public\protected_things.h" />
     <ClInclude Include="..\public\rehlds\archtypes.h" />
     <ClInclude Include="..\public\rehlds\bspfile.h" />
     <ClInclude Include="..\public\rehlds\cmd_rehlds.h" />
@@ -530,11 +536,8 @@
     <ClInclude Include="..\public\steam\steam_api.h" />
     <ClInclude Include="..\public\steam\steam_gameserver.h" />
     <ClInclude Include="..\public\string_t.h" />
+    <ClInclude Include="..\public\strtools.h" />
     <ClInclude Include="..\public\tier0\dbg.h" />
-    <ClInclude Include="..\public\tier0\mem.h" />
-    <ClInclude Include="..\public\tier0\memalloc.h" />
-    <ClInclude Include="..\public\tier0\memdbgoff.h" />
-    <ClInclude Include="..\public\tier0\memdbgon.h" />
     <ClInclude Include="..\public\tier0\platform.h" />
     <ClInclude Include="..\public\utlbuffer.h" />
     <ClInclude Include="..\public\utllinkedlist.h" />
@@ -675,6 +678,15 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Swds|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset Condition="'$(VisualStudioVersion)' == '12.0'">v120_xp</PlatformToolset>
+    <PlatformToolset Condition="'$(VisualStudioVersion)' == '14.0'">v140_xp</PlatformToolset>
+    <PlatformToolset Condition="'$(VisualStudioVersion)' == '15.0'">v141_xp</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
@@ -708,6 +720,9 @@
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release Swds Play|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release Swds|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <TargetName>filesystem_stdio</TargetName>
@@ -739,6 +754,9 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Swds Play|Win32'">
     <TargetName>swds</TargetName>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Swds|Win32'">
+    <TargetName>swds</TargetName>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <PreBuildEvent>
       <Command>IF EXIST "$(ProjectDir)PreBuild.bat" (CALL "$(ProjectDir)PreBuild.bat" "$(ProjectDir)..\version\" "$(ProjectDir)..\")</Command>
@@ -749,7 +767,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>REHLDS_OPT_PEDANTIC;REHLDS_SELF;HOOK_ENGINE;REHLDS_FIXES;REHLDS_CHECKS;USE_BREAKPAD_HANDLER;DEDICATED;SWDS;_CRT_SECURE_NO_WARNINGS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>REHLDS_OPT_PEDANTIC;REHLDS_SELF;HOOK_ENGINE;REHLDS_FIXES;REHLDS_CHECKS;HAVE_OPT_STRTOOLS;USE_BREAKPAD_HANDLER;DEDICATED;SWDS;_CRT_SECURE_NO_WARNINGS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <FloatingPointModel>Precise</FloatingPointModel>
       <AdditionalOptions>/arch:IA32 %(AdditionalOptions)</AdditionalOptions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -773,8 +791,8 @@
     <CustomBuildStep>
       <Command>echo Empty Action</Command>
       <Message>Force build to run Pre-Build event</Message>
-      <Outputs>subversion.always.run</Outputs>
-      <Inputs>subversion.always.run</Inputs>
+      <Outputs>build.always.run</Outputs>
+      <Inputs>build.always.run</Inputs>
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Swds|Win32'">
@@ -787,7 +805,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>REHLDS_FLIGHT_REC;REHLDS_OPT_PEDANTIC;REHLDS_FIXES;REHLDS_SELF;REHLDS_CHECKS;USE_BREAKPAD_HANDLER;DEDICATED;SWDS;_CRT_SECURE_NO_WARNINGS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>REHLDS_FLIGHT_REC;REHLDS_OPT_PEDANTIC;REHLDS_FIXES;REHLDS_SELF;REHLDS_CHECKS;HAVE_OPT_STRTOOLS;USE_BREAKPAD_HANDLER;DEDICATED;SWDS;_CRT_SECURE_NO_WARNINGS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <FloatingPointModel>Precise</FloatingPointModel>
       <AdditionalOptions>/arch:IA32 %(AdditionalOptions)</AdditionalOptions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -810,8 +828,8 @@
     <CustomBuildStep>
       <Command>echo Empty Action</Command>
       <Message>Force build to run Pre-Build event</Message>
-      <Outputs>subversion.always.run</Outputs>
-      <Inputs>subversion.always.run</Inputs>
+      <Outputs>build.always.run</Outputs>
+      <Inputs>build.always.run</Inputs>
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Play|Win32'">
@@ -846,8 +864,8 @@
     <CustomBuildStep>
       <Command>echo Empty Action</Command>
       <Message>Force build to run Pre-Build event</Message>
-      <Outputs>subversion.always.run</Outputs>
-      <Inputs>subversion.always.run</Inputs>
+      <Outputs>build.always.run</Outputs>
+      <Inputs>build.always.run</Inputs>
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Swds Play|Win32'">
@@ -860,7 +878,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>REHLDS_FLIGHT_REC;REHLDS_OPT_PEDANTIC;REHLDS_SELF;REHLDS_CHECKS;USE_BREAKPAD_HANDLER;DEDICATED;SWDS;_CRT_SECURE_NO_WARNINGS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>REHLDS_FLIGHT_REC;REHLDS_OPT_PEDANTIC;REHLDS_SELF;REHLDS_CHECKS;HAVE_OPT_STRTOOLS;USE_BREAKPAD_HANDLER;DEDICATED;SWDS;_CRT_SECURE_NO_WARNINGS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <FloatingPointModel>Precise</FloatingPointModel>
       <AdditionalOptions>/arch:IA32 %(AdditionalOptions)</AdditionalOptions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -885,8 +903,8 @@
     <CustomBuildStep>
       <Command>echo Empty Action</Command>
       <Message>Force build to run Pre-Build event</Message>
-      <Outputs>subversion.always.run</Outputs>
-      <Inputs>subversion.always.run</Inputs>
+      <Outputs>build.always.run</Outputs>
+      <Inputs>build.always.run</Inputs>
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Record|Win32'">
@@ -921,8 +939,8 @@
     <CustomBuildStep>
       <Command>echo Empty Action</Command>
       <Message>Force build to run Pre-Build event</Message>
-      <Outputs>subversion.always.run</Outputs>
-      <Inputs>subversion.always.run</Inputs>
+      <Outputs>build.always.run</Outputs>
+      <Inputs>build.always.run</Inputs>
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Tests|Win32'">
@@ -935,7 +953,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>REHLDS_FLIGHT_REC;REHLDS_OPT_PEDANTIC;REHLDS_SELF;REHLDS_UNIT_TESTS;_BUILD_FROM_IDE;USE_BREAKPAD_HANDLER;DEDICATED;SWDS;_CRT_SECURE_NO_WARNINGS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>REHLDS_FLIGHT_REC;REHLDS_OPT_PEDANTIC;HAVE_OPT_STRTOOLS;REHLDS_SELF;REHLDS_UNIT_TESTS;_BUILD_FROM_IDE;USE_BREAKPAD_HANDLER;DEDICATED;SWDS;_CRT_SECURE_NO_WARNINGS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>precompiled.h</PrecompiledHeaderFile>
@@ -957,8 +975,8 @@
     <CustomBuildStep>
       <Command>echo Empty Action</Command>
       <Message>Force build to run Pre-Build event</Message>
-      <Outputs>subversion.always.run</Outputs>
-      <Inputs>subversion.always.run</Inputs>
+      <Outputs>build.always.run</Outputs>
+      <Inputs>build.always.run</Inputs>
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Test Fixes|Win32'">
@@ -971,7 +989,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>REHLDS_FLIGHT_REC;REHLDS_OPT_PEDANTIC;REHLDS_FIXES;REHLDS_SELF;REHLDS_UNIT_TESTS;_BUILD_FROM_IDE;USE_BREAKPAD_HANDLER;DEDICATED;SWDS;_CRT_SECURE_NO_WARNINGS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>REHLDS_FLIGHT_REC;REHLDS_OPT_PEDANTIC;REHLDS_FIXES;HAVE_OPT_STRTOOLS;REHLDS_SELF;REHLDS_UNIT_TESTS;_BUILD_FROM_IDE;USE_BREAKPAD_HANDLER;DEDICATED;SWDS;_CRT_SECURE_NO_WARNINGS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>precompiled.h</PrecompiledHeaderFile>
@@ -992,8 +1010,8 @@
     <CustomBuildStep>
       <Command>echo Empty Action</Command>
       <Message>Force build to run Pre-Build event</Message>
-      <Outputs>subversion.always.run</Outputs>
-      <Inputs>subversion.always.run</Inputs>
+      <Outputs>build.always.run</Outputs>
+      <Inputs>build.always.run</Inputs>
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -1008,7 +1026,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>REHLDS_OPT_PEDANTIC;REHLDS_SELF;HOOK_ENGINE;REHLDS_CHECKS;USE_BREAKPAD_HANDLER;DEDICATED;SWDS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>REHLDS_OPT_PEDANTIC;REHLDS_SELF;HOOK_ENGINE;REHLDS_CHECKS;HAVE_OPT_STRTOOLS;USE_BREAKPAD_HANDLER;DEDICATED;SWDS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <AdditionalOptions>/arch:IA32 %(AdditionalOptions)</AdditionalOptions>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -1031,8 +1049,8 @@
     <CustomBuildStep>
       <Command>echo Empty Action</Command>
       <Message>Force build to run Pre-Build event</Message>
-      <Outputs>subversion.always.run</Outputs>
-      <Inputs>subversion.always.run</Inputs>
+      <Outputs>build.always.run</Outputs>
+      <Inputs>build.always.run</Inputs>
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release Play|Win32'">
@@ -1071,8 +1089,8 @@
     <CustomBuildStep>
       <Command>echo Empty Action</Command>
       <Message>Force build to run Pre-Build event</Message>
-      <Outputs>subversion.always.run</Outputs>
-      <Inputs>subversion.always.run</Inputs>
+      <Outputs>build.always.run</Outputs>
+      <Inputs>build.always.run</Inputs>
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release Swds Play|Win32'">
@@ -1087,7 +1105,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>REHLDS_FLIGHT_REC;REHLDS_OPT_PEDANTIC;REHLDS_SELF;REHLDS_CHECKS;USE_BREAKPAD_HANDLER;DEDICATED;SWDS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>REHLDS_FLIGHT_REC;REHLDS_OPT_PEDANTIC;REHLDS_SELF;REHLDS_CHECKS;HAVE_OPT_STRTOOLS;USE_BREAKPAD_HANDLER;DEDICATED;SWDS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <AdditionalOptions>/arch:IA32 %(AdditionalOptions)</AdditionalOptions>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -1115,8 +1133,52 @@
     <CustomBuildStep>
       <Command>echo Empty Action</Command>
       <Message>Force build to run Pre-Build event</Message>
-      <Outputs>subversion.always.run</Outputs>
-      <Inputs>subversion.always.run</Inputs>
+      <Outputs>build.always.run</Outputs>
+      <Inputs>build.always.run</Inputs>
+    </CustomBuildStep>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release Swds|Win32'">
+    <PreBuildEvent>
+      <Command>IF EXIST "$(ProjectDir)PreBuild.bat" (CALL "$(ProjectDir)PreBuild.bat" "$(ProjectDir)..\version\" "$(ProjectDir)..\")</Command>
+      <Message>Setup version from Git revision</Message>
+    </PreBuildEvent>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\;$(ProjectDir)\..\hookers\;$(ProjectDir)\..\metamod\include\;$(ProjectDir)\..\public\rehlds\;$(ProjectDir)\..\common;$(ProjectDir)\..\engine;$(ProjectDir)\..\public;$(ProjectDir)\..\pm_shared;$(ProjectDir)\..\rehlds\;$(ProjectDir)\..\testsuite\;$(VCInstallDir)UnitTest\include;$(SolutionDir)..\dep\bzip2\include\;$(SolutionDir)..\dep\cppunitlite\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>REHLDS_FLIGHT_REC;REHLDS_FIXES;REHLDS_OPT_PEDANTIC;REHLDS_SELF;REHLDS_CHECKS;HAVE_OPT_STRTOOLS;USE_BREAKPAD_HANDLER;DEDICATED;SWDS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <AdditionalOptions>/arch:IA32 %(AdditionalOptions)</AdditionalOptions>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>precompiled.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>psapi.lib;ws2_32.lib;$(ProjectDir)../lib/steam_api.lib;$(ProjectDir)../lib/libacof32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <MinimumRequiredVersion>
+      </MinimumRequiredVersion>
+      <ModuleDefinitionFile>
+      </ModuleDefinitionFile>
+      <AdditionalLibraryDirectories>$(VCInstallDir)UnitTest\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <FixedBaseAddress>
+      </FixedBaseAddress>
+      <BaseAddress>0x4970000</BaseAddress>
+    </Link>
+    <PostBuildEvent>
+      <Command>IF EXIST "$(ProjectDir)PostBuild_swds.bat" (CALL "$(ProjectDir)PostBuild_swds.bat" "$(TargetDir)" "$(TargetName)" "$(TargetExt)" "$(ProjectDir)")</Command>
+      <Message>Automatic deployment script</Message>
+    </PostBuildEvent>
+    <CustomBuildStep>
+      <Command>echo Empty Action</Command>
+      <Message>Force build to run Pre-Build event</Message>
+      <Outputs>build.always.run</Outputs>
+      <Inputs>build.always.run</Inputs>
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

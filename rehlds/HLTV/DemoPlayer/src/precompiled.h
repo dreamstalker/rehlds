@@ -2,6 +2,7 @@
 
 #include "archtypes.h"
 #include "maintypes.h"
+#include "strtools.h"
 
 #include "TokenLine.h"
 #include "interface.h"

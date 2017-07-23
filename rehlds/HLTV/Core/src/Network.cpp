@@ -281,7 +281,7 @@ bool Network::ResolveAddress(char *string, NetAddress *address)
 	((sockaddr_in *)&sadr)->sin_family = AF_INET;
 	((sockaddr_in *)&sadr)->sin_port = 0;
 
-	strcopy(copy, string);
+	Q_strlcpy(copy, string);
 
 	// Parse port
 	char *colon = copy;
@@ -384,7 +384,7 @@ char *Network::GetErrorText(int code)
 
 void Network::SetName(char *newName)
 {
-	strcopy(m_Name, newName);
+	Q_strlcpy(m_Name, newName);
 }
 
 void Network::UpdateStats()

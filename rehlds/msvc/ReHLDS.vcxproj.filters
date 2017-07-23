@@ -215,12 +215,6 @@
     <ClCompile Include="..\public\utlbuffer.cpp">
       <Filter>public</Filter>
     </ClCompile>
-    <ClCompile Include="..\public\tier0\platform_win32.cpp">
-      <Filter>public\tier0</Filter>
-    </ClCompile>
-    <ClCompile Include="..\public\tier0\platform_linux.cpp">
-      <Filter>public\tier0</Filter>
-    </ClCompile>
     <ClCompile Include="..\engine\sv_remoteaccess.cpp">
       <Filter>engine</Filter>
     </ClCompile>
@@ -772,9 +766,6 @@
     <ClInclude Include="..\public\basetypes.h">
       <Filter>public</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\protected_things.h">
-      <Filter>public</Filter>
-    </ClInclude>
     <ClInclude Include="..\public\commonmacros.h">
       <Filter>public</Filter>
     </ClInclude>
@@ -783,18 +774,6 @@
     </ClInclude>
     <ClInclude Include="..\public\string_t.h">
       <Filter>public</Filter>
-    </ClInclude>
-    <ClInclude Include="..\public\tier0\memalloc.h">
-      <Filter>public\tier0</Filter>
-    </ClInclude>
-    <ClInclude Include="..\public\tier0\mem.h">
-      <Filter>public\tier0</Filter>
-    </ClInclude>
-    <ClInclude Include="..\public\tier0\memdbgon.h">
-      <Filter>public\tier0</Filter>
-    </ClInclude>
-    <ClInclude Include="..\public\tier0\memdbgoff.h">
-      <Filter>public\tier0</Filter>
     </ClInclude>
     <ClInclude Include="..\public\utllinkedlist.h">
       <Filter>public</Filter>
@@ -1057,9 +1036,6 @@
     <ClInclude Include="..\public\rehlds\crc32c.h">
       <Filter>public\rehlds</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\iosutil.h">
-      <Filter>public</Filter>
-    </ClInclude>
     <ClInclude Include="..\unittests\rehlds_tests_shared.h">
       <Filter>unittests</Filter>
     </ClInclude>
@@ -1098,6 +1074,12 @@
     </ClInclude>
     <ClInclude Include="..\engine\SystemWrapper.h">
       <Filter>engine\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\iosutil.h">
+      <Filter>hookers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\strtools.h">
+      <Filter>public</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -130,14 +130,12 @@ FunctionHook g_FunctionHooks[] =
 
 #ifndef Common_MSG_region
 
-#ifdef Q_functions
-
 	//HOOK_DEF(0x, Q_memset),
 	//HOOK_DEF(0x, Q_memcpy),
 	//HOOK_DEF(0x, Q_memcmp),
-	HOOK_DEF(0x01D28AF0, Q_strcpy),
+	//HOOK_DEF(0x01D28AF0, Q_strcpy),
 	//HOOK_DEF(0x, Q_strncpy),
-	HOOK_DEF(0x01D28B50, Q_strlen),
+	//HOOK_DEF(0x01D28B50, Q_strlen),
 	//HOOK_DEF(0x, Q_strrchr),
 	//HOOK_DEF(0x, Q_strcat),
 	//HOOK_DEF(0x, Q_strcmp),
@@ -152,8 +150,6 @@ FunctionHook g_FunctionHooks[] =
 	//HOOK_DEF(0x, Q_FileNameCmp),
 	//HOOK_DEF(0x, Q_strstr),
 	//HOOK_DEF(0x, Q_strtoull),
-
-#endif // Q_functions
 
 	HOOK_DEF(0x01D29290, MSG_WriteChar),
 	HOOK_DEF(0x01D292B0, MSG_WriteByte),
