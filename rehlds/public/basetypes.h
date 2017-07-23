@@ -35,6 +35,7 @@
 #include "osconfig.h"
 #include "commonmacros.h"
 
+#include "archtypes.h"
 #include "mathlib.h"
 
 // For backward compatibilty only...

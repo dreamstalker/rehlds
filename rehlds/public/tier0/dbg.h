@@ -19,9 +19,8 @@
 #pragma once
 #endif
 
-#include "osconfig.h"
 #include "basetypes.h"
-#include "tier0/platform.h"
+
 #include <math.h>
 #include <stdio.h>
 #include <stdarg.h>
