@@ -111,6 +111,7 @@
 	#define ALIGN16 __declspec(align(16))
 	#define NORETURN __declspec(noreturn)
 	#define FORCE_STACK_ALIGN
+	#define FUNC_TARGET(x)
 
 	#define __builtin_bswap16 _byteswap_ushort
 	#define __builtin_bswap32 _byteswap_ulong
@@ -160,9 +161,13 @@
 	#define FORCE_STACK_ALIGN __attribute__((force_align_arg_pointer))
 
 #if defined __INTEL_COMPILER
+	#define FUNC_TARGET(x)
+
 	#define __builtin_bswap16 _bswap16
 	#define __builtin_bswap32 _bswap
 	#define __builtin_bswap64 _bswap64
+#else
+	#define FUNC_TARGET(x) __attribute__((target(x)))
 #endif // __INTEL_COMPILER
 
 	//inline bool SOCKET_FIONBIO(SOCKET s, int m) { return (ioctl(s, FIONBIO, (int*)&m) == 0); }

@@ -115,10 +115,12 @@ uint32 crc32c_t_nosse(uint32 iCRC, const uint8 *buf, int len) {
 	return crc;
 }
 
+FUNC_TARGET("sse4.2")
 uint32 crc32c_t8_sse(uint32 iCRC, uint8 u8) {
 	return _mm_crc32_u8(iCRC, u8);
 }
 
+FUNC_TARGET("sse4.2")
 uint32 crc32c_t_sse(uint32 iCRC, const uint8 *buf, unsigned int len) {
 	uint32 crc32cval = iCRC;
 	unsigned int i = 0;

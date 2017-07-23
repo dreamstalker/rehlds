@@ -35,9 +35,28 @@
 class IBaseSystem;
 class ISystemModule;
 
-class IEngineWrapper: virtual public ISystemModule {
+// TODO: common/IEngineWrapper.h
+class IEngineWrapperEx {
 public:
-	virtual ~IEngineWrapper() {}
+	virtual ~IEngineWrapperEx() {}
+
+	virtual bool Init(IBaseSystem *system, int serial, char *name) = 0;
+	virtual void RunFrame(double time) = 0;
+	virtual void ReceiveSignal(ISystemModule *module, unsigned int signal, void *data) = 0;
+	virtual void ExecuteCommand(int commandID, char *commandLine) = 0;
+	virtual void RegisterListener(ISystemModule *module) = 0;
+	virtual void RemoveListener(ISystemModule *module) = 0;
+
+	virtual IBaseSystem *GetSystem() = 0;
+
+	virtual int GetSerial() = 0;
+	virtual char *GetStatusLine() = 0;
+	virtual char *GetType() = 0;
+	virtual char *GetName() = 0;
+
+	virtual int GetState() = 0;
+	virtual int GetVersion() = 0;
+	virtual void ShutDown() = 0;
 
 	virtual bool GetViewOrigin(float *origin) = 0;
 	virtual bool GetViewAngles(float *angles) = 0;
@@ -52,5 +71,7 @@ public:
 	virtual void CL_DemoPlaySound(int channel, char *sample, float attenuation, float volume, int flags, int pitch) = 0;
 	virtual void ClientDLL_ReadDemoBuffer(int size, unsigned char *buffer) = 0;
 };
+
+using IEngineWrapper = IEngineWrapperEx;
 
 #define ENGINEWRAPPER_INTERFACE_VERSION "enginewrapper001"

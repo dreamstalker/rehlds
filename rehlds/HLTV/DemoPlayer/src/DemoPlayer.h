@@ -35,7 +35,7 @@
 #include "vmodes.h"
 #include "cdll_int.h"
 #include "IDemoPlayer.h"
-#include "IEngineWrapper.h"
+#include "IEngineWrapperEx.h"
 
 #include "BaseSystemModule.h"
 #include "ObjectDictionary.h"

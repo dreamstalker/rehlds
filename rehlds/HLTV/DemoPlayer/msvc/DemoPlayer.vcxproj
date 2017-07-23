@@ -155,7 +155,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>HOOK_HLTV;HLTV;WIN32;NDEBUG;_WINDOWS;_USRDLL;DEMOPLAYER_MODULE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitiHOOons)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>HLTV;WIN32;NDEBUG;_WINDOWS;_USRDLL;DEMOPLAYER_MODULE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitiHOOons)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>precompiled.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(ProjectDir)\..\src;$(ProjectDir)\..\..\;$(ProjectDir)\..\..\..\;$(ProjectDir)\..\..\..\common;$(ProjectDir)\..\..\..\engine;$(ProjectDir)\..\..\..\public;$(ProjectDir)\..\..\..\public\rehlds;$(ProjectDir)\..\..\..\pm_shared;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>

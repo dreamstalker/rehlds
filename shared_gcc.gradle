@@ -16,7 +16,11 @@ rootProject.ext.createGccConfig = { boolean release, BinaryKind binKind ->
 						//intelExtensions: false,
 						//asmBlocks: true,
 
-						positionIndependentCode: false
+						positionIndependentCode: false,
+
+						extraDefines: [
+							'_GLIBCXX_USE_CXX11_ABI': 0,
+						]
 				),
 
 				linkerOptions: new GccToolchainConfig.LinkerOptions(
@@ -41,7 +45,11 @@ rootProject.ext.createGccConfig = { boolean release, BinaryKind binKind ->
 
 						noBuiltIn: true,
 						//intelExtensions: false,
-						//asmBlocks: true
+						//asmBlocks: true,
+
+						extraDefines: [
+							'_GLIBCXX_USE_CXX11_ABI': 0,
+						]
 				),
 
 				linkerOptions: new GccToolchainConfig.LinkerOptions(

@@ -81,6 +81,7 @@ inline void xmm2vec(vec_t *v, const __m128 m)
 	_mm_store_ss(v + 2, _mm_shuffle_ps(m, m, 0x02));
 }
 
+FUNC_TARGET("sse4.1")
 inline __m128 dotProduct3D(__m128 v1, __m128 v2)
 {
 	if (cpuinfo.sse4_1)
