@@ -171,8 +171,8 @@ size_t Q_strlcat(char (&dest)[N], const char *src)
 	if (srclen > size)
 		srclen = size;
 
-	Q_memcpy(dst + dstlen, src, srclen);
-	dst[dstlen + srclen] = '\0';
+	Q_memcpy(dest + dstlen, src, srclen);
+	dest[dstlen + srclen] = '\0';
 
 	return dstlen + srclen;
 }
