@@ -166,7 +166,7 @@ void setupToolchain(NativeBinarySpec b) {
 		if (useGcc) {
 			// Produce code optimized for the most common IA32/AMD64/EM64T processors.
 			// As new processors are deployed in the marketplace, the behavior of this option will change.
-			cfg.compilerOptions.args '-mtune=generic', '-Wno-write-strings'
+			cfg.compilerOptions.args '-mtune=generic', '-msse', '-msse2', '-msse3', '-msse4.1', '-Wno-write-strings'
 		} else {
 			cfg.compilerOptions.args '-Qoption,cpp,--treat_func_as_string_literal_cpp', '-fno-rtti'
 		}

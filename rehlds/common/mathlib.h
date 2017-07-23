@@ -87,9 +87,9 @@ inline T bswap(T s)
 {
 	switch (sizeof(T))
 	{
-	case 2: {auto res = __builtin_bswap16(*(uint16 *)&s); return *(T *)&res; }
-	case 4: {auto res = __builtin_bswap32(*(uint32 *)&s); return *(T *)&res; }
-	case 8: {auto res = __builtin_bswap64(*(uint64 *)&s); return *(T *)&res; }
+	case 2: {auto res = __builtin_bswap16(*(uint16_t *)&s); return *(T *)&res; }
+	case 4: {auto res = __builtin_bswap32(*(uint32_t *)&s); return *(T *)&res; }
+	case 8: {auto res = __builtin_bswap64(*(uint64_t *)&s); return *(T *)&res; }
 	default: return s;
 	}
 }
