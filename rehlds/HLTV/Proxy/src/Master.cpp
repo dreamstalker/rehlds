@@ -163,7 +163,7 @@ void Master::RunFrame(double time)
 				COM_FileBase(world->GetLevelName(), mapName);
 
 				char szHostName[MAX_PATH];
-				strcopy(szHostName, world->GetHostName());
+				Q_strlcpy(szHostName, world->GetHostName());
 
 				int slots, proxies, spectators;
 				m_Proxy->GetStatistics(proxies, slots, spectators);

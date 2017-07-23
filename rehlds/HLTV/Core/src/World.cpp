@@ -48,7 +48,7 @@ bool World::Init(IBaseSystem *system, int serial, char *name)
 	m_ServerInfo.SetMaxSize(MAX_SERVERINFO_STRING);
 
 	memset(m_HostName, 0, sizeof(m_HostName));
-	strcopy(m_ServerName, "Unnamed HLTV");
+	Q_strlcpy(m_ServerName, "Unnamed HLTV");
 
 	m_Frames.Init();
 	m_FramesByTime.Init();
@@ -179,7 +179,7 @@ bool World::AddUserMessage(int msgNumber, int size, char *name)
 		umsg.iSize = -1;
 	}
 
-	strcopy(umsg.szName, name);
+	Q_strlcpy(umsg.szName, name);
 
 	bool bFound = false;
 	for (UserMsg *pList = m_ClientUserMsgs; pList; pList = pList->next)
@@ -223,9 +223,9 @@ void World::UpdatePlayer(int playerNum, int userId, char *infostring, char *hash
 	m_System->DPrintf("Player update(%i:%s)\n", playerNum, player->name);
 	infostr.RemovePrefixedKeys('_');
 
-	strcopy(player->userinfo, infostr.GetString());
-	strcopy(player->name, infostr.ValueForKey("name"));
-	strcopy(player->model, infostr.ValueForKey("model"));
+	Q_strlcpy(player->userinfo, infostr.GetString());
+	Q_strlcpy(player->name, infostr.ValueForKey("name"));
+	Q_strlcpy(player->model, infostr.ValueForKey("model"));
 
 	player->topcolor    = atoi(infostr.ValueForKey("topcolor"));
 	player->bottomcolor = atoi(infostr.ValueForKey("bottomcolor"));
@@ -333,7 +333,7 @@ void World::SetHostName(char *name)
 		return;
 	}
 
-	strcopy(m_HostName, name);
+	Q_strlcpy(m_HostName, name);
 }
 
 void World::ClearLightStyles()
@@ -353,7 +353,7 @@ void World::AddLightStyle(int index, char *style)
 		m_System->Printf("WARNING! World::SetLightStyle: style too long (%i).\n", length);
 	}
 
-	strcopy(m_Lightstyles[index], style);
+	Q_strlcpy(m_Lightstyles[index], style);
 }
 
 void World::NewGame(int newServerCount)
@@ -1698,7 +1698,7 @@ void World::WriteNewData(BitBuffer *stream)
 
 void World::SetName(char *newName)
 {
-	strcopy(m_Name, newName);
+	Q_strlcpy(m_Name, newName);
 }
 
 float World::GetBufferedGameTime()
@@ -1855,8 +1855,8 @@ void World::SetServerInfo(int protocol, CRC32_t nserverCRC, unsigned char *nclie
 	m_PlayerNum = nplayernum;
 	m_GameType = ngametype;
 
-	strcopy(m_GameDir, ngamedir);
-	strcopy(m_LevelName, nlevelname);
+	Q_strlcpy(m_GameDir, ngamedir);
+	Q_strlcpy(m_LevelName, nlevelname);
 
 	_snprintf(m_ServerName, sizeof(m_ServerName), "%s:%i", nservername, m_PlayerNum);
 }
@@ -1909,7 +1909,7 @@ void World::ParseDeltaDescription(BitBuffer *stream)
 	}
 
 	char szDesc[256];
-	strcopy(szDesc, s);
+	Q_strlcpy(szDesc, s);
 	m_System->DPrintf("Reading delta description for: %s.\n", s);
 
 	delta_t **ppdelta = m_Delta.LookupRegistration(szDesc);
@@ -1967,7 +1967,7 @@ bool World::GetPlayerInfoString(int playerNum, InfoString *infoString)
 
 void World::SetExtraInfo(char *nclientfallback, int nallowCheats)
 {
-	strcopy(m_ClientFallback, nclientfallback);
+	Q_strlcpy(m_ClientFallback, nclientfallback);
 	m_AllowCheats = nallowCheats ? true : false;
 }
 
@@ -2253,14 +2253,14 @@ void World::RearrangeFrame(frame_t *frame, int seqNrOffset, float timeOffset)
 
 void World::UpdateServerInfo()
 {
-	strcopy(m_DetailedServerInfo.address, "");
-	strcopy(m_DetailedServerInfo.name, GetHostName());
+	Q_strlcpy(m_DetailedServerInfo.address, "");
+	Q_strlcpy(m_DetailedServerInfo.name, GetHostName());
 
 	COM_FileBase(m_LevelName, m_DetailedServerInfo.map);
 	m_DetailedServerInfo.map[sizeof(m_DetailedServerInfo.map) - 1] = '\0';
 
-	strcopy(m_DetailedServerInfo.gamedir, m_GameDir);
-	strcopy(m_DetailedServerInfo.description, "HLTV");
+	Q_strlcpy(m_DetailedServerInfo.gamedir, m_GameDir);
+	Q_strlcpy(m_DetailedServerInfo.description, "HLTV");
 
 	m_DetailedServerInfo.activePlayers = m_PlayerNum;
 	m_DetailedServerInfo.maxPlayers = m_Maxclients;

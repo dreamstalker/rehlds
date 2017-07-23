@@ -93,6 +93,7 @@ On Windows:
 <pre>gradlew --max-workers=1 clean buildRelease</pre>
 * For faster building without unit tests use this:exclamation:
 <pre>gradlew --max-workers=1 clean buildFixes</pre>
+<b>NOTE:</b> You can also use `Visual Studio` to build, just select from the solution configurations list `Release Swds` or `Debug Swds`<br />
 
 On Linux (ICC):
 <pre>./gradlew --max-workers=1 clean buildRelease</pre>

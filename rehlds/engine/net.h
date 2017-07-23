@@ -125,11 +125,6 @@ const int NET_MAX_PAYLOAD	= 65536;
 // }
 #define HEADER_BYTES (8 + MAX_STREAMS * 9)
 
-// Pad a number so it lies on an N byte boundary.
-// So PAD_NUMBER(0,4) is 0 and PAD_NUMBER(1,4) is 4
-#define PAD_NUMBER(number, boundary) \
-	(((number) + ((boundary) - 1)) / (boundary)) * (boundary)
-
 // Pad this to next higher 16 byte boundary
 // This is the largest packet that can come in/out over the wire, before processing the header
 //  bytes will be stripped by the networking channel layer

@@ -251,7 +251,7 @@ bool DemoFile::StartRecording(char *newName)
 		CloseFile();
 	}
 
-	strcopy(m_FileName, newName);
+	Q_strlcpy(m_FileName, newName);
 
 	m_FileHandle = m_FileSystem->Open(m_FileName, "wb");
 	if (!m_FileHandle) {
@@ -332,8 +332,8 @@ bool DemoFile::LoadDemo(char *demoname)
 
 	CloseFile();
 
-	strcopy(m_FileName, demoname);
-	_strlwr(m_FileName);
+	Q_strlcpy(m_FileName, demoname);
+	Q_strlwr(m_FileName);
 
 	if (!strstr(m_FileName, ".dem")) {
 		strcat(m_FileName, ".dem");
@@ -384,11 +384,11 @@ bool DemoFile::LoadDemo(char *demoname)
 	m_Continuous = true;
 	memset(&m_ServerInfo, 0, sizeof(m_ServerInfo));
 
-	strcopy(m_ServerInfo.address, m_DemoChannel->m_remote_address.ToBaseString());
-	strcopy(m_ServerInfo.name, m_FileName);
-	strcopy(m_ServerInfo.map, m_demoHeader.szMapName);
-	strcopy(m_ServerInfo.gamedir, m_demoHeader.szDllDir);
-	strcopy(m_ServerInfo.description, "Demo Playback");
+	Q_strlcpy(m_ServerInfo.address, m_DemoChannel->m_remote_address.ToBaseString());
+	Q_strlcpy(m_ServerInfo.name, m_FileName);
+	Q_strlcpy(m_ServerInfo.map, m_demoHeader.szMapName);
+	Q_strlcpy(m_ServerInfo.gamedir, m_demoHeader.szDllDir);
+	Q_strlcpy(m_ServerInfo.description, "Demo Playback");
 
 	m_ServerInfo.activePlayers = 0;
 	m_ServerInfo.maxPlayers = MAX_CLIENTS;

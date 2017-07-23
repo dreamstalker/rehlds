@@ -752,7 +752,7 @@ void DemoPlayer::ReadNetchanState(int *incoming_sequence, int *incoming_acknowle
 
 void DemoPlayer::SetName(char *newName)
 {
-	strcopy(m_Name, newName);
+	Q_strlcpy(m_Name, newName);
 }
 
 void DemoPlayer::RunClocks()
@@ -887,7 +887,7 @@ bool DemoPlayer::LoadGame(char *filename)
 		return false;
 	}
 
-	strcopy(m_DemoFileName, filename);
+	Q_strlcpy(m_DemoFileName, filename);
 
 	m_World->SetBufferSize(-1);
 	m_Outgoing_sequence = 0;

@@ -137,7 +137,7 @@ void Status::SendStatusUpdate()
 
 void Status::SetName(char *newName)
 {
-	strcopy(m_Name, newName);
+	Q_strlcpy(m_Name, newName);
 }
 
 char *Status::GetType()

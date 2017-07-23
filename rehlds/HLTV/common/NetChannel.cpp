@@ -1262,7 +1262,7 @@ bool NetChannel::CopyFileFragments()
 	}
 
 	filecontent.Reset();
-	strcopy(filename, filecontent.ReadString());
+	Q_strlcpy(filename, filecontent.ReadString());
 
 	if (!strlen(filename)) {
 		m_System->Printf("File fragment received with no filename\n");

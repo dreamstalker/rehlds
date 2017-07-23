@@ -153,14 +153,16 @@ void setupToolchain(NativeBinarySpec b) {
 					pchSourceSet: 'rehlds_pch'
 			)
 		}
-		cfg.compilerOptions.languageStandard = 'c++0x'
+		cfg.compilerOptions.languageStandard = 'c++11'
 		cfg.defines([
 				'_stricmp': 'strcasecmp',
 				'_strnicmp': 'strncasecmp',
 				'_strdup': 'strdup',
 				'_unlink': 'unlink',
 				'_vsnprintf': 'vsnprintf',
-		])
+				'_vsnwprintf' : 'vswprintf',
+		]);
+
 		if (useGcc) {
 			// Produce code optimized for the most common IA32/AMD64/EM64T processors.
 			// As new processors are deployed in the marketplace, the behavior of this option will change.
@@ -183,7 +185,7 @@ void setupToolchain(NativeBinarySpec b) {
 	}
 
 	if (rehldsFixes) {
-		cfg.singleDefines 'REHLDS_FIXES', 'REHLDS_CHECKS'
+		cfg.singleDefines 'REHLDS_FIXES', 'REHLDS_CHECKS', 'HAVE_OPT_STRTOOLS'
 	}
 
 	ToolchainConfigUtils.apply(project, cfg, b)

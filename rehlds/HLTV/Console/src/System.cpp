@@ -143,7 +143,7 @@ bool System::RegisterCommand(char *name, ISystemModule *module, int commandID)
 
 	cmd = (command_t *)malloc(sizeof(command_t));
 
-	strcopy(cmd->name, name);
+	Q_strlcpy(cmd->name, name);
 	cmd->module = module;
 	cmd->commandID = commandID;
 
@@ -355,7 +355,7 @@ bool System::Init(IBaseSystem *system, int serial, char *name)
 		SetName("system");
 	}
 
-	strcopy(m_BaseDir, GetBaseDir());
+	Q_strlcpy(m_BaseDir, GetBaseDir());
 
 	m_Developer = CheckParam("-dev") ? true : false;
 	if (!m_Console.Init(this))
@@ -480,7 +480,7 @@ void System::StopVGUI()
 
 void System::SetName(char *newName)
 {
-	strcopy(m_Name, newName);
+	Q_strlcpy(m_Name, newName);
 }
 
 void System::RunFrame(double time)
@@ -776,7 +776,7 @@ void System::CMD_Quit(char *cmdLine)
 void System::OpenLogFile(char *filename)
 {
 	CloseLogFile();
-	strcopy(m_LogFileName, filename);
+	Q_strlcpy(m_LogFileName, filename);
 
 	m_LogFile = m_FileSystem->Open(m_LogFileName, "wt");
 	if (!m_LogFile)
@@ -866,7 +866,7 @@ void System::ExecuteCommandLine()
 		}
 
 		memset(string, 0, sizeof(string));
-		strcopy(string, token + 1);
+		Q_strlcpy(string, token + 1);
 
 		// next iteration
 		token = m_Parameters.GetToken(++i);
@@ -942,7 +942,7 @@ void System::CMD_UnloadModule(char *cmdLine)
 System::library_t *System::GetLibrary(char *name)
 {
 	char fixedname[MAX_PATH];
-	strcopy(fixedname, name);
+	Q_strlcpy(fixedname, name);
 	COM_FixSlashes(fixedname);
 
 	library_t *lib = (library_t *)m_Libraries.GetFirst();
@@ -1033,7 +1033,7 @@ Panel *System::GetPanel()
 
 void System::SetStatusLine(char *text)
 {
-	strcopy(m_StatusLine, text);
+	Q_strlcpy(m_StatusLine, text);
 }
 
 void System::ShowConsole(bool visible)

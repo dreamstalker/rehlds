@@ -103,8 +103,10 @@
 	#ifndef CDECL
 		#define CDECL __cdecl
 	#endif
+	#define FASTCALL __fastcall
 	#define STDCALL __stdcall
 	#define HIDDEN
+	#define FORCEINLINE __forceinline
 	#define NOINLINE __declspec(noinline)
 	#define ALIGN16 __declspec(align(16))
 	#define NORETURN __declspec(noreturn)
@@ -147,9 +149,11 @@
 	typedef unsigned short WORD;
 	typedef unsigned int UNINT32;
 
+	#define FASTCALL
 	#define CDECL __attribute__ ((cdecl))
 	#define STDCALL __attribute__ ((stdcall))
 	#define HIDDEN __attribute__((visibility("hidden")))
+	#define FORCEINLINE inline
 	#define NOINLINE __attribute__((noinline))
 	#define ALIGN16 __attribute__((aligned(16)))
 	#define NORETURN __attribute__((noreturn))

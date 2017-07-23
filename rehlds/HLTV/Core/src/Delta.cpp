@@ -1192,7 +1192,7 @@ bool Delta::ParseField(int count, delta_definition_t *pdefinition, delta_link_t 
 		return false;
 	}
 
-	strcopy(pField->delta->fieldName, com_token);
+	Q_strlcpy(pField->delta->fieldName, com_token);
 	pField->delta->fieldOffset = FindOffset(count, pdefinition, com_token);
 
 	*pstream = COM_Parse(*pstream);
@@ -1399,7 +1399,7 @@ bool Delta::ParseDescription(char *name, delta_t **ppdesc, char *pstream)
 
 			if (_stricmp(com_token, "none"))
 			{
-				strcopy(source, com_token);
+				Q_strlcpy(source, com_token);
 
 				// Parse custom encoder function name
 				pstream = COM_Parse(pstream);
@@ -1408,7 +1408,7 @@ bool Delta::ParseDescription(char *name, delta_t **ppdesc, char *pstream)
 					return false;
 				}
 
-				strcopy(encoder, com_token);
+				Q_strlcpy(encoder, com_token);
 			}
 
 			// Parse fields
@@ -1439,7 +1439,7 @@ bool Delta::ParseDescription(char *name, delta_t **ppdesc, char *pstream)
 
 	if (encoder[0])
 	{
-		strcopy((*ppdesc)->conditionalencodename, encoder);
+		Q_strlcpy((*ppdesc)->conditionalencodename, encoder);
 		(*ppdesc)->conditionalencodename[sizeof((*ppdesc)->conditionalencodename) - 1] = '\0';
 		(*ppdesc)->conditionalencode = nullptr;
 	}

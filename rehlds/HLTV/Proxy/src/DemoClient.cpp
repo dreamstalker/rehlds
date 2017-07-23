@@ -297,7 +297,7 @@ void DemoClient::SetWorld(IWorld *world)
 
 void DemoClient::SetFileName(char *fileName)
 {
-	strcopy(m_BaseFileName, fileName);
+	Q_strlcpy(m_BaseFileName, fileName);
 }
 
 DemoFile *DemoClient::GetDemoFile()

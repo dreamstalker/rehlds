@@ -148,8 +148,8 @@ bool Server::Init(IBaseSystem *system, int serial, char *name)
 	m_ClientData.Clear();
 	m_DemoData.Clear();
 
-	strcopy(m_CDKey, "2123437429222");
-	strcopy(m_HostName, "Unkown Host");
+	Q_strlcpy(m_CDKey, "2123437429222");
+	Q_strlcpy(m_HostName, "Unkown Host");
 
 	memset(m_SeqNrMap, 0, sizeof(m_SeqNrMap));
 	m_validSequence = 0;
@@ -612,7 +612,7 @@ void Server::SendConnectPacket()
 			return;
 		}
 
-		strcopy(buffer, MD5_GetCDKeyHash(m_CDKey));
+		Q_strlcpy(buffer, MD5_GetCDKeyHash(m_CDKey));
 	}
 
 	protinfo.SetValueForKey("prot", COM_VarArgs("%i", m_AuthProtocol));
@@ -787,9 +787,9 @@ void Server::ParseServerinfo()
 	char levelname[MAX_PATH];
 	int gametype = m_Instream->ReadByte();
 
-	strcopy(gamedir, m_Instream->ReadString());
-	strcopy(m_HostName, m_Instream->ReadString());
-	strcopy(levelname, m_Instream->ReadString());
+	Q_strlcpy(gamedir, m_Instream->ReadString());
+	Q_strlcpy(m_HostName, m_Instream->ReadString());
+	Q_strlcpy(levelname, m_Instream->ReadString());
 
 	m_Instream->SkipString();
 
@@ -853,7 +853,7 @@ void Server::ParseMoveVars()
 	movevars.skyvec_y          = m_Instream->ReadFloat();
 	movevars.skyvec_z          = m_Instream->ReadFloat();
 
-	strcopy(movevars.skyName, m_Instream->ReadString());
+	Q_strlcpy(movevars.skyName, m_Instream->ReadString());
 	m_World->SetMoveVars(&movevars);
 }
 
@@ -1096,7 +1096,7 @@ void Server::ParseResourceList()
 
 		resource.type = (resourcetype_t)m_Instream->ReadBits(4);
 
-		strcopy(resource.szFileName, m_Instream->ReadBitString());
+		Q_strlcpy(resource.szFileName, m_Instream->ReadBitString());
 
 		resource.nIndex = m_Instream->ReadBits(12);
 		resource.nDownloadSize = m_Instream->ReadBits(24);
@@ -1348,7 +1348,7 @@ void Server::ParseSignonNum()
 		SendStringCommand(COM_VarArgs("VModEnable %d", m_IsVoiceBlocking ? 0 : 1));
 
 		char string[128];
-		strcopy(string, "vban");
+		Q_strlcpy(string, "vban");
 
 		for (int i = 0; i < MAX_CLIENTS; i++) {
 			strcat(string, " 0");
@@ -1373,7 +1373,7 @@ void Server::ParseCustomization()
 	resource_t *resource = (resource_t *)Mem_ZeroMalloc(sizeof(resource_t));
 	resource->type = (resourcetype_t)m_Instream->ReadByte();
 
-	strcopy(resource->szFileName, m_Instream->ReadString());
+	Q_strlcpy(resource->szFileName, m_Instream->ReadString());
 
 	resource->nIndex = m_Instream->ReadShort();
 	resource->nDownloadSize = m_Instream->ReadLong();
@@ -1477,7 +1477,7 @@ bool Server::ParseUserMessage(int cmd)
 		SendStringCommand(cmdString);
 
 		char string[128];
-		strcopy(string, "vban");
+		Q_strlcpy(string, "vban");
 
 		for (int i = 0; i < MAX_CLIENTS; i++) {
 			strcat(string, " 0");
@@ -1869,11 +1869,11 @@ void Server::ParseInfo(BitBuffer *stream, bool detailed)
 {
 	serverinfo_t si;
 
-	strcopy(si.address, m_ServerChannel.GetTargetAddress()->ToBaseString());
-	strcopy(si.name, stream->ReadString());
-	strcopy(si.map, stream->ReadString());
-	strcopy(si.gamedir, stream->ReadString());
-	strcopy(si.description, stream->ReadString());
+	Q_strlcpy(si.address, m_ServerChannel.GetTargetAddress()->ToBaseString());
+	Q_strlcpy(si.name, stream->ReadString());
+	Q_strlcpy(si.map, stream->ReadString());
+	Q_strlcpy(si.gamedir, stream->ReadString());
+	Q_strlcpy(si.description, stream->ReadString());
 
 	si.activePlayers = stream->ReadByte();
 	si.maxPlayers = stream->ReadByte();
@@ -1888,9 +1888,9 @@ void Server::ParseInfo(BitBuffer *stream, bool detailed)
 
 		if (si.mod)
 		{
-			strcopy(si.url_info, stream->ReadString());
-			strcopy(si.url_dl, stream->ReadString());
-			strcopy(si.hlversion, stream->ReadString());
+			Q_strlcpy(si.url_info, stream->ReadString());
+			Q_strlcpy(si.url_dl, stream->ReadString());
+			Q_strlcpy(si.hlversion, stream->ReadString());
 
 			si.ver = stream->ReadLong();
 			si.size = stream->ReadLong();
@@ -2211,7 +2211,7 @@ void Server::ParseResourceLocation()
 {
 	char *url = m_Instream->ReadString();
 	if (url) {
-		strcopy(g_DownloadURL, url);
+		Q_strlcpy(g_DownloadURL, url);
 	}
 }
 
@@ -2313,7 +2313,7 @@ char *Server::GetCmdName(int cmd)
 
 void Server::SetName(char *newName)
 {
-	strcopy(m_Name, newName);
+	Q_strlcpy(m_Name, newName);
 }
 
 void Server::ProcessEntityUpdate()

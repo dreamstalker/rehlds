@@ -235,7 +235,7 @@ void SystemWrapper::CMD_UnloadModule(char *cmdLine)
 SystemWrapper::library_t *SystemWrapper::GetLibrary(char *name)
 {
 	char fixedname[MAX_PATH];
-	strcopy(fixedname, name);
+	Q_strlcpy(fixedname, name);
 	COM_FixSlashes(fixedname);
 
 	library_t *lib = (library_t *)m_Libraries.GetFirst();
@@ -364,7 +364,7 @@ bool SystemWrapper::RegisterCommand(char *name, ISystemModule *module, int comma
 
 	cmd = (command_t *)Mem_ZeroMalloc(sizeof(command_t));
 
-	strcopy(cmd->name, name);
+	Q_strlcpy(cmd->name, name);
 	cmd->module = module;
 	cmd->commandID = commandID;
 
