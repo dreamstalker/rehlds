@@ -144,10 +144,11 @@ inline char *_strlwr(char *start)
 	#define Q_fmod fmod
 #endif // #if defined(ASMLIB_H) && defined(HAVE_OPT_STRTOOLS)
 
-template <size_t N>
-char *Q_strlcpy(char (&dest)[N], const char *src) {
-	Q_strncpy(dest, src, N - 1);
-	dest[N - 1] = '\0';
+// a safe variant of strcpy that truncates the result to fit in the destination buffer
+template <size_t size>
+char *Q_strlcpy(char (&dest)[size], const char *src) {
+	Q_strncpy(dest, src, size - 1);
+	dest[size - 1] = '\0';
 	return dest;
 }
 
@@ -157,19 +158,30 @@ inline char *Q_strnlcpy(char *dest, const char *src, size_t n) {
 	return dest;
 }
 
-template <size_t N>
-size_t Q_strlcat(char (&dest)[N], const char *src)
+// safely concatenate two strings.
+// a variant of strcat that truncates the result to fit in the destination buffer
+template <size_t size>
+size_t Q_strlcat(char (&dest)[size], const char *src)
 {
-	size_t dstlen = Q_strlen(dest);
-	size_t size = N - dstlen + 1;
+	size_t srclen; // Length of source string
+	size_t dstlen; // Length of destination string
 
-	if (!size) {
+	// Figure out how much room is left
+	dstlen = Q_strlen(dest);
+	size_t length = size - dstlen + 1;
+
+	if (!length) {
+		// No room, return immediately
 		return dstlen;
 	}
 
-	size_t srclen = Q_strlen(src);
-	if (srclen > size)
-		srclen = size;
+	// Figure out how much room is needed
+	srclen = Q_strlen(src);
+
+	// Copy the appropriate amount
+	if (srclen > length) {
+		srclen = length;
+	}
 
 	Q_memcpy(dest + dstlen, src, srclen);
 	dest[dstlen + srclen] = '\0';
@@ -192,7 +204,7 @@ inline void Q_FixSlashes(char *pname, char separator = CORRECT_PATH_SEPARATOR)
 }
 
 // strcpy that works correctly with overlapping src and dst buffers
-inline char *strcpy_safe(char *dst, char *src) {
+inline char *Q_strcpy_s(char *dst, char *src) {
 	int len = Q_strlen(src);
 	Q_memmove(dst, src, len + 1);
 	return dst;

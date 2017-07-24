@@ -37,8 +37,8 @@ void BSPModel::Init(IBaseSystem *system)
 	m_wadpath = nullptr;
 	m_IsMinimal = false;
 
-	memset(&m_model, 0, sizeof(m_model));
-	memset(m_novis, 0xFF, sizeof(m_novis));
+	Q_memset(&m_model, 0, sizeof(m_model));
+	Q_memset(m_novis, 0xFF, sizeof(m_novis));
 }
 
 bool BSPModel::Load(const char *name, bool minimal)
@@ -192,7 +192,7 @@ void BSPModel::DecompressPVS(unsigned char *in, unsigned char *decompressed, int
 	if (in == nullptr)
 	{
 		// Make all visible
-		memcpy(decompressed, m_novis, byteCount);
+		Q_memcpy(decompressed, m_novis, byteCount);
 		return;
 	}
 
@@ -216,7 +216,7 @@ void BSPModel::DecompressPVS(unsigned char *in, unsigned char *decompressed, int
 		}
 
 		// Unpack zeros
-		memset(out, 0, c);
+		Q_memset(out, 0, c);
 		out += c;
 	}
 }
@@ -372,7 +372,7 @@ void BSPModel::LoadVisibility(lump_t *l)
 		return;
 	}
 
-	memcpy(m_model.visdata, m_base + l->fileofs, l->filelen);
+	Q_memcpy(m_model.visdata, m_base + l->fileofs, l->filelen);
 }
 
 bool BSPModel::IsValid()
@@ -445,7 +445,7 @@ void BSPModel::Clear()
 
 	Free(m_wadpath);
 
-	memset(&m_model, 0, sizeof(m_model));
+	Q_memset(&m_model, 0, sizeof(m_model));
 
 	m_visframecount = 0;
 	m_wadpath = nullptr;
@@ -536,7 +536,7 @@ void BSPModel::MakeHull0()
 bool BSPModel::TraceLine(vec_t *start, vec_t *end, vec_t *impact)
 {
 	trace_t trace;
-	memset(&trace, 0, sizeof(trace));
+	Q_memset(&trace, 0, sizeof(trace));
 	auto res = RecursiveHullCheck(m_model.hulls, 0, 0, 1, start, end, &trace);
 	VectorCopy(trace.endpos, impact);
 	return res;
@@ -594,7 +594,7 @@ bool BSPModel::RecursiveHullCheck(hull_t *hull, int num, float p1f, float p2f, v
 		}
 
 		midf = midf / (t1 - t2);
-		midf = clamp(midf, 0.0f, 1.0f);
+		midf = Q_clamp(midf, 0.0f, 1.0f);
 
 		// not a number
 		if (!IS_NAN(midf))
@@ -836,21 +836,21 @@ void BSPModel::LoadEntities(lump_t *l)
 	}
 
 	m_model.entities = (char *)Mem_ZeroMalloc(l->filelen);
-	memcpy(m_model.entities, (const void *)(m_base + l->fileofs), l->filelen);
+	Q_memcpy(m_model.entities, (const void *)(m_base + l->fileofs), l->filelen);
 
 	char *pszInputStream = COM_Parse(m_model.entities);
 	if (*pszInputStream)
 	{
 		while (com_token[0] != '}')
 		{
-			if (!strcmp(com_token, "wad"))
+			if (!Q_strcmp(com_token, "wad"))
 			{
 				COM_Parse(pszInputStream);
 				if (m_wadpath) {
 					Mem_Free(m_wadpath);
 				}
 
-				m_wadpath = _strdup(com_token);
+				m_wadpath = Q_strdup(com_token);
 				return;
 			}
 
@@ -866,7 +866,7 @@ void BSPModel::LoadLighting(lump_t *l)
 	if (l->filelen)
 	{
 		m_model.lightdata = (color24 *)Mem_ZeroMalloc(l->filelen);
-		memcpy(m_model.lightdata, (const void *)(m_base + l->fileofs), l->filelen);
+		Q_memcpy(m_model.lightdata, (const void *)(m_base + l->fileofs), l->filelen);
 	}
 	else
 	{
@@ -923,12 +923,12 @@ void BSPModel::LoadFaces(lump_t *l)
 		{
 			// set the drawing flags flag
 			const char *texName = out->texinfo->texture->name;
-			if (!strncmp(texName, "sky", 3)) {
+			if (!Q_strncmp(texName, "sky", 3)) {
 				out->flags |= (SURF_DRAWSKY | SURF_DRAWTILED);
 				continue;
 			}
 
-			if (!strncmp(texName, "aaatrigger", 10)) {
+			if (!Q_strncmp(texName, "aaatrigger", 10)) {
 				out->flags |= (SURF_DRAWSKY | SURF_DRAWTILED);
 				continue;
 			}
@@ -1153,9 +1153,9 @@ void BSPModel::LoadTextures(lump_t *l)
 		tx = (texture_t *)Mem_ZeroMalloc(85 * pixels + 66);
 
 		m_model.textures[i] = tx;
-		memcpy(tx->name, mt->name, sizeof(tx->name));
+		Q_memcpy(tx->name, mt->name, sizeof(tx->name));
 
-		if (strchr(tx->name, '~')) {
+		if (Q_strchr(tx->name, '~')) {
 			tx->name[2] = ' ';
 		}
 

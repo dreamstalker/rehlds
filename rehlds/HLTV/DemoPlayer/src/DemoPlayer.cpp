@@ -93,7 +93,7 @@ bool DemoPlayer::Init(IBaseSystem *system, int serial, char *name)
 	m_IsSaving = false;
 	m_MasterMode = true;
 
-	memset(m_DemoFileName, 0, sizeof(m_DemoFileName));
+	Q_memset(m_DemoFileName, 0, sizeof(m_DemoFileName));
 
 	m_State = MODULE_RUNNING;
 	m_System->DPrintf("DemoPlayer module initialized.\n");
@@ -263,7 +263,7 @@ void DemoPlayer::CMD_Jump(char *cmdLine)
 		return;
 	}
 
-	SetWorldTime(atof(params.GetToken(1)), true);
+	SetWorldTime(Q_atof(params.GetToken(1)), true);
 	SetPaused(true);
 }
 
@@ -276,7 +276,7 @@ void DemoPlayer::CMD_ForceHLTV(char *cmdLine)
 	}
 
 	char *val = params.GetToken(1);
-	ForceHLTV(atoi(val) ? true : false);
+	ForceHLTV(Q_atoi(val) ? true : false);
 }
 
 void DemoPlayer::CMD_Save(char *cmdLine)
@@ -307,7 +307,7 @@ void DemoPlayer::CMD_Pause(char *cmdLine)
 	}
 
 	char *val = params.GetToken(1);
-	SetPaused(atoi(val) ? true : false);
+	SetPaused(Q_atoi(val) ? true : false);
 }
 
 void DemoPlayer::CMD_Speed(char *cmdLine)
@@ -323,7 +323,7 @@ void DemoPlayer::CMD_Speed(char *cmdLine)
 		return;
 	}
 
-	float timescale = (float)atof(params.GetToken(1));
+	float timescale = (float)Q_atof(params.GetToken(1));
 	SetTimeScale(timescale);
 }
 
@@ -456,7 +456,7 @@ void DemoPlayer::SetWorldTime(double time, bool relative)
 
 void DemoPlayer::SetTimeScale(float scale)
 {
-	m_TimeScale = clamp(scale, 0.05f, 4.0f);
+	m_TimeScale = Q_clamp(scale, 0.05f, 4.0f);
 
 	m_DemoStream.WriteByte(svc_timescale);
 	m_DemoStream.WriteFloat(m_TimeScale);
@@ -527,7 +527,7 @@ void DemoPlayer::GetDemoViewInfo(ref_params_t *rp, float *view, int *viewmodel)
 	oldcmd = rp->cmd;
 
 	demo_info_t *demoInfo = (demo_info_t *)frame->demoInfo;
-	memcpy(rp, &demoInfo->rp, sizeof(*rp));
+	Q_memcpy(rp, &demoInfo->rp, sizeof(*rp));
 
 	rp->viewport[0] = oldviewport[0];
 	rp->viewport[1] = oldviewport[1];
@@ -734,7 +734,7 @@ int DemoPlayer::ReadDemoMessage(unsigned char *buffer, int size)
 		return 0;
 	}
 
-	memcpy(buffer, m_DemoStream.GetData(), msgsize);
+	Q_memcpy(buffer, m_DemoStream.GetData(), msgsize);
 	m_DemoStream.FastClear();
 	return msgsize;
 }
@@ -836,7 +836,7 @@ void DemoPlayer::ShutDown()
 char *DemoPlayer::FormatTime(float time)
 {
 	static char timeCode[16];
-	_snprintf(timeCode, sizeof(timeCode), "%02u:%02u:%02u", (int)time / 60, (int)time % 60, (int)(time * 100) % 100);
+	Q_snprintf(timeCode, sizeof(timeCode), "%02u:%02u:%02u", (int)time / 60, (int)time % 60, (int)(time * 100) % 100);
 	return timeCode;
 }
 
@@ -1009,7 +1009,7 @@ void DemoPlayer::ExecuteDemoFileCommands(BitBuffer *stream)
 		case DemoCmd::PayLoad:
 		{
 			unsigned char data[32768];
-			memset(data, 0, sizeof(data));
+			Q_memset(data, 0, sizeof(data));
 
 			int length = stream->ReadLong();
 			stream->ReadBuf(length, data);

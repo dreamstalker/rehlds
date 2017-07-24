@@ -31,7 +31,7 @@
 InfoString::InfoString(char *string, unsigned int maxSize)
 	: m_String(nullptr), m_MaxSize(0)
 {
-	unsigned int len = strlen(string) + 1;
+	unsigned int len = Q_strlen(string) + 1;
 	if (len < maxSize) {
 		len = maxSize;
 	}
@@ -54,7 +54,7 @@ InfoString::InfoString(unsigned int maxSize)
 InfoString::InfoString(char *string)
 	: m_String(nullptr), m_MaxSize(0)
 {
-	unsigned int len = strlen(string) + 1;
+	unsigned int len = Q_strlen(string) + 1;
 	if (len < MAX_INFO_LEN) {
 		len = MAX_INFO_LEN;
 	}
@@ -77,12 +77,11 @@ bool InfoString::SetString(char *string)
 		return false;
 	}
 
-	if (strlen(string) >= m_MaxSize) {
+	if (Q_strlen(string) >= m_MaxSize) {
 		return false;
 	}
 
-	strncpy(m_String, string, m_MaxSize - 1);
-	m_String[m_MaxSize - 1] = '\0';
+	Q_strnlcpy(m_String, string, m_MaxSize);
 	return true;
 }
 
@@ -95,9 +94,8 @@ void InfoString::SetMaxSize(unsigned int maxSize)
 
 	if (m_String)
 	{
-		if (maxSize > strlen(m_String)) {
-			strncpy(newBuffer, m_String, maxSize - 1);
-			newBuffer[maxSize - 1] = '\0';
+		if (maxSize > Q_strlen(m_String)) {
+			Q_strnlcpy(newBuffer, m_String, maxSize);
 		}
 
 		Mem_Free(m_String);
@@ -114,13 +112,13 @@ int InfoString::GetMaxSize()
 
 int InfoString::GetCurrentSize()
 {
-	return strlen(m_String);
+	return Q_strlen(m_String);
 }
 
 void InfoString::Clear()
 {
 	if (m_String) {
-		memset(m_String, 0, m_MaxSize);
+		Q_memset(m_String, 0, m_MaxSize);
 	}
 }
 
@@ -200,7 +198,7 @@ char *InfoString::ValueForKey(const char *key)
 
 		*c = '\0';
 
-		if (!strcmp(key, pkey))
+		if (!Q_strcmp(key, pkey))
 		{
 			c = value[valueindex];
 			valueindex = (valueindex + 1) % MAX_INFO_VALUES;
@@ -223,11 +221,11 @@ bool InfoString::RemoveKey(const char *key)
 
 	s = m_String;
 
-	if (strchr(key, '\\')) {
+	if (Q_strchr(key, '\\')) {
 		return false;
 	}
 
-	cmpsize = strlen(key);
+	cmpsize = Q_strlen(key);
 	if (cmpsize > MAX_INFO_LEN - 1) {
 		cmpsize = MAX_INFO_LEN - 1;
 	}
@@ -292,10 +290,10 @@ bool InfoString::RemoveKey(const char *key)
 		*c = '\0';
 
 		// Compare keys
-		if (!strncmp(key, pkey, cmpsize) )
+		if (!Q_strncmp(key, pkey, cmpsize) )
 		{
 			found = true;
-			strcpy_safe(start, s);	// remove this part
+			Q_strcpy_s(start, s);	// remove this part
 			s = start;				// continue searching
 		}
 	}
@@ -374,7 +372,7 @@ void InfoString::RemovePrefixedKeys(char prefix)
 		// Compare prefix
 		if (pkey[0] == prefix)
 		{
-			strcpy_safe(start, s);	// remove this part
+			Q_strcpy_s(start, s);	// remove this part
 			s = start;				// continue searching
 		}
 	}
@@ -383,30 +381,30 @@ void InfoString::RemovePrefixedKeys(char prefix)
 bool InfoString::SetValueForStarKey(const char *key, const char *value)
 {
 	char newtoken[MAX_INFO_LEN + 4];
-	if (strstr(key, "\\") || strstr(value, "\\")) {
+	if (Q_strstr(key, "\\") || Q_strstr(value, "\\")) {
 		return false;
 	}
 
-	if (strstr(key, "\"") || strstr(value, "\"")) {
+	if (Q_strstr(key, "\"") || Q_strstr(value, "\"")) {
 		return false;
 	}
 
-	if (strlen(key) > MAX_INFO_KEY || strlen(value) > MAX_INFO_VALUE) {
+	if (Q_strlen(key) > MAX_INFO_KEY || Q_strlen(value) > MAX_INFO_VALUE) {
 		return false;
 	}
 
 	// Remove current key/value and return if we doesn't specified to set a value
 	RemoveKey(key);
 
-	if (!strlen(value)) {
+	if (!Q_strlen(value)) {
 		return true;
 	}
 
 	// Create key/value pair
-	_snprintf(newtoken, sizeof(newtoken), "\\%s\\%s", key, value);
+	Q_snprintf(newtoken, sizeof(newtoken), "\\%s\\%s", key, value);
 
-	int length = strlen(m_String);
-	if ((length + strlen(newtoken)) < m_MaxSize)
+	int length = Q_strlen(m_String);
+	if ((length + Q_strlen(newtoken)) < m_MaxSize)
 	{
 		char *v = newtoken;
 		char *s = m_String + length;

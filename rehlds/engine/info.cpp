@@ -170,7 +170,7 @@ void Info_RemoveKey(char *s, const char *key)
 		// Compare keys
 		if (!Q_strncmp(key, pkey, cmpsize))
 		{
-			strcpy_safe(start, s);	// remove this part
+			Q_strcpy_s(start, s);	// remove this part
 			s = start;	// continue searching
 		}
 	}
@@ -235,7 +235,7 @@ void Info_RemovePrefixedKeys(char *s, const char prefix)
 
 		if (pkey[0] == prefix)
 		{
-			strcpy_safe(start, s);	// remove this part
+			Q_strcpy_s(start, s);	// remove this part
 			s = start;	// continue searching
 		}
 	}

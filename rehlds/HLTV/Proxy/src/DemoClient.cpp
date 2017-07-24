@@ -37,7 +37,7 @@ DemoClient::DemoClient()
 	m_LastFrameSeqNr = 0;
 	m_IsActive = false;
 
-	memset(m_BaseFileName, 0, sizeof(m_BaseFileName));
+	Q_memset(m_BaseFileName, 0, sizeof(m_BaseFileName));
 }
 
 bool DemoClient::Init(IBaseSystem *system, int serial, char *name)
@@ -49,7 +49,7 @@ bool DemoClient::Init(IBaseSystem *system, int serial, char *name)
 	m_ClientDelta = 0;
 	m_IsActive = false;
 
-	memset(m_BaseFileName, 0, sizeof(m_BaseFileName));
+	Q_memset(m_BaseFileName, 0, sizeof(m_BaseFileName));
 	m_DemoInfo.SetMaxSize(MAX_DEMO_INFO);
 
 	m_State = MODULE_RUNNING;
@@ -61,7 +61,7 @@ bool DemoClient::Init(IBaseSystem *system, int serial, char *name)
 char *DemoClient::GetStatusLine()
 {
 	static char string[256];
-	_snprintf(string, sizeof(string), "Recording to %s (%.1f seconds)\n", m_DemoFile.GetFileName(), m_DemoFile.GetDemoTime());
+	Q_snprintf(string, sizeof(string), "Recording to %s (%.1f seconds)\n", m_DemoFile.GetFileName(), m_DemoFile.GetDemoTime());
 	return string;
 }
 
@@ -179,7 +179,7 @@ void DemoClient::WriteDatagram(double time, frame_t *frame)
 		COM_FileBase(m_World->GetLevelName(), mapname);
 
 		char fileName[MAX_PATH];
-		_snprintf(fileName, sizeof(fileName), "%s-%s-%s.dem", m_BaseFileName, COM_TimeString(), mapname);
+		Q_snprintf(fileName, sizeof(fileName), "%s-%s-%s.dem", m_BaseFileName, COM_TimeString(), mapname);
 
 		m_DemoFile.StartRecording(fileName);
 		m_Proxy->WriteSignonData(TYPE_DEMO, &m_DemoChannel.m_reliableStream);
@@ -208,7 +208,7 @@ void DemoClient::WriteDatagram(double time, frame_t *frame)
 	m_DemoChannel.TransmitOutgoing();
 
 	client_data_t cdata;
-	memset(&cdata, 0, sizeof(cdata));
+	Q_memset(&cdata, 0, sizeof(cdata));
 	m_DemoFile.WriteUpdateClientData(&cdata);
 }
 

@@ -52,8 +52,8 @@ char *CopyString(const char *src)
 	if (!src)
 		return nullptr;
 
-	char *out = (char *)new char[strlen(src) + 1];
-	strcpy(out, src);
+	char *out = (char *)new char[Q_strlen(src) + 1];
+	Q_strcpy(out, src);
 	return out;
 }
 
@@ -65,21 +65,21 @@ void CCommandLine::CreateCmdLine(int argc, const char *argv[])
 
 	for (int i = 0; i < argc; ++i)
 	{
-		if (strchr(argv[i], ' '))
+		if (Q_strchr(argv[i], ' '))
 		{
-			strncat(cmdline, "\"", MAX_CHARS);
-			strncat(cmdline, argv[i], MAX_CHARS);
-			strncat(cmdline, "\"", MAX_CHARS);
+			Q_strlcat(cmdline, "\"");
+			Q_strlcat(cmdline, argv[i]);
+			Q_strlcat(cmdline, "\"");
 		}
 		else
 		{
-			strncat(cmdline, argv[i], MAX_CHARS);
+			Q_strlcat(cmdline, argv[i]);
 		}
 
-		strncat(cmdline, " ", MAX_CHARS);
+		Q_strlcat(cmdline, " ");
 	}
 
-	cmdline[strlen(cmdline)] = '\0';
+	cmdline[Q_strlen(cmdline)] = '\0';
 	CreateCmdLine(cmdline);
 }
 
@@ -184,9 +184,9 @@ void CCommandLine::CreateCmdLine(const char *commandline)
 
 	*pDst = '\0';
 
-	int len = strlen(szFull) + 1;
+	int len = Q_strlen(szFull) + 1;
 	m_pszCmdLine = new char[len];
-	memcpy(m_pszCmdLine, szFull, len);
+	Q_memcpy(m_pszCmdLine, szFull, len);
 }
 
 // Purpose: Remove specified string ( and any args attached to it ) from command line
@@ -207,8 +207,8 @@ void CCommandLine::RemoveParm(const char *pszParm)
 	p = m_pszCmdLine;
 	while (*p)
 	{
-		curlen = strlen(p);
-		found = strstr(p, pszParm);
+		curlen = Q_strlen(p);
+		found = Q_strstr(p, pszParm);
 
 		if (!found)
 			break;
@@ -223,21 +223,21 @@ void CCommandLine::RemoveParm(const char *pszParm)
 			// # of characters after this param.
 			n = curlen - (pnextparam - p);
 
-			memcpy(found, pnextparam, n);
+			Q_memcpy(found, pnextparam, n);
 			found[n] = '\0';
 		}
 		else
 		{
 			// Clear out rest of string.
 			n = pnextparam - found;
-			memset(found, 0, n);
+			Q_memset(found, 0, n);
 		}
 	}
 
 	// Strip and trailing ' ' characters left over.
 	while (1)
 	{
-		int curpos = strlen(m_pszCmdLine);
+		int curpos = Q_strlen(m_pszCmdLine);
 		if (curpos == 0 || m_pszCmdLine[ curpos - 1 ] != ' ')
 			break;
 
@@ -252,11 +252,11 @@ void CCommandLine::AppendParm(const char *pszParm, const char *pszValues)
 	char *pCmdString;
 
 	// Parameter.
-	nNewLength = strlen(pszParm);
+	nNewLength = Q_strlen(pszParm);
 
 	// Values + leading space character.
 	if (pszValues)
-		nNewLength += strlen(pszValues) + 1;
+		nNewLength += Q_strlen(pszValues) + 1;
 
 	// Terminal 0;
 	nNewLength++;
@@ -264,11 +264,11 @@ void CCommandLine::AppendParm(const char *pszParm, const char *pszValues)
 	if (!m_pszCmdLine)
 	{
 		m_pszCmdLine = new char[ nNewLength ];
-		strcpy(m_pszCmdLine, pszParm);
+		Q_strcpy(m_pszCmdLine, pszParm);
 		if (pszValues)
 		{
-			strcat(m_pszCmdLine, " ");
-			strcat(m_pszCmdLine, pszValues);
+			Q_strcat(m_pszCmdLine, " ");
+			Q_strcat(m_pszCmdLine, pszValues);
 		}
 
 		return;
@@ -277,19 +277,19 @@ void CCommandLine::AppendParm(const char *pszParm, const char *pszValues)
 	// Remove any remnants from the current Cmd Line.
 	RemoveParm(pszParm);
 
-	nNewLength += strlen(m_pszCmdLine) + 1 + 1;
+	nNewLength += Q_strlen(m_pszCmdLine) + 1 + 1;
 
 	pCmdString = new char[ nNewLength ];
-	memset(pCmdString, 0, nNewLength);
+	Q_memset(pCmdString, 0, nNewLength);
 
-	strcpy(pCmdString, m_pszCmdLine);	// Copy old command line.
-	strcat(pCmdString, " ");		// Put in a space
-	strcat(pCmdString, pszParm);
+	Q_strcpy(pCmdString, m_pszCmdLine);	// Copy old command line.
+	Q_strcat(pCmdString, " ");			// Put in a space
+	Q_strcat(pCmdString, pszParm);
 
 	if (pszValues)
 	{
-		strcat(pCmdString, " ");
-		strcat(pCmdString, pszValues);
+		Q_strcat(pCmdString, " ");
+		Q_strcat(pCmdString, pszValues);
 	}
 
 	// Kill off the old one
@@ -308,7 +308,7 @@ void CCommandLine::SetParm(const char *pszParm, const char *pszValues)
 void CCommandLine::SetParm(const char *pszParm, int iValue)
 {
 	char buf[64];
-	_snprintf(buf, sizeof(buf), "%d", iValue);
+	Q_snprintf(buf, sizeof(buf), "%d", iValue);
 	SetParm(pszParm, buf);
 }
 
@@ -323,7 +323,7 @@ const char *CCommandLine::CheckParm(const char *psz, char **ppszValue) const
 	if (ppszValue)
 		*ppszValue = nullptr;
 
-	char *pret = strstr(m_pszCmdLine, psz);
+	char *pret = Q_strstr(m_pszCmdLine, psz);
 	if (!pret || !ppszValue)
 		return pret;
 
@@ -345,7 +345,7 @@ const char *CCommandLine::CheckParm(const char *psz, char **ppszValue) const
 
 	sz[i] = '\0';
 	*ppszValue = sz;
-	
+
 	return pret;
 }
 

@@ -47,7 +47,7 @@ bool World::Init(IBaseSystem *system, int serial, char *name)
 	m_SignonData.Resize(MAX_BUFFER_SIGNONDATA);
 	m_ServerInfo.SetMaxSize(MAX_SERVERINFO_STRING);
 
-	memset(m_HostName, 0, sizeof(m_HostName));
+	Q_memset(m_HostName, 0, sizeof(m_HostName));
 	Q_strlcpy(m_ServerName, "Unnamed HLTV");
 
 	m_Frames.Init();
@@ -61,7 +61,7 @@ bool World::Init(IBaseSystem *system, int serial, char *name)
 
 	char *maxCacheparam = m_System->CheckParam("-cachesize");
 	if (maxCacheparam) {
-		m_MaxCacheIndex = atoi(maxCacheparam);
+		m_MaxCacheIndex = Q_atoi(maxCacheparam);
 	}
 
 	if (m_MaxCacheIndex <= 0) {
@@ -134,7 +134,7 @@ void World::Reset()
 	m_StartTime = 0;
 	m_VoiceEnabled = false;
 
-	memset(m_ClientFallback, 0, sizeof(m_ClientFallback));
+	Q_memset(m_ClientFallback, 0, sizeof(m_ClientFallback));
 
 	m_AllowCheats = false;
 	m_IsHLTV = false;
@@ -170,7 +170,7 @@ void World::ClearUserMessages()
 bool World::AddUserMessage(int msgNumber, int size, char *name)
 {
 	UserMsg umsg;
-	memset(&umsg, 0, sizeof(umsg));
+	Q_memset(&umsg, 0, sizeof(umsg));
 
 	umsg.iMsg = msgNumber;
 	umsg.iSize = size;
@@ -184,7 +184,7 @@ bool World::AddUserMessage(int msgNumber, int size, char *name)
 	bool bFound = false;
 	for (UserMsg *pList = m_ClientUserMsgs; pList; pList = pList->next)
 	{
-		if (!_stricmp(pList->szName, umsg.szName)) {
+		if (!Q_stricmp(pList->szName, umsg.szName)) {
 			bFound = true;
 			pList->iMsg = umsg.iMsg;
 			pList->iSize = umsg.iSize;
@@ -194,7 +194,7 @@ bool World::AddUserMessage(int msgNumber, int size, char *name)
 	if (!bFound)
 	{
 		UserMsg *pumsg = (UserMsg *)Mem_Malloc(sizeof(UserMsg));
-		memcpy(pumsg, &umsg, sizeof(*pumsg));
+		Q_memcpy(pumsg, &umsg, sizeof(*pumsg));
 		pumsg->next = m_ClientUserMsgs;
 		m_ClientUserMsgs = pumsg;
 		return true;
@@ -218,7 +218,7 @@ void World::UpdatePlayer(int playerNum, int userId, char *infostring, char *hash
 
 	player->active = true;
 	player->userid = userId;
-	memcpy(player->hashedcdkey, hashedcdkey, sizeof(player->hashedcdkey));
+	Q_memcpy(player->hashedcdkey, hashedcdkey, sizeof(player->hashedcdkey));
 
 	m_System->DPrintf("Player update(%i:%s)\n", playerNum, player->name);
 	infostr.RemovePrefixedKeys('_');
@@ -227,10 +227,10 @@ void World::UpdatePlayer(int playerNum, int userId, char *infostring, char *hash
 	Q_strlcpy(player->name, infostr.ValueForKey("name"));
 	Q_strlcpy(player->model, infostr.ValueForKey("model"));
 
-	player->topcolor    = atoi(infostr.ValueForKey("topcolor"));
-	player->bottomcolor = atoi(infostr.ValueForKey("bottomcolor"));
-	player->spectator   = atoi(infostr.ValueForKey("*hltv"));
-	player->trackerID   = atoi(infostr.ValueForKey("*fid"));
+	player->topcolor    = Q_atoi(infostr.ValueForKey("topcolor"));
+	player->bottomcolor = Q_atoi(infostr.ValueForKey("bottomcolor"));
+	player->spectator   = Q_atoi(infostr.ValueForKey("*hltv"));
+	player->trackerID   = Q_atoi(infostr.ValueForKey("*fid"));
 
 	BaseSystemModule::FireSignal(4, &playerNum);
 }
@@ -242,7 +242,7 @@ bool World::AddResource(resource_t *resource)
 		return false;
 	}
 
-	memcpy(newresource, resource, sizeof(*newresource));
+	Q_memcpy(newresource, resource, sizeof(*newresource));
 
 	newresource->data = nullptr;
 	newresource->pNext = m_ResourcesList;
@@ -284,7 +284,7 @@ void World::AddBaselineEntity(int index, entity_state_t *ent)
 		return;
 	}
 
-	memcpy(&m_BaseLines[index], ent, sizeof(m_BaseLines[index]));
+	Q_memcpy(&m_BaseLines[index], ent, sizeof(m_BaseLines[index]));
 }
 
 bool World::IsPlayerIndex(int index)
@@ -298,7 +298,7 @@ bool World::IsPlayerIndex(int index)
 
 void World::ClearBaseline()
 {
-	memset(m_BaseLines, 0, sizeof(m_BaseLines));
+	Q_memset(m_BaseLines, 0, sizeof(m_BaseLines));
 
 	for (auto& base : m_BaseLines) {
 		base.entityType = ENTITY_UNINITIALIZED;
@@ -307,7 +307,7 @@ void World::ClearBaseline()
 
 void World::ClearInstancedBaseline()
 {
-	memset(m_Instanced_BaseLines, 0, sizeof(m_Instanced_BaseLines));
+	Q_memset(m_Instanced_BaseLines, 0, sizeof(m_Instanced_BaseLines));
 }
 
 void World::AddInstancedBaselineEntity(int index, entity_state_t *ent)
@@ -317,7 +317,7 @@ void World::AddInstancedBaselineEntity(int index, entity_state_t *ent)
 		return;
 	}
 
-	memcpy(&m_Instanced_BaseLines[index], ent, sizeof(m_Instanced_BaseLines[index]));
+	Q_memcpy(&m_Instanced_BaseLines[index], ent, sizeof(m_Instanced_BaseLines[index]));
 }
 
 void World::SetTime(double newTime)
@@ -329,7 +329,7 @@ void World::SetTime(double newTime)
 void World::SetHostName(char *name)
 {
 	if (!name || !name[0]) {
-		memset(m_HostName, 0, sizeof(m_HostName));
+		Q_memset(m_HostName, 0, sizeof(m_HostName));
 		return;
 	}
 
@@ -338,7 +338,7 @@ void World::SetHostName(char *name)
 
 void World::ClearLightStyles()
 {
-	memset(m_Lightstyles, 0, sizeof(m_Lightstyles));
+	Q_memset(m_Lightstyles, 0, sizeof(m_Lightstyles));
 }
 
 void World::AddLightStyle(int index, char *style)
@@ -348,7 +348,7 @@ void World::AddLightStyle(int index, char *style)
 		return;
 	}
 
-	int length = strlen(style);
+	int length = Q_strlen(style);
 	if (length >= sizeof(m_Lightstyles[0])) {
 		m_System->Printf("WARNING! World::SetLightStyle: style too long (%i).\n", length);
 	}
@@ -443,7 +443,7 @@ bool World::IsActive()
 
 void World::ClearPlayers()
 {
-	memset(m_Players, 0, sizeof(m_Players));
+	Q_memset(m_Players, 0, sizeof(m_Players));
 }
 
 void World::SetServerInfoString(char *infostring)
@@ -464,7 +464,7 @@ void World::WriteBaseline(BitBuffer *stream)
 	bool custom = false;
 	int entnum = 0;
 	entity_state_t nullstate;
-	memset(&nullstate, 0, sizeof(entity_state_t));
+	Q_memset(&nullstate, 0, sizeof(entity_state_t));
 
 	for (auto& base : m_BaseLines)
 	{
@@ -515,7 +515,7 @@ char *World::GetHostName()
 void World::WriteServerinfo(BitBuffer *stream)
 {
 	char message[2048];
-	_snprintf(message, sizeof(message), "Protocol Version %i, Spawn count %i %s\n", m_Protocol, m_ServerCount, m_IsHLTV ? "(HLTV)" : "");
+	Q_snprintf(message, sizeof(message), "Protocol Version %i, Spawn count %i %s\n", m_Protocol, m_ServerCount, m_IsHLTV ? "(HLTV)" : "");
 
 	stream->WriteByte(svc_print);
 	stream->WriteString(message);
@@ -564,7 +564,7 @@ void World::WriteDeltaDescriptions(BitBuffer *stream)
 	int i, c;
 
 	delta_description_t nulldesc;
-	memset(&nulldesc, 0, sizeof(nulldesc));
+	Q_memset(&nulldesc, 0, sizeof(nulldesc));
 
 	for (auto p = m_Delta.GetRegistry(); p; p = p->next)
 	{
@@ -637,7 +637,7 @@ void World::WriteRegisteredUserMessages(BitBuffer *stream)
 void World::WriteResources(BitBuffer *stream)
 {
 	unsigned char nullbuffer[32];
-	memset(nullbuffer, 0, sizeof(nullbuffer));
+	Q_memset(nullbuffer, 0, sizeof(nullbuffer));
 
 	if (g_DownloadURL[0])
 	{
@@ -662,7 +662,7 @@ void World::WriteResources(BitBuffer *stream)
 			stream->WriteBitData(resource->rgucMD5_hash, sizeof(resource->rgucMD5_hash));
 		}
 
-		if (!memcmp(resource->rguc_reserved, nullbuffer, sizeof(resource->rguc_reserved)))
+		if (!Q_memcmp(resource->rguc_reserved, nullbuffer, sizeof(resource->rguc_reserved)))
 		{
 			stream->WriteBit(0);
 		}
@@ -727,7 +727,7 @@ int World::AddFrame(frame_t *newFrame)
 
 		m_Delta.SetLargeTimeBufferSize(true);
 		BitBuffer tempStream(m_EntityBuffer, sizeof(m_EntityBuffer));
-		memset(m_EntityBuffer, 0, sizeof(m_EntityBuffer));
+		Q_memset(m_EntityBuffer, 0, sizeof(m_EntityBuffer));
 
 		compressedEntitiesSize = CompressFrame(newFrame, &tempStream);
 		m_Delta.SetLargeTimeBufferSize(false);
@@ -762,7 +762,7 @@ int World::AddFrame(frame_t *newFrame)
 
 	if (newFrame->entitiesSize)
 	{
-		memcpy(pdata, m_EntityBuffer, compressedEntitiesSize);
+		Q_memcpy(pdata, m_EntityBuffer, compressedEntitiesSize);
 		currentFrame->entities = pdata;
 		currentFrame->entitiesSize = compressedEntitiesSize;
 		currentFrame->entitynum = newFrame->entitynum;
@@ -771,7 +771,7 @@ int World::AddFrame(frame_t *newFrame)
 
 	if (newFrame->clientDataSize)
 	{
-		memcpy(pdata, newFrame->clientData, newFrame->clientDataSize);
+		Q_memcpy(pdata, newFrame->clientData, newFrame->clientDataSize);
 		currentFrame->clientData = pdata;
 		currentFrame->clientDataSize = newFrame->clientDataSize;
 		pdata += currentFrame->clientDataSize;
@@ -779,7 +779,7 @@ int World::AddFrame(frame_t *newFrame)
 
 	if (newFrame->eventsSize)
 	{
-		memcpy(pdata, newFrame->events, newFrame->eventsSize);
+		Q_memcpy(pdata, newFrame->events, newFrame->eventsSize);
 		currentFrame->events = pdata;
 		currentFrame->eventsSize = newFrame->eventsSize;
 		currentFrame->eventnum = newFrame->eventnum;
@@ -788,7 +788,7 @@ int World::AddFrame(frame_t *newFrame)
 
 	if (newFrame->reliableDataSize)
 	{
-		memcpy(pdata, newFrame->reliableData, newFrame->reliableDataSize);
+		Q_memcpy(pdata, newFrame->reliableData, newFrame->reliableDataSize);
 		currentFrame->reliableData = pdata;
 		currentFrame->reliableDataSize = newFrame->reliableDataSize;
 		pdata += currentFrame->reliableDataSize;
@@ -796,7 +796,7 @@ int World::AddFrame(frame_t *newFrame)
 
 	if (newFrame->unreliableDataSize)
 	{
-		memcpy(pdata, newFrame->unreliableData, newFrame->unreliableDataSize);
+		Q_memcpy(pdata, newFrame->unreliableData, newFrame->unreliableDataSize);
 		currentFrame->unreliableData = pdata;
 		currentFrame->unreliableDataSize = newFrame->unreliableDataSize;
 		pdata += currentFrame->unreliableDataSize;
@@ -804,7 +804,7 @@ int World::AddFrame(frame_t *newFrame)
 
 	if (newFrame->voiceDataSize)
 	{
-		memcpy(pdata, newFrame->voiceData, newFrame->voiceDataSize);
+		Q_memcpy(pdata, newFrame->voiceData, newFrame->voiceDataSize);
 		currentFrame->voiceData = pdata;
 		currentFrame->voiceDataSize = newFrame->voiceDataSize;
 		pdata += currentFrame->voiceDataSize;
@@ -812,7 +812,7 @@ int World::AddFrame(frame_t *newFrame)
 
 	if (newFrame->userMessagesSize)
 	{
-		memcpy(pdata, newFrame->userMessages, newFrame->userMessagesSize);
+		Q_memcpy(pdata, newFrame->userMessages, newFrame->userMessagesSize);
 		currentFrame->userMessages = pdata;
 		currentFrame->userMessagesSize = newFrame->userMessagesSize;
 		pdata += currentFrame->userMessagesSize;
@@ -820,7 +820,7 @@ int World::AddFrame(frame_t *newFrame)
 
 	if (newFrame->demoDataSize)
 	{
-		memcpy(pdata, newFrame->demoData, newFrame->demoDataSize);
+		Q_memcpy(pdata, newFrame->demoData, newFrame->demoDataSize);
 		currentFrame->demoData = pdata;
 		currentFrame->demoDataSize = newFrame->demoDataSize;
 		pdata += currentFrame->demoDataSize;
@@ -828,7 +828,7 @@ int World::AddFrame(frame_t *newFrame)
 
 	if (newFrame->demoInfo)
 	{
-		memcpy(pdata, newFrame->demoInfo, sizeof(demo_info_t));
+		Q_memcpy(pdata, newFrame->demoInfo, sizeof(demo_info_t));
 		currentFrame->demoInfo = pdata;
 	}
 
@@ -892,7 +892,7 @@ void World::WriteFrame(frame_t *frame, unsigned int lastFrameSeqnr, BitBuffer *r
 		if (GetClientData(frame, &clientData))
 		{
 			clientdata_t nullClientData;
-			memset(&nullClientData, 0, sizeof(nullClientData));
+			Q_memset(&nullClientData, 0, sizeof(nullClientData));
 
 			unreliableStream->WriteByte(svc_clientdata);
 			unreliableStream->StartBitMode();
@@ -990,7 +990,7 @@ bool World::GetClientData(frame_t *frame, clientdata_t *clientData)
 	}
 
 	clientdata_t BaseLineClientData;
-	memset(&BaseLineClientData, 0, sizeof(BaseLineClientData));
+	Q_memset(&BaseLineClientData, 0, sizeof(BaseLineClientData));
 
 	BitBuffer stream(frame->clientData, frame->clientDataSize);
 	stream.StartBitMode();
@@ -1011,7 +1011,7 @@ bool World::GetUncompressedFrame(frame_t *deltaFrame, frame_t *frame)
 		return false;
 	}
 
-	memcpy(frame, deltaFrame, sizeof(*frame));
+	Q_memcpy(frame, deltaFrame, sizeof(*frame));
 
 	frame->delta = 0;
 	frame->entitiesSize = deltaFrame->entitynum * sizeof(entity_state_t);
@@ -1039,10 +1039,10 @@ void World::ParseClientData(BitBuffer *stream, unsigned int deltaSeqNr, BitBuffe
 	weapon_data_t nullWeaponData;
 	clientdata_t fromClientData, nullClientData;
 
-	memset(&nullWeaponData, 0, sizeof(nullWeaponData));
-	memset(&fromClientData, 0, sizeof(fromClientData));
-	memset(&nullClientData, 0, sizeof(nullClientData));
-	memset(clientData, 0, sizeof(*clientData));
+	Q_memset(&nullWeaponData, 0, sizeof(nullWeaponData));
+	Q_memset(&fromClientData, 0, sizeof(fromClientData));
+	Q_memset(&nullClientData, 0, sizeof(nullClientData));
+	Q_memset(clientData, 0, sizeof(*clientData));
 
 	if (deltaSeqNr && !GetClientData(deltaSeqNr, &fromClientData)) {
 		m_System->Printf("WARNING! World::ParseClientData: couldn't uncompress delta frame %i\n", deltaSeqNr);
@@ -1212,11 +1212,11 @@ void World::ClearEntityCache()
 			m_DeltaCache[i].buffer.Free();
 		}
 
-		memset(m_DeltaCache, 0, sizeof(deltaCache_t) * m_MaxCacheIndex);
+		Q_memset(m_DeltaCache, 0, sizeof(deltaCache_t) * m_MaxCacheIndex);
 	}
 
 	if (m_FrameCache) {
-		memset(m_FrameCache, 0, sizeof(frameCache_t) * m_MaxCacheIndex);
+		Q_memset(m_FrameCache, 0, sizeof(frameCache_t) * m_MaxCacheIndex);
 	}
 
 	m_CacheHits = 1;
@@ -1387,7 +1387,7 @@ char *World::GetStatusLine()
 	static char string[256];
 	if (IsActive())
 	{
-		_snprintf(string, sizeof(string),
+		Q_snprintf(string, sizeof(string),
 			"Game \"%s\", Map \"%s\", Time %s, Players %i\nFrame cache use %.1f, Buffered time %.0f .\n",
 			m_GameDir,
 			m_LevelName,
@@ -1398,7 +1398,7 @@ char *World::GetStatusLine()
 	}
 	else
 	{
-		_snprintf(string, sizeof(string), "World not active.\n");
+		Q_snprintf(string, sizeof(string), "World not active.\n");
 	}
 
 	return string;
@@ -1408,7 +1408,7 @@ void World::ClearServerInfo()
 {
 	m_ServerInfo.Clear();
 
-	memset(&m_DetailedServerInfo, 0, sizeof(m_DetailedServerInfo));
+	Q_memset(&m_DetailedServerInfo, 0, sizeof(m_DetailedServerInfo));
 	m_DetailedServerInfo.type = '?';
 	m_DetailedServerInfo.os   = '?';
 	m_DetailedServerInfo.pw   = '?';
@@ -1416,7 +1416,7 @@ void World::ClearServerInfo()
 
 void World::SetServerInfo(serverinfo_t *serverinfo)
 {
-	memcpy(&m_DetailedServerInfo, serverinfo, sizeof(m_DetailedServerInfo));
+	Q_memcpy(&m_DetailedServerInfo, serverinfo, sizeof(m_DetailedServerInfo));
 }
 
 void World::FinishGame()
@@ -1453,7 +1453,7 @@ int World::FindUserMsgByName(char *name)
 {
 	for (UserMsg *pList = m_ClientUserMsgs; pList; pList = pList->next)
 	{
-		if (!strcmp(pList->szName, name)) {
+		if (!Q_strcmp(pList->szName, name)) {
 			return pList->iMsg;
 		}
 	}
@@ -1513,7 +1513,7 @@ bool World::UncompressEntitiesFromStream(frame_t *frame, BitBuffer *stream, unsi
 				stream->m_Overflowed = true;
 			}
 
-			memcpy(&entity[newindex], &deltaEntity[oldindex], sizeof(entity[newindex]));
+			Q_memcpy(&entity[newindex], &deltaEntity[oldindex], sizeof(entity[newindex]));
 
 			newindex++;
 			oldindex++;
@@ -1592,7 +1592,7 @@ bool World::UncompressEntitiesFromStream(frame_t *frame, BitBuffer *stream, unsi
 			stream->m_Overflowed = true;
 		}
 
-		memcpy(&entity[newindex], &deltaEntity[oldindex], sizeof(entity[newindex]));
+		Q_memcpy(&entity[newindex], &deltaEntity[oldindex], sizeof(entity[newindex]));
 		newindex++;
 		oldindex++;
 	}
@@ -1638,14 +1638,14 @@ bool World::UncompressEntitiesFromStream(frame_t *frame, BitBuffer *stream)
 		if (num >= MAX_ENTITIES)
 		{
 			m_System->Errorf("World::GetUncompressedFrame: entity number %i >= MAX_ENTITIES\n", num);
-			memset(frame, 0, sizeof(*frame));
+			Q_memset(frame, 0, sizeof(*frame));
 			return false;
 		}
 
 		if (remove)
 		{
 			m_System->Errorf("World::GetUncompressedFrame: remove invalid on non-delta compressed frames\n");
-			memset(frame, 0, sizeof(*frame));
+			Q_memset(frame, 0, sizeof(*frame));
 			return false;
 		}
 
@@ -1849,7 +1849,7 @@ void World::SetServerInfo(int protocol, CRC32_t nserverCRC, unsigned char *nclie
 {
 	m_Protocol = protocol;
 	m_ServerCRC = nserverCRC;
-	memcpy(m_ClientdllMD5, nclientdllmd5, sizeof(m_ClientdllMD5));
+	Q_memcpy(m_ClientdllMD5, nclientdllmd5, sizeof(m_ClientdllMD5));
 
 	m_Maxclients = nmaxclients;
 	m_PlayerNum = nplayernum;
@@ -1858,12 +1858,12 @@ void World::SetServerInfo(int protocol, CRC32_t nserverCRC, unsigned char *nclie
 	Q_strlcpy(m_GameDir, ngamedir);
 	Q_strlcpy(m_LevelName, nlevelname);
 
-	_snprintf(m_ServerName, sizeof(m_ServerName), "%s:%i", nservername, m_PlayerNum);
+	Q_snprintf(m_ServerName, sizeof(m_ServerName), "%s:%i", nservername, m_PlayerNum);
 }
 
 void World::SetMoveVars(movevars_t *nmovevars)
 {
-	memcpy(&m_MoveVars, nmovevars, sizeof(m_MoveVars));
+	Q_memcpy(&m_MoveVars, nmovevars, sizeof(m_MoveVars));
 }
 
 void World::SetPaused(bool state)
@@ -1900,7 +1900,7 @@ void World::ParseDeltaDescription(BitBuffer *stream)
 {
 	delta_description_t *pdesc;
 	delta_description_t nulldesc;
-	memset(&nulldesc, 0, sizeof(nulldesc));
+	Q_memset(&nulldesc, 0, sizeof(nulldesc));
 
 	char *s = stream->ReadString();
 	if (!s || !s[0]) {
@@ -1974,7 +1974,7 @@ void World::SetExtraInfo(char *nclientfallback, int nallowCheats)
 void World::ParseEvent(BitBuffer *stream)
 {
 	event_args_t nullargs;
-	memset(&nullargs, 0, sizeof(nullargs));
+	Q_memset(&nullargs, 0, sizeof(nullargs));
 	m_Delta.ParseDelta(stream, (byte *)&nullargs, (byte *)&nullargs, GetEventDelta());
 }
 
@@ -1997,7 +1997,7 @@ void World::ParseBaseline(BitBuffer *stream)
 		return;
 	}
 
-	memset(&nullstate, 0, sizeof(nullstate));
+	Q_memset(&nullstate, 0, sizeof(nullstate));
 	stream->StartBitMode();
 	m_MaxBaseLines = 0;
 	ClearBaseline();
@@ -2005,9 +2005,9 @@ void World::ParseBaseline(BitBuffer *stream)
 	while (stream->PeekBits(16) != 0xFFFF)
 	{
 		int index = stream->ReadBits(11);
-		m_MaxBaseLines = max(index, m_MaxBaseLines);
+		m_MaxBaseLines = Q_max(index, m_MaxBaseLines);
 
-		memset(&entstate, 0, sizeof(nullstate));
+		Q_memset(&entstate, 0, sizeof(nullstate));
 
 		type = stream->ReadBits(2);
 		custom = (type & ENTITY_BEAM) == ENTITY_BEAM;
@@ -2036,7 +2036,7 @@ void World::ParseBaseline(BitBuffer *stream)
 	m_MaxInstanced_BaseLine = stream->ReadBits(6);
 	for (int i = 0; i < m_MaxInstanced_BaseLine; i++)
 	{
-		memset(&entstate, 0, sizeof(entstate));
+		Q_memset(&entstate, 0, sizeof(entstate));
 		m_Delta.ParseDelta(stream, (byte *)&nullstate, (byte *)&entstate, *ppentity);
 		AddInstancedBaselineEntity(i, &entstate);
 	}
@@ -2113,7 +2113,7 @@ bool World::SaveAsDemo(char *filename, IDirector *director)
 	unsigned int clientDelta = 0;
 	unsigned int lastFrameSeqNr = 0;
 
-	memset(&cdata, 0, sizeof(cdata));
+	Q_memset(&cdata, 0, sizeof(cdata));
 
 	frame_t *frame = (frame_t *)m_Frames.GetFirst();
 	if (!frame) {
@@ -2237,7 +2237,7 @@ void World::RearrangeFrame(frame_t *frame, int seqNrOffset, float timeOffset)
 		}
 
 		BitBuffer tempStream(frame->entities, frame->entitiesSize);
-		memset(frame->entities, 0, frame->entitiesSize);
+		Q_memset(frame->entities, 0, frame->entitiesSize);
 
 		int newsize = CompressFrame(&fullFrame, &tempStream);
 		if ((unsigned)newsize > frame->entitiesSize || tempStream.IsOverflowed()) {

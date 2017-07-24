@@ -89,7 +89,7 @@ bool ProxyClient::ProcessStringCmd(char *string)
 	char *cmd = cmdLine.GetToken(0);
 	for (auto& local_cmd : m_LocalCmdReg)
 	{
-		if (!_stricmp(local_cmd.name, cmd)) {
+		if (!Q_stricmp(local_cmd.name, cmd)) {
 			(this->*local_cmd.pfnCmd)(&cmdLine);
 			return true;
 		}
@@ -143,7 +143,7 @@ void ProxyClient::CMD_JoinGame(TokenLine *cmd)
 	if (m_Proxy->IsPublicGame())
 	{
 		char string[64];
-		_snprintf(string, sizeof(string), "connect %s\n", m_World->GetGameServerAddress()->ToString());
+		Q_snprintf(string, sizeof(string), "connect %s\n", m_World->GetGameServerAddress()->ToString());
 
 		m_ClientChannel.m_reliableStream.WriteByte(svc_stufftext);
 		m_ClientChannel.m_reliableStream.WriteString(string);
@@ -177,7 +177,7 @@ void ProxyClient::CMD_IgnoreMsg(TokenLine *cmd)
 		return;
 	}
 
-	m_ChatEnabled = !atoi(cmd->GetToken(1));
+	m_ChatEnabled = !Q_atoi(cmd->GetToken(1));
 	PrintfToClient("Global HLTV stats: spectators %i, slots %i, proxies %i\n", m_ChatEnabled ? "Spectator chat enabled.\n" : "Spectator chat disabled.\n");
 }
 
@@ -304,9 +304,9 @@ void ProxyClient::DownloadFile(char *fileName)
 		return;
 
 	const char szMD5[] = "!MD5";
-	if (strstr(fileName, "..") ||
+	if (Q_strstr(fileName, "..") ||
 		// ignore customization's
-		(strlen(fileName) == 36 && !_strnicmp(fileName, szMD5, sizeof(szMD5) - 1)))
+		(Q_strlen(fileName) == 36 && !_strnicmp(fileName, szMD5, sizeof(szMD5) - 1)))
 	{
 		DownloadFailed(fileName);
 		return;

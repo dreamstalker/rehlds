@@ -148,7 +148,7 @@ char *Status::GetType()
 char *Status::GetStatusLine()
 {
 	static char string[256];
-	_snprintf(string, sizeof(string), "Global Status: Proxies %i, Slots %i, Spectators %i (max %i)\n",
+	Q_snprintf(string, sizeof(string), "Global Status: Proxies %i, Slots %i, Spectators %i (max %i)\n",
 		m_NumberOfProxies, m_NumberOfSlots,
 		m_NumberOfSpectators, m_MaxNumberOfSpectators);
 

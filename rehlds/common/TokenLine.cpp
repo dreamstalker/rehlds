@@ -2,9 +2,9 @@
 
 TokenLine::TokenLine()
 {
-	memset(m_token, 0, sizeof(m_token));
-	memset(m_fullLine, 0, sizeof(m_fullLine));
-	memset(m_tokenBuffer, 0, sizeof(m_tokenBuffer));
+	Q_memset(m_token, 0, sizeof(m_token));
+	Q_memset(m_fullLine, 0, sizeof(m_fullLine));
+	Q_memset(m_tokenBuffer, 0, sizeof(m_tokenBuffer));
 
 	m_tokenNumber = 0;
 }
@@ -23,10 +23,10 @@ bool TokenLine::SetLine(const char *newLine)
 {
 	m_tokenNumber = 0;
 
-	if (!newLine || (strlen(newLine) >= (MAX_LINE_CHARS - 1)))
+	if (!newLine || (Q_strlen(newLine) >= (MAX_LINE_CHARS - 1)))
 	{
-		memset(m_fullLine, 0, sizeof(m_fullLine));
-		memset(m_tokenBuffer, 0, sizeof(m_tokenBuffer));
+		Q_memset(m_fullLine, 0, sizeof(m_fullLine));
+		Q_memset(m_tokenBuffer, 0, sizeof(m_tokenBuffer));
 		return false;
 	}
 
@@ -95,7 +95,7 @@ char *TokenLine::CheckToken(char *parm)
 		if (!m_token[i])
 			continue;
 
-		if (!strcmp(parm, m_token[i]))
+		if (!Q_strcmp(parm, m_token[i]))
 		{
 			char *ret = m_token[i + 1];
 

@@ -35,7 +35,7 @@ BaseSystemModule::BaseSystemModule()
 	m_SystemTime = 0;
 	m_State = MODULE_UNDEFINED;
 
-	memset(m_Name, 0, sizeof(m_Name));
+	Q_memset(m_Name, 0, sizeof(m_Name));
 }
 
 char *BaseSystemModule::GetName()

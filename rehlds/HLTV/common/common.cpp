@@ -49,8 +49,8 @@ int COM_BuildNumber()
 		d += mond[m];
 	}
 
-	d += atoi(&date[4]) - 1;
-	y = atoi(&date[7]) - 1900;
+	d += Q_atoi(&date[4]) - 1;
+	y = Q_atoi(&date[7]) - 1900;
 	b = d + (int)((y - 1) * 365.25);
 
 	if (((y % 4) == 0) && m > 1)
@@ -96,12 +96,12 @@ char *COM_GetBaseDir()
 
 	if (GetModuleFileName((HMODULE)nullptr, basedir, sizeof(basedir)))
 	{
-		char *pBuffer = strrchr(basedir, '\\');
+		char *pBuffer = Q_strrchr(basedir, '\\');
 
 		if (pBuffer && *pBuffer)
 			pBuffer[1] = '\0';
 
-		int j = strlen(basedir);
+		int j = Q_strlen(basedir);
 		if (j > 0 && (basedir[j - 1] == '\\' || basedir[j - 1] == '/'))
 			basedir[j - 1] = '\0';
 	}
@@ -117,13 +117,13 @@ char *COM_GetBaseDir()
 	static char basedir[MAX_PATH];
 	basedir[0] = '\0';
 
-	strcpy(basedir, g_szEXEName);
-	char *pBuffer = strrchr(basedir, '/');
+	Q_strcpy(basedir, g_szEXEName);
+	char *pBuffer = Q_strrchr(basedir, '/');
 
 	if (pBuffer && *pBuffer)
 		pBuffer[1] = '\0';
 
-	int j = strlen(basedir);
+	int j = Q_strlen(basedir);
 	if (j > 0 && (basedir[j - 1] == '\\' || basedir[j - 1] == '/'))
 		basedir[j - 1] = '\0';
 
@@ -157,7 +157,7 @@ void COM_FileBase(char *in, char *out)
 {
 	*out = '\0';
 
-	int len = strlen(in);
+	int len = Q_strlen(in);
 	if (len <= 0) {
 		return;
 	}
@@ -176,7 +176,8 @@ void COM_FileBase(char *in, char *out)
 	start++;
 
 	len = end - start;
-	strncpy(out, start, len);
+
+	Q_strncpy(out, start, len);
 	out[len] = '\0';
 }
 
@@ -284,7 +285,7 @@ char *COM_VarArgs(char *format, ...)
 	static char string[1024];
 
 	va_start(argptr, format);
-	_vsnprintf(string, sizeof(string), format, argptr);
+	Q_vsnprintf(string, sizeof(string), format, argptr);
 	va_end(argptr);
 
 	return string;
@@ -328,12 +329,12 @@ char *COM_BinPrintf(unsigned char *buf, int length)
 {
 	char szChunk[10];
 	static char szReturn[4096];
-	memset(szReturn, 0, sizeof(szReturn));
+	Q_memset(szReturn, 0, sizeof(szReturn));
 
 	for (int i = 0; i < length; i++)
 	{
-		_snprintf(szChunk, sizeof(szChunk), "%02x", buf[i]);
-		strncat(szReturn, szChunk, sizeof(szReturn) - strlen(szReturn) - 1);
+		Q_snprintf(szChunk, sizeof(szChunk), "%02x", buf[i]);
+		Q_strlcat(szReturn, szChunk);
 	}
 
 	return szReturn;
@@ -346,11 +347,11 @@ char *COM_FormatTime(float seconds)
 	int hours = (int)seconds / 3600;
 	if (hours > 0)
 	{
-		_snprintf(time, sizeof(time), "%02i:%2i:%02i", hours, (int)seconds / 60, (int)seconds % 60);
+		Q_snprintf(time, sizeof(time), "%02i:%2i:%02i", hours, (int)seconds / 60, (int)seconds % 60);
 	}
 	else
 	{
-		_snprintf(time, sizeof(time), "%02i:%02i", (int)seconds / 60, (int)seconds % 60);
+		Q_snprintf(time, sizeof(time), "%02i:%02i", (int)seconds / 60, (int)seconds % 60);
 	}
 
 	return time;
@@ -413,7 +414,7 @@ void COM_TrimSpace(const char *source, char *dest)
 		start++;
 	}
 
-	int end = strlen(source) - 1;
+	int end = Q_strlen(source) - 1;
 	while (end > 0 && COM_IsWhiteSpace(source[end])) {
 		end--;
 	}
@@ -422,7 +423,7 @@ void COM_TrimSpace(const char *source, char *dest)
 
 	int length = end - start;
 	if (length > 0) {
-		strncpy(dest, &source[start], length);
+		Q_strncpy(dest, &source[start], length);
 	}
 	else
 		length = 0;

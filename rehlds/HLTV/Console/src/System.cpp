@@ -55,7 +55,7 @@ void Sys_Printf(char *fmt, ...)
 	static char string[8192];
 
 	va_start(argptr, fmt);
-	_vsnprintf(string, sizeof(string), fmt, argptr);
+	Q_vsnprintf(string, sizeof(string), fmt, argptr);
 	va_end(argptr);
 
 	// Get Current text and append it.
@@ -78,7 +78,7 @@ void System::RedirectOutput(char *buffer, int maxSize)
 	m_RedirectSize = maxSize;
 
 	if (m_RedirectBuffer) {
-		memset(m_RedirectBuffer, 0, m_RedirectSize);
+		Q_memset(m_RedirectBuffer, 0, m_RedirectSize);
 	}
 }
 
@@ -88,13 +88,13 @@ void System::Printf(char *fmt, ...)
 	static char string[8192];
 
 	va_start(argptr, fmt);
-	_vsnprintf(string, sizeof(string), fmt, argptr);
+	Q_vsnprintf(string, sizeof(string), fmt, argptr);
 	va_end(argptr);
 
 	Log(string);
 
-	if (m_RedirectBuffer && strlen(string) + strlen(m_RedirectBuffer) + 1 < m_RedirectSize) {
-		strcat(m_RedirectBuffer, string);
+	if (m_RedirectBuffer && Q_strlen(string) + Q_strlen(m_RedirectBuffer) + 1 < m_RedirectSize) {
+		Q_strcat(m_RedirectBuffer, string);
 	}
 
 	m_Console.Print(string);
@@ -107,11 +107,11 @@ void System::DPrintf(char *fmt, ...)
 	va_start(argptr, fmt);
 	if (m_Developer)
 	{
-		_vsnprintf(string, sizeof(string), fmt, argptr);
+		Q_vsnprintf(string, sizeof(string), fmt, argptr);
 		Log(string);
 
-		if (m_RedirectBuffer && strlen(string) + strlen(m_RedirectBuffer) + 1 < m_RedirectSize) {
-			strcat(m_RedirectBuffer, string);
+		if (m_RedirectBuffer && Q_strlen(string) + Q_strlen(m_RedirectBuffer) + 1 < m_RedirectSize) {
+			Q_strcat(m_RedirectBuffer, string);
 		}
 
 		m_Console.Print(string);
@@ -133,7 +133,7 @@ bool System::RegisterCommand(char *name, ISystemModule *module, int commandID)
 	command_t *cmd = (command_t *)m_Commands.GetFirst();
 	while (cmd)
 	{
-		if (_stricmp(cmd->name, name) == 0) {
+		if (Q_stricmp(cmd->name, name) == 0) {
 			Printf("WARNING! System::RegisterCommand: command \"%s\" already exists.\n", name);
 			return false;
 		}
@@ -202,7 +202,7 @@ void System::Errorf(char *fmt, ...)
 	va_list argptr;
 	static char string[1024];
 	va_start(argptr, fmt);
-	_vsnprintf(string, sizeof(string), fmt, argptr);
+	Q_vsnprintf(string, sizeof(string), fmt, argptr);
 	va_end(argptr);
 
 	Printf("***** FATAL ERROR *****\n");
@@ -225,8 +225,8 @@ ISystemModule *System::FindModule(char *type, char *name)
 	ISystemModule *module = (ISystemModule *)m_Modules.GetFirst();
 	while (module)
 	{
-		if (_stricmp(type, module->GetType()) == 0
-		&& (!name || _stricmp(name, module->GetType()) == 0)) {
+		if (Q_stricmp(type, module->GetType()) == 0
+		&& (!name || Q_stricmp(name, module->GetType()) == 0)) {
 			return module;
 		}
 
@@ -315,11 +315,11 @@ bool System::RemoveModule(ISystemModule *module)
 
 void System::GetCommandMatches(char *string, ObjectList *pMatchList)
 {
-	int len = strlen(string);
+	int len = Q_strlen(string);
 	command_t *cmd = (command_t *)m_Commands.GetFirst();
 	while (cmd)
 	{
-		if (!strncmp(cmd->name, string, len)) {
+		if (!Q_strncmp(cmd->name, string, len)) {
 			pMatchList->AddTail(cmd);
 		}
 
@@ -375,8 +375,8 @@ bool System::Init(IBaseSystem *system, int serial, char *name)
 	m_Libraries.Init();
 
 	m_LogFile = nullptr;
-	memset(m_LogFileName, 0, sizeof(m_LogFileName));
-	memset(m_Factorylist, 0, sizeof(m_Factorylist));
+	Q_memset(m_LogFileName, 0, sizeof(m_LogFileName));
+	Q_memset(m_Factorylist, 0, sizeof(m_Factorylist));
 
 	m_RedirectBuffer = nullptr;
 	m_RedirectSize = 0;
@@ -395,7 +395,7 @@ bool System::Init(IBaseSystem *system, int serial, char *name)
 	}
 
 	auto pszValue = CheckParam("-maxfps");
-	SetFPS(pszValue ? (float)atof(pszValue) : 100);
+	SetFPS(pszValue ? (float)Q_atof(pszValue) : 100);
 
 	for (auto& cmd : m_LocalCmdReg) {
 		RegisterCommand(cmd.name, this, cmd.id);
@@ -538,7 +538,7 @@ void System::RunFrame(double time)
 char *System::GetStatusLine()
 {
 	static char string[80];
-	sprintf(string, " Libraries %i, Modules %i, Commands %i.\n", m_Libraries.CountElements(), m_Modules.CountElements(), m_Commands.CountElements());
+	Q_sprintf(string, " Libraries %i, Modules %i, Commands %i.\n", m_Libraries.CountElements(), m_Modules.CountElements(), m_Commands.CountElements());
 	return string;
 }
 
@@ -702,7 +702,7 @@ void System::CMD_Logfile(char *cmdLine)
 		}
 
 		char filename[MAX_PATH];
-		sprintf(filename, "logfile%s.txt", COM_TimeString());
+		Q_sprintf(filename, "logfile%s.txt", COM_TimeString());
 		OpenLogFile(filename);
 		break;
 	}
@@ -765,7 +765,7 @@ void System::CMD_Developer(char *cmdLine)
 		return;
 	}
 
-	m_Developer = atoi(params.GetToken(1)) ? true : false;
+	m_Developer = Q_atoi(params.GetToken(1)) ? true : false;
 }
 
 void System::CMD_Quit(char *cmdLine)
@@ -781,7 +781,7 @@ void System::OpenLogFile(char *filename)
 	m_LogFile = m_FileSystem->Open(m_LogFileName, "wt");
 	if (!m_LogFile)
 	{
-		memset(m_LogFileName, 0, sizeof(m_LogFileName));
+		Q_memset(m_LogFileName, 0, sizeof(m_LogFileName));
 		Printf("System::OpenLogFile: error while opening logfile.\n");
 	}
 }
@@ -796,7 +796,7 @@ void System::CloseLogFile()
 	m_LogFile = nullptr;
 
 	Printf("Console log file closed.\n");
-	memset(m_LogFileName, 0, sizeof(m_LogFileName));
+	Q_memset(m_LogFileName, 0, sizeof(m_LogFileName));
 }
 
 void System::Log(char *string)
@@ -804,7 +804,7 @@ void System::Log(char *string)
 	if (!m_LogFile)
 		return;
 
-	m_FileSystem->Write(string, strlen(string), m_LogFile);
+	m_FileSystem->Write(string, Q_strlen(string), m_LogFile);
 }
 
 void System::ExecuteFile(char *filename)
@@ -821,7 +821,7 @@ void System::ExecuteFile(char *filename)
 	Printf("Executing file %s.\n", filename);
 	while ((m_FileSystem->ReadLine(line, sizeof(line) - 1, cfgfile)))
 	{
-		char *remark = strstr(line, "//");
+		char *remark = Q_strstr(line, "//");
 		if (remark) {
 			*remark = '\0';
 		}
@@ -841,7 +841,7 @@ bool System::DispatchCommand(char *command)
 	command_t *cmd = (command_t *)m_Commands.GetFirst();
 	while (cmd)
 	{
-		if (_stricmp(cmd->name, params.GetToken(0)) == 0) {
+		if (Q_stricmp(cmd->name, params.GetToken(0)) == 0) {
 			cmd->module->ExecuteCommand(cmd->commandID, command);
 			return true;
 		}
@@ -865,15 +865,15 @@ void System::ExecuteCommandLine()
 			continue;
 		}
 
-		memset(string, 0, sizeof(string));
+		Q_memset(string, 0, sizeof(string));
 		Q_strlcpy(string, token + 1);
 
 		// next iteration
 		token = m_Parameters.GetToken(++i);
 		while (token && !(token[0] == '+' || token[0] == '-'))
 		{
-			strncat(string, " ", (sizeof(string) - 1) - strlen(string));
-			strncat(string, token, (sizeof(string) - 1) - strlen(string));
+			Q_strlcat(string, " ");
+			Q_strlcat(string, token);
 
 			token = m_Parameters.GetToken(++i);
 		}
@@ -948,7 +948,7 @@ System::library_t *System::GetLibrary(char *name)
 	library_t *lib = (library_t *)m_Libraries.GetFirst();
 	while (lib)
 	{
-		if (_stricmp(lib->name, name) == 0) {
+		if (Q_stricmp(lib->name, name) == 0) {
 			return lib;
 		}
 
@@ -961,7 +961,7 @@ System::library_t *System::GetLibrary(char *name)
 		return nullptr;
 	}
 
-	_snprintf(lib->name, sizeof(lib->name), "%s." LIBRARY_PREFIX, fixedname);
+	Q_snprintf(lib->name, sizeof(lib->name), "%s." LIBRARY_PREFIX, fixedname);
 	lib->handle = (CSysModule *)Sys_LoadModule(lib->name);
 	if (!lib->handle) {
 		DPrintf("WARNING! System::GetLibrary: coulnd't load library (%s).\n", lib->name);
@@ -1111,7 +1111,7 @@ void System::Sleep(int msec)
 int main(int argc, char *argv[])
 {
 	gSystem.BuildCommandLine(argc, argv);
-	_snprintf(g_szEXEName, sizeof(g_szEXEName), "%s", argv[0]);
+	Q_snprintf(g_szEXEName, sizeof(g_szEXEName), "%s", argv[0]);
 	return gSystem.Run();
 }
 
@@ -1124,13 +1124,13 @@ void System::BuildCommandLine(int argc, char **argv)
 
 	for (int i = 1; i < argc && len < MAX_LINUX_CMDLINE; i++)
 	{
-		len += strlen(argv[i]) + 1;
+		len += Q_strlen(argv[i]) + 1;
 
 		if (i > 1) {
-			strcat(string, " ");
+			Q_strlcat(string, " ");
 		}
 
-		strcat(string, argv[i]);
+		Q_strlcat(string, argv[i]);
 	}
 
 	m_Parameters.SetLine(string);

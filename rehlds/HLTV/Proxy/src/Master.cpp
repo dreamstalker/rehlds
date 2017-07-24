@@ -58,7 +58,7 @@ Master::Master()
 int Master::GetGameAppID(const char *gamedir) const
 {
 	for (auto& game : m_GameToAppIDMap) {
-		if (!_stricmp(game.dir, gamedir)) {
+		if (!Q_stricmp(game.dir, gamedir)) {
 			return game.appID;
 		}
 	}
@@ -168,7 +168,7 @@ void Master::RunFrame(double time)
 				int slots, proxies, spectators;
 				m_Proxy->GetStatistics(proxies, slots, spectators);
 
-				SteamGameServer()->SetMaxPlayerCount(min(slots, 127));	// max slots
+				SteamGameServer()->SetMaxPlayerCount(Q_min(slots, 127));	// max slots
 				SteamGameServer()->SetServerName(szHostName);
 				SteamGameServer()->SetMapName(mapName);
 				SteamGameServer()->SetPasswordProtected(m_Proxy->IsPasswordProtected());
@@ -240,7 +240,7 @@ void Master::CMD_NoMaster(char *cmdLine)
 	}
 
 	bool bOldMasterState = m_NoMaster;
-	m_NoMaster = atoi(params.GetToken(1)) ? true : false;
+	m_NoMaster = Q_atoi(params.GetToken(1)) ? true : false;
 
 	if (bOldMasterState != m_NoMaster) {
 		SteamGameServer()->EnableHeartbeats(m_NoMaster);
@@ -294,6 +294,6 @@ void Master::SendShutdown()
 char *Master::GetStatusLine()
 {
 	static char string[256];
-	_snprintf(string, sizeof(string), "Master servers: 0\n");
+	Q_snprintf(string, sizeof(string), "Master servers: 0\n");
 	return string;
 }
