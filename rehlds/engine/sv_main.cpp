@@ -4344,7 +4344,7 @@ int SV_CreatePacketEntities_internal(sv_delta_t type, client_t *client, packet_e
 			else
 				newindex = 9999;
 		}
-		
+
 #ifdef REHLDS_FIXES
 		if (oldnum < oldmax && from)
 #else

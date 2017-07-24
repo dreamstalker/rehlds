@@ -1,9 +1,9 @@
 /***
 *
 *	Copyright (c) 1996-2002, Valve LLC. All rights reserved.
-*	
-*	This product contains software technology licensed from Id 
-*	Software, Inc. ("Id Technology").  Id Technology (c) 1996 Id Software, Inc. 
+*
+*	This product contains software technology licensed from Id
+*	Software, Inc. ("Id Technology").  Id Technology (c) 1996 Id Software, Inc.
 *	All Rights Reserved.
 *
 *   Use, distribution, and modification of this source code and/or resulting
@@ -35,5 +35,16 @@ typedef struct cvar_s
 	float	value;
 	struct cvar_s *next;
 } cvar_t;
+
+using cvar_callback_t = void (*)(const char *pszNewValue);
+
+struct cvar_listener_t
+{
+	cvar_listener_t(const char *var_name, cvar_callback_t handler) :
+		func(handler), name(var_name) {}
+
+	cvar_callback_t func;
+	const char      *name;
+};
 
 #endif // CVARDEF_H

@@ -59,7 +59,7 @@ int giStateInfo;
 DLL_FUNCTIONS gEntityInterface;
 NEW_DLL_FUNCTIONS gNewDLLFunctions;
 
-extensiondll_t g_rgextdll[50];
+extensiondll_t g_rgextdll[MAX_EXTENSION_DLL];
 
 int g_iextdllMac;
 modinfo_t gmodinfo;
@@ -789,7 +789,7 @@ const char* EXT_FUNC NameForFunction(uint32 function)
 	return NULL;
 }
 
-ENTITYINIT GetEntityInit(char *pClassName)
+ENTITYINIT EXT_FUNC GetEntityInit(char *pClassName)
 {
 	return (ENTITYINIT)GetDispatch(pClassName);
 }
@@ -1089,7 +1089,7 @@ void LoadThisDll(const char *szDllFilename)
 	}
 
 	pfnGiveFnptrsToDll(&g_engfuncsExportedToDlls, &gGlobalVariables);
-	if (g_iextdllMac == 50)
+	if (g_iextdllMac == MAX_EXTENSION_DLL)
 	{
 		Con_Printf("Too many DLLs, ignoring remainder\n");
 		goto IgnoreThisDLL;

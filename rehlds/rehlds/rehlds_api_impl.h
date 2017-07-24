@@ -285,5 +285,6 @@ public:
 extern sizebuf_t* GetNetMessage_api();
 extern IGameClient* GetHostClient_api();
 extern int* GetMsgReadCount_api();
+extern std::vector<cvar_listener_t *> g_CvarsListener;
 
 bool SV_EmitSound2_api(edict_t *entity, IGameClient *receiver, int channel, const char *sample, float volume, float attenuation, int fFlags, int pitch, int emitFlags, const float *pOrigin);

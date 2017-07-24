@@ -34,9 +34,10 @@
 #include "interface.h"
 #include "model.h"
 #include "ObjectList.h"
+#include "pr_dlls.h"
 
 #define REHLDS_API_VERSION_MAJOR 3
-#define REHLDS_API_VERSION_MINOR 2
+#define REHLDS_API_VERSION_MINOR 3
 
 //Steam_NotifyClientConnect hook
 typedef IHookChain<qboolean, IGameClient*, const void*, unsigned int> IRehldsHook_Steam_NotifyClientConnect;
@@ -285,6 +286,11 @@ struct RehldsFuncs_t {
 	bool(*StripUnprintableAndSpace)(char *pch);
 	void(*Cmd_RemoveCmd)(const char *cmd_name);
 	void(*GetCommandMatches)(const char *string, ObjectList *pMatchList);
+	bool(*AddExtDll)(void *hModule);
+	void(*AddCvarListener)(const char *var_name, cvar_callback_t func);
+	void(*RemoveExtDll)(void *hModule);
+	void(*RemoveCvarListener)(const char *var_name, cvar_callback_t func);
+	ENTITYINIT(*GetEntityInit)(char *pszClassName);
 };
 
 class IRehldsApi {

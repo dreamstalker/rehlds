@@ -577,9 +577,6 @@
     <ClInclude Include="..\engine\filter.h">
       <Filter>engine\server</Filter>
     </ClInclude>
-    <ClInclude Include="..\engine\pr_dlls.h">
-      <Filter>engine\common</Filter>
-    </ClInclude>
     <ClInclude Include="..\engine\sys_dll2.h">
       <Filter>engine\server</Filter>
     </ClInclude>
@@ -842,6 +839,9 @@
       <Filter>public\rehlds</Filter>
     </ClInclude>
     <ClInclude Include="..\public\rehlds\rehlds_api.h">
+      <Filter>public\rehlds</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\rehlds\pr_dlls.h">
       <Filter>public\rehlds</Filter>
     </ClInclude>
     <ClInclude Include="..\rehlds\hookchains_impl.h">
