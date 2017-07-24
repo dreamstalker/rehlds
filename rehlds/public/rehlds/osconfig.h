@@ -87,6 +87,10 @@
 #include <fstream>
 #include <iomanip>
 
+#ifdef REHLDS_FIXES
+#include <random>
+#endif
+
 #include <smmintrin.h>
 #include <xmmintrin.h>
 
