@@ -174,9 +174,9 @@ NOXREF const char *Cvar_CompleteVariable(const char *search, int forward)
 	return NULL;
 }
 
-void Cvar_FireListen(const char *var_name, const char *value)
+void Cvar_FireListeners(const char *var_name, const char *value)
 {
-	for (auto var : g_CvarsListener) {
+	for (auto var : g_CvarsListeners) {
 		if (Q_strcmp(var->name, var_name) == 0) {
 			var->func(value);
 		}
@@ -307,7 +307,7 @@ void EXT_FUNC Cvar_DirectSet_internal(struct cvar_s *var, const char *value)
 
 #ifdef REHLDS_API
 	if (changed) {
-		Cvar_FireListen(var->name, pszValue);
+		Cvar_FireListeners(var->name, pszValue);
 	}
 #endif
 }

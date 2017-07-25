@@ -34,7 +34,7 @@ struct plugin_api_t
 };
 
 std::vector<plugin_api_t *> g_PluginApis;
-std::vector<cvar_listener_t *> g_CvarsListener;
+std::vector<cvar_listener_t *> g_CvarsListeners;
 
 plugin_api_t* FindPluginApiByName(const char *name) {
 	for (auto pl : g_PluginApis) {
@@ -229,7 +229,7 @@ void EXT_FUNC AddCvarListener_api(const char *var_name, cvar_callback_t func)
 		return;
 	}
 
-	for (auto cvars : g_CvarsListener) {
+	for (auto cvars : g_CvarsListeners) {
 		if (!Q_strcmp(cvars->name, var_name)) {
 			if (cvars->func == func) {
 				return;
@@ -238,13 +238,13 @@ void EXT_FUNC AddCvarListener_api(const char *var_name, cvar_callback_t func)
 	}
 
 	cvar_listener_t *list = new cvar_listener_t(var_name, func);
-	g_CvarsListener.push_back(list);
+	g_CvarsListeners.push_back(list);
 }
 
 void EXT_FUNC RemoveCvarListener_api(const char *var_name, cvar_callback_t func)
 {
-	auto iter = g_CvarsListener.begin();
-	while (iter != g_CvarsListener.end())
+	auto iter = g_CvarsListeners.begin();
+	while (iter != g_CvarsListeners.end())
 	{
 		if (Q_strcmp((*iter)->name, var_name) != 0 || (*iter)->func != func) {
 			iter++;
@@ -252,7 +252,7 @@ void EXT_FUNC RemoveCvarListener_api(const char *var_name, cvar_callback_t func)
 		}
 
 		delete (*iter);
-		iter = g_CvarsListener.erase(iter);
+		iter = g_CvarsListeners.erase(iter);
 	}
 }
 
@@ -564,6 +564,10 @@ IRehldsHookRegistry_SV_CreatePacketEntities* CRehldsHookchains::SV_CreatePacketE
 
 IRehldsHookRegistry_SV_EmitSound2* CRehldsHookchains::SV_EmitSound2() {
 	return &m_SV_EmitSound2;
+}
+
+IRehldsHookRegistry_CreateFakeClient* CRehldsHookchains::CreateFakeClient() {
+	return &m_CreateFakeClient;
 }
 
 int EXT_FUNC CRehldsApi::GetMajorVersion()

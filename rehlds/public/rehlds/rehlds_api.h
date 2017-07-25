@@ -191,6 +191,10 @@ typedef IHookChainRegistry<int, enum sv_delta_s, IGameClient *, struct packet_en
 typedef IHookChain<bool, edict_t *, IGameClient *, int, const char*, float, float, int, int, int, const float*> IRehldsHook_SV_EmitSound2;
 typedef IHookChainRegistry<bool, edict_t *, IGameClient *, int, const char*, float, float, int, int, int, const float*> IRehldsHookRegistry_SV_EmitSound2;
 
+//CreateFakeClient hook
+typedef IHookChain<edict_t *, const char *> IRehldsHook_CreateFakeClient;
+typedef IHookChainRegistry<edict_t *, const char *> IRehldsHookRegistry_CreateFakeClient;
+
 class IRehldsHookchains {
 public:
 	virtual ~IRehldsHookchains() { }
@@ -233,6 +237,7 @@ public:
 	virtual IRehldsHookRegistry_SV_Spawn_f* SV_Spawn_f() = 0;
 	virtual IRehldsHookRegistry_SV_CreatePacketEntities* SV_CreatePacketEntities() = 0;
 	virtual IRehldsHookRegistry_SV_EmitSound2* SV_EmitSound2() = 0;
+	virtual IRehldsHookRegistry_CreateFakeClient* CreateFakeClient() = 0;
 };
 
 struct RehldsFuncs_t {
