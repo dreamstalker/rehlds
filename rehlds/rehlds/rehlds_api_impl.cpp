@@ -34,6 +34,7 @@ struct plugin_api_t
 };
 
 std::vector<plugin_api_t *> g_PluginApis;
+std::vector<cvar_listener_t *> g_CvarsListeners;
 
 plugin_api_t* FindPluginApiByName(const char *name) {
 	for (auto pl : g_PluginApis) {
@@ -181,10 +182,84 @@ void EXT_FUNC GetCommandMatches_api(const char *string, ObjectList *pMatchList)
 	}
 }
 
+bool EXT_FUNC AddExtDll_api(void *hModule)
+{
+	if (!hModule) {
+		return false;
+	}
+
+	if (g_iextdllMac >= MAX_EXTENSION_DLL) {
+		Con_Printf("Too many DLLs, ignoring remainder\n");
+		return false;
+	}
+
+	auto pextdll = &g_rgextdll[g_iextdllMac++];
+	Q_memset(pextdll, 0, sizeof(*pextdll));
+	pextdll->lDLLHandle = hModule;
+	return true;
+}
+
+void EXT_FUNC RemoveExtDll_api(void *hModule)
+{
+	if (!hModule) {
+		return;
+	}
+
+	for (auto i = 0; i < g_iextdllMac; i++)
+	{
+		if (g_rgextdll[i].lDLLHandle == hModule)
+		{
+			g_iextdllMac--;
+			if (g_iextdllMac != i)
+			{
+				Q_memmove(&g_rgextdll[i], &g_rgextdll[i + 1], (g_iextdllMac - i) * sizeof(g_rgextdll[0]));
+				i = g_iextdllMac;
+			}
+
+			Q_memset(&g_rgextdll[i], 0, sizeof(g_rgextdll[0]));
+			break;
+		}
+	}
+}
+
+void EXT_FUNC AddCvarListener_api(const char *var_name, cvar_callback_t func)
+{
+	cvar_t *var = Cvar_FindVar(var_name);
+	if (!var) {
+		return;
+	}
+
+	for (auto cvars : g_CvarsListeners) {
+		if (!Q_strcmp(cvars->name, var_name)) {
+			if (cvars->func == func) {
+				return;
+			}
+		}
+	}
+
+	cvar_listener_t *list = new cvar_listener_t(var_name, func);
+	g_CvarsListeners.push_back(list);
+}
+
+void EXT_FUNC RemoveCvarListener_api(const char *var_name, cvar_callback_t func)
+{
+	auto iter = g_CvarsListeners.begin();
+	while (iter != g_CvarsListeners.end())
+	{
+		if (Q_strcmp((*iter)->name, var_name) != 0 || (*iter)->func != func) {
+			iter++;
+			continue;
+		}
+
+		delete (*iter);
+		iter = g_CvarsListeners.erase(iter);
+	}
+}
+
 CRehldsServerStatic g_RehldsServerStatic;
 CRehldsServerData g_RehldsServerData;
 CRehldsHookchains g_RehldsHookchains;
-RehldsFuncs_t g_RehldsApiFuncs = 
+RehldsFuncs_t g_RehldsApiFuncs =
 {
 	&SV_DropClient_api,
 	&SV_RejectConnection,
@@ -235,7 +310,12 @@ RehldsFuncs_t g_RehldsApiFuncs =
 	&SV_UpdateUserInfo_api,
 	&StripUnprintableAndSpace_api,
 	&Cmd_RemoveCmd,
-	&GetCommandMatches_api
+	&GetCommandMatches_api,
+	&AddExtDll_api,
+	&AddCvarListener_api,
+	&RemoveExtDll_api,
+	&RemoveCvarListener_api,
+	&GetEntityInit
 };
 
 bool EXT_FUNC SV_EmitSound2_internal(edict_t *entity, IGameClient *pReceiver, int channel, const char *sample, float volume, float attenuation, int flags, int pitch, int emitFlags, const float *pOrigin)
@@ -484,6 +564,10 @@ IRehldsHookRegistry_SV_CreatePacketEntities* CRehldsHookchains::SV_CreatePacketE
 
 IRehldsHookRegistry_SV_EmitSound2* CRehldsHookchains::SV_EmitSound2() {
 	return &m_SV_EmitSound2;
+}
+
+IRehldsHookRegistry_CreateFakeClient* CRehldsHookchains::CreateFakeClient() {
+	return &m_CreateFakeClient;
 }
 
 int EXT_FUNC CRehldsApi::GetMajorVersion()

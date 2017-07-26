@@ -172,6 +172,7 @@ void PF_changepitch_I(edict_t *ent);
 void PF_setview_I(const edict_t *clientent, const edict_t *viewent);
 void PF_crosshairangle_I(const edict_t *clientent, float pitch, float yaw);
 edict_t *PF_CreateFakeClient_I(const char *netname);
+edict_t *CreateFakeClient_internal(const char *netname);
 void PF_RunPlayerMove_I(edict_t *fakeclient, const float *viewangles, float forwardmove, float sidemove, float upmove, unsigned short buttons, unsigned char impulse, unsigned char msec);
 sizebuf_t *WriteDest_Parm(int dest);
 void PF_MessageBegin_I(int msg_dest, int msg_type, const float *pOrigin, edict_t *ed);

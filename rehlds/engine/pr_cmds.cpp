@@ -1549,7 +1549,7 @@ int EXT_FUNC PF_IsMapValid_I(const char *mapname)
 	if (!mapname || Q_strlen(mapname) == 0)
 #endif
 		return 0;
-	
+
 	Q_snprintf(cBuf, sizeof(cBuf), "maps/%.32s.bsp", mapname);
 	return FS_FileExists(cBuf);
 }
@@ -1943,7 +1943,12 @@ void EXT_FUNC PF_crosshairangle_I(const edict_t *clientent, float pitch, float y
 	}
 }
 
-edict_t* EXT_FUNC PF_CreateFakeClient_I(const char *netname)
+edict_t *EXT_FUNC PF_CreateFakeClient_I(const char *netname)
+{
+	return g_RehldsHookchains.m_CreateFakeClient.callChain(CreateFakeClient_internal, netname);
+}
+
+edict_t *EXT_FUNC CreateFakeClient_internal(const char *netname)
 {
 	client_t *fakeclient;
 	edict_t *ent;
