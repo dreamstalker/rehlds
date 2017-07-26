@@ -46,6 +46,7 @@
 #include <algorithm>
 #include <deque>
 #include <functional>
+#include <memory>
 
 #ifdef _WIN32 // WINDOWS
 	#define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers

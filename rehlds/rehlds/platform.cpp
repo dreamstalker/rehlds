@@ -1,17 +1,17 @@
 #include "precompiled.h"
 
-IReHLDSPlatform* CRehldsPlatformHolder::m_Platform;
+std::unique_ptr<IReHLDSPlatform> CRehldsPlatformHolder::m_Platform;
 
 IReHLDSPlatform* CRehldsPlatformHolder::get() {
-	if (m_Platform == NULL) {
-		m_Platform = new CSimplePlatform();
+	if (m_Platform == nullptr) {
+		m_Platform = std::unique_ptr<IReHLDSPlatform>(new CSimplePlatform());
 	}
 
-	return m_Platform;
+	return m_Platform.get();
 }
 
 void CRehldsPlatformHolder::set(IReHLDSPlatform* p) {
-	m_Platform = p;
+	m_Platform.reset(p);
 }
 
 CSimplePlatform::CSimplePlatform() {
