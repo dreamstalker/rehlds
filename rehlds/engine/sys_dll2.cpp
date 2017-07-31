@@ -88,7 +88,7 @@ NOXREF const char *GetRateRegistrySetting(const char *pchDef)
 	return registry->ReadString("rate", pchDef);
 }
 
-void EXPORT F(IEngineAPI **api)
+DLL_EXPORT void F(IEngineAPI **api)
 {
 	CreateInterfaceFn fn;
 	fn = Sys_GetFactoryThis();
