@@ -78,7 +78,7 @@ public:
 const char *GetCurrentSteamAppName();
 NOXREF void SetRateRegistrySetting(const char *pchRate);
 NOXREF const char *GetRateRegistrySetting(const char *pchDef);
-void EXPORT F(IEngineAPI **api);
+DLL_EXPORT void F(IEngineAPI **api);
 void Sys_GetCDKey(char *pszCDKey, int *nLength, int *bDedicated);
 NOXREF void Legacy_ErrorMessage(int nLevel, const char *pszErrorMessage);
 void Legacy_Sys_Printf(char *fmt, ...);
