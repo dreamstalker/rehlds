@@ -115,7 +115,7 @@ public:
 
 class CRehldsPlatformHolder {
 private:
-	static IReHLDSPlatform* m_Platform;
+	static std::unique_ptr<IReHLDSPlatform> m_Platform;
 
 public:
 	static IReHLDSPlatform* get();
