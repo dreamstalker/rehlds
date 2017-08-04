@@ -2859,7 +2859,7 @@ void Host_Stopdemo_f(void)
 	}
 }
 
-NOXREF void Host_EndSection(const char *pszSection)
+NOXREF void EXT_FUNC Host_EndSection(const char *pszSection)
 {
 	NOXREFCHECK;
 	giActive = DLL_PAUSED;

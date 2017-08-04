@@ -475,7 +475,7 @@ void* EXT_FUNC PvEntPrivateData(edict_t *pEdict)
 	return pEdict->pvPrivateData;
 }
 
-void FreeEntPrivateData(edict_t *pEdict)
+void EXT_FUNC FreeEntPrivateData(edict_t *pEdict)
 {
 	if (pEdict->pvPrivateData)
 	{
