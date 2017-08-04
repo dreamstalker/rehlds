@@ -85,28 +85,28 @@ public:
 	Network();
 	virtual ~Network() {}
 
-	bool Init(IBaseSystem *system, int serial, char *name);
-	void RunFrame(double time);
-	void ReceiveSignal(ISystemModule *module, unsigned int signal, void *data);
-	void ExecuteCommand(int commandID, char *commandLine);
-	void RegisterListener(ISystemModule *module);
-	void RemoveListener(ISystemModule *module);
-	IBaseSystem *GetSystem();
-	int GetSerial();
-	char *GetStatusLine();
-	char *GetType();
-	char *GetName();
-	int GetState();
-	int GetVersion();
-	void ShutDown();
+	EXT_FUNC bool Init(IBaseSystem *system, int serial, char *name);
+	EXT_FUNC void RunFrame(double time);
+	EXT_FUNC void ReceiveSignal(ISystemModule *module, unsigned int signal, void *data);
+	EXT_FUNC void ExecuteCommand(int commandID, char *commandLine);
+	EXT_FUNC void RegisterListener(ISystemModule *module);
+	EXT_FUNC void RemoveListener(ISystemModule *module);
+	EXT_FUNC IBaseSystem *GetSystem();
+	EXT_FUNC int GetSerial();
+	EXT_FUNC char *GetStatusLine();
+	EXT_FUNC char *GetType();
+	EXT_FUNC char *GetName();
+	EXT_FUNC int GetState();
+	EXT_FUNC int GetVersion();
+	EXT_FUNC void ShutDown();
 
-	INetSocket *CreateSocket(int port, bool reuse, bool loopback);
-	bool RemoveSocket(INetSocket *netsocket);
-	NetAddress *GetLocalAddress();
-	bool ResolveAddress(char *string, NetAddress *address);
-	void GetFlowStats(float *totalIn, float *totalOut);
-	int GetLastErrorCode();
-	char *GetErrorText(int code);
+	EXT_FUNC INetSocket *CreateSocket(int port, bool reuse, bool loopback);
+	EXT_FUNC bool RemoveSocket(INetSocket *netsocket);
+	EXT_FUNC NetAddress *GetLocalAddress();
+	EXT_FUNC bool ResolveAddress(char *string, NetAddress *address);
+	EXT_FUNC void GetFlowStats(float *totalIn, float *totalOut);
+	EXT_FUNC int GetLastErrorCode();
+	EXT_FUNC char *GetErrorText(int code);
 
 protected:
 	enum LocalCommandIDs { CMD_ID_FAKELOSS = 1 };

@@ -85,9 +85,9 @@ typedef int BOOL;
 
 #ifndef UTIL_DLLEXPORT
 #ifdef _WIN32
-#define UTIL_DLLEXPORT _declspec( dllexport )
+#define UTIL_DLLEXPORT _declspec( dllexport ) EXT_FUNC
 #else
-#define UTIL_DLLEXPORT __attribute__ ((visibility("default")))
+#define UTIL_DLLEXPORT __attribute__ ((visibility("default"))) EXT_FUNC
 #endif
 #endif
 

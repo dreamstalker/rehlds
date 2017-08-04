@@ -49,8 +49,8 @@ public:
 
 	virtual ~CServerRemoteAccess() {}
 
-	virtual void WriteDataRequest(const void *buffer, int bufferSize);
-	virtual int ReadDataResponse(void *data, int len);
+	EXT_FUNC virtual void WriteDataRequest(const void *buffer, int bufferSize);
+	EXT_FUNC virtual int ReadDataResponse(void *data, int len);
 
 	void SendMessageToAdminUI(const char *message);
 	void RequestValue(int requestID, const char *variable);

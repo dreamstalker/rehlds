@@ -39,17 +39,17 @@ public:
 	BaseSystemModule();
 	virtual ~BaseSystemModule() {}
 
-	virtual bool Init(IBaseSystem *system, int serial, char *name);
-	virtual void RunFrame(double time);
-	virtual void ReceiveSignal(ISystemModule *module, unsigned int signal, void *data);
-	virtual void ExecuteCommand(int commandID, char *commandLine);
-	virtual void RegisterListener(ISystemModule *module);
-	virtual void RemoveListener(ISystemModule *module);
-	virtual IBaseSystem *GetSystem();
-	virtual int GetSerial();
-	virtual char *GetStatusLine();
-	virtual char *GetType();
-	virtual char *GetName();
+	EXT_FUNC virtual bool Init(IBaseSystem *system, int serial, char *name);
+	EXT_FUNC virtual void RunFrame(double time);
+	EXT_FUNC virtual void ReceiveSignal(ISystemModule *module, unsigned int signal, void *data);
+	EXT_FUNC virtual void ExecuteCommand(int commandID, char *commandLine);
+	EXT_FUNC virtual void RegisterListener(ISystemModule *module);
+	EXT_FUNC virtual void RemoveListener(ISystemModule *module);
+	EXT_FUNC virtual IBaseSystem *GetSystem();
+	EXT_FUNC virtual int GetSerial();
+	EXT_FUNC virtual char *GetStatusLine();
+	EXT_FUNC virtual char *GetType();
+	EXT_FUNC virtual char *GetName();
 
 	enum ModuleState {
 		MODULE_UNDEFINED = 0,
@@ -59,10 +59,10 @@ public:
 		MODULE_DISCONNECTED
 	};
 
-	virtual int GetState();
-	virtual int GetVersion();
-	virtual void ShutDown();
-	virtual char *GetBaseDir() { return ""; }
+	EXT_FUNC virtual int GetState();
+	EXT_FUNC virtual int GetVersion();
+	EXT_FUNC virtual void ShutDown();
+	EXT_FUNC virtual char *GetBaseDir() { return ""; }
 	void FireSignal(unsigned int signal, void *data = nullptr);
 
 protected:

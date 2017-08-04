@@ -104,7 +104,7 @@ float fran1()
 		return temp;
 }
 
-float RandomFloat(float flLow, float flHigh)
+float EXT_FUNC RandomFloat(float flLow, float flHigh)
 {
 	SeedRandomNumberGenerator();
 
@@ -114,7 +114,7 @@ float RandomFloat(float flLow, float flHigh)
 
 #define MAX_RANDOM_RANGE 0x7FFFFFFFUL
 
-int RandomLong(int lLow, int lHigh)
+int EXT_FUNC RandomLong(int lLow, int lHigh)
 {
 	SeedRandomNumberGenerator();
 

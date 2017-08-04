@@ -38,21 +38,21 @@ public:
 	NetSocket() : m_netSplitSequenceNumber(0) {}
 	virtual ~NetSocket() {}
 
-	NetPacket *ReceivePacket();
-	void FreePacket(NetPacket *packet);
-	bool SendPacket(NetPacket *packet);
-	bool SendPacket(NetAddress *packet, const void *data, int length);
-	void AddPacket(NetPacket *packet);
-	bool AddChannel(INetChannel *channel);
-	bool RemoveChannel(INetChannel *channel);
-	INetwork *GetNetwork();
-	void OutOfBandPrintf(NetAddress *to, const char *format, ...);
-	void Flush();
-	void GetFlowStats(float *avgInKBSec, float *avgOutKBSec);
-	bool LeaveGroup(NetAddress *group);
-	bool JoinGroup(NetAddress *group);
-	void Close();
-	int GetPort();
+	EXT_FUNC NetPacket *ReceivePacket();
+	EXT_FUNC void FreePacket(NetPacket *packet);
+	EXT_FUNC bool SendPacket(NetPacket *packet);
+	EXT_FUNC bool SendPacket(NetAddress *packet, const void *data, int length);
+	EXT_FUNC void AddPacket(NetPacket *packet);
+	EXT_FUNC bool AddChannel(INetChannel *channel);
+	EXT_FUNC bool RemoveChannel(INetChannel *channel);
+	EXT_FUNC INetwork *GetNetwork();
+	EXT_FUNC void OutOfBandPrintf(NetAddress *to, const char *format, ...);
+	EXT_FUNC void Flush();
+	EXT_FUNC void GetFlowStats(float *avgInKBSec, float *avgOutKBSec);
+	EXT_FUNC bool LeaveGroup(NetAddress *group);
+	EXT_FUNC bool JoinGroup(NetAddress *group);
+	EXT_FUNC void Close();
+	EXT_FUNC int GetPort();
 
 	bool Create(Network *network, int port, bool reuse, bool loopback);
 	void UpdateStats(double time);

@@ -45,7 +45,7 @@ public:
 
 	virtual ~IHookChainImpl() {}
 
-	virtual t_ret callNext(t_args... args) {
+	EXT_FUNC virtual t_ret callNext(t_args... args) {
 		hookfunc_t nexthook = (hookfunc_t)m_Hooks[0];
 
 		if (nexthook)
@@ -57,7 +57,7 @@ public:
 		return m_OriginalFunc(args...);
 	}
 
-	virtual t_ret callOriginal(t_args... args) {
+	EXT_FUNC virtual t_ret callOriginal(t_args... args) {
 		return m_OriginalFunc(args...);
 	}
 
@@ -76,7 +76,7 @@ public:
 	IVoidHookChainImpl(void** hooks, origfunc_t orig) : m_Hooks(hooks), m_OriginalFunc(orig) {}
 	virtual ~IVoidHookChainImpl() {}
 
-	virtual void callNext(t_args... args) {
+	EXT_FUNC virtual void callNext(t_args... args) {
 		hookfunc_t nexthook = (hookfunc_t)m_Hooks[0];
 
 		if (nexthook)
@@ -91,7 +91,7 @@ public:
 		}
 	}
 
-	virtual void callOriginal(t_args... args) {
+	EXT_FUNC virtual void callOriginal(t_args... args) {
 		if (m_OriginalFunc)
 			m_OriginalFunc(args...);
 	}
@@ -129,10 +129,10 @@ public:
 		return chain.callNext(args...);
 	}
 
-	virtual void registerHook(hookfunc_t hook, int priority) {
+	EXT_FUNC virtual void registerHook(hookfunc_t hook, int priority) {
 		addHook((void*)hook, priority);
 	}
-	virtual void unregisterHook(hookfunc_t hook) {
+	EXT_FUNC virtual void unregisterHook(hookfunc_t hook) {
 		removeHook((void*)hook);
 	}
 };
@@ -150,11 +150,11 @@ public:
 		chain.callNext(args...);
 	}
 
-	virtual void registerHook(hookfunc_t hook, int priority) {
+	EXT_FUNC virtual void registerHook(hookfunc_t hook, int priority) {
 		addHook((void*)hook, priority);
 	}
 
-	virtual void unregisterHook(hookfunc_t hook) {
+	EXT_FUNC virtual void unregisterHook(hookfunc_t hook) {
 		removeHook((void*)hook);
 	}
 };

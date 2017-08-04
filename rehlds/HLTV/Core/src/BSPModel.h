@@ -46,15 +46,15 @@ public:
 	BSPModel() {}
 	virtual ~BSPModel() {}
 
-	void Init(IBaseSystem *system);
-	void Clear();
-	bool Load(const char *name, bool minimal);
-	bool IsValid();
-	bool IsMinimal();
-	void SetPVS(vec_t *point);
-	bool InPVS(vec_t *point);
-	bool TraceLine(vec_t *start, vec_t *end, vec_t *impact);
-	int TruePointContents(vec_t *point);
+	EXT_FUNC void Init(IBaseSystem *system);
+	EXT_FUNC void Clear();
+	EXT_FUNC bool Load(const char *name, bool minimal);
+	EXT_FUNC bool IsValid();
+	EXT_FUNC bool IsMinimal();
+	EXT_FUNC void SetPVS(vec_t *point);
+	EXT_FUNC bool InPVS(vec_t *point);
+	EXT_FUNC bool TraceLine(vec_t *start, vec_t *end, vec_t *impact);
+	EXT_FUNC int TruePointContents(vec_t *point);
 
 private:
 	void LoadTextures(lump_t *l);
