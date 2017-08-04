@@ -68,11 +68,11 @@ private:
 	char m_OrigCmd[1024];
 
 public:
-	virtual bool Init(char *basedir, char *cmdline, CreateInterfaceFn launcherFactory, CreateInterfaceFn filesystemFactory);
-	virtual int Shutdown();
-	virtual bool RunFrame();
-	virtual void AddConsoleText(char *text);
-	virtual void UpdateStatus(float *fps, int *nActive, int *nMaxPlayers, char *pszMap);
+	EXT_FUNC virtual bool Init(char *basedir, char *cmdline, CreateInterfaceFn launcherFactory, CreateInterfaceFn filesystemFactory);
+	EXT_FUNC virtual int Shutdown();
+	EXT_FUNC virtual bool RunFrame();
+	EXT_FUNC virtual void AddConsoleText(char *text);
+	EXT_FUNC virtual void UpdateStatus(float *fps, int *nActive, int *nMaxPlayers, char *pszMap);
 };
 
 const char *GetCurrentSteamAppName();

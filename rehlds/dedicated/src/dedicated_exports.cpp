@@ -30,7 +30,7 @@
 
 class CDedicatedExports: public IDedicatedExports {
 public:
-	void Sys_Printf(char *text);
+	EXT_FUNC void Sys_Printf(char *text);
 };
 
 EXPOSE_SINGLE_INTERFACE(CDedicatedExports, IDedicatedExports, VENGINE_DEDICATEDEXPORTS_API_VERSION);

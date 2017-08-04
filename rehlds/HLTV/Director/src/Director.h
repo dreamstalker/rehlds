@@ -40,21 +40,21 @@ public:
 	Director() {}
 	virtual ~Director() {}
 
-	virtual bool Init(IBaseSystem *system, int serial, char *name);
-	virtual void RunFrame(double time);
-	virtual void ReceiveSignal(ISystemModule *module, unsigned int signal, void *data);
-	virtual void ExecuteCommand(int commandID, char *commandLine);
-	virtual char *GetStatusLine();
-	virtual char *GetType();
-	virtual void ShutDown();
+	EXT_FUNC virtual bool Init(IBaseSystem *system, int serial, char *name);
+	EXT_FUNC virtual void RunFrame(double time);
+	EXT_FUNC virtual void ReceiveSignal(ISystemModule *module, unsigned int signal, void *data);
+	EXT_FUNC virtual void ExecuteCommand(int commandID, char *commandLine);
+	EXT_FUNC virtual char *GetStatusLine();
+	EXT_FUNC virtual char *GetType();
+	EXT_FUNC virtual void ShutDown();
 
-	virtual void NewGame(IWorld *world, IProxy *proxy);
-	virtual char *GetModName();
-	virtual void WriteCommands(BitBuffer *stream, float startTime, float endTime);
-	virtual int AddCommand(DirectorCmd *cmd);
-	virtual bool RemoveCommand(int index);
-	virtual DirectorCmd *GetLastCommand();
-	virtual IObjectContainer *GetCommands();
+	EXT_FUNC virtual void NewGame(IWorld *world, IProxy *proxy);
+	EXT_FUNC virtual char *GetModName();
+	EXT_FUNC virtual void WriteCommands(BitBuffer *stream, float startTime, float endTime);
+	EXT_FUNC virtual int AddCommand(DirectorCmd *cmd);
+	EXT_FUNC virtual bool RemoveCommand(int index);
+	EXT_FUNC virtual DirectorCmd *GetLastCommand();
+	EXT_FUNC virtual IObjectContainer *GetCommands();
 
 	typedef struct playerData_s {
 		vec3_t origin;
