@@ -87,9 +87,9 @@ public:
 	EXPOSE_SINGLE_INTERFACE_GLOBALVAR(className, interfaceName, versionName, __g_##className##_singleton)
 
 #ifdef _WIN32
-	#define EXPORT_FUNCTION __declspec(dllexport)
+	#define EXPORT_FUNCTION __declspec(dllexport) EXT_FUNC
 #else
-	#define EXPORT_FUNCTION __attribute__((visibility("default")))
+	#define EXPORT_FUNCTION __attribute__((visibility("default"))) EXT_FUNC
 #endif // _WIN32
 
 // This function is automatically exported and allows you to access any interfaces exposed with the above macros.

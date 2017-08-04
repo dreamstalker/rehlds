@@ -46,15 +46,15 @@
 // C functions for external declarations that call the appropriate C++ methods
 #ifndef EXPORT
 #ifdef _WIN32
-#define EXPORT	__declspec(dllexport)
+#define EXPORT	__declspec(dllexport) EXT_FUNC
 #else
-#define EXPORT	/* */
+#define EXPORT	EXT_FUNC
 #endif
 #endif
 
 #ifdef _WIN32
 // Used for dll exporting and importing
-#define DLL_EXPORT extern "C" __declspec(dllexport)
+#define DLL_EXPORT extern "C" __declspec(dllexport) EXT_FUNC
 #define DLL_IMPORT extern "C" __declspec(dllimport)
 
 // Can't use extern "C" when DLL exporting a class
@@ -67,7 +67,7 @@
 #elif defined __linux__
 
 // Used for dll exporting and importing
-#define DLL_EXPORT extern "C"
+#define DLL_EXPORT extern "C" EXT_FUNC
 #define DLL_IMPORT extern "C"
 
 // Can't use extern "C" when DLL exporting a class
