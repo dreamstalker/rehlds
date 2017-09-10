@@ -1067,7 +1067,7 @@ void LoadThisDll(const char *szDllFilename)
 		goto IgnoreThisDLL;
 	}
 #else // _WIN32
-	void *hDLL = dlopen(szDllFilename, RTLD_NOW);
+	void *hDLL = dlopen(szDllFilename, RTLD_NOW | RTLD_DEEPBIND | RTLD_LOCAL);
 	if (!hDLL)
 	{
 		Con_Printf("LoadLibrary failed on %s: %s\n", szDllFilename, dlerror());
