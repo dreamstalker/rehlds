@@ -88,7 +88,7 @@ void *GetModuleHandle(const char *name)
 		return nullptr;
 	}
 
-	if ((handle = dlopen(name, RTLD_NOW | RTLD_DEEPBIND | RTLD_LOCAL)) == nullptr)
+	if ((handle = dlopen(name, RTLD_NOW)) == nullptr)
 	{
 		//printf("Error:%s\n",dlerror());
 		// couldn't open this file
@@ -139,12 +139,12 @@ CSysModule *Sys_LoadModule(const char *pModuleName)
 			szCwd[strlen(szCwd) - 1] = '\0';
 
 		_snprintf(szAbsoluteModuleName, sizeof(szAbsoluteModuleName), "%s/%s", szCwd, pModuleName);
-		hDLL = dlopen(szAbsoluteModuleName, RTLD_NOW | RTLD_DEEPBIND | RTLD_LOCAL);
+		hDLL = dlopen(szAbsoluteModuleName, RTLD_NOW);
 	}
 	else
 	{
 		_snprintf(szAbsoluteModuleName, sizeof(szAbsoluteModuleName), "%s", pModuleName);
-		hDLL = dlopen(pModuleName, RTLD_NOW | RTLD_DEEPBIND | RTLD_LOCAL);
+		hDLL = dlopen(pModuleName, RTLD_NOW);
 	}
 #endif // _WIN32
 
@@ -158,11 +158,11 @@ CSysModule *Sys_LoadModule(const char *pModuleName)
 #elif defined(OSX)
 		printf("Error: %s\n", dlerror());
 		_snprintf(str, sizeof(str), "%s.dylib", szAbsoluteModuleName);
-		hDLL = dlopen(str, RTLD_NOW | RTLD_DEEPBIND | RTLD_LOCAL);
+		hDLL = dlopen(str, RTLD_NOW);
 #else
 		printf("Error: %s\n", dlerror());
 		_snprintf(str, sizeof(str), "%s.so", szAbsoluteModuleName);
-		hDLL = dlopen(str, RTLD_NOW | RTLD_DEEPBIND | RTLD_LOCAL);
+		hDLL = dlopen(str, RTLD_NOW);
 #endif
 	}
 

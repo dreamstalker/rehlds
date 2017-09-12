@@ -232,7 +232,7 @@ bool HIDDEN FillModule(Section *section, Module *module)
 	module->base = base;
 	module->size = end - base;
 	module->end = module->base + module->size - 1;
-	module->handle = (size_t)dlopen(filename, RTLD_NOW | RTLD_DEEPBIND | RTLD_LOCAL);	// lock from unloading
+	module->handle = (size_t)dlopen(filename, RTLD_NOW);	// lock from unloading
 
 	ProcessModuleData(module);
 

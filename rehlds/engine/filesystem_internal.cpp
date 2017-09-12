@@ -330,7 +330,7 @@ void *FS_LoadLibrary(const char *dllName)
 #ifdef _WIN32
 		result = LoadLibraryA(dllName);
 #else
-		result = dlopen(dllName, RTLD_NOW | RTLD_DEEPBIND | RTLD_LOCAL);
+		result = dlopen(dllName, RTLD_NOW);
 #endif
 	}
 
