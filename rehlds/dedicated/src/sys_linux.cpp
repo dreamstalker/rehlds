@@ -227,7 +227,11 @@ long CSys::LoadLibrary(char *lib)
 
 	Q_snprintf(absolute_lib, sizeof(absolute_lib), "%s/%s", cwd, lib);
 
+#ifdef LAUNCHER_FIXES
+	void *hDll = dlopen(absolute_lib, RTLD_NOW | RTLD_DEEPBIND | RTLD_LOCAL);
+#else // LAUNCHER_FIXES
 	void *hDll = dlopen(absolute_lib, RTLD_NOW);
+#endif // LAUNCHER_FIXES
 	if (!hDll)
 	{
 		ErrorMessage(1, dlerror());
