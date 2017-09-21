@@ -191,7 +191,11 @@ struct hull_s *SV_HullForBsp(edict_t *ent, const vec_t *mins, const vec_t *maxs,
 		else
 		{
 			float zSize = maxs[2] - mins[2];
+#ifdef REHLDS_FIXES
+			if (zSize > (player_maxs[1][2] - player_mins[1][2]))
+#else // REHLDS_FIXES
 			if (zSize > 36.0f)
+#endif // REHLDS_FIXES
 				hull = &model->hulls[1];
 			else
 				hull = &model->hulls[3];
