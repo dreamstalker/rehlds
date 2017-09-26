@@ -12,6 +12,7 @@ apply plugin: IccCompilerPlugin
 apply plugin: GccCompilerPlugin
 
 void setupToolchain(NativeBinarySpec b) {
+	boolean useGcc = project.hasProperty("useGcc")
 	def cfg = rootProject.createToolchainConfig(b);
 	cfg.projectInclude(project, '/..', '/../..', '/src', '/../../common', '/../../engine', '/../../public', '/../../public/rehlds', '/../../pm_shared');
 	cfg.singleDefines 'USE_BREAKPAD_HANDLER', 'HLTV', 'DIRECTOR_MODULE'
@@ -27,10 +28,12 @@ void setupToolchain(NativeBinarySpec b) {
 		cfg.compilerOptions.args '/Ob2', '/Oi', '/GF'
 	}
 	else if (cfg instanceof GccToolchainConfig) {
-		cfg.compilerOptions.pchConfig = new GccToolchainConfig.PrecompilerHeaderOptions(
-			enabled: true,
-			pchSourceSet: 'director_pch'
-		);
+		if (!useGcc) {
+			cfg.compilerOptions.pchConfig = new GccToolchainConfig.PrecompilerHeaderOptions(
+				enabled: true,
+				pchSourceSet: 'director_pch'
+			);
+		}
 
 		cfg.compilerOptions.languageStandard = 'c++0x'
 		cfg.defines([
@@ -41,7 +44,15 @@ void setupToolchain(NativeBinarySpec b) {
 			'_snprintf': 'snprintf',
 		]);
 
-		cfg.compilerOptions.args '-Qoption,cpp,--treat_func_as_string_literal_cpp', '-fno-exceptions'
+		if (useGcc) {
+			// Produce code optimized for the most common IA32/AMD64/EM64T processors.
+			// As new processors are deployed in the marketplace, the behavior of this option will change.
+			cfg.compilerOptions.args '-mtune=generic', '-Wno-write-strings', '-msse3', '-flto'
+		} else {
+			cfg.compilerOptions.args '-Qoption,cpp,--treat_func_as_string_literal_cpp'
+		}
+
+		cfg.compilerOptions.args '-fno-exceptions'
 	}
 
 	ToolchainConfigUtils.apply(project, cfg, b);
@@ -61,7 +72,10 @@ model {
 	toolChains {
 		visualCpp(VisualCpp) {
 		}
-		icc(Icc) {
+		if (project.hasProperty("useGcc")) {
+			gcc(Gcc)
+		} else {
+			icc(Icc)
 		}
 	}
 

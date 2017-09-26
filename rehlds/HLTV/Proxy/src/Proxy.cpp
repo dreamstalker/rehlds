@@ -222,7 +222,7 @@ bool Proxy::Init(IBaseSystem *system, int serial, char *name)
 		-1.f, -1.f,				// x, y
 		0.5f, 2.f,				// fadein, fadeout
 		5.f, 0.f,				// holdtime, fxtime
-		""						// text
+		{}						// text
 	};
 
 	Q_memset(&m_CommentatorMessage, 0, sizeof(m_CommentatorMessage));
@@ -233,7 +233,7 @@ bool Proxy::Init(IBaseSystem *system, int serial, char *name)
 		-1.f, -1.f,				// x, y
 		0.3f, 1.f,				// fadein, fadeout
 		5.f, 0.f,				// holdtime, fxtime
-		""						// text
+		{}						// text
 	};
 
 	Q_strlcpy(m_OffLineText, "Game is delayed. Please try again later.");

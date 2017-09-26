@@ -14,6 +14,7 @@ apply plugin: GccCompilerPlugin
 project.ext.dep_bzip2 = project(':dep/bzip2')
 
 void setupToolchain(NativeBinarySpec b) {
+	boolean useGcc = project.hasProperty("useGcc")
 	def cfg = rootProject.createToolchainConfig(b);
 	cfg.projectInclude(project, '/..', '/../..', '/src', '/../../common', '/../../engine', '/../../public', '/../../public/rehlds', '/../../pm_shared');
 	cfg.projectInclude(dep_bzip2, '/include')
@@ -32,12 +33,14 @@ void setupToolchain(NativeBinarySpec b) {
 		cfg.extraLibs "ws2_32.lib", "psapi.lib"
 	}
 	else if (cfg instanceof GccToolchainConfig) {
-		cfg.compilerOptions.pchConfig = new GccToolchainConfig.PrecompilerHeaderOptions(
-			enabled: true,
-			pchSourceSet: 'core_pch'
-		);
+		if (!useGcc) {
+			cfg.compilerOptions.pchConfig = new GccToolchainConfig.PrecompilerHeaderOptions(
+				enabled: true,
+				pchSourceSet: 'core_pch'
+			);
+		}
 
-		cfg.compilerOptions.languageStandard = 'c++0x'
+		cfg.compilerOptions.languageStandard = 'c++11'
 		cfg.defines([
 			'_strdup': 'strdup',
 			'_stricmp': 'strcasecmp',
@@ -46,7 +49,15 @@ void setupToolchain(NativeBinarySpec b) {
 			'_snprintf': 'snprintf',
 		]);
 
-		cfg.compilerOptions.args '-Qoption,cpp,--treat_func_as_string_literal_cpp', '-fno-exceptions'
+		if (useGcc) {
+			// Produce code optimized for the most common IA32/AMD64/EM64T processors.
+			// As new processors are deployed in the marketplace, the behavior of this option will change.
+			cfg.compilerOptions.args '-mtune=generic', '-Wno-write-strings', '-msse3', '-flto'
+		} else {
+			cfg.compilerOptions.args '-Qoption,cpp,--treat_func_as_string_literal_cpp'
+		}
+
+		cfg.compilerOptions.args '-fno-exceptions'
 	}
 
 	ToolchainConfigUtils.apply(project, cfg, b);
@@ -66,7 +77,10 @@ model {
 	toolChains {
 		visualCpp(VisualCpp) {
 		}
-		icc(Icc) {
+		if (project.hasProperty("useGcc")) {
+			gcc(Gcc)
+		} else {
+			icc(Icc)
 		}
 	}
 

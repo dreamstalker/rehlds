@@ -168,10 +168,10 @@ void setupToolchain(NativeBinarySpec b) {
 			// As new processors are deployed in the marketplace, the behavior of this option will change.
 			cfg.compilerOptions.args '-mtune=generic', '-Wno-write-strings', '-msse3'
 		} else {
-			cfg.compilerOptions.args '-Qoption,cpp,--treat_func_as_string_literal_cpp', '-fno-rtti'
+			cfg.compilerOptions.args '-Qoption,cpp,--treat_func_as_string_literal_cpp'
 		}
 
-		cfg.compilerOptions.args '-fno-exceptions'
+		cfg.compilerOptions.args '-fno-rtti', '-fno-exceptions'
 		cfg.projectLibpath(project, '/lib/linux32')
 		cfg.extraLibs 'rt', 'dl', 'm', 'steam_api', 'aelf32'
 	}
@@ -364,8 +364,14 @@ task buildFixes {
 	}
 }
 
+task buildEngine {
+	dependsOn binaries.withType(SharedLibraryBinarySpec).matching {
+		SharedLibraryBinarySpec blib -> blib.buildable && blib.buildType.name == 'release' && blib.flavor.name == 'rehldsFixes' && blib.component.name == 'rehlds_swds_engine'
+	}
+}
+
 gradle.taskGraph.whenReady { graph ->
-	if (!graph.hasTask(buildFixes)) {
+	if (!graph.hasTask(buildFixes) && !graph.hasTask(buildEngine)) {
 		return;
 	}
 
