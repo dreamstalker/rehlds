@@ -56,6 +56,17 @@ Bugfixed version of rehlds contains an additional cvars:
 <li>sv_rehlds_attachedentities_playeranimationspeed_fix // Fixes bug with gait animation speed increase when player has some attached entities (aiments). Can cause animation lags when cl_updaterate is low. Default: 0
 </ul>
 
+## Extra commands
+Bugfixed version of rehlds contains additional commands:
+<ul>
+<li>show_precached_resource_count // Server command which prints in console the total precached resources count, and separately prints the precache counts for models, sounds, generic, events and decals. Usefull for managing resources and dealing with the goldsource precache limits.
+<li>show_precached_models // Server command which lists all precached models in the server console.
+<li>show_precached_sounds // Server command which lists all precached sounds in the server console.
+<li>show_precached_generic // Server command which lists all precached generics in the server console.
+<li>show_precached_events // Server command which lists all precached events in the server console.
+<li>show_precached_decals // Server command which lists all precached decals in the server console.
+</ul>
+
 ## Build instructions
 There are several software requirements for building rehlds:
 <ol>
