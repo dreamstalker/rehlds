@@ -2981,6 +2981,16 @@ NOXREF void Host_Crash_f(void)
 	*p = 0xffffffff;
 }
 
+template <typename T, typename T2>
+size_t SV_CountResources(const T& resources, T2 stopPredicate)
+{
+	size_t count = 0;
+	for (size_t i = 1; i < ARRAYSIZE(resources) && !stopPredicate(resources[i]); ++i) {
+		++count;
+	}
+	return count;
+}
+
 void Host_InitCommands(void)
 {
 #ifdef HOOK_ENGINE
@@ -3104,25 +3114,15 @@ void Host_InitCommands(void)
 		"show_precached_resource_count",
 		[]
 		{
-			auto countResources =
-				[](const auto& resources, auto stopPredicate)
-				{
-					size_t count = 0;
-					for (size_t i = 1; i < ARRAYSIZE(resources) && !stopPredicate(resources[i]); ++i) {
-						++count;
-					}
-					return count;
-				};
-
 			Con_Printf("Total resource count %d (max %d)\n", g_psv.num_resources, ARRAYSIZE(g_rehlds_sv.resources));
 
 			Con_Printf("Precached model count %d (max %d)\n",
-				countResources(g_psv.model_precache, [](const char* s) { return s == nullptr; }),
+				SV_CountResources(g_psv.model_precache, [](const char* s) { return s == nullptr; }),
 				MAX_MODELS - 2); // CL_LoadModel expects last model slot is empty
 
 			// TODO: find real max count of sounds
 			Con_Printf("Precached sound count %d (max %d)\n",
-				countResources(g_psv.sound_precache, [](const char* s) { return s == nullptr; }),
+				SV_CountResources(g_psv.sound_precache, [](const char* s) { return s == nullptr; }),
 				MAX_SOUNDS - 1);
 
 			// TODO: generic? other? or something else?
@@ -3132,7 +3132,7 @@ void Host_InitCommands(void)
 
 			// TODO: find real max count of events
 			Con_Printf("Precached event count %d (max %d)\n",
-				countResources(g_psv.event_precache, [](const event_t& ev) { return ev.filename == nullptr; }),
+				SV_CountResources(g_psv.event_precache, [](const event_t& ev) { return ev.filename == nullptr; }),
 				MAX_EVENTS - 1);
 
 			Con_Printf("Precached decal count %d (max %d)\n", sv_decalnamecount, MAX_DECALS);
