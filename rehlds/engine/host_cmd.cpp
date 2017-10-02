@@ -3096,6 +3096,101 @@ void Host_InitCommands(void)
 	Cmd_AddCommand("heartbeat", Master_Heartbeat_f);
 #endif // HOOK_ENGINE
 
+#ifdef REHLDS_FIXES
+	// TODO: move callbacks from lambdas to global functions?
+	// TODO: do something with indentation here
+	// TODO: add these commands to README
+	Cmd_AddCommand(
+		"show_precached_resource_count",
+		[]
+		{
+			auto countResources =
+				[](const auto& resources, auto stopPredicate)
+				{
+					size_t count = 0;
+					for (size_t i = 1; i < ARRAYSIZE(resources) && !stopPredicate(resources[i]); ++i) {
+						++count;
+					}
+					return count;
+				};
+
+			Con_Printf("Total resource count %d (max %d)\n", g_psv.num_resources, ARRAYSIZE(g_rehlds_sv.resources));
+
+			Con_Printf("Precached model count %d (max %d)\n",
+				countResources(g_psv.model_precache, [](const char* s) { return s == nullptr; }),
+				MAX_MODELS - 2); // CL_LoadModel expects last model slot is empty
+
+			// TODO: find real max count of sounds
+			Con_Printf("Precached sound count %d (max %d)\n",
+				countResources(g_psv.sound_precache, [](const char* s) { return s == nullptr; }),
+				MAX_SOUNDS - 1);
+
+			// TODO: generic? other? or something else?
+			Con_Printf("Precached generic count %d (max %d)\n",
+				g_rehlds_sv.precachedGenericResourceCount,
+				ARRAYSIZE(g_rehlds_sv.precachedGenericResourceNames));
+
+			// TODO: find real max count of events
+			Con_Printf("Precached event count %d (max %d)\n",
+				countResources(g_psv.event_precache, [](const event_t& ev) { return ev.filename == nullptr; }),
+				MAX_EVENTS - 1);
+
+			Con_Printf("Precached decal count %d (max %d)\n", sv_decalnamecount, MAX_DECALS);
+		});
+
+	Cmd_AddCommand(
+		"show_precached_models",
+		[]
+		{
+			for (size_t i = 1; i < ARRAYSIZE(g_psv.model_precache) && g_psv.model_precache[i] != nullptr; i++) {
+				// TODO: count number of spaces automatically
+				Con_Printf("%3d: %s\n", i, g_psv.model_precache[i]);
+			}
+		});
+
+	Cmd_AddCommand(
+		"show_precached_sounds",
+		[]
+		{
+			for (size_t i = 1; i < ARRAYSIZE(g_psv.sound_precache) && g_psv.sound_precache[i] != nullptr; i++) {
+				Con_Printf("%3d: %s\n", i, g_psv.sound_precache[i]);
+			}
+		});
+	
+	// TODO: generic? generics? or something else?
+	Cmd_AddCommand(
+		"show_precached_generic",
+		[]
+		{
+			for (size_t i = 0; i < g_rehlds_sv.precachedGenericResourceCount; i++) {
+				// TODO: count from zero (as is) or from one?
+				Con_Printf("%4d: %s\n", i + 1, g_rehlds_sv.precachedGenericResourceNames[i]);
+			}
+		});
+	
+	Cmd_AddCommand(
+		"show_precached_events",
+		[]
+		{
+			for (size_t i = 1; i < ARRAYSIZE(g_psv.event_precache) && g_psv.event_precache[i].filename != nullptr; i++) {
+				// TODO: ev.index or i? ev.index may be unordered if someone modify it, also SV_CreateResourceList ignores it
+				Con_Printf("%3d: %s\n", g_psv.event_precache[i].index, g_psv.event_precache[i].filename);
+			}
+		});
+	
+	Cmd_AddCommand(
+		"show_precached_decals",
+		[]
+		{
+			for (size_t i = 0; i < sv_decalnamecount; i++) {
+				// TODO: count from zero (print actual index?) or from one? or print both?
+				// TODO: count from one can confuse, because developers use 0-based indexes for decals
+				// TODO: or may be count from zero and print the actual count at the end or at the begin
+				Con_Printf("%3d: %s\n", i + 1, sv_decalnames[i].name);
+			}
+		});
+#endif // REHLDS_FIXES
+
 	Cvar_RegisterVariable(&gHostMap);
 	Cvar_RegisterVariable(&voice_recordtofile);
 	Cvar_RegisterVariable(&voice_inputfromfile);
