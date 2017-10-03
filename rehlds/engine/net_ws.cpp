@@ -1055,7 +1055,7 @@ qboolean NET_QueuePacket(netsrc_t sock)
 	return NET_GetLong(in_message.data, ret, &in_message.cursize);
 }
 
-DLL_EXPORT int NET_Sleep_Timeout(void)
+EXPORT_FUNCTION int NET_Sleep_Timeout(void)
 {
 	static int32 lasttime;
 	static int numFrames;
