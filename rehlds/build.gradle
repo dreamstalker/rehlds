@@ -171,7 +171,7 @@ void setupToolchain(NativeBinarySpec b) {
 			cfg.compilerOptions.args '-Qoption,cpp,--treat_func_as_string_literal_cpp'
 		}
 		cfg.compilerOptions.args '-ffunction-sections', '-fdata-sections' // Remove unused code and data
-		cfg.compilerOptions.args '-fno-rtti', '-fno-exceptions'
+		cfg.compilerOptions.args '-fno-rtti', '-fno-exceptions', '-fvisibility=hidden', '-fvisibility-inlines-hidden'
 
 		cfg.linkerOptions.args '-Wl,--version-script=../version_script.lds', '-Wl,--gc-sections'
 
