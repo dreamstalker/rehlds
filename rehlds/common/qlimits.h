@@ -24,6 +24,7 @@
 
 #define MAX_LIGHTSTYLE_INDEX_BITS	6
 #define MAX_LIGHTSTYLES			(1<<MAX_LIGHTSTYLE_INDEX_BITS)
+constexpr auto MAX_LIGHTSTYLE_SIZE = size_t{64};
 
 // Resource counts
 #define MAX_MODEL_INDEX_BITS		9	// sent as a short

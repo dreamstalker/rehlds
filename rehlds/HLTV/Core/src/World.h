@@ -251,6 +251,7 @@ protected:
 	entity_state_t m_Instanced_BaseLines[MAX_INSTANCED_BASELINES];
 
 	int m_MaxInstanced_BaseLine;
+	// TODO: wtf, why 65? here should be 64
 	char m_Lightstyles[MAX_LIGHTSTYLES][65];
 
 	movevars_t m_MoveVars;

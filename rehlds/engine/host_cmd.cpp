@@ -1636,8 +1636,8 @@ SAVERESTOREDATA *SaveGamestate(void)
 		if (g_psv.lightstyles[i])
 		{
 			light.index = i;
-			Q_strncpy(light.style, g_psv.lightstyles[i], 63);
-			light.style[63] = 0;
+			Q_strncpy(light.style, g_psv.lightstyles[i], ARRAYSIZE(light.style) - 1);
+			light.style[ARRAYSIZE(light.style) - 1] = '\0';
 			gEntityInterface.pfnSaveWriteFields(pSaveData, "LIGHTSTYLE", &light, gLightstyleDescription, ARRAYSIZE(gLightstyleDescription));
 		}
 	}
@@ -1844,9 +1844,14 @@ void ParseSaveTables(SAVERESTOREDATA *pSaveData, SAVE_HEADER *pHeader, int updat
 		gEntityInterface.pfnSaveReadFields(pSaveData, "LIGHTSTYLE", &light, gLightstyleDescription, ARRAYSIZE(gLightstyleDescription));
 		if (updateGlobals)
 		{
+			// TODO: why copied only 3 symbols, while allocated buffer has length+1 size, we also saving full string, not only 3 chars
+#ifdef REHLDS_FIXES
+			char* val = g_rehlds_sv.lightstyleBuffers[light.index];
+#else // REHLDS_FIXES
 			char *val = (char *)Hunk_Alloc(Q_strlen(light.style) + 1);
+#endif // REHLDS_FIXES
 			Q_strncpy(val, light.style, 3);
-			val[3] = 0;
+			val[3] = '\0';
 			g_psv.lightstyles[light.index] = val;
 		}
 	}
