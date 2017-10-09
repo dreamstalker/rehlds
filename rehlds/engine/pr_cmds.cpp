@@ -1711,7 +1711,12 @@ int EXT_FUNC PF_DecalIndex(const char *name)
 
 void EXT_FUNC PF_lightstyle_I(int style, const char *val)
 {
+#ifdef REHLDS_FIXES
+	Q_strlcpy(g_rehlds_sv.lightstyleBuffers[style], val);
+	g_psv.lightstyles[style] = g_rehlds_sv.lightstyleBuffers[style];
+#else // REHLDS_FIXES
 	g_psv.lightstyles[style] = val;
+#endif // REHLDS_FIXES
 	if (g_psv.state != ss_active)
 		return;
 

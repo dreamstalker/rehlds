@@ -69,7 +69,7 @@ typedef struct SAVE_HEADER_s
 typedef struct SAVELIGHTSTYLE_s
 {
 	int index;
-	char style[64];
+	char style[MAX_LIGHTSTYLE_SIZE];
 } SAVELIGHTSTYLE;
 
 typedef struct TITLECOMMENT_s
