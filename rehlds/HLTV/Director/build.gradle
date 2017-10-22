@@ -3,6 +3,7 @@ import org.doomedsociety.gradlecpp.msvc.MsvcToolchainConfig
 import org.doomedsociety.gradlecpp.toolchain.icc.Icc
 import org.doomedsociety.gradlecpp.toolchain.icc.IccCompilerPlugin
 import org.doomedsociety.gradlecpp.gcc.GccToolchainConfig
+import org.doomedsociety.gradlecpp.GradleCppUtils
 import org.gradle.nativeplatform.NativeBinarySpec
 import org.gradle.nativeplatform.NativeLibrarySpec
 import org.gradle.nativeplatform.toolchain.VisualCpp
@@ -135,6 +136,19 @@ model {
 	}
 }
 
+task buildFinalize << {
+	if (GradleCppUtils.windows) {
+		return;
+	}
+
+	binaries.withType(SharedLibraryBinarySpec) {
+		def sharedBinary = it.getSharedLibraryFile();
+		if (sharedBinary.exists()) {
+			sharedBinary.renameTo(new File(sharedBinary.getParent() + "/" + sharedBinary.getName().replaceFirst("^lib", "")));
+		}
+	}
+}
+
 task buildFixes {
 	dependsOn binaries.withType(SharedLibraryBinarySpec).matching { SharedLibraryBinarySpec blib ->
 		blib.buildable && blib.buildType.name == 'release'
@@ -146,6 +160,10 @@ task buildRelease {
 		blib.buildable && blib.buildType.name == 'release'
 	}
 }
+
+build.finalizedBy(buildFinalize);
+buildFixes.finalizedBy(buildFinalize);
+buildRelease.finalizedBy(buildFinalize);
 
 // prevent static lib building
 binaries.withType(StaticLibraryBinarySpec) { binary ->

@@ -355,6 +355,19 @@ model {
 	}
 }
 
+task buildFinalize << {
+	if (GradleCppUtils.windows) {
+		return;
+	}
+
+	binaries.withType(SharedLibraryBinarySpec) {
+		def sharedBinary = it.getSharedLibraryFile();
+		if (sharedBinary.exists()) {
+			sharedBinary.renameTo(new File(sharedBinary.getParent() + "/" + sharedBinary.getName().replaceFirst("^lib", "")));
+		}
+	}
+}
+
 task buildRelease {
 	dependsOn binaries.withType(SharedLibraryBinarySpec).matching { SharedLibraryBinarySpec blib ->
 		blib.buildable && blib.buildType.name == 'release' && !blib.name.contains('Rehlds_hooker_engine')
@@ -372,6 +385,10 @@ task buildEngine {
 		SharedLibraryBinarySpec blib -> blib.buildable && blib.buildType.name == 'release' && blib.flavor.name == 'rehldsFixes' && blib.component.name == 'rehlds_swds_engine'
 	}
 }
+
+buildFixes.finalizedBy(buildFinalize);
+buildEngine.finalizedBy(buildFinalize);
+buildRelease.finalizedBy(buildFinalize);
 
 gradle.taskGraph.whenReady { graph ->
 	if (!graph.hasTask(buildFixes) && !graph.hasTask(buildEngine)) {
