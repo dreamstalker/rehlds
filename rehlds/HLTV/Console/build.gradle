@@ -65,6 +65,7 @@ void setupToolchain(NativeBinarySpec b) {
 			cfg.compilerOptions.args '-Qoption,cpp,--treat_func_as_string_literal_cpp'
 		}
 
+		cfg.linkerOptions.args '-no-pie'
 		cfg.compilerOptions.args '-fno-rtti', '-fno-exceptions'
 		cfg.extraLibs 'dl'
 	}

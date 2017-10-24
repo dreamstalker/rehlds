@@ -340,7 +340,8 @@ const char *CCommandLine::CheckParm(const char *psz, char **ppszValue) const
 		if (p2[i] == '\0' || p2[i] == ' ')
 			break;
 
-		sz[i++] = p2[i];
+		sz[i] = p2[i];
+		i++;
 	} while (i < sizeof(sz));
 
 	sz[i] = '\0';
