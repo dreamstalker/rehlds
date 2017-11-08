@@ -1271,7 +1271,7 @@ void SV_SetupMove(client_t *_host_client)
 
 	if ( i >= SV_UPDATE_BACKUP || targettime - nextFrame->senttime > 1.0)
 	{
-		Q_memset(truepositions, 0, 0xB00u);
+		Q_memset(truepositions, 0, sizeof(truepositions));
 		nofind = 1;
 		return;
 	}
