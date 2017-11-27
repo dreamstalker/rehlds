@@ -29,6 +29,7 @@
 #include "precompiled.h"
 #include "jitasm.h"
 
+#ifdef REHLDS_JIT
 CDeltaJitRegistry g_DeltaJitRegistry;
 
 uint32 DELTAJIT_CreateMask(int startBit, int endBit) {
@@ -686,11 +687,11 @@ void CDeltaJitRegistry::CreateAndRegisterDeltaJIT(delta_t* delta) {
 
 	CDeltaClearMarkFieldsJIT* cleanMarkCheckFunc = new CDeltaClearMarkFieldsJIT(&data);
 	cleanMarkCheckFunc->Assemble();
-	cleanMarkCheckFunc->jitdesc = NULL;
+	cleanMarkCheckFunc->jitdesc = nullptr;
 
 	CDeltaTestDeltaJIT* testDeltaFunc = new CDeltaTestDeltaJIT(&data);
 	testDeltaFunc->Assemble();
-	testDeltaFunc->jitdesc = NULL;
+	testDeltaFunc->jitdesc = nullptr;
 
 	// align to 16
 	CDeltaJit* deltaJit = new CDeltaJit(delta, cleanMarkCheckFunc, testDeltaFunc);
@@ -731,13 +732,13 @@ void DELTAJit_SetSendFlagBits(delta_t *pFields, int *bits, int *bytecount) {
 	*bytecount = deltaJit->markedFieldsMaskSize;
 }
 
-void DELTAJit_SetFieldByIndex(struct delta_s *pFields, int fieldNumber)
+void DELTAJit_SetFieldByIndex(delta_t *pFields, int fieldNumber)
 {
 	CDeltaJit* deltaJit = DELTAJit_LookupDeltaJit(__func__, pFields);
 	deltaJit->marked_fields_mask.u32[fieldNumber >> 5] |= (1 << (fieldNumber & 31));
 }
 
-void DELTAJit_UnsetFieldByIndex(struct delta_s *pFields, int fieldNumber)
+void DELTAJit_UnsetFieldByIndex(delta_t *pFields, int fieldNumber)
 {
 	CDeltaJit* deltaJit = DELTAJit_LookupDeltaJit(__func__, pFields);
 	deltaJit->marked_fields_mask.u32[fieldNumber >> 5] &= ~(1 << (fieldNumber & 31));
@@ -777,3 +778,4 @@ void CDeltaJitRegistry::Cleanup() {
 	}
 #endif
 }
+#endif
