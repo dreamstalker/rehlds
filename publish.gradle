@@ -62,6 +62,10 @@ task publishPrepareFiles {
 		_copyFile('publish/director.dll', 'publish/publishRoot/bin/win32/valve/dlls/director.dll')
 		_copyFile('publish/director.so', 'publish/publishRoot/bin/linux32/valve/dlls/director.so')
 
+		// FileSystem binaries
+		_copyFile('publish/filesystem_stdio.dll', 'publish/publishRoot/bin/win32/filesystem_stdio.dll')
+		_copyFile('publish/filesystem_stdio.so', 'publish/publishRoot/bin/linux32/filesystem_stdio.so')
+
 		// hlsdk
 		project.file('publish/publishRoot/hlsdk').mkdirs()
 		copy {

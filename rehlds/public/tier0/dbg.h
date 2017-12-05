@@ -45,12 +45,12 @@
 // Usage model for the Dbg library
 //
 // 1. Spew.
-// 
+//
 //   Spew can be used in a static and a dynamic mode. The static
 //   mode allows us to display assertions and other messages either only
 //   in debug builds, or in non-release builds. The dynamic mode allows us to
 //   turn on and off certain spew messages while the application is running.
-// 
+//
 //   Static Spew messages:
 //
 //     Assertions are used to detect and warn about invalid states
@@ -65,14 +65,14 @@
 //     AssertFloatEquals( f, 5.0f, 1e-3 );
 //
 //     The first will simply report that an assertion failed on a particular
-//     code file and line. The second version will display a print-f formatted message 
+//     code file and line. The second version will display a print-f formatted message
 //	   along with the file and line, the third will display a generic message and
 //     will also cause the function BadFunc to be executed, and the last two
 //	   will report an error if f is not equal to 5 (the last one asserts within
 //	   a particular tolerance).
 //
 //     To use a warning, use
-//      
+//
 //     Warning("Oh I feel so %s all over\n", "yummy");
 //
 //     Warning will do its magic in only Debug builds. To perform spew in *all*
@@ -86,24 +86,24 @@
 //
 //   Dynamic Spew messages
 //
-//     It is possible to dynamically turn spew on and off. Dynamic spew is 
-//     identified by a spew group and priority level. To turn spew on for a 
-//     particular spew group, use SpewActivate( "group", level ). This will 
-//     cause all spew in that particular group with priority levels <= the 
-//     level specified in the SpewActivate function to be printed. Use DSpew 
+//     It is possible to dynamically turn spew on and off. Dynamic spew is
+//     identified by a spew group and priority level. To turn spew on for a
+//     particular spew group, use SpewActivate( "group", level ). This will
+//     cause all spew in that particular group with priority levels <= the
+//     level specified in the SpewActivate function to be printed. Use DSpew
 //     to perform the spew:
 //
 //     DWarning( "group", level, "Oh I feel even yummier!\n" );
 //
 //     Priority level 0 means that the spew will *always* be printed, and group
-//     '*' is the default spew group. If a DWarning is encountered using a group 
-//     whose priority has not been set, it will use the priority of the default 
-//     group. The priority of the default group is initially set to 0.      
+//     '*' is the default spew group. If a DWarning is encountered using a group
+//     whose priority has not been set, it will use the priority of the default
+//     group. The priority of the default group is initially set to 0.
 //
 //   Spew output
-//   
+//
 //     The output of the spew system can be redirected to an externally-supplied
-//     function which is responsible for outputting the spew. By default, the 
+//     function which is responsible for outputting the spew. By default, the
 //     spew is simply printed using printf.
 //
 //     To redirect spew output, call SpewOutput.
@@ -113,8 +113,8 @@
 //     This will cause OutputFunc to be called every time a spew message is
 //     generated. OutputFunc will be passed a spew type and a message to print.
 //     It must return a value indicating whether the debugger should be invoked,
-//     whether the program should continue running, or whether the program 
-//     should abort. 
+//     whether the program should continue running, or whether the program
+//     should abort.
 //
 // 2. Code activation
 //
@@ -126,10 +126,10 @@
 //					int x = 5;
 //					++x;
 //				}
-//           ); 
+//           );
 //
 //   Code can be activated based on the dynamic spew groups also. Use
-//  
+//
 //   DBG_DCODE( "group", level,
 //              { int x = 5; ++x; }
 //            );
@@ -254,7 +254,7 @@ SpewRetval_t   _DSpewMessage(char const *pGroupName, int level, char const* pMsg
 #define  Assert( _exp )           _Assert( _exp )
 #define  AssertMsg( _exp, _msg )  _AssertMsg( _exp, _msg )
 #define  AssertFunc( _exp, _f )   _AssertFunc( _exp, _f )
-#define  AssertEquals( _exp, _expectedValue )              _AssertEquals( _exp, _expectedValue ) 
+#define  AssertEquals( _exp, _expectedValue )              _AssertEquals( _exp, _expectedValue )
 #define  AssertFloatEquals( _exp, _expectedValue, _tol )   _AssertFloatEquals( _exp, _expectedValue, _tol )
 #define  Verify( _exp )           _Assert( _exp )
 
@@ -336,7 +336,7 @@ void DevLog(char const *pMsg, ...);
 
 #define DBG_CODE( _code )            if (0) ; else { _code }
 #define DBG_DCODE( _g, _l, _code )   if (IsSpewActive( _g, _l )) { _code } else {}
-#define DBG_BREAK()                  DebuggerBreak()	/* defined in platform.h */ 
+#define DBG_BREAK()                  DebuggerBreak()	/* defined in platform.h */
 
 #else /* not _DEBUG */
 
