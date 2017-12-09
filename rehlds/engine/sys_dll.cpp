@@ -428,13 +428,12 @@ NOBODY void MaskExceptions(void);
 
 NOBODY void Sys_Init(void);
 
-NOXREF void Sys_Sleep(int msec)
+void Sys_Sleep(int msec)
 {
-	NOXREFCHECK;
 #ifdef _WIN32
 	Sleep(msec);
 #else
-	usleep(1000 *msec);
+	usleep(1000 * msec);
 #endif // _WIN32
 }
 
