@@ -24,7 +24,7 @@ void setupToolchain(NativeBinarySpec b) {
 	boolean useGcc = project.hasProperty("useGcc")
 	def cfg = rootProject.createToolchainConfig(b);
 	cfg.projectInclude(project, '/..', '/../..', '/src', '/../../common', '/../../engine', '/../../public', '/../../public/rehlds');
-	cfg.singleDefines 'USE_BREAKPAD_HANDLER', 'HLTV', '_CONSOLE'
+	cfg.singleDefines 'USE_BREAKPAD_HANDLER', 'HLTV', 'LAUNCHER_FIXES', '_CONSOLE'
 
 	if (cfg instanceof MsvcToolchainConfig) {
 		cfg.compilerOptions.pchConfig = new MsvcToolchainConfig.PrecompiledHeadersConfig(

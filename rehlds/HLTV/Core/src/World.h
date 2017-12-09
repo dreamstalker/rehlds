@@ -251,8 +251,12 @@ protected:
 	entity_state_t m_Instanced_BaseLines[MAX_INSTANCED_BASELINES];
 
 	int m_MaxInstanced_BaseLine;
-	// TODO: wtf, why 65? here should be 64
+
+#ifdef HOOK_HLTV
 	char m_Lightstyles[MAX_LIGHTSTYLES][65];
+#else
+	char m_Lightstyles[MAX_LIGHTSTYLES][64];
+#endif // HOOK_HLTV
 
 	movevars_t m_MoveVars;
 	BSPModel m_WorldModel;

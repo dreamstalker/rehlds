@@ -353,13 +353,6 @@ void World::AddLightStyle(int index, char *style)
 		m_System->Printf("WARNING! World::SetLightStyle: style too long (%i).\n", length);
 	}
 
-	// FIXME: code mismatch
-	// Original code:
-	// Q_strncopy(..., 64);
-	// ...[63] = '\0';
-	// Current code:
-	// Q_strncopy(..., 64);
-	// ...[64] = '\0';
 	Q_strlcpy(m_Lightstyles[index], style);
 }
 
