@@ -1310,6 +1310,7 @@ void NET_AllocateQueues(void)
 
 void NET_FlushQueues(void)
 {
+	NET_StopThread();
 	for (int i = 0; i < NS_MAX; i++)
 	{
 		net_messages_t *p = messages[i];
