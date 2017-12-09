@@ -72,6 +72,12 @@ typedef struct delta_description_s
 
 class CDeltaJit;
 
+union delta_marked_mask_t {
+	uint8 u8[8];
+	uint32 u32[2];
+	uint64 u64;
+};
+
 typedef struct delta_s
 {
 	int dynamic;
@@ -80,8 +86,10 @@ typedef struct delta_s
 	encoder_t conditionalencode;
 	delta_description_t *pdd;
 
-#ifdef REHLDS_FIXES
+#if defined(REHLDS_JIT)
 	CDeltaJit* jit;
+#elif defined(REHLDS_FIXES)
+	delta_marked_mask_t originalMarkedFieldsMask;
 #endif
 } delta_t;
 
@@ -136,6 +144,8 @@ qboolean DELTA_CheckDelta(unsigned char *from, unsigned char *to, delta_t *pFiel
 
 #ifdef REHLDS_FIXES //Fix for https://github.com/dreamstalker/rehlds/issues/24
 qboolean DELTA_WriteDeltaForceMask(unsigned char *from, unsigned char *to, qboolean force, delta_t *pFields, void(*callback)(void), void* pForceMask);
+uint64 DELTA_GetOriginalMask(delta_t* pFields);
+uint64 DELTA_GetMaskU64(delta_t* pFields);
 #endif
 
 qboolean DELTA_WriteDelta(unsigned char *from, unsigned char *to, qboolean force, delta_t *pFields, void(*callback)(void));
