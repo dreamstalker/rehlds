@@ -2832,7 +2832,7 @@ NOXREF void ReplyServerChallenge(netadr_t *adr)
 	buf.flags = SIZEBUF_ALLOW_OVERFLOW;
 
 	MSG_WriteLong(&buf, 0xffffffff);
-	MSG_WriteByte(&buf, 65);
+	MSG_WriteByte(&buf, S2C_CHALLENGE);
 	MSG_WriteLong(&buf, GetChallengeNr(adr));
 	NET_SendPacket(NS_SERVER, buf.cursize, (char *)buf.data, *adr);
 }
@@ -3000,7 +3000,7 @@ NOXREF void SVC_Info(qboolean bDetailed)
 	}
 
 	MSG_WriteLong(&buf, 0xffffffff);
-	MSG_WriteByte(&buf, bDetailed ? 109 : 67);
+	MSG_WriteByte(&buf, bDetailed ? S2A_INFO_DETAILED : S2A_INFO);
 
 	if (noip)
 	{
@@ -3102,7 +3102,7 @@ NOXREF void SVC_PlayerInfo(void)
 	buf.flags = SIZEBUF_ALLOW_OVERFLOW;
 
 	MSG_WriteLong(&buf, 0xffffffff);
-	MSG_WriteByte(&buf, 68);
+	MSG_WriteByte(&buf, S2A_PLAYERS);
 
 	for (i = 0; i < g_psvs.maxclients; i++)
 	{
@@ -3154,7 +3154,7 @@ NOXREF void SVC_RuleInfo(void)
 		return;
 
 	MSG_WriteLong(&buf, 0xffffffff);
-	MSG_WriteByte(&buf, 69);
+	MSG_WriteByte(&buf, S2A_RULES);
 	MSG_WriteShort(&buf, nNumRules);
 
 	var = cvar_vars;
@@ -3216,7 +3216,7 @@ void SV_FlushRedirect(void)
 		buf.flags = SIZEBUF_ALLOW_OVERFLOW;
 
 		MSG_WriteLong(&buf, -1);
-		MSG_WriteByte(&buf, 0x6Cu);
+		MSG_WriteByte(&buf, A2A_PRINT);
 		MSG_WriteString(&buf, outputbuf);
 		MSG_WriteByte(&buf, 0);
 		NET_SendPacket(NS_SERVER, buf.cursize, buf.data, sv_redirectto);
@@ -4435,8 +4435,8 @@ int SV_CreatePacketEntities_internal(sv_delta_t type, client_t *client, packet_e
 		);
 		baselineToIdx = -1;
 
-		uint64 origMask = DELTAJit_GetOriginalMask(delta);
-		uint64 usedMask = DELTAJit_GetMaskU64(delta);
+		uint64 origMask = DELTA_GetOriginalMask(delta);
+		uint64 usedMask = DELTA_GetMaskU64(delta);
 		uint64 diffMask = origMask ^ usedMask;
 
 		//Remember changed fields that was marked in original mask, but unmarked by the conditional encoder
@@ -7717,7 +7717,7 @@ void SV_RegisterDelta(char *name, char *loadfile)
 	p->next = g_sv_delta;
 	g_sv_delta = p;
 
-#if defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)
+#if (defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)) && defined REHLDS_JIT
 	g_DeltaJitRegistry.CreateAndRegisterDeltaJIT(pdesc);
 #endif
 }
@@ -7763,7 +7763,7 @@ void SV_InitDeltas(void)
 		Sys_Error("%s: No usercmd_t encoder on server!\n", __func__);
 #endif
 
-#if defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)
+#if (defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)) && defined REHLDS_JIT
 	g_DeltaJitRegistry.CreateAndRegisterDeltaJIT(&g_MetaDelta[0]);
 #endif
 }
@@ -7966,7 +7966,9 @@ void SV_Init(void)
 
 void SV_Shutdown(void)
 {
+#if (defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)) && defined REHLDS_JIT
 	g_DeltaJitRegistry.Cleanup();
+#endif
 	delta_info_t *p = g_sv_delta;
 	while (p)
 	{

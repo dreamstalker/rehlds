@@ -168,10 +168,13 @@ void setupToolchain(NativeBinarySpec b) {
 			// As new processors are deployed in the marketplace, the behavior of this option will change.
 			cfg.compilerOptions.args '-mtune=generic', '-Wno-write-strings', '-msse3'
 		} else {
-			cfg.compilerOptions.args '-Qoption,cpp,--treat_func_as_string_literal_cpp', '-fno-rtti'
+			cfg.compilerOptions.args '-Qoption,cpp,--treat_func_as_string_literal_cpp'
 		}
+		cfg.compilerOptions.args '-ffunction-sections', '-fdata-sections' // Remove unused code and data
+		cfg.compilerOptions.args '-fno-rtti', '-fno-exceptions'
 
-		cfg.compilerOptions.args '-fno-exceptions'
+		cfg.linkerOptions.args '-Wl,--version-script=../version_script.lds', '-Wl,--gc-sections'
+
 		cfg.projectLibpath(project, '/lib/linux32')
 		cfg.extraLibs 'rt', 'dl', 'm', 'steam_api', 'aelf32'
 	}
@@ -181,11 +184,11 @@ void setupToolchain(NativeBinarySpec b) {
 	}
 
 	if (unitTestExecutable) {
-		cfg.singleDefines 'REHLDS_UNIT_TESTS'
+		cfg.singleDefines 'REHLDS_UNIT_TESTS', 'REHLDS_SSE', 'REHLDS_JIT'
 	}
 
 	if (rehldsFixes) {
-		cfg.singleDefines 'REHLDS_FIXES', 'REHLDS_CHECKS', 'HAVE_OPT_STRTOOLS'
+		cfg.singleDefines 'REHLDS_FIXES', 'REHLDS_SSE', 'REHLDS_JIT', 'REHLDS_CHECKS', 'HAVE_OPT_STRTOOLS'
 	}
 
 	ToolchainConfigUtils.apply(project, cfg, b)
@@ -352,6 +355,19 @@ model {
 	}
 }
 
+task buildFinalize << {
+	if (GradleCppUtils.windows) {
+		return;
+	}
+
+	binaries.withType(SharedLibraryBinarySpec) {
+		def sharedBinary = it.getSharedLibraryFile();
+		if (sharedBinary.exists()) {
+			sharedBinary.renameTo(new File(sharedBinary.getParent() + "/" + sharedBinary.getName().replaceFirst("^lib", "")));
+		}
+	}
+}
+
 task buildRelease {
 	dependsOn binaries.withType(SharedLibraryBinarySpec).matching { SharedLibraryBinarySpec blib ->
 		blib.buildable && blib.buildType.name == 'release' && !blib.name.contains('Rehlds_hooker_engine')
@@ -364,8 +380,18 @@ task buildFixes {
 	}
 }
 
+task buildEngine {
+	dependsOn binaries.withType(SharedLibraryBinarySpec).matching {
+		SharedLibraryBinarySpec blib -> blib.buildable && blib.buildType.name == 'release' && blib.flavor.name == 'rehldsFixes' && blib.component.name == 'rehlds_swds_engine'
+	}
+}
+
+buildFixes.finalizedBy(buildFinalize);
+buildEngine.finalizedBy(buildFinalize);
+buildRelease.finalizedBy(buildFinalize);
+
 gradle.taskGraph.whenReady { graph ->
-	if (!graph.hasTask(buildFixes)) {
+	if (!graph.hasTask(buildFixes) && !graph.hasTask(buildEngine)) {
 		return;
 	}
 

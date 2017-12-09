@@ -950,7 +950,7 @@ void EXT_FUNC GetAttachment(const edict_t *pEdict, int iAttachment, float *rgflO
 	);
 
 	if (rgflOrigin)
-		VectorTransform(pattachment->org, (float *)bonetransform[pattachment->bone], rgflOrigin);
+		VectorTransform(pattachment->org, bonetransform[pattachment->bone], rgflOrigin);
 }
 
 int ModelFrameCount(model_t *model)

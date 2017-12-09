@@ -94,7 +94,7 @@ void Sleep_Select(int msec)
 
 void Sleep_Net(int msec)
 {
-		NET_Sleep_Timeout();
+	NET_Sleep_Timeout();
 }
 
 // linux runs on a 100Hz scheduling clock, so the minimum latency from

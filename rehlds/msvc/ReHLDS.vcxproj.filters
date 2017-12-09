@@ -353,6 +353,9 @@
     <ClCompile Include="..\engine\SystemWrapper.cpp">
       <Filter>engine\common</Filter>
     </ClCompile>
+    <ClCompile Include="..\engine\mathlib_sse.cpp">
+      <Filter>engine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\version\version.h">
@@ -1080,6 +1083,9 @@
     </ClInclude>
     <ClInclude Include="..\public\strtools.h">
       <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\mathlib_sse.h">
+      <Filter>engine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

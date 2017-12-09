@@ -63,10 +63,13 @@ NOINLINE void _FillTestDelta(delta_test_struct_t* data, unsigned char val) {
 
 NOINLINE qboolean _DoMarkFields(void* src, void* dst, delta_t* delta, bool useJit) {
 	qboolean sendfields;
+#ifdef REHLDS_JIT
 	if (useJit) {
 		DELTA_ClearFlags(delta);
 		return DELTAJit_Fields_Clear_Mark_Check((unsigned char*)src, (unsigned char*)dst, delta, NULL);
-	} else {
+	} else
+#endif
+	{
 		DELTA_ClearFlags(delta);
 		DELTA_MarkSendFields((unsigned char*)src, (unsigned char*)dst, delta);
 		sendfields = DELTA_CountSendFields(delta);
@@ -140,9 +143,12 @@ NOINLINE void _MarkAndEnsureCorrectResults(const char* action, delta_t* delta, v
 
 	delta_marked_mask_t returnedMask;
 	int returnedBytecount;
+#ifdef REHLDS_JIT
 	if (useJit) {
 		DELTAJit_SetSendFlagBits(delta, (int*)returnedMask.u32, &returnedBytecount);
-	} else {
+	} else
+#endif
+	{
 		DELTA_SetSendFlagBits(delta, (int*)returnedMask.u32, &returnedBytecount);
 	}
 
@@ -159,10 +165,13 @@ NOINLINE void _MarkAndEnsureCorrectResults(const char* action, delta_t* delta, v
 
 
 NOINLINE void _GetBitmaskAndBytecount(delta_t* delta, int* bits, int* bytecount, int usejit) {
+#ifdef REHLDS_JIT
 	if (usejit) {
 		DELTAJit_SetSendFlagBits(delta, bits, bytecount);
 	}
-	else {
+	else
+#endif
+	{
 		DELTA_SetSendFlagBits(delta, bits, bytecount);
 	}
 }
@@ -209,8 +218,9 @@ NOINLINE delta_t* _CreateTestDeltaDesc() {
 	dinfo->next = g_sv_delta;
 	g_sv_delta = dinfo;
 
+#ifdef REHLDS_JIT
 	g_DeltaJitRegistry.CreateAndRegisterDeltaJIT(delta);
-
+#endif
 	return delta;
 };
 
@@ -345,11 +355,8 @@ TEST(TestDelta_Test, Delta, 1000) {
 	testdata[2].f_18 = 2.0;
 	testdata[2].wb_20 = 2.0;
 	strcpy(testdata[2].s_24, "TestDelta_Test" );
-#ifdef REHLDS_FIXES
+
 	result[2] = delta->pdd[10].significant_bits + delta->pdd[12].significant_bits + strlen(testdata[2].s_24) * 8 + 8 + (13 / 8 * 8 + 8);
-#else
-	result[2] = delta->pdd[10].significant_bits + delta->pdd[12].significant_bits + (13 / 8 * 8 + 8);
-#endif
 
 	// change byte + int + float + short
 	testdata[3].b_4D = 4;

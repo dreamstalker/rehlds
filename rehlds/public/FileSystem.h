@@ -64,20 +64,22 @@ enum
 
 typedef enum
 {
+	FILESYSTEM_WARNING = -1,					// A problem!
 	FILESYSTEM_WARNING_QUIET = 0,				// Don't print anything
 	FILESYSTEM_WARNING_REPORTUNCLOSED,			// On shutdown, report names of files left unclosed
 	FILESYSTEM_WARNING_REPORTUSAGE,				// Report number of times a file was opened, closed
 	FILESYSTEM_WARNING_REPORTALLACCESSES		// Report all open/close events to console (!slow!)
 } FileWarningLevel_t;
 
-#define FILESYSTEM_INVALID_HANDLE (FileHandle_t)0
+const FileHandle_t FILESYSTEM_INVALID_HANDLE = nullptr;
+
 #endif // FILESYSTEM_INTERNAL_H
 
 // turn off any windows defines
 #undef GetCurrentDirectory
 
 // Purpose: Main file system interface
-class IFileSystem : public IBaseInterface
+class IFileSystem: public IBaseInterface
 {
 public:
 	// Mount and unmount the filesystem
@@ -114,10 +116,10 @@ public:
 	virtual void			Close(FileHandle_t file) = 0;
 
 	virtual void			Seek(FileHandle_t file, int pos, FileSystemSeek_t seekType) = 0;
-	virtual unsigned int	Tell(FileHandle_t file) = 0;
+	virtual size_t			Tell(FileHandle_t file) = 0;
 
-	virtual unsigned int	Size(FileHandle_t file) = 0;
-	virtual unsigned int	Size(const char *pFileName) = 0;
+	virtual size_t			Size(FileHandle_t file) = 0;
+	virtual size_t			Size(const char *pFileName) = 0;
 
 	virtual long			GetFileTime(const char *pFileName) = 0;
 	virtual void			FileTimeToString(char *pStrip, int maxCharsIncludingTerminator, long fileTime) = 0;
@@ -130,7 +132,7 @@ public:
 	virtual int				Read(void *pOutput, int size, FileHandle_t file) = 0;
 	virtual int				Write(void const *pInput, int size, FileHandle_t file) = 0;
 	virtual char			*ReadLine(char *pOutput, int maxChars, FileHandle_t file) = 0;
-	virtual int				FPrintf(FileHandle_t file, char *pFormat, ...) = 0;
+	virtual int				FPrintf(FileHandle_t file, const char *fmt, ...) = 0;
 
 	// direct filesystem buffer access
 	// returns a handle to a buffer containing the file data

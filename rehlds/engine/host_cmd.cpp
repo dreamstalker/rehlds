@@ -1636,8 +1636,7 @@ SAVERESTOREDATA *SaveGamestate(void)
 		if (g_psv.lightstyles[i])
 		{
 			light.index = i;
-			Q_strncpy(light.style, g_psv.lightstyles[i], 63);
-			light.style[63] = 0;
+			Q_strlcpy(light.style, g_psv.lightstyles[i]);
 			gEntityInterface.pfnSaveWriteFields(pSaveData, "LIGHTSTYLE", &light, gLightstyleDescription, ARRAYSIZE(gLightstyleDescription));
 		}
 	}
@@ -1844,10 +1843,15 @@ void ParseSaveTables(SAVERESTOREDATA *pSaveData, SAVE_HEADER *pHeader, int updat
 		gEntityInterface.pfnSaveReadFields(pSaveData, "LIGHTSTYLE", &light, gLightstyleDescription, ARRAYSIZE(gLightstyleDescription));
 		if (updateGlobals)
 		{
+#ifdef REHLDS_FIXES
+			Q_strlcpy(g_rehlds_sv.lightstyleBuffers[light.index], light.style);
+			g_psv.lightstyles[light.index] = g_rehlds_sv.lightstyleBuffers[light.index];
+#else // REHLDS_FIXES
 			char *val = (char *)Hunk_Alloc(Q_strlen(light.style) + 1);
-			Q_strncpy(val, light.style, 3);
-			val[3] = 0;
+			Q_strncpy(val, light.style, ARRAYSIZE(val) - 1);
+			val[ARRAYSIZE(val) - 1] = '\0';
 			g_psv.lightstyles[light.index] = val;
+#endif // REHLDS_FIXES
 		}
 	}
 }

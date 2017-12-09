@@ -339,7 +339,7 @@ void EXT_FUNC PF_traceline_Shared(const float *v1, const float *v2, int nomonste
 #ifdef REHLDS_OPT_PEDANTIC
 	trace_t trace = SV_Move_Point(v1, v2, nomonsters, ent);
 #else // REHLDS_OPT_PEDANTIC
-	trace_t trace = SV_Move(v1, vec3_origin, vec3_origin, v2, nomonsters, ent, 0);
+	trace_t trace = SV_Move(v1, vec3_origin, vec3_origin, v2, nomonsters, ent, FALSE);
 #endif // REHLDS_OPT_PEDANTIC
 
 	gGlobalVariables.trace_flags = 0;
@@ -370,7 +370,8 @@ void EXT_FUNC TraceHull(const float *v1, const float *v2, int fNoMonsters, int h
 	hullNumber = hullNumber;
 	if (hullNumber < 0 || hullNumber > 3)
 		hullNumber = 0;
-	trace_t trace = SV_Move(v1, gHullMins[hullNumber], gHullMaxs[hullNumber], v2, fNoMonsters, pentToSkip, 0);
+
+	trace_t trace = SV_Move(v1, gHullMins[hullNumber], gHullMaxs[hullNumber], v2, fNoMonsters, pentToSkip, FALSE);
 
 	ptr->fAllSolid = trace.allsolid;
 	ptr->fStartSolid = trace.startsolid;
@@ -608,7 +609,7 @@ void EXT_FUNC PF_TraceToss_DLL(edict_t *pent, edict_t *pentToIgnore, TraceResult
 
 int EXT_FUNC TraceMonsterHull(edict_t *pEdict, const float *v1, const float *v2, int fNoMonsters, edict_t *pentToSkip, TraceResult *ptr)
 {
-	qboolean monsterClip = (pEdict->v.flags & FL_MONSTERCLIP) ? 1 : 0;
+	qboolean monsterClip = (pEdict->v.flags & FL_MONSTERCLIP) ? TRUE : FALSE;
 	trace_t trace = SV_Move(v1, pEdict->v.mins, pEdict->v.maxs, v2, fNoMonsters, pentToSkip, monsterClip);
 	if (ptr)
 	{
@@ -1676,12 +1677,12 @@ int EXT_FUNC PF_droptofloor_I(edict_t *ent)
 {
 	vec3_t end;
 	trace_t trace;
-	qboolean monsterClip = (ent->v.flags & FL_MONSTERCLIP) ? 1 : 0;
+	qboolean monsterClip = (ent->v.flags & FL_MONSTERCLIP) ? TRUE : FALSE;
 
 	end[0] = ent->v.origin[0];
 	end[1] = ent->v.origin[1];
 	end[2] = ent->v.origin[2] - 256.0;
-	trace = SV_Move(ent->v.origin, ent->v.mins, ent->v.maxs, end, 0, ent, monsterClip);
+	trace = SV_Move(ent->v.origin, ent->v.mins, ent->v.maxs, end, MOVE_NORMAL, ent, monsterClip);
 	if (trace.allsolid)
 		return -1;
 
@@ -1711,7 +1712,12 @@ int EXT_FUNC PF_DecalIndex(const char *name)
 
 void EXT_FUNC PF_lightstyle_I(int style, const char *val)
 {
+#ifdef REHLDS_FIXES
+	Q_strlcpy(g_rehlds_sv.lightstyleBuffers[style], val);
+	g_psv.lightstyles[style] = g_rehlds_sv.lightstyleBuffers[style];
+#else // REHLDS_FIXES
 	g_psv.lightstyles[style] = val;
+#endif // REHLDS_FIXES
 	if (g_psv.state != ss_active)
 		return;
 
@@ -1767,7 +1773,7 @@ void EXT_FUNC PF_aim_I(edict_t *ent, float speed, float *rgflReturn)
 	start[1] += ent->v.view_ofs[1];
 	start[2] += ent->v.view_ofs[2];
 	VectorMA(start, 2048.0, dir, end);
-	tr = SV_Move(start, vec3_origin, vec3_origin, end, 0, ent, 0);
+	tr = SV_Move(start, vec3_origin, vec3_origin, end, MOVE_NORMAL, ent, FALSE);
 
 	if (tr.ent && tr.ent->v.takedamage == 2.0f && (ent->v.team <= 0 || ent->v.team != tr.ent->v.team))
 	{
@@ -1806,7 +1812,7 @@ void EXT_FUNC PF_aim_I(edict_t *ent, float speed, float *rgflReturn)
 
 		if (dist >= bestdist)
 		{
-			tr = SV_Move(start, vec3_origin, vec3_origin, end, 0, ent, 0);
+			tr = SV_Move(start, vec3_origin, vec3_origin, end, MOVE_NORMAL, ent, FALSE);
 			if (tr.ent == check)
 			{
 				bestdist = dist;

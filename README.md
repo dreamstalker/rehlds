@@ -105,6 +105,7 @@ On Linux (GCC):
 * For faster building without unit tests use this:exclamation:
 <pre>./gradlew --max-workers=1 -PuseGcc clean buildFixes</pre>
 
+Also there is a task `buildEngine`, it builds only a part of the engine.<br />
 Compiled binaries will be placed in the rehlds/build/binaries/ directory
 
 ## How can I help the project?

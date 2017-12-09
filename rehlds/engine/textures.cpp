@@ -214,8 +214,8 @@ void TEX_AddAnimatingTextures(void)
 		if (miptex[i][0] != '+' && miptex[i][0] != '-')
 			continue;
 
-		Q_strncpy(name, miptex[i], 0x1Fu);
-		name[31] = 0;
+		Q_strncpy(name, miptex[i], sizeof(name) - 1);
+		name[sizeof(name) - 1] = 0;
 
 		for (int j = 0; j < 20; j++)
 		{

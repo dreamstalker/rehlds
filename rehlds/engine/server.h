@@ -170,6 +170,8 @@ struct rehlds_server_t {
 	resource_t resources[RESOURCE_MAX_COUNT];
 	char precachedGenericResourceNames[RESOURCE_MAX_COUNT][MAX_QPATH];
 	size_t precachedGenericResourceCount;
+
+	char lightstyleBuffers[MAX_LIGHTSTYLES][MAX_LIGHTSTYLE_SIZE];
 #endif
 };
 
