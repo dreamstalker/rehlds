@@ -197,7 +197,11 @@ hull_t *SV_HullForBsp(edict_t *ent, const vec_t *mins, const vec_t *maxs, vec_t 
 	{
 		if (size[0] <= 36.0f)
 		{
+#ifdef REHLDS_FIXES
+			if (size[2] <= (player_maxs[1][2] - player_mins[1][2]))
+#else
 			if (size[2] <= 36.0f)
+#endif
 				hull = &model->hulls[3];
 			else
 				hull = &model->hulls[1];
