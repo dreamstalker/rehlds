@@ -72,6 +72,7 @@
     <ClCompile Include="..\engine\ipratelimitWrapper.cpp" />
     <ClCompile Include="..\engine\l_studio.cpp" />
     <ClCompile Include="..\engine\mathlib.cpp" />
+    <ClCompile Include="..\engine\mathlib_sse.cpp" />
     <ClCompile Include="..\engine\md5.cpp" />
     <ClCompile Include="..\engine\mem.cpp" />
     <ClCompile Include="..\engine\model.cpp" />
@@ -432,6 +433,7 @@
     <ClInclude Include="..\engine\keys.h" />
     <ClInclude Include="..\engine\l_studio.h" />
     <ClInclude Include="..\engine\mathlib_e.h" />
+    <ClInclude Include="..\engine\mathlib_sse.h" />
     <ClInclude Include="..\engine\mem.h" />
     <ClInclude Include="..\engine\model_rehlds.h" />
     <ClInclude Include="..\engine\modinfo.h" />
@@ -805,7 +807,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>REHLDS_API;REHLDS_FLIGHT_REC;REHLDS_OPT_PEDANTIC;REHLDS_FIXES;REHLDS_SELF;REHLDS_CHECKS;HAVE_OPT_STRTOOLS;USE_BREAKPAD_HANDLER;DEDICATED;SWDS;_CRT_SECURE_NO_WARNINGS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>REHLDS_API;REHLDS_FLIGHT_REC;REHLDS_OPT_PEDANTIC;REHLDS_FIXES;REHLDS_SSE;REHLDS_SELF;REHLDS_CHECKS;HAVE_OPT_STRTOOLS;USE_BREAKPAD_HANDLER;DEDICATED;SWDS;_CRT_SECURE_NO_WARNINGS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <FloatingPointModel>Precise</FloatingPointModel>
       <AdditionalOptions>/arch:IA32 %(AdditionalOptions)</AdditionalOptions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -1149,7 +1151,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>REHLDS_API;REHLDS_FLIGHT_REC;REHLDS_FIXES;REHLDS_OPT_PEDANTIC;REHLDS_SELF;REHLDS_CHECKS;HAVE_OPT_STRTOOLS;USE_BREAKPAD_HANDLER;DEDICATED;SWDS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>REHLDS_API;REHLDS_FLIGHT_REC;REHLDS_FIXES;REHLDS_SSE;REHLDS_OPT_PEDANTIC;REHLDS_SELF;REHLDS_CHECKS;HAVE_OPT_STRTOOLS;USE_BREAKPAD_HANDLER;DEDICATED;SWDS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <AdditionalOptions>/arch:IA32 %(AdditionalOptions)</AdditionalOptions>
       <PrecompiledHeader>Use</PrecompiledHeader>
