@@ -66,6 +66,6 @@ rootProject.ext.createGccConfig = { boolean release, BinaryKind binKind ->
 		)
 	}
 
-	cfg.singleDefines('LINUX')
+	cfg.singleDefines('LINUX', '_LINUX')
 	return cfg
 }

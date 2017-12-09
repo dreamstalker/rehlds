@@ -115,6 +115,7 @@ uint32 crc32c_t_nosse(uint32 iCRC, const uint8 *buf, int len) {
 	return crc;
 }
 
+#ifdef REHLDS_SSE
 FUNC_TARGET("sse4.2")
 uint32 crc32c_t8_sse(uint32 iCRC, uint8 u8) {
 	return _mm_crc32_u8(iCRC, u8);
@@ -139,6 +140,14 @@ uint32 crc32c_t_sse(uint32 iCRC, const uint8 *buf, unsigned int len) {
 uint32 crc32c_t(uint32 iCRC, const uint8 *buf, unsigned int len) {
 	return cpuinfo.sse4_2 ? crc32c_t_sse(iCRC, buf, len) : crc32c_t_nosse(iCRC, buf, len);
 }
+
+#else
+
+uint32 crc32c_t(uint32 iCRC, const uint8 *buf, unsigned int len) {
+	return crc32c_t_nosse(iCRC, buf, len);
+}
+
+#endif // REHLDS_SSE
 
 uint32 crc32c(const uint8 *buf, int len) {
 	return crc32c_t(0xffffffff, buf, len);

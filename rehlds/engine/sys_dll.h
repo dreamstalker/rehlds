@@ -150,7 +150,7 @@ NOBODY void Sys_PushFPCW_SetHigh(void);
 NOBODY void Sys_PopFPCW(void);
 NOBODY void MaskExceptions(void);
 NOBODY void Sys_Init(void);
-NOXREF void Sys_Sleep(int msec);
+void Sys_Sleep(int msec);
 NOBODY void Sys_DebugOutStraight(const char *pStr);
 void NORETURN Sys_Error(const char *error, ...);
 NOXREF void Sys_Warning(const char *pszWarning, ...);

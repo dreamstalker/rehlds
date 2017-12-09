@@ -501,7 +501,7 @@ pmtrace_t _PM_PlayerTrace(vec_t *start, vec_t *end, int traceFlags, int numphyse
 				closest = 0;
 				for (int j = 0; j < pNumHulls; j++)
 				{
-					Q_memset(&testtrace, 0, 0x44u);
+					Q_memset(&testtrace, 0, sizeof(testtrace));
 					testtrace.endpos[0] = end[0];
 					testtrace.endpos[1] = end[1];
 					testtrace.endpos[2] = end[2];

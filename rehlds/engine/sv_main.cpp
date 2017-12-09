@@ -2832,7 +2832,7 @@ NOXREF void ReplyServerChallenge(netadr_t *adr)
 	buf.flags = SIZEBUF_ALLOW_OVERFLOW;
 
 	MSG_WriteLong(&buf, 0xffffffff);
-	MSG_WriteByte(&buf, 65);
+	MSG_WriteByte(&buf, S2C_CHALLENGE);
 	MSG_WriteLong(&buf, GetChallengeNr(adr));
 	NET_SendPacket(NS_SERVER, buf.cursize, (char *)buf.data, *adr);
 }
@@ -3000,7 +3000,7 @@ NOXREF void SVC_Info(qboolean bDetailed)
 	}
 
 	MSG_WriteLong(&buf, 0xffffffff);
-	MSG_WriteByte(&buf, bDetailed ? 109 : 67);
+	MSG_WriteByte(&buf, bDetailed ? S2A_INFO_DETAILED : S2A_INFO);
 
 	if (noip)
 	{
@@ -3102,7 +3102,7 @@ NOXREF void SVC_PlayerInfo(void)
 	buf.flags = SIZEBUF_ALLOW_OVERFLOW;
 
 	MSG_WriteLong(&buf, 0xffffffff);
-	MSG_WriteByte(&buf, 68);
+	MSG_WriteByte(&buf, S2A_PLAYERS);
 
 	for (i = 0; i < g_psvs.maxclients; i++)
 	{
@@ -3154,7 +3154,7 @@ NOXREF void SVC_RuleInfo(void)
 		return;
 
 	MSG_WriteLong(&buf, 0xffffffff);
-	MSG_WriteByte(&buf, 69);
+	MSG_WriteByte(&buf, S2A_RULES);
 	MSG_WriteShort(&buf, nNumRules);
 
 	var = cvar_vars;
@@ -3216,7 +3216,7 @@ void SV_FlushRedirect(void)
 		buf.flags = SIZEBUF_ALLOW_OVERFLOW;
 
 		MSG_WriteLong(&buf, -1);
-		MSG_WriteByte(&buf, 0x6Cu);
+		MSG_WriteByte(&buf, A2A_PRINT);
 		MSG_WriteString(&buf, outputbuf);
 		MSG_WriteByte(&buf, 0);
 		NET_SendPacket(NS_SERVER, buf.cursize, buf.data, sv_redirectto);

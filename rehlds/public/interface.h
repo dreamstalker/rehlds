@@ -70,7 +70,7 @@ public:
 //
 // Use this if you want to write the factory function.
 #define EXPOSE_INTERFACE_FN(functionName, interfaceName, versionName)\
-	static InterfaceReg __g_Create##className##_reg(functionName, versionName);
+	static InterfaceReg __g_Create##interfaceName##_reg(functionName, versionName);
 
 #define EXPOSE_INTERFACE(className, interfaceName, versionName)\
 	static IBaseInterface *__Create##className##_interface() {return (interfaceName *)new className;}\

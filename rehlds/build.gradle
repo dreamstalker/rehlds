@@ -184,11 +184,11 @@ void setupToolchain(NativeBinarySpec b) {
 	}
 
 	if (unitTestExecutable) {
-		cfg.singleDefines 'REHLDS_UNIT_TESTS', 'REHLDS_JIT'
+		cfg.singleDefines 'REHLDS_UNIT_TESTS', 'REHLDS_SSE', 'REHLDS_JIT'
 	}
 
 	if (rehldsFixes) {
-		cfg.singleDefines 'REHLDS_FIXES', 'REHLDS_JIT', 'REHLDS_CHECKS', 'HAVE_OPT_STRTOOLS'
+		cfg.singleDefines 'REHLDS_FIXES', 'REHLDS_SSE', 'REHLDS_JIT', 'REHLDS_CHECKS', 'HAVE_OPT_STRTOOLS'
 	}
 
 	ToolchainConfigUtils.apply(project, cfg, b)

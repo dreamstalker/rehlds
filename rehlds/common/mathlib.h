@@ -82,6 +82,30 @@ inline T clamp(T a, T min, T max)
 	return (a > max) ? max : (a < min) ? min : a;
 }
 
+template<typename T>
+inline T M_min(T a, T b)
+{
+	return min(a, b);
+}
+
+template<typename T>
+inline T M_max(T a, T b)
+{
+	return max(a, b);
+}
+
+template<typename T>
+inline T M_clamp(T a, T min, T max)
+{
+	return clamp(a, min, max);
+}
+
+template<typename T>
+inline double M_sqrt(T value)
+{
+	return sqrt(value);
+}
+
 template <typename T>
 inline T bswap(T s)
 {

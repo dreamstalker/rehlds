@@ -59,18 +59,18 @@ public:
 		bool operator!=(const Iterator_t it) const { return m_index != it.m_index; }
 	};
 
-	Iterator_t First() const							{ return Iterator_t(IsIdxValid(0) ? 0 : InvalidIndex()); }
-	Iterator_t Next(const Iterator_t &it) const			{ return Iterator_t(IsIdxValid(it.index + 1) ? it.index + 1 : InvalidIndex()); }
-	I GetIndex(const Iterator_t &it) const				{ return it.index; }
-	bool IsIdxAfter(I i, const Iterator_t &it) const	{ return i > it.index; }
-	bool IsValidIterator(const Iterator_t &it) const	{ return IsIdxValid(it.index); }
-	Iterator_t InvalidIterator() const					{ return Iterator_t(InvalidIndex()); }
+	Iterator_t First() const                         { return Iterator_t(IsIdxValid(0) ? 0 : InvalidIndex()); }
+	Iterator_t Next(const Iterator_t &it) const      { return Iterator_t(IsIdxValid(it.index + 1) ? it.index + 1 : InvalidIndex()); }
+	I GetIndex(const Iterator_t &it) const           { return it.index; }
+	bool IsIdxAfter(I i, const Iterator_t &it) const { return i > it.index; }
+	bool IsValidIterator(const Iterator_t &it) const { return IsIdxValid(it.index); }
+	Iterator_t InvalidIterator() const               { return Iterator_t(InvalidIndex()); }
 
 	// element access
-	T&			Element(I i);
-	T const&	Element(I i) const;
-	T&			operator[](I i);
-	T const&	operator[](I i) const;
+	T&       Element(I i);
+	T const& Element(I i) const;
+	T&       operator[](I i);
+	T const& operator[](I i) const;
 
 	// Can we use this index?
 	bool IsIdxValid(I i) const;
@@ -116,7 +116,7 @@ private:
 	int m_nGrowSize;
 };
 
-// constructor, destructor
+// Constructor, Destructor
 template <class T, class I>
 CUtlMemory<T, I>::CUtlMemory(int nGrowSize, int nInitSize) : m_pMemory(0),
 m_nAllocationCount(nInitSize), m_nGrowSize(nGrowSize)
@@ -170,7 +170,7 @@ void CUtlMemory<T, I>::SetExternalBuffer(T *pMemory, int numElements)
 	m_nGrowSize = EXTERNAL_BUFFER_MARKER;
 }
 
-// element access
+// Element access
 template <class T, class I>
 inline T& CUtlMemory<T, I>::operator[](I i)
 {
@@ -199,7 +199,7 @@ inline T const& CUtlMemory<T, I>::Element(I i) const
 	return m_pMemory[i];
 }
 
-// is the memory externally allocated?
+// Is the memory externally allocated?
 template <class T, class I>
 bool CUtlMemory<T, I>::IsExternallyAllocated() const
 {
@@ -329,6 +329,7 @@ void CUtlMemory<T, I>::Purge()
 			free((void *)m_pMemory);
 			m_pMemory = 0;
 		}
+
 		m_nAllocationCount = 0;
 	}
 }
