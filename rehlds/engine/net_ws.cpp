@@ -1273,7 +1273,7 @@ qboolean NET_GetPacket(netsrc_t sock)
 	{
 		Q_memcpy(net_message.data, in_message.data, in_message.cursize);
 		net_message.cursize = in_message.cursize;
-		Q_memcpy(&net_from, &in_from, 0x14u);
+		Q_memcpy(&net_from, &in_from, sizeof(netadr_t));
 		NET_ThreadUnlock();
 		return bret;
 	}

@@ -31,6 +31,16 @@
 #include "maintypes.h"
 #include "model.h"
 
+#ifndef REHLDS_FIXES
+// NOTE: In some cases we need high precision of floating-point,
+// so use double instead of float, otherwise unittest will fail
+typedef double real_t;
+#else
+typedef float real_t;
+#endif
+
+typedef real_t real3_t[3];
+
 enum
 {
 	PITCH = 0,	// up / down
@@ -44,6 +54,22 @@ enum
 #ifdef HOOK_ENGINE
 #define vec3_origin (*pvec3_origin)
 #endif // HOOK_ENGINE
+
+#define BOX_ON_PLANE_SIDE(emins, emaxs, p)      \
+	(((p)->type < 3) ?                          \
+	(                                           \
+		((p)->dist <= (emins)[(p)->type]) ?     \
+			1                                   \
+		:                                       \
+		(                                       \
+			((p)->dist >= (emaxs)[(p)->type]) ? \
+				2                               \
+			:                                   \
+				3                               \
+		)                                       \
+	)                                           \
+	:                                           \
+		BoxOnPlaneSide((emins), (emaxs), (p)))
 
 extern vec3_t vec3_origin;
 
@@ -104,6 +130,71 @@ inline T M_clamp(T a, T min, T max) {
 	return clamp(a, min, max);
 }
 
+inline void VectorAdd(const vec_t *veca, const vec_t *vecb, vec_t *out)
+{
+	out[0] = veca[0] + vecb[0];
+	out[1] = veca[1] + vecb[1];
+	out[2] = veca[2] + vecb[2];
+}
+
+template <typename T = vec_t>
+inline void VectorSubtract(const vec_t *veca, const vec_t *vecb, T *out)
+{
+	out[0] = veca[0] - vecb[0];
+	out[1] = veca[1] - vecb[1];
+	out[2] = veca[2] - vecb[2];
+}
+
+#ifndef REHLDS_FIXES
+template <typename T = vec_t>
+inline void VectorMA(const vec_t *veca, float scale, const T *vecm, vec_t *out)
+{
+	out[0] = scale * vecm[0] + veca[0];
+	out[1] = scale * vecm[1] + veca[1];
+	out[2] = scale * vecm[2] + veca[2];
+}
+#endif
+
+inline void VectorScale(const vec_t *in, float scale, vec_t *out)
+{
+	out[0] = scale * in[0];
+	out[1] = scale * in[1];
+	out[2] = scale * in[2];
+}
+
+inline void VectorClear(vec_t *in)
+{
+	in[0] = 0.0f;
+	in[1] = 0.0f;
+	in[2] = 0.0f;
+}
+
+inline void VectorCopy(const vec_t *in, vec_t *out)
+{
+	out[0] = in[0];
+	out[1] = in[1];
+	out[2] = in[2];
+}
+
+inline void VectorNegate(const vec_t *in, vec_t *out)
+{
+	out[0] = -in[0];
+	out[1] = -in[1];
+	out[2] = -in[2];
+}
+
+inline void VectorAverage(const vec_t *veca, const vec_t *vecb, vec_t *out)
+{
+	out[0] = (veca[0] + vecb[0]) * 0.5f;
+	out[1] = (veca[1] + vecb[1]) * 0.5f;
+	out[2] = (veca[2] + vecb[2]) * 0.5f;
+}
+
+inline bool VectorIsZero(const vec_t *in)
+{
+	return (in[0] == 0.0f && in[1] == 0.0f && in[2] == 0.0f);
+}
+
 float anglemod(float a);
 void BOPS_Error(void);
 
@@ -116,14 +207,10 @@ void AngleMatrix(const vec_t *angles, float(*matrix)[4]);
 NOBODY void AngleIMatrix(const vec_t *angles, float *matrix);
 NOBODY void NormalizeAngles(float *angles);
 NOBODY void InterpolateAngles(float *start, float *end, float *output, float frac);
-void VectorTransform(const vec_t *in1, float *in2, vec_t *out);
+void VectorTransform(const vec_t *in1, float (*in2)[4], vec_t *out);
 int VectorCompare(const vec_t *v1, const vec_t *v2);
 void VectorMA(const vec_t *veca, float scale, const vec_t *vecm, vec_t *out);
-#ifdef REHLDS_FIXES
-float _DotProduct(const vec_t *v1, const vec_t *v2); // with sse support
-#else // REHLDS_FIXES
-long double _DotProduct(const vec_t *v1, const vec_t *v2); // precise
-#endif // REHLDS_FIXES
+real_t _DotProduct(const vec_t *v1, const vec_t *v2);
 NOBODY void _VectorSubtract(vec_t *veca, vec_t *vecb, vec_t *out);
 void _VectorAdd(vec_t *veca, vec_t *vecb, vec_t *out);
 NOBODY void _VectorCopy(vec_t *in, vec_t *out);
