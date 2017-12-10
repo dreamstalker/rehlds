@@ -3032,16 +3032,16 @@ void Host_ResourcesList_f()
 	resource_t *pResourseList[RESOURCE_MAX_COUNT];
 	size_t nCountRes = SV_CountResourceByType(type, pResourseList, ARRAYSIZE(pResourseList), &nWidthFileName);
 
-	char szMD5Hash[8], szFlags[32];
-	Con_Printf("\n%4s  %-4s : %-*s %-10s %-8s %-26s\n\n", "#", "Index", nWidthFileName, "FileName", "Size", "Hash", "Flags");
+	char szMD5Hash[9], szFlags[32];
+	Con_Printf("\n%4s  %-4s : %-*s %-10s %-8s %-26s\n\n", "#", "Index", nWidthFileName, "FileName", "Size", "MD5", "Flags");
 	for (size_t i = 0; i < nCountRes; i++)
 	{
 		szFlags[0] = '\0';
 		if (pResourseList[i]->ucFlags & RES_CHECKFILE) {
-			Q_strlcat(szFlags, " CHECKFILE ");
+			Q_strlcat(szFlags, "CHECKFILE");
 		}
-		if (pResourseList[i]->ucFlags & (RES_WASMISSING | RES_FATALIFMISSING)) {
-			Q_strlcat(szFlags, " FATALIFMISSING ");
+		if (pResourseList[i]->ucFlags & RES_FATALIFMISSING) {
+			Q_strlcat(szFlags, " FATALIFMISSING");
 		}
 
 		TrimSpace(szFlags, szFlags);

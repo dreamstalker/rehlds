@@ -60,7 +60,7 @@ Bugfixed version of rehlds contains an additional cvars:
 Bugfixed version of rehlds contains an additional commands:
 <ul>
 <li>rescount // Prints the total precached of resources count in server console
-<li>reslist < sound | model | decal | generic | event > // Separately prints the details of the precached resources for sounds, models, decals, generic and events in server console. Useful for managing resources and dealing with the goldsource precache limits.
+<li>reslist &lt;sound | model | decal | generic | event&gt; // Separately prints the details of the precached resources for sounds, models, decals, generic and events in server console. Useful for managing resources and dealing with the goldsource precache limits.
 </ul>
 
 ## Build instructions
