@@ -2662,7 +2662,7 @@ void Host_Kill_f(void)
 		Cmd_ForwardToServer();
 		return;
 	}
-	
+
 	if (sv_player->v.health <= 0.0f
 #ifdef REHLDS_FIXES
 	    || sv_player->v.deadflag != DEAD_NO
@@ -2985,6 +2985,76 @@ NOXREF void Host_Crash_f(void)
 	*p = 0xffffffff;
 }
 
+#ifdef REHLDS_FIXES
+void Host_ResourcesCount_f()
+{
+	if (g_psv.num_resources <= 0) {
+		Con_Printf("--------------\nNo precached resources.\n\n");
+		return;
+	}
+
+	Con_Printf("\n  %-4s    : %-5s %-5s\n\n", "Type", "Total", "Limit");
+	Con_Printf("  model   : %-5d %-5d\n", SV_CountResourceByType(t_model), MAX_MODELS - 2); // CL_LoadModel expects last model slot is empty
+	Con_Printf("  sound   : %-5d %-5d\n", SV_CountResourceByType(t_sound), MAX_SOUNDS - 1);
+	Con_Printf("  generic : %-5d %-5d\n", SV_CountResourceByType(t_generic), ARRAYSIZE(g_rehlds_sv.precachedGenericResourceNames));
+	Con_Printf("  event   : %-5d %-5d\n", SV_CountResourceByType(t_eventscript), MAX_EVENTS - 1);
+	Con_Printf("  decal   : %-5d %-5d\n", SV_CountResourceByType(t_decal), MAX_DECALS - 1);
+	Con_Printf("------------------------\n%d Total of precached resource count\n\n", g_psv.num_resources, RESOURCE_MAX_COUNT);
+}
+
+void Host_ResourcesList_f()
+{
+	const char *pszType = Cmd_Argv(1);
+	if (Cmd_Argc() == 1
+		|| (pszType[0]
+			&& Q_stricmp(pszType, "sound")
+			&& Q_stricmp(pszType, "model")
+			&& Q_stricmp(pszType, "decal")
+			&& Q_stricmp(pszType, "generic")
+			&& Q_stricmp(pszType, "event")))
+	{
+		Con_Printf("Usage:  reslist <sound | model | decal | generic | event>\n");
+		return;
+	}
+
+	resourcetype_t type;
+	switch (pszType[0])
+	{
+	default:
+	case 's': type = t_sound;       break;
+	case 'm': type = t_model;       break;
+	case 'd': type = t_decal;       break;
+	case 'g': type = t_generic;     break;
+	case 'e': type = t_eventscript; break;
+	}
+
+	size_t nWidthFileName = 8;
+	resource_t *pResourseList[RESOURCE_MAX_COUNT];
+	size_t nCountRes = SV_CountResourceByType(type, pResourseList, ARRAYSIZE(pResourseList), &nWidthFileName);
+
+	char szMD5Hash[8], szFlags[32];
+	Con_Printf("\n%4s  %-4s : %-*s %-10s %-8s %-26s\n\n", "#", "Index", nWidthFileName, "FileName", "Size", "Hash", "Flags");
+	for (size_t i = 0; i < nCountRes; i++)
+	{
+		szFlags[0] = '\0';
+		if (pResourseList[i]->ucFlags & RES_CHECKFILE) {
+			Q_strlcat(szFlags, " CHECKFILE ");
+		}
+		if (pResourseList[i]->ucFlags & (RES_WASMISSING | RES_FATALIFMISSING)) {
+			Q_strlcat(szFlags, " FATALIFMISSING ");
+		}
+
+		TrimSpace(szFlags, szFlags);
+
+		// copy only 4 bytes
+		Q_strlcpy(szMD5Hash, MD5_Print(pResourseList[i]->rgucMD5_hash));
+		Con_Printf("%4d. %-4d  : %-*s %-10s %-8s %-26s\n", i + 1, pResourseList[i]->nIndex, nWidthFileName, pResourseList[i]->szFileName, va("%.2fK", pResourseList[i]->nDownloadSize / 1024.0f), szMD5Hash, (szFlags[0] == '\0') ? "-" : szFlags);
+	}
+
+	Con_Printf("--------------\n%d Total %s's\n\n", nCountRes, pszType);
+}
+#endif
+
 void Host_InitCommands(void)
 {
 #ifdef HOOK_ENGINE
@@ -3099,6 +3169,11 @@ void Host_InitCommands(void)
 	Cmd_AddCommand("setmaster", Master_SetMaster_f);
 	Cmd_AddCommand("heartbeat", Master_Heartbeat_f);
 #endif // HOOK_ENGINE
+
+#ifdef REHLDS_FIXES
+	Cmd_AddCommand("rescount", Host_ResourcesCount_f);
+	Cmd_AddCommand("reslist", Host_ResourcesList_f);
+#endif
 
 	Cvar_RegisterVariable(&gHostMap);
 	Cvar_RegisterVariable(&voice_recordtofile);
