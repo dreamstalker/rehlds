@@ -30,13 +30,8 @@
 
 #include "userid.h"
 
-#ifdef REHLDS_FIXES
-const int MAX_IPFILTERS   = 4096;
-const int MAX_USERFILTERS = 4096;
-#else
 const int MAX_IPFILTERS   = 32768;
 const int MAX_USERFILTERS = 32768;
-#endif // REHLDS_FIXES
 
 typedef struct ipfilter_s
 {
