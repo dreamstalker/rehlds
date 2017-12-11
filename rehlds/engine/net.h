@@ -57,7 +57,7 @@ const char M2S_REQUESTRESTART	= 'O';
 // Response details about each player on the server
 const char S2A_PLAYERS			= 'D';
 
-// Response as multi-packeted the rules the server is using
+// Number of rules + string key and string value pairs
 const char S2A_RULES			= 'E';
 
 // info request

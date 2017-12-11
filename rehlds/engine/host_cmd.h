@@ -205,6 +205,12 @@ void Host_KillServer_f(void);
 void Host_VoiceRecordStart_f(void);
 void Host_VoiceRecordStop_f(void);
 void Host_Crash_f(void);
+
+#ifdef REHLDS_FIXES
+void Host_ResourcesList_f();
+void Host_ResourcesCount_f();
+#endif
+
 void Host_InitCommands(void);
 void SV_CheckBlendingInterface(void);
 void SV_CheckSaveGameCommentInterface(void);

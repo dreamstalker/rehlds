@@ -5105,26 +5105,63 @@ void EXT_FUNC SV_AddResource(resourcetype_t type, const char *name, int size, un
 	resource_t *r;
 #ifdef REHLDS_FIXES
 	if (g_psv.num_resources >= ARRAYSIZE(g_rehlds_sv.resources))
-#else // REHLDS_FIXES
+#else
 	if (g_psv.num_resources >= MAX_RESOURCE_LIST)
-#endif // REHLDS_FIXES
+#endif
 	{
 		Sys_Error("%s: Too many resources on server.", __func__);
 	}
 
 #ifdef REHLDS_FIXES
 	r = &g_rehlds_sv.resources[g_psv.num_resources++];
-
 	Q_memset(r, 0, sizeof(*r));
-#else // REHLDS_FIXES
+#else
 	r = &g_psv.resourcelist[g_psv.num_resources++];
 #endif
+
 	r->type = type;
-	Q_strncpy(r->szFileName, name, sizeof(r->szFileName) - 1);
-	r->szFileName[sizeof(r->szFileName) - 1] = 0;
 	r->ucFlags = flags;
 	r->nDownloadSize = size;
 	r->nIndex = index;
+
+	Q_strlcpy(r->szFileName, name);
+}
+
+size_t SV_CountResourceByType(resourcetype_t type, resource_t **pResourceList, size_t nListMax, size_t *nWidthFileNameMax)
+{
+	if (type < t_sound || type >= rt_max)
+		return 0;
+
+	if (pResourceList && nListMax <= 0)
+		return 0;
+
+	resource_t *r;
+#ifdef REHLDS_FIXES
+	r = &g_rehlds_sv.resources[0];
+#else
+	r = &g_psv.resourcelist[0];
+#endif
+
+	size_t nCount = 0;
+	for (int i = 0; i < g_psv.num_resources; i++, r++)
+	{
+		if (r->type != type)
+			continue;
+
+		if (r->type == t_decal && r->nIndex >= MAX_DECALS)
+			continue;
+
+		if (pResourceList)
+			pResourceList[nCount] = r;
+
+		if (nWidthFileNameMax)
+			*nWidthFileNameMax = Q_max(*nWidthFileNameMax, Q_strlen(r->szFileName));
+
+		if (++nCount >= nListMax && nListMax > 0)
+			break;
+	}
+
+	return nCount;
 }
 
 #ifdef REHLDS_FIXES
