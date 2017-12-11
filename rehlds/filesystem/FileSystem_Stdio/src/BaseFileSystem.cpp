@@ -1384,7 +1384,7 @@ bool CBaseFileSystem::FindNextFileHelper(FindData_t *pFindData)
 		}
 		else
 		{
-			int len = Q_strlen(pSearchPath->GetPath().String() + pFindData->m_WildCardString.Size());
+			int len = Q_strlen(pSearchPath->GetPath().String()) + pFindData->m_WildCardString.Size();
 			char *pTmpFileName = (char *)alloca((len + 1) * sizeof(char));
 			Q_strcpy(pTmpFileName, pSearchPath->GetPath().String());
 			Q_strcat(pTmpFileName, pFindData->m_WildCardString.Base());
