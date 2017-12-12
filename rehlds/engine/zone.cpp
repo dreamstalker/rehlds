@@ -65,18 +65,7 @@ typedef struct memzone_s
 	memblock_t *rover;
 } memzone_t;
 
-/*
-* Globals initialization
-*/
-#ifndef HOOK_ENGINE
-
 cvar_t mem_dbgfile = { "mem_dbgfile", ".\\mem.txt", 0, 0.0f, NULL };
-
-#else // HOOK_ENGINE
-
-cvar_t mem_dbgfile;
-
-#endif // HOOK_ENGINE
 
 memzone_t *mainzone;
 

@@ -119,11 +119,6 @@ public:
 	void RunFrame();
 };
 
-#ifdef HOOK_ENGINE
-#define s_Steam3Server (*ps_Steam3Server)
-#define s_Steam3Client (*ps_Steam3Client)
-#endif // HOOK_ENGINE
-
 extern CSteam3Server *s_Steam3Server;
 extern CSteam3Client s_Steam3Client;
 

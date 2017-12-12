@@ -39,18 +39,7 @@ texture_t * r_notexture_mip;
 int nummiptex;
 char miptex[512][64];
 
-/*
- * Globals initialization
- */
-#ifndef HOOK_ENGINE
-
 cvar_t r_wadtextures = { "r_wadtextures", "0", 0, 0.0f, NULL };
-
-#else // HOOK_ENGINE
-
-cvar_t r_wadtextures;
-
-#endif // HOOK_ENGINE
 
 void SafeRead(FileHandle_t f, void *buffer, int count)
 {

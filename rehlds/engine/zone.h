@@ -38,20 +38,6 @@ typedef struct hunk_s hunk_t;
 typedef struct cache_user_s cache_user_t;
 typedef struct cache_system_s cache_system_t;
 
-#ifdef HOOK_ENGINE
-
-#define mem_dbgfile (*pmem_dbgfile)
-#define mainzone (*pmainzone)
-#define hunk_base (*phunk_base)
-#define hunk_size (*phunk_size)
-#define hunk_low_used (*phunk_low_used)
-#define hunk_high_used (*phunk_high_used)
-#define hunk_tempactive (*phunk_tempactive)
-#define hunk_tempmark (*phunk_tempmark)
-#define cache_head (*pcache_head)
-
-#endif // HOOK_ENGINE
-
 extern cvar_t mem_dbgfile;
 extern memzone_t *mainzone;
 extern byte *hunk_base;

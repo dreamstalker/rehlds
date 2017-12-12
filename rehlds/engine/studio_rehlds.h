@@ -42,30 +42,6 @@ typedef mplane_t studio_planes_t[STUDIO_NUM_PLANES];
 typedef r_studiocache_t rgStudioCache_t[STUDIO_CACHE_SIZE];
 typedef float bonetransform_t[STUDIO_NUM_HULLS][3][4];
 
-#ifdef HOOK_ENGINE
-
-#define cache_hull_hitgroup (*pcache_hull_hitgroup)
-#define cache_hull (*pcache_hull)
-#define cache_planes (*pcache_planes)
-
-#define pstudiohdr (*ppstudiohdr)
-#define studio_hull (*pstudio_hull)
-#define studio_hull_hitgroup (*pstudio_hull_hitgroup)
-#define studio_clipnodes (*pstudio_clipnodes)
-#define studio_planes (*pstudio_planes)
-#define rgStudioCache (*prgStudioCache)
-#define r_cachecurrent (*pr_cachecurrent)
-#define nCurrentHull (*pnCurrentHull)
-#define nCurrentPlane (*pnCurrentPlane)
-#define bonetransform (*pbonetransform)
-#define g_pSvBlendingAPI (*pg_pSvBlendingAPI)
-#define svBlending (*psvBlending)
-#define server_studio_api (*pserver_studio_api)
-#define r_cachestudio (*pr_cachestudio)
-#define rotationmatrix (*protationmatrix)
-
-#endif // HOOK_ENGINE
-
 extern int cache_hull_hitgroup[128];
 extern hull_t cache_hull[128];
 extern mplane_t cache_planes[768];

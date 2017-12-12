@@ -160,19 +160,11 @@ extern void ClientDLL_ChatInputPosition( int *x, int *y );
 
 extern cldll_func_t cl_funcs;
 extern cl_enginefunc_t cl_engsrcProxies;
-
-#ifdef HOOK_ENGINE
-#define g_engdstAddrs (*pg_engdstAddrs)
-#define g_module (*pg_module)
-#endif
-
 extern cl_enginefunc_dst_t g_engdstAddrs;
 extern module_t	g_module;
 
-
 // Module exports
 extern modfuncs_t g_modfuncs;
-
 
 // Macros for exported engine funcs
 #define RecEngSPR_Load(a)									(g_engdstAddrs.pfnSPR_Load(&a))

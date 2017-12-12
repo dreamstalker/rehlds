@@ -112,59 +112,6 @@ typedef struct SPLITPACKET_t
 
 const int NET_WS_MAX_FRAGMENTS = 5;
 
-#ifdef HOOK_ENGINE
-#define net_thread_initialized (*pnet_thread_initialized)
-#define net_address (*pnet_address)
-#define ipname (*pipname)
-#define defport (*pdefport)
-#define ip_clientport (*pip_clientport)
-#define clientport (*pclientport)
-#define net_sleepforever (*pnet_sleepforever)
-#define loopbacks (*ploopbacks)
-#define g_pLagData (*pg_pLagData)
-#define gFakeLag (*pgFakeLag)
-#define net_configured (*pnet_configured)
-#define net_message (*pnet_message)
-#ifdef _WIN32
-#define net_local_ipx_adr (*pnet_local_ipx_adr)
-#endif // _WIN32
-#define net_local_adr (*pnet_local_adr)
-#define net_from (*pnet_from)
-#define noip (*pnoip)
-#ifdef _WIN32
-#define noipx (*pnoipx)
-#endif // _WIN32
-#define clockwindow (*pclockwindow)
-#define use_thread (*puse_thread)
-#define iphostport (*piphostport)
-#define hostport (*phostport)
-#define multicastport (*pmulticastport)
-#ifdef _WIN32
-#define ipx_hostport (*pipx_hostport)
-#define ipx_clientport (*pipx_clientport)
-#endif // _WIN32
-#define fakelag (*pfakelag)
-#define fakeloss (*pfakeloss)
-
-#define net_graph (*pnet_graph)
-#define net_graphwidth (*pnet_graphwidth)
-#define net_scale (*pnet_scale)
-#define net_graphpos (*pnet_graphpos)
-#define net_message_buffer (*pnet_message_buffer)
-#define in_message_buf (*pin_message_buf)
-
-#define in_message (*pin_message)
-#define in_from (*pin_from)
-#define ip_sockets (*pip_sockets)
-#ifdef _WIN32
-#define ipx_sockets (*pipx_sockets)
-#endif // _WIN32
-#define gNetSplit (*pgNetSplit)
-#define messages (*pmessages)
-#define normalqueue (*pnormalqueue)
-#endif // HOOK_ENGINE
-
-
 extern qboolean net_thread_initialized;
 extern cvar_t net_address;
 extern cvar_t ipname;

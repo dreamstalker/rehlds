@@ -65,24 +65,10 @@ mplane_t studio_planes[6 * STUDIO_NUM_HULLS];
 float bonetransform[STUDIO_NUM_HULLS][3][4];
 float rotationmatrix[3][4];
 
-/*
-* Globals initialization
-*/
-#ifndef HOOK_ENGINE
-
 cvar_t r_cachestudio = { "r_cachestudio", "1", 0, 0.0f, NULL };
 sv_blending_interface_t svBlending = { 1, SV_StudioSetupBones };
 sv_blending_interface_t *g_pSvBlendingAPI = &svBlending;
 server_studio_api_t server_studio_api = { Mem_Calloc, Cache_Check, COM_LoadCacheFile, Mod_Extradata };
-
-#else // HOOK_ENGINE
-
-cvar_t r_cachestudio;
-sv_blending_interface_t svBlending;
-sv_blending_interface_t *g_pSvBlendingAPI;
-server_studio_api_t server_studio_api;
-
-#endif // HOOK_ENGINE
 
 void SV_InitStudioHull(void)
 {
@@ -782,7 +768,7 @@ hull_t *SV_HullForStudioModel(const edict_t *pEdict, const vec_t *mins, const ve
 			}
 		}
 	}
-	if (pEdict->v.gamestate == 1 && (g_bIsTerrorStrike == 1 || g_bIsCStrike == 1 || g_bIsCZero == 1))
+	if (pEdict->v.gamestate == 1 && (g_eGameType == GT_TerrorStrike || g_eGameType == GT_CStrike || g_eGameType == GT_CZero))
 		bSkipShield = 1;
 
 	if ((g_psv.models[pEdict->v.modelindex]->flags & FL_ONGROUND) || useComplexHull == TRUE)

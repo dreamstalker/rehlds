@@ -49,30 +49,6 @@ enum
 	AMBIENT_SOUND_NOT_LOOPING	= BIT(5)
 };
 
-#define SPEAKER_START_SILENT			1	// wait for trigger 'on' to start announcements
-
-
-#ifdef HOOK_ENGINE
-#define gMsgData (*pgMsgData)
-#define gMsgBuffer (*pgMsgBuffer)
-#define gMsgEntity (*pgMsgEntity)
-#define gMsgDest (*pgMsgDest)
-#define gMsgType (*pgMsgType)
-#define gMsgStarted (*pgMsgStarted)
-#define gMsgOrigin (*pgMsgOrigin)
-#define idum (*pidum)
-#define g_groupop (*pg_groupop)
-#define g_groupmask (*pg_groupmask)
-#define checkpvs (*pcheckpvs)
-#define c_invis (*pc_invis)
-#define c_notvis (*pc_notvis)
-
-#define vec_origin (*pvec_origin)
-
-#define r_visframecount (*pr_visframecount)
-#endif // HOOK_ENGINE
-
-
 extern unsigned char gMsgData[512];
 extern sizebuf_t gMsgBuffer;
 extern edict_t *gMsgEntity;
@@ -86,9 +62,7 @@ extern int g_groupmask;
 extern unsigned char checkpvs[1024];
 extern int c_invis;
 extern int c_notvis;
-
 extern vec3_t vec_origin;
-
 extern int r_visframecount;
 
 enum

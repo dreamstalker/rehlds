@@ -93,11 +93,6 @@ double g_StartTime;
 int g_WinNTOrHigher;
 #endif // _WIN32
 
-/*
-* Globals initialization
-*/
-#ifndef HOOK_ENGINE
-
 int g_FPUCW_Mask_Prec_64Bit = 0;
 int g_FPUCW_Mask_Prec_64Bit_2 = 0;
 int g_FPUCW_Mask_Round_Trunc = 0;
@@ -195,19 +190,6 @@ enginefuncs_t g_engfuncsExportedToDlls = {
 	QueryClientCvarValue, QueryClientCvarValue2,
 	EngCheckParm
 };
-
-#else // HOOK_ENGINE
-
-int g_FPUCW_Mask_Prec_64Bit;
-int g_FPUCW_Mask_Prec_64Bit_2;
-int g_FPUCW_Mask_Round_Trunc;
-int g_FPUCW_Mask_Round_Up;
-
-FileFindHandle_t g_hfind;
-
-enginefuncs_t g_engfuncsExportedToDlls;
-
-#endif // HOOK_ENGINE
 
 #ifdef _WIN32
 void Sys_SetupFPUOptions()
@@ -1296,12 +1278,7 @@ void Con_Init(void)
 {
 	con_debuglog = COM_CheckParm("-condebug");
 	Con_DPrintf("Console initialized.\n");
-
-#ifdef HOOK_ENGINE
-	Cmd_AddCommand("condebug", (xcommand_t)GetOriginalFuncAddrOrDefault("Con_Debug_f", (void *)Con_Debug_f));
-#else
 	Cmd_AddCommand("condebug", Con_Debug_f);
-#endif
 }
 
 void Con_DebugLog(const char *file, const char *fmt, ...)

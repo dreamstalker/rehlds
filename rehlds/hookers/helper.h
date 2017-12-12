@@ -8,7 +8,7 @@
 #include <array>
 #include <utility>
 
-#if defined(HOOK_ENGINE) || defined(HOOK_HLTV) || defined(HOOK_FILESYSTEM)
+#if defined(HOOK_HLTV) || defined(HOOK_FILESYSTEM)
 
 #define private public
 #define protected public
@@ -160,4 +160,4 @@ namespace MsvcMethod {
 	#error Hooking stuff is only available using MSVC compiler.
 #endif // _MSC_VER
 
-#endif // #if defined(HOOK_ENGINE) || defined(HOOK_HLTV) || defined(HOOK_FILESYSTEM)
+#endif // #if defined(HOOK_HLTV) || defined(HOOK_FILESYSTEM)

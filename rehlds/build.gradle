@@ -179,10 +179,6 @@ void setupToolchain(NativeBinarySpec b) {
 		cfg.extraLibs 'rt', 'dl', 'm', 'steam_api', 'aelf32'
 	}
 
-	if (!unitTestExecutable && !swdsLib) {
-		cfg.singleDefines 'HOOK_ENGINE'
-	}
-
 	if (unitTestExecutable) {
 		cfg.singleDefines 'REHLDS_UNIT_TESTS', 'REHLDS_SSE', 'REHLDS_JIT'
 	}
@@ -219,7 +215,6 @@ class RehldsSrc {
 			source {
 				srcDirs "hookers"
 				include "memory.cpp"
-				if (GradleCppUtils.windows) include "rehlds_debug.cpp"
 			}
 		}
 		h.rehlds_common(CppSourceSet) {
@@ -235,24 +230,6 @@ class RehldsSrc {
 			source {
 				srcDirs "rehlds"
 				include "precompiled.cpp"
-			}
-		}
-	}
-
-	static void rehlds_hooker_src(def h) {
-		h.rehlds_hooker_src(CppSourceSet) {
-			source {
-				srcDirs "hookers"
-				include "engine/hooklist.cpp", "hooker.cpp"
-			}
-		}
-	}
-
-	static void rehlds_hooker_main_src(def h) {
-		h.rehlds_hooker_main_src(CppSourceSet) {
-			source {
-				srcDirs "hookers"
-				include "engine/main.cpp"
 			}
 		}
 	}
@@ -275,7 +252,6 @@ class RehldsSrc {
 		}
 	}
 }
-
 
 model {
 	buildTypes {
@@ -304,20 +280,6 @@ model {
 	}
 
 	components {
-		rehlds_hooker_engine(NativeLibrarySpec) {
-			targetPlatform 'x86'
-			baseName 'FileSystem_Stdio'
-
-			sources {
-				RehldsSrc.rehlds_pch(it)
-				RehldsSrc.rehlds_src(it)
-				RehldsSrc.rehlds_hooker_src(it)
-				RehldsSrc.rehlds_hooker_main_src(it)
-			}
-
-			binaries.all { NativeBinarySpec b -> project.setupToolchain(b) }
-		}
-
 		rehlds_swds_engine(NativeLibrarySpec) {
 			targetPlatform 'x86'
 			baseName GradleCppUtils.windows ? 'swds' : 'engine_i486'
@@ -326,17 +288,6 @@ model {
 				RehldsSrc.rehlds_pch(it)
 				RehldsSrc.rehlds_src(it)
 				RehldsSrc.rehlds_swds_main_src(it)
-			}
-
-			binaries.all { NativeBinarySpec b -> project.setupToolchain(b) }
-		}
-
-		rehlds_hooker_engine_tests(NativeExecutableSpec) {
-			targetPlatform 'x86'
-			sources {
-				RehldsSrc.rehlds_pch(it)
-				RehldsSrc.rehlds_src(it)
-				RehldsSrc.rehlds_tests_src(it)
 			}
 
 			binaries.all { NativeBinarySpec b -> project.setupToolchain(b) }
@@ -370,7 +321,7 @@ task buildFinalize << {
 
 task buildRelease {
 	dependsOn binaries.withType(SharedLibraryBinarySpec).matching { SharedLibraryBinarySpec blib ->
-		blib.buildable && blib.buildType.name == 'release' && !blib.name.contains('Rehlds_hooker_engine')
+		blib.buildable && blib.buildType.name == 'release'
 	}
 }
 

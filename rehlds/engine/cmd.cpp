@@ -470,7 +470,7 @@ void Cmd_Alias_f(void)
 #ifndef REHLDS_FIXES
 	SetCStrikeFlags();	// DONE: Do this once somewhere at the server start
 #endif
-	if ((g_bIsCStrike || g_bIsCZero) &&
+	if ((g_eGameType == GT_CStrike || g_eGameType == GT_CZero) &&
 		(!Q_stricmp(s, "cl_autobuy")
 		|| !Q_stricmp(s, "cl_rebuy")
 		|| !Q_stricmp(s, "gl_ztrick")
@@ -482,7 +482,7 @@ void Cmd_Alias_f(void)
 	}
 
 	// Say hello to my little friend! (c)
-	if (g_bIsTFC && (!Q_stricmp(s, "_special") || !Q_stricmp(s, "special")))
+	if (g_eGameType == GT_TFC && (!Q_stricmp(s, "_special") || !Q_stricmp(s, "special")))
 	{
 		Con_Printf("Alias name is invalid\n");
 		return;

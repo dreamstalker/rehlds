@@ -30,12 +30,6 @@
 
 #include "maintypes.h"
 
-#ifdef HOOK_ENGINE
-#define r_pixbytes (*pr_pixbytes)
-#define gl_vsync (*pgl_vsync)
-#define scr_con_current (*pscr_con_current)
-#endif //HOOK_ENGINE
-
 extern int r_pixbytes;
 extern cvar_t gl_vsync;
 extern float scr_con_current;

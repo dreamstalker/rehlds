@@ -52,10 +52,6 @@ enum
 #define RAD2DEG(x)	((float)(x) * (float)(180.f / M_PI))
 #define DEG2RAD(x)	((float)(x) * (float)(M_PI / 180.f))
 
-#ifdef HOOK_ENGINE
-#define vec3_origin (*pvec3_origin)
-#endif // HOOK_ENGINE
-
 #define BOX_ON_PLANE_SIDE(emins, emaxs, p)      \
 	(((p)->type < 3) ?                          \
 	(                                           \

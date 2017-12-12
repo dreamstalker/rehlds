@@ -25,6 +25,7 @@
 *    version.
 *
 */
+
 #include "precompiled.h"
 
 struct plugin_api_t

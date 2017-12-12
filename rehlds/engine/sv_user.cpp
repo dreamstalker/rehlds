@@ -46,11 +46,6 @@ edict_t *sv_player;
 //int giSkip;
 qboolean nofind;
 
-/*
-* Globals initialization
-*/
-#ifndef HOOK_ENGINE
-
 #if defined(SWDS) && defined(REHLDS_FIXES)
 command_t clcommands[] = { "status", "name", "kill", "pause", "spawn", "new", "sendres", "dropclient", "kick", "ping", "dlfile", "setinfo", "sendents", "fullupdate", "setpause", "unpause", NULL };
 #else
@@ -71,42 +66,20 @@ cvar_t mp_consistency = { "mp_consistency", "1", FCVAR_SERVER, 0.0f, NULL };
 cvar_t sv_voiceenable = { "sv_voiceenable", "1", FCVAR_SERVER | FCVAR_ARCHIVE, 0.0f, NULL };
 
 clc_func_t sv_clcfuncs[] = {
-		{ clc_bad, "clc_bad", NULL },
-		{ clc_nop, "clc_nop", NULL },
-		{ clc_move, "clc_move", &SV_ParseMove },
-		{ clc_stringcmd, "clc_stringcmd", &SV_ParseStringCommand },
-		{ clc_delta, "clc_delta", &SV_ParseDelta },
-		{ clc_resourcelist, "clc_resourcelist", &SV_ParseResourceList },
-		{ clc_tmove, "clc_tmove", NULL },
-		{ clc_fileconsistency, "clc_fileconsistency", &SV_ParseConsistencyResponse },
-		{ clc_voicedata, "clc_voicedata", &SV_ParseVoiceData },
-		{ clc_hltv, "clc_hltv", &SV_IgnoreHLTV },
-		{ clc_cvarvalue, "clc_cvarvalue", &SV_ParseCvarValue },
-		{ clc_cvarvalue2, "clc_cvarvalue2", &SV_ParseCvarValue2 },
-
-		{ clc_endoflist, "End of List", NULL },
+	{ clc_bad,             "clc_bad",             nullptr                      },
+	{ clc_nop,             "clc_nop",             nullptr                      },
+	{ clc_move,            "clc_move",            &SV_ParseMove                },
+	{ clc_stringcmd,       "clc_stringcmd",       &SV_ParseStringCommand       },
+	{ clc_delta,           "clc_delta",           &SV_ParseDelta               },
+	{ clc_resourcelist,    "clc_resourcelist",    &SV_ParseResourceList        },
+	{ clc_tmove,           "clc_tmove",           nullptr                      },
+	{ clc_fileconsistency, "clc_fileconsistency", &SV_ParseConsistencyResponse },
+	{ clc_voicedata,       "clc_voicedata",       &SV_ParseVoiceData           },
+	{ clc_hltv,            "clc_hltv",            &SV_IgnoreHLTV               },
+	{ clc_cvarvalue,       "clc_cvarvalue",       &SV_ParseCvarValue           },
+	{ clc_cvarvalue2,      "clc_cvarvalue2",      &SV_ParseCvarValue2          },
+	{ clc_endoflist,       "End of List",         nullptr                      },
 };
-
-#else // HOOK_ENGINE
-
-command_t clcommands[23];
-
-cvar_t sv_edgefriction;
-cvar_t sv_maxspeed;
-cvar_t sv_accelerate;
-cvar_t sv_footsteps;
-cvar_t sv_rollspeed;
-cvar_t sv_rollangle;
-cvar_t sv_unlag;
-cvar_t sv_maxunlag;
-cvar_t sv_unlagpush;
-cvar_t sv_unlagsamples;
-cvar_t mp_consistency;
-cvar_t sv_voiceenable;
-
-clc_func_t sv_clcfuncs[12];
-
-#endif // HOOK_ENGINE
 
 bool EXT_FUNC SV_CheckConsistencyResponse_API(IGameClient *client, resource_t *res, uint32 hash) {
 	return (hash != *(uint32 *)&res->rgucMD5_hash[0]);

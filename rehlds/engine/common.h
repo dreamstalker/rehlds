@@ -49,42 +49,6 @@
 	#define __BUILD_DATE__ APP_COMMIT_DATE
 #endif // REHLDS_FIXES
 
-#ifdef HOOK_ENGINE
-#define serverinfo (*pserverinfo)
-
-#define gpszVersionString (*pgpszVersionString)
-#define gpszProductString (*pgpszProductString)
-
-#define bfread (*pbfread)
-#define bfwrite (*pbfwrite)
-
-#define msg_badread (*pmsg_badread)
-#define msg_readcount (*pmsg_readcount)
-
-#define bigendien (*pbigendien)
-
-#define BigShort (*pBigShort)
-#define LittleShort (*pLittleShort)
-#define BigLong (*pBigLong)
-#define LittleLong (*pLittleLong)
-#define BigFloat (*pBigFloat)
-#define LittleFloat (*pLittleFloat)
-
-#define com_argc (*pcom_argc)
-#define com_argv (*pcom_argv)
-#define com_token (*pcom_token)
-#define com_ignorecolons (*pcom_ignorecolons)
-#define s_com_token_unget (*ps_com_token_unget)
-#define com_clientfallback (*pcom_clientfallback)
-#define com_gamedir (*pcom_gamedir)
-#define com_cmdline (*pcom_cmdline)
-
-#define loadcache (*ploadcache)
-#define loadbuf (*ploadbuf)
-#define loadsize (*ploadsize)
-#endif // HOOK_ENGINE
-
-
 extern char serverinfo[MAX_INFO_STRING];
 
 extern char gpszVersionString[32];

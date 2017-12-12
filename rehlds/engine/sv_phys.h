@@ -32,17 +32,6 @@
 #include "model.h"
 #include "cvar.h"
 
-#ifdef HOOK_ENGINE
-#define sv_maxvelocity (*psv_maxvelocity)
-#define sv_gravity (*psv_gravity)
-#define sv_bounce (*psv_bounce)
-#define sv_stepsize (*psv_stepsize)
-#define sv_friction (*psv_friction)
-#define sv_stopspeed (*psv_stopspeed)
-#define g_moved_from (*pg_moved_from)
-#define g_moved_edict (*pg_moved_edict)
-#endif
-
 extern cvar_t sv_maxvelocity;
 extern cvar_t sv_gravity;
 extern cvar_t sv_bounce;

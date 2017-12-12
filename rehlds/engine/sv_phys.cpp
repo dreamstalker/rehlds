@@ -45,28 +45,12 @@
 vec3_t *g_moved_from;
 edict_t **g_moved_edict;
 
-/*
-* Globals initialization
-*/
-#ifndef HOOK_ENGINE
-
 cvar_t sv_maxvelocity = { "sv_maxvelocity", "2000", 0, 0.0f, NULL };
 cvar_t sv_gravity = { "sv_gravity", "800", FCVAR_SERVER, 0.0f, NULL };
 cvar_t sv_bounce = { "sv_bounce", "1", FCVAR_SERVER, 0.0f, NULL };
 cvar_t sv_stepsize = { "sv_stepsize", "18", FCVAR_SERVER, 0.0f, NULL };
 cvar_t sv_friction = { "sv_friction", "4", FCVAR_SERVER, 0.0f, NULL };
 cvar_t sv_stopspeed = { "sv_stopspeed", "100", FCVAR_SERVER, 0.0f, NULL };
-
-#else // HOOK_ENGINE
-
-cvar_t sv_maxvelocity;
-cvar_t sv_gravity;
-cvar_t sv_bounce;
-cvar_t sv_stepsize;
-cvar_t sv_friction;
-cvar_t sv_stopspeed;
-
-#endif // HOOK_ENGINE
 
 NOXREF void SV_CheckAllEnts()
 {

@@ -30,20 +30,8 @@
 
 float scr_con_current;
 
-/*
-* Globals initialization
-*/
-#ifndef HOOK_ENGINE
-
 int r_pixbytes = 1;
 cvar_t gl_vsync = { "gl_vsync", "1", 0, 0.0f, NULL };
-
-#else // HOOK_ENGINE
-
-int r_pixbytes;
-cvar_t gl_vsync;
-
-#endif // HOOK_ENGINE
 
 void VID_SetPalette(unsigned char *palette) { }
 void VID_ShiftPalette(unsigned char *palette) { }

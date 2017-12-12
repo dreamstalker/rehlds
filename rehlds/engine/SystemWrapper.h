@@ -28,10 +28,6 @@
 
 #pragma once
 
-#ifdef HOOK_ENGINE
-#define gSystemWrapper (*pgSystemWrapper)
-#endif // HOOK_ENGINE
-
 #include "ObjectList.h"
 #include "TokenLine.h"
 #include "BaseSystemModule.h"

@@ -35,12 +35,7 @@
 const int MAX_CVAR_VALUE     = 1024;
 const int MAX_CVARLIST_FILES = 100;
 
-#ifdef HOOK_ENGINE
-#define cvar_vars (*pcvar_vars)
-#endif // HOOK_ENGINE
-
 extern cvar_t *cvar_vars;
-
 
 void Cvar_Init(void);
 void Cvar_Shutdown(void);

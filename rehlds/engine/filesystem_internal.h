@@ -31,13 +31,7 @@
 #include "maintypes.h"
 #include "FileSystem.h"
 
-
-#ifdef HOOK_ENGINE
-#define g_pFileSystem (*pg_pFileSystem)
-#endif // HOOK_ENGINE
-
 extern IFileSystem *g_pFileSystem;
-
 
 void FS_RemoveAllSearchPaths(void);
 void FS_AddSearchPath(const char *pPath, const char *pathID);

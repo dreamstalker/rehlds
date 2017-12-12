@@ -116,12 +116,6 @@ typedef struct delta_info_s
 	delta_t *delta;
 } delta_info_t;
 
-#ifdef HOOK_ENGINE
-#define g_defs (*pg_defs)
-#define g_encoders (*pg_encoders)
-#define g_deltaregistry (*pg_deltaregistry)
-#endif // HOOK_ENGINE
-
 extern delta_definition_list_t *g_defs;
 extern delta_encoder_t *g_encoders;
 extern delta_registry_t *g_deltaregistry;

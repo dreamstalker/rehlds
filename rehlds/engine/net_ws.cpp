@@ -28,14 +28,6 @@
 
 #include "precompiled.h"
 
-#ifdef _WIN32
-
-HANDLE hThread;
-DWORD ThreadId;
-CRITICAL_SECTION net_cs;
-
-#endif // _WIN32
-
 qboolean net_thread_initialized;
 
 loopback_t loopbacks[2];
@@ -57,7 +49,7 @@ unsigned char in_message_buf[NET_MAX_PAYLOAD];
 sizebuf_t in_message;
 netadr_t in_from;
 
-#if defined(REHLDS_FIXES) && !defined(HOOK_ENGINE)
+#ifdef REHLDS_FIXES
 // Define default to INVALID_SOCKET
 #define INV_SOCK INVALID_SOCKET
 #else
@@ -65,30 +57,21 @@ netadr_t in_from;
 #define INV_SOCK 0
 #endif
 
-#ifndef HOOK_ENGINE
 SOCKET ip_sockets[NS_MAX] = { INV_SOCK, INV_SOCK, INV_SOCK };
-#else
-SOCKET ip_sockets[NS_MAX];
-#endif
 
 #ifdef _WIN32
-#ifndef HOOK_ENGINE
 SOCKET ipx_sockets[NS_MAX] = { INV_SOCK, INV_SOCK, INV_SOCK };
-#else
-SOCKET ipx_sockets[NS_MAX];
 #endif
-#endif // _WIN32
 
 LONGPACKET gNetSplit;
 net_messages_t *messages[NS_MAX];
 net_messages_t *normalqueue;
-//void *hNetThread;
-//int32 dwNetThreadId;
 
-/*
-* Globals initialization
-*/
-#ifndef HOOK_ENGINE
+#ifdef _WIN32
+HANDLE hNetThread;
+DWORD dwNetThreadId;
+CRITICAL_SECTION net_cs;
+#endif
 
 cvar_t net_address = { "net_address", "", 0, 0.0f, NULL };
 cvar_t ipname = { "ip", "localhost", 0, 0.0f, NULL };
@@ -106,7 +89,7 @@ cvar_t multicastport = { "multicastport", "27025", 0, 0.0f, NULL };
 #ifdef _WIN32
 cvar_t ipx_hostport = { "ipx_hostport", "0", 0, 0.0f, NULL };
 cvar_t ipx_clientport = { "ipx_clientport", "0", 0, 0.0f, NULL };
-#endif //_WIN32
+#endif
 
 cvar_t fakelag = { "fakelag", "0.0", 0, 0.0f, NULL };
 cvar_t fakeloss = { "fakeloss", "0.0", 0, 0.0f, NULL };
@@ -114,35 +97,6 @@ cvar_t net_graph = { "net_graph", "0", FCVAR_ARCHIVE, 0.0f, NULL };
 cvar_t net_graphwidth = { "net_graphwidth", "150", 0, 0.0f, NULL };
 cvar_t net_scale = { "net_scale", "5", FCVAR_ARCHIVE, 0.0f, NULL };
 cvar_t net_graphpos = { "net_graphpos", "1", FCVAR_ARCHIVE, 0.0f, NULL };
-
-#else // HOOK_ENGINE
-
-cvar_t net_address;
-cvar_t ipname;
-cvar_t defport;
-cvar_t ip_clientport;
-cvar_t clientport;
-int net_sleepforever;
-
-cvar_t clockwindow;
-
-cvar_t iphostport;
-cvar_t hostport;
-cvar_t multicastport;
-
-#ifdef _WIN32
-cvar_t ipx_hostport;
-cvar_t ipx_clientport;
-#endif // _WIN32
-
-cvar_t fakelag;
-cvar_t fakeloss;
-cvar_t net_graph;
-cvar_t net_graphwidth;
-cvar_t net_scale;
-cvar_t net_graphpos;
-
-#endif // HOOK_ENGINE
 
 void NET_ThreadLock()
 {
@@ -969,16 +923,12 @@ qboolean NET_GetLong(unsigned char *pData, int size, int *outSize)
 
 qboolean NET_QueuePacket(netsrc_t sock)
 {
-	int ret;
+	int ret = -1;
 	struct sockaddr from;
 	socklen_t fromlen;
 	SOCKET net_socket;
 	int protocol;
 	unsigned char buf[MAX_UDP_PACKET];
-
-#ifdef REHLDS_FIXES
-	ret = -1;
-#endif
 
 #ifdef _WIN32
 	for (protocol = 0; protocol < 2; protocol++)
@@ -1229,8 +1179,8 @@ void NET_StartThread()
 
 #ifdef _WIN32
 			InitializeCriticalSection(&net_cs);
-			hThread = CreateThread(0, 0, NET_ThreadMain, 0, 0, &ThreadId);
-			if (!hThread)
+			hNetThread = CreateThread(0, 0, NET_ThreadMain, 0, 0, &dwNetThreadId);
+			if (!hNetThread)
 			{
 				DeleteCriticalSection(&net_cs);
 				net_thread_initialized = FALSE;
@@ -1249,7 +1199,7 @@ void NET_StopThread()
 		if (net_thread_initialized)
 		{
 #ifdef _WIN32
-			TerminateThread(hThread, 0);
+			TerminateThread(hNetThread, 0);
 			DeleteCriticalSection(&net_cs);
 #endif // _WIN32
 			net_thread_initialized = FALSE;
@@ -2040,11 +1990,7 @@ void MaxPlayers_f()
 
 void NET_Init()
 {
-#ifdef HOOK_ENGINE
-	Cmd_AddCommand("maxplayers", (xcommand_t)GetOriginalFuncAddrOrDefault("MaxPlayers_f", (void *)MaxPlayers_f));
-#else
 	Cmd_AddCommand("maxplayers", MaxPlayers_f);
-#endif // HOOK_ENGINE
 
 	Cvar_RegisterVariable(&net_address);
 	Cvar_RegisterVariable(&ipname);

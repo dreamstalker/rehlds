@@ -44,18 +44,6 @@ const int MSGFILE_TEXT	= 1;
 const int NAME_HEAP_SIZE	= 16384;
 const int MAX_MESSAGES		= 1000;
 
-#ifdef HOOK_ENGINE
-
-#define gMessageTable (*pgMessageTable)
-#define gMessageTableCount (*pgMessageTableCount)
-#define gMessageParms (*pgMessageParms)
-
-#define gNetworkTextMessageBuffer (*pgNetworkTextMessageBuffer)
-#define gNetworkMessageNames (*pgNetworkMessageNames)
-#define gNetworkTextMessage (*pgNetworkTextMessage)
-
-#endif // HOOK_ENGINE
-
 extern client_textmessage_t *gMessageTable;
 extern int gMessageTableCount;
 extern client_textmessage_t gMessageParms;

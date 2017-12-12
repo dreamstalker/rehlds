@@ -73,18 +73,6 @@ typedef dclipnode_t box_clipnodes_t[6];
 typedef mplane_t box_planes_t[6];
 typedef mplane_t beam_planes_t[6];
 
-#ifdef HOOK_ENGINE
-
-#define box_hull (*pbox_hull)
-#define beam_hull (*pbeam_hull)
-#define box_clipnodes (*pbox_clipnodes)
-#define box_planes (*pbox_planes)
-#define beam_planes (*pbeam_planes)
-#define sv_areanodes (*psv_areanodes)
-#define sv_numareanodes (*psv_numareanodes)
-
-#endif // HOOK_ENGINE
-
 extern hull_t box_hull;
 extern hull_t beam_hull;
 extern box_clipnodes_t box_clipnodes;

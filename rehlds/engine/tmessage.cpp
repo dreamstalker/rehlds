@@ -31,11 +31,6 @@
 char gNetworkTextMessageBuffer[MAX_NETMESSAGE][512];
 client_textmessage_t gMessageParms;
 
-/*
-* Globals initialization
-*/
-#ifndef HOOK_ENGINE
-
 client_textmessage_t *gMessageTable = NULL;
 int gMessageTableCount = 0;
 
@@ -61,16 +56,6 @@ client_textmessage_t gNetworkTextMessage[MAX_NETMESSAGE] =
 	NETWORK_MESSAGE1,// pName message name.
 	gNetworkTextMessageBuffer[0] // pMessage
 };
-
-#else // HOOK_ENGINE
-
-client_textmessage_t *gMessageTable;
-int gMessageTableCount;
-
-const char *gNetworkMessageNames[MAX_NETMESSAGE];
-client_textmessage_t gNetworkTextMessage[MAX_NETMESSAGE];
-
-#endif // HOOK_ENGINE
 
 char* EXT_FUNC memfgets(unsigned char *pMemFile, int fileSize, int *pFilePos, char *pBuffer, int bufferSize)
 {
@@ -126,7 +111,7 @@ int IsComment(char *pText)
 	if ((length >= 2 && pText[0] == '/' && pText[1] == '/') || length <= 0)
 	{
 		return TRUE;
-	}	
+	}
 #endif
 
 	return FALSE;
@@ -148,7 +133,7 @@ int IsWhiteSpace(char space)
 	return isspace(space);
 #else
 	return space == ' ' || space == '\t' || space == '\r' || space == '\n';
-#endif	
+#endif
 }
 
 NOXREF const char *SkipSpace(const char *pText)

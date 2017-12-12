@@ -261,19 +261,6 @@ typedef enum CareerStateType_e
 	CAREER_PLAYING = 2,
 } CareerStateType;
 
-#ifdef HOOK_ENGINE
-#define g_pcls (*pcls)
-#define g_pcl (*pcl)
-#define key_dest (*pkey_dest)
-
-#define g_clmove (*pg_clmove)
-#define cl_inmovie (*pcl_inmovie)
-
-#define cl_name (*pcl_name)
-#define rate_ (*prate)
-#define console (*pconsole)
-#endif // HOOK_ENGINE
-
 extern keydest_t key_dest;
 extern client_static_t g_pcls;
 extern client_state_t g_pcl;

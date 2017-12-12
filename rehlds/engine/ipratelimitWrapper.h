@@ -32,12 +32,6 @@
 #include "net.h"
 #include "ipratelimit.h"
 
-#ifdef HOOK_ENGINE
-#define rateChecker (*prateChecker)
-
-extern int(*pCheckIP)(netadr_t adr);
-#endif //HOOK_ENGINE
-
 extern class CIPRateLimit rateChecker;
 
 int CheckIP(netadr_t adr);

@@ -25,7 +25,10 @@
 *    version.
 *
 */
+
 #pragma once
+
+#include <vector>
 
 #include "archtypes.h"
 #include "rehlds_api.h"

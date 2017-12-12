@@ -59,7 +59,7 @@ Bugfixed version of rehlds contains an additional cvars:
 ## Commands
 Bugfixed version of rehlds contains an additional commands:
 <ul>
-<li>rescount // Prints the total precached of resources count in server console
+<li>rescount // Prints the total count of precached resources in the server console
 <li>reslist &lt;sound | model | decal | generic | event&gt; // Separately prints the details of the precached resources for sounds, models, decals, generic and events in server console. Useful for managing resources and dealing with the goldsource precache limits.
 </ul>
 
@@ -112,7 +112,7 @@ On Linux (GCC):
 * For faster building without unit tests use this:exclamation:
 <pre>./gradlew --max-workers=1 -PuseGcc clean buildFixes</pre>
 
-Also there is a task `buildEngine`, it builds only a part of the engine.<br />
+Also there is a task `buildEngine`, it builds only engine, without other parts of the project.<br />
 Compiled binaries will be placed in the rehlds/build/binaries/ directory
 
 ## How can I help the project?

@@ -33,26 +33,13 @@
 #include "pm_defs.h"
 #include "pm_movevars.h"
 
-
-#ifdef HOOK_ENGINE
-#define pm_showclip (*ppm_showclip)
-
-#define player_mins (*pplayer_mins)
-#define player_maxs (*pplayer_maxs)
-
-#define pmove (*ppmove)
-#define movevars (*pmovevars)
-#endif // HOOK_ENGINE
-
-
 extern cvar_t pm_showclip;
 
-extern vec_t player_mins[4][3];
-extern vec_t player_maxs[4][3];
+extern vec3_t player_mins[MAX_MAP_HULLS];
+extern vec3_t player_maxs[MAX_MAP_HULLS];
 
 extern playermove_t *pmove;
 extern movevars_t movevars;
-
 
 qboolean PM_AddToTouched(pmtrace_t tr, vec_t *impactvelocity);
 void PM_StuckTouch(int hitent, pmtrace_t *ptraceresult);

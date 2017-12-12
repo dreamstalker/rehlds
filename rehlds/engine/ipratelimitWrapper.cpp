@@ -28,23 +28,10 @@
 
 #include "precompiled.h"
 
-#ifdef HOOK_ENGINE
-int (*pCheckIP)(netadr_t adr);
-#endif // HOOK_ENGINE
-
 class CIPRateLimit rateChecker;
 
 int CheckIP(netadr_t adr)
 {
-#ifdef HOOK_ENGINE
-	int res = pCheckIP(adr);
-	if (res != 1)
-	{
-		rehlds_syserror("CheckIP() is expected to return 1");
-	}
-	return res;
-#else
-	CRehldsPlatformHolder::get()->time(NULL); //time() is called inside IpRateLimiter
+	CRehldsPlatformHolder::get()->time(NULL); // time() is called inside IpRateLimiter
 	return 1;
-#endif
 }

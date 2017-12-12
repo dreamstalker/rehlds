@@ -43,8 +43,6 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 			printf("%s: launcher is not hlds.exe, tests playing/recording disabled!\n", __func__);
 		else
 			TestSuite_Init(NULL, &hlds_exe, NULL);
-
-		Rehlds_Debug_Init(NULL);
 #endif
 
 	}
@@ -52,6 +50,7 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 	{
 
 	}
+
 	return TRUE;
 }
 

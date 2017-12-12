@@ -28,19 +28,8 @@
 
 #include "precompiled.h"
 
-/*
-* Globals initialization
-*/
-#ifndef HOOK_ENGINE
-
 CGame g_Game;
 IGame *game = &g_Game;
-
-#else // HOOK_ENGINE
-
-IGame *game;
-
-#endif // HOOK_ENGINE
 
 CGame::CGame()
 {

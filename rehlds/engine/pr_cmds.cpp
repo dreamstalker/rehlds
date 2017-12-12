@@ -60,18 +60,7 @@ int c_notvis;
 vec3_t vec_origin;
 int r_visframecount;
 
-/*
-* Globals initialization
-*/
-#ifndef HOOK_ENGINE
-
 sizebuf_t gMsgBuffer = { "MessageBegin/End", 0, gMsgData, sizeof(gMsgData), 0 };
-
-#else // HOOK_ENGINE
-
-sizebuf_t gMsgBuffer;
-
-#endif // HOOK_ENGINE
 
 void EXT_FUNC PF_makevectors_I(const float *rgflVector)
 {
