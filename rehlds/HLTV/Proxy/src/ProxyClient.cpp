@@ -294,7 +294,7 @@ void ProxyClient::ParseVoiceData(NetPacket *packet)
 	voiceMsg.WriteShort(nDataLength);
 	voiceMsg.WriteBuf(packet->data.CurrentByte(), nDataLength);
 
-	m_Proxy->Broadcast(voiceMsg.GetData(), voiceMsg.CurrentSize(), GROUP_PROXY | GROUP_DEMO | GROUP_UNKNOWN | GROUP_VOICE, false);
+	m_Proxy->Broadcast(voiceMsg.GetData(), voiceMsg.CurrentSize(), GROUP_PROXY | GROUP_DEMO | GROUP_MULTICAST | GROUP_VOICE, false);
 	packet->data.SkipBytes(nDataLength);
 }
 

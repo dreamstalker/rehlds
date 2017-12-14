@@ -1063,7 +1063,7 @@ void Proxy::CMD_ClientCmd(char *cmdLine)
 	switch (group)
 	{
 	case 1: // spectators
-		group = GROUP_CLIENT | GROUP_DEMO | GROUP_UNKNOWN;
+		group = GROUP_CLIENT | GROUP_DEMO | GROUP_MULTICAST;
 		break;
 	case 2: // proxies
 		group = GROUP_PROXY;
@@ -1462,7 +1462,7 @@ void Proxy::BroadcastRetryMessage()
 	msg.WriteByte(svc_centerprint);
 	msg.WriteString("Retrying HLTV connection ...");
 
-	Broadcast(msg.GetData(), msg.CurrentSize(), GROUP_CLIENT | GROUP_PROXY | GROUP_UNKNOWN, false);
+	Broadcast(msg.GetData(), msg.CurrentSize(), GROUP_CLIENT | GROUP_PROXY | GROUP_MULTICAST, false);
 }
 
 void Proxy::StopBroadcast(const char *message)

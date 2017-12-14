@@ -131,7 +131,7 @@ void Status::SendStatusUpdate()
 	cmd.WriteToStream(&buffer);
 
 	// group spectators
-	m_Proxy->Broadcast(buffer.GetData(), buffer.CurrentSize(), GROUP_CLIENT | GROUP_DEMO | GROUP_UNKNOWN, false);
+	m_Proxy->Broadcast(buffer.GetData(), buffer.CurrentSize(), GROUP_CLIENT | GROUP_DEMO | GROUP_MULTICAST, false);
 	buffer.FastClear();
 }
 

@@ -39,16 +39,16 @@ class BitBuffer;
 class NetAddress;
 class IObjectContainer;
 
-#define MAX_PROXY_CLIENTS       255
+#define MAX_PROXY_CLIENTS 255
 
-#define GROUP_CLIENT            0x00001         // Broadcast to client
-#define GROUP_PROXY             0x00002         // Broadcast to proxy
-#define GROUP_DEMO              0x00004         // Broadcast to demo file
-#define GROUP_UNKNOWN           0x00008         // Broadcast to UNKNOWN: unused
-#define GROUP_VOICE             0x00010         // Broadcast to voice enabled clients
-#define GROUP_CHAT              0x00020         // Broadcast to chat enabled clients
+#define GROUP_CLIENT      0x00001 // Broadcast to client
+#define GROUP_PROXY       0x00002 // Broadcast to proxy
+#define GROUP_DEMO        0x00004 // Broadcast to demo file
+#define GROUP_MULTICAST   0x00008 // Broadcast to multicast (obsolete)
+#define GROUP_VOICE       0x00010 // Broadcast to voice enabled clients
+#define GROUP_CHAT        0x00020 // Broadcast to chat enabled clients
 
-#define GROUP_CLIENT_ALL	GROUP_CLIENT | GROUP_PROXY | GROUP_DEMO | GROUP_UNKNOWN
+#define GROUP_CLIENT_ALL  GROUP_CLIENT | GROUP_PROXY | GROUP_DEMO | GROUP_MULTICAST
 
 enum ChatMode_e : int
 {
