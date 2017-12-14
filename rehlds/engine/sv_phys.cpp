@@ -182,14 +182,8 @@ void SV_Impact(edict_t *e1, edict_t *e2, trace_t *ptrace)
 const float STOP_EPSILON = 0.1f;
 
 // Slide off of the impacting object
-int ClipVelocity(vec_t *in, vec_t *normal, vec_t *out, float overbounce)
+void SV_ClipVelocity(vec_t *in, vec_t *normal, vec_t *out, float overbounce)
 {
-	int blocked = 0;
-	if (normal[2] > 0.0f)
-		blocked = 1;		// floor
-	if (normal[2] == 0.0f)
-		blocked |= 2;		// step
-
 	float change;
 	float backoff = _DotProduct(in, normal) * overbounce;
 
@@ -201,47 +195,46 @@ int ClipVelocity(vec_t *in, vec_t *normal, vec_t *out, float overbounce)
 		if (out[i] > -STOP_EPSILON && out[i] < STOP_EPSILON)
 			out[i] = 0.0f;
 	}
-
-	return blocked;
 }
 
 #define MAX_CLIP_PLANES 5
 
 // The basic solid body movement clip that slides along multiple planes
-// steptrace - if not NULL, the trace results of any vertical wall hit will be stored
-// Returns the clipflags if the velocity was modified (hit something solid)
-// 1 = floor
-// 2 = wall / step
-// 4 = dead stop
-int SV_FlyMove(edict_t *ent, float time, trace_t *steptrace)
+void SV_FlyMove(edict_t *ent, float time)
 {
-	int blocked = 0;
-	int numplanes = 0;
-	float time_left = time;
+	int numplanes = 0;		// and not sliding along any planes
+	float time_left = time;	// Total time for this movement operation.
 
+	vec3_t move;
 	vec3_t planes[MAX_CLIP_PLANES];
 	vec3_t primal_velocity, original_velocity, new_velocity;
 
-	VectorCopy(ent->v.velocity, original_velocity);
+	VectorCopy(ent->v.velocity, original_velocity); // Store original velocity
 	VectorCopy(ent->v.velocity, primal_velocity);
 
 	qboolean monsterClip = (ent->v.flags & FL_MONSTERCLIP) ? TRUE : FALSE;
+
 	for (int bumpcount = 0; bumpcount < MAX_CLIP_PLANES - 1; bumpcount++)
 	{
 		if (VectorIsZero(ent->v.velocity))
 			break;
 
-		vec3_t end;
-		VectorMA(ent->v.origin, time_left, ent->v.velocity, end);
+		// Assume we can move all the way from the current origin to the end point
+		VectorMA(ent->v.origin, time_left, ent->v.velocity, move);
 
-		trace_t trace = SV_Move(ent->v.origin, ent->v.mins, ent->v.maxs, end, MOVE_NORMAL, ent, monsterClip);
+		// See if we can make it from origin to end point
+		trace_t trace = SV_Move(ent->v.origin, ent->v.mins, ent->v.maxs, move, MOVE_NORMAL, ent, monsterClip);
+
+		// If we started in a solid object, or we were in solid space the whole way, zero out our velocity.
 		if (trace.allsolid)
 		{
 			// entity is trapped in another solid
 			VectorClear(ent->v.velocity);
-			return 4; // dead end
+			break;
 		}
 
+		// If we moved some portion of the total distance,
+		// the copy the end position into the ent->v.origin and zero the plane counter.
 		if (trace.fraction > 0.0f)
 		{
 			trace_t test = SV_Move(trace.endpos, ent->v.mins, ent->v.maxs, trace.endpos, MOVE_NORMAL, ent, monsterClip);
@@ -254,35 +247,28 @@ int SV_FlyMove(edict_t *ent, float time, trace_t *steptrace)
 			}
 		}
 
-		// moved the entire distance
+		// If we covered the entire distance, we are done and can return
 		if (trace.fraction == 1.0f)
+		{
+			// moved the entire distance
 			break;
+		}
 
 		if (!trace.ent)
+		{
 			Sys_Error("%s: !trace.ent", __func__);
+		}
 
+		// stop if on ground
 		if (trace.plane.normal[2] > 0.7f)
 		{
-			blocked |= 1; // floor
-
 			if (trace.ent->v.solid == SOLID_BSP
 				|| trace.ent->v.solid == SOLID_SLIDEBOX
 				|| trace.ent->v.movetype == MOVETYPE_PUSHSTEP
-				|| (ent->v.flags & FL_CLIENT))
+				|| (ent->v.flags & FL_CLIENT) == FL_CLIENT)
 			{
 				ent->v.flags |= FL_ONGROUND;
 				ent->v.groundentity = trace.ent;
-			}
-		}
-
-		if (trace.plane.normal[2] == 0.0f)
-		{
-			blocked |= 2; // step
-
-			if (steptrace)
-			{
-				// save for player extrafriction
-				Q_memcpy(steptrace, &trace, sizeof(trace_t));
 			}
 		}
 
@@ -293,16 +279,20 @@ int SV_FlyMove(edict_t *ent, float time, trace_t *steptrace)
 		if (ent->free)
 			break;
 
+		// Reduce amount of host_frametime left by total time left * fraction that we covered
 		time_left -= time_left * trace.fraction;
 
 		// clipped to another plane
+		// Did we run out of planes to clip against?
 		if (numplanes >= MAX_CLIP_PLANES)
 		{
 			// this shouldn't really happen
+			// stop our movement if so
 			VectorClear(ent->v.velocity);
 			break;
 		}
 
+		// Set up next clipping plane
 		VectorCopy(trace.plane.normal, planes[numplanes]);
 		numplanes++;
 
@@ -318,8 +308,9 @@ int SV_FlyMove(edict_t *ent, float time, trace_t *steptrace)
 				d = 1.0f;
 			}
 
-			ClipVelocity(original_velocity, planes[0], new_velocity, d);
+			SV_ClipVelocity(original_velocity, planes[0], new_velocity, d);
 
+			// go along this plane
 			VectorCopy(new_velocity, ent->v.velocity);
 			VectorCopy(new_velocity, original_velocity);
 		}
@@ -330,7 +321,7 @@ int SV_FlyMove(edict_t *ent, float time, trace_t *steptrace)
 			// modify original_velocity so it parallels all of the clip planes
 			for (i = 0; i < numplanes; i++)
 			{
-				ClipVelocity(original_velocity, planes[i], new_velocity, 1.0f);
+				SV_ClipVelocity(original_velocity, planes[i], new_velocity, 1.0f);
 
 				for (j = 0; j < numplanes; j++)
 				{
@@ -374,8 +365,6 @@ int SV_FlyMove(edict_t *ent, float time, trace_t *steptrace)
 			}
 		}
 	}
-
-	return blocked;
 }
 
 void SV_AddGravity(edict_t *ent)
@@ -575,7 +564,8 @@ void SV_PushMove(edict_t *pusher, float movetime)
 	}
 }
 
-int SV_PushRotate(edict_t *pusher, float movetime)
+// Returns false if the pusher can't push
+qboolean SV_PushRotate(edict_t *pusher, float movetime)
 {
 	vec3_t amove, pushorig;
 	vec3_t forward, right, up;
@@ -584,7 +574,7 @@ int SV_PushRotate(edict_t *pusher, float movetime)
 	if (VectorIsZero(pusher->v.avelocity))
 	{
 		pusher->v.ltime += movetime;
-		return 1;
+		return TRUE;
 	}
 
 	VectorScale(pusher->v.avelocity, movetime, amove);
@@ -601,7 +591,7 @@ int SV_PushRotate(edict_t *pusher, float movetime)
 
 	// non-solid pushers can't push anything
 	if (pusher->v.solid == SOLID_NOT)
-		return 1;
+		return TRUE;
 
 	// see if any solid entities are inside the final position
 	int num_moved = 0;
@@ -681,13 +671,11 @@ int SV_PushRotate(edict_t *pusher, float movetime)
 			if (check->v.flags & FL_CLIENT)
 			{
 				check->v.fixangle = 2;
-				check->v.avelocity[1] = check->v.avelocity[1] + amove[1];
+				check->v.avelocity[1] += amove[1];
 			}
 			else
 			{
-				//check->v.angles[0] = check->v.angles[0] + 0.0f; //TODO: The 'check->v.angles[0]' variable is assigned to itself.
-				check->v.angles[1] = check->v.angles[1] + amove[1];
-				//check->v.angles[2] = check->v.angles[2] + 0.0f; //TODO: The 'check->v.angles[2]' variable is assigned to itself.
+				check->v.angles[1] += amove[1];
 			}
 		}
 
@@ -729,24 +717,19 @@ int SV_PushRotate(edict_t *pusher, float movetime)
 				{
 					movedEnt->v.avelocity[1] = 0.0f;
 				}
-				else
+				else if (movedEnt->v.movetype != MOVETYPE_PUSHSTEP)
 				{
-					if (movedEnt->v.movetype != MOVETYPE_PUSHSTEP)
-					{
-						//movedEnt->v.angles[0] = movedEnt->v.angles[0]; //TODO: V570 The 'movedEnt->v.angles[0]' variable is assigned to itself.
-						movedEnt->v.angles[1] = movedEnt->v.angles[1] - amove[1];
-						//movedEnt->v.angles[2] = movedEnt->v.angles[2]; //TODO: V570 The 'movedEnt->v.angles[2]' variable is assigned to itself.
-					}
+					movedEnt->v.angles[1] -= amove[1];
 				}
 
 				SV_LinkEdict(movedEnt, FALSE);
 			}
 
-			return 0;
+			return FALSE;
 		}
 	}
 
-	return 1;
+	return TRUE;
 }
 
 void SV_Physics_Pusher(edict_t *ent)
@@ -776,6 +759,8 @@ void SV_Physics_Pusher(edict_t *ent)
 				if (SV_PushRotate(ent, movetime))
 				{
 					float savetime = ent->v.ltime;
+
+					// reset the local time to what it was before we rotated
 					ent->v.ltime = oldltime;
 					SV_PushMove(ent, movetime);
 
@@ -1084,6 +1069,7 @@ void SV_Physics_Toss(edict_t *ent)
 	trace_t trace = SV_PushEntity(ent, move);
 	SV_CheckVelocity(ent);
 
+	// If we started in a solid object, or we were in solid space the whole way, zero out our velocity.
 	if (trace.allsolid)
 	{
 		// entity is trapped in another solid
@@ -1092,8 +1078,10 @@ void SV_Physics_Toss(edict_t *ent)
 		return;
 	}
 
+	// If we covered the entire distance, we are done and can return
 	if (trace.fraction == 1.0f)
 	{
+		// moved the entire distance
 		SV_CheckWaterTransition(ent);
 		return;
 	}
@@ -1109,7 +1097,7 @@ void SV_Physics_Toss(edict_t *ent)
 	else
 		backoff = 1.0f;
 
-	ClipVelocity(ent->v.velocity, trace.plane.normal, ent->v.velocity, backoff);
+	SV_ClipVelocity(ent->v.velocity, trace.plane.normal, ent->v.velocity, backoff);
 
 	// stop if on ground
 	if (trace.plane.normal[2] > 0.7f)
@@ -1125,7 +1113,7 @@ void SV_Physics_Toss(edict_t *ent)
 			ent->v.groundentity = trace.ent;
 		}
 
-		if (_DotProduct(move, move) < 900.0f || (ent->v.movetype != MOVETYPE_BOUNCE && ent->v.movetype != MOVETYPE_BOUNCEMISSILE))
+		if (vel < 900.0f || (ent->v.movetype != MOVETYPE_BOUNCE && ent->v.movetype != MOVETYPE_BOUNCEMISSILE))
 		{
 			ent->v.flags |= FL_ONGROUND;
 			ent->v.groundentity = trace.ent;
@@ -1136,6 +1124,7 @@ void SV_Physics_Toss(edict_t *ent)
 		else
 		{
 			float scale = (1.0f - trace.fraction) * host_frametime * 0.9f;
+
 			VectorScale(ent->v.velocity, scale, move);
 			VectorMA(move, scale, ent->v.basevelocity, move);
 
@@ -1329,7 +1318,7 @@ void SV_Physics_Step(edict_t *ent)
 		VectorAdd(ent->v.velocity, ent->v.basevelocity, ent->v.velocity);
 		SV_CheckVelocity(ent);
 
-		SV_FlyMove(ent, host_frametime, nullptr);
+		SV_FlyMove(ent, host_frametime);
 		SV_CheckVelocity(ent);
 
 		VectorSubtract(ent->v.velocity, ent->v.basevelocity, ent->v.velocity);
