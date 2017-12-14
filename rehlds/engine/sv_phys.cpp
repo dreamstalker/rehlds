@@ -434,13 +434,7 @@ trace_t SV_PushEntity(edict_t *ent, vec_t *push)
 
 	if (trace.fraction != 0.0f)
 	{
-#ifdef REHLDS_FIXES
-		// don't move in the direction, since this is a dead end
-		if (!trace.startsolid && !trace.allsolid)
-#endif
-		{
-			VectorCopy(trace.endpos, ent->v.origin);
-		}
+		VectorCopy(trace.endpos, ent->v.origin);
 	}
 
 	SV_LinkEdict(ent, TRUE);

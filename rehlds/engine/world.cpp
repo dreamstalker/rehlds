@@ -1221,8 +1221,15 @@ void SV_ClipToLinks(areanode_t *node, moveclip_t *clip)
 		|| clip->boxmaxs[2] < touch->v.absmin[2])
 			continue;
 
-		if (touch->v.solid != SOLID_SLIDEBOX && !SV_CheckSphereIntersection(touch, clip->start, clip->end))
-			continue;
+		if (touch->v.solid != SOLID_SLIDEBOX
+#ifdef REHLDS_FIXES
+			|| sv_force_ent_intersection.value
+#endif
+)
+		{
+			if (!SV_CheckSphereIntersection(touch, clip->start, clip->end))
+				continue;
+		}
 
 		if (clip->passedict && clip->passedict->v.size[0] && !touch->v.size[0])
 			continue; // points never interact
