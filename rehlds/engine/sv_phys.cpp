@@ -265,7 +265,12 @@ void SV_FlyMove(edict_t *ent, float time)
 			if (trace.ent->v.solid == SOLID_BSP
 				|| trace.ent->v.solid == SOLID_SLIDEBOX
 				|| trace.ent->v.movetype == MOVETYPE_PUSHSTEP
-				|| (ent->v.flags & FL_CLIENT) == FL_CLIENT)
+				|| (
+#ifdef REHLDS_FIXES
+					// Should be a case when entity collided into the client that has non-standard SOLID_BBOX set
+					trace.
+#endif
+					ent->v.flags & FL_CLIENT) == FL_CLIENT)
 			{
 				ent->v.flags |= FL_ONGROUND;
 				ent->v.groundentity = trace.ent;
