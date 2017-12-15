@@ -212,7 +212,7 @@ char *ED_ParseEdict(char *data, edict_t *ent)
 			}
 		}
 
-		while (1)
+		while (true)
 		{
 			data = COM_Parse(data);
 			if (com_token[0] == '}')
@@ -269,7 +269,7 @@ char *ED_ParseEdict(char *data, edict_t *ent)
 			kvd.szClassName = className;
 			kvd.szKeyName = keyname;
 			kvd.szValue = com_token;
-			kvd.fHandled = 0;
+			kvd.fHandled = FALSE;
 			gEntityInterface.pfnKeyValue(ent, &kvd);
 		}
 	}
@@ -291,7 +291,7 @@ void ED_LoadFromFile(char *data)
 
 	ent = NULL;
 	inhibit = 0;
-	while (1)
+	while (true)
 	{
 		data = COM_Parse(data);
 		if (!data)
