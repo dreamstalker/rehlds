@@ -200,7 +200,7 @@ void SV_ClipVelocity(vec_t *in, vec_t *normal, vec_t *out, float overbounce)
 #define MAX_CLIP_PLANES 5
 
 // The basic solid body movement clip that slides along multiple planes
-void SV_FlyMove(edict_t *ent, float time)
+void SV_FlyMove(edict_t *ent, float time, float bounce)
 {
 	int numplanes = 0;		// and not sliding along any planes
 	float time_left = time;	// Total time for this movement operation.
@@ -211,6 +211,14 @@ void SV_FlyMove(edict_t *ent, float time)
 
 	VectorCopy(ent->v.velocity, original_velocity); // Store original velocity
 	VectorCopy(ent->v.velocity, primal_velocity);
+
+	int moveType;
+
+#ifdef REHLDS_FIXES
+	if (ent->v.solid == SOLID_TRIGGER || ent->v.solid == SOLID_NOT)
+		moveType = MOVE_NOMONSTERS;
+#endif
+		moveType = MOVE_NORMAL;
 
 	qboolean monsterClip = (ent->v.flags & FL_MONSTERCLIP) ? TRUE : FALSE;
 
@@ -223,7 +231,7 @@ void SV_FlyMove(edict_t *ent, float time)
 		VectorMA(ent->v.origin, time_left, ent->v.velocity, move);
 
 		// See if we can make it from origin to end point
-		trace_t trace = SV_Move(ent->v.origin, ent->v.mins, ent->v.maxs, move, MOVE_NORMAL, ent, monsterClip);
+		trace_t trace = SV_Move(ent->v.origin, ent->v.mins, ent->v.maxs, move, moveType, ent, monsterClip);
 
 		// If we started in a solid object, or we were in solid space the whole way, zero out our velocity.
 		if (trace.allsolid)
@@ -237,7 +245,7 @@ void SV_FlyMove(edict_t *ent, float time)
 		// the copy the end position into the ent->v.origin and zero the plane counter.
 		if (trace.fraction > 0.0f)
 		{
-			trace_t test = SV_Move(trace.endpos, ent->v.mins, ent->v.maxs, trace.endpos, MOVE_NORMAL, ent, monsterClip);
+			trace_t test = SV_Move(trace.endpos, ent->v.mins, ent->v.maxs, trace.endpos, moveType, ent, monsterClip);
 			if (!test.allsolid)
 			{
 				// actually covered some distance
@@ -275,6 +283,14 @@ void SV_FlyMove(edict_t *ent, float time)
 				ent->v.flags |= FL_ONGROUND;
 				ent->v.groundentity = trace.ent;
 			}
+
+#ifdef REHLDS_FIXES
+			if ((ent->v.flags & FL_ONGROUND) && ent->v.movetype == MOVETYPE_TOSS)
+			{
+				VectorClear(ent->v.velocity);
+				return;
+			}
+#endif
 		}
 
 		// run the impact function
@@ -326,7 +342,7 @@ void SV_FlyMove(edict_t *ent, float time)
 			// modify original_velocity so it parallels all of the clip planes
 			for (i = 0; i < numplanes; i++)
 			{
-				SV_ClipVelocity(original_velocity, planes[i], new_velocity, 1.0f);
+				SV_ClipVelocity(original_velocity, planes[i], new_velocity, bounce);
 
 				for (j = 0; j < numplanes; j++)
 				{
@@ -1018,8 +1034,85 @@ void SV_CheckWaterTransition(edict_t *ent)
 	}
 }
 
-// Toss, bounce, and fly movement. When onground, do nothing.
+// Toss movement. When onground, do nothing.
 void SV_Physics_Toss(edict_t *ent)
+{
+	SV_CheckWater(ent);
+
+	// regular thinking
+	if (!SV_RunThink(ent))
+		return;
+
+	if (ent->v.velocity[2] > 0.0f || !ent->v.groundentity || (ent->v.groundentity->v.flags & (FL_MONSTER | FL_CLIENT))) {
+		ent->v.flags &= ~FL_ONGROUND;
+	}
+
+	// if on ground and not moving, return.
+	if ((ent->v.flags & FL_ONGROUND) && VectorIsZero(ent->v.velocity))
+	{
+		VectorClear(ent->v.avelocity);
+
+		if (VectorIsZero(ent->v.basevelocity))
+			return; // at rest
+	}
+
+	SV_CheckVelocity(ent);
+
+	// add gravity
+	SV_AddGravity(ent);
+
+	// move angles
+	VectorMA(ent->v.angles, host_frametime, ent->v.avelocity, ent->v.angles);
+
+	// move origin
+	VectorAdd(ent->v.velocity, ent->v.basevelocity, ent->v.velocity);
+	SV_CheckVelocity(ent);
+
+	SV_FlyMove(ent, host_frametime, 1.1f);
+	SV_CheckVelocity(ent);
+
+	VectorSubtract(ent->v.velocity, ent->v.basevelocity, ent->v.velocity);
+	SV_CheckVelocity(ent);
+
+	// determine if it's on solid ground at all
+	{
+		int x, y;
+		vec3_t point, mins, maxs;
+
+		VectorAdd(ent->v.origin, ent->v.mins, mins);
+		VectorAdd(ent->v.origin, ent->v.maxs, maxs);
+
+		// if all of the points under the corners are solid world, don't bother
+		// with the tougher checks
+		// the corners must be within 16 of the midpoint
+		point[2] = mins[2] - 1.0f;
+
+		for (x = 0; x <= 1; x++)
+		{
+			for (y = 0; y <= 1; y++)
+			{
+				point[0] = x ? maxs[0] : mins[0];
+				point[1] = y ? maxs[1] : mins[1];
+
+				g_groupmask = ent->v.groupinfo;
+
+				if (SV_PointContents(point) == CONTENTS_SOLID)
+				{
+					ent->v.flags |= FL_ONGROUND;
+					break;
+				}
+			}
+		}
+	}
+
+	SV_LinkEdict(ent, TRUE);
+
+	// check for in water
+	SV_CheckWaterTransition(ent);
+}
+
+// Bounce and fly movement. When onground, do nothing.
+void SV_Physics_Bounce(edict_t *ent)
 {
 	SV_CheckWater(ent);
 
@@ -1317,7 +1410,7 @@ void SV_Physics_Step(edict_t *ent)
 		VectorAdd(ent->v.velocity, ent->v.basevelocity, ent->v.velocity);
 		SV_CheckVelocity(ent);
 
-		SV_FlyMove(ent, host_frametime);
+		SV_FlyMove(ent, host_frametime, 1.0f);
 		SV_CheckVelocity(ent);
 
 		VectorSubtract(ent->v.velocity, ent->v.basevelocity, ent->v.velocity);
@@ -1436,11 +1529,15 @@ void SV_Physics()
 			SV_Physics_Step(ent);
 			break;
 		case MOVETYPE_TOSS:
+#ifdef REHLDS_FIXES
+			SV_Physics_Toss(ent);
+			break;
+#endif
 		case MOVETYPE_BOUNCE:
 		case MOVETYPE_BOUNCEMISSILE:
 		case MOVETYPE_FLY:
 		case MOVETYPE_FLYMISSILE:
-			SV_Physics_Toss(ent);
+			SV_Physics_Bounce(ent);
 			break;
 		default:
 			Sys_Error("%s: %s bad movetype %d", __func__, &pr_strings[ent->v.classname], ent->v.movetype);

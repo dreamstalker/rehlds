@@ -47,7 +47,7 @@ void SV_CheckVelocity(edict_t *ent);
 qboolean SV_RunThink(edict_t *ent);
 void SV_Impact(edict_t *e1, edict_t *e2, trace_t *ptrace);
 void SV_ClipVelocity(vec_t *in, vec_t *normal, vec_t *out, float overbounce);
-void SV_FlyMove(edict_t *ent, float time);
+void SV_FlyMove(edict_t *ent, float time, float bounce);
 void SV_AddGravity(edict_t *ent);
 NOXREF void SV_AddCorrectGravity(edict_t *ent);
 NOXREF void SV_FixupGravityVelocity(edict_t *ent);
