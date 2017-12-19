@@ -242,9 +242,6 @@
     <ClCompile Include="..\engine\ipratelimit.cpp">
       <Filter>engine\server</Filter>
     </ClCompile>
-    <ClCompile Include="..\engine\ipratelimitWrapper.cpp">
-      <Filter>engine\server</Filter>
-    </ClCompile>
     <ClCompile Include="..\engine\decals.cpp">
       <Filter>engine\common</Filter>
     </ClCompile>
@@ -782,9 +779,6 @@
       <Filter>public</Filter>
     </ClInclude>
     <ClInclude Include="..\engine\ipratelimit.h">
-      <Filter>engine\server</Filter>
-    </ClInclude>
-    <ClInclude Include="..\engine\ipratelimitWrapper.h">
       <Filter>engine\server</Filter>
     </ClInclude>
     <ClInclude Include="..\public\savegame_version.h">

@@ -78,7 +78,6 @@
 #include "com_custom.h"
 #include "hashpak.h"
 #include "ipratelimit.h"
-#include "ipratelimitWrapper.h"
 #include "savegame_version.h"
 #include "sys_linuxwnd.h"
 #include "SystemWrapper.h"

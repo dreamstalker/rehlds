@@ -49,7 +49,6 @@
     <ClCompile Include="..\engine\host_cmd.cpp" />
     <ClCompile Include="..\engine\info.cpp" />
     <ClCompile Include="..\engine\ipratelimit.cpp" />
-    <ClCompile Include="..\engine\ipratelimitWrapper.cpp" />
     <ClCompile Include="..\engine\l_studio.cpp" />
     <ClCompile Include="..\engine\mathlib.cpp" />
     <ClCompile Include="..\engine\mathlib_sse.cpp" />
@@ -316,7 +315,6 @@
     <ClInclude Include="..\engine\info.h" />
     <ClInclude Include="..\engine\inst_baseline.h" />
     <ClInclude Include="..\engine\ipratelimit.h" />
-    <ClInclude Include="..\engine\ipratelimitWrapper.h" />
     <ClInclude Include="..\engine\keys.h" />
     <ClInclude Include="..\engine\l_studio.h" />
     <ClInclude Include="..\engine\mathlib_e.h" />

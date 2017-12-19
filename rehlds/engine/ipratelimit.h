@@ -35,9 +35,10 @@
 class CIPRateLimit
 {
 public:
-	CIPRateLimit() {}
-	~CIPRateLimit() {}
+	CIPRateLimit();
+	~CIPRateLimit();
 
+	// updates an ip entry, return true if the ip is allowed, false otherwise
 	bool CheckIP(netadr_t adr);
 
 private:
@@ -48,21 +49,25 @@ private:
 		FLUSH_TIMEOUT = 120,
 	};
 
-	typedef struct iprate_s
+	using ip_t = int;
+	struct iprate_t
 	{
-		typedef int ip_t;
 		ip_t ip;
-
 		long lastTime;
 		int count;
-	} iprate_t;
+	};
 
 private:
-	class CUtlRBTree<CIPRateLimit::iprate_s, int> m_IPTree;
+	CUtlRBTree<iprate_t, int> m_IPTree;
 	int m_iGlobalCount;
 	long m_lLastTime;
 
-	bool LessIP(const struct iprate_s  &, const struct iprate_s  &);
+	static bool LessIP(const iprate_t &lhs, const iprate_t &rhs);
 };
 
-//extern bool (__fastcall *pCIPRateLimit__CheckIP)(CIPRateLimit *obj, int none, netadr_t adr);
+extern cvar_t max_queries_sec;
+extern cvar_t max_queries_sec_global;
+extern cvar_t max_queries_window;
+extern cvar_t sv_logblocks;
+
+bool SV_CheckConnectionLessRateLimits(netadr_t &adr);

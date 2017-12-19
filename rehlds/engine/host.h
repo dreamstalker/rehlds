@@ -81,7 +81,7 @@ extern unsigned short *host_basepal;
 NOXREF void Host_EndGame(const char *message, ...);
 void NORETURN Host_Error(const char *error, ...);
 void Host_InitLocal(void);
-NOBODY void Info_WriteVars(FileHandle_t fp);
+NOXREF void Info_WriteVars(FileHandle_t fp);
 void Host_WriteConfiguration(void);
 void Host_WriteCustomConfig(void);
 void SV_ClientPrintf(const char *fmt, ...);

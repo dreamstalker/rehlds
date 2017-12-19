@@ -174,10 +174,6 @@ cvar_t sv_max_upload = { "sv_uploadmax", "0.5", FCVAR_SERVER, 0.0f, NULL };
 cvar_t hpk_maxsize = { "hpk_maxsize", "4", FCVAR_ARCHIVE, 0.0f, NULL };
 cvar_t sv_visiblemaxplayers = { "sv_visiblemaxplayers", "-1", 0, 0.0f, NULL };
 
-cvar_t max_queries_sec = { "max_queries_sec", "3.0", FCVAR_SERVER | FCVAR_PROTECTED, 0.0f, NULL };
-cvar_t max_queries_sec_global = { "max_queries_sec_global", "30", FCVAR_SERVER | FCVAR_PROTECTED, 0.0f, NULL };
-cvar_t max_queries_window = { "max_queries_window", "60", FCVAR_SERVER | FCVAR_PROTECTED, 0.0f, NULL };
-cvar_t sv_logblocks = { "sv_logblocks", "0", FCVAR_SERVER, 0.0f, NULL };
 cvar_t sv_downloadurl = { "sv_downloadurl", "", FCVAR_PROTECTED, 0.0f, NULL };
 cvar_t sv_allow_dlfile = { "sv_allow_dlfile", "1", 0, 0.0f, NULL };
 #ifdef REHLDS_FIXES
@@ -3571,15 +3567,12 @@ void SV_ReadPackets(void)
 		if (*(uint32 *)net_message.data == 0xFFFFFFFF)
 		{
 			// Connectionless packet
-			if (CheckIP(net_from))
+			if (SV_CheckConnectionLessRateLimits(net_from))
 			{
 				Steam_HandleIncomingPacket(net_message.data, net_message.cursize, ntohl(*(u_long *)&net_from.ip[0]), htons(net_from.port));
 				SV_ConnectionlessPacket();
 			}
-			else if (sv_logblocks.value != 0.0f)
-			{
-				Log_Printf("Traffic from %s was blocked for exceeding rate limits\n", NET_AdrToString(net_from));
-			}
+
 			continue;
 		}
 
