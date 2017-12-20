@@ -2495,6 +2495,11 @@ int EXT_FUNC SV_GetChallenge(const netadr_t& adr)
 
 void SVC_GetChallenge(void)
 {
+#ifdef REHLDS_FIXES
+	if (!g_psv.active)
+		return;
+#endif
+
 	char data[1024];
 	qboolean steam = (Cmd_Argc() == 2 && !Q_stricmp(Cmd_Argv(1), "steam"));
 	int challenge = SV_GetChallenge(net_from);
