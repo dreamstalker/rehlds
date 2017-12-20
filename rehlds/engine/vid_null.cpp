@@ -54,13 +54,13 @@ void R_MarkLeaves()
 
 void R_InitTextures()
 {
-	r_notexture_mip = (texture_t *)Hunk_AllocName(404, "notexture");
+	r_notexture_mip = (texture_t *)Hunk_AllocName(sizeof(texture_t) + 16*16 + 8*8 + 4*4 + 2*2, "notexture");
 	r_notexture_mip->height = 16;
 	r_notexture_mip->width = 16;
-	r_notexture_mip->offsets[0] = 64;
-	r_notexture_mip->offsets[1] = 320;
-	r_notexture_mip->offsets[2] = 384;
-	r_notexture_mip->offsets[3] = 400;
+	r_notexture_mip->offsets[0] = sizeof(texture_t);
+	r_notexture_mip->offsets[1] = r_notexture_mip->offsets[0] + 16*16;
+	r_notexture_mip->offsets[2] = r_notexture_mip->offsets[1] + 8*8;
+	r_notexture_mip->offsets[3] = r_notexture_mip->offsets[2] + 4*4;
 
 	for (int m = 0; m < 4; m++)
 	{
@@ -77,9 +77,7 @@ void R_InitTextures()
 					*dest = 0;
 			}
 		}
-
 	}
-
 }
 
 void StartLoadingProgressBar(const char *loadingType, int numProgressPoints) { }

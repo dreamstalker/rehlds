@@ -42,19 +42,22 @@ typedef mplane_t studio_planes_t[STUDIO_NUM_PLANES];
 typedef r_studiocache_t rgStudioCache_t[STUDIO_CACHE_SIZE];
 typedef float bonetransform_t[STUDIO_NUM_HULLS][3][4];
 
-extern int cache_hull_hitgroup[128];
-extern hull_t cache_hull[128];
-extern mplane_t cache_planes[768];
-
 extern studiohdr_t *pstudiohdr;
+
+extern studio_hull_hitgroup_t cache_hull_hitgroup;
+extern studio_hull_t cache_hull;
+extern studio_planes_t cache_planes;
+
+extern int r_cachecurrent;
+extern int nCurrentHull;
+extern int nCurrentPlane;
+
 extern studio_hull_t studio_hull;
 extern studio_hull_hitgroup_t studio_hull_hitgroup;
 extern studio_clipnodes_t studio_clipnodes;
 extern studio_planes_t studio_planes;
 extern rgStudioCache_t rgStudioCache;
-extern int r_cachecurrent;
-extern int nCurrentHull;
-extern int nCurrentPlane;
+
 extern bonetransform_t bonetransform;
 extern sv_blending_interface_t *g_pSvBlendingAPI;
 extern sv_blending_interface_t svBlending;
@@ -62,9 +65,9 @@ extern server_studio_api_t server_studio_api;
 extern cvar_t r_cachestudio;
 extern float rotationmatrix[3][4];
 
-void SV_InitStudioHull(void);
+void SV_InitStudioHull();
 r_studiocache_t *R_CheckStudioCache(model_t *pModel, float frame, int sequence, const vec_t *angles, const vec_t *origin, const vec_t *size, const unsigned char *controller, const unsigned char *blending);
-NOXREF void R_AddToStudioCache(float frame, int sequence, const vec_t *angles, const vec_t *origin, const vec_t *size, const unsigned char *controller, const unsigned char *pblending, model_t *pModel, hull_t *pHulls, int numhulls);
+void R_AddToStudioCache(float frame, int sequence, const vec_t *angles, const vec_t *origin, const vec_t *size, const unsigned char *controller, const unsigned char *pblending, model_t *pModel, hull_t *pHulls, int numhulls);
 void AngleQuaternion(vec_t *angles, vec_t *quaternion);
 void QuaternionSlerp(vec_t *p, vec_t *q, float t, vec_t *qt);
 void QuaternionMatrix(vec_t *quaternion, float matrix[3][4]);
@@ -77,8 +80,8 @@ void SV_StudioSetupBones(model_t *pModel, float frame, int sequence, const vec_t
 void SV_SetStudioHullPlane(mplane_t *pplane, int iBone, int k, float dist);
 hull_t *R_StudioHull(model_t *pModel, float frame, int sequence, const vec_t *angles, const vec_t *origin, const vec_t *size, const unsigned char *pcontroller, const unsigned char *pblending, int *pNumHulls, const edict_t *pEdict, int bSkipShield);
 int SV_HitgroupForStudioHull(int index);
-NOXREF void R_InitStudioCache(void);
-NOXREF void R_FlushStudioCache(void);
+void R_InitStudioCache();
+void R_FlushStudioCache();
 int R_StudioBodyVariations(model_t *model);
 void R_StudioPlayerBlend(mstudioseqdesc_t *pseqdesc, int *pBlend, float *pPitch);
 hull_t *SV_HullForStudioModel(const edict_t *pEdict, const vec_t *mins, const vec_t *maxs, vec_t *offset, int *pNumHulls);
@@ -93,4 +96,4 @@ void R_StudioBoundBone(vec_t *mins, vec_t *maxs, int *bonecount, const vec_t *po
 void R_StudioAccumulateBoneVerts(vec_t *mins, vec_t *maxs, int *vertcount, vec_t *bone_mins, vec_t *bone_maxs, int *bonecount);
 int R_StudioComputeBounds(unsigned char *pBuffer, float *mins, float *maxs);
 int R_GetStudioBounds(const char *filename, float *mins, float *maxs);
-void R_ResetSvBlending(void);
+void R_ResetSvBlending();
