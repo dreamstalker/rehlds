@@ -217,6 +217,7 @@ void SV_FlyMove(edict_t *ent, float time, float bounce)
 #ifdef REHLDS_FIXES
 	if (ent->v.solid == SOLID_TRIGGER || ent->v.solid == SOLID_NOT)
 		moveType = MOVE_NOMONSTERS;
+	else
 #endif
 		moveType = MOVE_NORMAL;
 
