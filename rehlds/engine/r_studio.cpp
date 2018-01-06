@@ -658,7 +658,7 @@ void R_DrawHitBox(const mstudiobbox_t &bbox, edict_t *pEdict)
 			}
 		}
 	}
-
+	
 	const BYTE colors[][3] = 
 	{
 		{255, 0, 0}, // Red
@@ -684,13 +684,9 @@ void R_DrawHitBox(const mstudiobbox_t &bbox, edict_t *pEdict)
 		{5, 7},
 		{6, 7}
 	};
-
 	short model_index = SV_ModelIndex("sprites/laserbeam.spr");
-
-	for (int index = 0; index < 12; index++)
-	{
-		sizebuf_t *buffer = &g_psv.multicast;
-
+	
+	auto writeToBuffer = [&](int index, sizebuf_t *buffer) {
 		MSG_WriteByte(buffer, svc_temp_entity);
 		MSG_WriteByte(buffer, TE_BEAMPOINTS);
 
@@ -717,8 +713,38 @@ void R_DrawHitBox(const mstudiobbox_t &bbox, edict_t *pEdict)
 
 		MSG_WriteByte(buffer, 255);	
 		MSG_WriteByte(buffer, 0);
-		
-		SV_Multicast(pEdict, pEdict->v.origin, MSG_FL_ONE | MSG_FL_PVS, FALSE);
+	};
+
+
+	for (int index = 0; index < 12; index++)
+	{
+		static int bufferType = 0;
+		bufferType = (++bufferType) % 5;
+		switch(bufferType)
+		{
+			case 0:
+				writeToBuffer(index, &g_psv.multicast);
+				SV_Multicast(pEdict, pEdict->v.origin, MSG_FL_ONE | MSG_FL_PVS, FALSE);
+				break;
+			case 1:
+				writeToBuffer(index, &g_psv.datagram);
+				break;
+			case 2:
+			case 3:
+				for (int i = 0; i < g_psvs.maxclients; i++)
+				{
+					client_t* client = &g_psvs.clients[i];
+					
+					if (client->edict == pEdict || client->fakeclient || !client->hasusrmsgs || (!client->active && !client->spawned))
+						continue;
+					
+					writeToBuffer(index, bufferType == 2 ? &client->datagram : &client->netchan_message);
+				}
+				break;
+			case 4:
+				writeToBuffer(index, &g_psv.reliable_datagram);
+				break;
+		}
 	}
 
 }
