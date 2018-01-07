@@ -219,9 +219,9 @@ void CTextConsoleWin32::PrintRaw(char *pszMsg, int nChars)
 		return;
 
 	WideCharToMultiByte(CP_OEMCP, 0, unicodeStr, -1, outputStr, nLength, NULL, NULL);
-	WriteFile(houtput, outputStr, nChars ? nChars : strlen(outputStr), NULL, NULL);
+	WriteFile(houtput, outputStr, nChars ? nChars : Q_strlen(outputStr), NULL, NULL);
 #else
-	WriteFile(houtput, pszMsg, nChars ? nChars : strlen(pszMsg), NULL, NULL);
+	WriteFile(houtput, pszMsg, nChars ? nChars : Q_strlen(pszMsg), NULL, NULL);
 #endif
 }
 
@@ -247,7 +247,7 @@ int CTextConsoleWin32::GetWidth()
 
 void CTextConsoleWin32::SetStatusLine(char *pszStatus)
 {
-	strncpy(statusline, pszStatus, sizeof(statusline) - 1);
+	Q_strncpy(statusline, pszStatus, sizeof(statusline) - 1);
 	statusline[sizeof(statusline) - 2] = '\0';
 	UpdateStatus();
 }

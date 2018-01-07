@@ -47,11 +47,6 @@ unsigned short *host_basepal;
 //unsigned char *host_colormap;
 //const char *g_InGameAdsAllowed[3];
 
-/*
-* Globals initialization
-*/
-#ifndef HOOK_ENGINE
-
 cvar_t host_name = { "hostname", "Half-Life", 0, 0.0f, NULL };
 cvar_t host_speeds = { "host_speeds", "0", 0, 0.0f, NULL };
 cvar_t host_profile = { "host_profile", "0", 0, 0.0f, NULL };
@@ -70,29 +65,6 @@ cvar_t fps_override = { "fps_override", "0", 0, 0.0f, NULL };
 cvar_t host_framerate = { "host_framerate", "0", 0, 0.0f, NULL };
 cvar_t pausable = { "pausable", "1", FCVAR_SERVER, 0.0f, NULL };
 cvar_t suitvolume = { "suitvolume", "0.25", FCVAR_ARCHIVE, 0.0f, NULL };
-
-#else // HOOK_ENGINE
-
-cvar_t host_name;
-cvar_t host_speeds;
-cvar_t host_profile;
-cvar_t developer;
-cvar_t host_limitlocal;
-cvar_t skill;
-cvar_t deathmatch;
-cvar_t coop;
-
-cvar_t sys_ticrate;
-cvar_t sys_timescale;
-cvar_t fps_max;
-cvar_t host_killtime;
-cvar_t sv_stats;
-cvar_t fps_override;
-cvar_t host_framerate;
-cvar_t pausable;
-cvar_t suitvolume;
-
-#endif // HOOK_ENGINE
 
 NOXREF void Host_EndGame(const char *message, ...)
 {

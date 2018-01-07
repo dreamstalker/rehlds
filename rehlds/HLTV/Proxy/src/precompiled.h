@@ -1,9 +1,8 @@
 #pragma once
 
 #include "basetypes.h"
-#include "archtypes.h"
-#include "mathlib.h"
 #include "FileSystem.h"
+#include "strtools.h"
 
 #include "interface.h"
 #include "IBaseSystem.h"

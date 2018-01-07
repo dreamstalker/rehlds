@@ -70,12 +70,12 @@ int StartVGUI()
 	if (steamPath)
 	{
 		// put the config dir directly under steam
-		_snprintf(szConfigDir, sizeof(szConfigDir), "%s/config", steamPath);
+		Q_snprintf(szConfigDir, sizeof(szConfigDir), "%s/config", steamPath);
 	}
 	else
 	{
 		// we're not running steam, so just put the config dir under the platform
-		strncpy(szConfigDir, "platform/config", sizeof(szConfigDir));
+		Q_strlcpy(szConfigDir, "platform/config");
 	}
 
 	mkdir(szConfigDir);

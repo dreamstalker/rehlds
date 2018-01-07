@@ -8,7 +8,7 @@
 #include <array>
 #include <utility>
 
-#if defined(HOOK_ENGINE) || defined(HOOK_HLTV)
+#if defined(HOOK_HLTV) || defined(HOOK_FILESYSTEM)
 
 #define private public
 #define protected public
@@ -117,6 +117,9 @@ namespace MsvcMethod {
 	}
 
 	template <typename TMethod, typename T>
+	TMethod &declmethod(TMethod T::*method);
+
+	template <typename TMethod, typename T>
 	std::enable_if_t<Detail::is_function_v<TMethod>, std::uintptr_t>
 	GetVirtualAddress(TMethod T::*method)
 	{
@@ -145,15 +148,16 @@ namespace MsvcMethod {
 } // namespace MsvcMethod
 
 #ifdef _MSC_VER
-	#define GLOBALVAR_LINK(offset, symbol, var, ...)             { offset, #symbol, (size_t)&##var, __VA_ARGS__ }
-	#define HOOK_SYMBOLDEF(offset, symbol, func, ...)            { offset, #symbol, MsvcMethod::GetAddress<__VA_ARGS__>(&func) }
-	#define HOOK_SYMBOL_VIRTUAL_DEF(offset, symbol, func, ...)   { offset, #symbol, MsvcMethod::GetVirtualAddress<__VA_ARGS__>(&func) }
+	#define GLOBALVAR_LINK(offset, symbol, var, ...)                            { offset, #symbol, (size_t)&##var, __VA_ARGS__ }
+	#define HOOK_SYMBOLDEF(offset, symbol, func, ...)                           { offset, #symbol, MsvcMethod::GetAddress<__VA_ARGS__>(&func) }
+	#define HOOK_SYMBOL_VIRTUAL_DEF(offset, symbol, func, ...)                  { offset, #symbol, MsvcMethod::GetVirtualAddress<__VA_ARGS__>(&func) }
+	#define HOOK_SYMBOL_VIRTUAL_EX(offset, class, func, ...)                    { offset, #class#func, MsvcMethod::GetVirtualAddress<std::remove_reference<decltype(MsvcMethod::declmethod<__VA_ARGS__>(&class::func))>::type, class>(&class::func) }
 
-	#define HOOK_DEF(offset, func, ...)                          HOOK_SYMBOLDEF(offset, func, func, __VA_ARGS__)
-	#define HOOK_VIRTUAL_DEF(offset, func, ...)                  HOOK_SYMBOL_VIRTUAL_DEF(offset, func, func, __VA_ARGS__)
+	#define HOOK_DEF(offset, func, ...)                                         HOOK_SYMBOLDEF(offset, func, func, __VA_ARGS__)
+	#define HOOK_VIRTUAL_DEF(offset, func, ...)                                 HOOK_SYMBOL_VIRTUAL_DEF(offset, func, func, __VA_ARGS__)
 
 #else
 	#error Hooking stuff is only available using MSVC compiler.
 #endif // _MSC_VER
 
-#endif // #if defined(HOOK_ENGINE) || defined(HOOK_HLTV)
+#endif // #if defined(HOOK_HLTV) || defined(HOOK_FILESYSTEM)

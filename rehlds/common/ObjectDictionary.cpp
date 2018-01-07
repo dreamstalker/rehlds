@@ -34,7 +34,7 @@ ObjectDictionary::ObjectDictionary()
 	m_findKey = 0;
 	m_entries = nullptr;
 
-	memset(m_cache, 0, sizeof(m_cache));
+	Q_memset(m_cache, 0, sizeof(m_cache));
 
 	m_cacheIndex = 0;
 	m_size = 0;
@@ -163,7 +163,7 @@ int ObjectDictionary::FindClosestAsIndex(float key)
 
 void ObjectDictionary::ClearCache()
 {
-	memset(m_cache, 0, sizeof(m_cache));
+	Q_memset(m_cache, 0, sizeof(m_cache));
 	m_cacheIndex = 0;
 }
 
@@ -285,11 +285,11 @@ bool ObjectDictionary::CheckSize()
 		if (!newEntries)
 			return false;
 
-		memset(&newEntries[m_size], 0, sizeof(entry_t) * (newSize - m_size));
+		Q_memset(&newEntries[m_size], 0, sizeof(entry_t) * (newSize - m_size));
 
 		if (m_entries && m_size)
 		{
-			memcpy(newEntries, m_entries, sizeof(entry_t) * m_size);
+			Q_memcpy(newEntries, m_entries, sizeof(entry_t) * m_size);
 			Mem_Free(m_entries);
 		}
 

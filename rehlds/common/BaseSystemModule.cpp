@@ -28,7 +28,6 @@
 
 #include "precompiled.h"
 
-
 BaseSystemModule::BaseSystemModule()
 {
 	m_System = nullptr;
@@ -36,7 +35,7 @@ BaseSystemModule::BaseSystemModule()
 	m_SystemTime = 0;
 	m_State = MODULE_UNDEFINED;
 
-	memset(m_Name, 0, sizeof(m_Name));
+	Q_memset(m_Name, 0, sizeof(m_Name));
 }
 
 char *BaseSystemModule::GetName()
@@ -87,7 +86,7 @@ bool BaseSystemModule::Init(IBaseSystem *system, int serial, char *name)
 	m_SystemTime = 0;
 
 	if (name) {
-		strcopy(m_Name, name);
+		Q_strlcpy(m_Name, name);
 	}
 
 	return true;

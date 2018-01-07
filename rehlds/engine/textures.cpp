@@ -39,18 +39,7 @@ texture_t * r_notexture_mip;
 int nummiptex;
 char miptex[512][64];
 
-/*
- * Globals initialization
- */
-#ifndef HOOK_ENGINE
-
 cvar_t r_wadtextures = { "r_wadtextures", "0", 0, 0.0f, NULL };
-
-#else // HOOK_ENGINE
-
-cvar_t r_wadtextures;
-
-#endif // HOOK_ENGINE
 
 void SafeRead(FileHandle_t f, void *buffer, int count)
 {
@@ -214,8 +203,8 @@ void TEX_AddAnimatingTextures(void)
 		if (miptex[i][0] != '+' && miptex[i][0] != '-')
 			continue;
 
-		Q_strncpy(name, miptex[i], 0x1Fu);
-		name[31] = 0;
+		Q_strncpy(name, miptex[i], sizeof(name) - 1);
+		name[sizeof(name) - 1] = 0;
 
 		for (int j = 0; j < 20; j++)
 		{

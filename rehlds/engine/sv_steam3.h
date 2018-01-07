@@ -50,7 +50,7 @@ protected:
 	virtual ~CSteam3() {}
 	virtual void Shutdown() = 0;
 
-	void GSSendUserStatusResponse(CSteamID &, int, int);
+	void GSSendUserStatusResponse(CSteamID &steamID, int nSecondsConnected, int nSecondsSinceLast);
 	bool InitModule();
 };
 
@@ -75,11 +75,11 @@ public:
 
 	NOBODY void SetServerType();
 	NOBODY void SetSpawnCount(int count);
-	NOBODY bool BSecure();
-	NOBODY bool BLanOnly();
 
-	bool BWantsSecure() { return m_bWantToBeSecure; }
-	bool BLoggedOn() { return m_bLoggedOn; }
+	bool BSecure()      const { return m_bWantToBeSecure; }
+	bool BLanOnly()     const { return m_bLanOnly; };
+	bool BWantsSecure() const { return m_bWantToBeSecure; }
+	bool BLoggedOn()    const { return m_bLoggedOn; }
 
 	uint64 GetSteamID();
 
@@ -118,11 +118,6 @@ public:
 	void InitClient();
 	void RunFrame();
 };
-
-#ifdef HOOK_ENGINE
-#define s_Steam3Server (*ps_Steam3Server)
-#define s_Steam3Client (*ps_Steam3Client)
-#endif // HOOK_ENGINE
 
 extern CSteam3Server *s_Steam3Server;
 extern CSteam3Client s_Steam3Client;

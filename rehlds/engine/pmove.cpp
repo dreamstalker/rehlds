@@ -31,36 +31,25 @@
 playermove_t *pmove;
 movevars_t movevars;
 
-/*
-* Globals initialization
-*/
-#ifndef HOOK_ENGINE
-
 cvar_t pm_showclip = { "pm_showclip", "0", 0, 0.0f, NULL };
-vec_t player_mins[4][3] = {
-		{ -16.0f, -16.0f, -36.0f, },
-		{ -16.0f, -16.0f, -18.0f, },
-		{ 0.0f, 0.0f, 0.0f, },
-		{ -32.0f, -32.0f, -32.0f, }
-};
-vec_t player_maxs[4][3] = {
-		{ 16.0f, 16.0f, 36.0f, },
-		{ 16.0f, 16.0f, 18.0f, },
-		{ 0.0f, 0.0f, 0.0f, },
-		{ 32.0f, 32.0f, 32.0f, }
-};
-#else //HOOK_ENGINE
 
-cvar_t pm_showclip;
-vec_t player_mins[4][3]; // vec_t player_mins[4][3];
-vec_t player_maxs[4][3]; // vec_t player_maxs[4][3];
+vec3_t player_mins[MAX_MAP_HULLS] = {
+	{ -16.0f, -16.0f, -36.0f, },
+	{ -16.0f, -16.0f, -18.0f, },
+	{  0.0f,   0.0f,   0.0f,  },
+	{ -32.0f, -32.0f, -32.0f, }
+};
 
-#endif //HOOK_ENGINE
+vec3_t player_maxs[MAX_MAP_HULLS] = {
+	{ 16.0f, 16.0f, 36.0f, },
+	{ 16.0f, 16.0f, 18.0f, },
+	{ 0.0f,  0.0f,  0.0f,  },
+	{ 32.0f, 32.0f, 32.0f, }
+};
 
 qboolean PM_AddToTouched(pmtrace_t tr, vec_t *impactvelocity)
 {
 	int i;
-
 	for (i = 0; i < pmove->numtouch; i++)
 	{
 		if (pmove->touchindex[i].ent == tr.ent)
@@ -77,10 +66,7 @@ qboolean PM_AddToTouched(pmtrace_t tr, vec_t *impactvelocity)
 #endif
 	}
 
-	tr.deltavelocity[0] = impactvelocity[0];
-	tr.deltavelocity[1] = impactvelocity[1];
-	tr.deltavelocity[2] = impactvelocity[2];
-
+	VectorCopy(impactvelocity, tr.deltavelocity);
 	pmove->touchindex[pmove->numtouch++] = tr;
 
 	return TRUE;
@@ -106,52 +92,20 @@ void EXT_FUNC PM_StuckTouch(int hitent, pmtrace_t *ptraceresult)
 void PM_Init(playermove_t *ppm)
 {
 	PM_InitBoxHull();
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < MAX_MAP_HULLS; i++)
 	{
-		ppm->_player_mins[i][0] = player_mins[i][0];
-		ppm->_player_mins[i][1] = player_mins[i][1];
-		ppm->_player_mins[i][2] = player_mins[i][2];
-		ppm->_player_maxs[i][0] = player_maxs[i][0];
-		ppm->_player_maxs[i][1] = player_maxs[i][1];
-		ppm->_player_maxs[i][2] = player_maxs[i][2];
+		VectorCopy(player_mins[i], ppm->player_mins[i]);
+		VectorCopy(player_maxs[i], ppm->player_maxs[i]);
 	}
 
 	ppm->_movevars = &movevars;
 
-#ifdef HOOK_ENGINE
-	*(size_t*)&ppm->PM_Info_ValueForKey = (size_t)GetOriginalFuncAddrOrDefault("Info_ValueForKey", (void *)Info_ValueForKey);
-	*(size_t*)&ppm->PM_Particle = (size_t)GetOriginalFuncAddrOrDefault("CL_Particle", (void *)CL_Particle);
-	*(size_t*)&ppm->PM_TestPlayerPosition = (size_t)GetOriginalFuncAddrOrDefault("PM_TestPlayerPosition", (void *)PM_TestPlayerPosition);
-	*(size_t*)&ppm->Con_NPrintf = (size_t)GetFuncRefAddrOrDefault("Con_NPrintf", (void *)Con_NPrintf);
-	*(size_t*)&ppm->Con_DPrintf = (size_t)GetFuncRefAddrOrDefault("Con_DPrintf", (void *)Con_DPrintf);
-	*(size_t*)&ppm->Con_Printf = (size_t)GetFuncRefAddrOrDefault("Con_Printf", (void *)Con_Printf);
-	*(size_t*)&ppm->Sys_FloatTime = (size_t)GetOriginalFuncAddrOrDefault("Sys_FloatTime", (void *)Sys_FloatTime);
-	*(size_t*)&ppm->PM_StuckTouch = (size_t)GetOriginalFuncAddrOrDefault("PM_StuckTouch", (void *)PM_StuckTouch);
-	*(size_t*)&ppm->PM_PointContents = (size_t)GetOriginalFuncAddrOrDefault("PM_PointContents", (void *)PM_PointContents);
-	*(size_t*)&ppm->PM_TruePointContents = (size_t)GetOriginalFuncAddrOrDefault("PM_TruePointContents", (void *)PM_TruePointContents);
-	*(size_t*)&ppm->PM_HullPointContents = (size_t)GetOriginalFuncAddrOrDefault("PM_HullPointContents", (void *)PM_HullPointContents);
-	*(size_t*)&ppm->PM_PlayerTrace = (size_t)GetOriginalFuncAddrOrDefault("PM_PlayerTrace", (void *)PM_PlayerTrace);
-	*(size_t*)&ppm->PM_TraceLine = (size_t)GetOriginalFuncAddrOrDefault("PM_TraceLine", (void *)PM_TraceLine);
-	*(size_t*)&ppm->PM_TraceModel = (size_t)GetOriginalFuncAddrOrDefault("PM_TraceModel", (void *)PM_TraceModel);
-	*(size_t*)&ppm->RandomLong = (size_t)GetOriginalFuncAddrOrDefault("RandomLong", (void *)RandomLong);
-	*(size_t*)&ppm->RandomFloat = (size_t)GetOriginalFuncAddrOrDefault("RandomFloat", (void *)RandomFloat);
-	*(size_t*)&ppm->PM_GetModelType = (size_t)GetOriginalFuncAddrOrDefault("PM_GetModelType", (void *)PM_GetModelType);
-	*(size_t*)&ppm->PM_HullForBsp = (size_t)GetOriginalFuncAddrOrDefault("PM_HullForBsp", (void *)PM_HullForBsp);
-	*(size_t*)&ppm->PM_GetModelBounds = (size_t)GetOriginalFuncAddrOrDefault("PM_GetModelBounds", (void *)PM_GetModelBounds);
-	*(size_t*)&ppm->COM_FileSize = (size_t)GetOriginalFuncAddrOrDefault("COM_FileSize", (void *)COM_FileSize);
-	*(size_t*)&ppm->COM_LoadFile = (size_t)GetOriginalFuncAddrOrDefault("COM_LoadFile", (void *)COM_LoadFile);
-	*(size_t*)&ppm->COM_FreeFile = (size_t)GetOriginalFuncAddrOrDefault("COM_FreeFile", (void *)COM_FreeFile);
-	*(size_t*)&ppm->memfgets = (size_t)GetOriginalFuncAddrOrDefault("memfgets", (void *)memfgets);
-	*(size_t*)&ppm->PM_PlayerTraceEx = (size_t)GetOriginalFuncAddrOrDefault("PM_PlayerTraceEx", (void *)PM_PlayerTraceEx);
-	*(size_t*)&ppm->PM_TestPlayerPositionEx = (size_t)GetOriginalFuncAddrOrDefault("PM_TestPlayerPositionEx", (void *)PM_TestPlayerPositionEx);
-	*(size_t*)&ppm->PM_TraceLineEx = (size_t)GetOriginalFuncAddrOrDefault("PM_TraceLineEx", (void *)PM_TraceLineEx);
-#else
 	ppm->PM_Info_ValueForKey = Info_ValueForKey;
 	ppm->PM_Particle = CL_Particle;
 	ppm->PM_TestPlayerPosition = PM_TestPlayerPosition;
-	ppm->Con_NPrintf = (void(*)(int idx, char *fmt, ...))Con_NPrintf;
-	ppm->Con_DPrintf = (void(*)(char *fmt, ...))Con_DPrintf;
-	ppm->Con_Printf = (void (*)(char *fmt, ...))Con_Printf;
+	ppm->Con_NPrintf = Con_NPrintf;
+	ppm->Con_DPrintf = Con_DPrintf;
+	ppm->Con_Printf = Con_Printf;
 	ppm->Sys_FloatTime = Sys_FloatTime;
 	ppm->PM_StuckTouch = PM_StuckTouch;
 	ppm->PM_PointContents = PM_PointContents;
@@ -163,7 +117,7 @@ void PM_Init(playermove_t *ppm)
 	ppm->RandomLong = RandomLong;
 	ppm->RandomFloat = RandomFloat;
 	ppm->PM_GetModelType = PM_GetModelType;
-	ppm->PM_HullForBsp = (void *(__cdecl *)(physent_t *, float *))PM_HullForBsp;
+	ppm->PM_HullForBsp = PM_HullForBsp;
 	ppm->PM_GetModelBounds = PM_GetModelBounds;
 	ppm->COM_FileSize = COM_FileSize;
 	ppm->COM_LoadFile = COM_LoadFile;
@@ -172,5 +126,4 @@ void PM_Init(playermove_t *ppm)
 	ppm->PM_PlayerTraceEx = PM_PlayerTraceEx;
 	ppm->PM_TestPlayerPositionEx = PM_TestPlayerPositionEx;
 	ppm->PM_TraceLineEx = PM_TraceLineEx;
-#endif
 }

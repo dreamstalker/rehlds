@@ -280,17 +280,17 @@ void InitConProc()
 	// give external front ends a chance to hook into the console
 	if (CommandLine()->CheckParm("-HFILE", &p) && p)
 	{
-		hFile = (HANDLE)atoi(p);
+		hFile = (HANDLE)Q_atoi(p);
 	}
 
 	if (CommandLine()->CheckParm("-HPARENT", &p) && p)
 	{
-		heventParent = (HANDLE)atoi(p);
+		heventParent = (HANDLE)Q_atoi(p);
 	}
 
 	if (CommandLine()->CheckParm("-HCHILD", &p) && p)
 	{
-		heventChild = (HANDLE)atoi(p);
+		heventChild = (HANDLE)Q_atoi(p);
 	}
 
 	// ignore if we don't have all the events.
@@ -327,7 +327,7 @@ void InitConProc()
 
 	if (CommandLine()->CheckParm("-conheight", &p) && p)
 	{
-		WantHeight = atoi(p);
+		WantHeight = Q_atoi(p);
 	}
 
 	// Force 80 character width, at least 25 character height

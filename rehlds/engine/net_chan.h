@@ -32,21 +32,6 @@
 #include "cvar.h"
 #include "net.h"
 
-#ifdef HOOK_ENGINE
-
-#define gDownloadFile (*pgDownloadFile)
-
-#define net_drop (*pnet_drop)
-#define net_log (*pnet_log)
-#define net_showpackets (*pnet_showpackets)
-#define net_showdrop (*pnet_showdrop)
-#define net_drawslider (*pnet_drawslider)
-#define net_chokeloopback (*pnet_chokeloopback)
-#define sv_filetransfercompression (*psv_filetransfercompression)
-#define sv_filetransfermaxsize (*psv_filetransfermaxsize)
-
-#endif // HOOK_ENGINE
-
 extern char gDownloadFile[256];
 
 extern int net_drop;

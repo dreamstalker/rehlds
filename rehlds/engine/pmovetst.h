@@ -33,13 +33,6 @@
 #include "model.h"
 #include "world.h"
 
-#ifdef HOOK_ENGINE
-#define g_contentsresult (*pg_contentsresult)
-#define box_hull_0 (*pbox_hull_0)
-#define box_clipnodes_0 (*pbox_clipnodes_0)
-#define box_planes_0 (*pbox_planes_0)
-#endif // HOOK_ENGINE
-
 extern int g_contentsresult;
 extern hull_t box_hull_0;
 extern box_clipnodes_t box_clipnodes_0;

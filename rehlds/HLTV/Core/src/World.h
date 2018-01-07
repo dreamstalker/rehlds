@@ -44,98 +44,98 @@ public:
 	World() {}
 	virtual ~World() {}
 
-	bool Init(IBaseSystem *system, int serial, char *name);
-	void RunFrame(double time);
-	void ReceiveSignal(ISystemModule *module, unsigned int signal, void *data);
-	void ExecuteCommand(int commandID, char *commandLine);
-	void RegisterListener(ISystemModule *module);
-	void RemoveListener(ISystemModule *module);
-	IBaseSystem *GetSystem();
-	int GetSerial();
-	char *GetStatusLine();
-	char *GetType();
-	char *GetName();
-	int GetState();
-	int GetVersion();
-	void ShutDown();
+	EXT_FUNC bool Init(IBaseSystem *system, int serial, char *name);
+	EXT_FUNC void RunFrame(double time);
+	EXT_FUNC void ReceiveSignal(ISystemModule *module, unsigned int signal, void *data);
+	EXT_FUNC void ExecuteCommand(int commandID, char *commandLine);
+	EXT_FUNC void RegisterListener(ISystemModule *module);
+	EXT_FUNC void RemoveListener(ISystemModule *module);
+	EXT_FUNC IBaseSystem *GetSystem();
+	EXT_FUNC int GetSerial();
+	EXT_FUNC char *GetStatusLine();
+	EXT_FUNC char *GetType();
+	EXT_FUNC char *GetName();
+	EXT_FUNC int GetState();
+	EXT_FUNC int GetVersion();
+	EXT_FUNC void ShutDown();
 
-	double GetTime();
-	NetAddress *GetGameServerAddress();
-	char *GetLevelName();
-	char *GetGameDir();
-	frame_t *GetFrameByTime(double time);
-	frame_t *GetFrameBySeqNr(unsigned int seqnr);
-	frame_t *GetLastFrame();
-	frame_t *GetFirstFrame();
-	int GetServerCount();
-	int GetSlotNumber();
-	int GetMaxClients();
-	int GetNumPlayers();
-	IBSPModel *GetWorldModel();
-	InfoString *GetServerInfoString();
-	bool GetPlayerInfoString(int playerNum, InfoString *infoString);
-	UserMsg *GetUserMsg(int msgNumber);
-	char *GetHostName();
-	serverinfo_t *GetServerInfo();
+	EXT_FUNC double GetTime();
+	EXT_FUNC NetAddress *GetGameServerAddress();
+	EXT_FUNC char *GetLevelName();
+	EXT_FUNC char *GetGameDir();
+	EXT_FUNC frame_t *GetFrameByTime(double time);
+	EXT_FUNC frame_t *GetFrameBySeqNr(unsigned int seqnr);
+	EXT_FUNC frame_t *GetLastFrame();
+	EXT_FUNC frame_t *GetFirstFrame();
+	EXT_FUNC int GetServerCount();
+	EXT_FUNC int GetSlotNumber();
+	EXT_FUNC int GetMaxClients();
+	EXT_FUNC int GetNumPlayers();
+	EXT_FUNC IBSPModel *GetWorldModel();
+	EXT_FUNC InfoString *GetServerInfoString();
+	EXT_FUNC bool GetPlayerInfoString(int playerNum, InfoString *infoString);
+	EXT_FUNC UserMsg *GetUserMsg(int msgNumber);
+	EXT_FUNC char *GetHostName();
+	EXT_FUNC serverinfo_t *GetServerInfo();
 
-	bool IsPlayerIndex(int index);
-	bool IsVoiceEnabled();
-	bool IsActive();
-	bool IsPaused();
-	bool IsComplete();
-	bool IsHLTV();
-	void Reset();
+	EXT_FUNC bool IsPlayerIndex(int index);
+	EXT_FUNC bool IsVoiceEnabled();
+	EXT_FUNC bool IsActive();
+	EXT_FUNC bool IsPaused();
+	EXT_FUNC bool IsComplete();
+	EXT_FUNC bool IsHLTV();
+	EXT_FUNC void Reset();
 
-	void SetServerInfo(int protocol, CRC32_t nserverCRC, unsigned char *nclientdllmd5, int nmaxclients, int nplayernum, int ngametype, char *ngamedir, char *nservername, char *nlevelname);
-	void SetServerInfoString(char *infostring);
-	void SetServerInfo(serverinfo_t *serverinfo);
+	EXT_FUNC void SetServerInfo(int protocol, CRC32_t nserverCRC, unsigned char *nclientdllmd5, int nmaxclients, int nplayernum, int ngametype, char *ngamedir, char *nservername, char *nlevelname);
+	EXT_FUNC void SetServerInfoString(char *infostring);
+	EXT_FUNC void SetServerInfo(serverinfo_t *serverinfo);
 
-	void UpdateServerInfo();
-	void SetPaused(bool state);
-	void SetTime(double newTime);
-	void SetBufferSize(float seconds);
-	void SetVoiceEnabled(bool state);
-	void SetMoveVars(movevars_t *nmovevars);
-	void SetCDInfo(int ncdtrack, int nlooptrack);
-	void SetHLTV(bool state);
-	void SetExtraInfo(char *nclientfallback, int nallowCheats);
-	void SetViewEntity(int nviewentity);
-	void SetGameServerAddress(NetAddress *address);
-	void SetHostName(char *name);
-	void NewGame(int newServerCount);
-	void FinishGame();
-	bool SaveAsDemo(char *filename, IDirector *director);
-	void StopGame();
-	int FindUserMsgByName(char *name);
-	void ParseDeltaDescription(BitBuffer *stream);
-	void ParseBaseline(BitBuffer *stream);
-	void ParseEvent(BitBuffer *stream);
-	void ParseClientData(BitBuffer *stream, unsigned int deltaSeqNr, BitBuffer *to, clientdata_t *clientData);
-	bool GetUncompressedFrame(unsigned int seqNr, frame_t *frame);
-	bool UncompressEntitiesFromStream(frame_t *frame, BitBuffer *stream);
-	bool UncompressEntitiesFromStream(frame_t *frame, BitBuffer *stream, unsigned int from);
-	bool GetClientData(unsigned int SeqNr, clientdata_t *clientData);
-	bool GetClientData(frame_t *frame, clientdata_t *clientData);
-	int AddFrame(frame_t *newFrame);
-	bool AddResource(resource_t *resource);
-	void AddLightStyle(int index, char *style);
-	bool AddSignonData(unsigned char type, unsigned char *data, int size);
-	bool AddUserMessage(int msgNumber, int size, char *name);
-	void AddBaselineEntity(int index, entity_state_t *ent);
-	void AddInstancedBaselineEntity(int index, entity_state_t *ent);
-	void UpdatePlayer(int playerNum, int userId, char *infostring, char *hashedcdkey);
+	EXT_FUNC void UpdateServerInfo();
+	EXT_FUNC void SetPaused(bool state);
+	EXT_FUNC void SetTime(double newTime);
+	EXT_FUNC void SetBufferSize(float seconds);
+	EXT_FUNC void SetVoiceEnabled(bool state);
+	EXT_FUNC void SetMoveVars(movevars_t *nmovevars);
+	EXT_FUNC void SetCDInfo(int ncdtrack, int nlooptrack);
+	EXT_FUNC void SetHLTV(bool state);
+	EXT_FUNC void SetExtraInfo(char *nclientfallback, int nallowCheats);
+	EXT_FUNC void SetViewEntity(int nviewentity);
+	EXT_FUNC void SetGameServerAddress(NetAddress *address);
+	EXT_FUNC void SetHostName(char *name);
+	EXT_FUNC void NewGame(int newServerCount);
+	EXT_FUNC void FinishGame();
+	EXT_FUNC bool SaveAsDemo(char *filename, IDirector *director);
+	EXT_FUNC void StopGame();
+	EXT_FUNC int FindUserMsgByName(char *name);
+	EXT_FUNC void ParseDeltaDescription(BitBuffer *stream);
+	EXT_FUNC void ParseBaseline(BitBuffer *stream);
+	EXT_FUNC void ParseEvent(BitBuffer *stream);
+	EXT_FUNC void ParseClientData(BitBuffer *stream, unsigned int deltaSeqNr, BitBuffer *to, clientdata_t *clientData);
+	EXT_FUNC bool GetUncompressedFrame(unsigned int seqNr, frame_t *frame);
+	EXT_FUNC bool UncompressEntitiesFromStream(frame_t *frame, BitBuffer *stream);
+	EXT_FUNC bool UncompressEntitiesFromStream(frame_t *frame, BitBuffer *stream, unsigned int from);
+	EXT_FUNC bool GetClientData(unsigned int SeqNr, clientdata_t *clientData);
+	EXT_FUNC bool GetClientData(frame_t *frame, clientdata_t *clientData);
+	EXT_FUNC int AddFrame(frame_t *newFrame);
+	EXT_FUNC bool AddResource(resource_t *resource);
+	EXT_FUNC void AddLightStyle(int index, char *style);
+	EXT_FUNC bool AddSignonData(unsigned char type, unsigned char *data, int size);
+	EXT_FUNC bool AddUserMessage(int msgNumber, int size, char *name);
+	EXT_FUNC void AddBaselineEntity(int index, entity_state_t *ent);
+	EXT_FUNC void AddInstancedBaselineEntity(int index, entity_state_t *ent);
+	EXT_FUNC void UpdatePlayer(int playerNum, int userId, char *infostring, char *hashedcdkey);
 
-	void WriteFrame(frame_t *frame, unsigned int lastFrameSeqnr, BitBuffer *reliableStream, BitBuffer *unreliableStream, unsigned int deltaSeqNr, unsigned int clientDelta, bool addVoice);
-	void WriteNewData(BitBuffer *stream);
-	void WriteClientUpdate(BitBuffer *stream, int playerIndex);
-	void WriteMovevars(BitBuffer *stream);
-	void WriteSigonData(BitBuffer *stream);
-	void WriteLightStyles(BitBuffer *stream);
+	EXT_FUNC void WriteFrame(frame_t *frame, unsigned int lastFrameSeqnr, BitBuffer *reliableStream, BitBuffer *unreliableStream, unsigned int deltaSeqNr, unsigned int clientDelta, bool addVoice);
+	EXT_FUNC void WriteNewData(BitBuffer *stream);
+	EXT_FUNC void WriteClientUpdate(BitBuffer *stream, int playerIndex);
+	EXT_FUNC void WriteMovevars(BitBuffer *stream);
+	EXT_FUNC void WriteSigonData(BitBuffer *stream);
+	EXT_FUNC void WriteLightStyles(BitBuffer *stream);
 
-	int RemoveFrames(unsigned int startSeqNr, unsigned int endSeqNr);
-	int DuplicateFrames(unsigned int startSeqNr, unsigned int endSeqNr);
-	int MoveFrames(unsigned int startSeqNr, unsigned int endSeqNr, double destSeqnr);
-	int RevertFrames(unsigned int startSeqNr, unsigned int endSeqNr);
+	EXT_FUNC int RemoveFrames(unsigned int startSeqNr, unsigned int endSeqNr);
+	EXT_FUNC int DuplicateFrames(unsigned int startSeqNr, unsigned int endSeqNr);
+	EXT_FUNC int MoveFrames(unsigned int startSeqNr, unsigned int endSeqNr, double destSeqnr);
+	EXT_FUNC int RevertFrames(unsigned int startSeqNr, unsigned int endSeqNr);
 
 private:
 	int CompressFrame(frame_t *from, BitBuffer *stream);
@@ -251,7 +251,12 @@ protected:
 	entity_state_t m_Instanced_BaseLines[MAX_INSTANCED_BASELINES];
 
 	int m_MaxInstanced_BaseLine;
+
+#ifdef HOOK_HLTV
 	char m_Lightstyles[MAX_LIGHTSTYLES][65];
+#else
+	char m_Lightstyles[MAX_LIGHTSTYLES][64];
+#endif // HOOK_HLTV
 
 	movevars_t m_MoveVars;
 	BSPModel m_WorldModel;

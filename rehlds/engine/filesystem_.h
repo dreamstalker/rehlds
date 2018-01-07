@@ -32,15 +32,6 @@
 #include "iregistry.h"
 #include "utlvector.h"
 
-#ifdef HOOK_ENGINE
-#define g_fallbackLocalizationFiles (*pg_fallbackLocalizationFiles)
-#define s_pBaseDir (*ps_pBaseDir)
-#define bLowViolenceBuild (*pbLowViolenceBuild)
-
-#define g_pFileSystemModule (*pg_pFileSystemModule)
-#define g_FileSystemFactory (*pg_FileSystemFactory)
-#endif // HOOK_ENGINE
-
 extern CUtlVector<char *> g_fallbackLocalizationFiles;
 extern char s_pBaseDir[512];
 extern bool bLowViolenceBuild;

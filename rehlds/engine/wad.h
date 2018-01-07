@@ -70,10 +70,6 @@ typedef struct lumpinfo_s lumpinfo_t;
 
 const int NUM_WADS = 2;
 
-#ifdef HOOK_ENGINE
-#define wads (*pwads)
-#endif
-
 extern wadlist_t wads[NUM_WADS];
 
 void W_CleanupName(char *in, char *out);

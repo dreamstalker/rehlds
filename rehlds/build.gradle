@@ -125,7 +125,7 @@ void setupToolchain(NativeBinarySpec b) {
 	}
 	b.lib LazyNativeDepSet.create(dep_bzip2, 'bzip2', b.buildType.name, true)
 
-	cfg.singleDefines 'USE_BREAKPAD_HANDLER', 'DEDICATED', 'SWDS', 'REHLDS_SELF', 'REHLDS_OPT_PEDANTIC', 'REHLDS_FLIGHT_REC'
+	cfg.singleDefines 'USE_BREAKPAD_HANDLER', 'DEDICATED', 'SWDS', 'REHLDS_SELF', 'REHLDS_OPT_PEDANTIC', 'REHLDS_FLIGHT_REC', 'REHLDS_API'
 
 	if (cfg instanceof MsvcToolchainConfig) {
 		cfg.compilerOptions.pchConfig = new MsvcToolchainConfig.PrecompiledHeadersConfig(
@@ -153,36 +153,38 @@ void setupToolchain(NativeBinarySpec b) {
 					pchSourceSet: 'rehlds_pch'
 			)
 		}
-		cfg.compilerOptions.languageStandard = 'c++0x'
+		cfg.compilerOptions.languageStandard = 'c++11'
 		cfg.defines([
 				'_stricmp': 'strcasecmp',
 				'_strnicmp': 'strncasecmp',
 				'_strdup': 'strdup',
 				'_unlink': 'unlink',
 				'_vsnprintf': 'vsnprintf',
-		])
-		if (useGcc) {
-			// MMX, SSE, SSE2, SSE3, SSSE3, SSE4.1, SSE4.2, POPCNT, AVX, AES and PCLMUL instruction set support.
-			cfg.compilerOptions.args '-march=sandybridge', '-Wno-write-strings'
-		} else {
-			cfg.compilerOptions.args '-Qoption,cpp,--treat_func_as_string_literal_cpp', '-fno-rtti'
-		}
+				'_vsnwprintf' : 'vswprintf',
+		]);
 
-		cfg.compilerOptions.args '-fno-exceptions'
+		if (useGcc) {
+			// Produce code optimized for the most common IA32/AMD64/EM64T processors.
+			// As new processors are deployed in the marketplace, the behavior of this option will change.
+			cfg.compilerOptions.args '-mtune=generic', '-Wno-write-strings', '-msse3'
+		} else {
+			cfg.compilerOptions.args '-Qoption,cpp,--treat_func_as_string_literal_cpp'
+		}
+		cfg.compilerOptions.args '-ffunction-sections', '-fdata-sections' // Remove unused code and data
+		cfg.compilerOptions.args '-fno-rtti', '-fno-exceptions'
+
+		cfg.linkerOptions.args '-Wl,--version-script=../version_script.lds', '-Wl,--gc-sections'
+
 		cfg.projectLibpath(project, '/lib/linux32')
 		cfg.extraLibs 'rt', 'dl', 'm', 'steam_api', 'aelf32'
 	}
 
-	if (!unitTestExecutable && !swdsLib) {
-		cfg.singleDefines 'HOOK_ENGINE'
-	}
-
 	if (unitTestExecutable) {
-		cfg.singleDefines 'REHLDS_UNIT_TESTS'
+		cfg.singleDefines 'REHLDS_UNIT_TESTS', 'REHLDS_SSE', 'REHLDS_JIT'
 	}
 
 	if (rehldsFixes) {
-		cfg.singleDefines 'REHLDS_FIXES', 'REHLDS_CHECKS'
+		cfg.singleDefines 'REHLDS_FIXES', 'REHLDS_SSE', 'REHLDS_JIT', 'REHLDS_CHECKS', 'HAVE_OPT_STRTOOLS'
 	}
 
 	ToolchainConfigUtils.apply(project, cfg, b)
@@ -213,7 +215,6 @@ class RehldsSrc {
 			source {
 				srcDirs "hookers"
 				include "memory.cpp"
-				if (GradleCppUtils.windows) include "rehlds_debug.cpp"
 			}
 		}
 		h.rehlds_common(CppSourceSet) {
@@ -229,24 +230,6 @@ class RehldsSrc {
 			source {
 				srcDirs "rehlds"
 				include "precompiled.cpp"
-			}
-		}
-	}
-
-	static void rehlds_hooker_src(def h) {
-		h.rehlds_hooker_src(CppSourceSet) {
-			source {
-				srcDirs "hookers"
-				include "engine/hooklist.cpp", "hooker.cpp"
-			}
-		}
-	}
-
-	static void rehlds_hooker_main_src(def h) {
-		h.rehlds_hooker_main_src(CppSourceSet) {
-			source {
-				srcDirs "hookers"
-				include "engine/main.cpp"
 			}
 		}
 	}
@@ -269,7 +252,6 @@ class RehldsSrc {
 		}
 	}
 }
-
 
 model {
 	buildTypes {
@@ -298,20 +280,6 @@ model {
 	}
 
 	components {
-		rehlds_hooker_engine(NativeLibrarySpec) {
-			targetPlatform 'x86'
-			baseName 'FileSystem_Stdio'
-
-			sources {
-				RehldsSrc.rehlds_pch(it)
-				RehldsSrc.rehlds_src(it)
-				RehldsSrc.rehlds_hooker_src(it)
-				RehldsSrc.rehlds_hooker_main_src(it)
-			}
-
-			binaries.all { NativeBinarySpec b -> project.setupToolchain(b) }
-		}
-
 		rehlds_swds_engine(NativeLibrarySpec) {
 			targetPlatform 'x86'
 			baseName GradleCppUtils.windows ? 'swds' : 'engine_i486'
@@ -320,17 +288,6 @@ model {
 				RehldsSrc.rehlds_pch(it)
 				RehldsSrc.rehlds_src(it)
 				RehldsSrc.rehlds_swds_main_src(it)
-			}
-
-			binaries.all { NativeBinarySpec b -> project.setupToolchain(b) }
-		}
-
-		rehlds_hooker_engine_tests(NativeExecutableSpec) {
-			targetPlatform 'x86'
-			sources {
-				RehldsSrc.rehlds_pch(it)
-				RehldsSrc.rehlds_src(it)
-				RehldsSrc.rehlds_tests_src(it)
 			}
 
 			binaries.all { NativeBinarySpec b -> project.setupToolchain(b) }
@@ -349,9 +306,22 @@ model {
 	}
 }
 
+task buildFinalize << {
+	if (GradleCppUtils.windows) {
+		return;
+	}
+
+	binaries.withType(SharedLibraryBinarySpec) {
+		def sharedBinary = it.getSharedLibraryFile();
+		if (sharedBinary.exists()) {
+			sharedBinary.renameTo(new File(sharedBinary.getParent() + "/" + sharedBinary.getName().replaceFirst("^lib", "")));
+		}
+	}
+}
+
 task buildRelease {
 	dependsOn binaries.withType(SharedLibraryBinarySpec).matching { SharedLibraryBinarySpec blib ->
-		blib.buildable && blib.buildType.name == 'release' && !blib.name.contains('Rehlds_hooker_engine')
+		blib.buildable && blib.buildType.name == 'release'
 	}
 }
 
@@ -361,8 +331,18 @@ task buildFixes {
 	}
 }
 
+task buildEngine {
+	dependsOn binaries.withType(SharedLibraryBinarySpec).matching {
+		SharedLibraryBinarySpec blib -> blib.buildable && blib.buildType.name == 'release' && blib.flavor.name == 'rehldsFixes' && blib.component.name == 'rehlds_swds_engine'
+	}
+}
+
+buildFixes.finalizedBy(buildFinalize);
+buildEngine.finalizedBy(buildFinalize);
+buildRelease.finalizedBy(buildFinalize);
+
 gradle.taskGraph.whenReady { graph ->
-	if (!graph.hasTask(buildFixes)) {
+	if (!graph.hasTask(buildFixes) && !graph.hasTask(buildEngine)) {
 		return;
 	}
 

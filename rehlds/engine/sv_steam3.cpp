@@ -172,7 +172,6 @@ void CSteam3Server::OnGSClientApprove(GSClientApprove_t *pGSClientSteam2Accept)
 	if (!cl)
 		return;
 
-
 	if (SV_FilterUser(&cl->network_userid))
 	{
 		char msg[256];
@@ -518,7 +517,6 @@ void CSteam3Server::SendUpdatedServerDetails()
 	CRehldsPlatformHolder::get()->SteamGameServer()->SetServerName(Cvar_VariableString("hostname"));
 	CRehldsPlatformHolder::get()->SteamGameServer()->SetMapName(g_psv.name);
 }
-
 
 void CSteam3Client::Shutdown()
 {

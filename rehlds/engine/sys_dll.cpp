@@ -59,7 +59,7 @@ int giStateInfo;
 DLL_FUNCTIONS gEntityInterface;
 NEW_DLL_FUNCTIONS gNewDLLFunctions;
 
-extensiondll_t g_rgextdll[50];
+extensiondll_t g_rgextdll[MAX_EXTENSION_DLL];
 
 int g_iextdllMac;
 modinfo_t gmodinfo;
@@ -92,11 +92,6 @@ double g_StartTime;
 
 int g_WinNTOrHigher;
 #endif // _WIN32
-
-/*
-* Globals initialization
-*/
-#ifndef HOOK_ENGINE
 
 int g_FPUCW_Mask_Prec_64Bit = 0;
 int g_FPUCW_Mask_Prec_64Bit_2 = 0;
@@ -195,19 +190,6 @@ enginefuncs_t g_engfuncsExportedToDlls = {
 	QueryClientCvarValue, QueryClientCvarValue2,
 	EngCheckParm
 };
-
-#else // HOOK_ENGINE
-
-int g_FPUCW_Mask_Prec_64Bit;
-int g_FPUCW_Mask_Prec_64Bit_2;
-int g_FPUCW_Mask_Round_Trunc;
-int g_FPUCW_Mask_Round_Up;
-
-FileFindHandle_t g_hfind;
-
-enginefuncs_t g_engfuncsExportedToDlls;
-
-#endif // HOOK_ENGINE
 
 #ifdef _WIN32
 void Sys_SetupFPUOptions()
@@ -428,13 +410,12 @@ NOBODY void MaskExceptions(void);
 
 NOBODY void Sys_Init(void);
 
-NOXREF void Sys_Sleep(int msec)
+void Sys_Sleep(int msec)
 {
-	NOXREFCHECK;
 #ifdef _WIN32
 	Sleep(msec);
 #else
-	usleep(1000 *msec);
+	usleep(1000 * msec);
 #endif // _WIN32
 }
 
@@ -789,7 +770,7 @@ const char* EXT_FUNC NameForFunction(uint32 function)
 	return NULL;
 }
 
-ENTITYINIT GetEntityInit(char *pClassName)
+ENTITYINIT EXT_FUNC GetEntityInit(char *pClassName)
 {
 	return (ENTITYINIT)GetDispatch(pClassName);
 }
@@ -1067,7 +1048,11 @@ void LoadThisDll(const char *szDllFilename)
 		goto IgnoreThisDLL;
 	}
 #else // _WIN32
+#ifdef REHLDS_FIXES
+	void *hDLL = dlopen(szDllFilename, RTLD_NOW | RTLD_DEEPBIND | RTLD_LOCAL);
+#else // REHLDS_FIXES
 	void *hDLL = dlopen(szDllFilename, RTLD_NOW);
+#endif // REHLDS_FIXES
 	if (!hDLL)
 	{
 		Con_Printf("LoadLibrary failed on %s: %s\n", szDllFilename, dlerror());
@@ -1089,7 +1074,7 @@ void LoadThisDll(const char *szDllFilename)
 	}
 
 	pfnGiveFnptrsToDll(&g_engfuncsExportedToDlls, &gGlobalVariables);
-	if (g_iextdllMac == 50)
+	if (g_iextdllMac == MAX_EXTENSION_DLL)
 	{
 		Con_Printf("Too many DLLs, ignoring remainder\n");
 		goto IgnoreThisDLL;
@@ -1293,12 +1278,7 @@ void Con_Init(void)
 {
 	con_debuglog = COM_CheckParm("-condebug");
 	Con_DPrintf("Console initialized.\n");
-
-#ifdef HOOK_ENGINE
-	Cmd_AddCommand("condebug", (xcommand_t)GetOriginalFuncAddrOrDefault("Con_Debug_f", (void *)Con_Debug_f));
-#else
 	Cmd_AddCommand("condebug", Con_Debug_f);
-#endif
 }
 
 void Con_DebugLog(const char *file, const char *fmt, ...)

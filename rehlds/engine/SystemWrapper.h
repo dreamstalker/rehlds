@@ -28,10 +28,6 @@
 
 #pragma once
 
-#ifdef HOOK_ENGINE
-#define gSystemWrapper (*pgSystemWrapper)
-#endif // HOOK_ENGINE
-
 #include "ObjectList.h"
 #include "TokenLine.h"
 #include "BaseSystemModule.h"
@@ -73,39 +69,39 @@ public:
 class Panel;
 class SystemWrapper: public IBaseSystem, public BaseSystemModule {
 public:
-	bool Init(IBaseSystem *system, int serial, char *name);
-	void RunFrame(double time);
-	void ExecuteCommand(int commandID, char *commandLine);
-	char *GetStatusLine();
-	char *GetType();
-	void ShutDown();
+	EXT_FUNC bool Init(IBaseSystem *system, int serial, char *name);
+	EXT_FUNC void RunFrame(double time);
+	EXT_FUNC void ExecuteCommand(int commandID, char *commandLine);
+	EXT_FUNC char *GetStatusLine();
+	EXT_FUNC char *GetType();
+	EXT_FUNC void ShutDown();
 
-	double GetTime();
-	unsigned int GetTick();
-	void SetFPS(float fps) {}
-	void Printf(char *fmt, ...);
-	void DPrintf(char *fmt, ...);
-	void RedirectOutput(char *buffer, int maxSize);
-	IFileSystem *GetFileSystem();
-	unsigned char *LoadFile(const char *name, int *length);
-	void FreeFile(unsigned char *fileHandle);
-	void SetTitle(char *pszTitle);
-	void SetStatusLine(char *pszStatus);
-	void ShowConsole(bool visible) {}
-	void LogConsole(char *filename);
-	bool InitVGUI(IVGuiModule *module);
-	Panel *GetPanel();
-	bool RegisterCommand(char *name, ISystemModule *module, int commandID);
-	void GetCommandMatches(char *string, ObjectList *pMatchList);
-	void ExecuteString(char *commands);
-	void ExecuteFile(char *filename);
-	void Errorf(char *fmt, ...);
-	char *CheckParam(char *param);
-	bool AddModule(ISystemModule *module, char *name);
-	ISystemModule *GetModule(char *interfacename, char *library, char *instancename = nullptr);
-	bool RemoveModule(ISystemModule *module);
-	void Stop();
-	char *GetBaseDir() { return BaseSystemModule::GetBaseDir(); }
+	EXT_FUNC double GetTime();
+	EXT_FUNC unsigned int GetTick();
+	EXT_FUNC void SetFPS(float fps) {}
+	EXT_FUNC void Printf(char *fmt, ...);
+	EXT_FUNC void DPrintf(char *fmt, ...);
+	EXT_FUNC void RedirectOutput(char *buffer, int maxSize);
+	EXT_FUNC IFileSystem *GetFileSystem();
+	EXT_FUNC unsigned char *LoadFile(const char *name, int *length);
+	EXT_FUNC void FreeFile(unsigned char *fileHandle);
+	EXT_FUNC void SetTitle(char *pszTitle);
+	EXT_FUNC void SetStatusLine(char *pszStatus);
+	EXT_FUNC void ShowConsole(bool visible) {}
+	EXT_FUNC void LogConsole(char *filename);
+	EXT_FUNC bool InitVGUI(IVGuiModule *module);
+	EXT_FUNC Panel *GetPanel();
+	EXT_FUNC bool RegisterCommand(char *name, ISystemModule *module, int commandID);
+	EXT_FUNC void GetCommandMatches(char *string, ObjectList *pMatchList);
+	EXT_FUNC void ExecuteString(char *commands);
+	EXT_FUNC void ExecuteFile(char *filename);
+	EXT_FUNC void Errorf(char *fmt, ...);
+	EXT_FUNC char *CheckParam(char *param);
+	EXT_FUNC bool AddModule(ISystemModule *module, char *name);
+	EXT_FUNC ISystemModule *GetModule(char *interfacename, char *library, char *instancename = nullptr);
+	EXT_FUNC bool RemoveModule(ISystemModule *module);
+	EXT_FUNC void Stop();
+	EXT_FUNC char *GetBaseDir() { return BaseSystemModule::GetBaseDir(); }
 
 protected:
 	struct command_t {

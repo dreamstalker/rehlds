@@ -44,7 +44,7 @@
 // Response details about each player on the server
 #define S2A_PLAYERS			'D'
 
-// Response as multi-packeted the rules the server is using
+// Number of rules + string key and string value pairs
 #define S2A_RULES			'E'
 
 /* ------ S2C_* - Server to client ------ */

@@ -86,7 +86,7 @@ bool CTextConsoleUnix::Init(IBaseSystem *system)
 
 	tcgetattr(STDIN_FILENO, &termStored);
 
-	memcpy(&termNew, &termStored, sizeof(struct termios));
+	Q_memcpy(&termNew, &termStored, sizeof(struct termios));
 
 	// Disable canonical mode, and set buffer size to 1 byte
 	termNew.c_lflag &= (~ICANON);

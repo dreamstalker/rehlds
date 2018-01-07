@@ -30,6 +30,7 @@
 
 #include "maintypes.h"
 
+#ifdef REHLDS_JIT
 const int DELTAJIT_MAX_BLOCKS = 32;
 const int DELTAJIT_MAX_FIELDS = 56;
 
@@ -87,23 +88,16 @@ public:
 	void Cleanup();
 };
 
-union delta_marked_mask_t {
-	uint8 u8[8];
-	uint32 u32[2];
-	uint64 u64;
-};
-
-
 extern CDeltaJitRegistry g_DeltaJitRegistry;
 
 extern int DELTAJit_Fields_Clear_Mark_Check(unsigned char *from, unsigned char *to, delta_t *pFields, void* pForceMarkMask);
 extern int DELTAJit_TestDelta(unsigned char *from, unsigned char *to, delta_t *pFields);
 extern void DELTAJit_SetSendFlagBits(delta_t *pFields, int *bits, int *bytecount);
-extern void DELTAJit_SetFieldByIndex(struct delta_s *pFields, int fieldNumber);
-extern void DELTAJit_UnsetFieldByIndex(struct delta_s *pFields, int fieldNumber);
+extern void DELTAJit_SetFieldByIndex(delta_t *pFields, int fieldNumber);
+extern void DELTAJit_UnsetFieldByIndex(delta_t *pFields, int fieldNumber);
 extern qboolean DELTAJit_IsFieldMarked(delta_t* pFields, int fieldNumber);
 
 /* Returns original mask, before it was changed by the conditional encoder */
 extern uint64 DELTAJit_GetOriginalMask(delta_t* pFields);
-
 extern uint64 DELTAJit_GetMaskU64(delta_t* pFields);
+#endif

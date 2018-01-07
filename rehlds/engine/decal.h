@@ -49,15 +49,6 @@ typedef struct lumplist_s
 	lumplist_s *next;
 } lumplist_t;
 
-#ifdef HOOK_ENGINE
-#define decal_wad (*pdecal_wad)
-#define menu_wad (*pmenu_wad)
-#define szCustName (*pszCustName)
-#define decal_names (*pdecal_names)
-#define m_bDrawInitialized (*pm_bDrawInitialized)
-#define gfCustomBuild (*pgfCustomBuild)
-#endif // HOOK_ENGINE
-
 extern cachewad_t *decal_wad;
 extern cachewad_t *menu_wad;
 extern char szCustName[10];

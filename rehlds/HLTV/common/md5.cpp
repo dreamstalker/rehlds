@@ -264,12 +264,12 @@ char *MD5_Print(unsigned char *hash)
 	char szChunk[10];
 	int i;
 
-	memset(szReturn, 0, sizeof(szReturn));
+	Q_memset(szReturn, 0, sizeof(szReturn));
 
 	for (i = 0; i < 16; i++)
 	{
-		_snprintf(szChunk, sizeof(szChunk), "%02x", hash[i]);
-		strncat(szReturn, szChunk, sizeof(szReturn) - strlen(szReturn) - 1);
+		Q_snprintf(szChunk, sizeof(szChunk), "%02x", hash[i]);
+		Q_strlcat(szReturn, szChunk);
 	}
 
 	return szReturn;
@@ -280,36 +280,32 @@ char *MD5_GetCDKeyHash(const char *key)
 	static char szHashedKeyBuffer[256];
 
 	char szKeyBuffer[256];
-	int nKeyLength = strlen(key);
+	int nKeyLength = Q_strlen(key);
 	if (nKeyLength <= 0 || nKeyLength > 255) {
 		return nullptr;
 	}
 
-	strncpy(szKeyBuffer, key, sizeof(szKeyBuffer) - 1);
-	szKeyBuffer[sizeof(szKeyBuffer) - 1] = '\0';
+	Q_strlcpy(szKeyBuffer, key);
 	szKeyBuffer[nKeyLength] = '\0';
 
 	MD5Context_t ctx;
 	unsigned char digest[16];
 
-	memset(&ctx, 0, sizeof(ctx));
-	memset(digest, 0, sizeof(digest));
-	memset(szHashedKeyBuffer, 0, sizeof(szHashedKeyBuffer));
+	Q_memset(&ctx, 0, sizeof(ctx));
+	Q_memset(digest, 0, sizeof(digest));
+	Q_memset(szHashedKeyBuffer, 0, sizeof(szHashedKeyBuffer));
 
 	MD5_Init(&ctx);
 	MD5_Update(&ctx, (unsigned char *)szKeyBuffer, nKeyLength);
 	MD5_Final(digest, &ctx);
 
-	strncpy(szHashedKeyBuffer, MD5_Print(digest), sizeof(szHashedKeyBuffer) - 1);
-	szHashedKeyBuffer[sizeof(szHashedKeyBuffer) - 1] = '\0';
-
-	return szHashedKeyBuffer;
+	return Q_strlcpy(szHashedKeyBuffer, MD5_Print(digest));
 }
 
 void MD5_Hash_Mem(unsigned char *digest, unsigned char *mem, int size)
 {
 	MD5Context_t ctx;
-	memset(&ctx, 0, sizeof(ctx));
+	Q_memset(&ctx, 0, sizeof(ctx));
 
 	MD5_Init(&ctx);
 	MD5_Update(&ctx, mem, size);

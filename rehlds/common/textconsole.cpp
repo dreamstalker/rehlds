@@ -33,14 +33,14 @@ bool CTextConsole::Init(IBaseSystem *system)
 	// NULL or a valid base system interface
 	m_System = system;
 
-	memset(m_szConsoleText, 0, sizeof(m_szConsoleText));
+	Q_memset(m_szConsoleText, 0, sizeof(m_szConsoleText));
 	m_nConsoleTextLen = 0;
 	m_nCursorPosition = 0;
 
-	memset(m_szSavedConsoleText, 0, sizeof(m_szSavedConsoleText));
+	Q_memset(m_szSavedConsoleText, 0, sizeof(m_szSavedConsoleText));
 	m_nSavedConsoleTextLen = 0;
 
-	memset(m_aszLineBuffer, 0, sizeof(m_aszLineBuffer));
+	Q_memset(m_aszLineBuffer, 0, sizeof(m_aszLineBuffer));
 	m_nTotalLines = 0;
 	m_nInputLine = 0;
 	m_nBrowseLine = 0;
@@ -110,9 +110,9 @@ int CTextConsole::ReceiveNewline()
 		m_nCursorPosition = 0;
 
 		// cache line in buffer, but only if it's not a duplicate of the previous line
-		if ((m_nInputLine == 0) || (strcmp(m_aszLineBuffer[ m_nInputLine - 1 ], m_szConsoleText)))
+		if ((m_nInputLine == 0) || (Q_strcmp(m_aszLineBuffer[ m_nInputLine - 1 ], m_szConsoleText)))
 		{
-			strncpy(m_aszLineBuffer[ m_nInputLine ], m_szConsoleText, MAX_CONSOLE_TEXTLEN);
+			Q_strncpy(m_aszLineBuffer[ m_nInputLine ], m_szConsoleText, MAX_CONSOLE_TEXTLEN);
 			m_nInputLine++;
 
 			if (m_nInputLine > m_nTotalLines)
@@ -176,16 +176,16 @@ void CTextConsole::ReceiveTab()
 	if (matches.CountElements() == 1)
 	{
 		char *pszCmdName = (char *)matches.GetFirst();
-		char *pszRest = pszCmdName + strlen(m_szConsoleText);
+		char *pszRest = pszCmdName + Q_strlen(m_szConsoleText);
 
 		if (pszRest)
 		{
 			Echo(pszRest);
-			strcat(m_szConsoleText, pszRest);
-			m_nConsoleTextLen += strlen(pszRest);
+			Q_strlcat(m_szConsoleText, pszRest);
+			m_nConsoleTextLen += Q_strlen(pszRest);
 
 			Echo(" ");
-			strcat(m_szConsoleText, " ");
+			Q_strlcat(m_szConsoleText, " ");
 			m_nConsoleTextLen++;
 		}
 	}
@@ -199,17 +199,17 @@ void CTextConsole::ReceiveTab()
 		char szFormatCmd[256];
 		char *pszSmallestCmd;
 		char *pszCurrentCmd = (char *)matches.GetFirst();
-		nSmallestCmd = strlen(pszCurrentCmd);
+		nSmallestCmd = Q_strlen(pszCurrentCmd);
 		pszSmallestCmd = pszCurrentCmd;
 		while (pszCurrentCmd)
 		{
-			if ((int)strlen(pszCurrentCmd) > nLongestCmd)
+			if ((int)Q_strlen(pszCurrentCmd) > nLongestCmd)
 			{
-				nLongestCmd = strlen(pszCurrentCmd);
+				nLongestCmd = Q_strlen(pszCurrentCmd);
 			}
-			if ((int)strlen(pszCurrentCmd) < nSmallestCmd)
+			if ((int)Q_strlen(pszCurrentCmd) < nSmallestCmd)
 			{
-				nSmallestCmd = strlen(pszCurrentCmd);
+				nSmallestCmd = Q_strlen(pszCurrentCmd);
 				pszSmallestCmd = pszCurrentCmd;
 			}
 			pszCurrentCmd = (char *)matches.GetNext();
@@ -231,7 +231,7 @@ void CTextConsole::ReceiveTab()
 				nCurrentColumn = 1;
 			}
 
-			_snprintf(szFormatCmd, sizeof(szFormatCmd), "%-*s ", nLongestCmd, pszCurrentCmd);
+			Q_snprintf(szFormatCmd, sizeof(szFormatCmd), "%-*s ", nLongestCmd, pszCurrentCmd);
 			Echo(szFormatCmd);
 			for (char *pCur = pszCurrentCmd, *pCommon = szCommonCmd; (*pCur && *pCommon); pCur++, pCommon++)
 			{
@@ -307,7 +307,7 @@ void CTextConsole::ReceiveUpArrow()
 		if (m_nConsoleTextLen > 0)
 		{
 			// Save off current text
-			strncpy(m_szSavedConsoleText, m_szConsoleText, m_nConsoleTextLen);
+			Q_strncpy(m_szSavedConsoleText, m_szConsoleText, m_nConsoleTextLen);
 			// No terminator, it's a raw buffer we always know the length of
 		}
 
@@ -329,9 +329,9 @@ void CTextConsole::ReceiveUpArrow()
 	// copy buffered line
 	Echo(m_aszLineBuffer[ m_nBrowseLine ]);
 
-	strncpy(m_szConsoleText, m_aszLineBuffer[ m_nBrowseLine ], MAX_CONSOLE_TEXTLEN);
+	Q_strncpy(m_szConsoleText, m_aszLineBuffer[ m_nBrowseLine ], MAX_CONSOLE_TEXTLEN);
 
-	m_nConsoleTextLen = strlen(m_aszLineBuffer[ m_nBrowseLine ]);
+	m_nConsoleTextLen = Q_strlen(m_aszLineBuffer[ m_nBrowseLine ]);
 	m_nCursorPosition = m_nConsoleTextLen;
 }
 
@@ -354,7 +354,7 @@ void CTextConsole::ReceiveDownArrow()
 		if (m_nSavedConsoleTextLen > 0)
 		{
 			// Restore current text
-			strncpy(m_szConsoleText, m_szSavedConsoleText, m_nSavedConsoleTextLen);
+			Q_strncpy(m_szConsoleText, m_szSavedConsoleText, m_nSavedConsoleTextLen);
 			// No terminator, it's a raw buffer we always know the length of
 
 			Echo(m_szConsoleText, m_nSavedConsoleTextLen);
@@ -366,8 +366,8 @@ void CTextConsole::ReceiveDownArrow()
 	{
 		// copy buffered line
 		Echo(m_aszLineBuffer[ m_nBrowseLine ]);
-		strncpy(m_szConsoleText, m_aszLineBuffer[ m_nBrowseLine ], MAX_CONSOLE_TEXTLEN);
-		m_nConsoleTextLen = strlen(m_aszLineBuffer[ m_nBrowseLine ]);
+		Q_strncpy(m_szConsoleText, m_aszLineBuffer[ m_nBrowseLine ], MAX_CONSOLE_TEXTLEN);
+		m_nConsoleTextLen = Q_strlen(m_aszLineBuffer[ m_nBrowseLine ]);
 	}
 
 	m_nCursorPosition = m_nConsoleTextLen;

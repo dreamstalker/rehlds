@@ -131,13 +131,13 @@ void Status::SendStatusUpdate()
 	cmd.WriteToStream(&buffer);
 
 	// group spectators
-	m_Proxy->Broadcast(buffer.GetData(), buffer.CurrentSize(), GROUP_CLIENT | GROUP_DEMO | GROUP_UNKNOWN, false);
+	m_Proxy->Broadcast(buffer.GetData(), buffer.CurrentSize(), GROUP_CLIENT | GROUP_DEMO | GROUP_MULTICAST, false);
 	buffer.FastClear();
 }
 
 void Status::SetName(char *newName)
 {
-	strcopy(m_Name, newName);
+	Q_strlcpy(m_Name, newName);
 }
 
 char *Status::GetType()
@@ -148,7 +148,7 @@ char *Status::GetType()
 char *Status::GetStatusLine()
 {
 	static char string[256];
-	_snprintf(string, sizeof(string), "Global Status: Proxies %i, Slots %i, Spectators %i (max %i)\n",
+	Q_snprintf(string, sizeof(string), "Global Status: Proxies %i, Slots %i, Spectators %i (max %i)\n",
 		m_NumberOfProxies, m_NumberOfSlots,
 		m_NumberOfSpectators, m_MaxNumberOfSpectators);
 

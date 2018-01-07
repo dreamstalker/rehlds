@@ -58,40 +58,10 @@ typedef struct clc_func_s
 	void(*pfnParse)(client_t *);
 } clc_func_t;
 
-#ifdef HOOK_ENGINE
-#define sv_player (*psv_player)
-#define clcommands (*pclcommands)
-#define truepositions (*ptruepositions)
-#define g_balreadymoved (*pg_balreadymoved)
-#define sv_clcfuncs (*psv_clcfuncs)
-
-#define s_LastFullUpdate (*ps_LastFullUpdate)
-#define sv_edgefriction (*psv_edgefriction)
-#define sv_maxspeed (*psv_maxspeed)
-#define sv_accelerate (*psv_accelerate)
-#define sv_footsteps (*psv_footsteps)
-#define sv_rollspeed (*psv_rollspeed)
-#define sv_rollangle (*psv_rollangle)
-#define sv_unlag (*psv_unlag)
-#define sv_maxunlag (*psv_maxunlag)
-#define sv_unlagpush (*psv_unlagpush)
-#define sv_unlagsamples (*psv_unlagsamples)
-#define mp_consistency (*pmp_consistency)
-#define sv_voiceenable (*psv_voiceenable)
-
-#define nofind (*pnofind)
-
-#endif // HOOK_ENGINE
-
 extern edict_t *sv_player;
 extern command_t clcommands[23];
 extern sv_adjusted_positions_t truepositions[MAX_CLIENTS];
 extern qboolean g_balreadymoved;
-
-#ifdef HOOK_ENGINE
-extern clc_func_t sv_clcfuncs[12];
-#else
-#endif
 
 extern float s_LastFullUpdate[33];
 extern cvar_t sv_edgefriction;

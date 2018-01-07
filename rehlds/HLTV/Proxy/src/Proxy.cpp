@@ -110,7 +110,7 @@ bool Proxy::Init(IBaseSystem *system, int serial, char *name)
 	}
 
 	char *portparam = m_System->CheckParam("-port");
-	int proxyport = atoi(portparam ? portparam : PROXY_DEFAULT_PORT);
+	int proxyport = Q_atoi(portparam ? portparam : PROXY_DEFAULT_PORT);
 
 	if (!(m_Socket = (INetSocket *)m_Network->CreateSocket(proxyport)))
 	{
@@ -201,20 +201,20 @@ bool Proxy::Init(IBaseSystem *system, int serial, char *name)
 	m_RconAddress.Clear();
 
 	// Clear buffers
-	memset(m_RconPassword, 0, sizeof(m_RconPassword));
-	memset(m_AdminPassword, 0, sizeof(m_AdminPassword));
-	memset(m_ProxyPassword, 0, sizeof(m_ProxyPassword));
-	memset(m_SpectatorPassword, 0, sizeof(m_SpectatorPassword));
-	memset(m_LastRconCommand, 0, sizeof(m_LastRconCommand));
-	memset(m_OffLineText, 0, sizeof(m_OffLineText));
-	memset(m_SignonCommands, 0, sizeof(m_SignonCommands));
-	memset(m_Challenges, 0, sizeof(m_Challenges));
+	Q_memset(m_RconPassword, 0, sizeof(m_RconPassword));
+	Q_memset(m_AdminPassword, 0, sizeof(m_AdminPassword));
+	Q_memset(m_ProxyPassword, 0, sizeof(m_ProxyPassword));
+	Q_memset(m_SpectatorPassword, 0, sizeof(m_SpectatorPassword));
+	Q_memset(m_LastRconCommand, 0, sizeof(m_LastRconCommand));
+	Q_memset(m_OffLineText, 0, sizeof(m_OffLineText));
+	Q_memset(m_SignonCommands, 0, sizeof(m_SignonCommands));
+	Q_memset(m_Challenges, 0, sizeof(m_Challenges));
 
 	m_LoopCommands.Init();
 	m_BannList.Init();
 	m_Resources.Init();
 
-	memset(&m_LocalMessage, 0, sizeof(m_LocalMessage));
+	Q_memset(&m_LocalMessage, 0, sizeof(m_LocalMessage));
 	m_LocalMessage = {
 		0,						// effect
 		255, 160, 0, 255,		// r1, g1, b1, a1
@@ -222,10 +222,10 @@ bool Proxy::Init(IBaseSystem *system, int serial, char *name)
 		-1.f, -1.f,				// x, y
 		0.5f, 2.f,				// fadein, fadeout
 		5.f, 0.f,				// holdtime, fxtime
-		""						// text
+		{}						// text
 	};
 
-	memset(&m_CommentatorMessage, 0, sizeof(m_CommentatorMessage));
+	Q_memset(&m_CommentatorMessage, 0, sizeof(m_CommentatorMessage));
 	m_CommentatorMessage = {
 		0,						// effect
 		255, 160, 0, 255,		// r1, g1, b1, a1
@@ -233,10 +233,10 @@ bool Proxy::Init(IBaseSystem *system, int serial, char *name)
 		-1.f, -1.f,				// x, y
 		0.3f, 1.f,				// fadein, fadeout
 		5.f, 0.f,				// holdtime, fxtime
-		""						// text
+		{}						// text
 	};
 
-	strcopy(m_OffLineText, "Game is delayed. Please try again later.");
+	Q_strlcpy(m_OffLineText, "Game is delayed. Please try again later.");
 
 	m_System->SetTitle("HLTV - offline");
 	m_System->ExecuteFile("hltv.cfg");
@@ -390,7 +390,7 @@ void Proxy::CMD_Ping(char *cmdLine)
 	}
 
 	if (!to.m_Port) {
-		to.SetPort(atoi("27015"));
+		to.SetPort(Q_atoi("27015"));
 	}
 
 	m_Socket->OutOfBandPrintf(&to, "ping");
@@ -444,7 +444,7 @@ void Proxy::ReplyConnect(NetAddress *to, int protocol, int challenge, char *prot
 	InfoString info(userinfo);
 	NetAddress relayProxy;
 
-	int type = atoi(info.ValueForKey("*hltv"));
+	int type = Q_atoi(info.ValueForKey("*hltv"));
 	char *name = info.ValueForKey("name");
 
 	if (protocol != PROTOCOL_VERSION) {
@@ -568,7 +568,7 @@ void Proxy::RejectConnection(NetAddress *adr, bool badPassword, const char *fmt,
 	char text[1024] = "";
 
 	va_start(argptr, fmt);
-	_vsnprintf(text, sizeof(text), fmt, argptr);
+	Q_vsnprintf(text, sizeof(text), fmt, argptr);
 	va_end(argptr);
 
 	if (badPassword) {
@@ -584,7 +584,7 @@ void Proxy::RejectConnection(NetAddress *adr, bool badPassword, const char *fmt,
 char *Proxy::GetStatusLine()
 {
 	static char string[256];
-	_snprintf(string, sizeof(string), "Proxy name \"%s\", %s, Port %i, Clients %i/%i.\n", m_World->GetName(), m_IsMaster ? "Master" : "Relay", m_Socket->GetPort(), m_Clients.CountElements(), m_MaxClients);
+	Q_snprintf(string, sizeof(string), "Proxy name \"%s\", %s, Port %i, Clients %i/%i.\n", m_World->GetName(), m_IsMaster ? "Master" : "Relay", m_Socket->GetPort(), m_Clients.CountElements(), m_MaxClients);
 	return string;
 }
 
@@ -624,12 +624,12 @@ void Proxy::UpdateStatusLine()
 	char text[128];
 	char activeTime[32];
 
-	strcopy(activeTime, COM_FormatTime((float)m_World->GetTime()));
+	Q_strlcpy(activeTime, COM_FormatTime((float)m_World->GetTime()));
 
 	m_Network->GetFlowStats(&in, &out);
 	m_CurrentLoss = m_Server->GetPacketLoss();
 
-	_snprintf(text, sizeof(text), "%s, Time %s, Delay %.0f, FPS %.0f, Clients %i, In %.1f, Out %.1f, Loss %.2f",
+	Q_snprintf(text, sizeof(text), "%s, Time %s, Delay %.0f, FPS %.0f, Clients %i, In %.1f, Out %.1f, Loss %.2f",
 		IsMaster() ? "Master" : "Relay", activeTime, m_ClientDelay, m_FPS, m_Clients.CountElements(), in, out, m_CurrentLoss);
 
 	m_System->SetStatusLine(text);
@@ -684,7 +684,7 @@ void Proxy::CMD_Status(char *cmdLine)
 	if (m_World->IsActive())
 	{
 		char activeTime[32];
-		strcopy(activeTime, COM_FormatTime((float)m_World->GetTime()));
+		Q_strlcpy(activeTime, COM_FormatTime((float)m_World->GetTime()));
 
 		const char *mapname = m_World->GetLevelName() + sizeof("maps/") - 1; // skip 'maps/'
 		m_System->Printf("Game Time %s, Mod \"%s\", Map \"%s\", Players %i\n", activeTime, m_World->GetGameDir(), mapname, m_World->GetNumPlayers());
@@ -865,7 +865,7 @@ void Proxy::CMD_Say(char *cmdLine)
 	if (m_Server->IsConnected())
 	{
 		char string[1024];
-		_snprintf(string, sizeof(string), "say \"%s\"", params.GetRestOfLine(1));
+		Q_snprintf(string, sizeof(string), "say \"%s\"", params.GetRestOfLine(1));
 		m_Server->SendStringCommand(string);
 	}
 }
@@ -880,7 +880,7 @@ void Proxy::CMD_MaxClients(char *cmdLine)
 		return;
 	}
 
-	if (!SetMaxClients(atoi(params.GetToken(1)))) {
+	if (!SetMaxClients(Q_atoi(params.GetToken(1)))) {
 		m_System->Printf("Allowed maximum number of local clients is %i.\n", MAX_PROXY_CLIENTS);
 		return;
 	}
@@ -904,7 +904,7 @@ bool Proxy::SetMaxClients(int number)
 
 void Proxy::SetMaxLoss(float maxloss)
 {
-	m_MaxLoss = clamp(maxloss, 0.0f, 1.0f);
+	m_MaxLoss = Q_clamp(maxloss, 0.0f, 1.0f);
 }
 
 int Proxy::GetMaxClients()
@@ -927,7 +927,7 @@ void Proxy::CMD_Delay(char *cmdLine)
 		return;
 	}
 
-	SetDelay(float(atof(params.GetToken(1))));
+	SetDelay(float(Q_atof(params.GetToken(1))));
 }
 
 void Proxy::CMD_Stop(char *cmdLine)
@@ -947,7 +947,7 @@ void Proxy::CMD_Connect(char *cmdLine)
 	}
 
 	if (!address.m_Port) {
-		address.SetPort(atoi("27015"));
+		address.SetPort(Q_atoi("27015"));
 	}
 
 	Reset();
@@ -964,13 +964,13 @@ void Proxy::CMD_Name(char *cmdLine)
 	}
 
 	char name[MAX_NAME];
-	int len = strlen(params.GetToken(1));
+	int len = Q_strlen(params.GetToken(1));
 	if (len > sizeof(name) - 1) {
 		m_System->Printf("Invalid name length.\n");
 		return;
 	}
 
-	strcopy(name, params.GetToken(1));
+	Q_strlcpy(name, params.GetToken(1));
 	m_Server->SetPlayerName(name);
 }
 
@@ -983,13 +983,13 @@ void Proxy::CMD_Msg(char *cmdLine)
 		return;
 	}
 
-	strcopy(m_LocalMessage.text, params.GetToken(1));
+	Q_strlcpy(m_LocalMessage.text, params.GetToken(1));
 
 	if (params.CountToken() == 6)
 	{
-		m_LocalMessage.holdtime = float(atof(params.GetToken(2)));
-		m_LocalMessage.x = float(atof(params.GetToken(3)));
-		m_LocalMessage.y = float(atof(params.GetToken(4)));
+		m_LocalMessage.holdtime = float(Q_atof(params.GetToken(2)));
+		m_LocalMessage.x = float(Q_atof(params.GetToken(3)));
+		m_LocalMessage.y = float(Q_atof(params.GetToken(4)));
 
 		sscanf(params.GetToken(5), "%2hhx%2hhx%2hhx%2hhx", &m_LocalMessage.r1, &m_LocalMessage.g1, &m_LocalMessage.b1, &m_LocalMessage.a1);
 	}
@@ -1010,7 +1010,7 @@ void Proxy::CMD_Protocol(char *cmdLine)
 		return;
 	}
 
-	if (!m_Server->SetProtocol(atoi(params.GetToken(1)))) {
+	if (!m_Server->SetProtocol(Q_atoi(params.GetToken(1)))) {
 		m_System->Printf("Protocol version not supported!\n");
 		return;
 	}
@@ -1026,7 +1026,7 @@ void Proxy::CMD_MaxRate(char *cmdLine)
 		return;
 	}
 
-	SetMaxRate(atoi(params.GetToken(1)));
+	SetMaxRate(Q_atoi(params.GetToken(1)));
 }
 
 void Proxy::CMD_ServerCmd(char *cmdLine)
@@ -1053,9 +1053,9 @@ void Proxy::CMD_ClientCmd(char *cmdLine)
 		return;
 	}
 
-	int group = atoi(params.GetToken(1));
+	int group = Q_atoi(params.GetToken(1));
 	char *cmdstring = params.GetRestOfLine(2);
-	if (strlen(cmdstring) > 100) {
+	if (Q_strlen(cmdstring) > 100) {
 		m_System->Printf("ERROR! Command string too long.\n");
 		return;
 	}
@@ -1063,7 +1063,7 @@ void Proxy::CMD_ClientCmd(char *cmdLine)
 	switch (group)
 	{
 	case 1: // spectators
-		group = GROUP_CLIENT | GROUP_DEMO | GROUP_UNKNOWN;
+		group = GROUP_CLIENT | GROUP_DEMO | GROUP_MULTICAST;
 		break;
 	case 2: // proxies
 		group = GROUP_PROXY;
@@ -1090,7 +1090,7 @@ void Proxy::CMD_Rate(char *cmdLine)
 		return;
 	}
 
-	m_Server->SetRate(atoi(params.GetToken(1)));
+	m_Server->SetRate(Q_atoi(params.GetToken(1)));
 }
 
 void Proxy::CMD_Players(char *cmdLine)
@@ -1117,7 +1117,7 @@ void Proxy::CMD_HostName(char *cmdLine)
 		return;
 	}
 
-	if (!_stricmp(params.GetToken(1), "none")) {
+	if (!Q_stricmp(params.GetToken(1), "none")) {
 		m_World->SetHostName(nullptr);
 		return;
 	}
@@ -1135,7 +1135,7 @@ void Proxy::CMD_Updaterate(char *cmdLine)
 		return;
 	}
 
-	SetMaxUpdateRate(atoi(params.GetToken(1)));
+	SetMaxUpdateRate(Q_atoi(params.GetToken(1)));
 	m_Server->SetUpdateRate(m_MaxUpdateRate);
 }
 
@@ -1149,7 +1149,7 @@ void Proxy::CMD_BlockVoice(char *cmdLine)
 		return;
 	}
 
-	m_Server->SetVoiceBlocking(atoi(params.GetToken(1)) ? true : false);
+	m_Server->SetVoiceBlocking(Q_atoi(params.GetToken(1)) ? true : false);
 }
 
 void Proxy::CMD_Record(char *cmdLine)
@@ -1187,8 +1187,8 @@ void Proxy::CMD_LoopCmd(char *cmdLine)
 		return;
 	}
 
-	int id = atoi(params.GetToken(1));
-	float seconds = float(atof(params.GetToken(2)));
+	int id = Q_atoi(params.GetToken(1));
+	float seconds = float(Q_atof(params.GetToken(2)));
 	char *cmds = params.GetRestOfLine(3);
 
 	loopcmd_t *lcmd = (loopcmd_t *)m_LoopCommands.GetFirst();
@@ -1201,7 +1201,7 @@ void Proxy::CMD_LoopCmd(char *cmdLine)
 		lcmd = (loopcmd_t *)m_LoopCommands.GetNext();
 	}
 
-	if (!_stricmp(cmds, "none") || !seconds)
+	if (!Q_stricmp(cmds, "none") || !seconds)
 	{
 		if (lcmd) {
 			m_LoopCommands.Remove(lcmd);
@@ -1223,7 +1223,7 @@ void Proxy::CMD_LoopCmd(char *cmdLine)
 	lcmd->interval = seconds;
 	lcmd->lastTime = 0;
 
-	strcopy(lcmd->command, cmds);
+	Q_strlcpy(lcmd->command, cmds);
 }
 
 void Proxy::CMD_RconAddress(char *cmdLine)
@@ -1238,7 +1238,7 @@ void Proxy::CMD_RconAddress(char *cmdLine)
 
 	m_Network->ResolveAddress(params.GetToken(1), &m_RconAddress);
 	if (!m_RconAddress.m_Port) {
-		m_RconAddress.SetPort(atoi("27015"));
+		m_RconAddress.SetPort(Q_atoi("27015"));
 	}
 }
 
@@ -1251,7 +1251,7 @@ void Proxy::CMD_RconPassword(char *cmdLine)
 		return;
 	}
 
-	strcopy(m_RconPassword, params.GetToken(1));
+	Q_strlcpy(m_RconPassword, params.GetToken(1));
 }
 
 void Proxy::CMD_Rcon(char *cmdLine)
@@ -1277,7 +1277,7 @@ void Proxy::CMD_Rcon(char *cmdLine)
 		return;
 	}
 
-	strcopy(m_LastRconCommand, params.GetRestOfLine(1));
+	Q_strlcpy(m_LastRconCommand, params.GetRestOfLine(1));
 	m_Socket->OutOfBandPrintf(&m_RconAddress, "challenge rcon\n");
 }
 
@@ -1367,12 +1367,12 @@ void Proxy::CMD_ProxyPassword(char *cmdLine)
 		return;
 	}
 
-	if (!_stricmp(params.GetToken(1), "none")) {
+	if (!Q_stricmp(params.GetToken(1), "none")) {
 		m_ProxyPassword[0] = '\0';
 		return;
 	}
 
-	strcopy(m_ProxyPassword, params.GetToken(1));
+	Q_strlcpy(m_ProxyPassword, params.GetToken(1));
 }
 
 void Proxy::NewServerConnection()
@@ -1462,7 +1462,7 @@ void Proxy::BroadcastRetryMessage()
 	msg.WriteByte(svc_centerprint);
 	msg.WriteString("Retrying HLTV connection ...");
 
-	Broadcast(msg.GetData(), msg.CurrentSize(), GROUP_CLIENT | GROUP_PROXY | GROUP_UNKNOWN, false);
+	Broadcast(msg.GetData(), msg.CurrentSize(), GROUP_CLIENT | GROUP_PROXY | GROUP_MULTICAST, false);
 }
 
 void Proxy::StopBroadcast(const char *message)
@@ -1512,9 +1512,9 @@ bool Proxy::ProcessConnectionlessMessage(NetAddress *from, BitBuffer *stream)
 	{
 		const int maxBuffer = 4096;
 		unsigned char data[maxBuffer];
-		int maxSize = min(stream->m_MaxSize, maxBuffer);
+		int maxSize = Q_min(stream->m_MaxSize, maxBuffer);
 
-		memcpy((char *)&data[4], stream->m_Data, maxSize);
+		Q_memcpy((char *)&data[4], stream->m_Data, maxSize);
 		*(uint32 *)data = CONNECTIONLESS_HEADER; // connectionless packet
 
 		SteamGameServer()->HandleIncomingPacket(data, maxSize + 4, ntohl(*(u_long *)&from->m_IP[0]), htons(from->m_Port));
@@ -1527,14 +1527,14 @@ bool Proxy::ProcessConnectionlessMessage(NetAddress *from, BitBuffer *stream)
 		return false;
 	}
 
-	if (!strcmp(c, "challenge"))
+	if (!Q_strcmp(c, "challenge"))
 	{
 		char *type = cmdLine.GetToken(1);
 		switch (cmdLine.CountToken())
 		{
 		case 3:
 		{
-			if (type && type[0] && !_stricmp(type, "rcon"))
+			if (type && type[0] && !Q_stricmp(type, "rcon"))
 			{
 				unsigned int challengeNr = strtoul(cmdLine.GetToken(2), 0, 10);
 				SendRcon(from, challengeNr);
@@ -1552,7 +1552,7 @@ bool Proxy::ProcessConnectionlessMessage(NetAddress *from, BitBuffer *stream)
 			return false;
 		}
 	}
-	else if (!strcmp(c, "rcon"))
+	else if (!Q_strcmp(c, "rcon"))
 	{
 		if (cmdLine.CountToken() < 4) {
 			return false;
@@ -1568,7 +1568,7 @@ bool Proxy::ProcessConnectionlessMessage(NetAddress *from, BitBuffer *stream)
 			return false;
 		}
 
-		if (!m_AdminPassword[0] || strcmp(m_AdminPassword, password) != 0)
+		if (!m_AdminPassword[0] || Q_strcmp(m_AdminPassword, password) != 0)
 		{
 			m_System->Printf("Invalid rcon password from: %s\n", from->ToString());
 			return false;
@@ -1576,16 +1576,16 @@ bool Proxy::ProcessConnectionlessMessage(NetAddress *from, BitBuffer *stream)
 
 		ExecuteRcon(from, command);
 	}
-	else if (!strcmp(c, "getchallenge"))
+	else if (!Q_strcmp(c, "getchallenge"))
 	{
 		ReplyChallenge(from);
 	}
-	else if (!strcmp(c, "connect"))
+	else if (!Q_strcmp(c, "connect"))
 	{
 		if (cmdLine.CountToken() == 5)
 		{
-			int protocol = atoi(cmdLine.GetToken(1));
-			int challenge = atoi(cmdLine.GetToken(2));
+			int protocol = Q_atoi(cmdLine.GetToken(1));
+			int challenge = Q_atoi(cmdLine.GetToken(2));
 
 			char *protinfo = cmdLine.GetToken(3);
 			char *userinfo = cmdLine.GetToken(4);
@@ -1613,38 +1613,38 @@ bool Proxy::ProcessConnectionlessMessage(NetAddress *from, BitBuffer *stream)
 	{
 		ReplyRules(from);
 	}
-	else if (!strcmp(c, "listen"))
+	else if (!Q_strcmp(c, "listen"))
 	{
 		ReplyListen(from);
 	}
 	// guard to frequency queries
 	else if (m_MaxFrameQueries > 0)
 	{
-		if (!strcmp(c, "ping") || (c[0] == A2A_PING && (c[1] == 0 || c[1] == '\n')))
+		if (!Q_strcmp(c, "ping") || (c[0] == A2A_PING && (c[1] == 0 || c[1] == '\n')))
 		{
 			ReplyPing(from);
 		}
-		else if (!_stricmp(c, "infostring"))
+		else if (!Q_stricmp(c, "infostring"))
 		{
 			ReplyInfoString(from);
 		}
-		else if (!_stricmp(c, "info"))
+		else if (!Q_stricmp(c, "info"))
 		{
 			ReplyInfo(from, false);
 		}
-		else if (!_stricmp(c, "details"))
+		else if (!Q_stricmp(c, "details"))
 		{
 			ReplyInfo(from, true);
 		}
-		else if (!_stricmp(c, "players"))
+		else if (!Q_stricmp(c, "players"))
 		{
 			ReplyPlayers(from);
 		}
-		else if (!_stricmp(c, "rules"))
+		else if (!Q_stricmp(c, "rules"))
 		{
 			ReplyRules(from);
 		}
-		else if (!_stricmp(c, "log"))
+		else if (!Q_stricmp(c, "log"))
 		{
 			m_System->Printf("Ignoring log from %s.\n", from->ToString());
 			return false;
@@ -1680,7 +1680,7 @@ void Proxy::CMD_ChatMode(char *cmdLine)
 		return;
 	}
 
-	m_ChatMode = clamp((ChatMode_e)atoi(params.GetToken(1)), CHAT_OFF, CHAT_GLOBAL);
+	m_ChatMode = Q_clamp((ChatMode_e)Q_atoi(params.GetToken(1)), CHAT_OFF, CHAT_GLOBAL);
 }
 
 void Proxy::CMD_MaxQueries(char *cmdLine)
@@ -1693,7 +1693,7 @@ void Proxy::CMD_MaxQueries(char *cmdLine)
 		return;
 	}
 
-	m_MaxQueries = float(atof(params.GetToken(1)));
+	m_MaxQueries = float(Q_atof(params.GetToken(1)));
 }
 
 void Proxy::CMD_Kick(char *cmdLine)
@@ -1705,7 +1705,7 @@ void Proxy::CMD_Kick(char *cmdLine)
 		return;
 	}
 
-	int id = atoi(params.GetToken(1));
+	int id = Q_atoi(params.GetToken(1));
 
 	IClient *client = (IClient *)m_Clients.GetFirst();
 	while (client)
@@ -1742,7 +1742,7 @@ void Proxy::ChatSpectator(char *nick, char *text)
 
 	// TODO: too harsh, let more? maxlen: 190
 	const int maxLengthOfString = 64;
-	int len = strlen(text);
+	int len = Q_strlen(text);
 	if (len <= 0) {
 		return;
 	}
@@ -1753,7 +1753,7 @@ void Proxy::ChatSpectator(char *nick, char *text)
 
 	if (m_ChatMode != CHAT_LOCAL && !m_IsMaster)
 	{
-		_snprintf(string, sizeof(string), "say \"%s\"", text);
+		Q_snprintf(string, sizeof(string), "say \"%s\"", text);
 		if (m_Server->IsConnected()) {
 			m_Server->SendStringCommand(string);
 		}
@@ -1765,9 +1765,9 @@ void Proxy::ChatSpectator(char *nick, char *text)
 	const int headerBytes = 3;					// reserve a header of 3 bytes.
 	const int maxSizeOfMessage = MAX_USER_MSG_DATA - headerBytes;	// user message size limit is 192 bytes
 
-	_snprintf(&string[ headerBytes ], sizeof(string) - headerBytes, "<%s> %s", nick, text);
+	Q_snprintf(&string[ headerBytes ], sizeof(string) - headerBytes, "<%s> %s", nick, text);
 
-	int curLen = strlen(&string[ headerBytes ]);
+	int curLen = Q_strlen(&string[ headerBytes ]);
 	if (curLen > maxSizeOfMessage) {
 		curLen = maxSizeOfMessage;
 	}
@@ -1798,11 +1798,11 @@ bool Proxy::IsMaster()
 bool Proxy::CheckDirectorModule()
 {
 	char szAbsoluteLibFilename[MAX_PATH];
-	if (m_Director && !strcmp(m_Director->GetModName(), m_World->GetGameDir())) {
+	if (m_Director && !Q_strcmp(m_Director->GetModName(), m_World->GetGameDir())) {
 		return true;
 	}
 
-	_snprintf(szAbsoluteLibFilename, sizeof(szAbsoluteLibFilename), "%s/dlls/director", m_World->GetGameDir());
+	Q_snprintf(szAbsoluteLibFilename, sizeof(szAbsoluteLibFilename), "%s/dlls/director", m_World->GetGameDir());
 	if (m_Director) {
 		m_System->RemoveModule(m_Director);
 	}
@@ -1849,7 +1849,7 @@ void Proxy::CMD_OffLineText(char *cmdLine)
 		return;
 	}
 
-	strcopy(m_OffLineText, params.GetToken(1));
+	Q_strlcpy(m_OffLineText, params.GetToken(1));
 	COM_RemoveEvilChars(m_OffLineText);
 }
 
@@ -1874,7 +1874,7 @@ void Proxy::CMD_AddResource(char *cmdLine)
 		return;
 	}
 
-	if (!AddResource(params.GetToken(1), (resourcetype_t)atoi(params.GetToken(2)), params.GetToken(3)))
+	if (!AddResource(params.GetToken(1), (resourcetype_t)Q_atoi(params.GetToken(2)), params.GetToken(3)))
 	{
 		m_System->Printf("Error! Failed to load resource %s.\n", params.GetToken(1));
 		return;
@@ -1891,7 +1891,7 @@ void Proxy::CMD_PublicGame(char *cmdLine)
 		return;
 	}
 
-	m_PublicGame = atoi(params.GetToken(1)) ? true : false;
+	m_PublicGame = Q_atoi(params.GetToken(1)) ? true : false;
 }
 
 void Proxy::WriteHUDMsg(textmessage_t *msg, BitBuffer *stream)
@@ -1926,12 +1926,12 @@ void Proxy::CMD_SpectatorPassword(char *cmdLine)
 		return;
 	}
 
-	if (!_stricmp(params.GetToken(1), "none")) {
+	if (!Q_stricmp(params.GetToken(1), "none")) {
 		m_SpectatorPassword[0] = '\0';
 		return;
 	}
 
-	strcopy(m_SpectatorPassword, params.GetToken(1));
+	Q_strlcpy(m_SpectatorPassword, params.GetToken(1));
 }
 
 void Proxy::CMD_DispatchMode(char *cmdLine)
@@ -1946,7 +1946,7 @@ void Proxy::CMD_DispatchMode(char *cmdLine)
 		return;
 	}
 
-	m_DispatchMode = clamp((DispatchMode_e)atoi(params.GetToken(1)), DISPATCH_OFF, DISPATCH_ALL);
+	m_DispatchMode = Q_clamp((DispatchMode_e)Q_atoi(params.GetToken(1)), DISPATCH_OFF, DISPATCH_ALL);
 }
 
 bool Proxy::IsValidPassword(int type, char *pw)
@@ -1957,7 +1957,7 @@ bool Proxy::IsValidPassword(int type, char *pw)
 	case TYPE_CLIENT:
 	{
 		if (m_SpectatorPassword[0]) {
-			return strcmp(m_SpectatorPassword, pw) == 0;
+			return Q_strcmp(m_SpectatorPassword, pw) == 0;
 		}
 
 		return true;
@@ -1966,7 +1966,7 @@ bool Proxy::IsValidPassword(int type, char *pw)
 	case TYPE_PROXY:
 	{
 		if (m_ProxyPassword[0]) {
-			return strcmp(m_ProxyPassword, pw) == 0;
+			return Q_strcmp(m_ProxyPassword, pw) == 0;
 		}
 
 		// password is not set
@@ -1976,7 +1976,7 @@ bool Proxy::IsValidPassword(int type, char *pw)
 	case TYPE_COMMENTATOR:
 	{
 		if (m_AdminPassword[0]) {
-			return strcmp(m_AdminPassword, pw) == 0;
+			return Q_strcmp(m_AdminPassword, pw) == 0;
 		}
 
 		break;
@@ -2017,7 +2017,7 @@ resource_t *Proxy::LoadResourceFromFile(char *fileName, resourcetype_t type)
 {
 	resource_t *newresource = (resource_t *)Mem_ZeroMalloc(sizeof(resource_t));
 
-	strcopy(newresource->szFileName, fileName);
+	Q_strlcpy(newresource->szFileName, fileName);
 
 	newresource->type = type;
 	newresource->data = m_System->LoadFile(newresource->szFileName, &newresource->nDownloadSize);
@@ -2064,7 +2064,7 @@ resource_t *Proxy::AddResource(char *fileName, resourcetype_t type, char *asFile
 	if (resource)
 	{
 		if (asFileName) {
-			strcopy(resource->szFileName, asFileName);
+			Q_strlcpy(resource->szFileName, asFileName);
 		}
 
 		m_Resources.Add(resource);
@@ -2099,13 +2099,13 @@ void Proxy::CMD_SignOnCommands(char *cmdLine)
 		return;
 	}
 
-	if (strlen(params.GetToken(1)) > 250)
+	if (Q_strlen(params.GetToken(1)) > 250)
 	{
 		m_System->Printf("Error! String too long (>250)!\n");
 		return;
 	}
 
-	strcopy(m_SignonCommands, params.GetToken(1));
+	Q_strlcpy(m_SignonCommands, params.GetToken(1));
 }
 
 void Proxy::CMD_AdminPassword(char *cmdLine)
@@ -2117,12 +2117,12 @@ void Proxy::CMD_AdminPassword(char *cmdLine)
 		return;
 	}
 
-	if (!_stricmp(params.GetToken(1), "none")) {
+	if (!Q_stricmp(params.GetToken(1), "none")) {
 		m_AdminPassword[0] = '\0';
 		return;
 	}
 
-	strcopy(m_AdminPassword, params.GetToken(1));
+	Q_strlcpy(m_AdminPassword, params.GetToken(1));
 }
 
 void Proxy::CMD_LocalMsg(char *cmdLine)
@@ -2134,13 +2134,13 @@ void Proxy::CMD_LocalMsg(char *cmdLine)
 		return;
 	}
 
-	strcopy(m_LocalMessage.text, params.GetToken(1));
+	Q_strlcpy(m_LocalMessage.text, params.GetToken(1));
 
 	if (params.CountToken() == 6)
 	{
-		m_LocalMessage.holdtime = float(atof(params.GetToken(2)));
-		m_LocalMessage.x = float(atof(params.GetToken(3)));
-		m_LocalMessage.y = float(atof(params.GetToken(4)));
+		m_LocalMessage.holdtime = float(Q_atof(params.GetToken(2)));
+		m_LocalMessage.x = float(Q_atof(params.GetToken(3)));
+		m_LocalMessage.y = float(Q_atof(params.GetToken(4)));
 
 		sscanf(params.GetToken(5), "%2hhx%2hhx%2hhx%2hhx", &m_LocalMessage.r1, &m_LocalMessage.g1, &m_LocalMessage.b1, &m_LocalMessage.a1);
 	}
@@ -2155,7 +2155,7 @@ void Proxy::ChatCommentator(char *nick, char *text)
 {
 	BitBuffer buffer(144);
 
-	strcopy(m_CommentatorMessage.text, text);
+	Q_strlcpy(m_CommentatorMessage.text, text);
 
 	COM_RemoveEvilChars(m_CommentatorMessage.text);
 	WriteHUDMsg(&m_CommentatorMessage, &buffer);
@@ -2187,13 +2187,13 @@ void Proxy::CMD_AddFakeClients(char *cmdLine)
 		return;
 	}
 
-	int number = atoi(params.GetToken(1));
+	int number = Q_atoi(params.GetToken(1));
 
 	NetAddress adr;
 	m_Network->ResolveAddress(params.GetToken(2), &adr);
 
-	int rate = atoi(params.GetToken(3));
-	float activity = float(atof(params.GetToken(4)));
+	int rate = Q_atoi(params.GetToken(3));
+	float activity = float(Q_atof(params.GetToken(4)));
 
 	for (int i = 0; i < number; i++)
 	{
@@ -2219,7 +2219,7 @@ void Proxy::CMD_MaxLoss(char *cmdLine)
 		return;
 	}
 
-	SetMaxLoss(float(atof(params.GetToken(1))));
+	SetMaxLoss(float(Q_atof(params.GetToken(1))));
 }
 
 void Proxy::CMD_Region(char *cmdLine)
@@ -2232,7 +2232,7 @@ void Proxy::CMD_Region(char *cmdLine)
 		return;
 	}
 
-	SetRegion(atoi(params.GetToken(1)));
+	SetRegion(Q_atoi(params.GetToken(1)));
 }
 
 void Proxy::CMD_Bann(char *cmdLine)
@@ -2296,7 +2296,7 @@ void Proxy::CMD_AutoRetry(char *cmdLine)
 		return;
 	}
 
-	m_Server->SetAutoRetry(atoi(params.GetToken(1)) ? true : false);
+	m_Server->SetAutoRetry(Q_atoi(params.GetToken(1)) ? true : false);
 }
 
 void Proxy::CMD_BannerFile(char *cmdLine)
@@ -2314,7 +2314,7 @@ void Proxy::CMD_BannerFile(char *cmdLine)
 		return;
 	}
 
-	if (!_stricmp(params.GetToken(1), "none")) {
+	if (!Q_stricmp(params.GetToken(1), "none")) {
 		m_BannerTGA = nullptr;
 		return;
 	}
@@ -2324,7 +2324,7 @@ void Proxy::CMD_BannerFile(char *cmdLine)
 		return;
 	}
 
-	_snprintf(m_BannerTGA->szFileName, sizeof(m_BannerTGA->szFileName), "gfx/temp/%s.tga", COM_BinPrintf(m_BannerTGA->rgucMD5_hash, sizeof(m_BannerTGA->rgucMD5_hash)));
+	Q_snprintf(m_BannerTGA->szFileName, sizeof(m_BannerTGA->szFileName), "gfx/temp/%s.tga", COM_BinPrintf(m_BannerTGA->rgucMD5_hash, sizeof(m_BannerTGA->rgucMD5_hash)));
 }
 
 void Proxy::CMD_CheeringThreshold(char *cmdLine)
@@ -2337,7 +2337,7 @@ void Proxy::CMD_CheeringThreshold(char *cmdLine)
 		return;
 	}
 
-	m_CheeringThreshold = float(atof(params.GetToken(1)));
+	m_CheeringThreshold = float(Q_atof(params.GetToken(1)));
 }
 
 float Proxy::GetDelay()
@@ -2407,7 +2407,7 @@ void Proxy::CreateServerInfoString(InfoString *info)
 	m_Status.GetLocalStats(proxies, slots, spectators);
 
 	char address[256];
-	_snprintf(address, sizeof(address), "%s", m_Network->GetLocalAddress()->ToString());
+	Q_snprintf(address, sizeof(address), "%s", m_Network->GetLocalAddress()->ToString());
 
 	info->SetValueForKey("protocol", COM_VarArgs("%i", PROTOCOL_VERSION));
 	info->SetValueForKey("address", address);
@@ -2455,13 +2455,13 @@ void Proxy::CreateServerInfoString(InfoString *info)
 void Proxy::SetMaxRate(int rate)
 {
 	// maxrate:       1.000 - 20.000
-	m_MaxRate = clamp(rate, 1000, MAX_PROXY_RATE);
+	m_MaxRate = Q_clamp(rate, 1000, MAX_PROXY_RATE);
 }
 
 void Proxy::SetMaxUpdateRate(int updaterate)
 {
 	// maxupdaterate: 1.0 - 40.0
-	m_MaxUpdateRate = clamp(updaterate, 1, MAX_PROXY_UPDATERATE);
+	m_MaxUpdateRate = Q_clamp(updaterate, 1, MAX_PROXY_UPDATERATE);
 }
 
 void Proxy::SetDelay(float seconds)
@@ -2495,7 +2495,7 @@ void Proxy::SetClientTime(double time, bool relative)
 void Proxy::SetClientTimeScale(float scale)
 {
 	BitBuffer buf(32);
-	m_ClientTimeScale = clamp(scale, 0.5f, 4.0f);
+	m_ClientTimeScale = Q_clamp(scale, 0.5f, 4.0f);
 
 	buf.WriteByte(svc_timescale);
 	buf.WriteFloat(m_ClientTimeScale);
@@ -2564,7 +2564,7 @@ void Proxy::NewGameStarted()
 	m_Server->SetDirector(m_Director);
 
 	char newTitle[4096];
-	_snprintf(newTitle, sizeof(newTitle), "HLTV - %s %s",
+	Q_snprintf(newTitle, sizeof(newTitle), "HLTV - %s %s",
 		m_Server->IsDemoFile() ? m_Server->GetDemoFileName() : m_Server->GetAddress()->ToString(),
 		m_World->GetLevelName());
 
@@ -2626,7 +2626,7 @@ void Proxy::UpdateInfoMessages()
 	serverinfo_t *serverInfo = m_World->GetServerInfo();
 
 	m_Status.GetLocalStats(proxies, slots, spectators);
-	_snprintf(ipport, sizeof(ipport), "%s:%i", m_Network->GetLocalAddress()->ToBaseString(), m_Socket->GetPort());
+	Q_snprintf(ipport, sizeof(ipport), "%s:%i", m_Network->GetLocalAddress()->ToBaseString(), m_Socket->GetPort());
 
 	m_InfoInfo.Clear();
 	if (m_World->IsActive())
@@ -2639,8 +2639,8 @@ void Proxy::UpdateInfoMessages()
 		m_InfoInfo.WriteString(serverInfo->map);					// mapname
 		m_InfoInfo.WriteString(serverInfo->gamedir);				// gamedir
 		m_InfoInfo.WriteString(serverInfo->description);			// gamename
-		m_InfoInfo.WriteByte(min(spectators, MAX_PROXY_CLIENTS));	// players
-		m_InfoInfo.WriteByte(min(slots, MAX_PROXY_CLIENTS));		// maxplayers
+		m_InfoInfo.WriteByte(Q_min(spectators, MAX_PROXY_CLIENTS));	// players
+		m_InfoInfo.WriteByte(Q_min(slots, MAX_PROXY_CLIENTS));		// maxplayers
 		m_InfoInfo.WriteByte(PROTOCOL_VERSION);						// protocol
 
 		if (spectators >= MAX_PROXY_CLIENTS || slots >= MAX_PROXY_CLIENTS)
@@ -2660,8 +2660,8 @@ void Proxy::UpdateInfoMessages()
 		m_InfoDetails.WriteString(serverInfo->map);						// mapname
 		m_InfoDetails.WriteString(serverInfo->gamedir);					// gamedir
 		m_InfoDetails.WriteString(serverInfo->description);				// gamename
-		m_InfoDetails.WriteByte(min(spectators, MAX_PROXY_CLIENTS));	// players
-		m_InfoDetails.WriteByte(min(slots, MAX_PROXY_CLIENTS));			// maxplayers
+		m_InfoDetails.WriteByte(Q_min(spectators, MAX_PROXY_CLIENTS));	// players
+		m_InfoDetails.WriteByte(Q_min(slots, MAX_PROXY_CLIENTS));		// maxplayers
 		m_InfoDetails.WriteByte(PROTOCOL_VERSION);						// protocol
 
 		m_InfoDetails.WriteByte(GetServerType(HLST_TV)[0]);				// server type (Indicates the type of server: HLTV Server)
@@ -2754,7 +2754,7 @@ void Proxy::UpdateInfoMessages()
 
 void Proxy::SetName(char *newName)
 {
-	strcopy(m_Name, newName);
+	Q_strlcpy(m_Name, newName);
 }
 
 const char *Proxy::GetDescription()

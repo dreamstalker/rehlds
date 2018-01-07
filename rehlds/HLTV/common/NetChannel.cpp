@@ -93,10 +93,10 @@ void NetChannel::OutOfBandPrintf(const char *format, ...)
 		*(int *)string = CONNECTIONLESS_HEADER;
 
 		va_start(argptr, format);
-		_vsnprintf(&string[4], sizeof(string) - 4, format, argptr);
+		Q_vsnprintf(&string[4], sizeof(string) - 4, format, argptr);
 		va_end(argptr);
 
-		data.SkipBytes(strlen(string));
+		data.SkipBytes(Q_strlen(string));
 		m_Socket->SendPacket(&m_remote_address, data.GetData(), data.CurrentSize());
 	}
 }
@@ -210,8 +210,8 @@ void NetChannel::Clear()
 	m_tempBufferSize = 0;
 	m_reliableOutSize = 0;
 
-	memset(m_reliableOutBuffer, 0, sizeof(m_reliableOutBuffer));
-	memset(m_flow, 0, sizeof(m_flow));
+	Q_memset(m_reliableOutBuffer, 0, sizeof(m_reliableOutBuffer));
+	Q_memset(m_flow, 0, sizeof(m_flow));
 
 	m_reliableStream.Clear();
 	m_unreliableStream.Clear();
@@ -431,7 +431,7 @@ void NetChannel::TransmitOutgoing()
 
 		if (send_from_regular)
 		{
-			memcpy(m_reliableOutBuffer, m_reliableStream.GetData(), m_reliableStream.CurrentSize());
+			Q_memcpy(m_reliableOutBuffer, m_reliableStream.GetData(), m_reliableStream.CurrentSize());
 
 			m_reliableOutSize = m_reliableStream.CurrentSize();
 			m_reliableStream.FastClear();
@@ -469,7 +469,7 @@ void NetChannel::TransmitOutgoing()
 					m_System->Printf("TODO! NetChannel::Transmit: system file support\n");
 				}
 
-				memcpy(m_reliableOutBuffer + m_reliableOutSize, pbuf->data, pbuf->size);
+				Q_memcpy(m_reliableOutBuffer + m_reliableOutSize, pbuf->data, pbuf->size);
 
 				m_reliableOutSize += pbuf->size;
 				m_frag_length[i] = pbuf->size;
@@ -571,7 +571,7 @@ void NetChannel::TransmitOutgoing()
 	}
 
 	m_last_send = m_System->GetTime();
-	m_cleartime = max(m_send_interval, (data.CurrentSize() + UDP_HEADER_SIZE) * (1.0 / m_max_bandwidth_rate)) + m_last_send;
+	m_cleartime = Q_max(m_send_interval, (data.CurrentSize() + UDP_HEADER_SIZE) * (1.0 / m_max_bandwidth_rate)) + m_last_send;
 }
 
 NetChannel::fragbuf_t *NetChannel::FindBufferById(fragbuf_t **pplist, int id, bool allocate)
@@ -801,7 +801,7 @@ void NetChannel::ProcessIncoming(unsigned char *data, int size)
 				pbuf = FindBufferById(&m_incomingbufs[i], fragid[i], true);
 				if (pbuf)
 				{
-					memcpy(pbuf->data, message.GetData() + message.CurrentSize() + frag_offset[i], frag_length[i]);
+					Q_memcpy(pbuf->data, message.GetData() + message.CurrentSize() + frag_offset[i], frag_length[i]);
 					pbuf->size = frag_length[i];
 				}
 				else
@@ -817,7 +817,7 @@ void NetChannel::ProcessIncoming(unsigned char *data, int size)
 			int wpos = message.CurrentSize() + frag_offset[i];
 			int rpos = wpos + frag_length[i];
 
-			memmove(message.GetData() + wpos, message.GetData() + rpos, message.GetMaxSize() - rpos);
+			Q_memmove(message.GetData() + wpos, message.GetData() + rpos, message.GetMaxSize() - rpos);
 			message.m_MaxSize -= frag_length[i];
 
 			for (j = i + 1; j < MAX_STREAMS; j++)
@@ -949,14 +949,14 @@ bool NetChannel::CreateFragmentsFromBuffer(void *buffer, int size, int streamtyp
 	if (!BZ2_bzBuffToBuffCompress((char *)compressed, &compressedSize, (char *)buffer, size, 9, 0, 30))
 	{
 		m_System->DPrintf("Compressing split packet (%d -> %d bytes)\n", size, compressedSize);
-		memcpy(buffer, hdr, sizeof(hdr));
+		Q_memcpy(buffer, hdr, sizeof(hdr));
 
 		if (streamtype == FRAG_FILE_STREAM) {
-			memcpy((char *)buffer + 4, &size, sizeof(int));
+			Q_memcpy((char *)buffer + 4, &size, sizeof(int));
 			header_size = 8;
 		}
 
-		memcpy((char *)buffer + header_size, compressed, compressedSize);
+		Q_memcpy((char *)buffer + header_size, compressed, compressedSize);
 		size = header_size + compressedSize;
 	}
 
@@ -967,7 +967,7 @@ bool NetChannel::CreateFragmentsFromBuffer(void *buffer, int size, int streamtyp
 	pos = 0;
 	while (remaining > 0)
 	{
-		sendsize = min(remaining, chunksize);
+		sendsize = Q_min(remaining, chunksize);
 		remaining -= sendsize;
 
 		buf = (fragbuf_t *)Mem_ZeroMalloc(sizeof(fragbuf_t));
@@ -982,16 +982,16 @@ bool NetChannel::CreateFragmentsFromBuffer(void *buffer, int size, int streamtyp
 		{
 			firstfragment = false;
 
-			unsigned int len = strlen(filename) + 1;
-			memcpy(buf->data, filename, len);
+			unsigned int len = Q_strlen(filename) + 1;
+			Q_memcpy(buf->data, filename, len);
 			sendsize -= len;
 
-			memcpy(&buf->data[len], (char *)buffer + pos, sendsize);
+			Q_memcpy(&buf->data[len], (char *)buffer + pos, sendsize);
 			buf->size = len + sendsize;
 		}
 		else
 		{
-			memcpy(buf->data, (char *)buffer + pos, sendsize);
+			Q_memcpy(buf->data, (char *)buffer + pos, sendsize);
 			buf->size = sendsize;
 		}
 
@@ -1128,7 +1128,7 @@ void NetChannel::SetConnected(bool flag)
 
 void NetChannel::SetRate(int newRate)
 {
-	m_max_bandwidth_rate = clamp(newRate, 1000, 20000);
+	m_max_bandwidth_rate = Q_clamp(newRate, 1000, 20000);
 }
 
 void NetChannel::GetFlowStats(float *avgInKBSec, float *avgOutKBSec)
@@ -1262,15 +1262,15 @@ bool NetChannel::CopyFileFragments()
 	}
 
 	filecontent.Reset();
-	strcopy(filename, filecontent.ReadString());
+	Q_strlcpy(filename, filecontent.ReadString());
 
-	if (!strlen(filename)) {
+	if (!Q_strlen(filename)) {
 		m_System->Printf("File fragment received with no filename\n");
 		FlushIncoming(FRAG_FILE_STREAM);
 		return false;
 	}
 
-	if (strstr(filename, "..")) {
+	if (Q_strstr(filename, "..")) {
 		m_System->Printf("File fragment received with relative path, ignoring\n");
 		FlushIncoming(FRAG_FILE_STREAM);
 		return false;
@@ -1279,7 +1279,7 @@ bool NetChannel::CopyFileFragments()
 	// TODO: Here is the missing code.
 	// TODO: Check me, value of return function only false.
 
-	totalSize -= strlen(filename) - 1;
+	totalSize -= Q_strlen(filename) - 1;
 	m_incomingbufs[FRAG_FILE_STREAM] = nullptr;
 
 	return false;

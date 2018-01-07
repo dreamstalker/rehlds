@@ -28,22 +28,9 @@
 
 #include "precompiled.h"
 
-/*
-* Globals initialization
-*/
-#ifndef HOOK_ENGINE
-
 hash_pack_queue_t *gp_hpak_queue = NULL;
 hash_pack_directory_t hash_pack_dir = { 0, NULL };
 hash_pack_header_t hash_pack_header = { { 0, 0, 0, 0 }, 0, 0 };
-
-#else //HOOK_ENGINE
-
-hash_pack_queue_t *gp_hpak_queue;
-hash_pack_directory_t hash_pack_dir;
-hash_pack_header_t hash_pack_header;
-
-#endif //HOOK_ENGINE
 
 qboolean HPAK_GetDataPointer(char *pakname, struct resource_s *pResource, unsigned char **pbuffer, int *bufsize)
 {
@@ -1159,17 +1146,11 @@ void HPAK_Extract_f(void)
 
 void HPAK_Init(void)
 {
-#ifdef HOOK_ENGINE
-	Cmd_AddCommand("hpklist", (xcommand_t)GetOriginalFuncAddrOrDefault("HPAK_List_f", (void *)HPAK_List_f));
-	Cmd_AddCommand("hpkremove", (xcommand_t)GetOriginalFuncAddrOrDefault("HPAK_Remove_f", (void *)HPAK_Remove_f));
-	Cmd_AddCommand("hpkval", (xcommand_t)GetOriginalFuncAddrOrDefault("HPAK_Validate_f", (void *)HPAK_Validate_f));
-	Cmd_AddCommand("hpkextract", (xcommand_t)GetOriginalFuncAddrOrDefault("HPAK_Extract_f", (void *)HPAK_Extract_f));
-#else
 	Cmd_AddCommand("hpklist", HPAK_List_f);
 	Cmd_AddCommand("hpkremove", HPAK_Remove_f);
 	Cmd_AddCommand("hpkval", HPAK_Validate_f);
 	Cmd_AddCommand("hpkextract", HPAK_Extract_f);
-#endif // HOOK_ENGINE
+
 	gp_hpak_queue = NULL;
 }
 

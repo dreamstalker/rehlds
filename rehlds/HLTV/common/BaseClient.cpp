@@ -35,7 +35,7 @@ bool BaseClient::Init(IBaseSystem *system, int serial, char *name)
 	}
 
 	if (!name) {
-		strcopy(m_Name, CLIENT_INTERFACE_VERSION);
+		Q_strlcpy(m_Name, CLIENT_INTERFACE_VERSION);
 	}
 
 	SetState(CLIENT_INITIALIZING);
@@ -269,7 +269,7 @@ bool BaseClient::ProcessStringCmd(char *string)
 	char *cmd = cmdLine.GetToken(0);
 	for (auto& local_cmd : m_LocalCmdReg)
 	{
-		if (!_stricmp(local_cmd.name, cmd)) {
+		if (!Q_stricmp(local_cmd.name, cmd)) {
 			(this->*local_cmd.pfnCmd)(&cmdLine);
 			return true;
 		}
@@ -291,7 +291,7 @@ void BaseClient::CMD_Spawn(TokenLine *cmd)
 		return;
 	}
 
-	ReplySpawn(atoi(cmd->GetToken(1)), atoi(cmd->GetToken(2)));
+	ReplySpawn(Q_atoi(cmd->GetToken(1)), Q_atoi(cmd->GetToken(2)));
 }
 
 void BaseClient::CMD_New(TokenLine *cmd)
@@ -346,7 +346,7 @@ void BaseClient::CMD_VoiceModEnable(TokenLine *cmd)
 	}
 
 	m_VoiceQuery = false;
-	m_VoiceEnabled = atoi(cmd->GetToken(1)) ? true : false;
+	m_VoiceEnabled = Q_atoi(cmd->GetToken(1)) ? true : false;
 	UpdateVoiceMask(&m_ClientChannel.m_reliableStream);
 }
 
@@ -386,10 +386,10 @@ void BaseClient::UpdateUserInfo(char *userinfostring)
 		m_Userinfo.SetString(userinfostring);
 	}
 
-	strcopy(buffer, m_Userinfo.ValueForKey("name"));
+	Q_strlcpy(buffer, m_Userinfo.ValueForKey("name"));
 
 	SetName(buffer);
-	m_ClientType = atoi(m_Userinfo.ValueForKey("*hltv"));
+	m_ClientType = Q_atoi(m_Userinfo.ValueForKey("*hltv"));
 
 	if (m_ClientType < TYPE_CLIENT) {
 		m_System->DPrintf("WARNING! BaseClient::UpdateUserInfo: invalid client ype %i\n", m_ClientType);
@@ -398,12 +398,12 @@ void BaseClient::UpdateUserInfo(char *userinfostring)
 
 	string = m_Userinfo.ValueForKey("rate");
 	if (*string) {
-		m_ClientChannel.SetRate(atoi(string));
+		m_ClientChannel.SetRate(Q_atoi(string));
 	}
 
 	string = m_Userinfo.ValueForKey("cl_updaterate");
 	if (*string) {
-		m_ClientChannel.SetUpdateRate(atoi(string));
+		m_ClientChannel.SetUpdateRate(Q_atoi(string));
 	}
 }
 
@@ -413,7 +413,7 @@ void BaseClient::PrintfToClient(char *fmt, ...)
 	static char string[1024];
 
 	va_start(argptr, fmt);
-	_vsnprintf(string, sizeof(string), fmt, argptr);
+	Q_vsnprintf(string, sizeof(string), fmt, argptr);
 	va_end(argptr);
 
 	m_ClientChannel.m_reliableStream.WriteByte(svc_print);
@@ -587,7 +587,7 @@ char *BaseClient::GetStatusLine()
 	static char string[256];
 
 	m_ClientChannel.GetFlowStats(&in, &out);
-	_snprintf(string, sizeof(string),
+	Q_snprintf(string, sizeof(string),
 		"ID: %i, Name \"%s\", Time %s, IP %s, In %.2f, Out %.2f.\n",
 		GetSerial(),
 		m_ClientName,
@@ -640,15 +640,15 @@ void BaseClient::SetName(char *newName)
 	COM_TrimSpace(newName, temp);
 
 	const int len = sizeof(m_ClientName);
-	if (strlen(temp) >= len) {
+	if (Q_strlen(temp) >= len) {
 		temp[len] = '\0';
 	}
 
-	if (!temp[0] || !_stricmp(temp, "console")) {
-		strcpy(temp, "unnamed");
+	if (!temp[0] || !Q_stricmp(temp, "console")) {
+		Q_strcpy(temp, "unnamed");
 	}
 
-	strcopy(m_ClientName, temp);
+	Q_strlcpy(m_ClientName, temp);
 	m_Userinfo.SetValueForKey("name", m_ClientName);
 }
 
@@ -773,7 +773,7 @@ void BaseClient::Reset()
 	m_DeltaFrameSeqNr = 0;
 	m_ClientDelta = 0;
 
-	memset(m_SeqNrMap, 0, sizeof(m_SeqNrMap));
+	Q_memset(m_SeqNrMap, 0, sizeof(m_SeqNrMap));
 	m_VoiceQuery = true;
 	m_ClientChannel.Clear();
 }

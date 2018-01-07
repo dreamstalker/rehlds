@@ -85,7 +85,7 @@ bool Network::Init(IBaseSystem *system, int serial, char *name)
 		portparam = "27020";
 	}
 
-	m_LocalAddress.m_Port = htons(atoi(portparam));
+	m_LocalAddress.m_Port = htons(Q_atoi(portparam));
 	m_LastStatsUpdateTime = 0;
 
 	m_State = MODULE_RUNNING;
@@ -226,7 +226,7 @@ char *Network::GetStatusLine()
 	float in, out;
 
 	GetFlowStats(&in, &out);
-	_snprintf(string, sizeof(string), "Local IP %s, Sockets %i, In %.2f, Out %.2f.\n", m_LocalAddress.ToBaseString(), m_Sockets.CountElements(), in, out);
+	Q_snprintf(string, sizeof(string), "Local IP %s, Sockets %i, In %.2f, Out %.2f.\n", m_LocalAddress.ToBaseString(), m_Sockets.CountElements(), in, out);
 	return string;
 }
 
@@ -257,7 +257,7 @@ void Network::CMD_FakeLoss(char *cmdLine)
 		return;
 	}
 
-	m_FakeLoss = atof(params.GetToken(1));
+	m_FakeLoss = Q_atof(params.GetToken(1));
 }
 
 int Network::GetLastErrorCode()
@@ -273,15 +273,15 @@ bool Network::ResolveAddress(char *string, NetAddress *address)
 
 	address->Clear();
 
-	if (!string || !strlen(string)) {
+	if (!string || !Q_strlen(string)) {
 		return 0;
 	}
 
-	memset(&sadr, 0, sizeof(sadr));
+	Q_memset(&sadr, 0, sizeof(sadr));
 	((sockaddr_in *)&sadr)->sin_family = AF_INET;
 	((sockaddr_in *)&sadr)->sin_port = 0;
 
-	strcopy(copy, string);
+	Q_strlcpy(copy, string);
 
 	// Parse port
 	char *colon = copy;
@@ -290,7 +290,7 @@ bool Network::ResolveAddress(char *string, NetAddress *address)
 		if (*colon == ':')
 		{
 			*colon = '\0';
-			int val = atoi(colon + 1);
+			int val = Q_atoi(colon + 1);
 			((sockaddr_in *)&sadr)->sin_port = htons(val);
 		}
 		colon++;
@@ -298,7 +298,7 @@ bool Network::ResolveAddress(char *string, NetAddress *address)
 
 	// Parse address
 	// Validate IPv4
-	if (copy[0] >= '0' && copy[0] <= '9' && strstr(copy, "."))
+	if (copy[0] >= '0' && copy[0] <= '9' && Q_strstr(copy, "."))
 	{
 		uint32 ret = inet_addr(copy);
 		if (ret == INADDR_NONE) {
@@ -384,7 +384,7 @@ char *Network::GetErrorText(int code)
 
 void Network::SetName(char *newName)
 {
-	strcopy(m_Name, newName);
+	Q_strlcpy(m_Name, newName);
 }
 
 void Network::UpdateStats()

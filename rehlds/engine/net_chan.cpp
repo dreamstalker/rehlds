@@ -31,11 +31,6 @@
 int net_drop;
 char gDownloadFile[256];
 
-/*
-* Globals initialization
-*/
-#ifndef HOOK_ENGINE
-
 cvar_t net_log = { "net_log", "0", 0, 0.0f, nullptr};
 cvar_t net_showpackets = { "net_showpackets", "0", 0, 0.0f, nullptr};
 cvar_t net_showdrop = { "net_showdrop", "0", 0, 0.0f, nullptr};
@@ -43,18 +38,6 @@ cvar_t net_drawslider = { "net_drawslider", "0", 0, 0.0f, nullptr};
 cvar_t net_chokeloopback = { "net_chokeloop", "0", 0, 0.0f, nullptr};
 cvar_t sv_filetransfercompression = { "sv_filetransfercompression", "1", 0, 0.0f, nullptr};
 cvar_t sv_filetransfermaxsize = { "sv_filetransfermaxsize", "10485760", 0, 0.0f, nullptr};
-
-#else //HOOK_ENGINE
-
-cvar_t net_log;
-cvar_t net_showpackets;
-cvar_t net_showdrop;
-cvar_t net_drawslider;
-cvar_t net_chokeloopback;
-cvar_t sv_filetransfercompression;
-cvar_t sv_filetransfermaxsize;
-
-#endif //HOOK_ENGINE
 
 void Netchan_UnlinkFragment(fragbuf_t *buf, fragbuf_t **list)
 {

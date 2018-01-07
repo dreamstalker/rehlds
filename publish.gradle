@@ -40,7 +40,7 @@ task publishPrepareFiles {
 
 		// bugfixed binaries
 		_copyFile('publish/releaseRehldsFixes/swds.dll', 'publish/publishRoot/bin/win32/swds.dll')
-		_copyFile('publish/releaseRehldsFixes/libengine_i486.so', 'publish/publishRoot/bin/linux32/engine_i486.so')
+		_copyFile('publish/releaseRehldsFixes/engine_i486.so', 'publish/publishRoot/bin/linux32/engine_i486.so')
 
 		// dedicated binaries
 		_copyFile('publish/hlds.exe', 'publish/publishRoot/bin/win32/hlds.exe')
@@ -51,16 +51,20 @@ task publishPrepareFiles {
 		_copyFile('publish/hltv', 'publish/publishRoot/bin/linux32/hltv')
 
 		_copyFile('publish/core.dll', 'publish/publishRoot/bin/win32/core.dll')
-		_copyFile('publish/libcore.so', 'publish/publishRoot/bin/linux32/core.so')
+		_copyFile('publish/core.so', 'publish/publishRoot/bin/linux32/core.so')
 
 		_copyFile('publish/proxy.dll', 'publish/publishRoot/bin/win32/proxy.dll')
-		_copyFile('publish/libproxy.so', 'publish/publishRoot/bin/linux32/proxy.so')
+		_copyFile('publish/proxy.so', 'publish/publishRoot/bin/linux32/proxy.so')
 
 		_copyFile('publish/demoplayer.dll', 'publish/publishRoot/bin/win32/demoplayer.dll')
-		_copyFile('publish/libdemoplayer.so', 'publish/publishRoot/bin/linux32/demoplayer.so')
+		_copyFile('publish/demoplayer.so', 'publish/publishRoot/bin/linux32/demoplayer.so')
 
 		_copyFile('publish/director.dll', 'publish/publishRoot/bin/win32/valve/dlls/director.dll')
-		_copyFile('publish/libdirector.so', 'publish/publishRoot/bin/linux32/valve/dlls/director.so')
+		_copyFile('publish/director.so', 'publish/publishRoot/bin/linux32/valve/dlls/director.so')
+
+		// FileSystem binaries
+		_copyFile('publish/filesystem_stdio.dll', 'publish/publishRoot/bin/win32/filesystem_stdio.dll')
+		_copyFile('publish/filesystem_stdio.so', 'publish/publishRoot/bin/linux32/filesystem_stdio.so')
 
 		// hlsdk
 		project.file('publish/publishRoot/hlsdk').mkdirs()
