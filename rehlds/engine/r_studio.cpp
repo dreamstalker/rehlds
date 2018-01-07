@@ -738,7 +738,7 @@ void R_DrawHitBox(const mstudiobbox_t &bbox, edict_t *pEdict)
 					if (client->edict == pEdict || client->fakeclient || !client->hasusrmsgs || (!client->active && !client->spawned))
 						continue;
 					
-					writeToBuffer(index, bufferType == 2 ? &client->datagram : &client->netchan_message);
+					writeToBuffer(index, bufferType == 2 ? (&client->datagram) : (&client->netchan_message));
 				}
 				break;
 			case 4:
