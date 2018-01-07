@@ -31,7 +31,7 @@
 // Steam API export macro
 #if defined( _WIN32 ) && !defined( _X360 )
 	#if defined( STEAM_API_EXPORTS )
-	#define S_API extern "C" __declspec( dllexport )
+	#define S_API extern "C" __declspec( dllexport ) EXT_FUNC
 	#elif defined( STEAM_API_NODLL )
 	#define S_API extern "C"
 	#else
@@ -39,13 +39,13 @@
 	#endif // STEAM_API_EXPORTS
 #elif defined( GNUC )
 	#if defined( STEAM_API_EXPORTS )
-	#define S_API extern "C" __attribute__ ((visibility("default")))
+	#define S_API extern "C" __attribute__ ((visibility("default"))) EXT_FUNC
 	#else
 	#define S_API extern "C"
 	#endif // STEAM_API_EXPORTS
 #else // !WIN32
 	#if defined( STEAM_API_EXPORTS )
-	#define S_API extern "C"
+	#define S_API extern "C" EXT_FUNC
 	#else
 	#define S_API extern "C"
 	#endif // STEAM_API_EXPORTS

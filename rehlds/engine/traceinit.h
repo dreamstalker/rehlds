@@ -30,11 +30,6 @@
 
 #include "utlvector.h"
 
-#ifndef HOOK_ENGINE
-#define CInitTracker_construct CInitTracker
-#define CInitTracker_destruct ~CInitTracker
-#endif
-
 class CInitTracker
 {
 public:
@@ -66,10 +61,6 @@ private:
 	int m_nNumFuncs[NUM_LISTS];
 	CUtlVector<InitFunc *> m_Funcs[NUM_LISTS];
 };
-
-#ifdef HOOK_ENGINE
-#define g_InitTracker (*pg_InitTracker)
-#endif
 
 extern CInitTracker g_InitTracker;
 

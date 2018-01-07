@@ -1,9 +1,8 @@
 #pragma once
 
-#include "osconfig.h"
-#include "archtypes.h"
-#include "mathlib.h"
+#include "basetypes.h"
 #include "FileSystem.h"
+#include "strtools.h"
 
 #include <HLTV/IProxy.h>
 #include <game_shared/counter.h>

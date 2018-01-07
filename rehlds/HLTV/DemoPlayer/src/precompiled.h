@@ -1,7 +1,7 @@
 #pragma once
 
-#include "archtypes.h"
-#include "maintypes.h"
+#include "basetypes.h"
+#include "strtools.h"
 
 #include "TokenLine.h"
 #include "interface.h"

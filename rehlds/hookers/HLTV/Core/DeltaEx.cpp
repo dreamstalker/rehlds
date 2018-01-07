@@ -299,7 +299,7 @@ delta_description_t *DELTA_FindField(delta_t *pFields, const char *pszField)
 {
 	for (int i = 0; i < pFields->fieldCount; i++)
 	{
-		if (_stricmp(pFields->pdd[i].fieldName, pszField) == 0) {
+		if (Q_stricmp(pFields->pdd[i].fieldName, pszField) == 0) {
 			return &pFields->pdd[i];
 		}
 	}
@@ -311,7 +311,7 @@ int DELTA_FindFieldIndex(delta_t *pFields, const char *fieldname)
 {
 	for (int i = 0; i < pFields->fieldCount; i++)
 	{
-		if (_stricmp(pFields->pdd[i].fieldName, fieldname) == 0) {
+		if (Q_stricmp(pFields->pdd[i].fieldName, fieldname) == 0) {
 			return i;
 		}
 	}
@@ -404,7 +404,7 @@ void DELTA_MarkSendFields(unsigned char *from, unsigned char *to, delta_t *pFiel
 			st2 = (char *)&to[pTest->fieldOffset];
 
 			// Not sure why it is case insensitive, but it looks so
-			if (!(!*st1 && !*st2 || *st1 && *st2 && !_stricmp(st1, st2))) {
+			if (!(!*st1 && !*st2 || *st1 && *st2 && !Q_stricmp(st1, st2))) {
 				pTest->flags |= FDT_MARK;
 			}
 			break;
@@ -424,7 +424,7 @@ void DELTA_SetSendFlagBits(delta_t *pFields, int *bits, int *bytecount)
 	int lastbit = -1;
 	int fieldCount = pFields->fieldCount;
 
-	memset(bits, 0, 8);
+	Q_memset(bits, 0, 8);
 
 	for (i = fieldCount - 1; i >= 0; i--)
 	{
@@ -686,7 +686,7 @@ int DELTA_ParseDelta(BitBuffer *stream, unsigned char *from, unsigned char *to, 
 	int startbit;
 
 	startbit = stream->CurrentBit();
-	memset(bits, 0, sizeof(bits));
+	Q_memset(bits, 0, sizeof(bits));
 
 	nbytes = stream->ReadBits(3);
 	for (i = 0; i < nbytes; i++) {
@@ -717,7 +717,7 @@ int DELTA_ParseDelta(BitBuffer *stream, unsigned char *from, unsigned char *to, 
 				*(uint32 *)&to[pTest->fieldOffset] = *(uint32 *)&from[pTest->fieldOffset];
 				break;
 			case DT_STRING:
-				strcpy((char *)&to[pTest->fieldOffset], (char *)&from[pTest->fieldOffset]);
+				Q_strcpy((char *)&to[pTest->fieldOffset], (char *)&from[pTest->fieldOffset]);
 				break;
 			default:
 				break;
@@ -919,10 +919,10 @@ int DELTA_TestDelta(unsigned char *from, unsigned char *to, delta_t *pFields)
 			st2 = (char *)&to[pTest->fieldOffset];
 
 			// Not sure why it is case insensitive, but it looks so
-			if (!(!*st1 && !*st2 || *st1 && *st2 && !_stricmp(st1, st2)))
+			if (!(!*st1 && !*st2 || *st1 && *st2 && !Q_stricmp(st1, st2)))
 			{
 				different = true;
-				length = strlen(st2) * 8;
+				length = Q_strlen(st2) * 8;
 				pTest->flags |= FDT_MARK;
 			}
 			break;
@@ -947,7 +947,7 @@ int DELTA_TestDelta(unsigned char *from, unsigned char *to, delta_t *pFields)
 void DELTA_AddEncoder(char *name, encoder_t conditionalencode)
 {
 	delta_encoder_t *delta = (delta_encoder_t *)Mem_ZeroMalloc(sizeof(delta_encoder_t));
-	delta->name = _strdup(name);
+	delta->name = Q_strdup(name);
 	delta->conditionalencode = conditionalencode;
 	delta->next = g_encoders;
 	g_encoders = delta;
@@ -972,7 +972,7 @@ encoder_t DELTA_LookupEncoder(char *name)
 	delta_encoder_t *p = g_encoders;
 	while (p)
 	{
-		if (_stricmp(name, p->name) == 0) {
+		if (Q_stricmp(name, p->name) == 0) {
 			return p->conditionalencode;
 		}
 
@@ -1041,7 +1041,7 @@ delta_t *DELTA_BuildFromLinks(delta_link_t **pplinks)
 
 	for (p = *pplinks, pcur = pdesc; p; p = p->next, pcur++)
 	{
-		memcpy(pcur, p->delta, sizeof(delta_description_t));
+		Q_memcpy(pcur, p->delta, sizeof(delta_description_t));
 		Mem_Free(p->delta);
 		p->delta = nullptr;
 	}
@@ -1059,7 +1059,7 @@ int DELTA_FindOffset(int count, delta_definition_t *pdef, char *fieldname)
 {
 	for (int i = 0; i < count; i++)
 	{
-		if (_stricmp(fieldname, pdef[i].fieldName) == 0) {
+		if (Q_stricmp(fieldname, pdef[i].fieldName) == 0) {
 			return pdef[i].fieldOffset;
 		}
 	}
@@ -1072,30 +1072,30 @@ bool DELTA_ParseType(delta_description_t *pdelta, char **pstream)
 	// Read the stream till we hit the end
 	while (*pstream = COM_Parse(*pstream), com_token[0] != 0)
 	{
-		if (!_stricmp(com_token, ","))
+		if (!Q_stricmp(com_token, ","))
 			return true;	// end of type description
 
-		if (!_stricmp(com_token, "|"))
+		if (!Q_stricmp(com_token, "|"))
 			continue;	// skip | token
 
 		// Determine field type
-		if (!_stricmp(com_token, "DT_SIGNED"))
+		if (!Q_stricmp(com_token, "DT_SIGNED"))
 			pdelta->fieldType |= DT_SIGNED;
-		else if (!_stricmp(com_token, "DT_BYTE"))
+		else if (!Q_stricmp(com_token, "DT_BYTE"))
 			pdelta->fieldType |= DT_BYTE;
-		else if (!_stricmp(com_token, "DT_SHORT"))
+		else if (!Q_stricmp(com_token, "DT_SHORT"))
 			pdelta->fieldType |= DT_SHORT;
-		else if (!_stricmp(com_token, "DT_FLOAT"))
+		else if (!Q_stricmp(com_token, "DT_FLOAT"))
 			pdelta->fieldType |= DT_FLOAT;
-		else if (!_stricmp(com_token, "DT_INTEGER"))
+		else if (!Q_stricmp(com_token, "DT_INTEGER"))
 			pdelta->fieldType |= DT_INTEGER;
-		else if (!_stricmp(com_token, "DT_ANGLE"))
+		else if (!Q_stricmp(com_token, "DT_ANGLE"))
 			pdelta->fieldType |= DT_ANGLE;
-		else if (!_stricmp(com_token, "DT_TIMEWINDOW_8"))
+		else if (!Q_stricmp(com_token, "DT_TIMEWINDOW_8"))
 			pdelta->fieldType |= DT_TIMEWINDOW_8;
-		else if (!_stricmp(com_token, "DT_TIMEWINDOW_BIG"))
+		else if (!Q_stricmp(com_token, "DT_TIMEWINDOW_BIG"))
 			pdelta->fieldType |= DT_TIMEWINDOW_BIG;
-		else if (!_stricmp(com_token, "DT_STRING"))
+		else if (!Q_stricmp(com_token, "DT_STRING"))
 			pdelta->fieldType |= DT_STRING;
 		else
 		{
@@ -1110,9 +1110,9 @@ bool DELTA_ParseType(delta_description_t *pdelta, char **pstream)
 bool DELTA_ParseField(int count, delta_definition_t *pdefinition, delta_link_t *pField, char **pstream)
 {
 	bool readpost = false;
-	if (_stricmp(com_token, "DEFINE_DELTA"))
+	if (Q_stricmp(com_token, "DEFINE_DELTA"))
 	{
-		if (_stricmp(com_token, "DEFINE_DELTA_POST") != 0) {
+		if (Q_stricmp(com_token, "DEFINE_DELTA_POST") != 0) {
 			return false;
 		}
 
@@ -1120,7 +1120,7 @@ bool DELTA_ParseField(int count, delta_definition_t *pdefinition, delta_link_t *
 	}
 
 	*pstream = COM_Parse(*pstream);
-	if (_stricmp(com_token, "("))
+	if (Q_stricmp(com_token, "("))
 	{
 		return false;
 	}
@@ -1131,8 +1131,7 @@ bool DELTA_ParseField(int count, delta_definition_t *pdefinition, delta_link_t *
 		return false;
 	}
 
-	strncpy(pField->delta->fieldName, com_token, sizeof(pField->delta->fieldName) - 1);
-	pField->delta->fieldName[sizeof(pField->delta->fieldName) - 1] = '\0';
+	Q_strlcpy(pField->delta->fieldName, com_token);
 
 	pField->delta->fieldOffset = DELTA_FindOffset(count, pdefinition, com_token);
 
@@ -1143,16 +1142,16 @@ bool DELTA_ParseField(int count, delta_definition_t *pdefinition, delta_link_t *
 
 	*pstream = COM_Parse(*pstream);
 	pField->delta->fieldSize = 1;
-	pField->delta->significant_bits = atoi(com_token);
+	pField->delta->significant_bits = Q_atoi(com_token);
 	*pstream = COM_Parse(*pstream);
 	*pstream = COM_Parse(*pstream);
-	pField->delta->premultiply = (float)atof(com_token);
+	pField->delta->premultiply = (float)Q_atof(com_token);
 
 	if (readpost)
 	{
 		*pstream = COM_Parse(*pstream);
 		*pstream = COM_Parse(*pstream);
-		pField->delta->postmultiply = (float)atof(com_token);
+		pField->delta->postmultiply = (float)Q_atof(com_token);
 	}
 	else
 	{
@@ -1160,13 +1159,13 @@ bool DELTA_ParseField(int count, delta_definition_t *pdefinition, delta_link_t *
 	}
 
 	*pstream = COM_Parse(*pstream);
-	if (_stricmp(com_token, ")"))
+	if (Q_stricmp(com_token, ")"))
 	{
 		return false;
 	}
 
 	*pstream = COM_Parse(*pstream);
-	if (_stricmp(com_token, ",")) {
+	if (Q_stricmp(com_token, ",")) {
 		COM_UngetToken();
 	}
 
@@ -1191,7 +1190,7 @@ void DELTA_AddDefinition(char *name, delta_definition_t *pdef, int numelements)
 	delta_definition_list_t *p = g_defs;
 	while (p)
 	{
-		if (_stricmp(name, p->ptypename) == 0) {
+		if (Q_stricmp(name, p->ptypename) == 0) {
 			break;
 		}
 
@@ -1201,7 +1200,7 @@ void DELTA_AddDefinition(char *name, delta_definition_t *pdef, int numelements)
 	if (!p)
 	{
 		p = (delta_definition_list_t *)Mem_ZeroMalloc(sizeof(delta_definition_list_t));
-		p->ptypename = _strdup(name);
+		p->ptypename = Q_strdup(name);
 		p->next = g_defs;
 		g_defs = p;
 	}
@@ -1231,7 +1230,7 @@ delta_definition_t *DELTA_FindDefinition(char *name, int *count)
 	delta_definition_list_t *p = g_defs;
 	while (p)
 	{
-		if (!_stricmp(name, p->ptypename))
+		if (!Q_stricmp(name, p->ptypename))
 		{
 			*count = p->numelements;
 			return p->pdefinition;
@@ -1253,7 +1252,7 @@ void DELTA_SkipDescription(char **pstream)
 			return;
 		}
 	}
-	while (_stricmp(com_token, "}"));
+	while (Q_stricmp(com_token, "}"));
 }
 
 bool DELTA_ParseOneField(char **ppstream, delta_link_t **pplist, int count, delta_definition_t *pdefinition)
@@ -1263,7 +1262,7 @@ bool DELTA_ParseOneField(char **ppstream, delta_link_t **pplist, int count, delt
 
 	while (true)
 	{
-		if (!_stricmp(com_token, "}"))
+		if (!Q_stricmp(com_token, "}"))
 		{
 			COM_UngetToken();
 			break;
@@ -1274,7 +1273,7 @@ bool DELTA_ParseOneField(char **ppstream, delta_link_t **pplist, int count, delt
 			break;
 		}
 
-		memset(&link, 0, sizeof(link));
+		Q_memset(&link, 0, sizeof(link));
 		link.delta = (delta_description_t *)Mem_ZeroMalloc(sizeof(delta_description_t));
 		if (!DELTA_ParseField(count, pdefinition, &link, ppstream)) {
 			return false;
@@ -1315,7 +1314,7 @@ bool DELTA_ParseDescription(char *name, delta_t **ppdesc, char *pstream)
 			break;
 		}
 
-		if (_stricmp(com_token, name))
+		if (Q_stricmp(com_token, name))
 		{
 			DELTA_SkipDescription(&pstream);
 		}
@@ -1332,10 +1331,9 @@ bool DELTA_ParseDescription(char *name, delta_t **ppdesc, char *pstream)
 				return false;
 			}
 
-			if (_stricmp(com_token, "none"))
+			if (Q_stricmp(com_token, "none"))
 			{
-				strncpy(source, com_token, sizeof(source) - 1);
-				source[sizeof(source) - 1] = '\0';
+				Q_strlcpy(source, com_token);
 
 				// Parse custom encoder function name
 				pstream = COM_Parse(pstream);
@@ -1343,8 +1341,7 @@ bool DELTA_ParseDescription(char *name, delta_t **ppdesc, char *pstream)
 					return false;
 				}
 
-				strncpy(encoder, com_token, sizeof(encoder) - 1);
-				encoder[sizeof(encoder) - 1] = '\0';
+				Q_strlcpy(encoder, com_token);
 			}
 
 			// Parse fields
@@ -1355,11 +1352,11 @@ bool DELTA_ParseDescription(char *name, delta_t **ppdesc, char *pstream)
 					break;
 				}
 
-				if (!_stricmp(com_token, "}")) {
+				if (!Q_stricmp(com_token, "}")) {
 					break;
 				}
 
-				if (_stricmp(com_token, "{")) {
+				if (Q_stricmp(com_token, "{")) {
 					return false;
 				}
 
@@ -1374,8 +1371,7 @@ bool DELTA_ParseDescription(char *name, delta_t **ppdesc, char *pstream)
 
 	if (encoder[0])
 	{
-		strncpy((*ppdesc)->conditionalencodename, encoder, sizeof((*ppdesc)->conditionalencodename) - 1);
-		(*ppdesc)->conditionalencodename[sizeof((*ppdesc)->conditionalencodename) - 1] = '\0';
+		Q_strlcpy((*ppdesc)->conditionalencodename, encoder1);
 		(*ppdesc)->conditionalencode = nullptr;
 	}
 
@@ -1392,7 +1388,7 @@ void DELTA_RegisterDescription(char *name)
 	delta_registry_t *p = (delta_registry_t *)Mem_ZeroMalloc(sizeof(delta_registry_t));
 	p->next = g_deltaregistry;
 	g_deltaregistry = p;
-	p->name = _strdup(name);
+	p->name = Q_strdup(name);
 	p->pdesc = 0;
 }
 
@@ -1420,7 +1416,7 @@ delta_t **DELTA_LookupRegistration(char *name)
 	delta_registry_t *delta = g_deltaregistry;
 	while (delta)
 	{
-		if (_stricmp(delta->name, name) == 0) {
+		if (Q_stricmp(delta->name, name) == 0) {
 			return &delta->pdesc;
 		}
 

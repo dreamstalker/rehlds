@@ -37,9 +37,9 @@
 
 /*
 #ifdef _WIN32
-#define DLLEXPORT __stdcall
+#define DLLEXPORT __stdcall EXT_FUNC
 #else
-#define DLLEXPORT  __attribute__ ((visibility("default")))
+#define DLLEXPORT  __attribute__ ((visibility("default"))) EXT_FUNC
 #endif
 */
 

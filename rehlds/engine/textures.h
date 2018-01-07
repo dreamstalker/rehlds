@@ -39,21 +39,6 @@ typedef struct texlumpinfo_s
 	int iTexFile;
 } texlumpinfo_t;
 
-#ifdef HOOK_ENGINE
-#define lumpinfo (*plumpinfo)
-#define nTexLumps (*pnTexLumps)
-#define texfiles (*ptexfiles)
-#define nTexFiles (*pnTexFiles)
-
-#define texgammatable (*ptexgammatable)
-#define r_notexture_mip (*pr_notexture_mip)
-
-#define nummiptex (*pnummiptex)
-#define miptex (*pmiptex)
-
-#define r_wadtextures (*pr_wadtextures)
-#endif
-
 extern texlumpinfo_t* lumpinfo;
 extern int nTexLumps;
 extern FILE* texfiles[128];

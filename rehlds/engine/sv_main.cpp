@@ -99,24 +99,8 @@ char outputbuf[MAX_ROUTEABLE_PACKET];
 redirect_t sv_redirected;
 netadr_t sv_redirectto;
 
-// DONE: make one global var with mods enum.
-#ifdef REHLDS_FIXES
 GameType_e g_eGameType = GT_Unitialized;
-#else
-int g_bCS_CZ_Flags_Initialized;
-int g_bIsCZero;
-int g_bIsCZeroRitual;
-int g_bIsTerrorStrike;
-int g_bIsTFC;
-int g_bIsHL1;
-int g_bIsCStrike;
-#endif
 qboolean allow_cheats;
-
-/*
- * Globals initialization
- */
-#ifndef HOOK_ENGINE
 
 char *gNullString = "";
 int SV_UPDATE_BACKUP = SINGLEPLAYER_BACKUP;
@@ -190,10 +174,6 @@ cvar_t sv_max_upload = { "sv_uploadmax", "0.5", FCVAR_SERVER, 0.0f, NULL };
 cvar_t hpk_maxsize = { "hpk_maxsize", "4", FCVAR_ARCHIVE, 0.0f, NULL };
 cvar_t sv_visiblemaxplayers = { "sv_visiblemaxplayers", "-1", 0, 0.0f, NULL };
 
-cvar_t max_queries_sec = { "max_queries_sec", "3.0", FCVAR_SERVER | FCVAR_PROTECTED, 0.0f, NULL };
-cvar_t max_queries_sec_global = { "max_queries_sec_global", "30", FCVAR_SERVER | FCVAR_PROTECTED, 0.0f, NULL };
-cvar_t max_queries_window = { "max_queries_window", "60", FCVAR_SERVER | FCVAR_PROTECTED, 0.0f, NULL };
-cvar_t sv_logblocks = { "sv_logblocks", "0", FCVAR_SERVER, 0.0f, NULL };
 cvar_t sv_downloadurl = { "sv_downloadurl", "", FCVAR_PROTECTED, 0.0f, NULL };
 cvar_t sv_allow_dlfile = { "sv_allow_dlfile", "1", 0, 0.0f, NULL };
 #ifdef REHLDS_FIXES
@@ -208,97 +188,6 @@ cvar_t sv_rcon_minfailuretime = { "sv_rcon_minfailuretime", "30", 0, 0.0f, NULL 
 cvar_t sv_rcon_banpenalty = { "sv_rcon_banpenalty", "0", 0, 0.0f, NULL };
 
 cvar_t scr_downloading = { "scr_downloading", "0", 0, 0.0f, NULL };
-
-#else //HOOK_ENGINE
-
-char *gNullString;
-int SV_UPDATE_BACKUP;
-int SV_UPDATE_MASK;
-int giNextUserMsg;
-
-cvar_t sv_lan;
-cvar_t sv_lan_rate;
-cvar_t sv_aim;
-
-cvar_t sv_skycolor_r;
-cvar_t sv_skycolor_g;
-cvar_t sv_skycolor_b;
-cvar_t sv_skyvec_x;
-cvar_t sv_skyvec_y;
-cvar_t sv_skyvec_z;
-
-cvar_t sv_spectatormaxspeed;
-cvar_t sv_airaccelerate;
-cvar_t sv_wateraccelerate;
-cvar_t sv_waterfriction;
-cvar_t sv_zmax;
-cvar_t sv_wateramp;
-
-cvar_t sv_skyname;
-cvar_t mapcyclefile;
-cvar_t motdfile;
-cvar_t servercfgfile;
-cvar_t lservercfgfile;
-cvar_t logsdir;
-cvar_t bannedcfgfile;
-
-int g_userid;
-
-cvar_t rcon_password;
-cvar_t sv_enableoldqueries;
-
-cvar_t sv_instancedbaseline;
-cvar_t sv_contact;
-cvar_t sv_maxupdaterate;
-cvar_t sv_minupdaterate;
-cvar_t sv_filterban;
-cvar_t sv_minrate;
-cvar_t sv_maxrate;
-cvar_t sv_logrelay;
-
-cvar_t violence_hblood;
-cvar_t violence_ablood;
-cvar_t violence_hgibs;
-cvar_t violence_agibs;
-cvar_t sv_newunit;
-
-cvar_t sv_clienttrace;
-cvar_t sv_timeout;
-cvar_t sv_failuretime;
-cvar_t sv_cheats;
-cvar_t sv_password;
-cvar_t sv_proxies;
-cvar_t sv_outofdatetime;
-cvar_t mapchangecfgfile;
-
-cvar_t sv_allow_download;
-cvar_t sv_send_logos;
-cvar_t sv_send_resources;
-cvar_t sv_log_singleplayer;
-cvar_t sv_logsecret;
-cvar_t sv_log_onefile;
-cvar_t sv_logbans;
-cvar_t sv_allow_upload;
-cvar_t sv_max_upload;
-cvar_t hpk_maxsize;
-cvar_t sv_visiblemaxplayers;
-
-cvar_t max_queries_sec;
-cvar_t max_queries_sec_global;
-cvar_t max_queries_window;
-cvar_t sv_logblocks;
-cvar_t sv_downloadurl;
-cvar_t sv_allow_dlfile;
-cvar_t sv_version;
-
-cvar_t sv_rcon_minfailures;
-cvar_t sv_rcon_maxfailures;
-cvar_t sv_rcon_minfailuretime;
-cvar_t sv_rcon_banpenalty;
-
-cvar_t scr_downloading;
-
-#endif //HOOK_ENGINE
 
 #ifdef REHLDS_FIXES
 cvar_t sv_echo_unknown_cmd = { "sv_echo_unknown_cmd", "0", 0, 0.0f, NULL };
@@ -1419,9 +1308,9 @@ void SV_WriteClientdataToMessage(client_t *client, sizebuf_t *msg)
 					if (globalGameTime > 0.0f)
 						globalGameTime -= (float)g_GameClients[host_client - g_psvs.clients]->GetLocalGameTimeBase();
 				};
-				if (g_bIsCStrike || g_bIsCZero)
+				if (g_eGameType == GT_CStrike || g_eGameType == GT_CZero)
 					convertGlobalGameTimeToLocal(std::ref(tdata->m_fAimedDamage));
-				if (g_bIsHL1 || g_bIsCStrike || g_bIsCZero)
+				if (g_eGameType == GT_HL1 || g_eGameType == GT_CStrike || g_eGameType == GT_CZero)
 				{
 					convertGlobalGameTimeToLocal(std::ref(tdata->fuser2));
 					convertGlobalGameTimeToLocal(std::ref(tdata->fuser3));
@@ -2608,6 +2497,11 @@ int EXT_FUNC SV_GetChallenge(const netadr_t& adr)
 
 void SVC_GetChallenge(void)
 {
+#ifdef REHLDS_FIXES
+	if (!g_psv.active)
+		return;
+#endif
+
 	char data[1024];
 	qboolean steam = (Cmd_Argc() == 2 && !Q_stricmp(Cmd_Argv(1), "steam"));
 	int challenge = SV_GetChallenge(net_from);
@@ -2834,7 +2728,7 @@ NOXREF void ReplyServerChallenge(netadr_t *adr)
 	buf.flags = SIZEBUF_ALLOW_OVERFLOW;
 
 	MSG_WriteLong(&buf, 0xffffffff);
-	MSG_WriteByte(&buf, 65);
+	MSG_WriteByte(&buf, S2C_CHALLENGE);
 	MSG_WriteLong(&buf, GetChallengeNr(adr));
 	NET_SendPacket(NS_SERVER, buf.cursize, (char *)buf.data, *adr);
 }
@@ -3002,7 +2896,7 @@ NOXREF void SVC_Info(qboolean bDetailed)
 	}
 
 	MSG_WriteLong(&buf, 0xffffffff);
-	MSG_WriteByte(&buf, bDetailed ? 109 : 67);
+	MSG_WriteByte(&buf, bDetailed ? S2A_INFO_DETAILED : S2A_INFO);
 
 	if (noip)
 	{
@@ -3104,7 +2998,7 @@ NOXREF void SVC_PlayerInfo(void)
 	buf.flags = SIZEBUF_ALLOW_OVERFLOW;
 
 	MSG_WriteLong(&buf, 0xffffffff);
-	MSG_WriteByte(&buf, 68);
+	MSG_WriteByte(&buf, S2A_PLAYERS);
 
 	for (i = 0; i < g_psvs.maxclients; i++)
 	{
@@ -3156,7 +3050,7 @@ NOXREF void SVC_RuleInfo(void)
 		return;
 
 	MSG_WriteLong(&buf, 0xffffffff);
-	MSG_WriteByte(&buf, 69);
+	MSG_WriteByte(&buf, S2A_RULES);
 	MSG_WriteShort(&buf, nNumRules);
 
 	var = cvar_vars;
@@ -3218,7 +3112,7 @@ void SV_FlushRedirect(void)
 		buf.flags = SIZEBUF_ALLOW_OVERFLOW;
 
 		MSG_WriteLong(&buf, -1);
-		MSG_WriteByte(&buf, 0x6Cu);
+		MSG_WriteByte(&buf, A2A_PRINT);
 		MSG_WriteString(&buf, outputbuf);
 		MSG_WriteByte(&buf, 0);
 		NET_SendPacket(NS_SERVER, buf.cursize, buf.data, sv_redirectto);
@@ -3680,15 +3574,12 @@ void SV_ReadPackets(void)
 		if (*(uint32 *)net_message.data == 0xFFFFFFFF)
 		{
 			// Connectionless packet
-			if (CheckIP(net_from))
+			if (SV_CheckConnectionLessRateLimits(net_from))
 			{
 				Steam_HandleIncomingPacket(net_message.data, net_message.cursize, ntohl(*(u_long *)&net_from.ip[0]), htons(net_from.port));
 				SV_ConnectionlessPacket();
 			}
-			else if (sv_logblocks.value != 0.0f)
-			{
-				Log_Printf("Traffic from %s was blocked for exceeding rate limits\n", NET_AdrToString(net_from));
-			}
+
 			continue;
 		}
 
@@ -4346,7 +4237,7 @@ int SV_CreatePacketEntities_internal(sv_delta_t type, client_t *client, packet_e
 			else
 				newindex = 9999;
 		}
-		
+
 #ifdef REHLDS_FIXES
 		if (oldnum < oldmax && from)
 #else
@@ -4437,8 +4328,8 @@ int SV_CreatePacketEntities_internal(sv_delta_t type, client_t *client, packet_e
 		);
 		baselineToIdx = -1;
 
-		uint64 origMask = DELTAJit_GetOriginalMask(delta);
-		uint64 usedMask = DELTAJit_GetMaskU64(delta);
+		uint64 origMask = DELTA_GetOriginalMask(delta);
+		uint64 usedMask = DELTA_GetMaskU64(delta);
 		uint64 diffMask = origMask ^ usedMask;
 
 		//Remember changed fields that was marked in original mask, but unmarked by the conditional encoder
@@ -5107,26 +4998,63 @@ void EXT_FUNC SV_AddResource(resourcetype_t type, const char *name, int size, un
 	resource_t *r;
 #ifdef REHLDS_FIXES
 	if (g_psv.num_resources >= ARRAYSIZE(g_rehlds_sv.resources))
-#else // REHLDS_FIXES
+#else
 	if (g_psv.num_resources >= MAX_RESOURCE_LIST)
-#endif // REHLDS_FIXES
+#endif
 	{
 		Sys_Error("%s: Too many resources on server.", __func__);
 	}
 
 #ifdef REHLDS_FIXES
 	r = &g_rehlds_sv.resources[g_psv.num_resources++];
-
 	Q_memset(r, 0, sizeof(*r));
-#else // REHLDS_FIXES
+#else
 	r = &g_psv.resourcelist[g_psv.num_resources++];
 #endif
+
 	r->type = type;
-	Q_strncpy(r->szFileName, name, sizeof(r->szFileName) - 1);
-	r->szFileName[sizeof(r->szFileName) - 1] = 0;
 	r->ucFlags = flags;
 	r->nDownloadSize = size;
 	r->nIndex = index;
+
+	Q_strlcpy(r->szFileName, name);
+}
+
+size_t SV_CountResourceByType(resourcetype_t type, resource_t **pResourceList, size_t nListMax, size_t *nWidthFileNameMax)
+{
+	if (type < t_sound || type >= rt_max)
+		return 0;
+
+	if (pResourceList && nListMax <= 0)
+		return 0;
+
+	resource_t *r;
+#ifdef REHLDS_FIXES
+	r = &g_rehlds_sv.resources[0];
+#else
+	r = &g_psv.resourcelist[0];
+#endif
+
+	size_t nCount = 0;
+	for (int i = 0; i < g_psv.num_resources; i++, r++)
+	{
+		if (r->type != type)
+			continue;
+
+		if (r->type == t_decal && r->nIndex >= MAX_DECALS)
+			continue;
+
+		if (pResourceList)
+			pResourceList[nCount] = r;
+
+		if (nWidthFileNameMax)
+			*nWidthFileNameMax = Q_max(*nWidthFileNameMax, Q_strlen(r->szFileName));
+
+		if (++nCount >= nListMax && nListMax > 0)
+			break;
+	}
+
+	return nCount;
 }
 
 #ifdef REHLDS_FIXES
@@ -5635,64 +5563,32 @@ NOXREF void SV_ReconnectAllClients(void)
 
 void SetCStrikeFlags(void)
 {
-#ifdef REHLDS_FIXES
-	if(g_eGameType==GT_Unitialized)
-#else
-	if (!g_bCS_CZ_Flags_Initialized)	// DONE: Convert these to enum
-#endif
+	if (g_eGameType == GT_Unitialized)
 	{
 		if (!Q_stricmp(com_gamedir, "valve"))
 		{
-#ifdef REHLDS_FIXES
 			g_eGameType = GT_HL1;
-#else
-			g_bIsHL1 = 1;
-#endif
 		}
 		else if (!Q_stricmp(com_gamedir, "cstrike") || !Q_stricmp(com_gamedir, "cstrike_beta"))
 		{
-#ifdef REHLDS_FIXES
 			g_eGameType = GT_CStrike;
-#else
-			g_bIsCStrike = 1;
-#endif
 		}
 		else if (!Q_stricmp(com_gamedir, "czero"))
 		{
-#ifdef REHLDS_FIXES
 			g_eGameType = GT_CZero;
-#else
-			g_bIsCZero = 1;
-#endif
 		}
 		else if (!Q_stricmp(com_gamedir, "czeror"))
 		{
-#ifdef REHLDS_FIXES
 			g_eGameType = GT_CZeroRitual;
-#else
-			g_bIsCZeroRitual = 1;
-#endif
 		}
 		else if (!Q_stricmp(com_gamedir, "terror"))
 		{
-#ifdef REHLDS_FIXES
 			g_eGameType = GT_TerrorStrike;
-#else
-			g_bIsTerrorStrike = 1;
-#endif
 		}
 		else if (!Q_stricmp(com_gamedir, "tfc"))
 		{
-#ifdef REHLDS_FIXES
 			g_eGameType = GT_TFC;
-#else
-			g_bIsTFC = 1;
-#endif
 		}
-
-#ifndef REHLDS_FIXES
-		g_bCS_CZ_Flags_Initialized = 1;
-#endif
 	}
 }
 
@@ -7719,7 +7615,7 @@ void SV_RegisterDelta(char *name, char *loadfile)
 	p->next = g_sv_delta;
 	g_sv_delta = p;
 
-#if defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)
+#if (defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)) && defined REHLDS_JIT
 	g_DeltaJitRegistry.CreateAndRegisterDeltaJIT(pdesc);
 #endif
 }
@@ -7765,7 +7661,7 @@ void SV_InitDeltas(void)
 		Sys_Error("%s: No usercmd_t encoder on server!\n", __func__);
 #endif
 
-#if defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)
+#if (defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)) && defined REHLDS_JIT
 	g_DeltaJitRegistry.CreateAndRegisterDeltaJIT(&g_MetaDelta[0]);
 #endif
 }
@@ -7784,36 +7680,6 @@ void SV_InitEncoders(void)
 
 void SV_Init(void)
 {
-#ifdef HOOK_ENGINE
-
-	Cmd_AddCommand("banid", (xcommand_t)GetOriginalFuncAddrOrDefault("SV_BanId_f", (void *)SV_BanId_f));
-	Cmd_AddCommand("removeid", (xcommand_t)GetOriginalFuncAddrOrDefault("SV_RemoveId_f", (void *)SV_RemoveId_f));
-	Cmd_AddCommand("listid", (xcommand_t)GetOriginalFuncAddrOrDefault("SV_ListId_f", (void *)SV_ListId_f));
-	Cmd_AddCommand("writeid", (xcommand_t)GetOriginalFuncAddrOrDefault("SV_WriteId_f", (void *)SV_WriteId_f));
-	Cmd_AddCommand("resetrcon", (xcommand_t)GetOriginalFuncAddrOrDefault("SV_ResetRcon_f", (void *)SV_ResetRcon_f));
-	Cmd_AddCommand("logaddress", (xcommand_t)GetOriginalFuncAddrOrDefault("SV_SetLogAddress_f", (void *)SV_SetLogAddress_f));
-	Cmd_AddCommand("logaddress_add", (xcommand_t)GetOriginalFuncAddrOrDefault("SV_AddLogAddress_f", (void *)SV_AddLogAddress_f));
-	Cmd_AddCommand("logaddress_del", (xcommand_t)GetOriginalFuncAddrOrDefault("SV_DelLogAddress_f", (void *)SV_DelLogAddress_f));
-	Cmd_AddCommand("log", (xcommand_t)GetOriginalFuncAddrOrDefault("SV_ServerLog_f", (void *)SV_ServerLog_f));
-	Cmd_AddCommand("serverinfo", (xcommand_t)GetOriginalFuncAddrOrDefault("SV_Serverinfo_f", (void *)SV_Serverinfo_f));
-	Cmd_AddCommand("localinfo", (xcommand_t)GetOriginalFuncAddrOrDefault("SV_Localinfo_f", (void *)SV_Localinfo_f));
-	Cmd_AddCommand("showinfo", (xcommand_t)GetOriginalFuncAddrOrDefault("SV_ShowServerinfo_f", (void *)SV_ShowServerinfo_f));
-	Cmd_AddCommand("user", (xcommand_t)GetOriginalFuncAddrOrDefault("SV_User_f", (void *)SV_User_f));
-	Cmd_AddCommand("users", (xcommand_t)GetOriginalFuncAddrOrDefault("SV_Users_f", (void *)SV_Users_f));
-	Cmd_AddCommand("dlfile", (xcommand_t)GetOriginalFuncAddrOrDefault("SV_BeginFileDownload_f", (void *)SV_BeginFileDownload_f));
-	Cmd_AddCommand("addip", (xcommand_t)GetOriginalFuncAddrOrDefault("SV_AddIP_f", (void *)SV_AddIP_f));
-	Cmd_AddCommand("removeip", (xcommand_t)GetOriginalFuncAddrOrDefault("SV_RemoveIP_f", (void *)SV_RemoveIP_f));
-	Cmd_AddCommand("listip", (xcommand_t)GetOriginalFuncAddrOrDefault("SV_ListIP_f", (void *)SV_ListIP_f));
-	Cmd_AddCommand("writeip", (xcommand_t)GetOriginalFuncAddrOrDefault("SV_WriteIP_f", (void *)SV_WriteIP_f));
-	Cmd_AddCommand("dropclient", (xcommand_t)GetOriginalFuncAddrOrDefault("SV_Drop_f", (void *)SV_Drop_f));
-	Cmd_AddCommand("spawn", (xcommand_t)GetOriginalFuncAddrOrDefault("SV_Spawn_f", (void *)SV_Spawn_f));
-	Cmd_AddCommand("new", (xcommand_t)GetOriginalFuncAddrOrDefault("SV_New_f", (void *)SV_New_f));
-	Cmd_AddCommand("sendres", (xcommand_t)GetOriginalFuncAddrOrDefault("SV_SendRes_f", (void *)SV_SendRes_f));
-	Cmd_AddCommand("sendents", (xcommand_t)GetOriginalFuncAddrOrDefault("SV_SendEnts_f", (void *)SV_SendEnts_f));
-	Cmd_AddCommand("fullupdate", (xcommand_t)GetOriginalFuncAddrOrDefault("SV_FullUpdate_f", (void *)SV_FullUpdate_f));
-
-#else // HOOK_ENGINE
-
 	Cmd_AddCommand("banid", SV_BanId_f);
 	Cmd_AddCommand("removeid", SV_RemoveId_f);
 	Cmd_AddCommand("listid", SV_ListId_f);
@@ -7839,8 +7705,6 @@ void SV_Init(void)
 	Cmd_AddCommand("sendres", SV_SendRes_f);
 	Cmd_AddCommand("sendents", SV_SendEnts_f);
 	Cmd_AddCommand("fullupdate", SV_FullUpdate_f);
-
-#endif // HOOK_ENGINE
 
 	Cvar_RegisterVariable(&sv_failuretime);
 	Cvar_RegisterVariable(&sv_voiceenable);
@@ -7970,7 +7834,9 @@ void SV_Init(void)
 
 void SV_Shutdown(void)
 {
+#if (defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)) && defined REHLDS_JIT
 	g_DeltaJitRegistry.Cleanup();
+#endif
 	delta_info_t *p = g_sv_delta;
 	while (p)
 	{

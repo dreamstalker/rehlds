@@ -30,20 +30,8 @@
 
 LOGLIST_T *firstLog;
 
-/*
-* Globals initialization
-*/
-#ifndef HOOK_ENGINE
-
 cvar_t mp_logecho = { "mp_logecho", "1", 0, 0.0f, NULL };
 cvar_t mp_logfile = { "mp_logfile", "1", FCVAR_SERVER, 0.0f, NULL };
-
-#else // HOOK_ENGINE
-
-cvar_t mp_logecho;
-cvar_t mp_logfile;
-
-#endif // HOOK_ENGINE
 
 void Log_Printf(const char *fmt, ...)
 {

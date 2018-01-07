@@ -55,7 +55,7 @@ void LaunchSelfViaSteam(const char *params)
 	::GetModuleFileName((HINSTANCE)GetModuleHandle(NULL), appPath, sizeof(appPath));
 
 	// strip out the exe name
-	char *slash = strrchr(appPath, '\\');
+	char *slash = Q_strrchr(appPath, '\\');
 	if (slash)
 	{
 		*slash = '\0';
@@ -66,9 +66,9 @@ void LaunchSelfViaSteam(const char *params)
 	if (ERROR_SUCCESS == RegOpenKey(HKEY_CURRENT_USER, "Software\\Valve\\Steam", &hKey))
 	{
 		DWORD dwType = REG_SZ;
-		DWORD dwSize = static_cast<DWORD>( strlen(appPath) + 1 );
+		DWORD dwSize = static_cast<DWORD>(Q_strlen(appPath) + 1);
 		RegSetValueEx(hKey, "TempAppPath", NULL, dwType, (LPBYTE)appPath, dwSize);
-		dwSize = static_cast<DWORD>( strlen(params) + 1 );
+		dwSize = static_cast<DWORD>(Q_strlen(params) + 1);
 		RegSetValueEx(hKey, "TempAppCmdLine", NULL, dwType, (LPBYTE)params, dwSize);
 		// clear out the appID (since we don't know it yet)
 		dwType = REG_DWORD;
@@ -93,38 +93,38 @@ void LaunchSelfViaSteam(const char *params)
 
 		if (::GetCurrentDirectoryA(sizeof(dir), dir))
 		{
-			char *slash = strrchr(dir, '\\');
+			char *slash = Q_strrchr(dir, '\\');
 			while (slash)
 			{
 				// see if steam_dev.exe is in the directory first
-				slash[1] = 0;
-				strcat(slash, "steam_dev.exe");
+				slash[1] = '\0';
+				Q_strcat(slash, "steam_dev.exe");
 				FILE *f = fopen(dir, "rb");
 				if (f)
 				{
 					// found it
 					fclose(f);
-					strcpy(steamExe, dir);
+					Q_strcpy(steamExe, dir);
 					break;
 				}
 
 				// see if steam.exe is in the directory
-				slash[1] = 0;
-				strcat(slash, "steam.exe");
+				slash[1] = '\0';
+				Q_strcat(slash, "steam.exe");
 				f = fopen(dir, "rb");
 				if (f)
 				{
 					// found it
 					fclose(f);
-					strcpy(steamExe, dir);
+					Q_strcpy(steamExe, dir);
 					break;
 				}
 
 				// kill the string at the slash
-				slash[0] = 0;
+				slash[0] = '\0';
 
 				// move to the previous slash
-				slash = strrchr(dir, '\\');
+				slash = Q_strrchr(dir, '\\');
 			}
 		}
 
@@ -158,11 +158,11 @@ void LaunchSelfViaSteam(const char *params)
 		}
 
 		// change to the steam directory
-		strcpy(dir, steamExe);
-		char *delimiter = strrchr(dir, '\\');
+		Q_strcpy(dir, steamExe);
+		char *delimiter = Q_strrchr(dir, '\\');
 		if (delimiter)
 		{
-			*delimiter = 0;
+			*delimiter = '\0';
 			_chdir(dir);
 		}
 
@@ -176,12 +176,12 @@ void LaunchSelfViaSteam(const char *params)
 bool ShouldLaunchAppViaSteam(const char *lpCmdLine, const char *steamFilesystemDllName, const char *stdioFilesystemDllName)
 {
 	// see if steam is on the command line
-	const char *steamStr = strstr(lpCmdLine, STEAM_PARM);
+	const char *steamStr = Q_strstr(lpCmdLine, STEAM_PARM);
 
 	// check the character following it is a whitespace or null
 	if (steamStr)
 	{
-		const char *postChar = steamStr + strlen(STEAM_PARM);
+		const char *postChar = steamStr + Q_strlen(STEAM_PARM);
 		if (*postChar == 0 || isspace(*postChar))
 		{
 			// we're running under steam already, let the app continue

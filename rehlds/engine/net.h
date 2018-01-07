@@ -54,6 +54,17 @@ const char S2C_CONNECTION       = 'B';
 // HLMaster rejected a server's connection because the server needs to be updated
 const char M2S_REQUESTRESTART	= 'O';
 
+// Response details about each player on the server
+const char S2A_PLAYERS			= 'D';
+
+// Number of rules + string key and string value pairs
+const char S2A_RULES			= 'E';
+
+// info request
+const char S2A_INFO				= 'C'; // deprecated goldsrc response
+
+const char S2A_INFO_DETAILED	= 'm'; // New Query protocol, returns dedicated or not, + other performance info.
+
 // send a log event as key value
 const char S2A_LOGSTRING		= 'R';
 
@@ -77,6 +88,9 @@ const char A2A_PING				= 'i';	// respond with an A2A_ACK
 
 // Generic Ack
 const char A2A_ACK				= 'j';	// general acknowledgement without info
+
+// Print to client console
+const char A2A_PRINT			= 'l'; // print a message on client
 
 // Challenge response from master
 const char M2A_CHALLENGE		= 's';	// + challenge value
@@ -124,11 +138,6 @@ const int NET_MAX_PAYLOAD	= 65536;
 //  short (length)
 // }
 #define HEADER_BYTES (8 + MAX_STREAMS * 9)
-
-// Pad a number so it lies on an N byte boundary.
-// So PAD_NUMBER(0,4) is 0 and PAD_NUMBER(1,4) is 4
-#define PAD_NUMBER(number, boundary) \
-	(((number) + ((boundary) - 1)) / (boundary)) * (boundary)
 
 // Pad this to next higher 16 byte boundary
 // This is the largest packet that can come in/out over the wire, before processing the header

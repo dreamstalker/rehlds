@@ -16,26 +16,21 @@
 #include "ed_strpool.h"
 
 #include "memory.h"
-
-// Hook stuff
-#include "hookers/engine/hooklist.h"
-
-#include "engine.h"
-#include "platform.h"
-#include "RehldsRuntimeConfig.h"
-#include "rehlds_debug.h"
+#include "strtools.h"
 
 // Valve libs stuff
 #include "tier0/platform.h"
 #include "tier0/dbg.h"
+
+#include "engine.h"
+#include "platform.h"
+#include "RehldsRuntimeConfig.h"
 
 #include "interface.h"
 #include "iregistry.h"
 
 #include "utlbuffer.h"
 #include "utlrbtree.h"
-
-#include "iosutil.h"
 
 // Testsuite
 #include "testsuite.h"

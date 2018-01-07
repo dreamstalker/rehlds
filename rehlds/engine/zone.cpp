@@ -28,22 +28,15 @@
 
 #include "precompiled.h"
 
-#ifndef Z_Functions_region
-
-/*
-==============================================================================
-
-ZONE MEMORY ALLOCATION
-
-There is never any space between memblocks, and there will never be two
-contiguous free memblocks.
-
-The rover can be left pointing at a non-empty block
-
-The zone calls are pretty much only used for small strings and structures,
-all big things are allocated on the hunk.
-==============================================================================
-*/
+// ZONE MEMORY ALLOCATION
+//
+// There is never any space between memblocks, and there will never be two
+// contiguous free memblocks.
+//
+// The rover can be left pointing at a non-empty block
+//
+// The zone calls are pretty much only used for small strings and structures,
+// all big things are allocated on the hunk.
 
 #define ZONEID 0x001d4a11
 const int MINFRAGMENT = 64;
@@ -65,18 +58,7 @@ typedef struct memzone_s
 	memblock_t *rover;
 } memzone_t;
 
-/*
-* Globals initialization
-*/
-#ifndef HOOK_ENGINE
-
 cvar_t mem_dbgfile = { "mem_dbgfile", ".\\mem.txt", 0, 0.0f, NULL };
-
-#else // HOOK_ENGINE
-
-cvar_t mem_dbgfile;
-
-#endif // HOOK_ENGINE
 
 memzone_t *mainzone;
 
@@ -253,7 +235,7 @@ NOXREF void Z_Print(memzone_t *zone)
 	}
 }
 
-void Z_CheckHeap(void)
+void Z_CheckHeap()
 {
 	memblock_t *block;
 
@@ -281,10 +263,6 @@ void Z_CheckHeap(void)
 	}
 }
 
-#endif // Z_Functions_region
-
-#ifndef Hunk_Functions_region
-
 const int HUNK_NAME_LEN = 64;
 #define HUNK_SENTINEL 0x1df001ed
 
@@ -304,15 +282,8 @@ int hunk_high_used;
 qboolean hunk_tempactive;
 int hunk_tempmark;
 
-/*
-==============
-Hunk_Check
-
-Run consistency and sentinel trashing checks
-==============
-*/
-
-void Hunk_Check(void)
+// Run consistency and sentinel trashing checks
+void Hunk_Check()
 {
 	hunk_t *h;
 
@@ -330,15 +301,8 @@ void Hunk_Check(void)
 	}
 }
 
-/*
-==============
-Hunk_Print
-
-If "all" is specified, every single allocation is printed.
-Otherwise, allocations with the same name will be totaled up before printing.
-==============
-*/
-
+// If "all" is specified, every single allocation is printed.
+// Otherwise, allocations with the same name will be totaled up before printing.
 NOXREF void Hunk_Print(qboolean all)
 {
 	NOXREFCHECK;
@@ -363,9 +327,7 @@ NOXREF void Hunk_Print(qboolean all)
 
 	while (true)
 	{
-		//
 		// skip to the high hunk if done with low hunk
-		//
 		if (h == endlow)
 		{
 			Con_Printf("-------------------------\n");
@@ -374,15 +336,11 @@ NOXREF void Hunk_Print(qboolean all)
 			h = starthigh;
 		}
 
-		//
 		// if totally done, break
-		//
 		if (h == endhigh)
 			break;
 
-		//
 		// run consistancy checks
-		//
 		if (h->sentinel != HUNK_SENTINEL)
 			Sys_Error("%s: trahsed sentinal", __func__);
 		if (h->size < 16 || h->size + (byte *)h - hunk_base > hunk_size)
@@ -393,16 +351,12 @@ NOXREF void Hunk_Print(qboolean all)
 		totalblocks++;
 		sum += h->size;
 
-		//
 		// print the single block
-		//
 		Q_memcpy(name, h->name, HUNK_NAME_LEN);
 		if (all)
 			Con_Printf("%8p :%8i %8s\n", h, h->size, name);
 
-		//
 		// print the total
-		//
 		if (next == endlow || next == endhigh ||
 			Q_strncmp(h->name, next->name, HUNK_NAME_LEN))
 		{
@@ -418,12 +372,6 @@ NOXREF void Hunk_Print(qboolean all)
 	Con_Printf("-------------------------\n");
 	Con_Printf("%8i total blocks\n", totalblocks);
 }
-
-/*
-===================
-Hunk_AllocName
-===================
-*/
 
 void *Hunk_AllocName(int size, const char *name)
 {
@@ -458,7 +406,7 @@ void *Hunk_Alloc(int size)
 	return Hunk_AllocName(size, "unknown");
 }
 
-int Hunk_LowMark(void)
+int Hunk_LowMark()
 {
 	return hunk_low_used;
 }
@@ -473,7 +421,7 @@ void Hunk_FreeToLowMark(int mark)
 	hunk_low_used = mark;
 }
 
-int Hunk_HighMark(void)
+int Hunk_HighMark()
 {
 	if (hunk_tempactive)
 	{
@@ -499,12 +447,6 @@ void Hunk_FreeToHighMark(int mark)
 
 	hunk_high_used = mark;
 }
-
-/*
-===================
-Hunk_HighAllocName
-===================
-*/
 
 void *Hunk_HighAllocName(int size, const char *name)
 {
@@ -539,17 +481,10 @@ void *Hunk_HighAllocName(int size, const char *name)
 	Q_strncpy(h->name, name, HUNK_NAME_LEN - 1);
 	h->name[HUNK_NAME_LEN - 1] = 0;
 
-	return (void*)(h + 1);
+	return (void *)(h + 1);
 }
 
-/*
-=================
-Hunk_TempAlloc
-
-Return space from the top of the hunk
-=================
-*/
-
+// Return space from the top of the hunk
 void *Hunk_TempAlloc(int size)
 {
 	void *buf;
@@ -567,18 +502,7 @@ void *Hunk_TempAlloc(int size)
 	return buf;
 }
 
-#endif // Hunk_Functions_region
-
-#ifndef Cache_Functions_region
-
-/*
-===============================================================================
-
-CACHE MEMORY
-
-===============================================================================
-*/
-
+// CACHE MEMORY
 const int CACHE_NAME_LEN = 64;
 
 typedef struct cache_system_s
@@ -593,12 +517,6 @@ typedef struct cache_system_s
 } cache_system_t;
 
 cache_system_t cache_head;
-
-/*
-===========
-Cache_Move
-===========
-*/
 
 void Cache_Move(cache_system_t *c)
 {
@@ -618,14 +536,7 @@ void Cache_Move(cache_system_t *c)
 	}
 }
 
-/*
-============
-Cache_FreeLow
-
-Throw things out until the hunk can be expanded to the given point
-============
-*/
-
+// Throw things out until the hunk can be expanded to the given point
 void Cache_FreeLow(int new_low_hunk)
 {
 	cache_system_t	*c;
@@ -641,14 +552,7 @@ void Cache_FreeLow(int new_low_hunk)
 	}
 }
 
-/*
-============
-Cache_FreeHigh
-
-Throw things out until the hunk can be expanded to the given point
-============
-*/
-
+// Throw things out until the hunk can be expanded to the given point
 void Cache_FreeHigh(int new_high_hunk)
 {
 	cache_system_t	*c, *prev;
@@ -696,15 +600,8 @@ void Cache_MakeLRU(cache_system_t *cs)
 	cache_head.lru_next = cs;
 }
 
-/*
-============
-Cache_TryAlloc
-
-Looks for a free block of memory between the high and low hunk marks
-Size should already include the header and padding
-============
-*/
-
+// Looks for a free block of memory between the high and low hunk marks
+// Size should already include the header and padding
 cache_system_t *Cache_TryAlloc(int size, qboolean nobottom)
 {
 	cache_system_t *cs;
@@ -769,15 +666,8 @@ cache_system_t *Cache_TryAlloc(int size, qboolean nobottom)
 	return newmem;
 }
 
-/*
-============
-Cache_Flush
-
-Throw everything out, so new data will be demand cached
-============
-*/
-
-void Cache_Force_Flush(void)
+// Throw everything out, so new data will be demand cached
+void Cache_Force_Flush()
 {
 	cache_system_t *i;
 
@@ -787,7 +677,7 @@ void Cache_Force_Flush(void)
 	}
 }
 
-void Cache_Flush(void)
+void Cache_Flush()
 {
 	if (g_pcl.maxclients <= 1 || allow_cheats)
 	{
@@ -799,15 +689,8 @@ void Cache_Flush(void)
 	}
 }
 
-/*
-============
-CacheSystemCompare
-
-Compares the names of two cache_system_t structs.
-Used with qsort()
-============
-*/
-
+// Compares the names of two cache_system_t structs.
+// Used with qsort()
 NOXREF int CacheSystemCompare(const void *ppcs1, const void *ppcs2)
 {
 	NOXREFCHECK;
@@ -818,14 +701,7 @@ NOXREF int CacheSystemCompare(const void *ppcs1, const void *ppcs2)
 	return Q_stricmp(pcs1->name, pcs2->name);
 }
 
-/*
-============
-Cache_Print
-
-============
-*/
-
-NOXREF void Cache_Print(void)
+NOXREF void Cache_Print()
 {
 	NOXREFCHECK;
 
@@ -837,15 +713,8 @@ NOXREF void Cache_Print(void)
 	}
 }
 
-/*
-============
-ComparePath1
-
-compares the first directory of two paths...
-(so  "foo/bar" will match "foo/fred"
-============
-*/
-
+// compares the first directory of two paths...
+// (so  "foo/bar" will match "foo/fred"
 NOXREF int ComparePath1(char *path1, char *path2)
 {
 	NOXREFCHECK;
@@ -862,19 +731,12 @@ NOXREF int ComparePath1(char *path1, char *path2)
 	return 1;
 }
 
-/*
-============
-CommatizeNumber
-
-takes a number, and creates a string of that with commas in the
-appropriate places.
-============
-*/
-
+// Takes a number, and creates a string of that with commas in the appropriate places.
 NOXREF char *CommatizeNumber(int num, char *pout)
 {
 	NOXREFCHECK;
-	//this is probably more complex than it needs to be.
+
+	// this is probably more complex than it needs to be.
 	int len = 0;
 	int i;
 	char outbuf[50];
@@ -891,51 +753,30 @@ NOXREF char *CommatizeNumber(int num, char *pout)
 
 	len = Q_strlen(outbuf);
 
-	for (i = 0; i < len; i++)				//find first significant digit
+	for (i = 0; i < len; i++)				// find first significant digit
 		if (outbuf[i] != '0' && outbuf[i] != ',')
 			break;
 
 	if (i == len)
 		Q_strcpy(pout, "0");
 	else
-		Q_strcpy(pout, &outbuf[i]);	//copy from i to get rid of the first comma and leading zeros
+		Q_strcpy(pout, &outbuf[i]);	// copy from i to get rid of the first comma and leading zeros
 
 	return pout;
 }
 
-/*
-============
-Cache_Report
-
-============
-*/
-
-NOXREF void Cache_Report(void)
+NOXREF void Cache_Report()
 {
 	NOXREFCHECK;
 	Con_DPrintf("%4.1f megabyte data cache\n", (hunk_size - hunk_low_used - hunk_high_used) / (float)(1024 * 1024));
 }
 
-/*
-============
-Cache_Compact
-
-============
-*/
-
-NOXREF void Cache_Compact(void)
+NOXREF void Cache_Compact()
 {
 	NOXREFCHECK;
 }
 
-/*
-============
-Cache_Init
-
-============
-*/
-
-void Cache_Init(void)
+void Cache_Init()
 {
 	cache_head.next = cache_head.prev = &cache_head;
 	cache_head.lru_next = cache_head.lru_prev = &cache_head;
@@ -943,14 +784,7 @@ void Cache_Init(void)
 	Cmd_AddCommand("flush", Cache_Flush);
 }
 
-/*
-==============
-Cache_Free
-
-Frees the memory and removes it from the LRU list
-==============
-*/
-
+// Frees the memory and removes it from the LRU list
 void Cache_Free(cache_user_t *c)
 {
 	if (!c->data)
@@ -967,7 +801,7 @@ void Cache_Free(cache_user_t *c)
 	Cache_UnlinkLRU(cs);
 }
 
-NOXREF int Cache_TotalUsed(void)
+NOXREF int Cache_TotalUsed()
 {
 	NOXREFCHECK;
 
@@ -978,12 +812,6 @@ NOXREF int Cache_TotalUsed(void)
 
 	return Total;
 }
-
-/*
-==============
-Cache_Check
-==============
-*/
 
 void* EXT_FUNC Cache_Check(cache_user_t *c)
 {
@@ -999,12 +827,6 @@ void* EXT_FUNC Cache_Check(cache_user_t *c)
 
 	return c->data;
 }
-
-/*
-==============
-Cache_Alloc
-==============
-*/
 
 void *Cache_Alloc(cache_user_t *c, int size, char *name)
 {
@@ -1045,12 +867,6 @@ void *Cache_Alloc(cache_user_t *c, int size, char *name)
 	return Cache_Check(c);
 }
 
-/*
-========================
-Memory_Init
-========================
-*/
-
 void Memory_Init(void *buf, int size)
 {
 	int zonesize = ZONE_DYNAMIC_SIZE;
@@ -1080,7 +896,7 @@ void Memory_Init(void *buf, int size)
 	Z_ClearZone(mainzone, zonesize);
 }
 
-NOXREF void Cache_Print_Models_And_Totals(void)
+NOXREF void Cache_Print_Models_And_Totals()
 {
 	NOXREFCHECK;
 	char buf[50];
@@ -1097,7 +913,7 @@ NOXREF void Cache_Print_Models_And_Totals(void)
 
 	Q_memset(sortarray, 0, sizeof(cache_system_t *) * 512);
 
-	//pack names into the array.
+	// pack names into the array.
 	for (cd = cache_head.next; cd != &cache_head; cd = cd->next)
 	{
 		if (Q_strstr(cd->name,".mdl"))
@@ -1107,7 +923,7 @@ NOXREF void Cache_Print_Models_And_Totals(void)
 	qsort(sortarray, i, sizeof(cache_system_t *), CacheSystemCompare);
 	FS_FPrintf(file, "\nCACHED MODELS:\n");
 
-	//now process the sorted list.
+	// now process the sorted list.
 	for (j = 0; j < i; j++)
 	{
 		FS_FPrintf(file, "\t%16.16s : %s\n", CommatizeNumber(sortarray[j]->size, buf), sortarray[j]->name);
@@ -1120,7 +936,7 @@ NOXREF void Cache_Print_Models_And_Totals(void)
 
 const int MAX_SFX = 1024;
 
-NOXREF void Cache_Print_Sounds_And_Totals(void)
+NOXREF void Cache_Print_Sounds_And_Totals()
 {
 	NOXREFCHECK;
 	char buf[50];
@@ -1138,7 +954,7 @@ NOXREF void Cache_Print_Sounds_And_Totals(void)
 
 	Q_memset(sortarray, 0, sizeof(cache_system_t *) * MAX_SFX);
 
-	//pack names into the array.
+	// pack names into the array.
 	for (cd = cache_head.next; cd != &cache_head; cd = cd->next)
 	{
 		if (Q_strstr(cd->name,".wav"))
@@ -1148,7 +964,7 @@ NOXREF void Cache_Print_Sounds_And_Totals(void)
 	qsort(sortarray, i, sizeof(cache_system_t *), CacheSystemCompare);
 	FS_FPrintf(file, "\nCACHED SOUNDS:\n");
 
-	//now process the sorted list.  (totals by directory)
+	// now process the sorted list.  (totals by directory)
 	for (j = 0; j < i; j++)
 	{
 		FS_FPrintf(file, "\t%16.16s : %s\n", CommatizeNumber(sortarray[j]->size, buf), sortarray[j]->name);
@@ -1165,5 +981,3 @@ NOXREF void Cache_Print_Sounds_And_Totals(void)
 	FS_FPrintf(file, "Total bytes in cache used by sound:  %s\n", CommatizeNumber(totalsndbytes, buf));
 	FS_Close(file);
 }
-
-#endif // Cache_Functions_region

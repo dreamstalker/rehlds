@@ -28,19 +28,8 @@
 
 #include "precompiled.h"
 
-/*
-* Globals initialization
-*/
-#ifndef HOOK_ENGINE
-
 CEngine g_Engine;
 IEngine *eng = &g_Engine;
-
-#else // HOOK_ENGINE
-
-IEngine *eng;
-
-#endif // HOOK_ENGINE
 
 CEngine::CEngine()
 {

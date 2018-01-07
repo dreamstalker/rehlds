@@ -178,7 +178,7 @@ bool DirectorCmd::GetSoundData(char *name, float &volume)
 	}
 
 	m_Data.Reset();
-	strcpy(name, m_Data.ReadString());
+	Q_strcpy(name, m_Data.ReadString());
 	volume = m_Data.ReadFloat();
 
 	return true;
@@ -241,7 +241,7 @@ bool DirectorCmd::GetMessageData(int &effect, int &color, vec_t *position, float
 	fadeout = m_Data.ReadFloat();
 	holdtime = m_Data.ReadFloat();
 	fxtime = m_Data.ReadFloat();
-	strcpy(text, m_Data.ReadString());
+	Q_strcpy(text, m_Data.ReadString());
 
 	return true;
 }
@@ -267,7 +267,7 @@ bool DirectorCmd::GetBannerData(char *filename)
 	}
 
 	m_Data.Reset();
-	strcpy(filename, m_Data.ReadString());
+	Q_strcpy(filename, m_Data.ReadString());
 
 	return true;
 }
@@ -279,7 +279,7 @@ bool DirectorCmd::GetStuffTextData(char *commands)
 	}
 
 	m_Data.Reset();
-	strcpy(commands, m_Data.ReadString());
+	Q_strcpy(commands, m_Data.ReadString());
 
 	return true;
 }
@@ -369,7 +369,7 @@ void DirectorCmd::SetCamPathData(vec_t *position, vec_t *angles, float fov, int 
 
 void DirectorCmd::SetSoundData(char *name, float volume)
 {
-	int len = strlen(name);
+	int len = Q_strlen(name);
 	m_Type = DRC_CMD_SOUND;
 	Resize(len + 5);
 
@@ -392,7 +392,7 @@ void DirectorCmd::SetTime(float time)
 
 void DirectorCmd::SetMessageData(int effect, unsigned int color, vec_t *position, float fadein, float fadeout, float holdtime, float fxtime, char *text)
 {
-	int len = strlen(text);
+	int len = Q_strlen(text);
 	m_Type = DRC_CMD_MESSAGE;
 	Resize(len + 30);
 
@@ -434,7 +434,7 @@ void DirectorCmd::SetBannerData(char *filename)
 {
 	m_Type = DRC_CMD_BANNER;
 
-	int len = strlen(filename);
+	int len = Q_strlen(filename);
 	Resize(len + 1);
 	m_Data.WriteString(filename);
 }
@@ -443,7 +443,7 @@ void DirectorCmd::SetStuffTextData(char *commands)
 {
 	m_Type = DRC_CMD_STUFFTEXT;
 
-	int len = strlen(commands);
+	int len = Q_strlen(commands);
 	Resize(len + 1);
 	m_Data.WriteString(commands);
 }
@@ -496,7 +496,7 @@ bool DirectorCmd::ReadFromStream(BitBuffer *stream)
 		stream->SkipBytes(29);
 
 		string = stream->ReadString();
-		length = strlen(string);
+		length = Q_strlen(string);
 		Resize(length + 30);
 
 		m_Data.WriteBuf(start, 29);
@@ -506,7 +506,7 @@ bool DirectorCmd::ReadFromStream(BitBuffer *stream)
 	case DRC_CMD_SOUND:
 	{
 		string = stream->ReadString();
-		length = strlen(string);
+		length = Q_strlen(string);
 		Resize(length + 5);
 
 		m_Data.WriteBuf(string, length + 1);
@@ -521,7 +521,7 @@ bool DirectorCmd::ReadFromStream(BitBuffer *stream)
 	case DRC_CMD_BANNER:
 	{
 		string = stream->ReadString();
-		length = strlen(string) + 1;
+		length = Q_strlen(string) + 1;
 
 		Resize(length);
 		m_Data.WriteBuf(string, length);
@@ -530,7 +530,7 @@ bool DirectorCmd::ReadFromStream(BitBuffer *stream)
 	case DRC_CMD_STUFFTEXT:
 	{
 		string = stream->ReadString();
-		length = strlen(string) + 1;
+		length = Q_strlen(string) + 1;
 
 		Resize(length);
 		m_Data.WriteBuf(string, length);
@@ -593,68 +593,68 @@ char *DirectorCmd::ToString()
 	char t2[1024];
 
 	static char s[1024];
-	memset(s, 0, sizeof(s));
+	Q_memset(s, 0, sizeof(s));
 
 	switch (m_Type)
 	{
 	case DRC_CMD_START:
-		sprintf(s, "%s", t1);
+		Q_sprintf(s, "%s", t1);
 		break;
 	case DRC_CMD_EVENT:
 		GetEventData(i1, i2, i3);
-		sprintf(s, "%s %i %i %i", t1, i1, i2, i3);
+		Q_sprintf(s, "%s %i %i %i", t1, i1, i2, i3);
 		break;
 	case DRC_CMD_MODE:
 		GetModeData(i1);
-		sprintf(s, "%s %i", t1, i1);
+		Q_sprintf(s, "%s %i", t1, i1);
 		break;
 	case DRC_CMD_CAMERA:
 		GetCameraData(v1, v2, f1, i1);
-		sprintf(s, "%s (%.1f %.1f %.1f) (%.1f %.1f %.1f) %.1f %i", t1, v1[0], v1[1], v1[2], v2[0], v2[1], v2[2], f1, i1);
+		Q_sprintf(s, "%s (%.1f %.1f %.1f) (%.1f %.1f %.1f) %.1f %i", t1, v1[0], v1[1], v1[2], v2[0], v2[1], v2[2], f1, i1);
 		break;
 	case DRC_CMD_TIMESCALE:
 		GetTimeScaleData(f1);
-		sprintf(s, "%s %.2f", t1, f1);
+		Q_sprintf(s, "%s %.2f", t1, f1);
 		break;
 	case DRC_CMD_MESSAGE:
 		GetMessageData(i1, i2, v1, f1, f2, f3, f4, t2);
-		sprintf(s, "%s \"%s\" %i %x (%.2f %.2f) %.1f, %.1f %.1f %.1f", t1, t2, i1, i2, v1[0], v1[1], f1, f2, f3, f4);
+		Q_sprintf(s, "%s \"%s\" %i %x (%.2f %.2f) %.1f, %.1f %.1f %.1f", t1, t2, i1, i2, v1[0], v1[1], f1, f2, f3, f4);
 		break;
 	case DRC_CMD_SOUND:
 		GetSoundData(t2, f1);
-		sprintf(s, "%s \"%s\" %.2f", t1, t2, f1);
+		Q_sprintf(s, "%s \"%s\" %.2f", t1, t2, f1);
 		break;
 	case DRC_CMD_STATUS:
 		GetStatusData(i1, i2, i3);
-		sprintf(s, "%s %i %i %i", t1, i1, i2, i3);
+		Q_sprintf(s, "%s %i %i %i", t1, i1, i2, i3);
 		break;
 	case DRC_CMD_BANNER:
 		GetBannerData(t2);
-		sprintf(s, "%s \"%s\"", t1, t2);
+		Q_sprintf(s, "%s \"%s\"", t1, t2);
 		break;
 	case DRC_CMD_STUFFTEXT:
 		GetStuffTextData(t2);
-		sprintf(s, "%s \"%s\"", t1, t2);
+		Q_sprintf(s, "%s \"%s\"", t1, t2);
 		break;
 	case DRC_CMD_CHASE:
 		GetChaseData(i1, i2, f1, i3);
-		sprintf(s, "%s %i %i %.1f %i", t1, i1, i2, f1, i3);
+		Q_sprintf(s, "%s %i %i %.1f %i", t1, i1, i2, f1, i3);
 		break;
 	case DRC_CMD_INEYE:
 		GetInEyeData(i1);
-		sprintf(s, "%s %i", t1, i1);
+		Q_sprintf(s, "%s %i", t1, i1);
 		break;
 	case DRC_CMD_MAP:
 		GetMapData(i1, f1, f2);
-		sprintf(s, "%s %i %.1f %.1f", t1, i1, f1, f2);
+		Q_sprintf(s, "%s %i %.1f %.1f", t1, i1, f1, f2);
 		break;
 	case DRC_CMD_CAMPATH:
 		GetCamPathData(v1, v2, f1, i1);
-		sprintf(s, "%s (%.1f %.1f %.1f) (%.1f %.1f %.1f) %.1f %i", t1, v1[0], v1[1], v1[2], v2[0], v2[1], v2[2], f1, i1);
+		Q_sprintf(s, "%s (%.1f %.1f %.1f) (%.1f %.1f %.1f) %.1f %i", t1, v1[0], v1[1], v1[2], v2[0], v2[1], v2[2], f1, i1);
 		break;
 	case DRC_CMD_WAYPOINTS:
 		GetWayPointsData(i1);
-		sprintf(s, "%s %i", t1, i1);
+		Q_sprintf(s, "%s %i", t1, i1);
 		break;
 	default:
 	case DRC_CMD_NONE:

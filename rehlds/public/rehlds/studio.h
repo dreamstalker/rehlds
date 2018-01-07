@@ -1,9 +1,9 @@
 /***
 *
 *	Copyright (c) 1996-2002, Valve LLC. All rights reserved.
-*	
-*	This product contains software technology licensed from Id 
-*	Software, Inc. ("Id Technology").  Id Technology (c) 1996 Id Software, Inc. 
+*
+*	This product contains software technology licensed from Id
+*	Software, Inc. ("Id Technology").  Id Technology (c) 1996 Id Software, Inc.
 *	All Rights Reserved.
 *
 *   Use, distribution, and modification of this source code and/or resulting
@@ -12,6 +12,7 @@
 *   without written permission from Valve LLC.
 *
 ****/
+
 #pragma once
 
 /*
@@ -22,7 +23,6 @@ STUDIO MODELS
 Studio models are position independent, so the cache manager can move them.
 ==============================================================================
 */
-
 
 #define MAXSTUDIOTRIANGLES	20000	// TODO: tune this
 #define MAXSTUDIOVERTS		2048	// TODO: tune this
@@ -39,7 +39,7 @@ Studio models are position independent, so the cache manager can move them.
 #define MAXSTUDIOPIVOTS		256
 #define MAXSTUDIOCONTROLLERS 8
 
-typedef struct 
+typedef struct
 {
 	int					id;
 	int					version;
@@ -49,10 +49,10 @@ typedef struct
 
 	vec3_t				eyeposition;	// ideal eye position
 	vec3_t				min;			// ideal movement hull size
-	vec3_t				max;			
+	vec3_t				max;
 
 	vec3_t				bbmin;			// clipping bounding box
-	vec3_t				bbmax;		
+	vec3_t				bbmax;
 
 	int					flags;
 
@@ -63,8 +63,8 @@ typedef struct
 	int					bonecontrollerindex;
 
 	int					numhitboxes;			// complex bounding boxes
-	int					hitboxindex;			
-	
+	int					hitboxindex;
+
 	int					numseq;				// animation sequences
 	int					seqindex;
 
@@ -79,7 +79,7 @@ typedef struct
 	int					numskinfamilies;
 	int					skinindex;
 
-	int					numbodyparts;		
+	int					numbodyparts;
 	int					bodypartindex;
 
 	int					numattachments;		// queryable attachable points
@@ -95,7 +95,7 @@ typedef struct
 } studiohdr_t;
 
 // header for demand loaded sequence group data
-typedef struct 
+typedef struct
 {
 	int					id;
 	int					version;
@@ -105,7 +105,7 @@ typedef struct
 } studioseqhdr_t;
 
 // bones
-typedef struct 
+typedef struct
 {
 	char				name[32];	// bone name for symbolic links
 	int		 			parent;		// parent bone
@@ -115,9 +115,8 @@ typedef struct
 	float				scale[6];   // scale for delta DoF values
 } mstudiobone_t;
 
-
 // bone controllers
-typedef struct 
+typedef struct
 {
 	int					bone;	// -1 == 0
 	int					type;	// X, Y, Z, XR, YR, ZR, M
@@ -133,7 +132,7 @@ typedef struct
 	int					bone;
 	int					group;			// intersection group
 	vec3_t				bbmin;		// bounding box
-	vec3_t				bbmax;		
+	vec3_t				bbmax;
 } mstudiobbox_t;
 
 // demand loaded sequence groups
@@ -150,7 +149,7 @@ typedef struct
 {
 	char				label[32];	// sequence label
 
-	float				fps;		// frames per second	
+	float				fps;		// frames per second
 	int					flags;		// looping/non-looping flags
 
 	int					activity;
@@ -164,14 +163,14 @@ typedef struct
 	int					numpivots;	// number of foot pivots
 	int					pivotindex;
 
-	int					motiontype;	
+	int					motiontype;
 	int					motionbone;
 	vec3_t				linearmovement;
 	int					automoveposindex;
 	int					automoveangleindex;
 
 	vec3_t				bbmin;		// per sequence bounding box
-	vec3_t				bbmax;		
+	vec3_t				bbmax;
 
 	int					numblends;
 	int					animindex;		// mstudioanim_t pointer relative to start of sequence group data
@@ -187,14 +186,14 @@ typedef struct
 	int					entrynode;		// transition node at entry
 	int					exitnode;		// transition node at exit
 	int					nodeflags;		// transition rules
-	
+
 	int					nextseq;		// auto advancing sequences
 } mstudioseqdesc_t;
 
 // events
 #include "studio_event.h"
 /*
-typedef struct 
+typedef struct
 {
 	int 				frame;
 	int					event;
@@ -204,7 +203,7 @@ typedef struct
 */
 
 // pivots
-typedef struct 
+typedef struct
 {
 	vec3_t				org;	// pivot point
 	int					start;
@@ -212,7 +211,7 @@ typedef struct
 } mstudiopivot_t;
 
 // attachment
-typedef struct 
+typedef struct
 {
 	char				name[32];
 	int					type;
@@ -227,7 +226,7 @@ typedef struct
 } mstudioanim_t;
 
 // animation frames
-typedef union 
+typedef union
 {
 	struct {
 		byte	valid;
@@ -235,8 +234,6 @@ typedef union
 	} num;
 	short		value;
 } mstudioanimvalue_t;
-
-
 
 // body part index
 typedef struct
@@ -247,8 +244,6 @@ typedef struct
 	int					modelindex; // index into models array
 } mstudiobodyparts_t;
 
-
-
 // skin info
 typedef struct
 {
@@ -258,7 +253,6 @@ typedef struct
 	int						height;
 	int						index;
 } mstudiotexture_t;
-
 
 // skin families
 // short	index[skinfamilies][skinref]
@@ -286,12 +280,10 @@ typedef struct
 	int					groupindex;
 } mstudiomodel_t;
 
-
 // vec3_t	boundingbox[model][bone][2];	// complex intersection info
 
-
 // meshes
-typedef struct 
+typedef struct
 {
 	int					numtris;
 	int					triindex;
@@ -302,7 +294,7 @@ typedef struct
 
 // triangles
 #if 0
-typedef struct 
+typedef struct
 {
 	short				vertindex;		// index into vertex array
 	short				normindex;		// index into normal array
@@ -310,13 +302,13 @@ typedef struct
 } mstudiotrivert_t;
 #endif
 
-#define STUDIO_DYNAMIC_LIGHT		0x0100	// dynamically get lighting from floor or ceil (flying monsters)
+#define STUDIO_DYNAMIC_LIGHT	0x0100	// dynamically get lighting from floor or ceil (flying monsters)
 #define STUDIO_TRACE_HITBOX		0x0200	// always use hitbox trace instead of bbox
 
 // lighting options
 #define STUDIO_NF_FLATSHADE		0x0001
 #define STUDIO_NF_CHROME		0x0002
-#define STUDIO_NF_FULLBRIGHT		0x0004
+#define STUDIO_NF_FULLBRIGHT	0x0004
 #define STUDIO_NF_NOMIPS		0x0008
 #define STUDIO_NF_ALPHA			0x0010
 #define STUDIO_NF_ADDITIVE		0x0020
@@ -341,6 +333,9 @@ typedef struct
 #define STUDIO_TYPES	0x7FFF
 #define STUDIO_RLOOP	0x8000	// controller that wraps shortest distance
 
+// bonecontroller types
+#define STUDIO_MOUTH	4	// hardcoded
+
 // sequence flags
 #define STUDIO_LOOPING	0x0001
 
@@ -353,9 +348,7 @@ typedef struct
 #define RAD_TO_STUDIO		(32768.0/M_PI)
 #define STUDIO_TO_RAD		(M_PI/32768.0)
 
-
-#define STUDIO_NUM_HULLS 128
-#define STUDIO_NUM_PLANES (STUDIO_NUM_HULLS * 6)
-#define STUDIO_CACHE_SIZE 16
-
-
+#define STUDIO_NUM_HULLS	128
+#define STUDIO_NUM_PLANES	(STUDIO_NUM_HULLS * 6)
+#define STUDIO_CACHE_SIZE	16
+#define STUDIO_CACHEMASK	(STUDIO_CACHE_SIZE - 1)

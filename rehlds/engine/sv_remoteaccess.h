@@ -49,8 +49,8 @@ public:
 
 	virtual ~CServerRemoteAccess() {}
 
-	virtual void WriteDataRequest(const void *buffer, int bufferSize);
-	virtual int ReadDataResponse(void *data, int len);
+	EXT_FUNC virtual void WriteDataRequest(const void *buffer, int bufferSize);
+	EXT_FUNC virtual int ReadDataResponse(void *data, int len);
 
 	void SendMessageToAdminUI(const char *message);
 	void RequestValue(int requestID, const char *variable);
@@ -63,10 +63,5 @@ public:
 	void GetMapList(CUtlBuffer &value);
 };
 
-#ifdef HOOK_ENGINE
-#define g_ServerRemoteAccess (*pg_ServerRemoteAccess)
-#endif
-
-extern class CServerRemoteAccess g_ServerRemoteAccess;
-
+extern CServerRemoteAccess g_ServerRemoteAccess;
 extern void NotifyDedicatedServerUI(const char *message);

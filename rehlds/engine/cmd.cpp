@@ -378,19 +378,28 @@ void Cmd_Exec_f(void)
 	pszFileData[nAddLen] = 0;
 	FS_Close(hFile);
 
+	char *configContents = pszFileData;
+#ifdef REHLDS_FIXES
+	if (configContents[0] == char(0xEF) && configContents[1] == char(0xBB) && configContents[2] == char(0xBF))
+	{
+		configContents += 3;
+		nAddLen -= 3;
+	}
+#endif
+
 	Con_DPrintf("execing %s\n", pszFileName);
 
 	if (cmd_text.cursize + nAddLen + 2 < cmd_text.maxsize)
 	{
-		Cbuf_InsertTextLines(pszFileData);
+		Cbuf_InsertTextLines(configContents);
 	}
 	else
 	{
-		char *pszDataPtr = pszFileData;
+		char *pszDataPtr = configContents;
 		while (true)
 		{
 			Cbuf_Execute();	// TODO: This doesn't obey the rule to first execute commands from the file, and then the others in the buffer
-			pszDataPtr = COM_ParseLine(pszDataPtr);
+			pszDataPtr = COM_ParseLine(pszDataPtr); // TODO: COM_ParseLine can be const char*
 
 			if (com_token[0] == 0)
 			{
@@ -461,7 +470,7 @@ void Cmd_Alias_f(void)
 #ifndef REHLDS_FIXES
 	SetCStrikeFlags();	// DONE: Do this once somewhere at the server start
 #endif
-	if ((g_bIsCStrike || g_bIsCZero) &&
+	if ((g_eGameType == GT_CStrike || g_eGameType == GT_CZero) &&
 		(!Q_stricmp(s, "cl_autobuy")
 		|| !Q_stricmp(s, "cl_rebuy")
 		|| !Q_stricmp(s, "gl_ztrick")
@@ -473,7 +482,7 @@ void Cmd_Alias_f(void)
 	}
 
 	// Say hello to my little friend! (c)
-	if (g_bIsTFC && (!Q_stricmp(s, "_special") || !Q_stricmp(s, "special")))
+	if (g_eGameType == GT_TFC && (!Q_stricmp(s, "_special") || !Q_stricmp(s, "special")))
 	{
 		Con_Printf("Alias name is invalid\n");
 		return;

@@ -28,10 +28,6 @@
 
 #include "precompiled.h"
 
-#ifdef _WIN32
-CRITICAL_SECTION net_cs;
-#endif // _WIN32
-
 qboolean net_thread_initialized;
 
 loopback_t loopbacks[2];
@@ -46,15 +42,14 @@ netadr_t net_from;
 sizebuf_t net_message;
 qboolean noip;
 qboolean noipx;
-
-int use_thread;
+qboolean use_thread;
 
 unsigned char net_message_buffer[NET_MAX_PAYLOAD];
 unsigned char in_message_buf[NET_MAX_PAYLOAD];
 sizebuf_t in_message;
 netadr_t in_from;
 
-#if defined(REHLDS_FIXES) && !defined(HOOK_ENGINE)
+#ifdef REHLDS_FIXES
 // Define default to INVALID_SOCKET
 #define INV_SOCK INVALID_SOCKET
 #else
@@ -62,30 +57,21 @@ netadr_t in_from;
 #define INV_SOCK 0
 #endif
 
-#ifndef HOOK_ENGINE
 SOCKET ip_sockets[NS_MAX] = { INV_SOCK, INV_SOCK, INV_SOCK };
-#else
-SOCKET ip_sockets[NS_MAX];
-#endif
 
 #ifdef _WIN32
-#ifndef HOOK_ENGINE
 SOCKET ipx_sockets[NS_MAX] = { INV_SOCK, INV_SOCK, INV_SOCK };
-#else
-SOCKET ipx_sockets[NS_MAX];
 #endif
-#endif // _WIN32
 
 LONGPACKET gNetSplit;
 net_messages_t *messages[NS_MAX];
 net_messages_t *normalqueue;
-//void *hNetThread;
-//int32 dwNetThreadId;
 
-/*
-* Globals initialization
-*/
-#ifndef HOOK_ENGINE
+#ifdef _WIN32
+HANDLE hNetThread;
+DWORD dwNetThreadId;
+CRITICAL_SECTION net_cs;
+#endif
 
 cvar_t net_address = { "net_address", "", 0, 0.0f, NULL };
 cvar_t ipname = { "ip", "localhost", 0, 0.0f, NULL };
@@ -103,7 +89,7 @@ cvar_t multicastport = { "multicastport", "27025", 0, 0.0f, NULL };
 #ifdef _WIN32
 cvar_t ipx_hostport = { "ipx_hostport", "0", 0, 0.0f, NULL };
 cvar_t ipx_clientport = { "ipx_clientport", "0", 0, 0.0f, NULL };
-#endif //_WIN32
+#endif
 
 cvar_t fakelag = { "fakelag", "0.0", 0, 0.0f, NULL };
 cvar_t fakeloss = { "fakeloss", "0.0", 0, 0.0f, NULL };
@@ -112,36 +98,7 @@ cvar_t net_graphwidth = { "net_graphwidth", "150", 0, 0.0f, NULL };
 cvar_t net_scale = { "net_scale", "5", FCVAR_ARCHIVE, 0.0f, NULL };
 cvar_t net_graphpos = { "net_graphpos", "1", FCVAR_ARCHIVE, 0.0f, NULL };
 
-#else // HOOK_ENGINE
-
-cvar_t net_address;
-cvar_t ipname;
-cvar_t defport;
-cvar_t ip_clientport;
-cvar_t clientport;
-int net_sleepforever;
-
-cvar_t clockwindow;
-
-cvar_t iphostport;
-cvar_t hostport;
-cvar_t multicastport;
-
-#ifdef _WIN32
-cvar_t ipx_hostport;
-cvar_t ipx_clientport;
-#endif // _WIN32
-
-cvar_t fakelag;
-cvar_t fakeloss;
-cvar_t net_graph;
-cvar_t net_graphwidth;
-cvar_t net_scale;
-cvar_t net_graphpos;
-
-#endif // HOOK_ENGINE
-
-void NET_ThreadLock(void)
+void NET_ThreadLock()
 {
 #ifdef _WIN32
 	if (use_thread && net_thread_initialized)
@@ -151,7 +108,7 @@ void NET_ThreadLock(void)
 #endif // _WIN32
 }
 
-void NET_ThreadUnlock(void)
+void NET_ThreadUnlock()
 {
 #ifdef _WIN32
 	if (use_thread && net_thread_initialized)
@@ -212,7 +169,7 @@ void SockadrToNetadr(const struct sockaddr *s, netadr_t *a)
 	else if (s->sa_family == AF_IPX)
 	{
 		a->type = NA_IPX;
-		Q_memcpy(a->ipx, s->sa_data, 10);
+		Q_memcpy(a->ipx, s->sa_data, sizeof(a->ipx));
 		a->port = *(unsigned short *)&s->sa_data[10];
 	}
 #endif // _WIN32
@@ -727,7 +684,7 @@ void NET_AddToLagged(netsrc_t sock, packetlag_t *pList, packetlag_t *pPacket, ne
 	Q_memcpy(&pPacket->net_from_, net_from_, sizeof(netadr_t));
 }
 
-void NET_AdjustLag(void)
+void NET_AdjustLag()
 {
 	static double lasttime = realtime;
 	double dt;
@@ -814,9 +771,11 @@ qboolean NET_LagPacket(qboolean newdata, netsrc_t sock, netadr_t *from, sizebuf_
 				Cvar_SetValue("fakeloss", 0.0);
 			}
 		}
-		pNewPacketLag = (packetlag_t *)Mem_ZeroMalloc(0x28u);
+
+		pNewPacketLag = (packetlag_t *)Mem_ZeroMalloc(sizeof(packetlag_t));
 		NET_AddToLagged(sock, &g_pLagData[sock], pNewPacketLag, from, *data, curtime);
 	}
+
 	pPacket = g_pLagData[sock].pNext;
 
 	while (pPacket != &g_pLagData[sock])
@@ -826,6 +785,7 @@ qboolean NET_LagPacket(qboolean newdata, netsrc_t sock, netadr_t *from, sizebuf_
 
 		pPacket = pPacket->pNext;
 	}
+
 	if (pPacket == &g_pLagData[sock])
 		return FALSE;
 
@@ -963,16 +923,12 @@ qboolean NET_GetLong(unsigned char *pData, int size, int *outSize)
 
 qboolean NET_QueuePacket(netsrc_t sock)
 {
-	int ret;
+	int ret = -1;
 	struct sockaddr from;
 	socklen_t fromlen;
 	SOCKET net_socket;
 	int protocol;
 	unsigned char buf[MAX_UDP_PACKET];
-
-#ifdef REHLDS_FIXES
-	ret = -1;
-#endif
 
 #ifdef _WIN32
 	for (protocol = 0; protocol < 2; protocol++)
@@ -1055,7 +1011,7 @@ qboolean NET_QueuePacket(netsrc_t sock)
 	return NET_GetLong(in_message.data, ret, &in_message.cursize);
 }
 
-DLL_EXPORT int NET_Sleep_Timeout(void)
+DLL_EXPORT int NET_Sleep_Timeout()
 {
 	static int32 lasttime;
 	static int numFrames;
@@ -1076,7 +1032,7 @@ DLL_EXPORT int NET_Sleep_Timeout(void)
 	{
 		lasttime = curtime;
 	}
-	
+
 	fd_set fdset;
 	FD_ZERO(&fdset);
 
@@ -1123,7 +1079,7 @@ DLL_EXPORT int NET_Sleep_Timeout(void)
 	return res;
 }
 
-int NET_Sleep(void)
+int NET_Sleep()
 {
 	fd_set fdset;
 	struct timeval tv;
@@ -1161,45 +1117,92 @@ int NET_Sleep(void)
 	return select((int)(number + 1), &fdset, NULL, NULL, net_sleepforever == 0 ? &tv : NULL);
 }
 
-void NET_StartThread(void)
+#ifdef _WIN32
+
+DWORD WINAPI NET_ThreadMain(LPVOID lpThreadParameter)
+{
+	while (true)
+	{
+		while (NET_Sleep())
+		{
+			qboolean bret = FALSE;
+			for (int sock = 0; sock < NS_MAX; sock++)
+			{
+				NET_ThreadLock();
+
+				bret = NET_QueuePacket((netsrc_t)sock);
+				if (bret)
+				{
+					net_messages_t *pmsg = NET_AllocMsg(in_message.cursize);
+					pmsg->next = nullptr;
+					Q_memcpy(pmsg->buffer, in_message.data, in_message.cursize);
+					Q_memcpy(&pmsg->from, &in_from, sizeof(pmsg->from));
+
+					// add to tail of the list
+					net_messages_t *p = messages[sock];
+					if (p)
+					{
+						while (p->next)
+							p = p->next;
+
+						p->next = pmsg;
+					}
+					// add to head
+					else
+					{
+						messages[sock] = pmsg;
+					}
+				}
+
+				NET_ThreadUnlock();
+			}
+
+			if (!bret)
+				break;
+		}
+
+		Sys_Sleep(1);
+	}
+
+	return 0;
+}
+
+#endif // _WIN32
+
+void NET_StartThread()
 {
 	if (use_thread)
 	{
 		if (!net_thread_initialized)
 		{
 			net_thread_initialized = TRUE;
-			Sys_Error("%s: -netthread is not reversed yet", __func__);
+
 #ifdef _WIN32
-			/*
 			InitializeCriticalSection(&net_cs);
-			hThread = CreateThread(0, 0, (LPTHREAD_START_ROUTINE)NET_ThreadMain, 0, 0, &ThreadId);
-			if (!hThread)
+			hNetThread = CreateThread(0, 0, NET_ThreadMain, 0, 0, &dwNetThreadId);
+			if (!hNetThread)
 			{
 				DeleteCriticalSection(&net_cs);
-				net_thread_initialized = 0;
-				use_thread = 0;
+				net_thread_initialized = FALSE;
+				use_thread = FALSE;
 				Sys_Error("%s: Couldn't initialize network thread, run without -netthread\n", __func__);
 			}
-			*/
 #endif // _WIN32
 		}
 	}
 }
 
-void NET_StopThread(void)
+void NET_StopThread()
 {
 	if (use_thread)
 	{
 		if (net_thread_initialized)
 		{
 #ifdef _WIN32
-			/*
-			TerminateThread(hThread, 0);
+			TerminateThread(hNetThread, 0);
 			DeleteCriticalSection(&net_cs);
-			*/
 #endif // _WIN32
 			net_thread_initialized = FALSE;
-			Sys_Error("%s: -netthread is not reversed yet", __func__);
 		}
 	}
 }
@@ -1214,9 +1217,9 @@ net_messages_t *NET_AllocMsg(int size)
 	net_messages_t *pmsg;
 	if (size <= MSG_QUEUE_SIZE && normalqueue)
 	{
-		pmsg = normalqueue->next;
-		normalqueue->buffersize = size;
-		normalqueue = pmsg;
+		pmsg = normalqueue;
+		pmsg->buffersize = size;
+		normalqueue = pmsg->next;
 	}
 	else
 	{
@@ -1273,7 +1276,7 @@ qboolean NET_GetPacket(netsrc_t sock)
 	{
 		Q_memcpy(net_message.data, in_message.data, in_message.cursize);
 		net_message.cursize = in_message.cursize;
-		Q_memcpy(&net_from, &in_from, 0x14u);
+		Q_memcpy(&net_from, &in_from, sizeof(netadr_t));
 		NET_ThreadUnlock();
 		return bret;
 	}
@@ -1287,20 +1290,20 @@ qboolean NET_GetPacket(netsrc_t sock)
 		net_from = pmsg->from;
 		msg_readcount = 0;
 		NET_FreeMsg(pmsg);
-		bret = 1;
+		bret = TRUE;
 	}
 	NET_ThreadUnlock();
 	return bret;
 }
 
-void NET_AllocateQueues(void)
+void NET_AllocateQueues()
 {
 	net_messages_t *p;
 	for (int i = 0; i < NUM_MSG_QUEUES; i++)
 	{
 		p = (net_messages_t *)Mem_ZeroMalloc(sizeof(net_messages_t));
 		p->buffer = (unsigned char *)Mem_ZeroMalloc(MSG_QUEUE_SIZE);
-		p->preallocated = 1;
+		p->preallocated = TRUE;
 		p->next = normalqueue;
 		normalqueue = p;
 	}
@@ -1308,8 +1311,10 @@ void NET_AllocateQueues(void)
 	NET_StartThread();
 }
 
-void NET_FlushQueues(void)
+void NET_FlushQueues()
 {
+	NET_StopThread();
+
 	for (int i = 0; i < NS_MAX; i++)
 	{
 		net_messages_t *p = messages[i];
@@ -1612,7 +1617,7 @@ SOCKET NET_IPSocket(char *net_interface, int port, qboolean multicast)
 	return newsocket;
 }
 
-void NET_OpenIP(void)
+void NET_OpenIP()
 {
 	//cvar_t *ip;//unused?
 	int port;
@@ -1744,7 +1749,7 @@ SOCKET NET_IPXSocket(int hostshort)
 	return newsocket;
 }
 
-void NET_OpenIPX(void)
+void NET_OpenIPX()
 {
 	int port;
 	int dedicated;
@@ -1795,7 +1800,7 @@ void NET_OpenIPX(void)
 
 #endif // _WIN32
 
-void NET_GetLocalAddress(void)
+void NET_GetLocalAddress()
 {
 	char buff[512];
 	struct sockaddr_in address;
@@ -1888,7 +1893,7 @@ void NET_GetLocalAddress(void)
 #endif //_WIN32
 }
 
-int NET_IsConfigured(void)
+int NET_IsConfigured()
 {
 	return net_configured;
 }
@@ -1950,7 +1955,7 @@ void NET_Config(qboolean multiplayer)
 	net_configured = multiplayer ? 1 : 0;
 }
 
-void MaxPlayers_f(void)
+void MaxPlayers_f()
 {
 	if (Cmd_Argc() != 2)
 	{
@@ -1983,13 +1988,9 @@ void MaxPlayers_f(void)
 		Cvar_Set("deathmatch", "1");
 }
 
-void NET_Init(void)
+void NET_Init()
 {
-#ifdef HOOK_ENGINE
-	Cmd_AddCommand("maxplayers", (xcommand_t)GetOriginalFuncAddrOrDefault("MaxPlayers_f", (void *)MaxPlayers_f));
-#else
 	Cmd_AddCommand("maxplayers", MaxPlayers_f);
-#endif // HOOK_ENGINE
 
 	Cvar_RegisterVariable(&net_address);
 	Cvar_RegisterVariable(&ipname);
@@ -2012,10 +2013,8 @@ void NET_Init(void)
 	Cvar_RegisterVariable(&net_graphpos);
 
 	if (COM_CheckParm("-netthread"))
-	{
-		use_thread = 1;
-		Sys_Error("%s: -netthread is not reversed yet", __func__);
-	}
+		use_thread = TRUE;
+
 	if (COM_CheckParm("-netsleep"))
 		net_sleepforever = 0;
 
@@ -2073,7 +2072,7 @@ void NET_ClearLagData(qboolean bClient, qboolean bServer)
 	NET_ThreadUnlock();
 }
 
-void NET_Shutdown(void)
+void NET_Shutdown()
 {
 	NET_ThreadLock();
 

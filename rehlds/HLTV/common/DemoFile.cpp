@@ -52,8 +52,8 @@ void DemoFile::Init(IWorld *world, IServer *server, NetChannel *channel)
 
 void DemoFile::Reset()
 {
-	memset(m_FileName, 0, sizeof(m_FileName));
-	memset(&m_zeroDemoInfo, 0, sizeof(m_zeroDemoInfo));
+	Q_memset(m_FileName, 0, sizeof(m_FileName));
+	Q_memset(&m_zeroDemoInfo, 0, sizeof(m_zeroDemoInfo));
 
 	CloseFile();
 	m_Continuous = true;
@@ -251,7 +251,7 @@ bool DemoFile::StartRecording(char *newName)
 		CloseFile();
 	}
 
-	strcopy(m_FileName, newName);
+	Q_strlcpy(m_FileName, newName);
 
 	m_FileHandle = m_FileSystem->Open(m_FileName, "wb");
 	if (!m_FileHandle) {
@@ -259,8 +259,8 @@ bool DemoFile::StartRecording(char *newName)
 		return false;
 	}
 
-	memset(&m_demoHeader, 0, sizeof(m_demoHeader));
-	strcpy(m_demoHeader.szFileStamp, "HLDEMO");
+	Q_memset(&m_demoHeader, 0, sizeof(m_demoHeader));
+	Q_strcpy(m_demoHeader.szFileStamp, "HLDEMO");
 
 	COM_FileBase(m_World->GetLevelName(), m_demoHeader.szMapName);
 	COM_FileBase(m_World->GetGameDir(), m_demoHeader.szDllDir);
@@ -271,8 +271,8 @@ bool DemoFile::StartRecording(char *newName)
 	m_demoHeader.nDirectoryOffset = 0;
 	m_FileSystem->Write(&m_demoHeader, sizeof(m_demoHeader), m_FileHandle);
 
-	memset(&m_loadEntry, 0, sizeof(m_loadEntry));
-	strcpy(m_loadEntry.szDescription, "LOADING");
+	Q_memset(&m_loadEntry, 0, sizeof(m_loadEntry));
+	Q_strcpy(m_loadEntry.szDescription, "LOADING");
 
 	m_loadEntry.nEntryType = DEMO_STARTUP;
 	m_loadEntry.nOffset = m_FileSystem->Tell(m_FileHandle);
@@ -293,8 +293,8 @@ bool DemoFile::StartRecording(char *newName)
 
 	m_loadEntry.nFileLength = m_FileSystem->Tell(m_FileHandle) - m_loadEntry.nOffset;
 
-	memset(&m_gameEntry, 0, sizeof(m_gameEntry));
-	_snprintf(m_gameEntry.szDescription, sizeof(m_gameEntry.szDescription), "Playback");
+	Q_memset(&m_gameEntry, 0, sizeof(m_gameEntry));
+	Q_snprintf(m_gameEntry.szDescription, sizeof(m_gameEntry.szDescription), "Playback");
 
 	m_gameEntry.nEntryType = DEMO_NORMAL;
 	m_gameEntry.nOffset = m_FileSystem->Tell(m_FileHandle);
@@ -332,11 +332,11 @@ bool DemoFile::LoadDemo(char *demoname)
 
 	CloseFile();
 
-	strcopy(m_FileName, demoname);
-	_strlwr(m_FileName);
+	Q_strlcpy(m_FileName, demoname);
+	Q_strlwr(m_FileName);
 
-	if (!strstr(m_FileName, ".dem")) {
-		strcat(m_FileName, ".dem");
+	if (!Q_strstr(m_FileName, ".dem")) {
+		Q_strlcat(m_FileName, ".dem");
 	}
 
 	m_FileHandle = m_FileSystem->Open(m_FileName, "rb");
@@ -345,10 +345,10 @@ bool DemoFile::LoadDemo(char *demoname)
 		return false;
 	}
 
-	memset(&m_demoHeader, 0, sizeof(m_demoHeader));
+	Q_memset(&m_demoHeader, 0, sizeof(m_demoHeader));
 	m_FileSystem->Read(&m_demoHeader, sizeof(m_demoHeader), m_FileHandle);
 
-	if (strcmp(m_demoHeader.szFileStamp, "HLDEMO") != 0) {
+	if (Q_strcmp(m_demoHeader.szFileStamp, "HLDEMO") != 0) {
 		m_System->Printf("%s is not a HL demo file.\n", m_FileName);
 		m_FileSystem->Close(m_FileHandle);
 		return false;
@@ -382,13 +382,13 @@ bool DemoFile::LoadDemo(char *demoname)
 	m_nextReadTime = m_System->GetTime();
 
 	m_Continuous = true;
-	memset(&m_ServerInfo, 0, sizeof(m_ServerInfo));
+	Q_memset(&m_ServerInfo, 0, sizeof(m_ServerInfo));
 
-	strcopy(m_ServerInfo.address, m_DemoChannel->m_remote_address.ToBaseString());
-	strcopy(m_ServerInfo.name, m_FileName);
-	strcopy(m_ServerInfo.map, m_demoHeader.szMapName);
-	strcopy(m_ServerInfo.gamedir, m_demoHeader.szDllDir);
-	strcopy(m_ServerInfo.description, "Demo Playback");
+	Q_strlcpy(m_ServerInfo.address, m_DemoChannel->m_remote_address.ToBaseString());
+	Q_strlcpy(m_ServerInfo.name, m_FileName);
+	Q_strlcpy(m_ServerInfo.map, m_demoHeader.szMapName);
+	Q_strlcpy(m_ServerInfo.gamedir, m_demoHeader.szDllDir);
+	Q_strlcpy(m_ServerInfo.description, "Demo Playback");
 
 	m_ServerInfo.activePlayers = 0;
 	m_ServerInfo.maxPlayers = MAX_CLIENTS;

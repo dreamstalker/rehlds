@@ -4,29 +4,30 @@
 
 #pragma pack(push, 1)
 struct delta_test_struct_t {
-	uint8 b_00; //0
-	uint8 b_01; //1
-	uint16 s_02; //2
-	uint32 i_04; //3
-	float f_08; //4
-	float w8_0C; //5
-	uint8 b_10; //6
-	uint8 b_11; //7
-	uint16 s_12; //8
-	uint32 i_14; //9
-	float f_18; //10
-	float w8_1C; //11
-	float wb_20; //12
-	char s_24[41]; //13
-	uint8 b_4D; //14
-	int i_4E; //15
-	uint8 b_52; //16
-	char s_53[9]; //17
-	uint8 b_5C; //18
-	int i_5D; //19
-	uint8 b_61; //20
+	uint8 b_00;    // 0
+	uint8 b_01;    // 1
+	uint16 s_02;   // 2
+	uint32 i_04;   // 3
+	float f_08;    // 4
+	float w8_0C;   // 5
+	uint8 b_10;    // 6
+	uint8 b_11;    // 7
+	uint16 s_12;   // 8
+	uint32 i_14;   // 9
+	float f_18;    // 10
+	float w8_1C;   // 11
+	float wb_20;   // 12
+	char s_24[41]; // 13
+	uint8 b_4D;    // 14
+	int i_4E;      // 15
+	uint8 b_52;    // 16
+	char s_53[9];  // 17
+	uint8 b_5C;    // 18
+	int i_5D;      // 19
+	uint8 b_61;    // 20
 };
 #pragma pack(pop)
+
 typedef delta_test_struct_t dts_t;
 
 struct delta_res_t
@@ -40,7 +41,7 @@ NOINLINE void _InitDeltaField(delta_description_t* fieldDesc, int expectedOffset
 	if (expectedOffset != off) {
 		rehlds_syserror("%s: Expected and real offset mismatch (%d != %d)", expectedOffset, off);
 	}
-	
+
 	fieldDesc->fieldType = type;
 	strcpy(fieldDesc->fieldName, name);
 	fieldDesc->fieldOffset = off;
@@ -63,10 +64,12 @@ NOINLINE void _FillTestDelta(delta_test_struct_t* data, unsigned char val) {
 
 NOINLINE qboolean _DoMarkFields(void* src, void* dst, delta_t* delta, bool useJit) {
 	qboolean sendfields;
+#ifdef REHLDS_JIT
 	if (useJit) {
-		DELTA_ClearFlags(delta);
 		return DELTAJit_Fields_Clear_Mark_Check((unsigned char*)src, (unsigned char*)dst, delta, NULL);
-	} else {
+	} else
+#endif
+	{
 		DELTA_ClearFlags(delta);
 		DELTA_MarkSendFields((unsigned char*)src, (unsigned char*)dst, delta);
 		sendfields = DELTA_CountSendFields(delta);
@@ -83,7 +86,7 @@ NOINLINE void _MarkAndEnsureCorrectResults(const char* action, delta_t* delta, v
 	char localFieldsStr[512];
 	strcpy(localFieldsStr, szFields);
 
-	//parse fields
+	// parse fields
 	int prevEnd = -1;
 	for (char* pcc = localFieldsStr; *pcc; pcc++) {
 		if (*pcc == ' ') {
@@ -105,7 +108,7 @@ NOINLINE void _MarkAndEnsureCorrectResults(const char* action, delta_t* delta, v
 		fields[numFields++] = &delta->pdd[fIdx];
 	}
 
-	//build expected mask
+	// build expected mask
 	delta_marked_mask_t expectedMask; expectedMask.u64 = 0;
 	for (int i = 0; i < numFields; i++) {
 		delta_description_t* f = fields[i];
@@ -114,7 +117,7 @@ NOINLINE void _MarkAndEnsureCorrectResults(const char* action, delta_t* delta, v
 	}
 
 	if (!changed) {
-		//invert mask
+		// invert mask
 		uint64 existingFieldsMask = 0xFFFFFFFFFFFFFFFF;
 		existingFieldsMask = existingFieldsMask >> (64 - delta->fieldCount);
 
@@ -122,7 +125,7 @@ NOINLINE void _MarkAndEnsureCorrectResults(const char* action, delta_t* delta, v
 		expectedMask.u64 &= existingFieldsMask;
 	}
 
-	//calculate expected bytecount
+	// calculate expected bytecount
 	int expectedBytecount = 0;
 	for (int i = 0; i < ARRAYSIZE(expectedMask.u8); i++) {
 		if (expectedMask.u8[i]) {
@@ -130,39 +133,44 @@ NOINLINE void _MarkAndEnsureCorrectResults(const char* action, delta_t* delta, v
 		}
 	}
 
-	//do marking
+	// do marking
 	qboolean markResult = _DoMarkFields(src, dst, delta, useJit != 0);
 
-	//check marking result
+	// check marking result
 	if ((markResult != 0) != (expectedMask.u64 != 0)) {
 		rehlds_syserror("%s: DoMarkFields returned invalid value %d, expected %s", action, markResult, (expectedMask.u64 == 0) ? "0" : "!0");
 	}
 
 	delta_marked_mask_t returnedMask;
 	int returnedBytecount;
+#ifdef REHLDS_JIT
 	if (useJit) {
 		DELTAJit_SetSendFlagBits(delta, (int*)returnedMask.u32, &returnedBytecount);
-	} else {
+	} else
+#endif
+	{
 		DELTA_SetSendFlagBits(delta, (int*)returnedMask.u32, &returnedBytecount);
 	}
 
-	//check per-field marks
+	// check per-field marks
 	if (returnedMask.u64 != expectedMask.u64) {
 		rehlds_syserror("%s: DoMarkFields returned invalid mask %llX, expected %llX", action, returnedMask.u64, expectedMask.u64);
 	}
 
-	//check bytecount
+	// check bytecount
 	if (returnedBytecount != expectedBytecount) {
 		rehlds_syserror("%s: DoMarkFields returned invalid bytecount %d, expected %d", action, returnedBytecount, expectedBytecount);
-	}	
+	}
 }
 
-
 NOINLINE void _GetBitmaskAndBytecount(delta_t* delta, int* bits, int* bytecount, int usejit) {
+#ifdef REHLDS_JIT
 	if (usejit) {
 		DELTAJit_SetSendFlagBits(delta, bits, bytecount);
 	}
-	else {
+	else
+#endif
+	{
 		DELTA_SetSendFlagBits(delta, bits, bytecount);
 	}
 }
@@ -209,8 +217,9 @@ NOINLINE delta_t* _CreateTestDeltaDesc() {
 	dinfo->next = g_sv_delta;
 	g_sv_delta = dinfo;
 
+#ifdef REHLDS_JIT
 	g_DeltaJitRegistry.CreateAndRegisterDeltaJIT(delta);
-
+#endif
 	return delta;
 };
 
@@ -237,7 +246,6 @@ void _DeltaSimpleTests(delta_t* delta, delta_simpletest_data_t* tests, int tests
 		}
 	}
 }
-
 
 TEST(MarkFieldsTest_Simple_Primitives, Delta, 1000) {
 	EngineInitializer engInitGuard;
@@ -344,12 +352,9 @@ TEST(TestDelta_Test, Delta, 1000) {
 	// change float + float + string
 	testdata[2].f_18 = 2.0;
 	testdata[2].wb_20 = 2.0;
-	strcpy(testdata[2].s_24, "TestDelta_Test" );
-#ifdef REHLDS_FIXES
+	strcpy(testdata[2].s_24, "TestDelta_Test");
+
 	result[2] = delta->pdd[10].significant_bits + delta->pdd[12].significant_bits + strlen(testdata[2].s_24) * 8 + 8 + (13 / 8 * 8 + 8);
-#else
-	result[2] = delta->pdd[10].significant_bits + delta->pdd[12].significant_bits + (13 / 8 * 8 + 8);
-#endif
 
 	// change byte + int + float + short
 	testdata[3].b_4D = 4;
@@ -361,8 +366,6 @@ TEST(TestDelta_Test, Delta, 1000) {
 	for (size_t i = 0; i < 4; i++)
 	{
 		int tested = DELTA_TestDelta((uint8 *)&from, (uint8 *)&testdata[i], delta);
-
-		if (tested != result[i])
-			rehlds_syserror("TestDelta_Test: returned bitcount %i is not equal to true value %i", tested, result[i]);
+		CHECK(va("TestDelta_Test: returned bitcount %i is not equal to true value %i on iter %i", tested, result[i], i), tested == result[i]);
 	}
 }

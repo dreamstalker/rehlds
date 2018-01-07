@@ -26,45 +26,49 @@
 *
 */
 
-#include "precompiled.h"
+#pragma once
 
-#ifdef _WIN32
+#if defined(REHLDS_SSE)
 
-// DLL entry point
-BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
+inline float M_min(float a, float b)
 {
-	if (fdwReason == DLL_PROCESS_ATTACH)
-	{
-		g_RehldsRuntimeConfig.parseFromCommandLine(GetCommandLineA());
-
-#ifdef _WIN32
-		Module hlds_exe;
-		if (!FindModuleByName("hlds.exe", &hlds_exe))
-			printf("%s: launcher is not hlds.exe, tests playing/recording disabled!\n", __func__);
-		else
-			TestSuite_Init(NULL, &hlds_exe, NULL);
-
-		Rehlds_Debug_Init(NULL);
-#endif
-
-	}
-	else if (fdwReason == DLL_PROCESS_DETACH)
-	{
-
-	}
-	return TRUE;
+	return _mm_cvtss_f32(_mm_min_ss(_mm_load_ss(&a), _mm_load_ss(&b)));
 }
 
-#else // _WIN32
-
-void __attribute__((constructor)) DllMainLoad()
+inline double M_min(double a, double b)
 {
-
+	return _mm_cvtsd_f64(_mm_min_sd(_mm_load_sd(&a), _mm_load_sd(&b)));
 }
 
-void __attribute__((destructor)) DllMainUnload()
+inline float M_max(float a, float b)
 {
-
+	return _mm_cvtss_f32(_mm_max_ss(_mm_load_ss(&a), _mm_load_ss(&b)));
 }
 
-#endif // _WIN32
+inline double M_max(double a, double b)
+{
+	return _mm_cvtsd_f64(_mm_max_sd(_mm_load_sd(&a), _mm_load_sd(&b)));
+}
+
+inline float M_sqrt(float value)
+{
+	return _mm_cvtss_f32(_mm_sqrt_ss(_mm_load_ss(&value)));
+}
+
+inline double M_sqrt(double value)
+{
+	auto v = _mm_load_sd(&value);
+	return _mm_cvtsd_f64(_mm_sqrt_sd(v, v));
+}
+
+inline float M_clamp(float a, float min, float max)
+{
+	return _mm_cvtss_f32(_mm_min_ss(_mm_max_ss(_mm_load_ss(&a), _mm_load_ss(&min)), _mm_load_ss(&max)));
+}
+
+inline double M_clamp(double a, double min, double max)
+{
+	return _mm_cvtsd_f64(_mm_min_sd(_mm_max_sd(_mm_load_sd(&a), _mm_load_sd(&min)), _mm_load_sd(&max)));
+}
+
+#endif // #if defined(REHLDS_SSE)

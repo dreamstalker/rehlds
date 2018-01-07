@@ -28,88 +28,59 @@
 
 #include "precompiled.h"
 
-IBaseInterface *CreateFileSystemInterface();
-InterfaceReg iface = InterfaceReg(CreateFileSystemInterface, "VFileSystem009");
+#if defined(HOOK_FILESYSTEM)
 
-#ifdef _WIN32
-const char *ORIGINAL_ENGINE_DLL_NAME = "swds.dll";
 const char *ORIGINAL_FILESYSTEM_DLL_NAME = "filesystem_stdio2.dll";
-#else
-const char *ORIGINAL_ENGINE_DLL_NAME = "engine_i486.so";
-const char *ORIGINAL_FILESYSTEM_DLL_NAME = "filesystem_stdio2.so";
-#endif
 
-CSysModule *g_pOriginalFileSystemModule = NULL;
-CreateInterfaceFn g_OriginalFileSystemFactory = NULL;
-IFileSystem *g_pOriginalFileSystem = NULL;
+CSysModule *g_pOriginalFileSystemModule = nullptr;
+CreateInterfaceFn g_OriginalFileSystemFactory = nullptr;
+IFileSystem *g_pOriginalFileSystem = nullptr;
 
 IBaseInterface *CreateFileSystemInterface()
 {
-	if (g_pOriginalFileSystem)
+	if (g_pOriginalFileSystem) {
 		return g_pOriginalFileSystem;
+	}
 
 	if (g_pOriginalFileSystemModule)
 	{
-		g_OriginalFileSystemFactory = Sys_GetFactory(g_pOriginalFileSystemModule);
+		g_OriginalFileSystemFactory = (CreateInterfaceFn)Sys_GetFactory(g_pOriginalFileSystemModule);
+
 		if (g_OriginalFileSystemFactory)
 		{
 			int returnCode = 0;
-			g_pOriginalFileSystem = reinterpret_cast<IBaseFileSystem *>(g_OriginalFileSystemFactory(FILESYSTEM_INTERFACE_VERSION, &returnCode));
+			g_pOriginalFileSystem = (IFileSystem *)g_OriginalFileSystemFactory(FILESYSTEM_INTERFACE_VERSION, &returnCode);
 			return g_pOriginalFileSystem;
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
-#ifdef _WIN32
+EXPOSE_INTERFACE_FN(CreateFileSystemInterface, IFileSystem, FILESYSTEM_INTERFACE_VERSION);
 
 // DLL entry point
 BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 {
 	if (fdwReason == DLL_PROCESS_ATTACH)
 	{
-		g_RehldsRuntimeConfig.parseFromCommandLine(GetCommandLineA());
-
-#ifdef HOOK_ENGINE
-		size_t addr = (size_t)Sys_GetProcAddress(ORIGINAL_ENGINE_DLL_NAME, CREATEINTERFACE_PROCNAME);
+		g_pOriginalFileSystemModule = (CSysModule *)LoadLibrary(ORIGINAL_FILESYSTEM_DLL_NAME);
+		size_t addr = (size_t)Sys_GetProcAddress(ORIGINAL_FILESYSTEM_DLL_NAME, CREATEINTERFACE_PROCNAME);
 		HookModule("hlds.exe", addr);
-
-		g_pOriginalFileSystemModule = Sys_LoadModule(ORIGINAL_FILESYSTEM_DLL_NAME);
-#endif // HOOK_ENGINE
 	}
 	else if (fdwReason == DLL_PROCESS_DETACH)
 	{
 		if (g_pOriginalFileSystemModule)
 		{
 			Sys_UnloadModule(g_pOriginalFileSystemModule);
-			g_pOriginalFileSystemModule = NULL;
-			g_OriginalFileSystemFactory = NULL;
-			g_pOriginalFileSystem = NULL;
+			g_pOriginalFileSystemModule = nullptr;
+
+			g_OriginalFileSystemFactory = nullptr;
+			g_pOriginalFileSystem = nullptr;
 		}
 	}
+
 	return TRUE;
 }
 
-#else // _WIN32
-
-void __attribute__((constructor)) DllMainLoad()
-{
-	size_t addr = (size_t)Sys_GetProcAddress(ORIGINAL_ENGINE_DLL_NAME, CREATEINTERFACE_PROCNAME);
-	HookModule("hlds.exe", addr);
-
-	g_pOriginalFileSystemModule = Sys_LoadModule(ORIGINAL_FILESYSTEM_DLL_NAME);
-}
-
-void __attribute__((destructor)) DllMainUnload()
-{
-	if (g_pOriginalFileSystemModule)
-	{
-		Sys_UnloadModule(g_pOriginalFileSystemModule);
-		g_pOriginalFileSystemModule = NULL;
-		g_OriginalFileSystemFactory = NULL;
-		g_pOriginalFileSystem = NULL;
-	}
-}
-
-#endif // _WIN32
+#endif // #if defined(HOOK_FILESYSTEM)

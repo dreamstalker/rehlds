@@ -95,20 +95,20 @@ void NetAddress::FromStream(BitBuffer *stream)
 
 char *NetAddress::ToString()
 {
-	_snprintf(m_String, sizeof(m_String), "%i.%i.%i.%i:%i", m_IP[0], m_IP[1], m_IP[2], m_IP[3], ntohs(m_Port));
+	Q_snprintf(m_String, sizeof(m_String), "%i.%i.%i.%i:%i", m_IP[0], m_IP[1], m_IP[2], m_IP[3], ntohs(m_Port));
 	return m_String;
 }
 
 char *NetAddress::ToBaseString()
 {
-	_snprintf(m_String, sizeof(m_String), "%i.%i.%i.%i", m_IP[0], m_IP[1], m_IP[2], m_IP[3]);
+	Q_snprintf(m_String, sizeof(m_String), "%i.%i.%i.%i", m_IP[0], m_IP[1], m_IP[2], m_IP[3]);
 	return m_String;
 }
 
 void NetAddress::FromNetAddress(NetAddress *adr)
 {
 	if (!adr) {
-		memset(m_IP, 0, sizeof(m_IP));
+		Q_memset(m_IP, 0, sizeof(m_IP));
 		m_Port = 0;
 		return;
 	}
@@ -152,7 +152,7 @@ void NetAddress::Clear()
 	m_IP[0] = 0;
 	m_Port = 0;
 
-	memset(m_String, 0, sizeof(m_String));
+	Q_memset(m_String, 0, sizeof(m_String));
 }
 
 bool NetAddress::IsSubAdress(NetAddress *adr)

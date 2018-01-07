@@ -57,14 +57,14 @@ float TriangleDiameter(const vec_t *v1, vec_t *v2, vec_t *v3)
 	}
 
 	if (l3 > l2 && l3 > l1) {
-		return sqrt(l3);
+		return Q_sqrt(l3);
 	}
 
 	if (l2 > l3 && l2 > l1) {
-		return sqrt(l2);
+		return Q_sqrt(l2);
 	}
 
-	return sqrt(l1);
+	return Q_sqrt(l1);
 }
 
 float VectorNormalize(vec_t *v)
@@ -106,7 +106,7 @@ void VectorAngles(const float *forward, float *angles)
 		if (yaw < 0)
 			yaw += 360;
 
-		tmp = sqrt(forward[0] * forward[0] + forward[1] * forward[1]);
+		tmp = Q_sqrt(forward[0] * forward[0] + forward[1] * forward[1]);
 		pitch = float(atan2(forward[2], tmp) * 180 / M_PI);
 		if (pitch < 0)
 			pitch += 360;
@@ -119,7 +119,7 @@ void VectorAngles(const float *forward, float *angles)
 
 void VectorRAngles(const float *v, float *a)
 {
-	a[0] = atan2(v[2], sqrt(v[0] * v[0] + v[1] * v[1]));
+	a[0] = atan2(v[2], Q_sqrt(v[0] * v[0] + v[1] * v[1]));
 	a[1] = atan2(v[1], v[0]);
 	NormalizeRAngles(a);
 }
@@ -381,7 +381,7 @@ void Normal2Plane(vec_t *v1, vec_t *v2, vec_t *v3)
 
 float Length(const vec_t *v)
 {
-	return sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
+	return Q_sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
 }
 
 float DotProduct(const vec_t *v1, const vec_t *v2)

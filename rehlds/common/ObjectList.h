@@ -32,24 +32,24 @@
 
 class ObjectList: public IObjectContainer {
 public:
-	void Init();
-	bool Add(void *newObject);
-	void *GetFirst();
-	void *GetNext();
+	EXT_FUNC void Init();
+	EXT_FUNC bool Add(void *newObject);
+	EXT_FUNC void *GetFirst();
+	EXT_FUNC void *GetNext();
 
 	ObjectList();
 	virtual ~ObjectList();
 
-	void Clear(bool freeElementsMemory = false);
-	int CountElements();
+	EXT_FUNC void Clear(bool freeElementsMemory = false);
+	EXT_FUNC int CountElements();
 	void *RemoveTail();
 	void *RemoveHead();
 
 	bool AddTail(void *newObject);
 	bool AddHead(void *newObject);
-	bool Remove(void *object);
-	bool Contains(void *object);
-	bool IsEmpty();
+	EXT_FUNC bool Remove(void *object);
+	EXT_FUNC bool Contains(void *object);
+	EXT_FUNC bool IsEmpty();
 
 	typedef struct element_s {
 		struct element_s *prev;	// pointer to the last element or NULL

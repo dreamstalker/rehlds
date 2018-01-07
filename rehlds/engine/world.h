@@ -40,6 +40,9 @@ typedef struct areanode_s
 	link_t solid_edicts;
 } areanode_t;
 
+const int AREA_DEPTH = 4;
+const int AREA_NODES = 32;
+
 typedef struct moveclip_s	// TODO: Move it to world.cpp someday
 {
 	vec3_t boxmins;
@@ -57,28 +60,25 @@ typedef struct moveclip_s	// TODO: Move it to world.cpp someday
 	qboolean monsterClipBrush;
 } moveclip_t;
 
+#define CONTENTS_NONE       0 // no custom contents specified
+
+#define MOVE_NORMAL         0 // normal trace
+#define MOVE_NOMONSTERS     1 // ignore monsters (edicts with flags (FL_MONSTER|FL_FAKECLIENT|FL_CLIENT) set)
+#define MOVE_MISSILE        2 // extra size for monsters
+
+#define FMOVE_IGNORE_GLASS  0x100
+#define FMOVE_SIMPLEBOX     0x200
+
 typedef dclipnode_t box_clipnodes_t[6];
 typedef mplane_t box_planes_t[6];
 typedef mplane_t beam_planes_t[6];
-
-#ifdef HOOK_ENGINE
-
-#define box_hull (*pbox_hull)
-#define beam_hull (*pbeam_hull)
-#define box_clipnodes (*pbox_clipnodes)
-#define box_planes (*pbox_planes)
-#define beam_planes (*pbeam_planes)
-#define sv_areanodes (*psv_areanodes)
-#define sv_numareanodes (*psv_numareanodes)
-
-#endif // HOOK_ENGINE
 
 extern hull_t box_hull;
 extern hull_t beam_hull;
 extern box_clipnodes_t box_clipnodes;
 extern box_planes_t box_planes;
 extern beam_planes_t beam_planes;
-extern areanode_t sv_areanodes[32];
+extern areanode_t sv_areanodes[AREA_NODES];
 extern int sv_numareanodes;
 
 extern cvar_t sv_force_ent_intersection;
@@ -87,13 +87,13 @@ void ClearLink(link_t *l);
 void RemoveLink(link_t *l);
 void InsertLinkBefore(link_t *l, link_t *before);
 NOXREF void InsertLinkAfter(link_t *l, link_t *after);
-void SV_InitBoxHull(void);
+void SV_InitBoxHull();
 hull_t *SV_HullForBox(const vec_t *mins, const vec_t *maxs);
 NOXREF hull_t *SV_HullForBeam(const vec_t *start, const vec_t *end, const vec_t *size);
-struct hull_s *SV_HullForBsp(edict_t *ent, const vec_t *mins, const vec_t *maxs, vec_t *offset);
+hull_t *SV_HullForBsp(edict_t *ent, const vec_t *mins, const vec_t *maxs, vec_t *offset);
 hull_t *SV_HullForEntity(edict_t *ent, const vec_t *mins, const vec_t *maxs, vec_t *offset);
 areanode_t *SV_CreateAreaNode(int depth, vec_t *mins, vec_t *maxs);
-void SV_ClearWorld(void);
+void SV_ClearWorld();
 void SV_UnlinkEdict(edict_t *ent);
 void SV_TouchLinks(edict_t *ent, areanode_t *node);
 void SV_FindTouchedLeafs(edict_t *ent, mnode_t *node, int *topnode);

@@ -2,22 +2,23 @@
 **/.gradle
 .idea
 *.iml
+*.bat
+*.log
+*.lnk
 **/msvc/Debug*
 **/msvc/Release*
 **/msvc/Tests
 **/msvc/Test Fixes
-**/msvc/.vs
-**/msvc/*.db
-**/msvc/*.opendb
 **/msvc/*.sdf
 **/msvc/*.opensdf
 **/msvc/*.user
 **/msvc/*.suo
 **/msvc/*.db
 **/msvc/*.opendb
-**/msvc/PublishPath*.txt
-**/msvc/ipch
+**/msvc/*.txt
+**/msvc/*.amplxeproj
 **/msvc/.vs
+**/msvc/ipch
 
 rehlds/version/appversion.h
 rehlds/_rehldsTestImg

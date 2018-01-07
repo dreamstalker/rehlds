@@ -38,21 +38,11 @@
 
 const int FIFTEEN_MB = (15 * 1024 * 1024);
 
-#define MINIMUM_WIN_MEMORY		0x0e00000
-#define WARNING_MEMORY			0x0200000
-#define MAXIMUM_WIN_MEMORY		0x8000000 // Ask for 128 MB max
-#define MAXIMUM_DEDICATED_MEMORY	0x8000000 // Ask for 128 MB max
-#define DEFAULT_MEMORY			0x2800000
-
-#ifdef HOOK_ENGINE
-#define dedicated_ (*pdedicated)
-#define g_bIsWin95 (*pg_bIsWin95)
-#define g_bIsWin98 (*pg_bIsWin98)
-#define g_flLastSteamProgressUpdateTime (*pg_flLastSteamProgressUpdateTime)
-#define szCommonPreloads (*pszCommonPreloads)
-#define szReslistsBaseDir (*pszReslistsBaseDir)
-#define szReslistsExt (*pszReslistsExt)
-#endif
+#define MINIMUM_WIN_MEMORY       0x0e00000
+#define WARNING_MEMORY           0x0200000
+#define MAXIMUM_WIN_MEMORY       0x8000000 // Ask for 128 MB max
+#define MAXIMUM_DEDICATED_MEMORY 0x8000000 // Ask for 128 MB max
+#define DEFAULT_MEMORY           0x2800000
 
 extern IDedicatedExports *dedicated_;
 extern qboolean g_bIsWin95;
@@ -68,17 +58,17 @@ private:
 	char m_OrigCmd[1024];
 
 public:
-	virtual bool Init(char *basedir, char *cmdline, CreateInterfaceFn launcherFactory, CreateInterfaceFn filesystemFactory);
-	virtual int Shutdown();
-	virtual bool RunFrame();
-	virtual void AddConsoleText(char *text);
-	virtual void UpdateStatus(float *fps, int *nActive, int *nMaxPlayers, char *pszMap);
+	EXT_FUNC virtual bool Init(char *basedir, char *cmdline, CreateInterfaceFn launcherFactory, CreateInterfaceFn filesystemFactory);
+	EXT_FUNC virtual int Shutdown();
+	EXT_FUNC virtual bool RunFrame();
+	EXT_FUNC virtual void AddConsoleText(char *text);
+	EXT_FUNC virtual void UpdateStatus(float *fps, int *nActive, int *nMaxPlayers, char *pszMap);
 };
 
 const char *GetCurrentSteamAppName();
 NOXREF void SetRateRegistrySetting(const char *pchRate);
 NOXREF const char *GetRateRegistrySetting(const char *pchDef);
-void EXPORT F(IEngineAPI **api);
+DLL_EXPORT void F(IEngineAPI **api);
 void Sys_GetCDKey(char *pszCDKey, int *nLength, int *bDedicated);
 NOXREF void Legacy_ErrorMessage(int nLevel, const char *pszErrorMessage);
 void Legacy_Sys_Printf(char *fmt, ...);

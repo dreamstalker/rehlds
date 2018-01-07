@@ -46,11 +46,6 @@ edict_t *sv_player;
 //int giSkip;
 qboolean nofind;
 
-/*
-* Globals initialization
-*/
-#ifndef HOOK_ENGINE
-
 #if defined(SWDS) && defined(REHLDS_FIXES)
 command_t clcommands[] = { "status", "name", "kill", "pause", "spawn", "new", "sendres", "dropclient", "kick", "ping", "dlfile", "setinfo", "sendents", "fullupdate", "setpause", "unpause", NULL };
 #else
@@ -71,42 +66,20 @@ cvar_t mp_consistency = { "mp_consistency", "1", FCVAR_SERVER, 0.0f, NULL };
 cvar_t sv_voiceenable = { "sv_voiceenable", "1", FCVAR_SERVER | FCVAR_ARCHIVE, 0.0f, NULL };
 
 clc_func_t sv_clcfuncs[] = {
-		{ clc_bad, "clc_bad", NULL },
-		{ clc_nop, "clc_nop", NULL },
-		{ clc_move, "clc_move", &SV_ParseMove },
-		{ clc_stringcmd, "clc_stringcmd", &SV_ParseStringCommand },
-		{ clc_delta, "clc_delta", &SV_ParseDelta },
-		{ clc_resourcelist, "clc_resourcelist", &SV_ParseResourceList },
-		{ clc_tmove, "clc_tmove", NULL },
-		{ clc_fileconsistency, "clc_fileconsistency", &SV_ParseConsistencyResponse },
-		{ clc_voicedata, "clc_voicedata", &SV_ParseVoiceData },
-		{ clc_hltv, "clc_hltv", &SV_IgnoreHLTV },
-		{ clc_cvarvalue, "clc_cvarvalue", &SV_ParseCvarValue },
-		{ clc_cvarvalue2, "clc_cvarvalue2", &SV_ParseCvarValue2 },
-
-		{ clc_endoflist, "End of List", NULL },
+	{ clc_bad,             "clc_bad",             nullptr                      },
+	{ clc_nop,             "clc_nop",             nullptr                      },
+	{ clc_move,            "clc_move",            &SV_ParseMove                },
+	{ clc_stringcmd,       "clc_stringcmd",       &SV_ParseStringCommand       },
+	{ clc_delta,           "clc_delta",           &SV_ParseDelta               },
+	{ clc_resourcelist,    "clc_resourcelist",    &SV_ParseResourceList        },
+	{ clc_tmove,           "clc_tmove",           nullptr                      },
+	{ clc_fileconsistency, "clc_fileconsistency", &SV_ParseConsistencyResponse },
+	{ clc_voicedata,       "clc_voicedata",       &SV_ParseVoiceData           },
+	{ clc_hltv,            "clc_hltv",            &SV_IgnoreHLTV               },
+	{ clc_cvarvalue,       "clc_cvarvalue",       &SV_ParseCvarValue           },
+	{ clc_cvarvalue2,      "clc_cvarvalue2",      &SV_ParseCvarValue2          },
+	{ clc_endoflist,       "End of List",         nullptr                      },
 };
-
-#else // HOOK_ENGINE
-
-command_t clcommands[23];
-
-cvar_t sv_edgefriction;
-cvar_t sv_maxspeed;
-cvar_t sv_accelerate;
-cvar_t sv_footsteps;
-cvar_t sv_rollspeed;
-cvar_t sv_rollangle;
-cvar_t sv_unlag;
-cvar_t sv_maxunlag;
-cvar_t sv_unlagpush;
-cvar_t sv_unlagsamples;
-cvar_t mp_consistency;
-cvar_t sv_voiceenable;
-
-clc_func_t sv_clcfuncs[12];
-
-#endif // HOOK_ENGINE
 
 bool EXT_FUNC SV_CheckConsistencyResponse_API(IGameClient *client, resource_t *res, uint32 hash) {
 	return (hash != *(uint32 *)&res->rgucMD5_hash[0]);
@@ -396,8 +369,10 @@ void SV_CopyEdictToPhysent(physent_t *pe, int e, edict_t *check)
 
 	pe->origin[0] = check->v.origin[0];
 	pe->origin[1] = check->v.origin[1];
-	pe->info = e;
 	pe->origin[2] = check->v.origin[2];
+
+	pe->info = e;
+
 	if (e < 1 || e > g_psvs.maxclients)
 	{
 		pe->player = 0;
@@ -411,30 +386,32 @@ void SV_CopyEdictToPhysent(physent_t *pe, int e, edict_t *check)
 	pe->angles[0] = check->v.angles[0];
 	pe->angles[1] = check->v.angles[1];
 	pe->angles[2] = check->v.angles[2];
-	pe->studiomodel = 0;
+
+	pe->studiomodel = nullptr;
 	pe->rendermode = check->v.rendermode;
+
 	if (check->v.solid == SOLID_BSP)
 	{
 		pe->model = g_psv.models[check->v.modelindex];
-		Q_strncpy(pe->name, pe->model->name, 0x20u);
-		pe->name[31] = 0;
+		Q_strncpy(pe->name, pe->model->name, sizeof(pe->name) - 1);
+		pe->name[sizeof(pe->name) - 1] = 0;
 	}
 	else if (check->v.solid == SOLID_NOT)
 	{
 		if (check->v.modelindex)
 		{
 			pe->model = g_psv.models[check->v.modelindex];
-			Q_strncpy(pe->name, pe->model->name, 0x20u);
-			pe->name[31] = 0;
+			Q_strncpy(pe->name, pe->model->name, sizeof(pe->name) - 1);
+			pe->name[sizeof(pe->name) - 1] = 0;
 		}
 		else
 		{
-			pe->model = 0;
+			pe->model = nullptr;
 		}
 	}
 	else
 	{
-		pe->model = NULL;
+		pe->model = nullptr;
 		if (check->v.solid != SOLID_BBOX)
 		{
 			pe->mins[0] = check->v.mins[0];
@@ -443,10 +420,11 @@ void SV_CopyEdictToPhysent(physent_t *pe, int e, edict_t *check)
 			pe->mins[2] = check->v.mins[2];
 			pe->maxs[1] = check->v.maxs[1];
 			pe->maxs[2] = check->v.maxs[2];
+
 			if (check->v.classname)
 			{
-				Q_strncpy(pe->name, &pr_strings[check->v.classname], 0x20u);
-				pe->name[31] = 0;
+				Q_strncpy(pe->name, &pr_strings[check->v.classname], sizeof(pe->name) - 1);
+				pe->name[sizeof(pe->name) - 1] = 0;
 			}
 			else
 			{
@@ -460,13 +438,14 @@ void SV_CopyEdictToPhysent(physent_t *pe, int e, edict_t *check)
 				pModel = g_psv.models[check->v.modelindex];
 				if (pModel)
 				{
-					if (pModel->flags & 0x200)
+					if (pModel->flags & STUDIO_TRACE_HITBOX)
 						pe->studiomodel = pModel;
 
-					Q_strncpy(pe->name, pModel->name, 0x20u);
-					pe->name[31] = 0;
+					Q_strncpy(pe->name, pModel->name, sizeof(pe->name) - 1);
+					pe->name[sizeof(pe->name) - 1] = 0;
 				}
 			}
+
 			pe->mins[0] = check->v.mins[0];
 			pe->mins[1] = check->v.mins[1];
 			pe->mins[2] = check->v.mins[2];
@@ -475,13 +454,16 @@ void SV_CopyEdictToPhysent(physent_t *pe, int e, edict_t *check)
 			pe->maxs[2] = check->v.maxs[2];
 		}
 	}
+
 	pe->skin = check->v.skin;
 	pe->frame = check->v.frame;
 	pe->solid = check->v.solid;
 	pe->sequence = check->v.sequence;
-	Q_memcpy(pe->controller, check->v.controller, 4);
-	Q_memcpy(pe->blending, check->v.blending, 2);
 	pe->movetype = check->v.movetype;
+
+	Q_memcpy(&pe->controller[0], &check->v.controller[0], 4 * sizeof(byte));
+	Q_memcpy(&pe->blending[0], &check->v.blending[0], 2 * sizeof(byte));
+
 	pe->iuser1 = check->v.iuser1;
 	pe->iuser2 = check->v.iuser2;
 	pe->iuser3 = check->v.iuser3;
@@ -490,6 +472,7 @@ void SV_CopyEdictToPhysent(physent_t *pe, int e, edict_t *check)
 	pe->fuser2 = check->v.fuser2;
 	pe->fuser3 = check->v.fuser3;
 	pe->fuser4 = check->v.fuser4;
+
 	pe->vuser1[0] = check->v.vuser1[0];
 	pe->vuser1[1] = check->v.vuser1[1];
 	pe->vuser1[2] = check->v.vuser1[2];
@@ -499,8 +482,10 @@ void SV_CopyEdictToPhysent(physent_t *pe, int e, edict_t *check)
 	pe->vuser3[0] = check->v.vuser3[0];
 	pe->vuser3[1] = check->v.vuser3[1];
 	pe->vuser3[2] = check->v.vuser3[2];
+
 	pe->takedamage = 0;
 	pe->blooddecal = 0;
+
 	pe->vuser4[0] = check->v.vuser4[0];
 	pe->vuser4[1] = check->v.vuser4[1];
 	pe->vuser4[2] = check->v.vuser4[2];
@@ -619,8 +604,8 @@ void SV_AddLinksToPM(areanode_t *node, vec_t *origin)
 	pmove->physents[0].model = g_psv.worldmodel;
 	if (g_psv.worldmodel != NULL)
 	{
-		Q_strncpy(pmove->physents[0].name, g_psv.worldmodel->name, 0x20u);
-		pmove->physents[0].name[31] = 0;
+		Q_strncpy(pmove->physents[0].name, g_psv.worldmodel->name, sizeof(pmove->physents[0].name) - 1);
+		pmove->physents[0].name[sizeof(pmove->physents[0].name) - 1] = 0;
 	}
 	pmove->physents[0].origin[0] = vec3_origin[0];
 	pmove->physents[0].origin[1] = vec3_origin[1];
@@ -813,50 +798,62 @@ void SV_RunCmd(usercmd_t *ucmd, int random_seed)
 		sv_player->v.clbasevelocity[1] = sv_player->v.basevelocity[1];
 		sv_player->v.clbasevelocity[2] = sv_player->v.basevelocity[2];
 	}
-	pmove->server = 1;
-	pmove->multiplayer = (qboolean)(g_psvs.maxclients > 1);
+
+	pmove->server = TRUE;
+	pmove->multiplayer = (g_psvs.maxclients > 1) ? TRUE : FALSE;
 	pmove->time = float(1000.0 * host_client->svtimebase);
-	pmove->usehull = (sv_player->v.flags & 0x4000) != 0;
+	pmove->usehull = (sv_player->v.flags & FL_DUCKING) == FL_DUCKING;
 	pmove->maxspeed = sv_maxspeed.value;
 	pmove->clientmaxspeed = sv_player->v.maxspeed;
-	pmove->flDuckTime = (float) sv_player->v.flDuckTime;
+	pmove->flDuckTime = (float)sv_player->v.flDuckTime;
 	pmove->bInDuck = sv_player->v.bInDuck;
 	pmove->flTimeStepSound = sv_player->v.flTimeStepSound;
 	pmove->iStepLeft = sv_player->v.iStepLeft;
 	pmove->flFallVelocity = sv_player->v.flFallVelocity;
 	pmove->flSwimTime = (float)sv_player->v.flSwimTime;
 	pmove->oldbuttons = sv_player->v.oldbuttons;
-	Q_strncpy(pmove->physinfo, host_client->physinfo, 0xFFu);
-	pmove->physinfo[255] = 0;
+
+	Q_strncpy(pmove->physinfo, host_client->physinfo, sizeof(pmove->physinfo) - 1);
+	pmove->physinfo[sizeof(pmove->physinfo) - 1] = 0;
+
 	pmove->velocity[0] = sv_player->v.velocity[0];
 	pmove->velocity[1] = sv_player->v.velocity[1];
 	pmove->velocity[2] = sv_player->v.velocity[2];
+
 	pmove->movedir[0] = sv_player->v.movedir[0];
 	pmove->movedir[1] = sv_player->v.movedir[1];
 	pmove->movedir[2] = sv_player->v.movedir[2];
+
 	pmove->angles[0] = sv_player->v.v_angle[0];
 	pmove->angles[1] = sv_player->v.v_angle[1];
 	pmove->angles[2] = sv_player->v.v_angle[2];
+
 	pmove->basevelocity[0] = sv_player->v.basevelocity[0];
 	pmove->basevelocity[1] = sv_player->v.basevelocity[1];
 	pmove->basevelocity[2] = sv_player->v.basevelocity[2];
+
 	pmove->view_ofs[0] = sv_player->v.view_ofs[0];
 	pmove->view_ofs[1] = sv_player->v.view_ofs[1];
 	pmove->view_ofs[2] = sv_player->v.view_ofs[2];
+
 	pmove->punchangle[0] = sv_player->v.punchangle[0];
 	pmove->punchangle[1] = sv_player->v.punchangle[1];
 	pmove->punchangle[2] = sv_player->v.punchangle[2];
+
 	pmove->deadflag = sv_player->v.deadflag;
 	pmove->effects = sv_player->v.effects;
 	pmove->gravity = sv_player->v.gravity;
 	pmove->friction = sv_player->v.friction;
 	pmove->spectator = 0;
 	pmove->waterjumptime = sv_player->v.teleport_time;
+
 	Q_memcpy(&pmove->cmd, &cmd, sizeof(pmove->cmd));
+
 	pmove->dead = sv_player->v.health <= 0.0;
 	pmove->movetype = sv_player->v.movetype;
 	pmove->flags = sv_player->v.flags;
 	pmove->player_index = NUM_FOR_EDICT(sv_player) - 1;
+
 	pmove->iuser1 = sv_player->v.iuser1;
 	pmove->iuser2 = sv_player->v.iuser2;
 	pmove->iuser3 = sv_player->v.iuser3;
@@ -865,28 +862,37 @@ void SV_RunCmd(usercmd_t *ucmd, int random_seed)
 	pmove->fuser2 = sv_player->v.fuser2;
 	pmove->fuser3 = sv_player->v.fuser3;
 	pmove->fuser4 = sv_player->v.fuser4;
+
 	pmove->vuser1[0] = sv_player->v.vuser1[0];
 	pmove->vuser1[1] = sv_player->v.vuser1[1];
 	pmove->vuser1[2] = sv_player->v.vuser1[2];
+
 	pmove->vuser2[0] = sv_player->v.vuser2[0];
 	pmove->vuser2[1] = sv_player->v.vuser2[1];
 	pmove->vuser2[2] = sv_player->v.vuser2[2];
+
 	pmove->vuser3[0] = sv_player->v.vuser3[0];
 	pmove->vuser3[1] = sv_player->v.vuser3[1];
 	pmove->vuser3[2] = sv_player->v.vuser3[2];
+
 	pmove->vuser4[0] = sv_player->v.vuser4[0];
 	pmove->vuser4[1] = sv_player->v.vuser4[1];
 	pmove->vuser4[2] = sv_player->v.vuser4[2];
+
 	pmove->origin[0] = sv_player->v.origin[0];
 	pmove->origin[1] = sv_player->v.origin[1];
 	pmove->origin[2] = sv_player->v.origin[2];
+
 	SV_AddLinksToPM(sv_areanodes, pmove->origin);
+
 	pmove->frametime = frametime;
-	pmove->runfuncs = 1;
+	pmove->runfuncs = TRUE;
 	pmove->PM_PlaySound = PM_SV_PlaySound;
 	pmove->PM_TraceTexture = PM_SV_TraceTexture;
 	pmove->PM_PlaybackEventFull = PM_SV_PlaybackEventFull;
-	gEntityInterface.pfnPM_Move(pmove, 1);
+
+	gEntityInterface.pfnPM_Move(pmove, TRUE);
+
 	sv_player->v.deadflag = pmove->deadflag;
 	sv_player->v.effects = pmove->effects;
 	sv_player->v.teleport_time = pmove->waterjumptime;
@@ -897,15 +903,19 @@ void SV_RunCmd(usercmd_t *ucmd, int random_seed)
 	sv_player->v.movetype = pmove->movetype;
 	sv_player->v.maxspeed = pmove->clientmaxspeed;
 	sv_player->v.iStepLeft = pmove->iStepLeft;
+
 	sv_player->v.view_ofs[0] = pmove->view_ofs[0];
 	sv_player->v.view_ofs[1] = pmove->view_ofs[1];
 	sv_player->v.view_ofs[2] = pmove->view_ofs[2];
+
 	sv_player->v.movedir[0] = pmove->movedir[0];
 	sv_player->v.movedir[1] = pmove->movedir[1];
 	sv_player->v.movedir[2] = pmove->movedir[2];
+
 	sv_player->v.punchangle[0] = pmove->punchangle[0];
 	sv_player->v.punchangle[1] = pmove->punchangle[1];
 	sv_player->v.punchangle[2] = pmove->punchangle[2];
+
 	if (pmove->onground == -1)
 	{
 		sv_player->v.flags &= ~FL_ONGROUND;
@@ -915,15 +925,19 @@ void SV_RunCmd(usercmd_t *ucmd, int random_seed)
 		sv_player->v.flags |= FL_ONGROUND;
 		sv_player->v.groundentity = EDICT_NUM(pmove->physents[pmove->onground].info);
 	}
+
 	sv_player->v.origin[0] = pmove->origin[0];
 	sv_player->v.origin[1] = pmove->origin[1];
 	sv_player->v.origin[2] = pmove->origin[2];
+
 	sv_player->v.velocity[0] = pmove->velocity[0];
 	sv_player->v.velocity[1] = pmove->velocity[1];
 	sv_player->v.velocity[2] = pmove->velocity[2];
+
 	sv_player->v.basevelocity[0] = pmove->basevelocity[0];
 	sv_player->v.basevelocity[1] = pmove->basevelocity[1];
 	sv_player->v.basevelocity[2] = pmove->basevelocity[2];
+
 	if (!sv_player->v.fixangle)
 	{
 		sv_player->v.v_angle[0] = pmove->angles[0];
@@ -933,12 +947,14 @@ void SV_RunCmd(usercmd_t *ucmd, int random_seed)
 		sv_player->v.angles[1] = pmove->angles[1];
 		sv_player->v.angles[2] = pmove->angles[2];
 	}
+
 	sv_player->v.bInDuck = pmove->bInDuck;
 	sv_player->v.flDuckTime = (int)pmove->flDuckTime;
 	sv_player->v.flTimeStepSound = pmove->flTimeStepSound;
 	sv_player->v.flFallVelocity = pmove->flFallVelocity;
 	sv_player->v.flSwimTime = (int)pmove->flSwimTime;
 	sv_player->v.oldbuttons = pmove->cmd.buttons;
+
 	sv_player->v.iuser1 = pmove->iuser1;
 	sv_player->v.iuser2 = pmove->iuser2;
 	sv_player->v.iuser3 = pmove->iuser3;
@@ -947,18 +963,23 @@ void SV_RunCmd(usercmd_t *ucmd, int random_seed)
 	sv_player->v.fuser2 = pmove->fuser2;
 	sv_player->v.fuser3 = pmove->fuser3;
 	sv_player->v.fuser4 = pmove->fuser4;
+
 	sv_player->v.vuser1[0] = pmove->vuser1[0];
 	sv_player->v.vuser1[1] = pmove->vuser1[1];
 	sv_player->v.vuser1[2] = pmove->vuser1[2];
+
 	sv_player->v.vuser2[0] = pmove->vuser2[0];
 	sv_player->v.vuser2[1] = pmove->vuser2[1];
 	sv_player->v.vuser2[2] = pmove->vuser2[2];
+
 	sv_player->v.vuser3[0] = pmove->vuser3[0];
 	sv_player->v.vuser3[1] = pmove->vuser3[1];
 	sv_player->v.vuser3[2] = pmove->vuser3[2];
+
 	sv_player->v.vuser4[0] = pmove->vuser4[0];
 	sv_player->v.vuser4[1] = pmove->vuser4[1];
 	sv_player->v.vuser4[2] = pmove->vuser4[2];
+
 	SetMinMaxSize(sv_player, player_mins[pmove->usehull], player_maxs[pmove->usehull], 0);
 	if (host_client->edict->v.solid)
 	{
@@ -982,6 +1003,7 @@ void SV_RunCmd(usercmd_t *ucmd, int random_seed)
 		sv_player->v.velocity[1] = vel[1];
 		sv_player->v.velocity[2] = vel[2];
 	}
+
 	gGlobalVariables.time = (float)host_client->svtimebase;
 	gGlobalVariables.frametime = frametime;
 	gEntityInterface.pfnPlayerPostThink(sv_player);
@@ -1271,7 +1293,7 @@ void SV_SetupMove(client_t *_host_client)
 
 	if ( i >= SV_UPDATE_BACKUP || targettime - nextFrame->senttime > 1.0)
 	{
-		Q_memset(truepositions, 0, 0xB00u);
+		Q_memset(truepositions, 0, sizeof(truepositions));
 		nofind = 1;
 		return;
 	}

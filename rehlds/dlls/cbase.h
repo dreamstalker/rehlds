@@ -54,9 +54,9 @@ CBaseEntity
 
 #ifndef CBASE_DLLEXPORT
 #ifdef _WIN32
-#define CBASE_DLLEXPORT _declspec( dllexport )
+#define CBASE_DLLEXPORT _declspec( dllexport ) EXT_FUNC
 #else
-#define CBASE_DLLEXPORT __attribute__ ((visibility("default")))
+#define CBASE_DLLEXPORT __attribute__ ((visibility("default"))) EXT_FUNC
 #endif
 #endif
 

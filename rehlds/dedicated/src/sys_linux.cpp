@@ -94,7 +94,7 @@ void Sleep_Select(int msec)
 
 void Sleep_Net(int msec)
 {
-		NET_Sleep_Timeout();
+	NET_Sleep_Timeout();
 }
 
 // linux runs on a 100Hz scheduling clock, so the minimum latency from
@@ -152,7 +152,7 @@ void Sys_InitPingboost()
 
 	char *pPingType;
 	if (CommandLine()->CheckParm("-pingboost", &pPingType) && pPingType) {
-		int type = atoi(pPingType);
+		int type = Q_atoi(pPingType);
 		switch (type) {
 		case 1:
 			signal(SIGALRM, alarmFunc);
@@ -195,7 +195,7 @@ void Sys_WriteProcessIdFile()
 
 bool CSys::GetExecutableName(char *out)
 {
-	strcpy(out, g_szEXEName);
+	Q_strcpy(out, g_szEXEName);
 	return true;
 }
 
@@ -222,12 +222,16 @@ long CSys::LoadLibrary(char *lib)
 	if (!getcwd(cwd, sizeof(cwd)))
 		ErrorMessage(1, "Sys_LoadLibrary: Couldn't determine current directory.");
 
-	if (cwd[strlen(cwd) - 1] == '/')
-		cwd[strlen(cwd) - 1] = '\0';
+	if (cwd[Q_strlen(cwd) - 1] == '/')
+		cwd[Q_strlen(cwd) - 1] = '\0';
 
-	_snprintf(absolute_lib, sizeof(absolute_lib), "%s/%s", cwd, lib);
+	Q_snprintf(absolute_lib, sizeof(absolute_lib), "%s/%s", cwd, lib);
 
+#ifdef LAUNCHER_FIXES
+	void *hDll = dlopen(absolute_lib, RTLD_NOW | RTLD_DEEPBIND | RTLD_LOCAL);
+#else // LAUNCHER_FIXES
 	void *hDll = dlopen(absolute_lib, RTLD_NOW);
+#endif // LAUNCHER_FIXES
 	if (!hDll)
 	{
 		ErrorMessage(1, dlerror());
@@ -272,7 +276,7 @@ void CSys::Printf(char *fmt, ...)
 	char szText[1024];
 
 	va_start(argptr, fmt);
-	_vsnprintf(szText, sizeof(szText), fmt, argptr);
+	Q_vsnprintf(szText, sizeof(szText), fmt, argptr);
 	va_end(argptr);
 
 	// Get Current text and append it.
@@ -288,7 +292,7 @@ char* BuildCmdLine(int argc, char **argv)
 
 	for (int i = 1; i < argc; i++)
 	{
-		len += strlen(argv[i]) + 1;
+		len += Q_strlen(argv[i]) + 1;
 	}
 
 	if (len > MAX_LINUX_CMDLINE)
@@ -301,10 +305,10 @@ char* BuildCmdLine(int argc, char **argv)
 	for (int i = 1; i < argc; i++)
 	{
 		if (i > 1) {
-			strcat(linuxCmdline, " ");
+			Q_strlcat(linuxCmdline, " ");
 		}
 
-		strcat(linuxCmdline, argv[i]);
+		Q_strlcat(linuxCmdline, argv[i]);
 	}
 
 	return linuxCmdline;
@@ -321,7 +325,7 @@ void Sys_PrepareConsoleInput()
 
 int main(int argc, char *argv[])
 {
-	_snprintf(g_szEXEName, sizeof(g_szEXEName), "%s", argv[0]);
+	Q_snprintf(g_szEXEName, sizeof(g_szEXEName), "%s", argv[0]);
 	char* cmdline = BuildCmdLine(argc, argv);
 	StartServer(cmdline);
 

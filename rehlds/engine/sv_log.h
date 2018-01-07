@@ -36,10 +36,6 @@ typedef struct loglist
 	struct loglist *next;
 } LOGLIST_T;
 
-#ifdef HOOK_ENGINE
-#define firstLog (*pfirstLog)
-#endif // HOOK_ENGINE
-
 extern LOGLIST_T *firstLog;
 
 void Log_Printf(const char *fmt, ...);

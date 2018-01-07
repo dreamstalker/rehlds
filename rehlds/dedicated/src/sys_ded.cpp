@@ -55,7 +55,7 @@ void Sys_Printf(char *fmt, ...)
 	char szText[1024];
 
 	va_start(argptr, fmt);
-	_vsnprintf(szText, sizeof(szText), fmt, argptr);
+	Q_vsnprintf(szText, sizeof(szText), fmt, argptr);
 	va_end(argptr);
 
 	// Get Current text and append it.
@@ -80,7 +80,7 @@ void ProcessConsoleInput()
 	if (inputLine)
 	{
 		char szBuf[256];
-		_snprintf(szBuf, sizeof(szBuf), "%s\n", inputLine);
+		Q_snprintf(szBuf, sizeof(szBuf), "%s\n", inputLine);
 		engineAPI->AddConsoleText(szBuf);
 	}
 }
@@ -134,11 +134,11 @@ int RunEngine()
 		const char *steamPath = getenv("SteamInstallPath");
 		if (steamPath) {
 			// put the config dir directly under steam
-			_snprintf(szConfigDir, sizeof(szConfigDir), "%s/config", steamPath);
+			Q_snprintf(szConfigDir, sizeof(szConfigDir), "%s/config", steamPath);
 		}
 		else {
 			// we're not running steam, so just put the config dir under the platform
-			strncpy(szConfigDir, "platform/config", sizeof(szConfigDir));
+			Q_strlcpy(szConfigDir, "platform/config");
 		}
 	}*/
 #endif // VGUI

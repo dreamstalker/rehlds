@@ -136,7 +136,7 @@ bool BitBuffer::Resize(unsigned int size)
 
 void BitBuffer::Clear()
 {
-	memset(m_Data, 0, m_MaxSize);
+	Q_memset(m_Data, 0, m_MaxSize);
 
 	m_CurByte = m_Data;
 	m_CurSize = 0;
@@ -330,7 +330,7 @@ bool BitBuffer::ReadBuf(int iSize, void *pbuf)
 	}
 	else
 	{
-		memcpy(pbuf, m_CurByte, iSize);
+		Q_memcpy(pbuf, m_CurByte, iSize);
 		m_CurByte += iSize;
 	}
 
@@ -562,7 +562,7 @@ void BitBuffer::WriteString(const char *p)
 {
 	if (p)
 	{
-		WriteBuf(p, strlen(p) + 1);
+		WriteBuf(p, Q_strlen(p) + 1);
 	}
 	else
 	{
@@ -596,7 +596,7 @@ void BitBuffer::WriteBuf(const void *buf, int iSize)
 	}
 	else
 	{
-		memcpy(m_CurByte, buf, iSize);
+		Q_memcpy(m_CurByte, buf, iSize);
 		m_CurByte += iSize;
 	}
 }
@@ -867,7 +867,7 @@ void BitBuffer::FastClear()
 		iSize = m_MaxSize;
 	}
 
-	memset(m_Data, 0, iSize);
+	Q_memset(m_Data, 0, iSize);
 
 	m_CurByte = m_Data;
 	m_CurSize = 0;

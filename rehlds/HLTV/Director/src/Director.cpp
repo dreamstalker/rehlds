@@ -164,8 +164,8 @@ void Director::NewGame(IWorld *world, IProxy *proxy)
 	m_World->RegisterListener(this);
 	m_WorldModel = m_World->GetWorldModel();
 
-	memset(m_history, 0, sizeof(*m_history) * m_historyLength);
-	memset(&m_frameEvent, 0, sizeof(m_frameEvent));
+	Q_memset(m_history, 0, sizeof(*m_history) * m_historyLength);
+	Q_memset(&m_frameEvent, 0, sizeof(m_frameEvent));
 
 	ClearDirectorCommands();
 
@@ -193,7 +193,7 @@ void Director::AnalyseFrame(frame_t *frame)
 		ranks[i] = now->players[i].rank;
 	}
 
-	memset(now, 0, sizeof(*now));
+	Q_memset(now, 0, sizeof(*now));
 	for (i = 0; i < MAX_CLIENTS; i++) {
 		now->players[i].rank = ranks[i];
 	}
@@ -215,7 +215,7 @@ void Director::AnalyseFrame(frame_t *frame)
 	m_currentTime = frame->time;
 	now->time = frame->time;
 
-	unsigned int count = min(maxclients, frame->entitynum);
+	unsigned int count = Q_min(maxclients, frame->entitynum);
 	for (num = 0; num < count; num++)
 	{
 		entity_state_t *ent = &((entity_state_t *)frame->entities)[num];
@@ -246,7 +246,7 @@ void Director::AnalyseFrame(frame_t *frame)
 	now->event.entity2 = m_frameEvent.entity2;
 	now->event.flags = m_frameEvent.flags;
 
-	memset(&m_frameEvent, 0, sizeof(m_frameEvent));
+	Q_memset(&m_frameEvent, 0, sizeof(m_frameEvent));
 }
 
 void Director::SmoothRank(int playerNum, float rank)
@@ -377,7 +377,7 @@ float Director::AddBestGenericCut()
 
 	for (int i = 0; i < MAX_CLIENTS; i++)
 	{
-		memset(sumTarget2Rank, 0, sizeof(sumTarget2Rank));
+		Q_memset(sumTarget2Rank, 0, sizeof(sumTarget2Rank));
 
 		float tillTime = m_nextCutTime + 4;
 		while (tillTime > m_history[seqNrMod].time)
@@ -512,7 +512,7 @@ int Director::GetClosestPlayer(frame_t *frame, int entityIndex)
 	m_WorldModel->SetPVS(origin);
 
 	float minDistance = 32000.0f;
-	unsigned int count = min(maxclients, frame->entitynum);
+	unsigned int count = Q_min(maxclients, frame->entitynum);
 
 	for (i = 0; i < count; i++)
 	{
@@ -679,8 +679,8 @@ void Director::CMD_SlowMotion(char *cmdLine)
 		return;
 	}
 
-	float val = (float)atof(params.GetToken(1));
-	m_slowMotion = clamp(val, 0.05f, 4.0f);
+	float val = (float)Q_atof(params.GetToken(1));
+	m_slowMotion = Q_clamp(val, 0.05f, 4.0f);
 }
 
 Director::worldHistory_t *Director::FindBestEvent()

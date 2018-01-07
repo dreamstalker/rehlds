@@ -34,9 +34,10 @@
 #include "interface.h"
 #include "model.h"
 #include "ObjectList.h"
+#include "pr_dlls.h"
 
 #define REHLDS_API_VERSION_MAJOR 3
-#define REHLDS_API_VERSION_MINOR 2
+#define REHLDS_API_VERSION_MINOR 3
 
 //Steam_NotifyClientConnect hook
 typedef IHookChain<qboolean, IGameClient*, const void*, unsigned int> IRehldsHook_Steam_NotifyClientConnect;
@@ -190,6 +191,10 @@ typedef IHookChainRegistry<int, enum sv_delta_s, IGameClient *, struct packet_en
 typedef IHookChain<bool, edict_t *, IGameClient *, int, const char*, float, float, int, int, int, const float*> IRehldsHook_SV_EmitSound2;
 typedef IHookChainRegistry<bool, edict_t *, IGameClient *, int, const char*, float, float, int, int, int, const float*> IRehldsHookRegistry_SV_EmitSound2;
 
+//CreateFakeClient hook
+typedef IHookChain<edict_t *, const char *> IRehldsHook_CreateFakeClient;
+typedef IHookChainRegistry<edict_t *, const char *> IRehldsHookRegistry_CreateFakeClient;
+
 class IRehldsHookchains {
 public:
 	virtual ~IRehldsHookchains() { }
@@ -232,6 +237,7 @@ public:
 	virtual IRehldsHookRegistry_SV_Spawn_f* SV_Spawn_f() = 0;
 	virtual IRehldsHookRegistry_SV_CreatePacketEntities* SV_CreatePacketEntities() = 0;
 	virtual IRehldsHookRegistry_SV_EmitSound2* SV_EmitSound2() = 0;
+	virtual IRehldsHookRegistry_CreateFakeClient* CreateFakeClient() = 0;
 };
 
 struct RehldsFuncs_t {
@@ -285,6 +291,11 @@ struct RehldsFuncs_t {
 	bool(*StripUnprintableAndSpace)(char *pch);
 	void(*Cmd_RemoveCmd)(const char *cmd_name);
 	void(*GetCommandMatches)(const char *string, ObjectList *pMatchList);
+	bool(*AddExtDll)(void *hModule);
+	void(*AddCvarListener)(const char *var_name, cvar_callback_t func);
+	void(*RemoveExtDll)(void *hModule);
+	void(*RemoveCvarListener)(const char *var_name, cvar_callback_t func);
+	ENTITYINIT(*GetEntityInit)(char *pszClassName);
 };
 
 class IRehldsApi {

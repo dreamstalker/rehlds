@@ -314,7 +314,7 @@ int NetSocket::GetLong(unsigned char *pData, int size)
 		netSplitFlags[packetNumber] = sequenceNumber;
 	}
 
-	memcpy(&m_NetSplitPacket.buffer[SPLIT_SIZE * packetNumber], pHeader + 1, packetPayloadSize);
+	Q_memcpy(&m_NetSplitPacket.buffer[SPLIT_SIZE * packetNumber], pHeader + 1, packetPayloadSize);
 
 	if (m_NetSplitPacket.splitCount > 0) {
 		return 0;
@@ -328,7 +328,7 @@ int NetSocket::GetLong(unsigned char *pData, int size)
 
 	}
 
-	memcpy(pData, m_NetSplitPacket.buffer, m_NetSplitPacket.totalSize);
+	Q_memcpy(pData, m_NetSplitPacket.buffer, m_NetSplitPacket.totalSize);
 	return m_NetSplitPacket.totalSize;
 }
 
@@ -340,10 +340,10 @@ void NetSocket::OutOfBandPrintf(NetAddress *to, const char *format, ...)
 	*(int *)string = CONNECTIONLESS_HEADER;
 
 	va_start(argptr, format);
-	_vsnprintf(&string[4], sizeof(string) - 4, format, argptr);
+	Q_vsnprintf(&string[4], sizeof(string) - 4, format, argptr);
 	va_end(argptr);
 
-	SendPacket(to, string, strlen(string) + 1);
+	SendPacket(to, string, Q_strlen(string) + 1);
 }
 
 void NetSocket::GetFlowStats(float *avgInKBSec, float *avgOutKBSec)
@@ -412,8 +412,8 @@ bool NetSocket::Create(Network *network, int port, bool reuse, bool loopback)
 
 	m_Channels.Init();
 
-	memset(m_Buffer, 0, sizeof(m_Buffer));
-	memset(&m_NetSplitPacket, 0, sizeof(m_NetSplitPacket));
+	Q_memset(m_Buffer, 0, sizeof(m_Buffer));
+	Q_memset(&m_NetSplitPacket, 0, sizeof(m_NetSplitPacket));
 
 	if ((m_Socket = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP)) == INVALID_SOCKET) {
 		return false;
@@ -465,7 +465,7 @@ bool NetSocket::Create(Network *network, int port, bool reuse, bool loopback)
 	uint32 ttl = 32;
 	char *ttlparam = m_System->CheckParam("-multicastttl");
 	if (ttlparam) {
-		ttl = atoi(ttlparam);
+		ttl = Q_atoi(ttlparam);
 	}
 
 	if (setsockopt(m_Socket, IPPROTO_IP, IP_MULTICAST_TTL, (char *)&ttl, sizeof(ttl)) == SOCKET_ERROR) {
@@ -520,9 +520,9 @@ int NetSocket::SendLong(const char *pData, int len, int flags, const sockaddr *t
 
 	while (len > 0)
 	{
-		size = min(SPLIT_SIZE, (unsigned)len);
+		size = Q_min(SPLIT_SIZE, (unsigned)len);
 		pPacket->packetID = (packetNumber << 4) + packetCount;
-		memcpy(packet + sizeof(SPLITPACKET), pData + (packetNumber * SPLIT_SIZE), size);
+		Q_memcpy(packet + sizeof(SPLITPACKET), pData + (packetNumber * SPLIT_SIZE), size);
 
 		ret = sendto(m_Socket, packet, size + sizeof(SPLITPACKET), flags, to, tolen);
 		if (ret < 0) {
@@ -548,8 +548,8 @@ int NetSocket::SendShort(const char *pData, int len, int flags, const sockaddr *
 	}
 
 	char packet[MAX_ROUTEABLE_PACKET];
-	memcpy(packet, pData, len);
-	memset(&packet[len], 0, sizeof(packet) - len);
+	Q_memcpy(packet, pData, len);
+	Q_memset(&packet[len], 0, sizeof(packet) - len);
 
 	return sendto(m_Socket, packet, sizeof(packet), flags, to, tolen);
 }

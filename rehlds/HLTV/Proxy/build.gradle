@@ -3,6 +3,7 @@ import org.doomedsociety.gradlecpp.msvc.MsvcToolchainConfig
 import org.doomedsociety.gradlecpp.toolchain.icc.Icc
 import org.doomedsociety.gradlecpp.toolchain.icc.IccCompilerPlugin
 import org.doomedsociety.gradlecpp.gcc.GccToolchainConfig
+import org.doomedsociety.gradlecpp.GradleCppUtils
 import org.gradle.nativeplatform.NativeBinarySpec
 import org.gradle.nativeplatform.NativeLibrarySpec
 import org.gradle.nativeplatform.toolchain.VisualCpp
@@ -14,6 +15,7 @@ apply plugin: GccCompilerPlugin
 project.ext.dep_bzip2 = project(':dep/bzip2')
 
 void setupToolchain(NativeBinarySpec b) {
+	boolean useGcc = project.hasProperty("useGcc")
 	def cfg = rootProject.createToolchainConfig(b);
 	cfg.projectInclude(project, '/..', '/../..', '/src', '/../Director/src', '/../../common', '/../../engine', '/../../public', '/../../public/rehlds', '/../../pm_shared');
 	cfg.projectInclude(dep_bzip2, '/include')
@@ -33,12 +35,14 @@ void setupToolchain(NativeBinarySpec b) {
 		cfg.extraLibs "steam_api.lib", "psapi.lib", "ws2_32.lib"
 	}
 	else if (cfg instanceof GccToolchainConfig) {
-		cfg.compilerOptions.pchConfig = new GccToolchainConfig.PrecompilerHeaderOptions(
-			enabled: true,
-			pchSourceSet: 'proxy_pch'
-		);
+		if (!useGcc) {
+			cfg.compilerOptions.pchConfig = new GccToolchainConfig.PrecompilerHeaderOptions(
+				enabled: true,
+				pchSourceSet: 'proxy_pch'
+			);
+		}
 
-		cfg.compilerOptions.languageStandard = 'c++0x'
+		cfg.compilerOptions.languageStandard = 'c++11'
 		cfg.defines([
 			'_strdup': 'strdup',
 			'_stricmp': 'strcasecmp',
@@ -47,7 +51,15 @@ void setupToolchain(NativeBinarySpec b) {
 			'_snprintf': 'snprintf',
 		]);
 
-		cfg.compilerOptions.args '-Qoption,cpp,--treat_func_as_string_literal_cpp', '-fno-exceptions'
+		if (useGcc) {
+			// Produce code optimized for the most common IA32/AMD64/EM64T processors.
+			// As new processors are deployed in the marketplace, the behavior of this option will change.
+			cfg.compilerOptions.args '-mtune=generic', '-Wno-write-strings', '-msse3', '-flto'
+		} else {
+			cfg.compilerOptions.args '-Qoption,cpp,--treat_func_as_string_literal_cpp'
+		}
+
+		cfg.compilerOptions.args '-fno-exceptions'
 		cfg.projectLibpath(project, '/../../lib/linux32')
 		cfg.extraLibs "steam_api"
 	}
@@ -69,7 +81,10 @@ model {
 	toolChains {
 		visualCpp(VisualCpp) {
 		}
-		icc(Icc) {
+		if (project.hasProperty("useGcc")) {
+			gcc(Gcc)
+		} else {
+			icc(Icc)
 		}
 	}
 
@@ -147,6 +162,19 @@ model {
 	}
 }
 
+task buildFinalize << {
+	if (GradleCppUtils.windows) {
+		return;
+	}
+
+	binaries.withType(SharedLibraryBinarySpec) {
+		def sharedBinary = it.getSharedLibraryFile();
+		if (sharedBinary.exists()) {
+			sharedBinary.renameTo(new File(sharedBinary.getParent() + "/" + sharedBinary.getName().replaceFirst("^lib", "")));
+		}
+	}
+}
+
 task buildFixes {
 	dependsOn binaries.withType(SharedLibraryBinarySpec).matching { SharedLibraryBinarySpec blib ->
 		blib.buildable && blib.buildType.name == 'release'
@@ -158,6 +186,10 @@ task buildRelease {
 		blib.buildable && blib.buildType.name == 'release'
 	}
 }
+
+build.finalizedBy(buildFinalize);
+buildFixes.finalizedBy(buildFinalize);
+buildRelease.finalizedBy(buildFinalize);
 
 // prevent static lib building
 binaries.withType(StaticLibraryBinarySpec) { binary ->

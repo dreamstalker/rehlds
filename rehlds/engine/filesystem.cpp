@@ -452,7 +452,6 @@ int FileSystem_SetGameDirectory(const char *pDefaultDir, const char *pGameDir)
 	g_pFileSystem->AddSearchPath(temp, "PLATFORM");
 
 	return 1;
-
 }
 
 int FileSystem_AddFallbackGameDir(const char *pGameDir)

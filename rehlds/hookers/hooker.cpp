@@ -137,14 +137,6 @@ int HookModule(const char *pszAppName, size_t addr)
 		return (FALSE);
 	}
 
-#if defined(_WIN32) && defined(HOOK_ENGINE)
-	Module application;
-	if (!FindModuleByName(pszAppName, &application))
-		printf("%s: launcher is not %s, tests playing/recording is disabled!\n", __func__, pszAppName);
-	else
-		TestSuite_Init(&g_Module, &application, g_FunctionRefs);
-#endif
-
 	refData = g_DataRefs;
 	while (refData->addressRef != NULL)
 	{
@@ -161,23 +153,13 @@ int HookModule(const char *pszAppName, size_t addr)
 		refFunc++;
 	}
 
-#ifdef HOOK_ENGINE
-	// Actually hook all things
-	if (!g_RehldsRuntimeConfig.disableAllHooks)
-#endif // SWDS
+	hookFunc = g_FunctionHooks;
+	while (hookFunc->handlerFunc != NULL)
 	{
-		hookFunc = g_FunctionHooks;
-		while (hookFunc->handlerFunc != NULL)
-		{
-			if (!HookFunction(&g_Module, hookFunc))
-				return (FALSE);
-			hookFunc++;
-		}
+		if (!HookFunction(&g_Module, hookFunc))
+			return (FALSE);
+		hookFunc++;
 	}
-
-#if defined(_WIN32) && defined(HOOK_ENGINE)
-	Rehlds_Debug_Init(&g_Module);
-#endif // _WIN32
 
 	return (TRUE);
 }
@@ -185,42 +167,23 @@ int HookModule(const char *pszAppName, size_t addr)
 #ifdef _WIN32
 
 void *malloc_wrapper(size_t size) {
-	void *res = malloc(size);
-#ifdef HOOK_ENGINE
-	//Rehlds_Debug_logAlloc(size, res);
-#endif // HOOK_ENGINE
-	return res;
+	return malloc(size);
 }
 
 void *realloc_wrapper(void *orig, size_t newSize) {
-	void *res = realloc(orig, newSize);
-#ifdef HOOK_ENGINE
-	//Rehlds_Debug_logRealloc(newSize, orig, res);
-#endif // HOOK_ENGINE
-	return res;
+	return realloc(orig, newSize);
 }
 
 void free_wrapper(void *mem) {
-#ifdef HOOK_ENGINE
-	//Rehlds_Debug_logFree(mem);
-#endif // HOOK_ENGINE
 	free(mem);
 }
 
 void *calloc_wrapper(size_t count, size_t size) {
-	void *res = calloc(count, size);
-#ifdef HOOK_ENGINE
-	//Rehlds_Debug_logAlloc(size * count, res);
-#endif // HOOK_ENGINE
-	return res;
+	return calloc(count, size);
 }
 
 void *__nh_malloc_wrapper(size_t sz, int unk) {
-	void *res = malloc(sz);
-#ifdef HOOK_ENGINE
-	//Rehlds_Debug_logAlloc(sz, res);
-#endif // HOOK_ENGINE
-	return res;
+	return malloc(sz);
 }
 
 char *strdup_wrapper(const char *s) {

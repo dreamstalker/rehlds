@@ -16,12 +16,16 @@ rootProject.ext.createGccConfig = { boolean release, BinaryKind binKind ->
 						//intelExtensions: false,
 						//asmBlocks: true,
 
-						positionIndependentCode: false
+						positionIndependentCode: false,
+
+						extraDefines: [
+							'_GLIBCXX_USE_CXX11_ABI': 0,
+						]
 				),
 
 				linkerOptions: new GccToolchainConfig.LinkerOptions(
 						//interProceduralOptimizations: true,
-						stripSymbolTable: true,
+						stripSymbolTable: false,
 						staticLibGcc: false,
 						//staticIntel: true,
 						staticLibStdCpp: false,
@@ -41,7 +45,11 @@ rootProject.ext.createGccConfig = { boolean release, BinaryKind binKind ->
 
 						noBuiltIn: true,
 						//intelExtensions: false,
-						//asmBlocks: true
+						//asmBlocks: true,
+
+						extraDefines: [
+							'_GLIBCXX_USE_CXX11_ABI': 0,
+						]
 				),
 
 				linkerOptions: new GccToolchainConfig.LinkerOptions(
@@ -58,6 +66,6 @@ rootProject.ext.createGccConfig = { boolean release, BinaryKind binKind ->
 		)
 	}
 
-	cfg.singleDefines('LINUX')
+	cfg.singleDefines('LINUX', '_LINUX')
 	return cfg
 }

@@ -33,22 +33,9 @@ qboolean g_bIsWin95;
 qboolean g_bIsWin98;
 double g_flLastSteamProgressUpdateTime;
 
-/*
-* Globals initialization
-*/
-#ifndef HOOK_ENGINE
-
 char *szCommonPreloads = "multiplayer_preloads";
 char *szReslistsBaseDir = "reslists";
 char *szReslistsExt = ".lst";
-
-#else // HOOK_ENGINE
-
-char *szCommonPreloads;
-char *szReslistsBaseDir;
-char *szReslistsExt;
-
-#endif // HOOK_ENGINE
 
 const char *GetCurrentSteamAppName(void)
 {
@@ -88,7 +75,7 @@ NOXREF const char *GetRateRegistrySetting(const char *pchDef)
 	return registry->ReadString("rate", pchDef);
 }
 
-void EXPORT F(IEngineAPI **api)
+DLL_EXPORT void F(IEngineAPI **api)
 {
 	CreateInterfaceFn fn;
 	fn = Sys_GetFactoryThis();
@@ -574,15 +561,13 @@ void ClearIOStates(void)
 class CEngineAPI: public IEngineAPI
 {
 public:
-	int Run(void *instance, char *basedir, char *cmdline, char *postRestartCmdLineArgs, CreateInterfaceFn launcherFactory, CreateInterfaceFn filesystemFactory)
+	EXT_FUNC int Run(void *instance, char *basedir, char *cmdline, char *postRestartCmdLineArgs, CreateInterfaceFn launcherFactory, CreateInterfaceFn filesystemFactory)
 	{
 		return 0;
 	}
 };
 
-#ifndef HOOK_ENGINE
 EXPOSE_SINGLE_INTERFACE(CEngineAPI, IEngineAPI, VENGINE_LAUNCHER_API_VERSION);
-#endif // HOOK_ENGINE
 
 // TODO: Needs rechecking
 /*
@@ -728,6 +713,4 @@ void CDedicatedServerAPI::UpdateStatus(float *fps, int *nActive, int *nMaxPlayer
 	Host_GetHostInfo(fps, nActive, NULL, nMaxPlayers, pszMap);
 }
 
-#ifndef HOOK_ENGINE
 EXPOSE_SINGLE_INTERFACE(CDedicatedServerAPI, IDedicatedServerAPI, VENGINE_HLDS_API_VERSION);
-#endif // HOOK_ENGINE

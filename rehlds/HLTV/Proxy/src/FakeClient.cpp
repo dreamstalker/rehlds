@@ -40,7 +40,7 @@ bool FakeClient::Init(IBaseSystem *system, int serial, char *name)
 {
 	BaseSystemModule::Init(system, serial, name);
 
-	_snprintf(m_Name, sizeof(m_Name), "fakeclient%i", serial);
+	Q_snprintf(m_Name, sizeof(m_Name), "fakeclient%i", serial);
 
 	m_Network = dynamic_cast<INetwork *>(m_System->GetModule(NETWORK_INTERFACE_VERSION, "core"));
 	if (!m_Network)
@@ -56,7 +56,7 @@ bool FakeClient::Init(IBaseSystem *system, int serial, char *name)
 	}
 
 	char temp[256];
-	sprintf(temp, "fakeserver%i", serial);
+	Q_sprintf(temp, "fakeserver%i", serial);
 
 	m_Server = dynamic_cast<IServer *>(m_System->GetModule(SERVER_INTERFACE_VERSION, "core", temp));
 	if (!m_Server)
@@ -72,7 +72,7 @@ bool FakeClient::Init(IBaseSystem *system, int serial, char *name)
 	m_Server->SetPlayerName(m_Name);
 	m_Server->SetAutoRetry(false);
 
-	sprintf(temp, "fakeworld%i", serial);
+	Q_sprintf(temp, "fakeworld%i", serial);
 
 	m_World = dynamic_cast<IWorld *>(m_System->GetModule(WORLD_INTERFACE_VERSION, "core", temp));
 	if (!m_World)
@@ -121,7 +121,7 @@ void FakeClient::Say(char *text)
 		return;
 
 	char string[1024];
-	_snprintf(string, sizeof(string), "say \"%s\"", text);
+	Q_snprintf(string, sizeof(string), "say \"%s\"", text);
 	m_Server->SendStringCommand(text);
 }
 

@@ -113,7 +113,7 @@ void CSys::UpdateStatus(int force)
 	}
 
 	tLast = tCurrent;
-	_snprintf(szStatus, sizeof(szStatus), "%.1f fps %2i/%2i on %16s", fps, n, nMax, szMap);
+	Q_snprintf(szStatus, sizeof(szStatus), "%.1f fps %2i/%2i on %16s", fps, n, nMax, szMap);
 
 	console.SetStatusLine(szStatus);
 	console.UpdateStatus();
@@ -178,7 +178,7 @@ void CSys::Printf(char *fmt, ...)
 	char szText[1024];
 
 	va_start(argptr, fmt);
-	_vsnprintf(szText, sizeof(szText), fmt, argptr);
+	Q_vsnprintf(szText, sizeof(szText), fmt, argptr);
 	va_end(argptr);
 
 	// Get Current text and append it.

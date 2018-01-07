@@ -132,7 +132,7 @@ bool Server::Init(IBaseSystem *system, int serial, char *name)
 	m_ClientData.Resize(MAX_UDP_PACKET);
 	m_DemoData.Resize(MAX_UDP_PACKET);
 
-	memset(&m_Frame, 0, sizeof(m_Frame));
+	Q_memset(&m_Frame, 0, sizeof(m_Frame));
 
 	m_Frame.reliableData   = m_ReliableData.GetData();
 	m_Frame.unreliableData = m_UnreliableData.GetData();
@@ -148,10 +148,10 @@ bool Server::Init(IBaseSystem *system, int serial, char *name)
 	m_ClientData.Clear();
 	m_DemoData.Clear();
 
-	strcopy(m_CDKey, "2123437429222");
-	strcopy(m_HostName, "Unkown Host");
+	Q_strlcpy(m_CDKey, "2123437429222");
+	Q_strlcpy(m_HostName, "Unkown Host");
 
-	memset(m_SeqNrMap, 0, sizeof(m_SeqNrMap));
+	Q_memset(m_SeqNrMap, 0, sizeof(m_SeqNrMap));
 	m_validSequence = 0;
 	m_AutoRetry = true;
 	m_IsHLTV = true;
@@ -174,13 +174,13 @@ void Server::SetGameDirectory(const char *defaultDir, const char *gameDir)
 	char temp[MAX_PATH];
 	m_FileSystem->RemoveAllSearchPaths();
 
-	if (gameDir && _stricmp(gameDir, defaultDir) != 0)
+	if (gameDir && Q_stricmp(gameDir, defaultDir) != 0)
 	{
-		sprintf(temp, "%s/%s", m_System->GetBaseDir(), gameDir);
+		Q_sprintf(temp, "%s/%s", m_System->GetBaseDir(), gameDir);
 		m_FileSystem->AddSearchPath(temp, "GAME");
 	}
 
-	sprintf(temp, "%s/%s", m_System->GetBaseDir(), defaultDir);
+	Q_sprintf(temp, "%s/%s", m_System->GetBaseDir(), defaultDir);
 	m_FileSystem->AddSearchPath(temp, "DEFAULTGAME");
 	m_FileSystem->AddSearchPath(m_System->GetBaseDir(), "ROOT");
 }
@@ -451,8 +451,8 @@ void Server::AcceptChallenge(char *cmdLine)
 		return;
 	}
 
-	m_ChallengeNumber = atoi(params.GetToken(1));
-	m_AuthProtocol = atoi(params.GetToken(2));
+	m_ChallengeNumber = Q_atoi(params.GetToken(1));
+	m_AuthProtocol = Q_atoi(params.GetToken(2));
 	m_AuthProtocol = 2;
 
 	if (m_AuthProtocol == 2)
@@ -480,13 +480,13 @@ void Server::SetVoiceBlocking(bool state)
 
 void Server::SetRate(int rate)
 {
-	m_Rate = clamp(rate, 1000, MAX_SERVER_RATE);
+	m_Rate = Q_clamp(rate, 1000, MAX_SERVER_RATE);
 	SetUserInfo("rate", COM_VarArgs("%i", m_Rate));
 }
 
 void Server::SetUpdateRate(int updaterate)
 {
-	m_UpdateRate = clamp(updaterate, 1, MAX_SERVER_UPDATERATE);
+	m_UpdateRate = Q_clamp(updaterate, 1, MAX_SERVER_UPDATERATE);
 	SetUserInfo("cl_updaterate", COM_VarArgs("%i", m_UpdateRate));
 }
 
@@ -612,7 +612,7 @@ void Server::SendConnectPacket()
 			return;
 		}
 
-		strcopy(buffer, MD5_GetCDKeyHash(m_CDKey));
+		Q_strlcpy(buffer, MD5_GetCDKeyHash(m_CDKey));
 	}
 
 	protinfo.SetValueForKey("prot", COM_VarArgs("%i", m_AuthProtocol));
@@ -623,8 +623,8 @@ void Server::SendConnectPacket()
 		protinfo.SetValueForKey("cdkey", MD5_GetCDKeyHash(m_CDKey));
 	}
 
-	_snprintf(data, sizeof(data), "%c%c%c%cconnect %i %i \"%s\" \"%s\"\n", 0xFF, 0xFF, 0xFF, 0xFF, m_Protocol, m_ChallengeNumber, protinfo.GetString(), m_UserInfo.GetString());
-	m_ServerSocket->SendPacket(m_ServerChannel.GetTargetAddress(), data, strlen(data));
+	Q_snprintf(data, sizeof(data), "%c%c%c%cconnect %i %i \"%s\" \"%s\"\n", 0xFF, 0xFF, 0xFF, 0xFF, m_Protocol, m_ChallengeNumber, protinfo.GetString(), m_UserInfo.GetString());
+	m_ServerSocket->SendPacket(m_ServerChannel.GetTargetAddress(), data, Q_strlen(data));
 
 	m_System->Printf("Connecting to %s (%i/%i).\n", m_ServerChannel.GetTargetAddress()->ToString(), m_CurrentRetry, MAX_CONNECT_RETRIES);
 	nextRetry = m_SystemTime + CONNECT_RETRY_INTERVAL;
@@ -702,7 +702,7 @@ void Server::ParseVoiceInit()
 	char *codec = m_Instream->ReadString();
 	unsigned char quality = m_Instream->ReadByte();
 
-	int length = strlen(codec);
+	int length = Q_strlen(codec);
 	if (m_ServerState == SERVER_CONNECTED) {
 		m_World->AddSignonData(svc_voiceinit, start, length + 2);
 	}
@@ -787,9 +787,9 @@ void Server::ParseServerinfo()
 	char levelname[MAX_PATH];
 	int gametype = m_Instream->ReadByte();
 
-	strcopy(gamedir, m_Instream->ReadString());
-	strcopy(m_HostName, m_Instream->ReadString());
-	strcopy(levelname, m_Instream->ReadString());
+	Q_strlcpy(gamedir, m_Instream->ReadString());
+	Q_strlcpy(m_HostName, m_Instream->ReadString());
+	Q_strlcpy(levelname, m_Instream->ReadString());
 
 	m_Instream->SkipString();
 
@@ -853,7 +853,7 @@ void Server::ParseMoveVars()
 	movevars.skyvec_y          = m_Instream->ReadFloat();
 	movevars.skyvec_z          = m_Instream->ReadFloat();
 
-	strcopy(movevars.skyName, m_Instream->ReadString());
+	Q_strlcpy(movevars.skyName, m_Instream->ReadString());
 	m_World->SetMoveVars(&movevars);
 }
 
@@ -967,7 +967,7 @@ void Server::ParseStuffText()
 		return;
 	}
 
-	if (!_stricmp(cmd, "fullserverinfo"))
+	if (!Q_stricmp(cmd, "fullserverinfo"))
 	{
 		char *infostring = cmdLine.GetToken(1);
 		m_ServerInfo.SetString(infostring);
@@ -998,7 +998,7 @@ void Server::ParseStuffText()
 		BaseSystemModule::FireSignal(4);
 		return;
 	}
-	else if (!_stricmp(cmd, "reconnect"))
+	else if (!Q_stricmp(cmd, "reconnect"))
 	{
 		if (IsDemoFile())
 		{
@@ -1017,7 +1017,7 @@ void Server::ParseStuffText()
 		m_IsPaused = false;
 		return;
 	}
-	else if (!_stricmp(cmd, "connect"))
+	else if (!Q_stricmp(cmd, "connect"))
 	{
 		if (m_ServerSocket && m_World)
 		{
@@ -1035,18 +1035,18 @@ void Server::ParseStuffText()
 
 		return;
 	}
-	else if (!_stricmp(cmd, "rate")
-		|| !_stricmp(cmd, "cl_updaterate")
-		|| !_stricmp(cmd, "ex_interp")
-		|| !_stricmp(cmd, "cl_cmdrate")
-		|| !_stricmp(cmd, "cl_cmdbackup"))
+	else if (!Q_stricmp(cmd, "rate")
+		|| !Q_stricmp(cmd, "cl_updaterate")
+		|| !Q_stricmp(cmd, "ex_interp")
+		|| !Q_stricmp(cmd, "cl_cmdrate")
+		|| !Q_stricmp(cmd, "cl_cmdbackup"))
 	{
 		return;
 	}
 
 	if (m_ServerState == SERVER_CONNECTED)
 	{
-		m_World->AddSignonData(svc_stufftext, (unsigned char *)cmdLine.GetLine(), strlen(cmdLine.GetLine()) + 1);
+		m_World->AddSignonData(svc_stufftext, (unsigned char *)cmdLine.GetLine(), Q_strlen(cmdLine.GetLine()) + 1);
 	}
 	else if (m_ServerState == SERVER_RUNNING || m_ServerState == SERVER_INTERMISSION)
 	{
@@ -1092,11 +1092,11 @@ void Server::ParseResourceList()
 	for (int i = 0; i < total; i++)
 	{
 		resource_t resource;
-		memset(&resource, 0, sizeof(resource));
+		Q_memset(&resource, 0, sizeof(resource));
 
 		resource.type = (resourcetype_t)m_Instream->ReadBits(4);
 
-		strcopy(resource.szFileName, m_Instream->ReadBitString());
+		Q_strlcpy(resource.szFileName, m_Instream->ReadBitString());
 
 		resource.nIndex = m_Instream->ReadBits(12);
 		resource.nDownloadSize = m_Instream->ReadBits(24);
@@ -1110,7 +1110,7 @@ void Server::ParseResourceList()
 			m_Instream->ReadBitData(resource.rguc_reserved, sizeof(resource.rguc_reserved));
 		}
 
-		if (strncmp(resource.szFileName, "gfx/temp/", 9) != 0) {
+		if (Q_strncmp(resource.szFileName, "gfx/temp/", 9) != 0) {
 			m_World->AddResource(&resource);
 		}
 	}
@@ -1348,10 +1348,10 @@ void Server::ParseSignonNum()
 		SendStringCommand(COM_VarArgs("VModEnable %d", m_IsVoiceBlocking ? 0 : 1));
 
 		char string[128];
-		strcopy(string, "vban");
+		Q_strlcpy(string, "vban");
 
 		for (int i = 0; i < MAX_CLIENTS; i++) {
-			strcat(string, " 0");
+			Q_strlcat(string, " 0");
 		}
 
 		SendStringCommand(string);
@@ -1373,7 +1373,7 @@ void Server::ParseCustomization()
 	resource_t *resource = (resource_t *)Mem_ZeroMalloc(sizeof(resource_t));
 	resource->type = (resourcetype_t)m_Instream->ReadByte();
 
-	strcopy(resource->szFileName, m_Instream->ReadString());
+	Q_strlcpy(resource->szFileName, m_Instream->ReadString());
 
 	resource->nIndex = m_Instream->ReadShort();
 	resource->nDownloadSize = m_Instream->ReadLong();
@@ -1414,7 +1414,7 @@ void Server::ClearFrame(bool completely)
 	m_Frame.eventsSize = 0;
 	m_Frame.demoInfo = 0;
 
-	memset(&m_DemoInfo, 0, sizeof(m_DemoInfo));
+	Q_memset(&m_DemoInfo, 0, sizeof(m_DemoInfo));
 	m_Frame.unreliableDataSize = 0;
 	m_Frame.voiceDataSize = 0;
 	m_Frame.clientDataSize = 0;
@@ -1462,25 +1462,25 @@ bool Server::ParseUserMessage(int cmd)
 		m_System->Printf("WARNING! Server::ParseUserMessage: unexpected server state.\n");
 	}
 
-	if (!strcmp(usermsg->szName, "SayText"))
+	if (!Q_strcmp(usermsg->szName, "SayText"))
 	{
 		m_System->Printf("%s\n", start + 2);
 	}
-	else if (!strcmp(usermsg->szName, "TextMsg"))
+	else if (!Q_strcmp(usermsg->szName, "TextMsg"))
 	{
 		m_System->DPrintf("%s\n", start + 2);
 	}
-	else if (!strcmp(usermsg->szName, "ReqState"))
+	else if (!Q_strcmp(usermsg->szName, "ReqState"))
 	{
 		char cmdString[32];
-		_snprintf(cmdString, sizeof(cmdString), "VModEnable %d", m_IsVoiceBlocking == 0);
+		Q_snprintf(cmdString, sizeof(cmdString), "VModEnable %d", m_IsVoiceBlocking == 0);
 		SendStringCommand(cmdString);
 
 		char string[128];
-		strcopy(string, "vban");
+		Q_strlcpy(string, "vban");
 
 		for (int i = 0; i < MAX_CLIENTS; i++) {
-			strcat(string, " 0");
+			Q_strlcat(string, " 0");
 		}
 
 		SendStringCommand(string);
@@ -1503,7 +1503,7 @@ void Server::ParsePacketEntities()
 	m_Frame.entitiesSize = sizeof(entity_state_t) * entnum;
 	m_Frame.entities = m_EntityBuffer;
 
-	memset(m_EntityBuffer, 0, m_Frame.entitiesSize);
+	Q_memset(m_EntityBuffer, 0, m_Frame.entitiesSize);
 	m_World->UncompressEntitiesFromStream(&m_Frame, m_Instream);
 }
 
@@ -1518,7 +1518,7 @@ void Server::ParseDeltaPacketEntities()
 	m_Frame.entitynum = entnum;
 	m_Frame.entitiesSize = sizeof(entity_state_t) * entnum;
 	m_Frame.entities = m_EntityBuffer;
-	memset(m_EntityBuffer, 0, m_Frame.entitiesSize);
+	Q_memset(m_EntityBuffer, 0, m_Frame.entitiesSize);
 
 	int from = m_Instream->ReadByte();
 	if (!m_World->UncompressEntitiesFromStream(&m_Frame, m_Instream, m_SeqNrMap[from])) {
@@ -1763,27 +1763,27 @@ char *Server::GetStatusLine()
 	switch (m_ServerState)
 	{
 	case SERVER_INITIALIZING:
-		_snprintf(string, sizeof(string), "Initializing.\n");
+		Q_snprintf(string, sizeof(string), "Initializing.\n");
 		break;
 	case SERVER_DISCONNECTED:
-		_snprintf(string, sizeof(string), "Disconnected.\n");
+		Q_snprintf(string, sizeof(string), "Disconnected.\n");
 		break;
 	case SERVER_CHALLENGING:
-		_snprintf(string, sizeof(string), "challenging %s.\n", m_ServerChannel.GetTargetAddress()->ToString());
+		Q_snprintf(string, sizeof(string), "challenging %s.\n", m_ServerChannel.GetTargetAddress()->ToString());
 		break;
 	case SERVER_AUTHENTICATING:
-		_snprintf(string, sizeof(string), "Authenticating.\n");
+		Q_snprintf(string, sizeof(string), "Authenticating.\n");
 		break;
 	case SERVER_CONNECTING:
-		_snprintf(string, sizeof(string), "Connecting to %s.\n", m_ServerChannel.GetTargetAddress()->ToString());
+		Q_snprintf(string, sizeof(string), "Connecting to %s.\n", m_ServerChannel.GetTargetAddress()->ToString());
 		break;
 	case SERVER_CONNECTED:
 	case SERVER_RUNNING:
 		m_ServerChannel.GetFlowStats(&in, &out);
-		_snprintf(string, sizeof(string), "Connected to %s, Time %.0f, In %.2f, Out %.2f.\n", m_ServerChannel.GetTargetAddress()->ToString(), m_SystemTime - m_ServerChannel.m_connect_time, in, out);
+		Q_snprintf(string, sizeof(string), "Connected to %s, Time %.0f, In %.2f, Out %.2f.\n", m_ServerChannel.GetTargetAddress()->ToString(), m_SystemTime - m_ServerChannel.m_connect_time, in, out);
 		break;
 	case SERVER_INTERMISSION:
-		_snprintf(string, sizeof(string), "Intermission (%s).\n", m_ServerChannel.GetTargetAddress()->ToString());
+		Q_snprintf(string, sizeof(string), "Intermission (%s).\n", m_ServerChannel.GetTargetAddress()->ToString());
 		break;
 	default:
 		m_System->Errorf("Server::GetStatusLine: not valid state.\n");
@@ -1869,11 +1869,11 @@ void Server::ParseInfo(BitBuffer *stream, bool detailed)
 {
 	serverinfo_t si;
 
-	strcopy(si.address, m_ServerChannel.GetTargetAddress()->ToBaseString());
-	strcopy(si.name, stream->ReadString());
-	strcopy(si.map, stream->ReadString());
-	strcopy(si.gamedir, stream->ReadString());
-	strcopy(si.description, stream->ReadString());
+	Q_strlcpy(si.address, m_ServerChannel.GetTargetAddress()->ToBaseString());
+	Q_strlcpy(si.name, stream->ReadString());
+	Q_strlcpy(si.map, stream->ReadString());
+	Q_strlcpy(si.gamedir, stream->ReadString());
+	Q_strlcpy(si.description, stream->ReadString());
 
 	si.activePlayers = stream->ReadByte();
 	si.maxPlayers = stream->ReadByte();
@@ -1888,9 +1888,9 @@ void Server::ParseInfo(BitBuffer *stream, bool detailed)
 
 		if (si.mod)
 		{
-			strcopy(si.url_info, stream->ReadString());
-			strcopy(si.url_dl, stream->ReadString());
-			strcopy(si.hlversion, stream->ReadString());
+			Q_strlcpy(si.url_info, stream->ReadString());
+			Q_strlcpy(si.url_dl, stream->ReadString());
+			Q_strlcpy(si.hlversion, stream->ReadString());
 
 			si.ver = stream->ReadLong();
 			si.size = stream->ReadLong();
@@ -2021,7 +2021,7 @@ void Server::SendUserVar(char *key, char *value)
 
 	if (*value)
 	{
-		_snprintf(cmdString, sizeof(cmdString), "setinfo \"%s\" \"%s\"\n", key, value);
+		Q_snprintf(cmdString, sizeof(cmdString), "setinfo \"%s\" \"%s\"\n", key, value);
 		SendStringCommand(cmdString);
 	}
 }
@@ -2055,7 +2055,7 @@ void Server::ParseCenterPrint()
 	char *string = m_Instream->ReadString();
 	if (m_ServerState == SERVER_CONNECTED)
 	{
-		m_World->AddSignonData(svc_centerprint, (unsigned char *)string, strlen(string) + 1);
+		m_World->AddSignonData(svc_centerprint, (unsigned char *)string, Q_strlen(string) + 1);
 	}
 	else if (m_ServerState == SERVER_RUNNING || m_ServerState == SERVER_INTERMISSION)
 	{
@@ -2211,7 +2211,7 @@ void Server::ParseResourceLocation()
 {
 	char *url = m_Instream->ReadString();
 	if (url) {
-		strcopy(g_DownloadURL, url);
+		Q_strlcpy(g_DownloadURL, url);
 	}
 }
 
@@ -2274,7 +2274,7 @@ void Server::Reset()
 	m_ServerChannel.Close();
 
 	ClearFrame(true);
-	memset(m_SeqNrMap, 0, sizeof(m_SeqNrMap));
+	Q_memset(m_SeqNrMap, 0, sizeof(m_SeqNrMap));
 
 	m_validSequence = 0;
 	m_CurrentRetry = 0;
@@ -2296,16 +2296,16 @@ char *Server::GetCmdName(int cmd)
 		UserMsg *usermsg = m_World->GetUserMsg(cmd);
 		if (usermsg)
 		{
-			_snprintf(description, sizeof(description), "UserMsg:%s", usermsg->szName);
+			Q_snprintf(description, sizeof(description), "UserMsg:%s", usermsg->szName);
 		}
 		else
 		{
-			_snprintf(description, sizeof(description), "Invalid UserMsg");
+			Q_snprintf(description, sizeof(description), "Invalid UserMsg");
 		}
 	}
 	else
 	{
-		_snprintf(description, sizeof(description), "EngMsg:%s", m_ClientFuncs[cmd].pszname);
+		Q_snprintf(description, sizeof(description), "EngMsg:%s", m_ClientFuncs[cmd].pszname);
 	}
 
 	return description;
@@ -2313,7 +2313,7 @@ char *Server::GetCmdName(int cmd)
 
 void Server::SetName(char *newName)
 {
-	strcopy(m_Name, newName);
+	Q_strlcpy(m_Name, newName);
 }
 
 void Server::ProcessEntityUpdate()

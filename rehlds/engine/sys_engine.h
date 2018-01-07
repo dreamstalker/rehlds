@@ -35,11 +35,6 @@
 const int MINIMIZED_SLEEP = 20;
 const int NOT_FOCUS_SLEEP = 50;	// sleep time when not focus
 
-#ifdef HOOK_ENGINE
-#define game (*pgame)
-#define eng (*peng)
-#endif // HOOK_ENGINE
-
 extern IGame* game;
 extern IEngine* eng;
 

@@ -3,7 +3,7 @@
 Reverse-engineered (and bugfixed) HLDS
 
 ## What is this?
-Rehlds is a result of reverse engineering of original HLDS (build 6152/6153) using DWARF debug info embedded into linux version of HLDS, engine_i486.so
+ReHLDS is a result of reverse engineering of original HLDS (build 6152/6153) using DWARF debug info embedded into linux version of HLDS, engine_i486.so
 
 Along with reverse engineering, a lot of defects and (potential) bugs were found and fixed
 
@@ -56,6 +56,13 @@ Bugfixed version of rehlds contains an additional cvars:
 <li>sv_rehlds_attachedentities_playeranimationspeed_fix // Fixes bug with gait animation speed increase when player has some attached entities (aiments). Can cause animation lags when cl_updaterate is low. Default: 0
 </ul>
 
+## Commands
+Bugfixed version of rehlds contains an additional commands:
+<ul>
+<li>rescount // Prints the total count of precached resources in the server console
+<li>reslist &lt;sound | model | decal | generic | event&gt; // Separately prints the details of the precached resources for sounds, models, decals, generic and events in server console. Useful for managing resources and dealing with the goldsource precache limits.
+</ul>
+
 ## Build instructions
 There are several software requirements for building rehlds:
 <ol>
@@ -93,6 +100,7 @@ On Windows:
 <pre>gradlew --max-workers=1 clean buildRelease</pre>
 * For faster building without unit tests use this:exclamation:
 <pre>gradlew --max-workers=1 clean buildFixes</pre>
+<b>NOTE:</b> You can also use `Visual Studio` to build, just select from the solution configurations list `Release Swds` or `Debug Swds`<br />
 
 On Linux (ICC):
 <pre>./gradlew --max-workers=1 clean buildRelease</pre>
@@ -104,6 +112,7 @@ On Linux (GCC):
 * For faster building without unit tests use this:exclamation:
 <pre>./gradlew --max-workers=1 -PuseGcc clean buildFixes</pre>
 
+Also there is a task `buildEngine`, it builds only engine, without other parts of the project.<br />
 Compiled binaries will be placed in the rehlds/build/binaries/ directory
 
 ## How can I help the project?
