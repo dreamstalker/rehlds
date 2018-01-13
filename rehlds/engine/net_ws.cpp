@@ -1549,25 +1549,22 @@ SOCKET NET_IPSocket(char *net_interface, int port, qboolean multicast)
 void NET_OpenIP()
 {
 	//cvar_t *ip;//unused?
-	int port;
-	int dedicated;
 	int sv_port = 0;
 	int cl_port = 0;
 	//int mc_port;//unused?
-	static qboolean bFirst = TRUE;
 
-	dedicated = g_pcls.state == ca_dedicated;
+	int dedicated = g_pcls.state == ca_dedicated;
 
 	NET_ThreadLock();
 
 	if (ip_sockets[NS_SERVER] == INV_SOCK)
 	{
-		port = (int)iphostport.value;
+		int port = (int)iphostport.value;
 
-		if (!port)
+		if (!NET_CheckPort(port))
 		{
 			port = (int)hostport.value;
-			if (!port)
+			if (!NET_CheckPort(port))
 			{
 				port = (int)defport.value;
 				hostport.value = defport.value;
@@ -1591,12 +1588,12 @@ void NET_OpenIP()
 
 	if (ip_sockets[NS_CLIENT] == INV_SOCK)
 	{
-		port = (int)ip_clientport.value;
+		int port = (int)ip_clientport.value;
 
-		if (!port)
+		if (!NET_CheckPort(port))
 		{
 			port = (int)clientport.value;
-			if (!port)
+			if (!NET_CheckPort(port))
 				port = -1;
 		}
 		ip_sockets[NS_CLIENT] = NET_IPSocket(ipname.string, port, FALSE);
@@ -1614,6 +1611,7 @@ void NET_OpenIP()
 
 	NET_ThreadUnlock();
 
+	static qboolean bFirst = TRUE;
 	if (bFirst)
 	{
 		bFirst = FALSE;
