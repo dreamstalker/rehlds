@@ -1678,20 +1678,17 @@ SOCKET NET_IPXSocket(int hostshort)
 
 void NET_OpenIPX()
 {
-	int port;
-	int dedicated;
-
-	dedicated = g_pcls.state == ca_dedicated;
+	int dedicated = g_pcls.state == ca_dedicated;
 
 	NET_ThreadLock();
 
 	if (ipx_sockets[NS_SERVER] == INV_SOCK)
 	{
-		port = ipx_hostport.value;
-		if (!port)
+		int port = ipx_hostport.value;
+		if (!NET_CheckPort(port))
 		{
 			port = hostport.value;
-			if (!port)
+			if (!NET_CheckPort(port))
 			{
 				hostport.value = defport.value;
 				port = defport.value;
@@ -1709,11 +1706,11 @@ void NET_OpenIPX()
 
 	if (ipx_sockets[NS_CLIENT] == INV_SOCK)
 	{
-		port = ipx_clientport.value;
-		if (!port)
+		int port = ipx_clientport.value;
+		if (!NET_CheckPort(port))
 		{
 			port = clientport.value;
-			if (!port)
+			if (!NET_CheckPort(port))
 				port = -1;
 		}
 		ipx_sockets[NS_CLIENT] = NET_IPXSocket(port);
