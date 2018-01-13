@@ -1018,12 +1018,9 @@ DLL_EXPORT int NET_Sleep_Timeout()
 int NET_Sleep()
 {
 	fd_set fdset;
-	struct timeval tv;
-	SOCKET number;
-
 	FD_ZERO(&fdset);
-	number = 0;
 
+	SOCKET number = 0;
 	for (int sock = 0; sock < NS_MAX; sock++)
 	{
 		SOCKET net_socket = ip_sockets[sock];
@@ -1047,6 +1044,7 @@ int NET_Sleep()
 #endif // _WIN32
 	}
 
+	struct timeval tv;
 	tv.tv_sec = 0;
 	tv.tv_usec = 20 * 1000;
 
