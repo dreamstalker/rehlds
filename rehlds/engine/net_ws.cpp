@@ -1834,7 +1834,6 @@ bool NET_CheckPort(int port)
 void NET_Config(qboolean multiplayer)
 {
 	static qboolean old_config;
-	static qboolean bFirst = TRUE;
 
 	if (old_config == multiplayer)
 	{
@@ -1851,6 +1850,8 @@ void NET_Config(qboolean multiplayer)
 		if (!noipx)
 			NET_OpenIPX();
 #endif //_WIN32
+
+		static qboolean bFirst = TRUE;
 		if (bFirst)
 		{
 			bFirst = FALSE;
