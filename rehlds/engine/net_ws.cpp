@@ -1626,7 +1626,6 @@ SOCKET NET_IPXSocket(int hostshort)
 	int err;
 	u_long optval = 1;
 	SOCKET newsocket;
-	SOCKADDR_IPX address;
 
 	if((newsocket = CRehldsPlatformHolder::get()->socket(PF_IPX, SOCK_DGRAM, NSPROTO_IPX)) == INVALID_SOCKET)
 	{
@@ -1658,6 +1657,7 @@ SOCKET NET_IPXSocket(int hostshort)
 		return INV_SOCK;
 	}
 
+	SOCKADDR_IPX address;
 	address.sa_family = AF_IPX;
 	Q_memset(address.sa_netnum, 0, 4);
 	Q_memset(address.sa_nodenum, 0, 6);
