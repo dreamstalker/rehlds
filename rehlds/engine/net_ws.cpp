@@ -1347,16 +1347,13 @@ void EXT_FUNC NET_SendPacket_api(unsigned int length, void *data, const netadr_t
 
 void NET_SendPacket(netsrc_t sock, int length, void *data, const netadr_t& to)
 {
-	int ret;
-	struct sockaddr addr;
-	SOCKET net_socket;
-
 	if (to.type == NA_LOOPBACK)
 	{
 		NET_SendLoopPacket(sock, length, data, to);
 		return;
 	}
 
+	SOCKET net_socket;
 	if (to.type == NA_BROADCAST)
 	{
 		net_socket = ip_sockets[sock];
@@ -1388,9 +1385,10 @@ void NET_SendPacket(netsrc_t sock, int length, void *data, const netadr_t& to)
 		Sys_Error("%s: bad address type", __func__);
 	}
 
+	struct sockaddr addr;
 	NetadrToSockadr(&to, &addr);
 
-	ret = NET_SendLong(sock, net_socket, (const char *)data, length, 0, &addr, sizeof(addr));
+	int ret = NET_SendLong(sock, net_socket, (const char *)data, length, 0, &addr, sizeof(addr));
 	if (ret == -1)
 	{
 		int err = NET_GetLastError();
@@ -1428,6 +1426,7 @@ void NET_SendPacket(netsrc_t sock, int length, void *data, const netadr_t& to)
 		}
 	}
 }
+
 
 SOCKET NET_IPSocket(char *net_interface, int port, qboolean multicast)
 {
