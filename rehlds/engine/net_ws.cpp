@@ -71,6 +71,13 @@ net_messages_t *normalqueue;
 HANDLE hNetThread;
 DWORD dwNetThreadId;
 CRITICAL_SECTION net_cs;
+#else
+pthread_mutex_t net_mutex;
+pthread_t hNetThread;
+#endif
+
+#ifdef REHLDS_FIXES
+volatile bool net_thread_terminated;
 #endif
 
 cvar_t net_address = { "net_address", "", 0, 0.0f, NULL };
@@ -100,22 +107,26 @@ cvar_t net_graphpos = { "net_graphpos", "1", FCVAR_ARCHIVE, 0.0f, NULL };
 
 void NET_ThreadLock()
 {
-#ifdef _WIN32
 	if (use_thread && net_thread_initialized)
 	{
+#ifdef _WIN32
 		EnterCriticalSection(&net_cs);
-	}
+#else
+		pthread_mutex_lock(&net_mutex);
 #endif // _WIN32
+	}
 }
 
 void NET_ThreadUnlock()
 {
-#ifdef _WIN32
 	if (use_thread && net_thread_initialized)
 	{
+#ifdef _WIN32
 		LeaveCriticalSection(&net_cs);
-	}
+#else
+		pthread_mutex_unlock(&net_mutex);
 #endif // _WIN32
+	}
 }
 
 unsigned short Q_ntohs(unsigned short netshort)
@@ -1112,14 +1123,20 @@ int NET_Sleep()
 	}
 
 	tv.tv_sec = 0;
+#ifdef REHLDS_FIXES
+	tv.tv_usec = 0.25 * 1000000;
+#else
 	tv.tv_usec = 20 * 1000;
+#endif
 
 	return select((int)(number + 1), &fdset, NULL, NULL, net_sleepforever == 0 ? &tv : NULL);
 }
 
 #ifdef _WIN32
-
 DWORD WINAPI NET_ThreadMain(LPVOID lpThreadParameter)
+#else
+void* NET_ThreadMain(void*)
+#endif // _WIN32
 {
 	while (true)
 	{
@@ -1129,6 +1146,14 @@ DWORD WINAPI NET_ThreadMain(LPVOID lpThreadParameter)
 			for (int sock = 0; sock < NS_MAX; sock++)
 			{
 				NET_ThreadLock();
+
+#ifdef REHLDS_FIXES
+				if (net_thread_terminated)
+				{
+					NET_ThreadUnlock();
+					return 0;
+				}
+#endif
 
 				bret = NET_QueuePacket((netsrc_t)sock);
 				if (bret)
@@ -1161,13 +1186,12 @@ DWORD WINAPI NET_ThreadMain(LPVOID lpThreadParameter)
 				break;
 		}
 
+#ifndef REHLDS_FIXES
 		Sys_Sleep(1);
+#endif
 	}
-
 	return 0;
 }
-
-#endif // _WIN32
 
 void NET_StartThread()
 {
@@ -1176,6 +1200,9 @@ void NET_StartThread()
 		if (!net_thread_initialized)
 		{
 			net_thread_initialized = TRUE;
+#ifdef REHLDS_FIXES
+			net_thread_terminated = false;
+#endif
 
 #ifdef _WIN32
 			InitializeCriticalSection(&net_cs);
@@ -1183,11 +1210,21 @@ void NET_StartThread()
 			if (!hNetThread)
 			{
 				DeleteCriticalSection(&net_cs);
+#else
+			// In-line: There are several cases where mutex can go recursive in one thread.
+			pthread_mutexattr_t net_mutex_attr;
+			pthread_mutexattr_init(&net_mutex_attr);
+			pthread_mutexattr_settype(&net_mutex_attr, PTHREAD_MUTEX_RECURSIVE);
+			pthread_mutex_init(&net_mutex, &net_mutex_attr);
+			if (pthread_create(&hNetThread, nullptr, &NET_ThreadMain, nullptr) != 0)
+			{
+				pthread_mutex_destroy(&net_mutex);
+#endif
 				net_thread_initialized = FALSE;
 				use_thread = FALSE;
 				Sys_Error("%s: Couldn't initialize network thread, run without -netthread\n", __func__);
 			}
-#endif // _WIN32
+			Con_Printf("Network thread was initialized\n");
 		}
 	}
 }
@@ -1198,11 +1235,38 @@ void NET_StopThread()
 	{
 		if (net_thread_initialized)
 		{
+#ifdef REHLDS_FIXES // Safe thread stopping.
+			NET_ThreadLock();
+			net_thread_terminated = true;
+			NET_ThreadUnlock();
+#endif // REHLDS_FIXES
+
 #ifdef _WIN32
-			TerminateThread(hNetThread, 0);
+
+#ifdef REHLDS_FIXES
+			if (WaitForSingleObject(hNetThread, 0.5 * 1000) != WAIT_OBJECT_0) // Wait 0.5 second for thread to finish
+#endif // REHLDS_FIXES
+			{
+				TerminateThread(hNetThread, 0); // Kill unresponsive thread.
+			}
 			DeleteCriticalSection(&net_cs);
+
+#else // _WIN32
+			struct timespec ts;
+			if (clock_gettime(CLOCK_REALTIME, &ts) == -1) {
+				Sys_Error("%s: CLOCK_REALTIME ERROR: %s", __func__, NET_ErrorString(NET_GetLastError()));
+			}
+			ts.tv_nsec += 0.5 * 1000000000; // Wait 0.5 second for thread to finish
+
+			if (pthread_timedjoin_np(hNetThread, nullptr, &ts) != 0)
+			{
+				pthread_cancel(hNetThread); // Kill unresponsive thread.
+				pthread_join(hNetThread, nullptr);
+			}
+			pthread_mutex_destroy(&net_mutex);
 #endif // _WIN32
 			net_thread_initialized = FALSE;
+			Con_Printf("Network thread was terminated\n");
 		}
 	}
 }
@@ -2013,9 +2077,15 @@ void NET_Init()
 	Cvar_RegisterVariable(&net_graphpos);
 
 	if (COM_CheckParm("-netthread"))
+#if defined(REHLDS_FIXES) || defined(_WIN32) // -netthread will work either on windows or on fixed linux build.
 		use_thread = TRUE;
+#else
+		use_thread = FALSE;
+#endif
 
-	if (COM_CheckParm("-netsleep"))
+#ifndef REHLDS_FIXES
+	if (COM_CheckParm("-netsleep")) // Sleeping forever is useless.
+#endif
 		net_sleepforever = 0;
 
 #ifdef _WIN32
