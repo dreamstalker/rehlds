@@ -1183,7 +1183,6 @@ void NET_FreeMsg(net_messages_t *pmsg)
 
 qboolean NET_GetPacket(netsrc_t sock)
 {
-	net_messages_t *pmsg;
 	qboolean bret;
 
 	NET_AdjustLag();
@@ -1215,7 +1214,7 @@ qboolean NET_GetPacket(netsrc_t sock)
 		return bret;
 	}
 
-	pmsg = messages[sock];
+	net_messages_t *pmsg = messages[sock];
 	if (pmsg)
 	{
 		net_message.cursize = pmsg->buffersize;
