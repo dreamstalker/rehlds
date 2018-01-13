@@ -525,10 +525,7 @@ void NET_TransferRawData(sizebuf_t *msg, unsigned char *pStart, int nSize)
 
 qboolean NET_GetLoopPacket(netsrc_t sock, netadr_t *in_from_, sizebuf_t *msg)
 {
-	int i;
-	loopback_t *loop;
-
-	loop = &loopbacks[sock];
+	loopback_t *loop = &loopbacks[sock];
 
 	if (loop->send - loop->get > 4)
 	{
@@ -537,7 +534,7 @@ qboolean NET_GetLoopPacket(netsrc_t sock, netadr_t *in_from_, sizebuf_t *msg)
 
 	if (loop->get < loop->send)
 	{
-		i = loop->get & (MAX_LOOPBACK - 1);
+		int i = loop->get & (MAX_LOOPBACK - 1);
 		loop->get++;
 
 		NET_TransferRawData(msg, loop->msgs[i].data, loop->msgs[i].datalen);
