@@ -581,15 +581,10 @@ NOXREF int NET_CountLaggedList(packetlag_t *pList)
 {
 	NOXREFCHECK;
 
-	int c;
-	packetlag_t *p;
-
-	c = 0;
-	p = pList->pNext;
-	while (p && p != pList)
+	int c = 0;
+	for (packetlag_t* p = pList->pNext; p && p != pList; p = p->pNext)
 	{
 		c++;
-		p = p->pNext;
 	}
 
 	return c;
