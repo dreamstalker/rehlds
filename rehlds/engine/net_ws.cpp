@@ -1280,26 +1280,23 @@ int NET_SendLong(netsrc_t sock, SOCKET s, const char *buf, int len, int flags, c
 	if (sock == NS_SERVER && len > MAX_ROUTEABLE_PACKET)
 	{
 		// yep
-		char packet[MAX_ROUTEABLE_PACKET];
-		int totalSent, ret, size, packetCount, packetNumber;
-		SPLITPACKET *pPacket;
-
 		gSequenceNumber++;
 		if (gSequenceNumber < 0)
 		{
 			gSequenceNumber = 1;
 		}
 
-		pPacket = (SPLITPACKET *)packet;
+		char packet[MAX_ROUTEABLE_PACKET];
+		SPLITPACKET *pPacket = (SPLITPACKET *)packet;
 		pPacket->netID = NET_HEADER_FLAG_SPLITPACKET;
 		pPacket->sequenceNumber = gSequenceNumber;
-		packetNumber = 0;
-		totalSent = 0;
-		packetCount = (len + SPLIT_SIZE - 1) / SPLIT_SIZE;
+		int packetNumber = 0;
+		int totalSent = 0;
+		int packetCount = (len + SPLIT_SIZE - 1) / SPLIT_SIZE;
 
 		while (len > 0)
 		{
-			size = Q_min(int(SPLIT_SIZE), len);
+			int size = Q_min(int(SPLIT_SIZE), len);
 
 			pPacket->packetID = (packetNumber << 4) + packetCount;
 
@@ -1320,7 +1317,7 @@ int NET_SendLong(netsrc_t sock, SOCKET s, const char *buf, int len, int flags, c
 					NET_AdrToString(adr));
 			}
 
-			ret = CRehldsPlatformHolder::get()->sendto(s, packet, size + sizeof(SPLITPACKET), flags, to, tolen);
+			int ret = CRehldsPlatformHolder::get()->sendto(s, packet, size + sizeof(SPLITPACKET), flags, to, tolen);
 			if (ret < 0)
 			{
 				return ret;
@@ -1341,6 +1338,7 @@ int NET_SendLong(netsrc_t sock, SOCKET s, const char *buf, int len, int flags, c
 	int nSend = CRehldsPlatformHolder::get()->sendto(s, buf, len, flags, to, tolen);
 	return nSend;
 }
+
 
 void EXT_FUNC NET_SendPacket_api(unsigned int length, void *data, const netadr_t &to)
 {
