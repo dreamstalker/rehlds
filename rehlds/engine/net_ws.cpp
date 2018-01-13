@@ -127,17 +127,19 @@ void NetadrToSockadr(const netadr_t *a, struct sockaddr *s)
 {
 	Q_memset(s, 0, sizeof(*s));
 
+	auto s_in = (sockaddr_in *)s;
+
 	switch (a->type)
 	{
 	case NA_BROADCAST:
-		((struct sockaddr_in *)s)->sin_family = AF_INET;
-		((struct sockaddr_in *)s)->sin_addr.s_addr = INADDR_BROADCAST;
-		((struct sockaddr_in *)s)->sin_port = a->port;
+		s_in->sin_family = AF_INET;
+		s_in->sin_addr.s_addr = INADDR_BROADCAST;
+		s_in->sin_port = a->port;
 		break;
 	case NA_IP:
-		((struct sockaddr_in *)s)->sin_family = AF_INET;
-		((struct sockaddr_in *)s)->sin_addr.s_addr = *(int *)&a->ip;
-		((struct sockaddr_in *)s)->sin_port = a->port;
+		s_in->sin_family = AF_INET;
+		s_in->sin_addr.s_addr = *(int *)&a->ip;
+		s_in->sin_port = a->port;
 		break;
 #ifdef _WIN32
 	case NA_IPX:
