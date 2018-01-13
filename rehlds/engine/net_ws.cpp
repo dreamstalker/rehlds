@@ -549,14 +549,11 @@ qboolean NET_GetLoopPacket(netsrc_t sock, netadr_t *in_from_, sizebuf_t *msg)
 
 void NET_SendLoopPacket(netsrc_t sock, int length, void *data, const netadr_t& to)
 {
-	int i;
-	loopback_t *loop;
-
 	NET_ThreadLock();
 
-	loop = &loopbacks[sock ^ 1];
+	loopback_t *loop = &loopbacks[sock ^ 1];
 
-	i = loop->send & (MAX_LOOPBACK - 1);
+	int i = loop->send & (MAX_LOOPBACK - 1);
 	loop->send++;
 
 #ifdef REHLDS_CHECKS
