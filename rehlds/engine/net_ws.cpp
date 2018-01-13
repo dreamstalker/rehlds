@@ -1231,10 +1231,9 @@ qboolean NET_GetPacket(netsrc_t sock)
 
 void NET_AllocateQueues()
 {
-	net_messages_t *p;
 	for (int i = 0; i < NUM_MSG_QUEUES; i++)
 	{
-		p = (net_messages_t *)Mem_ZeroMalloc(sizeof(net_messages_t));
+		net_messages_t *p = (net_messages_t *)Mem_ZeroMalloc(sizeof(net_messages_t));
 		p->buffer = (unsigned char *)Mem_ZeroMalloc(MSG_QUEUE_SIZE);
 		p->preallocated = TRUE;
 		p->next = normalqueue;
