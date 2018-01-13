@@ -742,14 +742,13 @@ qboolean NET_LagPacket(qboolean newdata, netsrc_t sock, netadr_t *from, sizebuf_
 
 void NET_FlushSocket(netsrc_t sock)
 {
-	struct sockaddr from;
-	socklen_t fromlen;
-	SOCKET net_socket;
-	unsigned char buf[MAX_UDP_PACKET];
-
-	net_socket = ip_sockets[sock];
+	SOCKET net_socket = ip_sockets[sock];
 	if (net_socket != INV_SOCK)
 	{
+		struct sockaddr from;
+		socklen_t fromlen;
+		unsigned char buf[MAX_UDP_PACKET];
+
 		fromlen = 16;
 		while (CRehldsPlatformHolder::get()->recvfrom(net_socket, (char*)buf, sizeof buf, 0, &from, &fromlen) > 0)
 			;
