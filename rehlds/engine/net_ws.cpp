@@ -351,68 +351,26 @@ char *NET_BaseAdrToString(netadr_t& a)
 
 qboolean NET_StringToSockaddr(const char *s, struct sockaddr *sadr)
 {
-	struct hostent *h;
-	char *colon;
-	int val;
-	char copy[128];
-
 	Q_memset(sadr, 0, sizeof(*sadr));
+
 #ifdef _WIN32
+	// IPX support.
 	if (Q_strlen(s) >= 24 && s[8] == ':' && s[21] == ':')
 	{
 		sadr->sa_family = AF_IPX;
-
-		copy[2] = 0;
-
-		copy[0] = s[0];
-		copy[1] = s[1];
-		sscanf(copy, "%x", &val);
-		sadr->sa_data[0] = (char)val;
-
-		copy[0] = s[2];
-		copy[1] = s[3];
-		sscanf(copy, "%x", &val);
-		sadr->sa_data[1] = (char)val;
-
-		copy[0] = s[4];
-		copy[1] = s[5];
-		sscanf(copy, "%x", &val);
-		sadr->sa_data[2] = (char)val;
-
-		copy[0] = s[6];
-		copy[1] = s[7];
-		sscanf(copy, "%x", &val);
-		sadr->sa_data[3] = (char)val;
-
-		copy[0] = s[9];
-		copy[1] = s[10];
-		sscanf(copy, "%x", &val);
-		sadr->sa_data[4] = (char)val;
-
-		copy[0] = s[11];
-		copy[1] = s[12];
-		sscanf(copy, "%x", &val);
-		sadr->sa_data[5] = (char)val;
-
-		copy[0] = s[13];
-		copy[1] = s[14];
-		sscanf(copy, "%x", &val);
-		sadr->sa_data[6] = (char)val;
-
-		copy[0] = s[15];
-		copy[1] = s[16];
-		sscanf(copy, "%x", &val);
-		sadr->sa_data[7] = (char)val;
-
-		copy[0] = s[17];
-		copy[1] = s[18];
-		sscanf(copy, "%x", &val);
-		sadr->sa_data[8] = (char)val;
-
-		copy[0] = s[19];
-		copy[1] = s[20];
-		sscanf(copy, "%x", &val);
-		sadr->sa_data[9] = (char)val;
+		int val = 0;
+		for(int i = 0; i < 20; i+=2)
+		{
+			if (s[i] == ':')
+			{
+				--i; // Skip one char on next iteration.
+				continue;
+			}
+			// Convert from hexademical represantation to sockaddr
+			char temp[3] = { s[i], s[i + 1], '\0' };
+			sscanf(temp, "%x", &val);
+			sadr->sa_data[i / 2] = (char)val;
+		}
 
 		sscanf(s + 22, "%u", &val);
 		*(uint16 *)&sadr->sa_data[10] = htons(val);
@@ -421,36 +379,38 @@ qboolean NET_StringToSockaddr(const char *s, struct sockaddr *sadr)
 	}
 #endif // _WIN32
 
-	((sockaddr_in *)sadr)->sin_family = AF_INET;
-	((sockaddr_in *)sadr)->sin_port = 0;
+	auto *sadr_in = (sockaddr_in *)sadr;
 
+	sadr_in->sin_family = AF_INET;
+
+	char copy[128];
 	Q_strncpy(copy, s, sizeof(copy) - 1);
 	copy[sizeof(copy) - 1] = 0;
 
 	// Parse port
-	colon = copy;
-	while (*colon != 0)
+	char *colon = Q_strchr(copy, ':');
+	if(colon != nullptr)
 	{
-		if (*colon == ':')
-		{
-			*colon = 0;
-			val = Q_atoi(colon + 1);
-			((sockaddr_in *)sadr)->sin_port = htons(val);
-		}
-		colon++;
+		*colon = '\0';
+		sadr_in->sin_port = htons(Q_atoi(colon + 1));
+	}
+	else
+	{
+		sadr_in->sin_port = 0;
 	}
 
 	// Parse address
-	((sockaddr_in *)sadr)->sin_addr.s_addr = inet_addr(copy);
-	if (((sockaddr_in *)sadr)->sin_addr.s_addr == INADDR_NONE)
+	sadr_in->sin_addr.s_addr = inet_addr(copy);
+	if (sadr_in->sin_addr.s_addr == INADDR_NONE)
 	{
-		h = CRehldsPlatformHolder::get()->gethostbyname(copy);
+		struct hostent *host = CRehldsPlatformHolder::get()->gethostbyname(copy);
 
-		if (h == NULL || h->h_addr == NULL)
+		if (host == nullptr || host->h_addr == nullptr)
 		{
 			return FALSE;
 		}
-		((sockaddr_in *)sadr)->sin_addr.s_addr = *(uint32 *)h->h_addr;
+
+		sadr_in->sin_addr.s_addr = *(uint32 *)host->h_addr;
 	}
 	return TRUE;
 }
