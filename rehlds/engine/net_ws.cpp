@@ -674,19 +674,13 @@ void NET_AdjustLag()
 
 qboolean NET_LagPacket(qboolean newdata, netsrc_t sock, netadr_t *from, sizebuf_t *data)
 {
-	packetlag_t *pNewPacketLag;
-	packetlag_t *pPacket;
-	float curtime;
-	int ninterval;
-	static int losscount[NS_MAX];
-
 	if (gFakeLag <= 0.0)
 	{
 		NET_ClearLagData(TRUE, TRUE);
 		return newdata;
 	}
 
-	curtime = realtime;
+	float curtime = realtime;
 #ifdef REHLDS_FIXES
 	if (newdata && data)
 #else
@@ -697,10 +691,11 @@ qboolean NET_LagPacket(qboolean newdata, netsrc_t sock, netadr_t *from, sizebuf_
 		{
 			if (allow_cheats)
 			{
+				static int losscount[NS_MAX] = {};
 				++losscount[sock];
 				if (fakeloss.value <= 0.0f)
 				{
-					ninterval = fabs(fakeloss.value);
+					int ninterval = fabs(fakeloss.value);
 					if (ninterval < 2)
 						ninterval = 2;
 					if ((losscount[sock] % ninterval) == 0)
@@ -718,11 +713,11 @@ qboolean NET_LagPacket(qboolean newdata, netsrc_t sock, netadr_t *from, sizebuf_
 			}
 		}
 
-		pNewPacketLag = (packetlag_t *)Mem_ZeroMalloc(sizeof(packetlag_t));
+		packetlag_t *pNewPacketLag = (packetlag_t *)Mem_ZeroMalloc(sizeof(packetlag_t));
 		NET_AddToLagged(sock, &g_pLagData[sock], pNewPacketLag, from, *data, curtime);
 	}
 
-	pPacket = g_pLagData[sock].pNext;
+	packetlag_t *pPacket = g_pLagData[sock].pNext;
 
 	while (pPacket != &g_pLagData[sock])
 	{
