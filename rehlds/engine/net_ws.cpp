@@ -636,11 +636,8 @@ void NET_AddToLagged(netsrc_t sock, packetlag_t *pList, packetlag_t *pPacket, ne
 void NET_AdjustLag()
 {
 	static double lasttime = realtime;
-	double dt;
-	float diff;
-	float converge;
 
-	dt = realtime - lasttime;
+	double dt = realtime - lasttime;
 	if (dt <= 0.0)
 	{
 		dt = 0.0;
@@ -658,8 +655,8 @@ void NET_AdjustLag()
 	{
 		if (fakelag.value != gFakeLag)
 		{
-			diff = fakelag.value - gFakeLag;
-			converge = dt * 200.0;
+			float diff = fakelag.value - gFakeLag;
+			float converge = dt * 200.0;
 			if (fabs(diff) < converge)
 				converge = fabs(diff);
 			if (diff < 0.0)
