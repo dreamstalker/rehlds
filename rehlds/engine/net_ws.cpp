@@ -861,18 +861,16 @@ qboolean NET_GetLong(unsigned char *pData, int size, int *outSize)
 qboolean NET_QueuePacket(netsrc_t sock)
 {
 	int ret = -1;
-	struct sockaddr from;
-	socklen_t fromlen;
-	SOCKET net_socket;
-	int protocol;
 	unsigned char buf[MAX_UDP_PACKET];
 
 #ifdef _WIN32
-	for (protocol = 0; protocol < 2; protocol++)
+	for (int protocol = 0; protocol < 2; protocol++)
 #else
-	for (protocol = 0; protocol < 1; protocol++)
+	for (int protocol = 0; protocol < 1; protocol++)
 #endif // _WIN32
 	{
+		SOCKET net_socket;
+
 		if (protocol == 0)
 			net_socket = ip_sockets[sock];
 #ifdef _WIN32
@@ -883,7 +881,8 @@ qboolean NET_QueuePacket(netsrc_t sock)
 		if (net_socket == INV_SOCK)
 			continue;
 
-		fromlen = sizeof(from);
+		struct sockaddr from;
+		socklen_t fromlen = sizeof(from);
 		ret = CRehldsPlatformHolder::get()->recvfrom(net_socket, (char *)buf, sizeof buf, 0, &from, &fromlen);
 		if (ret == -1)
 		{
