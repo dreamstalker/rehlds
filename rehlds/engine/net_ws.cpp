@@ -2019,13 +2019,15 @@ void NET_Shutdown()
 	NET_FlushQueues();
 }
 
-qboolean NET_JoinGroup(netsrc_t sock, netadr_t& addr)
+NOXREF qboolean NET_JoinGroup(netsrc_t sock, netadr_t& addr)
 {
+	NOXREFCHECK;
+
 	ip_mreq mreq;
-	SOCKET net_socket = ip_sockets[sock];
 	SIN_SET_ADDR(&mreq.imr_multiaddr, *(unsigned int*)&addr.ip[0]);
 	SIN_SET_ADDR(&mreq.imr_interface, 0);
 
+	SOCKET net_socket = ip_sockets[sock];
 	if (CRehldsPlatformHolder::get()->setsockopt(net_socket, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char*)&mreq, sizeof(mreq)) == SOCKET_ERROR)
 	{
 		int err = NET_GetLastError();
@@ -2039,17 +2041,18 @@ qboolean NET_JoinGroup(netsrc_t sock, netadr_t& addr)
 	return TRUE;
 }
 
-qboolean NET_LeaveGroup(netsrc_t sock, netadr_t& addr)
+NOXREF qboolean NET_LeaveGroup(netsrc_t sock, netadr_t& addr)
 {
+	NOXREFCHECK;
+
 	ip_mreq mreq;
-	SOCKET net_socket = ip_sockets[sock];
 	SIN_SET_ADDR(&mreq.imr_multiaddr, *(unsigned int*)&addr.ip[0]);
 	SIN_SET_ADDR(&mreq.imr_interface, 0);
 
-	if (CRehldsPlatformHolder::get()->setsockopt(net_socket, 0, 6, (char *)&mreq, sizeof(mreq)) != SOCKET_ERROR)
+	SOCKET net_socket = ip_sockets[sock];
+	if (CRehldsPlatformHolder::get()->setsockopt(net_socket, IPPROTO_IP, IP_DROP_MEMBERSHIP, (char *)&mreq, sizeof(mreq)) != SOCKET_ERROR)
 	{
-		int err = NET_GetLastError();
-		if (err != WSAEAFNOSUPPORT)
+		if (NET_GetLastError() != WSAEAFNOSUPPORT)
 		{
 			return FALSE;
 		}
