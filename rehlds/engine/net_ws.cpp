@@ -1555,7 +1555,11 @@ SOCKET NET_IPSocket(char *net_interface, int port, qboolean multicast)
 	}
 
 #ifndef _WIN32
+#ifdef REHLDS_FIXES
+	if (!COM_CheckParm("-notos"))
+#else
 	if (COM_CheckParm("-tos"))
+#endif
 	{
 		i = 16;
 		Con_Printf("Enabling LOWDELAY TOS option\n");
