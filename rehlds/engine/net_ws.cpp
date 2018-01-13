@@ -757,23 +757,20 @@ void NET_FlushSocket(netsrc_t sock)
 
 qboolean NET_GetLong(unsigned char *pData, int size, int *outSize)
 {
-	unsigned int packetNumber;
-	unsigned int packetCount;
-	int sequenceNumber;
-	unsigned char packetID;
 	static int gNetSplitFlags[NET_WS_MAX_FRAGMENTS];
 	SPLITPACKET *pHeader = (SPLITPACKET *) pData;
 
-	sequenceNumber = pHeader->sequenceNumber;
-	packetID = pHeader->packetID;
-	packetCount = packetID & 0xF;
-	packetNumber = (unsigned int)packetID >> 4;
+	int sequenceNumber = pHeader->sequenceNumber;
+	unsigned char packetID = pHeader->packetID;
+	unsigned int packetCount = packetID & 0xF;
+	unsigned int packetNumber = (unsigned int)packetID >> 4;
 
 	if (packetNumber >= NET_WS_MAX_FRAGMENTS || packetCount > NET_WS_MAX_FRAGMENTS)
 	{
 		Con_NetPrintf("Malformed packet number (%i/%i)\n", packetNumber + 1, packetCount);
 		return FALSE;
 	}
+
 	if (gNetSplit.currentSequence == -1 || sequenceNumber != gNetSplit.currentSequence)
 	{
 		gNetSplit.currentSequence = pHeader->sequenceNumber;
