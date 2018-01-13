@@ -207,6 +207,7 @@ SOCKET NET_IPXSocket(int hostshort);
 void NET_OpenIPX();
 void NET_GetLocalAddress();
 int NET_IsConfigured();
+bool NET_CheckPort(int port);
 void NET_Config(qboolean multiplayer);
 void MaxPlayers_f();
 void NET_Init();

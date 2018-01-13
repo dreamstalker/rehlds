@@ -1825,6 +1825,15 @@ int NET_IsConfigured()
 	return net_configured;
 }
 
+bool NET_CheckPort(int port)
+{
+#ifdef REHLDS_FIXES
+	return port > 0 && port <= USHRT_MAX;
+#else
+	return port != 0;
+#endif
+}
+
 void NET_Config(qboolean multiplayer)
 {
 	static qboolean old_config;
