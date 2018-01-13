@@ -1431,10 +1431,7 @@ void NET_SendPacket(netsrc_t sock, int length, void *data, const netadr_t& to)
 SOCKET NET_IPSocket(char *net_interface, int port, qboolean multicast)
 {
 	SOCKET newsocket;
-	struct sockaddr_in address;
 	qboolean _true = TRUE;
-	int i = 1;
-	int err;
 
 #ifdef _WIN32
 	if ((newsocket = CRehldsPlatformHolder::get()->socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP)) == INVALID_SOCKET)
@@ -1442,7 +1439,7 @@ SOCKET NET_IPSocket(char *net_interface, int port, qboolean multicast)
 	if ((newsocket = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP)) == INVALID_SOCKET)
 #endif // _WIN32
 	{
-		err = NET_GetLastError();
+		int err = NET_GetLastError();
 		if (err != WSAEAFNOSUPPORT)
 		{
 			Con_Printf("WARNING: UDP_OpenSocket: port: %d socket: %s", port, NET_ErrorString(err));
@@ -1460,6 +1457,7 @@ SOCKET NET_IPSocket(char *net_interface, int port, qboolean multicast)
 		return INV_SOCK;
 	}
 
+	qboolean i = TRUE;
 #ifdef _WIN32
 	if (CRehldsPlatformHolder::get()->setsockopt(newsocket, SOL_SOCKET, SO_BROADCAST, (char *)&i, sizeof(i)) == SOCKET_ERROR)
 #else
@@ -1486,11 +1484,11 @@ SOCKET NET_IPSocket(char *net_interface, int port, qboolean multicast)
 #ifndef _WIN32
 	if (COM_CheckParm("-tos"))
 	{
-		i = 16;
+		int i = IPTOS_LOWDELAY;
 		Con_Printf("Enabling LOWDELAY TOS option\n");
 		if (setsockopt(newsocket, IPPROTO_IP, IP_TOS, (char *)&i, sizeof(i)) == SOCKET_ERROR)
 		{
-			err = NET_GetLastError();
+			int err = NET_GetLastError();
 			if (err != WSAENOPROTOOPT)
 				Con_Printf("WARNING: UDP_OpenSocket: port: %d  setsockopt IP_TOS: %s\n", port, NET_ErrorString(err));
 			return INV_SOCK;
@@ -1498,12 +1496,14 @@ SOCKET NET_IPSocket(char *net_interface, int port, qboolean multicast)
 	}
 #endif // _WIN32
 
+	struct sockaddr_in address;
+
 	if (net_interface && *net_interface && Q_stricmp(net_interface, "localhost"))
 		NET_StringToSockaddr(net_interface, (sockaddr *)&address);
 	else
 		address.sin_addr.s_addr = INADDR_ANY;
 
-	if (port == -1)
+	if (port == -1) // TODO: Always false?
 		address.sin_port = 0;
 	else
 		address.sin_port = htons((u_short)port);
@@ -1525,19 +1525,19 @@ SOCKET NET_IPSocket(char *net_interface, int port, qboolean multicast)
 		return INV_SOCK;
 	}
 
-	i = COM_CheckParm("-loopback") != 0;
+	qboolean bLoopBack = COM_CheckParm("-loopback") != 0;
 #ifdef _WIN32
-	if (CRehldsPlatformHolder::get()->setsockopt(newsocket, IPPROTO_IP, IP_MULTICAST_LOOP, (char *)&i, sizeof(i)) == SOCKET_ERROR)
+	if (CRehldsPlatformHolder::get()->setsockopt(newsocket, IPPROTO_IP, IP_MULTICAST_LOOP, (char *)&bLoopBack, sizeof(bLoopBack)) == SOCKET_ERROR)
 #else
-	if (setsockopt(newsocket, IPPROTO_IP, IP_MULTICAST_LOOP, (char *)&i, sizeof(i)) == SOCKET_ERROR)
+	if (setsockopt(newsocket, IPPROTO_IP, IP_MULTICAST_LOOP, (char *)&bLoopBack, sizeof(bLoopBack)) == SOCKET_ERROR)
 #endif // _WIN32
 	{
 		Con_DPrintf("WARNING: UDP_OpenSocket: port %d setsockopt IP_MULTICAST_LOOP: %s\n", port, NET_ErrorString(NET_GetLastError()));
 	}
 
 #if !defined _WIN32 && defined REHLDS_FIXES
-	i = IP_PMTUDISC_DONT;
-	if (setsockopt(newsocket, IPPROTO_IP, IP_MTU_DISCOVER, (char *)&i, sizeof(i)) == SOCKET_ERROR)
+	int j = IP_PMTUDISC_DONT;
+ 	if (setsockopt(newsocket, IPPROTO_IP, IP_MTU_DISCOVER, (char *)&j, sizeof(j)) == SOCKET_ERROR)
 	{
 		Con_Printf("WARNING: UDP_OpenSocket: port %d  setsockopt IP_MTU_DISCOVER: %s\n", port, NET_ErrorString(NET_GetLastError()));
 	}
