@@ -592,12 +592,10 @@ NOXREF int NET_CountLaggedList(packetlag_t *pList)
 
 void NET_ClearLaggedList(packetlag_t *pList)
 {
-	packetlag_t *p, *n;
-
-	p = pList->pNext;
+	packetlag_t *p = pList->pNext;
 	while (p && p != pList)
 	{
-		n = p->pNext;
+		packetlag_t *n = p->pNext;
 		NET_RemoveFromPacketList(p);
 		if (p->pPacketData)
 		{
