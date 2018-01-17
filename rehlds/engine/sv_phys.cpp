@@ -289,6 +289,9 @@ void SV_FlyMove(edict_t *ent, float time, float bounce)
 			if ((ent->v.flags & FL_ONGROUND) && ent->v.movetype == MOVETYPE_TOSS)
 			{
 				VectorClear(ent->v.velocity);
+
+				// run the impact function
+				SV_Impact(ent, trace.ent, &trace);
 				return;
 			}
 #endif
