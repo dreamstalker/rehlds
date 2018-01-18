@@ -71,6 +71,7 @@
 	#include <link.h>
 	#include <netdb.h>
 	#include <netinet/in.h>
+	#include <netinet/ip.h>
 	#include <pthread.h>
 	#include <sys/ioctl.h>
 	#include <sys/mman.h>
