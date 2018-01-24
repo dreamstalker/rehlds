@@ -155,6 +155,11 @@ int EXT_FUNC CRehldsServerStatic::GetMaxClients()
 	return g_psvs.maxclients;
 }
 
+int EXT_FUNC CRehldsServerStatic::GetMaxClientsLimit()
+{
+	return g_psvs.maxclientslimit;
+}
+
 bool EXT_FUNC CRehldsServerStatic::IsLogActive()
 {
 	return g_psvs.log.active ? true : false;
