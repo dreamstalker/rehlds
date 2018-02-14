@@ -5039,9 +5039,6 @@ size_t SV_CountResourceByType(resourcetype_t type, resource_t **pResourceList, s
 		if (r->type != type)
 			continue;
 
-		if (r->type == t_decal && r->nIndex >= MAX_DECALS)
-			continue;
-
 		if (pResourceList)
 			pResourceList[nCount] = r;
 
