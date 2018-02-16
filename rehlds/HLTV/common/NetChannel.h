@@ -53,6 +53,15 @@ enum
 
 #define MAX_LATENT				32
 #define FRAGMENT_MAX_SIZE		1400		// Size of fragmentation buffer internal buffers
+#define CLIENT_FRAGMENT_SIZE_ONCONNECT	128
+#define CUSTOMIZATION_MAX_SIZE	20480
+
+// Client sends normal fragments only while connecting
+#define MAX_NORMAL_FRAGMENTS (MAX_POSSIBLE_MSG / CLIENT_FRAGMENT_SIZE_ONCONNECT)
+
+// While client is connecting it sending fragments with minimal size, also it transfers sprays with minimal fragments...
+// But with sv_delayed_spray_upload it sends with cl_dlmax fragment size
+#define MAX_FILE_FRAGMENTS (CUSTOMIZATION_MAX_SIZE / FRAGMENT_C2S_MIN_SIZE)
 
 #define UDP_HEADER_SIZE			28
 #define MAX_RELIABLE_PAYLOAD	1200
@@ -152,6 +161,9 @@ public:
 		fragbuf_t *fragbufs;			// The actual buffers
 	} fragbufwaiting_t;
 
+#ifdef REHLTV_FIXES
+	bool ValidateFragments(int pkt_size, qboolean *frag_message, unsigned int *fragid, int *frag_offset, int *frag_length);
+#endif
 	bool CreateFragmentsFromFile(char *fileName);
 	bool CopyFileFragments();
 	void GetFlowStats(float *avgInKBSec, float *avgOutKBSec);

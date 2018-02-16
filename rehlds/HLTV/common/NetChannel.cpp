@@ -653,6 +653,44 @@ bool NetChannel::CheckForCompletion(int stream, int intotalbuffers)
 	return false;
 }
 
+#ifdef REHLTV_FIXES
+bool NetChannel::ValidateFragments(int pkt_size, qboolean *frag_message, unsigned int *fragid, int *frag_offset, int *frag_length)
+{
+	for (int i = 0; i < MAX_STREAMS; i++)
+	{
+		if (!frag_message[i])
+			continue;
+
+		// total fragments should be <= MAX_FRAGMENTS and current fragment can't be > total fragments
+		if (i == FRAG_NORMAL_STREAM && FRAG_GETCOUNT(fragid[i]) > MAX_NORMAL_FRAGMENTS)
+			return false;
+		if (i == FRAG_FILE_STREAM && FRAG_GETCOUNT(fragid[i]) > MAX_FILE_FRAGMENTS)
+			return false;
+		if (FRAG_GETID(fragid[i]) > FRAG_GETCOUNT(fragid[i]))
+			return false;
+		if (!frag_length[i])
+			return false;
+		if ((size_t)frag_length[i] > FRAGMENT_MAX_SIZE || (size_t)frag_offset[i] > MAX_POSSIBLE_MSG - 1)
+			return false;
+
+		int frag_end = frag_offset[i] + frag_length[i];
+
+		// end of fragment is out of the packet
+		if (frag_end + msg_readcount > pkt_size)
+			return false;
+
+		// fragment overlaps next stream's fragment or placed after it
+		for (int j = i + 1; j < MAX_STREAMS; j++)
+		{
+			if (frag_end > frag_offset[j] && frag_message[j]) // don't add msg_readcount for comparison
+				return false;
+		}
+	}
+
+	return true;
+}
+#endif // REHLTV_FIXES
+
 void NetChannel::ProcessIncoming(unsigned char *data, int size)
 {
 	BitBuffer message(data, size);
@@ -721,6 +759,11 @@ void NetChannel::ProcessIncoming(unsigned char *data, int size)
 				frag_length[i] = message.ReadShort();
 			}
 		}
+
+#ifdef REHLTV_FIXES
+		if (!ValidateFragments(size, frag_message, fragid, frag_offset, frag_length))
+			return;
+#endif
 	}
 
 	sequence &= ~(1 << 31);

@@ -16,6 +16,8 @@ project.ext.dep_bzip2 = project(':dep/bzip2')
 
 void setupToolchain(NativeBinarySpec b) {
 	boolean useGcc = project.hasProperty("useGcc")
+	boolean rehltvFixes = b.flavor.name.contains('rehltvFixes')
+
 	def cfg = rootProject.createToolchainConfig(b);
 	cfg.projectInclude(project, '/..', '/../..', '/src', '/../Director/src', '/../../common', '/../../engine', '/../../public', '/../../public/rehlds', '/../../pm_shared');
 	cfg.projectInclude(dep_bzip2, '/include')
@@ -62,6 +64,10 @@ void setupToolchain(NativeBinarySpec b) {
 		cfg.compilerOptions.args '-fno-exceptions'
 		cfg.projectLibpath(project, '/../../lib/linux32')
 		cfg.extraLibs "steam_api"
+	}
+
+	if (rehltvFixes) {
+		cfg.singleDefines 'REHLTV_FIXES', 'REHLTV_CHECKS'
 	}
 
 	ToolchainConfigUtils.apply(project, cfg, b);
