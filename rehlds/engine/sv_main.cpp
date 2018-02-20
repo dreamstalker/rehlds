@@ -7800,6 +7800,9 @@ void SV_Init(void)
 	Cvar_RegisterVariable(&sv_rehlds_attachedentities_playeranimationspeed_fix);
 	Cvar_RegisterVariable(&sv_rehlds_local_gametime);
 	Cvar_RegisterVariable(&sv_rehlds_send_mapcycle);
+	
+	Cvar_RegisterVariable(&sv_rollspeed);
+	Cvar_RegisterVariable(&sv_rollangle);
 #endif
 
 	for (int i = 0; i < MAX_MODELS; i++)
