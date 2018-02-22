@@ -20,7 +20,7 @@ void setupToolchain(NativeBinarySpec b) {
 	cfg.projectInclude(project, '/..', '/../..', '/src', '/../../common', '/../../engine', '/../../public', '/../../public/rehlds', '/../../pm_shared');
 	cfg.projectInclude(dep_bzip2, '/include')
 
-	cfg.singleDefines 'USE_BREAKPAD_HANDLER', 'HLTV', 'CORE_MODULE'
+	cfg.singleDefines 'USE_BREAKPAD_HANDLER', 'HLTV', 'HLTV_FIXES', 'CORE_MODULE'
 
 	if (cfg instanceof MsvcToolchainConfig) {
 		cfg.compilerOptions.pchConfig = new MsvcToolchainConfig.PrecompiledHeadersConfig(

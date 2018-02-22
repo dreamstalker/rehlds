@@ -41,7 +41,6 @@ public:
 	unsigned char *CurrentByte();
 
 	int GetMaxSize() const { return m_MaxSize; }
-	unsigned int GetCurSize() const { return m_CurSize; }
 	unsigned char *GetData() const { return m_Data; }
 	bool IsOverflowed() const { return m_Overflowed; }
 
@@ -108,7 +107,7 @@ public:
 	bool m_Overflowed;
 	unsigned char *m_Data;
 	unsigned char *m_CurByte;
-	int m_CurSize;
+	int m_CurBit;
 	int m_MaxSize;
 
 protected:

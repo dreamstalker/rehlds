@@ -69,7 +69,7 @@ const uint32 INVBITTABLE[] =
 
 BitBuffer::BitBuffer() : m_Data(nullptr),
 	m_CurByte(nullptr),
-	m_CurSize(0),
+	m_CurBit(0),
 	m_MaxSize(0),
 	m_Overflowed(false),
 	m_LittleEndian(false),
@@ -83,7 +83,7 @@ BitBuffer::BitBuffer(void *newData, unsigned int size)
 	m_Data = (unsigned char *)newData;
 	m_CurByte = m_Data;
 
-	m_CurSize = 0;
+	m_CurBit = 0;
 	m_MaxSize = size;
 	m_Overflowed = false;
 	m_LittleEndian = true;
@@ -100,7 +100,7 @@ BitBuffer::BitBuffer(unsigned int size)
 	m_Data = nullptr;
 	m_CurByte = nullptr;
 
-	m_CurSize = 0;
+	m_CurBit = 0;
 	m_MaxSize = size;
 	m_Overflowed = false;
 	m_LittleEndian = false;
@@ -114,7 +114,7 @@ bool BitBuffer::Resize(unsigned int size)
 	Free();
 
 	m_Data = (unsigned char *)Mem_ZeroMalloc(size + 4);
-	m_CurSize = 0;
+	m_CurBit = 0;
 	m_Overflowed = false;
 
 	if (m_Data)
@@ -139,7 +139,7 @@ void BitBuffer::Clear()
 	Q_memset(m_Data, 0, m_MaxSize);
 
 	m_CurByte = m_Data;
-	m_CurSize = 0;
+	m_CurBit = 0;
 
 	m_Overflowed = false;
 	m_LittleEndian = true;
@@ -147,13 +147,13 @@ void BitBuffer::Clear()
 
 int BitBuffer::CurrentBit()
 {
-	return m_CurSize + 8 * (m_CurByte - m_Data);
+	return m_CurBit + 8 * (m_CurByte - m_Data);
 }
 
 void BitBuffer::Reset()
 {
 	m_CurByte = m_Data;
-	m_CurSize = 0;
+	m_CurBit = 0;
 
 	m_Overflowed = false;
 	m_LittleEndian = true;
@@ -168,7 +168,7 @@ void BitBuffer::Free()
 	m_Data = nullptr;
 	m_CurByte = nullptr;
 
-	m_CurSize = 0;
+	m_CurBit = 0;
 	m_MaxSize = 0;
 
 	m_OwnData = false;
@@ -187,26 +187,26 @@ unsigned int BitBuffer::ReadBits(int numbits)
 			return -1;
 		}
 
-		int bits = m_CurSize + numbits;
+		int bits = m_CurBit + numbits;
 		if (bits <= 32)
 		{
-			result = (*(unsigned int *)m_CurByte >> m_CurSize) & ROWBITTABLE[numbits];
+			result = (*(unsigned int *)m_CurByte >> m_CurBit) & ROWBITTABLE[numbits];
 
 			m_CurByte += numbits >> 3;
-			m_CurSize += numbits & 7;
+			m_CurBit += numbits & 7;
 
-			if (m_CurSize > 7)
+			if (m_CurBit > 7)
 			{
-				m_CurSize &= 7;
+				m_CurBit &= 7;
 				m_CurByte++;
 			}
 		}
 		else
 		{
-			unsigned int data = *(unsigned int *)m_CurByte >> m_CurSize;
+			unsigned int data = *(unsigned int *)m_CurByte >> m_CurBit;
 			m_CurByte += 4;
-			result = ((ROWBITTABLE[bits & 7] & *(unsigned int *)m_CurByte) << (32 - m_CurSize)) | data;
-			m_CurSize = bits & 7;
+			result = ((ROWBITTABLE[bits & 7] & *(unsigned int *)m_CurByte) << (32 - m_CurBit)) | data;
+			m_CurBit = bits & 7;
 		}
 	}
 	else
@@ -235,26 +235,26 @@ int BitBuffer::ReadBit()
 	{
 		if (m_LittleEndian)
 		{
-			if (m_CurSize == 7)
+			if (m_CurBit == 7)
 			{
-				m_CurSize = 0;
+				m_CurBit = 0;
 				result = (*m_CurByte++ >> 7) & 1;
 			}
 			else
 			{
-				result = ((unsigned int)*m_CurByte >> m_CurSize++) & 1;
+				result = ((unsigned int)*m_CurByte >> m_CurBit++) & 1;
 			}
 		}
 		else
 		{
-			if (m_CurSize == 7)
+			if (m_CurBit == 7)
 			{
-				m_CurSize = 0;
+				m_CurBit = 0;
 				result = *m_CurByte++ & 1;
 			}
 			else
 			{
-				result = ((unsigned int)*m_CurByte >> (7 - m_CurSize++)) & 1;
+				result = ((unsigned int)*m_CurByte >> (7 - m_CurBit++)) & 1;
 			}
 		}
 	}
@@ -264,11 +264,11 @@ int BitBuffer::ReadBit()
 
 unsigned int BitBuffer::PeekBits(int numbits)
 {
-	int oldcurrentBit = m_CurSize;
+	int oldcurrentBit = m_CurBit;
 	unsigned char *oldcurrentByte = m_CurByte;
 	unsigned int data = ReadBits(numbits);
 
-	m_CurSize = oldcurrentBit;
+	m_CurBit = oldcurrentBit;
 	m_CurByte = oldcurrentByte;
 	return data;
 }
@@ -316,7 +316,7 @@ bool BitBuffer::ReadBuf(int iSize, void *pbuf)
 		return false;
 	}
 
-	if (m_CurSize)
+	if (m_CurBit)
 	{
 		int i, j;
 		unsigned int *p = (unsigned int *)pbuf;
@@ -402,7 +402,7 @@ void BitBuffer::WriteBit(int c)
 
 	if (m_LittleEndian)
 	{
-		if (m_CurSize == 7)
+		if (m_CurBit == 7)
 		{
 			if (c)
 			{
@@ -414,20 +414,20 @@ void BitBuffer::WriteBit(int c)
 			}
 
 			m_CurByte++;
-			m_CurSize = 0;
+			m_CurBit = 0;
 		}
 		else
 		{
 			if (c)
 			{
-				m_CurByte[0] |= BITTABLE[ m_CurSize ];
+				m_CurByte[0] |= BITTABLE[ m_CurBit ];
 			}
 			else
 			{
-				m_CurByte[0] &= INVBITTABLE[ m_CurSize ];
+				m_CurByte[0] &= INVBITTABLE[ m_CurBit ];
 			}
 
-			m_CurSize++;
+			m_CurBit++;
 		}
 	}
 	else
@@ -436,13 +436,13 @@ void BitBuffer::WriteBit(int c)
 		static unsigned char inv_masks[] = { 0x7Fu, 0xBFu, 0xDFu, 0xEFu, 0xF7u, 0xFBu, 0xFDu, 0xFEu };
 
 		if (c)
-			m_CurByte[0] |= masks[ m_CurSize ];
+			m_CurByte[0] |= masks[ m_CurBit ];
 		else
-			m_CurByte[0] &= inv_masks[ m_CurSize ];
+			m_CurByte[0] &= inv_masks[ m_CurBit ];
 
-		if (++m_CurSize == 8)
+		if (++m_CurBit == 8)
 		{
-			m_CurSize = 0;
+			m_CurBit = 0;
 			m_CurByte++;
 		}
 	}
@@ -461,26 +461,26 @@ void BitBuffer::WriteBits(unsigned int data, int numbits)
 			return;
 		}
 
-		int bits = numbits + m_CurSize;
+		int bits = numbits + m_CurBit;
 		if (bits <= 32)
 		{
-			*(uint32 *)m_CurByte |= (ROWBITTABLE[numbits] & data) << m_CurSize;
+			*(uint32 *)m_CurByte |= (ROWBITTABLE[numbits] & data) << m_CurBit;
 
 			m_CurByte = &m_CurByte[numbits >> 3];
-			m_CurSize = m_CurSize + (numbits & 7);
+			m_CurBit = m_CurBit + (numbits & 7);
 
-			if (m_CurSize > 7)
+			if (m_CurBit > 7)
 			{
-				m_CurSize = m_CurSize & 7;
+				m_CurBit = m_CurBit & 7;
 				m_CurByte = m_CurByte + 1;
 			}
 		}
 		else
 		{
-			*(uint32 *)m_CurByte |= (ROWBITTABLE[numbits] & data) << m_CurSize;
+			*(uint32 *)m_CurByte |= (ROWBITTABLE[numbits] & data) << m_CurBit;
 
-			int leftBits = (32 - m_CurSize);
-			m_CurSize = (m_CurSize + numbits) & 7;
+			int leftBits = (32 - m_CurBit);
+			m_CurBit = (m_CurBit + numbits) & 7;
 
 			m_CurByte += 4;
 			*(uint32 *)m_CurByte |= (ROWBITTABLE[numbits] & data) >> leftBits;
@@ -581,7 +581,7 @@ void BitBuffer::WriteBuf(const void *buf, int iSize)
 		return;
 	}
 
-	if (m_CurSize)
+	if (m_CurBit)
 	{
 		int i, j;
 		unsigned int *p = (unsigned int *)buf;
@@ -623,7 +623,7 @@ void BitBuffer::WriteHiresAngle(float f)
 
 int BitBuffer::CurrentSize()
 {
-	return (m_CurSize != 0) + m_CurByte - m_Data;
+	return (m_CurBit != 0) + m_CurByte - m_Data;
 }
 
 unsigned char *BitBuffer::CurrentByte()
@@ -638,10 +638,10 @@ int BitBuffer::SpaceLeft()
 
 void BitBuffer::AlignByte()
 {
-	if (m_CurSize)
+	if (m_CurBit)
 	{
 		m_CurByte++;
-		m_CurSize = 0;
+		m_CurBit = 0;
 	}
 }
 
@@ -712,7 +712,7 @@ void BitBuffer::WriteBitString(const char *p)
 
 void BitBuffer::StartBitMode()
 {
-	if (m_CurSize) {
+	if (m_CurBit) {
 		m_Overflowed = true;
 	}
 }
@@ -739,7 +739,7 @@ void BitBuffer::SetBuffer(void *buffer, int size)
 	m_Data = (unsigned char *)buffer;
 	m_CurByte = (unsigned char *)buffer;
 	m_MaxSize = size;
-	m_CurSize = 0;
+	m_CurBit = 0;
 
 	m_OwnData = false;
 	m_Overflowed = false;
@@ -811,22 +811,22 @@ void BitBuffer::SkipBits(int numbits)
 			return;
 		}
 
-		int bits = m_CurSize + numbits;
+		int bits = m_CurBit + numbits;
 		if (bits <= 32)
 		{
 			m_CurByte += numbits >> 3;
-			m_CurSize += numbits & 7;
+			m_CurBit += numbits & 7;
 
-			if (m_CurSize > 7)
+			if (m_CurBit > 7)
 			{
-				m_CurSize &= 7;
+				m_CurBit &= 7;
 				m_CurByte++;
 			}
 		}
 		else
 		{
 			m_CurByte += 4;
-			m_CurSize = bits & 7;
+			m_CurBit = bits & 7;
 		}
 	}
 	else
@@ -835,14 +835,14 @@ void BitBuffer::SkipBits(int numbits)
 		while (d > 0)
 		{
 			--d;
-			if (m_CurSize == 7)
+			if (m_CurBit == 7)
 			{
 				m_CurByte++;
-				m_CurSize = 0;
+				m_CurBit = 0;
 			}
 			else
 			{
-				m_CurSize++;
+				m_CurBit++;
 			}
 		}
 	}
@@ -870,7 +870,7 @@ void BitBuffer::FastClear()
 	Q_memset(m_Data, 0, iSize);
 
 	m_CurByte = m_Data;
-	m_CurSize = 0;
+	m_CurBit = 0;
 
 	m_Overflowed = false;
 	m_LittleEndian = true;
