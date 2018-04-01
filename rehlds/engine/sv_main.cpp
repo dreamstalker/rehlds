@@ -1977,29 +1977,29 @@ int SV_CheckForDuplicateSteamID(client_t *client)
 
 int SV_CheckForDuplicateNames(char *userinfo, qboolean bIsReconnecting, int nExcludeSlot)
 {
-	const char *val;
-	int i;
-	client_t *client;
 	int dupc = 0;
-	char rawname[MAX_NAME];
-	char newname[MAX_NAME];
 	int changed = FALSE;
 
-	val = Info_ValueForKey(userinfo, "name");
+	const char *val = Info_ValueForKey(userinfo, "name");
+
+	char rawname[MAX_NAME];
 	Q_strncpy(rawname, val, MAX_NAME - 1);
 
 	while (true)
 	{
-		for (i = 0, client = g_psvs.clients; i < g_psvs.maxclients; i++, client++)
+		int clientId = 0;
+		client_t *client = &g_psvs.clients[0];
+		for (; clientId < g_psvs.maxclients; clientId++, client++)
 		{
-			if (client->connected && !(i == nExcludeSlot && bIsReconnecting) && !Q_stricmp(client->name, val))
+			if (client->connected && !(clientId == nExcludeSlot && bIsReconnecting) && !Q_stricmp(client->name, val))
 				break;
 		}
 
 		// no duplicates for current name
-		if (i == g_psvs.maxclients)
+		if (clientId == g_psvs.maxclients)
 			return changed;
 
+		char newname[MAX_NAME];
 		Q_snprintf(newname, sizeof(newname), "(%d)%-0.*s", ++dupc, 28, rawname);
 #ifdef REHLDS_FIXES
 		// Fix possibly incorrectly cut UTF8 chars
