@@ -2121,7 +2121,11 @@ int SV_CheckUserInfo(netadr_t *adr, char *userinfo, qboolean bIsReconnecting, in
 	}
 #endif
 
+#ifdef REHLDS_FIXES
+	if (name[0] == 0 || !Q_stricmp(name, "console") || Q_strstr(name, "..") || Q_strstr(name, "\"") || Q_strstr(name, "\\"))
+#else // REHLDS_FIXES
 	if (name[0] == 0 || !Q_stricmp(name, "console") || Q_strstr(name, "..") != NULL)
+#endif // REHLDS_FIXES
 	{
 		Info_SetValueForKey(userinfo, "name", "unnamed", MAX_INFO_STRING);
 	}
@@ -4902,7 +4906,7 @@ void SV_ExtractFromUserinfo(client_t *cl)
 
 	if (newname[0] == '\0' || !Q_stricmp(newname, "console")
 #ifdef REHLDS_FIXES
-		|| Q_strstr(newname, "..") != NULL)
+		|| Q_strstr(newname, "..") || Q_strstr(newname, "\"") || Q_strstr(newname, "\\"))
 #else // REHLDS_FIXES
 		)
 #endif // REHLDS_FIXES
