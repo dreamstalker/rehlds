@@ -549,9 +549,13 @@ qboolean Info_IsValid(const char *s)
 		}
 
 		// Returns character count
-		// -1 error
-		// 0 string size is zero
-		auto validate = [&s](bool allowNull) -> int
+		// -1 - error
+		//  0 - string size is zero
+		enum class AllowNull {
+			Yes,
+			No,
+		};
+		auto validate = [&s](AllowNull allowNull) -> int
 		{
 			int nCount = 0;
 
@@ -559,7 +563,7 @@ qboolean Info_IsValid(const char *s)
 			{
 				if (!*s)
 				{
-					return allowNull ? nCount : -1;
+					return (allowNull == AllowNull::Yes) ? nCount : -1;
 				}
 
 				if (nCount >= MAX_KV_LEN)
@@ -568,7 +572,7 @@ qboolean Info_IsValid(const char *s)
 				}
 
 #ifdef REHLDS_FIXES
-				if(*s == '\"')
+				if (*s == '\"')
 				{
 					return -1; // string should not contain "
 				}
@@ -577,13 +581,13 @@ qboolean Info_IsValid(const char *s)
 			return nCount;
 		};
 
-		if(validate(false) == -1)
+		if (validate(AllowNull::No) == -1)
 		{
 			return FALSE;
 		}
 		s++; // Skip slash
 
-		if(validate(true) <= 0)
+		if (validate(AllowNull::Yes) <= 0)
 		{
 			return FALSE;
 		}
