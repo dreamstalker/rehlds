@@ -541,11 +541,6 @@ void Info_Print(const char *s)
 
 qboolean Info_IsValid(const char *s)
 {
-	char key[MAX_KV_LEN];
-	char value[MAX_KV_LEN];
-	char *c;
-	int nCount;
-
 	while (*s)
 	{
 		if (*s == '\\')
@@ -553,46 +548,48 @@ qboolean Info_IsValid(const char *s)
 			s++;	// skip the slash
 		}
 
-		// Copy a key
-		nCount = 0;
-		c = key;
-		while (*s != '\\')
+		// Returns character count
+		// -1 - error
+		//  0 - string size is zero
+		enum class AllowNull {
+			Yes,
+			No,
+		};
+		auto validate = [&s](AllowNull allowNull) -> int
 		{
-			if (!*s)
-			{
-				return FALSE;		// key should end with a \, not a NULL
-			}
-			if (nCount >= MAX_KV_LEN)
-			{
-				return FALSE;		// key length should be less then MAX_KV_LEN
-			}
-			*c++ = *s++;
-			nCount++;
-		}
-		*c = 0;
-		s++;	// skip the slash
+			int nCount = 0;
 
-		// Copy a value
-		nCount = 0;
-		c = value;
-		while (*s != '\\')
-		{
-			if (!*s)
+			for(; *s != '\\'; nCount++, s++)
 			{
-				break;				// allow value to be ended with NULL
-			}
-			if (nCount >= MAX_KV_LEN)
-			{
-				return FALSE;		// value length should be less then MAX_KV_LEN
-			}
-			*c++ = *s++;
-			nCount++;
-		}
-		*c = 0;
+				if (!*s)
+				{
+					return (allowNull == AllowNull::Yes) ? nCount : -1;
+				}
 
-		if (value[0] == 0)
+				if (nCount >= MAX_KV_LEN)
+				{
+					return -1;		// string length should be less then MAX_KV_LEN
+				}
+
+#ifdef REHLDS_FIXES
+				if (*s == '\"')
+				{
+					return -1; // string should not contain "
+				}
+#endif
+			}
+			return nCount;
+		};
+
+		if (validate(AllowNull::No) == -1)
 		{
-			return FALSE;	// empty values are not valid
+			return FALSE;
+		}
+		s++; // Skip slash
+
+		if (validate(AllowNull::Yes) <= 0)
+		{
+			return FALSE;
 		}
 
 		if (!*s)
