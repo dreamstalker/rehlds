@@ -65,7 +65,7 @@ std::vector<info_field_t *> g_info_transmitted_fields;
 
 // Searches the string for the given
 // key and returns the associated value, or an empty string.
-const char* EXT_FUNC Info_ValueForKey(const char *s, const char *lookup)
+const char* Info_ValueForKey(const char *s, const char *lookup)
 {
 #ifdef REHLDS_FIXES
 	static char valueBuf[INFO_MAX_BUFFER_VALUES][MAX_KV_LEN];
@@ -77,8 +77,13 @@ const char* EXT_FUNC Info_ValueForKey(const char *s, const char *lookup)
 		const char* key = ++s;
 
 		// skip key
-		while (*s != '\\')
+		while (*s != '\\') {
+			// Add some sanity checks because it's external function
+			if (*s == '\0')
+				return "";
+
 			s++;
+		}
 
 		size_t keyLen = s - key;
 		const char* value = ++s; // skip separating slash
@@ -87,7 +92,7 @@ const char* EXT_FUNC Info_ValueForKey(const char *s, const char *lookup)
 		while (*s != '\\' && *s != '\0')
 			s++;
 
-		size_t valueLen = s - value;
+		size_t valueLen = Q_min(s - value, MAX_KV_LEN - 1);
 
 		if (!Q_strncmp(key, lookup, keyLen))
 		{
@@ -561,9 +566,9 @@ qboolean Info_SetValueForStarKey(char *s, const char *key, const char *value, si
 	int keyLen = Q_strlen(key);
 	int valueLen = Q_strlen(value);
 
-	if (keyLen > MAX_KV_LEN || valueLen > MAX_KV_LEN)
+	if (keyLen >= MAX_KV_LEN || valueLen >= MAX_KV_LEN)
 	{
-		Con_Printf("Keys and values must be <= %i characters\n", MAX_KV_LEN);
+		Con_Printf("Keys and values must be < %i characters\n", MAX_KV_LEN);
 		return FALSE;
 	}
 
@@ -817,7 +822,7 @@ qboolean Info_IsValid(const char *s)
 		// keys and values are separated by another slash
 		while (*s != '\\')
 		{
-			// key should end with a \, not a NULL
+			// key should end with a '\', not a NULL
 			if (*s == '\0')
 				return FALSE;
 	
@@ -833,7 +838,7 @@ qboolean Info_IsValid(const char *s)
 		}
 
 		size_t keyLen = s - key;
-		if (keyLen == 0 || keyLen > MAX_KV_LEN)
+		if (keyLen == 0 || keyLen >= MAX_KV_LEN)
 			return FALSE;
 
 		const char* value = ++s; // skip the slash
@@ -841,7 +846,7 @@ qboolean Info_IsValid(const char *s)
 		// values should be ended by eos or slash
 		while (*s != '\\' && *s == '\0')
 		{
-			// quotes are deprecated. see https://github.com/dreamstalker/rehlds/pull/595
+			// quotes are deprecated
 			if (*s == '"')
 				return FALSE;
 
@@ -853,7 +858,7 @@ qboolean Info_IsValid(const char *s)
 		}
 
 		size_t valueLen = s - value;
-		if (valueLen == 0 || valueLen > MAX_KV_LEN)
+		if (valueLen == 0 || valueLen >= MAX_KV_LEN)
 			return FALSE;
 
 		if (*s == '\0')
@@ -965,7 +970,7 @@ void Info_SetFieldsToTransmit()
 			continue;
 		}
 
-		if (Q_strlen(key) > MAX_KV_LEN) {
+		if (Q_strlen(key) >= MAX_KV_LEN) {
 			Con_Printf("%s: keys and values must be < %i characters\n", __FUNCTION__, MAX_KV_LEN);
 			continue;
 		}
