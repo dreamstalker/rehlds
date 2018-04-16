@@ -844,7 +844,7 @@ qboolean Info_IsValid(const char *s)
 		const char* value = ++s; // skip the slash
 
 		// values should be ended by eos or slash
-		while (*s != '\\' && *s == '\0')
+		while (*s != '\\' && *s != '\0')
 		{
 			// quotes are deprecated
 			if (*s == '"')

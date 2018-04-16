@@ -43,17 +43,13 @@ TEST(SetValueForStarKey, Info, 1000) {
 
 	testdata_t testdata[] = {
 		// Behavior
-		{ "", "a", "b", "\\a\\b" },
-		{ "\\a\\b\\c\\d", "a", "b", "\\c\\d\\a\\b" },
+		{ "\\a\\b", "c", "d", "\\a\\b\\c\\d" },
+		{ "\\a\\b\\c\\d", "b", "f", "\\a\\b\\c\\d\\b\\f" },
+		{ "\\a\\b\\c\\d", "c", "", "\\a\\b" },
+		{ "\\a\\b\\c\\d\\e\\f", "c", "", "\\a\\b\\e\\f" },
+		{ "\\a\\b\\c\\d", "a", "e", "\\c\\d\\a\\e" },
 		{ "\\a\\b\\c\\d", "e", "f", "\\a\\b\\c\\d\\e\\f" },
 		{ "\\a\\b\\c\\d", "b", "c", "\\a\\b\\c\\d\\b\\c" },
-		{ "\\a\\b\\c\\d\\e\\f", "c", "q", "\\a\\b\\e\\f\\c\\q" },
-		
-
-		{ "\\a\\b\\c", "e", "f", "\\a\\b\\c\\e\\f" },
-		{ "\\a\\b\\c\\", "e", "f", "\\a\\b\\c\\\\e\\f" },
-		{ "\\a\\b\\\\c", "e", "f", "\\a\\b\\\\c\\e\\f" },
-
 		
 		//limits
 		{ //do nothing since 'team' is not important key
@@ -103,18 +99,10 @@ TEST(RemoveKeyValue, Info, 1000) {
 	testdata_t testdata[] = {
 		{ "", "a", "" },
 		{ "\\a\\b", "a", "" },
-		{ "\\a\\", "a", "" },
-		{ "\\a\\\\", "a", "\\" },
-		{ "\\a", "a", "" },
-		{ "a", "a", "" },
-		{ "a\\", "a", "" },
-		{ "a\\b", "a", "" },
-		{ "a\\b\\", "a", "\\" },
 		{ "\\a\\b\\c\\d\\e\\f", "d", "\\a\\b\\c\\d\\e\\f" },
 		{ "\\a\\b\\c\\d\\e\\f", "c", "\\a\\b\\e\\f" },
-		{ "a\\b\\c\\d\\e\\f", "d", "a\\b\\c\\d\\e\\f" },
-		{ "a\\b\\c\\d\\e\\f", "c", "a\\b\\e\\f" },
-		{ "a\\b\\c\\d\\e\\f", "a", "\\c\\d\\e\\f" },
+		{ "\\abc\\def\\x\\y\\ab\\cd", "ab", "\\x\\y" },
+		{ "\\ab\\cd", "abc", "\\ab\\cd" }
 	};
 
 	for (int i = 0; i < ARRAYSIZE(testdata); i++) {
@@ -196,6 +184,7 @@ TEST(InfoIsValid, Info, 1000) {
 		{ "\\a\\b\\c\\", false },
 		{ "\\a\\b\\c\\\\", false },
 #ifdef REHLDS_FIXES
+		{ "\\a\\b\\\\d", false },
 		{ "\\a\\b\\\\d\\", false },
 		{ "\\a\\b..c", false },
 		{ "\\a\\b\"c", false },
@@ -209,7 +198,10 @@ TEST(InfoIsValid, Info, 1000) {
 	for (int i = 0; i < ARRAYSIZE(testdata); i++) {
 		testdata_t* d = &testdata[i];
 
+		char error[256];
+		snprintf(error, sizeof error, "Invalid result for string '%s'", d->info);
+
 		qboolean res = Info_IsValid(d->info);
-		CHECK("Invalid info value", d->result == res);
+		CHECK(error, d->result == res);
 	}
 }
