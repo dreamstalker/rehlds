@@ -3,8 +3,6 @@
 #include "cppunitlite/TestHarness.h"
 
 TEST(PrefixedKeysRemove, Info, 1000) {
-	EngineInitializer engInitGuard;
-
 	struct testdata_t {
 		const char* inData;
 		const char* outData;
@@ -32,8 +30,6 @@ TEST(PrefixedKeysRemove, Info, 1000) {
 }
 
 TEST(SetValueForStarKey, Info, 1000) {
-	EngineInitializer engInitGuard;
-
 	struct testdata_t {
 		const char* initialInfo;
 		const char* key;
@@ -100,8 +96,6 @@ TEST(SetValueForStarKey, Info, 1000) {
 
 #ifdef REHLDS_FIXES
 TEST(SetValueForStarKeyResult, Info, 1000) {
-	EngineInitializer engInitGuard;
-
 	struct testdata_t {
 		const char* initialInfo;
 		const char* key;
@@ -138,8 +132,6 @@ TEST(SetValueForStarKeyResult, Info, 1000) {
 #endif
 
 TEST(RemoveKeyValue, Info, 1000) {
-	EngineInitializer engInitGuard;
-
 	struct testdata_t {
 		const char* initialInfo;
 		const char* key;
@@ -165,8 +157,6 @@ TEST(RemoveKeyValue, Info, 1000) {
 }
 
 TEST(GetKeyValue, Info, 1000) {
-	EngineInitializer engInitGuard;
-
 	struct testdata_t {
 		const char* info;
 		const char* key;
@@ -194,8 +184,6 @@ TEST(GetKeyValue, Info, 1000) {
 }
 
 TEST(FindLargestKey, Info, 1000) {
-	EngineInitializer engInitGuard;
-
 	struct testdata_t {
 		const char* info;
 		const char* result;
@@ -217,8 +205,6 @@ TEST(FindLargestKey, Info, 1000) {
 }
 
 TEST(InfoIsValid, Info, 1000) {
-	EngineInitializer engInitGuard;
-
 	struct testdata_t {
 		const char* info;
 		qboolean result;
@@ -253,5 +239,34 @@ TEST(InfoIsValid, Info, 1000) {
 
 		qboolean res = Info_IsValid(d->info);
 		CHECK(error, d->result == res);
+	}
+}
+
+TEST(InfoCollectFields, Info, 1000)
+{
+	struct testdata_t {
+		const char* info;
+		const char* cvar;
+		const char* result;
+	};
+
+	testdata_t testdata[] = {
+		{ "\\cl_updaterate\\100\\topcolor\\60\\name\\abcdefghijklmnop\\*sid\\12332432525345\\_vgui_menus\\1\\model\\urban", "", "\\name\\abcdefghijklmnop\\*sid\\12332432525345\\model\\urban" },
+		{ "\\cl_updaterate\\100\\topcolor\\60\\name\\abcdefghijklmnop\\*sid\\12332432525345\\_vgui_menus\\1\\model\\urban", "_vgui_menus", "\\name\\abcdefghijklmnop\\*sid\\12332432525345\\model\\urban" },
+		{ "\\cl_updaterate\\100\\topcolor\\60\\name\\abcdefghijklmnop\\*sid\\12332432525345\\_vgui_menus\\1\\model\\urban", "topcolor", "\\topcolor\\60\\name\\abcdefghijklmnop\\*sid\\12332432525345\\model\\urban" },
+		{ "\\cl_updaterate\\100\\topcolor\\60abv123\\name\\abcdefghijklmnop\\*sid\\12332432525345\\_vgui_menus\\1\\model\\urban", "topcolor", "\\topcolor\\60\\name\\abcdefghijklmnop\\*sid\\12332432525345\\model\\urban" },
+		{ "\\*hltv\\1dsgs", "", "\\*hltv\\1" },
+		{ "\\name\\player", "bottomcolor", "\\name\\player" },
+	};
+
+	for (int i = 0; i < ARRAYSIZE(testdata); i++) {
+		testdata_t* d = &testdata[i];
+
+		char destinfo[MAX_INFO_STRING];
+		sv_rehlds_userinfo_transmitted_fields.string = (char *)d->cvar;
+		Info_SetFieldsToTransmit();
+		Info_CollectFields(destinfo, d->info, MAX_INFO_STRING);
+
+		ZSTR_EQUAL("Invalid info string", d->result, destinfo);
 	}
 }
