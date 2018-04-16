@@ -418,7 +418,7 @@ qboolean Info_IsKeyImportant(const char *key)
 }
 #endif
 
-char *Info_FindLargestKey(char *s, int maxsize)
+const char *Info_FindLargestKey(char *s, int maxsize)
 {
 #ifdef REHLDS_FIXES
 	static char largestKey[MAX_KV_LEN];
@@ -607,7 +607,7 @@ qboolean Info_SetValueForStarKey(char *s, const char *key, const char *value, si
 		// keep removing the largest key/values until we have a room
 		do
 		{
-			char* largekey = Info_FindLargestKey(s, maxsize);
+			const char* largekey = Info_FindLargestKey(s, maxsize);
 			if (largekey[0] == '\0')
 			{
 				// no room to add setting

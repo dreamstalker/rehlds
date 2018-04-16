@@ -48,7 +48,7 @@ const char *Info_ValueForKey(const char *s, const char *key);
 void Info_RemoveKey(char *s, const char *key);
 void Info_RemovePrefixedKeys(char *s, const char prefix);
 qboolean Info_IsKeyImportant(const char *key);
-char *Info_FindLargestKey(char *s, int maxsize);
+const char *Info_FindLargestKey(char *s, int maxsize);
 #ifdef REHLDS_FIXES
 qboolean Info_SetValueForStarKey(char *s, const char *key, const char *value, size_t maxsize);
 #else
