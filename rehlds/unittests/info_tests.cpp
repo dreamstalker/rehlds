@@ -12,9 +12,7 @@ TEST(PrefixedKeysRemove, Info, 1000) {
 
 	testdata_t testdata[] = {
 		{ "", "" },
-		{ "key\\value", "key\\value" },
 		{ "\\key\\value", "\\key\\value" },
-		{ "_key\\value", "" },
 		{ "\\_key\\value", "" },
 		{ "\\k\\v\\_u\\t\\y\\z", "\\k\\v\\y\\z" },
 		{ "\\_k\\v\\u\\t\\y\\z", "\\u\\t\\y\\z" },
@@ -47,9 +45,7 @@ TEST(SetValueForStarKey, Info, 1000) {
 		// Behavior
 		{ "", "a", "b", "\\a\\b" },
 		{ "\\a\\b\\c\\d", "a", "b", "\\c\\d\\a\\b" },
-		{ "a\\b\\c\\d", "a", "b", "\\c\\d\\a\\b" },
 		{ "\\a\\b\\c\\d", "e", "f", "\\a\\b\\c\\d\\e\\f" },
-		{ "a\\b\\c\\d", "e", "f", "a\\b\\c\\d\\e\\f" },
 		{ "\\a\\b\\c\\d", "b", "c", "\\a\\b\\c\\d\\b\\c" },
 		{ "\\a\\b\\c\\d\\e\\f", "c", "q", "\\a\\b\\e\\f\\c\\q" },
 		
@@ -145,16 +141,8 @@ TEST(GetKeyValue, Info, 1000) {
 		{ "\\a\\", "a", "" },
 		{ "\\a\\\\", "a", "" },
 		{ "\\a", "a", "" },
-		{ "a", "a", "" },
-		{ "a\\", "a", "" },
-		{ "a\\b", "a", "b" },
-		{ "a\\b\\", "a", "b" },
 		{ "\\a\\b\\c\\d\\e\\f", "d", "" },
 		{ "\\a\\b\\c\\d\\e\\f", "c", "d" },
-		{ "a\\b\\c\\d\\e\\f", "d", "" },
-		{ "a\\b\\c\\d\\e\\f", "c", "d" },
-
-		{ "a\\b\\c\\d\\e\\f", "e", "f" },
 		{ "\\a\\b\\c\\d\\e\\f", "e", "f" },
 
 	};
@@ -164,5 +152,60 @@ TEST(GetKeyValue, Info, 1000) {
 
 		const char* res = Info_ValueForKey(d->info, d->key);
 		ZSTR_EQUAL("Invalid info value", d->result, res);
+	}
+}
+
+TEST(FindLargestKey, Info, 1000) {
+	EngineInitializer engInitGuard;
+
+	struct testdata_t {
+		const char* info;
+		const char* result;
+	};
+
+	testdata_t testdata[] = {
+		{ "", "" },
+		{ "\\name\\a\\model\\b", "" },
+		{ "\\name\\a\\1234567890abcdef\\b\\model\\c\\1234567890abcdefghi\\d\\rate\\1000", "1234567890abcdefghi" },
+		{ "\\name\\a\\1234567890abcdefghi\\b\\model\\c\\1234567890abcdef\\d\\rate\\1000", "1234567890abcdefghi" }
+	};
+
+	for (int i = 0; i < ARRAYSIZE(testdata); i++) {
+		testdata_t* d = &testdata[i];
+
+		const char* res = Info_FindLargestKey(d->info, MAX_INFO_STRING);
+		ZSTR_EQUAL("Invalid info value", d->result, res);
+	}
+}
+
+TEST(InfoIsValid, Info, 1000) {
+	EngineInitializer engInitGuard;
+
+	struct testdata_t {
+		const char* info;
+		bool result;
+	};
+
+	testdata_t testdata[] = {
+		{ "", false }, // by original design
+		{ "a\\b", false },
+		{ "\\a\\b", true },
+		{ "\\a\\b\\c", false },
+		{ "\\a\\b\\c\\", false },
+		{ "\\a\\b\\c\\\\", false },
+		{ "\\a\\b\\\\d\\", false },
+		{ "\\a\\b..c", false },
+		{ "\\a\\b\"c", false },
+		{ "\\a..b\\c", false },
+		{ "\\a\"b\\c", false },
+		{ "\\a\\bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", false },
+		{ "\\bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\\c", false }
+	};
+
+	for (int i = 0; i < ARRAYSIZE(testdata); i++) {
+		testdata_t* d = &testdata[i];
+
+		qboolean res = Info_IsValid(d->info);
+		CHECK("Invalid info value", d->result == res);
 	}
 }
