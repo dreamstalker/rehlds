@@ -47,6 +47,7 @@ TEST(SetValueForStarKey, Info, 1000) {
 		{ "\\a\\b\\c\\d", "a", "e", "\\c\\d\\a\\e" },
 		{ "\\a\\b\\c\\d", "e", "f", "\\a\\b\\c\\d\\e\\f" },
 		{ "\\a\\b\\c\\d", "b", "c", "\\a\\b\\c\\d\\b\\c" },
+		{ "\\a\\b\\c\\d", "team", "aBcD", "\\a\\b\\c\\d\\team\\abcd" },
 
 		// Invalid keys/values
 		{ "\\a\\b", "c", nullptr, "\\a\\b" },
@@ -228,7 +229,10 @@ TEST(InfoIsValid, Info, 1000) {
 		{ "\\a\"b\\c", false },
 #endif
 		{ "\\a\\bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", false },
-		{ "\\bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\\c", false }
+		{ "\\bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\\c", false },
+		{ "\\a\\b\\c\\d\\a\\e", false },
+		{ "\\aaab\\b\\c\\d\\aaa\\e", false },
+		{ "\\aaa\\b\\c\\d\\aaab\\e", false }
 	};
 
 	for (int i = 0; i < ARRAYSIZE(testdata); i++) {

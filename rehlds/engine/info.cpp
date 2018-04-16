@@ -586,7 +586,7 @@ qboolean Info_SetValueForStarKey(char *s, const char *key, const char *value, si
 	}
 
 	// auto lowercase team
-	if (!Q_stricmp(key, "team")) {
+	if (!Q_strcmp(key, "team")) {
 		value = Q_strcpy(valueBuf, value);
 		Q_strlwr(valueBuf);
 	}
@@ -817,6 +817,21 @@ void Info_Print(const char *s)
 qboolean Info_IsValid(const char *s)
 {
 #ifdef REHLDS_FIXES
+	struct {
+		const char*	start;
+		size_t		len;
+	} existingKeys[MAX_INFO_STRING / 4];
+	size_t existingKeysNum = 0;
+
+	auto isAlreadyExists = [&](const char* key, size_t len)
+	{
+		for (size_t i = 0; i < existingKeysNum; i++) {
+			if (len == existingKeys[i].len && !memcmp(key, existingKeys[i].start, existingKeys[i].len))
+				return true;
+		}
+		return false;
+	};
+
 	while (*s == '\\')
 	{
 		const char* key = ++s;
@@ -843,6 +858,9 @@ qboolean Info_IsValid(const char *s)
 		if (keyLen == 0 || keyLen >= MAX_KV_LEN)
 			return FALSE;
 
+		if (isAlreadyExists(key, keyLen))
+			return FALSE;
+
 		const char* value = ++s; // skip the slash
 
 		// values should be ended by eos or slash
@@ -865,6 +883,10 @@ qboolean Info_IsValid(const char *s)
 
 		if (*s == '\0')
 			return TRUE;
+
+		existingKeys[existingKeysNum].start = key;
+		existingKeys[existingKeysNum].len = keyLen;
+		existingKeysNum++;
 	}
 
 	return FALSE;
