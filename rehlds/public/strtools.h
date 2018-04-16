@@ -102,7 +102,6 @@ inline char *_strlwr(char *start)
 	#define Q_sin sin
 	#define Q_pow pow
 	#define Q_fmod fmod
-	#define Q_itoa _itoa
 #else
 	#define Q_memset memset
 	#define Q_memcpy memcpy
@@ -143,7 +142,6 @@ inline char *_strlwr(char *start)
 	#define Q_sin sin
 	#define Q_pow pow
 	#define Q_fmod fmod
-	#define Q_itoa _itoa
 #endif // #if defined(ASMLIB_H) && defined(HAVE_OPT_STRTOOLS)
 
 // a safe variant of strcpy that truncates the result to fit in the destination buffer

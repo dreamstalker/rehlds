@@ -418,7 +418,7 @@ qboolean Info_IsKeyImportant(const char *key)
 }
 #endif
 
-const char *Info_FindLargestKey(char *s, int maxsize)
+const char *Info_FindLargestKey(const char *s, int maxsize)
 {
 #ifdef REHLDS_FIXES
 	static char largestKey[MAX_KV_LEN];
@@ -427,7 +427,7 @@ const char *Info_FindLargestKey(char *s, int maxsize)
 	while (*s == '\\')
 	{
 		// skip starting slash
-		char* key = ++s;
+		const char* key = ++s;
 
 		// skip key
 		while (*s != '\\')
@@ -696,7 +696,7 @@ void Info_SetValueForStarKey(char *s, const char *key, const char *value, int ma
 		}
 
 		// keep removing the largest key/values until we have a room
-		char *largekey;
+		const char *largekey;
 		do
 		{
 			largekey = Info_FindLargestKey(s, maxsize);
@@ -1004,7 +1004,8 @@ void Info_CollectFields(char *destInfo, const char *srcInfo, size_t maxsize)
 			if (!intValue)
 				continue;
 
-			value = Q_itoa(intValue, valueBuf, 10);
+			Q_sprintf(valueBuf, "%i", intValue);
+			value = valueBuf;
 		}
 
 		// don't write truncated keys/values

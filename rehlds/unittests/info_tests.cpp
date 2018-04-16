@@ -183,21 +183,25 @@ TEST(InfoIsValid, Info, 1000) {
 
 	struct testdata_t {
 		const char* info;
-		bool result;
+		qboolean result;
 	};
 
 	testdata_t testdata[] = {
 		{ "", false }, // by original design
+#ifdef REHLDS_FIXES
 		{ "a\\b", false },
+#endif
 		{ "\\a\\b", true },
 		{ "\\a\\b\\c", false },
 		{ "\\a\\b\\c\\", false },
 		{ "\\a\\b\\c\\\\", false },
+#ifdef REHLDS_FIXES
 		{ "\\a\\b\\\\d\\", false },
 		{ "\\a\\b..c", false },
 		{ "\\a\\b\"c", false },
 		{ "\\a..b\\c", false },
 		{ "\\a\"b\\c", false },
+#endif
 		{ "\\a\\bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", false },
 		{ "\\bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\\c", false }
 	};
