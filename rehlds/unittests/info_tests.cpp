@@ -47,10 +47,21 @@ TEST(SetValueForStarKey, Info, 1000) {
 		{ "\\a\\b\\c\\d", "b", "f", "\\a\\b\\c\\d\\b\\f" },
 		{ "\\a\\b\\c\\d", "c", "", "\\a\\b" },
 		{ "\\a\\b\\c\\d\\e\\f", "c", "", "\\a\\b\\e\\f" },
+		{ "\\a\\b\\c\\d\\e\\f", "z", "", "\\a\\b\\c\\d\\e\\f" },
 		{ "\\a\\b\\c\\d", "a", "e", "\\c\\d\\a\\e" },
 		{ "\\a\\b\\c\\d", "e", "f", "\\a\\b\\c\\d\\e\\f" },
 		{ "\\a\\b\\c\\d", "b", "c", "\\a\\b\\c\\d\\b\\c" },
-		
+
+		// Invalid keys/values
+		{ "\\a\\b", "c", nullptr, "\\a\\b" },
+		{ "\\a\\b", nullptr, "c", "\\a\\b" },
+		{ "\\a\\b", "c", "d..", "\\a\\b" },
+		{ "\\a\\b", "..c", "d", "\\a\\b" },
+		{ "\\a\\b", "c\"", "d", "\\a\\b" },
+		{ "\\a\\b", "c", "d\"", "\\a\\b" },
+		{ "\\a\\b", "c\\", "d", "\\a\\b" },
+		{ "\\a\\b", "c", "d\\", "\\a\\b" },
+
 		//limits
 		{ //do nothing since 'team' is not important key
 			"\\cl_updaterate\\100\\topcolor\\60\\name\\abcdefghijklmnop\\*sid\\12332432525345\\_vgui_menus\\1\\model\\urban\\somelargeuselesskey\\12312321321323123123123213123123123123123123123123123123123123123dasdsad\\_cl_autowepswitch\\1",
@@ -86,6 +97,45 @@ TEST(SetValueForStarKey, Info, 1000) {
 		ZSTR_EQUAL("Invalid info string", d->finalInfo, localInfo);
 	}
 }
+
+#ifdef REHLDS_FIXES
+TEST(SetValueForStarKeyResult, Info, 1000) {
+	EngineInitializer engInitGuard;
+
+	struct testdata_t {
+		const char* initialInfo;
+		const char* key;
+		const char* value;
+		bool success;
+	};
+
+	testdata_t testdata[] = {
+		// Behavior
+		{ "\\a\\b", "c", "d", true },
+		{ "\\a\\b\\c\\d", "b", "f", true },
+		{ "\\a\\b\\c\\d", "b", "c", true },
+
+		// Invalid keys/values
+		{ "\\a\\b", "c", nullptr, false },
+		{ "\\a\\b", nullptr, "c", false },
+		{ "\\a\\b", "c", "d..", false },
+		{ "\\a\\b", "..c", "d", false },
+		{ "\\a\\b", "c\"", "d", false },
+		{ "\\a\\b", "c", "d\"", false },
+		{ "\\a\\b", "c\\", "d", false },
+		{ "\\a\\b", "c", "d\\", false },
+	};
+
+	for (int i = 0; i < ARRAYSIZE(testdata); i++) {
+		testdata_t* d = &testdata[i];
+		char localInfo[256];
+		strcpy(localInfo, d->initialInfo);
+		localInfo[255] = 0;
+		bool result = Info_SetValueForStarKey(localInfo, d->key, d->value, 256);
+		CHECK("Invalid info string", d->success == result);
+	}
+}
+#endif
 
 TEST(RemoveKeyValue, Info, 1000) {
 	EngineInitializer engInitGuard;

@@ -160,7 +160,7 @@ const char* Info_ValueForKey(const char *s, const char *lookup)
 		}
 		*c = 0;
 
-		if (!Q_strcmp(key, pkey))
+		if (!Q_strcmp(lookup, pkey))
 		{
 			c = value[valueindex];
 			valueindex = (valueindex + 1) % INFO_MAX_BUFFER_VALUES;
@@ -213,13 +213,13 @@ void Info_RemoveKey(char *s, const char *lookup)
 	int cmpsize;
 	int nCount;
 
-	if (Q_strstr(key, "\\"))
+	if (Q_strstr(lookup, "\\"))
 	{
 		Con_Printf("Can't use a key with a \\\n");
 		return;
 	}
 
-	cmpsize = Q_strlen(key);
+	cmpsize = Q_strlen(lookup);
 	if (cmpsize > MAX_KV_LEN - 1)
 		cmpsize = MAX_KV_LEN - 1;
 
@@ -273,7 +273,7 @@ void Info_RemoveKey(char *s, const char *lookup)
 		*c = 0;
 
 		// Compare keys
-		if (!Q_strncmp(key, pkey, cmpsize))
+		if (!Q_strncmp(lookup, pkey, cmpsize))
 		{
 			Q_strcpy_s(start, s);	// remove this part
 			s = start;	// continue searching
@@ -551,15 +551,15 @@ qboolean Info_SetValueForStarKey(char *s, const char *key, const char *value, si
 		return FALSE;
 	}
 
-	if (Q_strstr(key, "..") || Q_strstr(value, ".."))
+	if (Q_strchr(key, '\"') || Q_strchr(value, '\"'))
 	{
-		Con_Printf("Can't use keys or values with a ..\n");
+		Con_Printf("Can't use keys or values with a \"\n");
 		return FALSE;
 	}
 
-	if (Q_strstr(key, "\"") || Q_strstr(value, "\""))
+	if (Q_strstr(key, "..") || Q_strstr(value, ".."))
 	{
-		Con_Printf("Can't use keys or values with a \"\n");
+		Con_Printf("Can't use keys or values with a ..\n");
 		return FALSE;
 	}
 
@@ -617,6 +617,8 @@ qboolean Info_SetValueForStarKey(char *s, const char *key, const char *value, si
 			Info_RemoveKey(s, largekey);
 		} while ((int)Q_strlen(s) + neededLength >= maxsize);
 	}
+
+	Q_strcat(s, newArray);
 
 	return TRUE;
 }
