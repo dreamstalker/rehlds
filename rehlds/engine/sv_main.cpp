@@ -198,7 +198,7 @@ cvar_t listipcfgfile = { "listipcfgfile", "listip.cfg", 0, 0.0f, nullptr };
 cvar_t syserror_logfile = { "syserror_logfile", "sys_error.log", 0, 0.0f, nullptr };
 cvar_t sv_rehlds_hull_centering = { "sv_rehlds_hull_centering", "0", 0, 0.0f, nullptr };
 cvar_t sv_rcon_condebug = { "sv_rcon_condebug", "1", 0, 1.0f, nullptr };
-cvar_t sv_rehlds_userinfo_transmitted_fields = { "sv_rehlds_userinfo_transmitted_fields", "", 0, 0.0f, nullptr };
+cvar_t sv_rehlds_userinfo_transmitted_fields = { "sv_rehlds_userinfo_transmitted_fields", "\bottomcolor\topcolor", 0, 0.0f, nullptr };
 cvar_t sv_rehlds_attachedentities_playeranimationspeed_fix = {"sv_rehlds_attachedentities_playeranimationspeed_fix", "0", 0, 0.0f, nullptr};
 cvar_t sv_rehlds_local_gametime = {"sv_rehlds_local_gametime", "0", 0, 0.0f, nullptr};
 cvar_t sv_rehlds_send_mapcycle = { "sv_rehlds_send_mapcycle", "0", 0, 0.0f, nullptr };
@@ -3750,17 +3750,12 @@ void SV_FullClientUpdate(client_t *cl, sizebuf_t *sb)
 	char info[MAX_INFO_STRING];
 
 #ifdef REHLDS_FIXES
-	if (sv_rehlds_userinfo_transmitted_fields.string[0] != '\0')
-	{
-		Info_CollectFields(info, cl->userinfo, sv_rehlds_userinfo_transmitted_fields.string);
-	}
-	else
+	Info_CollectFields(info, cl->userinfo, MAX_INFO_STRING);
+#else // REHLDS_FIXES
+	Q_strncpy(info, cl->userinfo, sizeof(info) - 1);
+	info[sizeof(info) - 1] = '\0';
+	Info_RemovePrefixedKeys(info, '_');
 #endif // REHLDS_FIXES
-	{
-		Q_strncpy(info, cl->userinfo, sizeof(info) - 1);
-		info[sizeof(info) - 1] = 0;
-		Info_RemovePrefixedKeys(info, '_');
-	}
 
 	g_RehldsHookchains.m_SV_WriteFullClientUpdate.callChain(SV_WriteFullClientUpdate_internal, GetRehldsApiClient(cl), info, MAX_INFO_STRING, sb, GetRehldsApiClient((sb == &g_psv.reliable_datagram) ? nullptr : host_client));
 }
@@ -5803,6 +5798,10 @@ void EXT_FUNC SV_ActivateServer_internal(int runPhysics)
 		Q_sprintf(szCommand, "exec %s\n", mapchangecfgfile.string);
 		Cbuf_AddText(szCommand);
 	}
+
+#ifdef REHLDS_FIXES
+	Info_SetFieldsToTransmit();
+#endif
 }
 
 void SV_ServerShutdown(void)
