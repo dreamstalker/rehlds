@@ -230,9 +230,11 @@ TEST(InfoIsValid, Info, 1000) {
 #endif
 		{ "\\a\\bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", false },
 		{ "\\bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\\c", false },
+#ifdef REHLDS_FIXES
 		{ "\\a\\b\\c\\d\\a\\e", false },
-		{ "\\aaab\\b\\c\\d\\aaa\\e", false },
-		{ "\\aaa\\b\\c\\d\\aaab\\e", false }
+#endif
+		{ "\\aaab\\b\\c\\d\\aaa\\e", true },
+		{ "\\aaa\\b\\c\\d\\aaab\\e", true }
 	};
 
 	for (int i = 0; i < ARRAYSIZE(testdata); i++) {
@@ -246,6 +248,7 @@ TEST(InfoIsValid, Info, 1000) {
 	}
 }
 
+#ifdef REHLDS_FIXES
 TEST(InfoCollectFields, Info, 1000)
 {
 	struct testdata_t {
@@ -255,10 +258,10 @@ TEST(InfoCollectFields, Info, 1000)
 	};
 
 	testdata_t testdata[] = {
-		{ "\\cl_updaterate\\100\\topcolor\\60\\name\\abcdefghijklmnop\\*sid\\12332432525345\\_vgui_menus\\1\\model\\urban", "", "\\name\\abcdefghijklmnop\\*sid\\12332432525345\\model\\urban" },
-		{ "\\cl_updaterate\\100\\topcolor\\60\\name\\abcdefghijklmnop\\*sid\\12332432525345\\_vgui_menus\\1\\model\\urban", "_vgui_menus", "\\name\\abcdefghijklmnop\\*sid\\12332432525345\\model\\urban" },
-		{ "\\cl_updaterate\\100\\topcolor\\60\\name\\abcdefghijklmnop\\*sid\\12332432525345\\_vgui_menus\\1\\model\\urban", "topcolor", "\\topcolor\\60\\name\\abcdefghijklmnop\\*sid\\12332432525345\\model\\urban" },
-		{ "\\cl_updaterate\\100\\topcolor\\60abv123\\name\\abcdefghijklmnop\\*sid\\12332432525345\\_vgui_menus\\1\\model\\urban", "topcolor", "\\topcolor\\60\\name\\abcdefghijklmnop\\*sid\\12332432525345\\model\\urban" },
+		{ "\\cl_updaterate\\100\\topcolor\\60\\name\\abcdefghijklmnop\\*sid\\12332432525345\\_vgui_menus\\1\\model\\urban", "", "\\name\\abcdefghijklmnop\\model\\urban\\*sid\\12332432525345" },
+		{ "\\cl_updaterate\\100\\topcolor\\60\\name\\abcdefghijklmnop\\*sid\\12332432525345\\_vgui_menus\\1\\model\\urban", "_vgui_menus", "\\name\\abcdefghijklmnop\\model\\urban\\*sid\\12332432525345" },
+		{ "\\cl_updaterate\\100\\topcolor\\60\\name\\abcdefghijklmnop\\*sid\\12332432525345\\_vgui_menus\\1\\model\\urban", "topcolor", "\\name\\abcdefghijklmnop\\model\\urban\\*sid\\12332432525345\\topcolor\\60" },
+		{ "\\cl_updaterate\\100\\topcolor\\60abv123\\name\\abcdefghijklmnop\\*sid\\12332432525345\\_vgui_menus\\1\\model\\urban", "topcolor", "\\name\\abcdefghijklmnop\\model\\urban\\*sid\\12332432525345\\topcolor\\60" },
 		{ "\\*hltv\\1dsgs", "", "\\*hltv\\1" },
 		{ "\\name\\player", "bottomcolor", "\\name\\player" },
 	};
@@ -274,3 +277,4 @@ TEST(InfoCollectFields, Info, 1000)
 		ZSTR_EQUAL("Invalid info string", d->result, destinfo);
 	}
 }
+#endif
