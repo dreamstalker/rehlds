@@ -80,6 +80,7 @@ inline char *_strlwr(char *start)
 	#define Q_strstr A_strstr
 	#define Q_strchr strchr
 	#define Q_strrchr strrchr
+	#define Q_strtok strtok
 	#define Q_strlwr A_strtolower
 	#define Q_strupr A_strtoupper
 	#define Q_sprintf sprintf
@@ -120,6 +121,7 @@ inline char *_strlwr(char *start)
 	#define Q_strstr strstr
 	#define Q_strchr strchr
 	#define Q_strrchr strrchr
+	#define Q_strtok strtok
 	#define Q_strlwr _strlwr
 	#define Q_strupr _strupr
 	#define Q_sprintf sprintf

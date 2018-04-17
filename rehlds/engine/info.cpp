@@ -838,7 +838,7 @@ qboolean Info_IsValid(const char *s)
 	auto isAlreadyExists = [&](const char* key, size_t len)
 	{
 		for (size_t i = 0; i < existingKeysNum; i++) {
-			if (len == existingKeys[i].len && !memcmp(key, existingKeys[i].start, existingKeys[i].len))
+			if (len == existingKeys[i].len && !Q_memcmp(key, existingKeys[i].start, existingKeys[i].len))
 				return true;
 		}
 		return false;
@@ -993,13 +993,13 @@ void Info_SetFieldsToTransmit()
 	auto isIntegerField = [](const char* key)
 	{
 		for (auto& x : g_info_important_fields) {
-			if (!strcmp(key, x.name))
+			if (!Q_strcmp(key, x.name))
 				return x.integer;
 		}
 		return false;
 	};
 
-	for (char *key = strtok(keys, "\\"); key; key = strtok(nullptr, "\\"))
+	for (char *key = Q_strtok(keys, "\\"); key; key = Q_strtok(nullptr, "\\"))
 	{
 		if (key[0] == '_') {
 			Con_Printf("%s: private keys couldn't be transmitted.\n", __FUNCTION__);
@@ -1011,7 +1011,7 @@ void Info_SetFieldsToTransmit()
 			continue;
 		}
 
-		if (std::find_if(g_info_transmitted_fields.begin(), g_info_transmitted_fields.end(), [key](info_field_t* field) { return !strcmp(key, field->name); }) == g_info_transmitted_fields.end()) {
+		if (std::find_if(g_info_transmitted_fields.begin(), g_info_transmitted_fields.end(), [key](info_field_t* field) { return !Q_strcmp(key, field->name); }) == g_info_transmitted_fields.end()) {
 			auto field = new info_field_t;
 			field->name = Q_strdup(key);
 			field->forceSend = true;
