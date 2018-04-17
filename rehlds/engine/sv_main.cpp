@@ -2051,7 +2051,6 @@ int SV_CheckUserInfo(netadr_t *adr, char *userinfo, qboolean bIsReconnecting, in
 	const char *s;
 	char newname[MAX_NAME];
 	int proxies;
-	int i;
 
 	if (!NET_IsLocalAddress(*adr))
 	{
@@ -2077,7 +2076,7 @@ int SV_CheckUserInfo(netadr_t *adr, char *userinfo, qboolean bIsReconnecting, in
 	}
 
 #ifndef REHLDS_FIXES
-	i = Q_strlen(userinfo);
+	int i = Q_strlen(userinfo);
 	if (i <= 4 || Q_strstr(userinfo, "\\\\") || userinfo[i - 1] == '\\')
 	{
 		SV_RejectConnection(adr, "Unknown HLTV client type.\n");

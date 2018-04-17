@@ -65,7 +65,7 @@ std::vector<info_field_t *> g_info_transmitted_fields;
 
 // Searches the string for the given
 // key and returns the associated value, or an empty string.
-const char* Info_ValueForKey(const char *s, const char *lookup)
+const char* EXT_FUNC Info_ValueForKey(const char *s, const char *lookup)
 {
 #ifdef REHLDS_FIXES
 	static char valueBuf[INFO_MAX_BUFFER_VALUES][MAX_KV_LEN];
@@ -185,8 +185,12 @@ void Info_RemoveKey(char *s, const char *lookup)
 		const char* key = ++s;
 
 		// skip key
-		while (*s != '\\')
+		while (*s != '\\') {
+			if (*s == '\0')
+				return;
+
 			s++;
+		}
 
 		size_t keyLen = s - key;
 		++s; // skip separating slash
@@ -293,8 +297,12 @@ void Info_RemovePrefixedKeys(char *s, const char prefix)
 		const char* key = ++s;
 
 		// skip key
-		while (*s != '\\')
+		while (*s != '\\') {
+			if (*s == '\0')
+				return;
+
 			s++;
+		}
 
 		// skip separating slash
 		++s;
@@ -430,8 +438,12 @@ const char *Info_FindLargestKey(const char *s, int maxsize)
 		const char* key = ++s;
 
 		// skip key
-		while (*s != '\\')
+		while (*s != '\\') {
+			if (*s == '\0')
+				return "";
+
 			s++;
+		}
 
 		size_t keyLen = s - key;
 		const char* value = ++s; // skip separating slash

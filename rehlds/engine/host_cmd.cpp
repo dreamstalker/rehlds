@@ -2395,7 +2395,7 @@ void Host_FullInfo_f(void)
 			s++;
 		}
 
-		*s = '0';
+		*s = '\0';
 		const char* value = ++s;
 
 		// value
