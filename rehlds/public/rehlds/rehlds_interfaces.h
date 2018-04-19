@@ -104,6 +104,7 @@ public:
 	virtual IGameClient* GetClient(int id) = 0;
 	virtual client_t* GetClient_t(int id) = 0;
 	virtual int GetIndexOfClient_t(client_t* client) = 0;
+	virtual int GetMaxClientsLimit() = 0;
 };
 
 class IRehldsServerData {

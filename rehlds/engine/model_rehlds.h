@@ -25,6 +25,7 @@
 *    version.
 *
 */
+
 #pragma once
 
 /*
@@ -43,20 +44,6 @@
 #include "maintypes.h"
 #include "bspfile.h"
 #include "crc.h"
-
-
-#ifdef HOOK_ENGINE
-#define loadmodel (*ploadmodel)
-#define loadname (*ploadname)
-#define mod_known (*pmod_known)
-#define mod_numknown (*pmod_numknown)
-#define mod_base (*pmod_base)
-#define wadpath (*pwadpath)
-#define tested (*ptested)
-#define ad_enabled (*pad_enabled)
-#define ad_wad (*pad_wad)
-#define mod_known_info (*pmod_known_info)
-#endif
 
 extern model_t* loadmodel;
 extern char loadname[32];

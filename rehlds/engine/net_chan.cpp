@@ -31,11 +31,6 @@
 int net_drop;
 char gDownloadFile[256];
 
-/*
-* Globals initialization
-*/
-#ifndef HOOK_ENGINE
-
 cvar_t net_log = { "net_log", "0", 0, 0.0f, nullptr};
 cvar_t net_showpackets = { "net_showpackets", "0", 0, 0.0f, nullptr};
 cvar_t net_showdrop = { "net_showdrop", "0", 0, 0.0f, nullptr};
@@ -44,25 +39,13 @@ cvar_t net_chokeloopback = { "net_chokeloop", "0", 0, 0.0f, nullptr};
 cvar_t sv_filetransfercompression = { "sv_filetransfercompression", "1", 0, 0.0f, nullptr};
 cvar_t sv_filetransfermaxsize = { "sv_filetransfermaxsize", "10485760", 0, 0.0f, nullptr};
 
-#else //HOOK_ENGINE
-
-cvar_t net_log;
-cvar_t net_showpackets;
-cvar_t net_showdrop;
-cvar_t net_drawslider;
-cvar_t net_chokeloopback;
-cvar_t sv_filetransfercompression;
-cvar_t sv_filetransfermaxsize;
-
-#endif //HOOK_ENGINE
-
 void Netchan_UnlinkFragment(fragbuf_t *buf, fragbuf_t **list)
 {
 	fragbuf_t *search;
 
 	if (list == nullptr)
 	{
-		Con_Printf(__FUNCTION__ ": Asked to unlink fragment from empty list, ignored\n");
+		Con_Printf("%s: Asked to unlink fragment from empty list, ignored\n", __func__);
 		return;
 	}
 
@@ -85,7 +68,7 @@ void Netchan_UnlinkFragment(fragbuf_t *buf, fragbuf_t **list)
 		search = search->next;
 	}
 
-	Con_Printf(__FUNCTION__ ": Couldn't find fragment\n");
+	Con_Printf("%s: Couldn't find fragment\n", __func__);
 }
 
 void Netchan_OutOfBand(netsrc_t sock, netadr_t adr, int length, byte *data)
@@ -167,7 +150,7 @@ void Netchan_Clear(netchan_t *chan)
 
 	if (chan->reliable_length)
 	{
-		Con_DPrintf(__FUNCTION__ ": reliable length not 0, reliable_sequence: %d, incoming_reliable_acknowledged: %d\n", chan->reliable_length, chan->incoming_reliable_acknowledged);
+		Con_DPrintf("%s: reliable length not 0, reliable_sequence: %d, incoming_reliable_acknowledged: %d\n", __func__, chan->reliable_length, chan->incoming_reliable_acknowledged);
 		chan->reliable_sequence ^= 1;
 		chan->reliable_length = 0;
 	}
@@ -631,7 +614,7 @@ void Netchan_CheckForCompletion(netchan_t *chan, int stream, int intotalbuffers)
 				Cbuf_AddText(szCommand);
 				return;
 			}
-			Con_Printf("Netchan_CheckForCompletion:  Lost/dropped fragment would cause stall, retrying connection\n");
+			Con_Printf("%s:  Lost/dropped fragment would cause stall, retrying connection\n", __func__);
 			Cbuf_AddText("retry\n");
 		}
 
@@ -1157,7 +1140,7 @@ void Netchan_CreateFileFragmentsFromBuffer(qboolean server, netchan_t *chan, con
 			if (server)
 				SV_DropClient(host_client, 0, "Malloc problem");
 			else
-				rehlds_syserror(__FUNCTION__ "Reverse me: client-side code");
+				rehlds_syserror("%s:Reverse me: client-side code", __func__);
 
 #ifdef REHLDS_FIXES
 			if (bCompressed) {
@@ -1357,8 +1340,8 @@ int Netchan_CreateFileFragments_(qboolean server, netchan_t *chan, const char *f
 			}
 			else
 			{
-				rehlds_syserror(__FUNCTION__ ": Reverse clientside code");
-				return 0;
+				rehlds_syserror("%s: Reverse clientside code", __func__);
+				//return 0;
 			}
 		}
 
@@ -1430,7 +1413,7 @@ qboolean Netchan_CopyNormalFragments(netchan_t *chan)
 
 	if (!chan->incomingbufs[FRAG_NORMAL_STREAM])
 	{
-		Con_Printf("Netchan_CopyNormalFragments:  Called with no fragments readied\n");
+		Con_Printf("%s:  Called with no fragments readied\n", __func__);
 		chan->incomingready[FRAG_NORMAL_STREAM] = FALSE;
 		return FALSE;
 	}
@@ -1466,11 +1449,11 @@ qboolean Netchan_CopyNormalFragments(netchan_t *chan)
 	{
 		if (chan->player_slot == 0)
 		{
-			Con_Printf("Netchan_CopyNormalFragments: Incoming overflowed\n");
+			Con_Printf("%s: Incoming overflowed\n", __func__);
 		}
 		else
 		{
-			Con_Printf("Netchan_CopyNormalFragments: Incoming overflowed from %s\n", g_psvs.clients[chan->player_slot - 1].name);
+			Con_Printf("%s: Incoming overflowed from %s\n", __func__, g_psvs.clients[chan->player_slot - 1].name);
 		}
 
 		SZ_Clear(&net_message);
@@ -1517,7 +1500,7 @@ qboolean Netchan_CopyFileFragments(netchan_t *chan)
 	p = chan->incomingbufs[FRAG_FILE_STREAM];
 	if (!p)
 	{
-		Con_Printf("Netchan_CopyFileFragments:  Called with no fragments readied\n");
+		Con_Printf("%s:  Called with no fragments readied\n", __func__);
 		chan->incomingready[FRAG_FILE_STREAM] = FALSE;
 		return FALSE;
 	}

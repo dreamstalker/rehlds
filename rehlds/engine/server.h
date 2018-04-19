@@ -26,17 +26,13 @@
 *
 */
 
-#ifndef SERVER_H
-#define SERVER_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #include "maintypes.h"
 
 // TODO: I think this defines must be in /common/
-#define NUM_EDICTS				900
-#define MAX_NAME				32
+const int NUM_EDICTS = 900;
+const int MAX_NAME   = 32;
 
 #include "custom_int.h"
 #include "crc.h"
@@ -58,31 +54,38 @@
 #include "inst_baseline.h"
 #include "net_ws.h"
 
-#define DEFAULT_SOUND_PACKET_VOLUME			255
-#define DEFAULT_SOUND_PACKET_ATTENUATION	1.0f
-#define DEFAULT_SOUND_PACKET_PITCH			100
+const int DEFAULT_SOUND_PACKET_VOLUME			= 255;
+const float DEFAULT_SOUND_PACKET_ATTENUATION	= 1.0f;
+const int DEFAULT_SOUND_PACKET_PITCH			= 100;
 
 // Sound flags
-#define SND_FL_VOLUME			BIT(0)	// send volume
-#define SND_FL_ATTENUATION		BIT(1)	// send attenuation
-#define SND_FL_LARGE_INDEX		BIT(2)	// send sound number as short instead of byte
-#define SND_FL_PITCH			BIT(3)	// send pitch
-#define SND_FL_SENTENCE			BIT(4)	// set if sound num is actually a sentence num
-#define SND_FL_STOP				BIT(5)	// stop the sound
-#define SND_FL_CHANGE_VOL		BIT(6)	// change sound vol
-#define SND_FL_CHANGE_PITCH		BIT(7)	// change sound pitch
-#define SND_FL_SPAWNING			BIT(8)	// we're spawning, used in some cases for ambients (not sent across network)
+enum
+{
+	SND_FL_VOLUME			= BIT(0),	// send volume
+	SND_FL_ATTENUATION		= BIT(1),	// send attenuation
+	SND_FL_LARGE_INDEX		= BIT(2),	// send sound number as short instead of byte
+	SND_FL_PITCH			= BIT(3),	// send pitch
+	SND_FL_SENTENCE			= BIT(4),	// set if sound num is actually a sentence num
+	SND_FL_STOP				= BIT(5),	// stop the sound
+	SND_FL_CHANGE_VOL		= BIT(6),	// change sound vol
+	SND_FL_CHANGE_PITCH		= BIT(7),	// change sound pitch
+	SND_FL_SPAWNING			= BIT(8)	// we're spawning, used in some cases for ambients (not sent across network)
+};
 
 // Message send destination flags
-#define MSG_FL_NONE				0		// No flags
-#define MSG_FL_BROADCAST		BIT(0)	// Broadcast?
-#define MSG_FL_PVS				BIT(1)	// Send to PVS
-#define MSG_FL_PAS				BIT(2)	// Send to PAS
-#define MSG_FL_ONE				BIT(7)	// Send to single client
+enum
+{
+	MSG_FL_NONE			= 0,		// No flags
+	MSG_FL_BROADCAST	= BIT(0),	// Broadcast?
+	MSG_FL_PVS			= BIT(1),	// Send to PVS
+	MSG_FL_PAS			= BIT(2),	// Send to PAS
+	MSG_FL_ONE			= BIT(7),	// Send to single client
+};
 
-#define RESOURCE_INDEX_BITS 12
+const int RESOURCE_INDEX_BITS = 12;
+
 #ifdef REHLDS_FIXES
-#define RESOURCE_MAX_COUNT  (1 << RESOURCE_INDEX_BITS)
+const int RESOURCE_MAX_COUNT = BIT(RESOURCE_INDEX_BITS);
 #endif // REHLDS_FIXES
 
 typedef enum redirect_e
@@ -129,7 +132,7 @@ typedef struct server_s
 	const char *generic_precache[MAX_GENERIC];
 	char generic_precache_names[MAX_GENERIC][64];
 	int num_generic_names;
-	char *lightstyles[MAX_LIGHTSTYLES];
+	const char *lightstyles[MAX_LIGHTSTYLES];
 	int num_edicts;
 	int max_edicts;
 	edict_t *edicts;
@@ -167,6 +170,8 @@ struct rehlds_server_t {
 	resource_t resources[RESOURCE_MAX_COUNT];
 	char precachedGenericResourceNames[RESOURCE_MAX_COUNT][MAX_QPATH];
 	size_t precachedGenericResourceCount;
+
+	char lightstyleBuffers[MAX_LIGHTSTYLES][MAX_LIGHTSTYLE_SIZE];
 #endif
 };
 
@@ -238,12 +243,6 @@ typedef struct client_s
 	int m_sendrescount;
 } client_t;
 
-typedef enum sv_delta_s
-{
-	sv_packet_nodelta,
-	sv_packet_delta,
-} sv_delta_t;
-
 enum
 {
 	SND_ANYPLAYER,
@@ -264,159 +263,6 @@ typedef struct deltacallback_s
 	qboolean full;
 	int offset;
 } deltacallback_t;
-
-
-#ifdef HOOK_ENGINE
-#define pr_strings (*ppr_strings)
-#define gNullString (*pgNullString)
-#define scr_skipupdate (*pscr_skipupdate)
-#define scr_centertime_off (*pscr_centertime_off)
-#define g_LastScreenUpdateTime (*pg_LastScreenUpdateTime)
-
-#define SV_UPDATE_BACKUP (*pSV_UPDATE_BACKUP)
-#define SV_UPDATE_MASK (*pSV_UPDATE_MASK)
-
-#define gGlobalVariables (*pgGlobalVariables)
-#define g_psvs (*psvs)
-#define g_psv (*psv)
-
-#define sv_lan (*psv_lan)
-#define sv_lan_rate (*psv_lan_rate)
-#define sv_aim (*psv_aim)
-
-#define sv_skycolor_r (*psv_skycolor_r)
-#define sv_skycolor_g (*psv_skycolor_g)
-#define sv_skycolor_b (*psv_skycolor_b)
-#define sv_skyvec_x (*psv_skyvec_x)
-#define sv_skyvec_y (*psv_skyvec_y)
-#define sv_skyvec_z (*psv_skyvec_z)
-#define sv_skyname (*psv_skyname)
-
-#define sv_spectatormaxspeed (*psv_spectatormaxspeed)
-#define sv_airaccelerate (*psv_airaccelerate)
-#define sv_wateraccelerate (*psv_wateraccelerate)
-#define sv_waterfriction (*psv_waterfriction)
-#define sv_zmax (*psv_zmax)
-#define sv_wateramp (*psv_wateramp)
-#define mapcyclefile (*pmapcyclefile)
-#define motdfile (*pmotdfile)
-#define servercfgfile (*pservercfgfile)
-#define lservercfgfile (*plservercfgfile)
-#define logsdir (*plogsdir)
-#define bannedcfgfile (*pbannedcfgfile)
-
-#define sv_decalnames (*psv_decalnames)
-#define sv_decalnamecount (*psv_decalnamecount)
-
-#define sv_gpNewUserMsgs (*psv_gpNewUserMsgs)
-#define sv_gpUserMsgs (*psv_gpUserMsgs)
-
-#define g_svmove (*pg_svmove)
-
-#define sv_lastnum (*psv_lastnum)
-#define g_sv_instance_baselines (*pg_sv_instance_baselines)
-#define g_bOutOfDateRestart (*pg_bOutOfDateRestart)
-#define g_userid (*pg_userid)
-
-#define g_sv_delta (*pg_sv_delta)
-#define g_peventdelta (*pg_peventdelta)
-
-#define rcon_password (*prcon_password)
-#define sv_enableoldqueries (*psv_enableoldqueries)
-#define sv_instancedbaseline (*psv_instancedbaseline)
-#define sv_contact (*psv_contact)
-#define sv_maxupdaterate (*psv_maxupdaterate)
-#define sv_minupdaterate (*psv_minupdaterate)
-#define sv_filterban (*psv_filterban)
-#define sv_minrate (*psv_minrate)
-#define sv_maxrate (*psv_maxrate)
-#define sv_logrelay (*psv_logrelay)
-#define violence_hblood (*pviolence_hblood)
-#define violence_ablood (*pviolence_ablood)
-#define violence_hgibs (*pviolence_hgibs)
-#define violence_agibs (*pviolence_agibs)
-#define sv_newunit (*psv_newunit)
-#define sv_clienttrace (*psv_clienttrace)
-#define sv_timeout (*psv_timeout)
-#define sv_failuretime (*psv_failuretime)
-
-#define sv_cheats (*psv_cheats)
-#define sv_password (*psv_password)
-#define sv_proxies (*psv_proxies)
-#define sv_outofdatetime (*psv_outofdatetime)
-#define mapchangecfgfile (*pmapchangecfgfile)
-
-#define allow_cheats (*pallow_cheats)
-#define mp_logecho (*pmp_logecho)
-#define mp_logfile (*pmp_logfile)
-
-#define sv_allow_download (*psv_allow_download)
-#define sv_send_logos (*psv_send_logos)
-#define sv_send_resources (*psv_send_resources)
-#define sv_log_singleplayer (*psv_log_singleplayer)
-#define sv_logsecret (*psv_logsecret)
-#define sv_log_onefile (*psv_log_onefile)
-#define sv_logbans (*psv_logbans)
-#define sv_allow_upload (*psv_allow_upload)
-#define sv_max_upload (*psv_max_upload)
-#define hpk_maxsize (*phpk_maxsize)
-#define sv_visiblemaxplayers (*psv_visiblemaxplayers)
-#define max_queries_sec (*pmax_queries_sec)
-#define max_queries_sec_global (*pmax_queries_sec_global)
-#define max_queries_window (*pmax_queries_window)
-#define sv_logblocks (*psv_logblocks)
-#define sv_downloadurl (*psv_downloadurl)
-#define sv_allow_dlfile (*psv_allow_dlfile)
-#define sv_version (*psv_version)
-#define sv_playermodel (*psv_playermodel)
-
-#define outputbuf (*poutputbuf)
-#define sv_redirected (*psv_redirected)
-#define sv_redirectto (*psv_redirectto)
-
-#define sv_rcon_minfailures (*psv_rcon_minfailures)
-#define sv_rcon_maxfailures (*psv_rcon_maxfailures)
-#define sv_rcon_minfailuretime (*psv_rcon_minfailuretime)
-#define sv_rcon_banpenalty (*psv_rcon_banpenalty)
-
-#define scr_downloading (*pscr_downloading)
-
-#define g_bCS_CZ_Flags_Initialized (*pg_bCS_CZ_Flags_Initialized)
-#define g_bIsCZero (*pg_bIsCZero)
-#define g_bIsCZeroRitual (*pg_bIsCZeroRitual)
-#define g_bIsTerrorStrike (*pg_bIsTerrorStrike)
-#define g_bIsTFC (*pg_bIsTFC)
-#define g_bIsHL1 (*pg_bIsHL1)
-#define g_bIsCStrike (*pg_bIsCStrike)
-
-#define fatbytes (*pfatbytes)
-#define fatpvs (*pfatpvs)
-#define fatpasbytes (*pfatpasbytes)
-#define fatpas (*pfatpas)
-#define gPacketSuppressed (*pgPacketSuppressed)
-#define giNextUserMsg (*pgiNextUserMsg)
-#define hashstrings_collisions (*phashstrings_collisions)
-
-#define g_pplayerdelta (*pg_pplayerdelta)
-#define g_pentitydelta (*pg_pentitydelta)
-#define g_pcustomentitydelta (*pg_pcustomentitydelta)
-#define g_pclientdelta (*pg_pclientdelta)
-#define g_pweapondelta (*pg_pweapondelta)
-
-#define localinfo (*plocalinfo)
-#define localmodels (*plocalmodels)
-
-#define ipfilters (*pipfilters)
-#define numipfilters (*pnumipfilters)
-#define userfilters (*puserfilters)
-#define numuserfilters (*pnumuserfilters)
-
-#define g_rg_sv_challenges (*pg_rg_sv_challenges)
-
-#define g_svdeltacallback (*pg_svdeltacallback)
-
-#endif // HOOK_ENGINE
-
 
 extern char *pr_strings;
 extern char *gNullString;
@@ -516,10 +362,6 @@ extern cvar_t sv_allow_upload;
 extern cvar_t sv_max_upload;
 extern cvar_t hpk_maxsize;
 extern cvar_t sv_visiblemaxplayers;
-extern cvar_t max_queries_sec;
-extern cvar_t max_queries_sec_global;
-extern cvar_t max_queries_window;
-extern cvar_t sv_logblocks;
 extern cvar_t sv_downloadurl;
 extern cvar_t sv_allow_dlfile;
 extern cvar_t sv_version;
@@ -533,6 +375,7 @@ extern cvar_t sv_rcon_condebug;
 extern cvar_t sv_rehlds_userinfo_transmitted_fields;
 extern cvar_t sv_rehlds_attachedentities_playeranimationspeed_fix;
 extern cvar_t sv_rehlds_local_gametime;
+extern cvar_t sv_rehlds_send_mapcycle;
 #endif
 extern int sv_playermodel;
 
@@ -546,7 +389,7 @@ extern cvar_t sv_rcon_minfailuretime;
 extern cvar_t sv_rcon_banpenalty;
 
 extern cvar_t scr_downloading;
-#ifdef REHLDS_FIXES
+
 enum GameType_e
 {
 	GT_Unitialized,
@@ -557,25 +400,9 @@ enum GameType_e
 	GT_HL1,
 	GT_CStrike
 };
+
 extern GameType_e g_eGameType;
 
-//A crutch to prevent rewriting tons of code.
-#define g_bIsCZero (g_eGameType==GT_CZero)
-#define g_bIsCZeroRitual (g_eGameType==GT_CZeroRitual)
-#define g_bIsTerrorStrike (g_eGameType==GT_TerrorStrike)
-#define g_bIsTFC (g_eGameType==GT_TFC)
-#define g_bIsHL1 (g_eGameType==GT_HL1)
-#define g_bIsCStrike (g_eGameType==GT_CStrike)
-
-#else
-extern int g_bCS_CZ_Flags_Initialized;
-extern int g_bIsCZero;
-extern int g_bIsCZeroRitual;
-extern int g_bIsTerrorStrike;
-extern int g_bIsTFC;
-extern int g_bIsHL1;
-extern int g_bIsCStrike;
-#endif
 extern int fatbytes;
 extern int giNextUserMsg;
 extern int hashstrings_collisions;
@@ -588,7 +415,6 @@ extern delta_t *g_pweapondelta;
 #ifdef REHLDS_OPT_PEDANTIC
 extern delta_t *g_pusercmddelta;
 #endif
-
 
 extern unsigned char fatpvs[1024];
 extern int fatpasbytes;
@@ -605,11 +431,6 @@ extern userfilter_t userfilters[MAX_USERFILTERS];
 extern int numuserfilters;
 
 extern challenge_t g_rg_sv_challenges[MAX_CHALLENGES];
-
-
-#ifdef HOOK_ENGINE
-#define g_rgRconFailures (*pg_rgRconFailures)
-#endif // HOOK_ENGINE
 
 extern rcon_failure_t g_rgRconFailures[32];
 extern deltacallback_t g_svdeltacallback;
@@ -710,8 +531,6 @@ void SV_ProcessFile(client_t *cl, char *filename);
 qboolean SV_FilterPacket(void);
 void SV_SendBan(void);
 void SV_ReadPackets(void);
-//NOBODY int ntohl(void);
-//NOBODY int htons(void);
 void SV_CheckTimeouts(void);
 int SV_CalcPing(client_t *cl);
 void SV_SendFullClientUpdateForAll(client_t *client);
@@ -747,6 +566,7 @@ void SV_SendClientMessages(void);
 void SV_ExtractFromUserinfo(client_t *cl);
 int SV_ModelIndex(const char *name);
 void SV_AddResource(resourcetype_t type, const char *name, int size, unsigned char flags, int index);
+size_t SV_CountResourceByType(resourcetype_t type, resource_t **pResourceList = nullptr, size_t nListMax = 0, size_t *nWidthFileNameMax = nullptr);
 void SV_CreateGenericResources(void);
 void SV_CreateResourceList(void);
 void SV_ClearCaches(void);
@@ -803,5 +623,3 @@ char *SV_GetClientIDString(client_t *client);
 int GetGameAppID(void);
 qboolean IsGameSubscribed(const char *gameName);
 NOXREF qboolean BIsValveGame(void);
-
-#endif // SERVER_H

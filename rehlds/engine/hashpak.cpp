@@ -28,22 +28,9 @@
 
 #include "precompiled.h"
 
-/*
-* Globals initialization
-*/
-#ifndef HOOK_ENGINE
-
 hash_pack_queue_t *gp_hpak_queue = NULL;
 hash_pack_directory_t hash_pack_dir = { 0, NULL };
 hash_pack_header_t hash_pack_header = { { 0, 0, 0, 0 }, 0, 0 };
-
-#else //HOOK_ENGINE
-
-hash_pack_queue_t *gp_hpak_queue;
-hash_pack_directory_t hash_pack_dir;
-hash_pack_header_t hash_pack_header;
-
-#endif //HOOK_ENGINE
 
 qboolean HPAK_GetDataPointer(char *pakname, struct resource_s *pResource, unsigned char **pbuffer, int *bufsize)
 {
@@ -72,7 +59,7 @@ qboolean HPAK_GetDataPointer(char *pakname, struct resource_s *pResource, unsign
 			{
 				pbuf = (byte *)Mem_Malloc(p->datasize);
 				if (!pbuf)
-					Sys_Error("Error allocating %i bytes for hpak!", p->datasize);
+					Sys_Error("%s: Error allocating %i bytes for hpak!", __func__, p->datasize);
 				Q_memcpy((void *)pbuf, p->data, p->datasize);
 				*pbuffer = pbuf;
 			}
@@ -173,7 +160,7 @@ void HPAK_AddToQueue(char *pakname, struct resource_s *pResource, void *pData, F
 {
 	hash_pack_queue_t *n = (hash_pack_queue_t *)Mem_Malloc(sizeof(hash_pack_queue_t));
 	if (!n)
-		Sys_Error("Unable to allocate %i bytes for hpak queue!", sizeof(hash_pack_queue_t));
+		Sys_Error("%s: Unable to allocate %i bytes for hpak queue!", __func__, sizeof(hash_pack_queue_t));
 
 	Q_memset(n, 0, sizeof(hash_pack_queue_t));
 	n->pakname = Mem_Strdup(pakname);
@@ -181,7 +168,7 @@ void HPAK_AddToQueue(char *pakname, struct resource_s *pResource, void *pData, F
 	n->datasize = pResource->nDownloadSize;
 	n->data = Mem_Malloc(pResource->nDownloadSize);
 	if (!n->data)
-		Sys_Error("Unable to allocate %i bytes for hpak queue!", n->datasize);
+		Sys_Error("%s: Unable to allocate %i bytes for hpak queue!", __func__, n->datasize);
 
 	if (pData)
 	{
@@ -192,7 +179,7 @@ void HPAK_AddToQueue(char *pakname, struct resource_s *pResource, void *pData, F
 	else
 	{
 		if (!fpSource)
-			Sys_Error("Add to Queue called without data or file pointer!");
+			Sys_Error("%s: Add to Queue called without data or file pointer!", __func__);
 		FS_Read(n->data, n->datasize, 1, fpSource);
 		n->next = gp_hpak_queue;
 		gp_hpak_queue = n;
@@ -228,22 +215,22 @@ void HPAK_AddLump(qboolean bUseQueue, char *pakname, struct resource_s *pResourc
 
 	if (pakname == NULL)
 	{
-		Con_Printf("HPAK_AddLump called with invalid arguments:  no .pak filename\n");
+		Con_Printf("%s called with invalid arguments:  no .pak filename\n", __func__);
 		return;
 	}
 	if (!pResource)
 	{
-		Con_Printf("HPAK_AddLump called with invalid arguments:  no lump to add\n");
+		Con_Printf("%s called with invalid arguments:  no lump to add\n", __func__);
 		return;
 	}
 	if (!pData && !fpSource)
 	{
-		Con_Printf("HPAK_AddLump called with invalid arguments:  no file handle\n");
+		Con_Printf("%s called with invalid arguments:  no file handle\n", __func__);
 		return;
 	}
 	if (pResource->nDownloadSize < 1024 || (unsigned int)pResource->nDownloadSize > MAX_FILE_SIZE)
 	{
-		Con_Printf("HPAK_AddLump called with bogus lump, size:  %i\n", pResource->nDownloadSize);
+		Con_Printf("%s called with bogus lump, size:  %i\n", __func__, pResource->nDownloadSize);
 		return;
 	}
 	Q_memset(&ctx, 0, sizeof(MD5Context_t));
@@ -264,7 +251,7 @@ void HPAK_AddLump(qboolean bUseQueue, char *pakname, struct resource_s *pResourc
 	MD5Final(md5, &ctx);
 	if (Q_memcmp(pResource->rgucMD5_hash, md5, sizeof(md5)) != 0)
 	{
-		Con_Printf("HPAK_AddLump called with bogus lump, md5 mismatch\n");
+		Con_Printf("%s called with bogus lump, md5 mismatch\n", __func__);
 		Con_Printf("Purported:  %s\n", MD5_Print(pResource->rgucMD5_hash));
 		Con_Printf("Actual   :  %s\n", MD5_Print(md5));
 		Con_Printf("Ignoring lump addition\n");
@@ -312,7 +299,7 @@ void HPAK_AddLump(qboolean bUseQueue, char *pakname, struct resource_s *pResourc
 		FS_Close(iRead);
 		FS_Close(iWrite);
 		FS_Unlink(szTempName);
-		Con_Printf("Invalid .hpk version in HPAK_AddLump\n");
+		Con_Printf("Invalid .hpk version in %s\n", __func__);
 		return;
 	}
 
@@ -422,7 +409,7 @@ void HPAK_RemoveLump(char *pakname, resource_t *pResource)
 
 	if (pakname == NULL || *pakname == '\0' || pResource == NULL)
 	{
-		Con_Printf(__FUNCTION__ ":  Invalid arguments\n");
+		Con_Printf("%s:  Invalid arguments\n", __func__);
 		return;
 	}
 	HPAK_FlushHostQueue();
@@ -1159,17 +1146,11 @@ void HPAK_Extract_f(void)
 
 void HPAK_Init(void)
 {
-#ifdef HOOK_ENGINE
-	Cmd_AddCommand("hpklist", (xcommand_t)GetOriginalFuncAddrOrDefault("HPAK_List_f", (void *)HPAK_List_f));
-	Cmd_AddCommand("hpkremove", (xcommand_t)GetOriginalFuncAddrOrDefault("HPAK_Remove_f", (void *)HPAK_Remove_f));
-	Cmd_AddCommand("hpkval", (xcommand_t)GetOriginalFuncAddrOrDefault("HPAK_Validate_f", (void *)HPAK_Validate_f));
-	Cmd_AddCommand("hpkextract", (xcommand_t)GetOriginalFuncAddrOrDefault("HPAK_Extract_f", (void *)HPAK_Extract_f));
-#else
 	Cmd_AddCommand("hpklist", HPAK_List_f);
 	Cmd_AddCommand("hpkremove", HPAK_Remove_f);
 	Cmd_AddCommand("hpkval", HPAK_Validate_f);
 	Cmd_AddCommand("hpkextract", HPAK_Extract_f);
-#endif // HOOK_ENGINE
+
 	gp_hpak_queue = NULL;
 }
 

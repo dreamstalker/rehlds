@@ -26,11 +26,7 @@
 *
 */
 
-#ifndef CLIENT_H
-#define CLIENT_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #include "maintypes.h"
 #include "common.h"
@@ -50,8 +46,8 @@
 #include "model.h"
 #include "kbutton.h"
 
-#define MAX_SCOREBOARDNAME	32
-#define MAX_DEMOS		32
+const int MAX_SCOREBOARDNAME = 32;
+const int MAX_DEMOS = 32;
 
 typedef enum cactive_e
 {
@@ -152,7 +148,7 @@ typedef struct client_static_s
 	qboolean demorecording;
 	qboolean demoplayback;
 	qboolean timedemo;
-	float demostarttime; 
+	float demostarttime;
 	int demostartframe;
 	int forcetrack;
 	FileHandle_t demofile;
@@ -265,19 +261,6 @@ typedef enum CareerStateType_e
 	CAREER_PLAYING = 2,
 } CareerStateType;
 
-#ifdef HOOK_ENGINE
-#define g_pcls (*pcls)
-#define g_pcl (*pcl)
-#define key_dest (*pkey_dest)
-
-#define g_clmove (*pg_clmove)
-#define cl_inmovie (*pcl_inmovie)
-
-#define cl_name (*pcl_name)
-#define rate_ (*prate)
-#define console (*pconsole)
-#endif // HOOK_ENGINE
-
 extern keydest_t key_dest;
 extern client_static_t g_pcls;
 extern client_state_t g_pcl;
@@ -289,67 +272,93 @@ extern cvar_t cl_name;
 extern cvar_t rate_;
 extern cvar_t console;
 
-void CL_RecordHUDCommand(char *cmdname);
+void CL_RecordHUDCommand(const char *cmdname);
 void R_DecalRemoveAll(int textureIndex);
-void CL_CheckForResend(void);
+void CL_CheckForResend();
 qboolean CL_CheckFile(sizebuf_t *msg, char *filename);
-void CL_ClearClientState(void);
-void CL_Connect_f(void);
-void CL_DecayLights(void);
-void CL_Disconnect(void);
-void CL_Disconnect_f(void);
-void CL_EmitEntities(void);
-void CL_InitClosest(void);
-void CL_Init(void);
+void CL_ClearClientState();
+void CL_Connect_f();
+void CL_DecayLights();
+void CL_Disconnect();
+void CL_Disconnect_f();
+void CL_EmitEntities();
+void CL_InitClosest();
+void CL_Init();
 void CL_Particle(vec_t *origin, int color, float life, int zpos, int zvel);
 void CL_PredictMove(qboolean repredicting);
-void CL_PrintLogos(void);
-void CL_ReadPackets(void);
-qboolean CL_RequestMissingResources(void);
-void CL_Move(void);
-void CL_SendConnectPacket(void);
-void CL_StopPlayback(void);
-void CL_UpdateSoundFade(void);
-void CL_AdjustClock(void);
+void CL_PrintLogos();
+void CL_ReadPackets();
+qboolean CL_RequestMissingResources();
+void CL_Move();
+void CL_SendConnectPacket();
+void CL_StopPlayback();
+void CL_UpdateSoundFade();
+void CL_AdjustClock();
 void CL_Save(const char *name);
 void CL_HudMessage(const char *pMessage);
 
-int Key_CountBindings(void);
+int Key_CountBindings();
 void Key_WriteBindings(FileHandle_t f);
-extern "C" void ClientDLL_UpdateClientData(void);
-extern "C" void ClientDLL_HudVidInit(void);
-void Chase_Init(void);
-void Key_Init(void);
-extern "C" void ClientDLL_Init(void);
-void Con_Shutdown(void);
+extern "C" void ClientDLL_UpdateClientData();
+extern "C" void ClientDLL_HudVidInit();
+void Chase_Init();
+void Key_Init();
+extern "C" void ClientDLL_Init();
+void Con_Shutdown();
 int DispatchDirectUserMsg(const char *pszName, int iSize, void *pBuf);
-void CL_ShutDownUsrMessages(void);
-void CL_ShutDownClientStatic(void);
+void CL_ShutDownUsrMessages();
+void CL_ShutDownClientStatic();
 extern "C" void ClientDLL_MoveClient(struct playermove_s *ppmove);
-void CL_Shutdown(void);
+void CL_Shutdown();
 extern "C" void ClientDLL_Frame(double time);
-extern "C" void ClientDLL_CAM_Think(void);
-void CL_InitEventSystem(void);
-void CL_CheckClientState(void);
-void CL_RedoPrediction(void);
-void CL_SetLastUpdate(void);
+extern "C" void ClientDLL_CAM_Think();
+void CL_InitEventSystem();
+void CL_CheckClientState();
+void CL_RedoPrediction();
+void CL_SetLastUpdate();
 void Con_NPrintf(int idx, const char *fmt, ...);
 void CL_WriteMessageHistory(int starting_count, int cmd);
-void CL_MoveSpectatorCamera(void);
+void CL_MoveSpectatorCamera();
 void CL_AddVoiceToDatagram(qboolean bFinal);
-void CL_VoiceIdle(void);
-void PollDInputDevices(void);
-void CL_KeepConnectionActive(void);
-void CL_UpdateModuleC(void);
-int VGuiWrap2_IsInCareerMatch(void);
-void VguiWrap2_GetCareerUI(void);
-int VGuiWrap2_GetLocalizedStringLength(const char *label);
-void VGuiWrap2_LoadingStarted(const char *resourceType, const char *resourceName);
+void CL_VoiceIdle();
+void PollDInputDevices();
+void CL_KeepConnectionActive();
+void CL_UpdateModuleC();
 void ConstructTutorMessageDecayBuffer(int *buffer, int bufferLength);
 void ProcessTutorMessageDecayBuffer(int *buffer, int bufferLength);
 int GetTimesTutorMessageShown(int id);
 void RegisterTutorMessageShown(int mid);
-void ResetTutorMessageDecayData(void);
+void ResetTutorMessageDecayData();
 void SetCareerAudioState(int state);
 
-#endif // CLIENT_H
+int EXT_FUNC VGuiWrap2_IsInCareerMatch();
+int EXT_FUNC VGuiWrap2_GetLocalizedStringLength(const char *label);
+void VGuiWrap2_LoadingStarted(const char *resourceType, const char *resourceName);
+void *VguiWrap2_GetCareerUI();
+void VguiWrap2_GetMouseDelta(int *x, int *y);
+int EXT_FUNC VGuiWrap2_GetLocalizedStringLength(const char *label);
+int EXT_FUNC VGuiWrap2_IsInCareerMatch();
+int VGuiWrap2_IsConsoleVisible();
+int VGuiWrap2_Key_Event(int down, int keynum, const char *pszCurrentBinding);
+int VGuiWrap2_GameUIKeyPressed();
+int VGuiWrap2_IsGameUIVisible();
+int VGuiWrap2_CallEngineSurfaceAppHandler(void *event, void *userData);
+int VGuiWrap2_UseVGUI1();
+void *VGuiWrap2_GetPanel();
+void VGuiWrap2_NotifyOfServerConnect(const char *game, int IP, int port);
+void VGuiWrap2_LoadingFinished(const char *resourceType, const char *resourceName);
+void VGuiWrap2_LoadingStarted(const char *resourceType, const char *resourceName);
+void VGuiWrap2_ConDPrintf(const char *msg);
+void VGuiWrap2_Startup();
+void VGuiWrap2_ConPrintf(const char *msg);
+void VGuiWrap2_ClearConsole();
+void VGuiWrap2_HideConsole();
+void VGuiWrap2_ShowDemoPlayer();
+void VGuiWrap2_ShowConsole();
+void VGuiWrap2_HideGameUI();
+void VGuiWrap2_NotifyOfServerDisconnect();
+void VGuiWrap2_Paint();
+void VGuiWrap2_SetVisible(int state);
+void VGuiWrap2_GetMouse();
+void VGuiWrap2_ReleaseMouse();
+void VGuiWrap2_Shutdown();

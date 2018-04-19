@@ -26,11 +26,7 @@
 *
 */
 
-#ifndef PR_CMDS_H
-#define PR_CMDS_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #include "maintypes.h"
 #include "const.h"
@@ -39,40 +35,19 @@
 #include "common.h"
 #include "server.h"
 
-
 #define MAX_RANDOM_RANGE 0x7FFFFFFFUL
 
-#define AMBIENT_SOUND_STATIC			0	// medium radius attenuation
-#define AMBIENT_SOUND_EVERYWHERE		1
-#define AMBIENT_SOUND_SMALLRADIUS		2
-#define AMBIENT_SOUND_MEDIUMRADIUS		4
-#define AMBIENT_SOUND_LARGERADIUS		8
-#define AMBIENT_SOUND_START_SILENT		16
-#define AMBIENT_SOUND_NOT_LOOPING		32
-
-#define SPEAKER_START_SILENT			1	// wait for trigger 'on' to start announcements
-
-
-#ifdef HOOK_ENGINE
-#define gMsgData (*pgMsgData)
-#define gMsgBuffer (*pgMsgBuffer)
-#define gMsgEntity (*pgMsgEntity)
-#define gMsgDest (*pgMsgDest)
-#define gMsgType (*pgMsgType)
-#define gMsgStarted (*pgMsgStarted)
-#define gMsgOrigin (*pgMsgOrigin)
-#define idum (*pidum)
-#define g_groupop (*pg_groupop)
-#define g_groupmask (*pg_groupmask)
-#define checkpvs (*pcheckpvs)
-#define c_invis (*pc_invis)
-#define c_notvis (*pc_notvis)
-
-#define vec_origin (*pvec_origin)
-
-#define r_visframecount (*pr_visframecount)
-#endif // HOOK_ENGINE
-
+// Ambient sound flags
+enum
+{
+	AMBIENT_SOUND_STATIC		= 0,	// medium radius attenuation
+	AMBIENT_SOUND_EVERYWHERE	= BIT(0),
+	AMBIENT_SOUND_SMALLRADIUS	= BIT(1),
+	AMBIENT_SOUND_MEDIUMRADIUS	= BIT(2),
+	AMBIENT_SOUND_LARGERADIUS	= BIT(3),
+	AMBIENT_SOUND_START_SILENT	= BIT(4),
+	AMBIENT_SOUND_NOT_LOOPING	= BIT(5)
+};
 
 extern unsigned char gMsgData[512];
 extern sizebuf_t gMsgBuffer;
@@ -87,13 +62,14 @@ extern int g_groupmask;
 extern unsigned char checkpvs[1024];
 extern int c_invis;
 extern int c_notvis;
-
 extern vec3_t vec_origin;
-
 extern int r_visframecount;
 
-#define GROUP_OP_AND	0
-#define GROUP_OP_NAND	1
+enum
+{
+	GROUP_OP_AND = 0,
+	GROUP_OP_NAND
+};
 
 void PF_makevectors_I(const float *rgflVector);
 float PF_Time(void);
@@ -129,8 +105,8 @@ mnode_t *PVSNode(mnode_t *node, vec_t *emins, vec_t *emaxs);
 void PVSMark(model_t *pmodel, unsigned char *ppvs);
 edict_t *PVSFindEntities(edict_t *pplayer);
 qboolean ValidCmd(const char *pCmd);
-void PF_stuffcmd_I(edict_t *pEdict, char *szFmt, ...);
-void PF_localcmd_I(char *str);
+void PF_stuffcmd_I(edict_t *pEdict, const char *szFmt, ...);
+void PF_localcmd_I(const char *str);
 void PF_localexec_I(void);
 edict_t *FindEntityInSphere(edict_t *pEdictStartSearchAfter, const float *org, float rad);
 edict_t *PF_Spawn_I(void);
@@ -150,8 +126,8 @@ void EV_PlayReliableEvent_internal(client_t *cl, int entindex, unsigned short ev
 void EV_Playback(int flags, const edict_t *pInvoker, unsigned short eventindex, float delay, float *origin, float *angles, float fparam1, float fparam2, int iparam1, int iparam2, int bparam1, int bparam2);
 void EV_SV_Playback(int flags, int clientindex, unsigned short eventindex, float delay, float *origin, float *angles, float fparam1, float fparam2, int iparam1, int iparam2, int bparam1, int bparam2);
 int PF_precache_model_I(const char *s);
-int PF_precache_generic_I(char *s);
-int PF_IsMapValid_I(char *mapname);
+int PF_precache_generic_I(const char *s);
+int PF_IsMapValid_I(const char *mapname);
 int PF_NumberOfEntities_I(void);
 char *PF_GetInfoKeyBuffer_I(edict_t *e);
 char *PF_InfoKeyValue_I(char *infobuffer, const char *key);
@@ -161,7 +137,7 @@ void PF_SetClientKeyValue_I(int clientIndex, char *infobuffer, const char *key, 
 int PF_walkmove_I(edict_t *ent, float yaw, float dist, int iMode);
 int PF_droptofloor_I(edict_t *ent);
 int PF_DecalIndex(const char *name);
-void PF_lightstyle_I(int style, char *val);
+void PF_lightstyle_I(int style, const char *val);
 int PF_checkbottom_I(edict_t *pEdict);
 int PF_pointcontents_I(const float *rgflVector);
 void PF_aim_I(edict_t *ent, float speed, float *rgflReturn);
@@ -170,6 +146,7 @@ void PF_changepitch_I(edict_t *ent);
 void PF_setview_I(const edict_t *clientent, const edict_t *viewent);
 void PF_crosshairangle_I(const edict_t *clientent, float pitch, float yaw);
 edict_t *PF_CreateFakeClient_I(const char *netname);
+edict_t *CreateFakeClient_internal(const char *netname);
 void PF_RunPlayerMove_I(edict_t *fakeclient, const float *viewangles, float forwardmove, float sidemove, float upmove, unsigned short buttons, unsigned char impulse, unsigned char msec);
 sizebuf_t *WriteDest_Parm(int dest);
 void PF_MessageBegin_I(int msg_dest, int msg_type, const float *pOrigin, edict_t *ed);
@@ -215,5 +192,3 @@ void QueryClientCvarValue(const edict_t *player, const char *cvarName);
 void QueryClientCvarValue2(const edict_t *player, const char *cvarName, int requestID);
 int hudCheckParm(char *parm, char **ppnext);
 int EngCheckParm(const char *pchCmdLineToken, char **pchNextVal);
-
-#endif // PR_CMDS_H

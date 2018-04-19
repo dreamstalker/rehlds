@@ -28,19 +28,8 @@
 
 #include "precompiled.h"
 
-/*
-* Globals initialization
-*/
-#ifndef HOOK_ENGINE
-
 CEngine g_Engine;
 IEngine *eng = &g_Engine;
-
-#else // HOOK_ENGINE
-
-IEngine *eng;
-
-#endif // HOOK_ENGINE
 
 CEngine::CEngine()
 {
@@ -65,11 +54,6 @@ CEngine::~CEngine()
 
 void CEngine::Unload()
 {
-	Unload_noVirt();
-}
-
-void CEngine::Unload_noVirt()
-{
 	Sys_ShutdownGame();
 	m_nDLLState = DLL_INACTIVE;
 }
@@ -88,7 +72,7 @@ void ForceReloadProfile()
 	//SDL_GL_SetSwapInterval((gl_vsync.value <= 0.0) - 1);
 	if (g_pcls.state != ca_dedicated)
 	{
-		Sys_Error("Only dedicated mode is supported");
+		Sys_Error("%s: Only dedicated mode is supported", __func__);
 		/*
 		v0 = GetRateRegistrySetting(rate.string);
 		Q_strncpy(szRate, v0, 0x20u);
@@ -98,11 +82,6 @@ void ForceReloadProfile()
 }
 
 bool CEngine::Load(bool dedicated, char *basedir, char *cmdline)
-{
-	return Load_noVirt(dedicated, basedir, cmdline);
-}
-
-bool CEngine::Load_noVirt(bool dedicated, char *basedir, char *cmdline)
 {
 	bool success = false;
 	SetState(DLL_ACTIVE);
@@ -117,11 +96,6 @@ bool CEngine::Load_noVirt(bool dedicated, char *basedir, char *cmdline)
 }
 
 int CEngine::Frame()
-{
-	return Frame_noVirt();
-}
-
-int CEngine::Frame_noVirt()
 {
 #ifndef SWDS
 	(*(void(**)(void))(*(_DWORD *)cdaudio + 24))();
@@ -161,21 +135,11 @@ int CEngine::Frame_noVirt()
 
 void CEngine::SetSubState(int iSubState)
 {
-	SetSubState_noVirt(iSubState);
-}
-
-void CEngine::SetSubState_noVirt(int iSubState)
-{
 	if (iSubState != 1)
 		GameSetSubState(iSubState);
 }
 
 void CEngine::SetState(int iState)
-{
-	SetState_noVirt(iState);
-}
-
-void CEngine::SetState_noVirt(int iState)
 {
 	m_nDLLState = iState;
 	GameSetState(iState);
@@ -183,59 +147,29 @@ void CEngine::SetState_noVirt(int iState)
 
 int CEngine::GetState()
 {
-	return GetState_noVirt();
-}
-
-int CEngine::GetState_noVirt()
-{
 	return m_nDLLState;
 }
 
 int CEngine::GetSubState()
-{
-	return GetSubState_noVirt();
-}
-
-int CEngine::GetSubState_noVirt()
 {
 	return m_nSubState;
 }
 
 double CEngine::GetFrameTime()
 {
-	return GetFrameTime_noVirt();
-}
-
-double CEngine::GetFrameTime_noVirt()
-{
 	return m_fFrameTime;
 }
 
 double CEngine::GetCurTime()
-{
-	return GetCurTime_noVirt();
-}
-
-double CEngine::GetCurTime_noVirt()
 {
 	return m_fCurTime;
 }
 
 void CEngine::TrapKey_Event(int key, bool down)
 {
-	TrapKey_Event_noVirt(key, down);
-}
-
-void CEngine::TrapKey_Event_noVirt(int key, bool down)
-{
 }
 
 void CEngine::TrapMouse_Event(int buttons, bool down)
-{
-	TrapMouse_Event_noVirt(buttons, down);
-}
-
-void CEngine::TrapMouse_Event_noVirt(int buttons, bool down)
 {
 	if (m_bTrapMode && buttons && !down)
 	{
@@ -252,11 +186,6 @@ void CEngine::TrapMouse_Event_noVirt(int buttons, bool down)
 
 void CEngine::StartTrapMode()
 {
-	StartTrapMode_noVirt();
-}
-
-void CEngine::StartTrapMode_noVirt()
-{
 	if (!m_bTrapMode)
 	{
 		m_bDoneTrapping = false;
@@ -266,20 +195,10 @@ void CEngine::StartTrapMode_noVirt()
 
 bool CEngine::IsTrapping()
 {
-	return IsTrapping_noVirt();
-}
-
-bool CEngine::IsTrapping_noVirt()
-{
 	return m_bTrapMode;
 }
 
 bool CEngine::CheckDoneTrapping(int & buttons, int & key)
-{
-	return CheckDoneTrapping_noVirt(buttons, key);
-}
-
-bool CEngine::CheckDoneTrapping_noVirt(int & buttons, int & key)
 {
 	if (m_bTrapMode)
 	{
@@ -300,20 +219,10 @@ bool CEngine::CheckDoneTrapping_noVirt(int & buttons, int & key)
 
 void CEngine::SetQuitting(int quittype)
 {
-	SetQuitting_noVirt(quittype);
-}
-
-void CEngine::SetQuitting_noVirt(int quittype)
-{
 	m_nQuitting = quittype;
 }
 
 int CEngine::GetQuitting()
-{
-	return GetQuitting_noVirt();
-}
-
-int CEngine::GetQuitting_noVirt()
 {
 	return m_nQuitting;
 }

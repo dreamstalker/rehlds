@@ -26,33 +26,18 @@
 *
 */
 
-#ifndef CMODEL_H
-#define CMODEL_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #include "maintypes.h"
 #include "model.h"
 
-
 // Looks like no more than 8096 visibility leafs per world model
-#define MODEL_MAX_PVS 1024
-
-
-#ifdef HOOK_ENGINE
-#define gPAS (*pgPAS)
-#define gPVS (*pgPVS)
-#define gPVSRowBytes (*pgPVSRowBytes)
-#define mod_novis (*pmod_novis)
-#endif // HOOK_ENGINE
-
+const int MODEL_MAX_PVS = 1024;
 
 extern unsigned char *gPAS;
 extern unsigned char *gPVS;
 extern int gPVSRowBytes;
 extern unsigned char mod_novis[MODEL_MAX_PVS];
-
 
 void Mod_Init(void);
 unsigned char *Mod_DecompressVis(unsigned char *in, model_t *model);
@@ -63,5 +48,3 @@ unsigned char *CM_LeafPAS(int leafnum);
 void CM_FreePAS(void);
 void CM_CalcPAS(model_t *pModel);
 qboolean CM_HeadnodeVisible(mnode_t *node, unsigned char *visbits, int *first_visible_leafnum);
-
-#endif // CMODEL_H

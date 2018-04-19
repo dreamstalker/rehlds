@@ -60,18 +60,7 @@ int c_notvis;
 vec3_t vec_origin;
 int r_visframecount;
 
-/*
-* Globals initialization
-*/
-#ifndef HOOK_ENGINE
-
 sizebuf_t gMsgBuffer = { "MessageBegin/End", 0, gMsgData, sizeof(gMsgData), 0 };
-
-#else // HOOK_ENGINE
-
-sizebuf_t gMsgBuffer;
-
-#endif // HOOK_ENGINE
 
 void EXT_FUNC PF_makevectors_I(const float *rgflVector)
 {
@@ -99,7 +88,7 @@ void EXT_FUNC SetMinMaxSize(edict_t *e, const float *min, const float *max, qboo
 	for (int i = 0; i < 3; i++)
 	{
 		if (min[i] > max[i])
-			Host_Error("backwards mins/maxs");
+			Host_Error("%s: backwards mins/maxs", __func__);
 	}
 
 	e->v.mins[0] = min[0];
@@ -113,7 +102,7 @@ void EXT_FUNC SetMinMaxSize(edict_t *e, const float *min, const float *max, qboo
 	e->v.size[0] = max[0] - min[0];
 	e->v.size[1] = max[1] - min[1];
 	e->v.size[2] = max[2] - min[2];
-	SV_LinkEdict(e, 0);
+	SV_LinkEdict(e, FALSE);
 }
 
 void EXT_FUNC PF_setsize_I(edict_t *e, const float *rgflMin, const float *rgflMax)
@@ -161,7 +150,7 @@ void EXT_FUNC PF_setmodel_I(edict_t *e, const char *m)
 		}
 	}
 
-	Host_Error("no precache: %s\n", m);
+	Host_Error("%s: no precache: %s\n", __func__, m);
 }
 
 int EXT_FUNC PF_modelindex(const char *pstr)
@@ -336,15 +325,14 @@ void EXT_FUNC PF_sound_I(edict_t *entity, int channel, const char *sample, float
 	checkBounds(pitch, nameof_variable(pitch), 0, 255);
 #else
 	if (volume < 0.0 || volume > 255.0)
-		Sys_Error("EMIT_SOUND: volume = %i", volume);
+		Sys_Error("%s: volume = %i", __func__, volume);
 	if (attenuation < 0.0 || attenuation > 4.0)
-		Sys_Error("EMIT_SOUND: attenuation = %f", attenuation);
+		Sys_Error("%s: attenuation = %f", __func__, attenuation);
 	if (channel < 0 || channel > 7)
-		Sys_Error("EMIT_SOUND: channel = %i", channel);
+		Sys_Error("%s: channel = %i", __func__, channel);
 	if (pitch < 0 || pitch > 255)
-		Sys_Error("EMIT_SOUND: pitch = %i", pitch);
+		Sys_Error("%s: pitch = %i", __func__, pitch);
 #endif
-
 	SV_StartSound(0, entity, channel, sample, (int)(volume * 255), attenuation, fFlags, pitch);
 }
 
@@ -353,7 +341,7 @@ void EXT_FUNC PF_traceline_Shared(const float *v1, const float *v2, int nomonste
 #ifdef REHLDS_OPT_PEDANTIC
 	trace_t trace = SV_Move_Point(v1, v2, nomonsters, ent);
 #else // REHLDS_OPT_PEDANTIC
-	trace_t trace = SV_Move(v1, vec3_origin, vec3_origin, v2, nomonsters, ent, 0);
+	trace_t trace = SV_Move(v1, vec3_origin, vec3_origin, v2, nomonsters, ent, FALSE);
 #endif // REHLDS_OPT_PEDANTIC
 
 	gGlobalVariables.trace_flags = 0;
@@ -384,7 +372,8 @@ void EXT_FUNC TraceHull(const float *v1, const float *v2, int fNoMonsters, int h
 	hullNumber = hullNumber;
 	if (hullNumber < 0 || hullNumber > 3)
 		hullNumber = 0;
-	trace_t trace = SV_Move(v1, gHullMins[hullNumber], gHullMaxs[hullNumber], v2, fNoMonsters, pentToSkip, 0);
+
+	trace_t trace = SV_Move(v1, gHullMins[hullNumber], gHullMaxs[hullNumber], v2, fNoMonsters, pentToSkip, FALSE);
 
 	ptr->fAllSolid = trace.allsolid;
 	ptr->fStartSolid = trace.startsolid;
@@ -404,7 +393,7 @@ void EXT_FUNC TraceHull(const float *v1, const float *v2, int fNoMonsters, int h
 
 void EXT_FUNC TraceSphere(const float *v1, const float *v2, int fNoMonsters, float radius, edict_t *pentToSkip, TraceResult *ptr)
 {
-	Sys_Error("TraceSphere not yet implemented!\n");
+	Sys_Error("%s: TraceSphere not yet implemented!\n", __func__);
 }
 
 void EXT_FUNC TraceModel(const float *v1, const float *v2, int hullNumber, edict_t *pent, TraceResult *ptr)
@@ -622,7 +611,7 @@ void EXT_FUNC PF_TraceToss_DLL(edict_t *pent, edict_t *pentToIgnore, TraceResult
 
 int EXT_FUNC TraceMonsterHull(edict_t *pEdict, const float *v1, const float *v2, int fNoMonsters, edict_t *pentToSkip, TraceResult *ptr)
 {
-	qboolean monsterClip = (pEdict->v.flags & FL_MONSTERCLIP) ? 1 : 0;
+	qboolean monsterClip = (pEdict->v.flags & FL_MONSTERCLIP) ? TRUE : FALSE;
 	trace_t trace = SV_Move(v1, pEdict->v.mins, pEdict->v.maxs, v2, fNoMonsters, pentToSkip, monsterClip);
 	if (ptr)
 	{
@@ -830,7 +819,7 @@ qboolean EXT_FUNC ValidCmd(const char *pCmd)
 	return len && (pCmd[len - 1] == '\n' || pCmd[len - 1] == ';');
 }
 
-void EXT_FUNC PF_stuffcmd_I(edict_t *pEdict, char *szFmt, ...)
+void EXT_FUNC PF_stuffcmd_I(edict_t *pEdict, const char *szFmt, ...)
 {
 	int entnum;
 	client_t *old;
@@ -842,7 +831,7 @@ void EXT_FUNC PF_stuffcmd_I(edict_t *pEdict, char *szFmt, ...)
 	Q_vsnprintf(szOut, sizeof(szOut), szFmt, argptr);
 	va_end(argptr);
 
-	szOut[1023] = 0;
+	szOut[sizeof(szOut) - 1] = 0;
 	if (entnum < 1 || entnum > g_psvs.maxclients)
 	{
 		Con_Printf("\n!!!\n\nStuffCmd:  Some entity tried to stuff '%s' to console "
@@ -864,7 +853,7 @@ void EXT_FUNC PF_stuffcmd_I(edict_t *pEdict, char *szFmt, ...)
 	}
 }
 
-void EXT_FUNC PF_localcmd_I(char *str)
+void EXT_FUNC PF_localcmd_I(const char *str)
 {
 	if (ValidCmd(str))
 		Cbuf_AddText(str);
@@ -920,7 +909,7 @@ edict_t* EXT_FUNC CreateNamedEntity(int className)
 	ENTITYINIT pEntityInit;
 
 	if (!className)
-		Sys_Error("Spawned a NULL entity!");
+		Sys_Error("%s: Spawned a NULL entity!", __func__);
 
 	pedict = ED_Alloc();
 	pedict->v.classname = className;
@@ -991,6 +980,8 @@ int EXT_FUNC iGetIndex(const char *pszField)
 	IGETINDEX_CHECK_FIELD(noise3);
 	IGETINDEX_CHECK_FIELD(globalname);
 
+	#undef IGETINDEX_CHECK_FIELD
+
 	return -1;
 }
 
@@ -1031,22 +1022,20 @@ qboolean EXT_FUNC PR_IsEmptyString(const char *s)
 
 int EXT_FUNC PF_precache_sound_I(const char *s)
 {
-	int i;
-
 	if (!s)
-		Host_Error(__FUNCTION__ ": NULL pointer");
+		Host_Error("%s: NULL pointer", __func__);
 
 	if (PR_IsEmptyString(s))
-		Host_Error(__FUNCTION__ ": Bad string '%s'", s);
+		Host_Error("%s: Bad string '%s'", __func__, s);
 
 	if (s[0] == '!')
-		Host_Error(__FUNCTION__ ": '%s' do not precache sentence names!", s);
+		Host_Error("%s: '%s' do not precache sentence names!", __func__, s);
 
 	if (g_psv.state == ss_loading)
 	{
 		g_psv.sound_precache_hashedlookup_built = 0;
 
-		for (i = 0; i < MAX_SOUNDS; i++)
+		for (int i = 0; i < MAX_SOUNDS; i++)
 		{
 			if (!g_psv.sound_precache[i])
 			{
@@ -1063,33 +1052,28 @@ int EXT_FUNC PF_precache_sound_I(const char *s)
 				return i;
 		}
 
-		Host_Error(__FUNCTION__  ": Sound '%s' failed to precache because the item count is over the %d limit.\n"
-			"Reduce the number of brush models and/or regular models in the map to correct this.",
+		Host_Error("%s: Sound '%s' failed to precache because the item count is over the %d limit.\n"
+			"Reduce the number of brush models and/or regular models in the map to correct this.", __func__,
 			s, MAX_SOUNDS);
 	}
-	else
-	{
-		// precaching not enabled. check if already exists.
-		for (i = 0; i < MAX_SOUNDS; i++)
-		{
-			if (g_psv.sound_precache[i] && !Q_stricmp(g_psv.sound_precache[i], s))
-				return i;
-		}
 
-		Host_Error(__FUNCTION__ ": '%s' Precache can only be done in spawn functions", s);
+	// precaching not enabled. check if already exists.
+	for (int i = 0; i < MAX_SOUNDS; i++)
+	{
+		if (g_psv.sound_precache[i] && !Q_stricmp(g_psv.sound_precache[i], s))
+			return i;
 	}
 
-	// unreach
-	return -1;
+	Host_Error("%s: '%s' Precache can only be done in spawn functions", __func__, s);
 }
 
 unsigned short EXT_FUNC EV_Precache(int type, const char *psz)
 {
 	if (!psz)
-		Host_Error(__FUNCTION__ ": NULL pointer");
+		Host_Error("%s: NULL pointer", __func__);
 
 	if (PR_IsEmptyString(psz))
-		Host_Error(__FUNCTION__ ": Bad string '%s'", psz);
+		Host_Error("%s: Bad string '%s'", __func__, psz);
 
 	if (g_psv.state == ss_loading)
 	{
@@ -1099,7 +1083,7 @@ unsigned short EXT_FUNC EV_Precache(int type, const char *psz)
 			if (!ev->filename)
 			{
 				if (type != 1)
-					Host_Error(__FUNCTION__ ":  only file type 1 supported currently\n");
+					Host_Error("%s:  only file type 1 supported currently\n", __func__);
 
 				char szpath[MAX_PATH];
 				Q_snprintf(szpath, sizeof(szpath), "%s", psz);
@@ -1108,7 +1092,7 @@ unsigned short EXT_FUNC EV_Precache(int type, const char *psz)
 				int scriptSize = 0;
 				char* evScript = (char*) COM_LoadFile(szpath, 5, &scriptSize);
 				if (!evScript)
-					Host_Error(__FUNCTION__ ":  file %s missing from server\n", psz);
+					Host_Error("%s:  file %s missing from server\n", __func__, psz);
 #ifdef REHLDS_FIXES
 				// Many modders don't know that the resource names passed to precache functions must be a static strings.
 				// Also some metamod modules can be unloaded during the server running.
@@ -1128,7 +1112,7 @@ unsigned short EXT_FUNC EV_Precache(int type, const char *psz)
 			if (!Q_stricmp(ev->filename, psz))
 				return i;
 		}
-		Host_Error(__FUNCTION__ ": '%s' overflow", psz);
+		Host_Error("%s: '%s' overflow", __func__, psz);
 	}
 	else
 	{
@@ -1139,7 +1123,7 @@ unsigned short EXT_FUNC EV_Precache(int type, const char *psz)
 				return i;
 		}
 
-		Host_Error(__FUNCTION__ ": '%s' Precache can only be done in spawn functions", psz);
+		Host_Error("%s: '%s' Precache can only be done in spawn functions", __func__, psz);
 	}
 }
 
@@ -1232,13 +1216,13 @@ void EXT_FUNC EV_Playback(int flags, const edict_t *pInvoker, unsigned short eve
 
 	if (eventindex < 1u || eventindex >= MAX_EVENTS)
 	{
-		Con_DPrintf(__FUNCTION__ ":  index out of range %i\n", eventindex);
+		Con_DPrintf("%s:  index out of range %i\n", __func__, eventindex);
 		return;
 	}
 
 	if (!g_psv.event_precache[eventindex].pszScript)
 	{
-		Con_DPrintf(__FUNCTION__ ":  no event for index %i\n", eventindex);
+		Con_DPrintf("%s:  no event for index %i\n", __func__, eventindex);
 		return;
 	}
 
@@ -1369,7 +1353,7 @@ void EXT_FUNC EV_SV_Playback(int flags, int clientindex, unsigned short eventind
 		return;
 
 	if (clientindex < 0 || clientindex >= g_psvs.maxclients)
-		Host_Error(__FUNCTION__ ":  Client index %i out of range\n", clientindex);
+		Host_Error("%s:  Client index %i out of range\n", __func__, clientindex);
 
 	edict_t *pEdict = g_psvs.clients[clientindex].edict;
 	EV_Playback(flags,pEdict, eventindex, delay, origin, angles, fparam1, fparam2, iparam1, iparam2, bparam1, bparam2);
@@ -1405,10 +1389,10 @@ int EXT_FUNC PF_precache_model_I(const char *s)
 {
 	int iOptional = 0;
 	if (!s)
-		Host_Error(__FUNCTION__ ": NULL pointer");
+		Host_Error("%s: NULL pointer", __func__);
 
 	if (PR_IsEmptyString(s))
-		Host_Error(__FUNCTION__ ": Bad string '%s'", s);
+		Host_Error("%s: Bad string '%s'", __func__, s);
 
 	if (*s == '!')
 	{
@@ -1449,8 +1433,8 @@ int EXT_FUNC PF_precache_model_I(const char *s)
 				return i;
 #endif
 		}
-		Host_Error(__FUNCTION__ ": Model '%s' failed to precache because the item count is over the %d limit.\n"
-			"Reduce the number of brush models and/or regular models in the map to correct this.",
+		Host_Error("%s: Model '%s' failed to precache because the item count is over the %d limit.\n"
+			"Reduce the number of brush models and/or regular models in the map to correct this.", __func__,
 			s, MAX_MODELS);
 	}
 	else
@@ -1466,20 +1450,20 @@ int EXT_FUNC PF_precache_model_I(const char *s)
 				return i;
 #endif
 		}
-		Host_Error(__FUNCTION__ ": '%s' Precache can only be done in spawn functions", s);
+		Host_Error("%s: '%s' Precache can only be done in spawn functions", __func__, s);
 	}
 }
 
 #ifdef REHLDS_FIXES
-int EXT_FUNC PF_precache_generic_I(char *s)
+int EXT_FUNC PF_precache_generic_I(const char *s)
 {
 	if (!s)
-		Host_Error(__FUNCTION__ ": NULL pointer");
+		Host_Error("%s: NULL pointer", __func__);
 
 	if (PR_IsEmptyString(s))
 	{
 		// TODO: Call to Con_Printf is replaced with Host_Error in 6153
-		Host_Error(__FUNCTION__ ": Bad string '%s'", s);
+		Host_Error("%s: Bad string '%s'", __func__, s);
 	}
 
 	char resName[MAX_QPATH];
@@ -1504,12 +1488,12 @@ int EXT_FUNC PF_precache_generic_I(char *s)
 	}
 
 	if (g_psv.state != ss_loading)
-		Host_Error(__FUNCTION__ ": '%s' Precache can only be done in spawn functions", resName);
+		Host_Error("%s: '%s' Precache can only be done in spawn functions", __func__, resName);
 
 	if (resCount >= ARRAYSIZE(g_rehlds_sv.precachedGenericResourceNames))
 	{
-		Host_Error(__FUNCTION__ ": Generic item '%s' failed to precache because the item count is over the %d limit.\n"
-			"Reduce the number of brush models and/or regular models in the map to correct this.",
+		Host_Error("%s: Generic item '%s' failed to precache because the item count is over the %d limit.\n"
+			"Reduce the number of brush models and/or regular models in the map to correct this.", __func__,
 			resName, ARRAYSIZE(g_rehlds_sv.precachedGenericResourceNames));
 	}
 
@@ -1518,15 +1502,15 @@ int EXT_FUNC PF_precache_generic_I(char *s)
 	return g_rehlds_sv.precachedGenericResourceCount++;
 }
 #else // REHLDS_FIXES
-int EXT_FUNC PF_precache_generic_I(char *s)
+int EXT_FUNC PF_precache_generic_I(const char *s)
 {
 	if (!s)
-		Host_Error(__FUNCTION__ ": NULL pointer");
+		Host_Error("%s: NULL pointer", __func__);
 
 	if (PR_IsEmptyString(s))
 	{
 		// TODO: Call to Con_Printf is replaced with Host_Error in 6153
-		Host_Error(__FUNCTION__ ": Bad string '%s'", s);
+		Host_Error("%s: Bad string '%s'", __func__, s);
 	}
 
 	if (g_psv.state == ss_loading)
@@ -1542,8 +1526,8 @@ int EXT_FUNC PF_precache_generic_I(char *s)
 			if (!Q_stricmp(g_psv.generic_precache[i], s))
 				return i;
 		}
-		Host_Error(__FUNCTION__ ": Generic item '%s' failed to precache because the item count is over the %d limit.\n"
-			"Reduce the number of brush models and/or regular models in the map to correct this.",
+		Host_Error("%s: Generic item '%s' failed to precache because the item count is over the %d limit.\n"
+			"Reduce the number of brush models and/or regular models in the map to correct this.", __func__,
 			s, MAX_GENERIC);
 	}
 	else
@@ -1553,17 +1537,21 @@ int EXT_FUNC PF_precache_generic_I(char *s)
 			if (!Q_stricmp(g_psv.generic_precache[i], s))
 				return i;
 		}
-		Host_Error(__FUNCTION__ ": '%s' Precache can only be done in spawn functions", s);
+		Host_Error("%s: '%s' Precache can only be done in spawn functions", __func__, s);
 	}
 }
 #endif // REHLDS_FIXES
 
-int EXT_FUNC PF_IsMapValid_I(char *mapname)
+int EXT_FUNC PF_IsMapValid_I(const char *mapname)
 {
+#ifdef REHLDS_FIXES
+	char cBuf[42];
+	if (!mapname || mapname[0] == '\0')
+#else
 	char cBuf[260];
 	if (!mapname || Q_strlen(mapname) == 0)
+#endif
 		return 0;
-
 
 	Q_snprintf(cBuf, sizeof(cBuf), "maps/%.32s.bsp", mapname);
 	return FS_FileExists(cBuf);
@@ -1628,7 +1616,7 @@ void EXT_FUNC PF_SetKeyValue_I(char *infobuffer, const char *key, const char *va
 	{
 		if (infobuffer != Info_Serverinfo())
 		{
-			Sys_Error("Can't set client keys with SetKeyValue");
+			Sys_Error("%s: Can't set client keys with SetKeyValue", __func__);
 		}
 #ifdef REHLDS_FIXES
 		Info_SetValueForKey(infobuffer, key, value, MAX_INFO_STRING);	// Use correct length
@@ -1691,12 +1679,12 @@ int EXT_FUNC PF_droptofloor_I(edict_t *ent)
 {
 	vec3_t end;
 	trace_t trace;
-	qboolean monsterClip = (ent->v.flags & FL_MONSTERCLIP) ? 1 : 0;
+	qboolean monsterClip = (ent->v.flags & FL_MONSTERCLIP) ? TRUE : FALSE;
 
 	end[0] = ent->v.origin[0];
 	end[1] = ent->v.origin[1];
 	end[2] = ent->v.origin[2] - 256.0;
-	trace = SV_Move(ent->v.origin, ent->v.mins, ent->v.maxs, end, 0, ent, monsterClip);
+	trace = SV_Move(ent->v.origin, ent->v.mins, ent->v.maxs, end, MOVE_NORMAL, ent, monsterClip);
 	if (trace.allsolid)
 		return -1;
 
@@ -1706,7 +1694,7 @@ int EXT_FUNC PF_droptofloor_I(edict_t *ent)
 	ent->v.origin[0] = trace.endpos[0];
 	ent->v.origin[1] = trace.endpos[1];
 	ent->v.origin[2] = trace.endpos[2];
-	SV_LinkEdict(ent, 0);
+	SV_LinkEdict(ent, FALSE);
 	ent->v.flags |= FL_ONGROUND;
 	ent->v.groundentity = trace.ent;
 
@@ -1724,9 +1712,14 @@ int EXT_FUNC PF_DecalIndex(const char *name)
 	return -1;
 }
 
-void EXT_FUNC PF_lightstyle_I(int style, char *val)
+void EXT_FUNC PF_lightstyle_I(int style, const char *val)
 {
+#ifdef REHLDS_FIXES
+	Q_strlcpy(g_rehlds_sv.lightstyleBuffers[style], val);
+	g_psv.lightstyles[style] = g_rehlds_sv.lightstyleBuffers[style];
+#else // REHLDS_FIXES
 	g_psv.lightstyles[style] = val;
+#endif // REHLDS_FIXES
 	if (g_psv.state != ss_active)
 		return;
 
@@ -1758,7 +1751,6 @@ void EXT_FUNC PF_aim_I(edict_t *ent, float speed, float *rgflReturn)
 	vec3_t dir;
 	vec3_t end;
 	vec3_t bestdir;
-	int j;
 	trace_t tr;
 	float dist;
 	float bestdist;
@@ -1783,7 +1775,7 @@ void EXT_FUNC PF_aim_I(edict_t *ent, float speed, float *rgflReturn)
 	start[1] += ent->v.view_ofs[1];
 	start[2] += ent->v.view_ofs[2];
 	VectorMA(start, 2048.0, dir, end);
-	tr = SV_Move(start, vec3_origin, vec3_origin, end, 0, ent, 0);
+	tr = SV_Move(start, vec3_origin, vec3_origin, end, MOVE_NORMAL, ent, FALSE);
 
 	if (tr.ent && tr.ent->v.takedamage == 2.0f && (ent->v.team <= 0 || ent->v.team != tr.ent->v.team))
 	{
@@ -1807,7 +1799,7 @@ void EXT_FUNC PF_aim_I(edict_t *ent, float speed, float *rgflReturn)
 		if (ent->v.team > 0 && ent->v.team == check->v.team)
 			continue;
 
-		for (j = 0; j < 3; j++)
+		for (int j = 0; j < 3; j++)
 		{
 			end[j] = (check->v.maxs[j] + check->v.mins[j]) * 0.75 + check->v.origin[j] + ent->v.view_ofs[j] * 0.0;
 		}
@@ -1822,7 +1814,7 @@ void EXT_FUNC PF_aim_I(edict_t *ent, float speed, float *rgflReturn)
 
 		if (dist >= bestdist)
 		{
-			tr = SV_Move(start, vec3_origin, vec3_origin, end, 0, ent, 0);
+			tr = SV_Move(start, vec3_origin, vec3_origin, end, MOVE_NORMAL, ent, FALSE);
 			if (tr.ent == check)
 			{
 				bestdist = dist;
@@ -1920,7 +1912,7 @@ void EXT_FUNC PF_setview_I(const edict_t *clientent, const edict_t *viewent)
 {
 	int clientnum = NUM_FOR_EDICT(clientent);
 	if (clientnum < 1 || clientnum > g_psvs.maxclients)
-		Host_Error("PF_setview_I: not a client");
+		Host_Error("%s: not a client", __func__);
 
 	client_t *client = &g_psvs.clients[clientnum - 1];
 	if (!client->fakeclient)
@@ -1959,7 +1951,12 @@ void EXT_FUNC PF_crosshairangle_I(const edict_t *clientent, float pitch, float y
 	}
 }
 
-edict_t* EXT_FUNC PF_CreateFakeClient_I(const char *netname)
+edict_t *EXT_FUNC PF_CreateFakeClient_I(const char *netname)
+{
+	return g_RehldsHookchains.m_CreateFakeClient.callChain(CreateFakeClient_internal, netname);
+}
+
+edict_t *EXT_FUNC CreateFakeClient_internal(const char *netname)
 {
 	client_t *fakeclient;
 	edict_t *ent;
@@ -2063,7 +2060,7 @@ sizebuf_t* EXT_FUNC WriteDest_Parm(int dest)
 		entnum = NUM_FOR_EDICT(gMsgEntity);
 		if (entnum <= 0 || entnum > g_psvs.maxclients)
 		{
-			Host_Error("WriteDest_Parm: not a client");
+			Host_Error("%s: not a client", __func__);
 		}
 		if (dest == MSG_ONE)
 		{
@@ -2083,7 +2080,7 @@ sizebuf_t* EXT_FUNC WriteDest_Parm(int dest)
 	case MSG_SPEC:
 		return &g_psv.spectator;
 	default:
-		Host_Error("WriteDest_Parm: bad destination=%d", dest);
+		Host_Error("%s: bad destination = %d", __func__, dest);
 	}
 }
 
@@ -2092,19 +2089,19 @@ void EXT_FUNC PF_MessageBegin_I(int msg_dest, int msg_type, const float *pOrigin
 	if (msg_dest == MSG_ONE || msg_dest == MSG_ONE_UNRELIABLE)
 	{
 		if (!ed)
-			Sys_Error("MSG_ONE or MSG_ONE_UNRELIABLE with no target entity\n");
+			Sys_Error("%s: with no target entity\n", __func__);
 	}
 	else
 	{
 		if (ed)
-			Sys_Error("Invalid message;  cannot use broadcast message with a target entity");
+			Sys_Error("%s: Invalid message: Cannot use broadcast message with a target entity", __func__);
 	}
 
 	if (gMsgStarted)
-		Sys_Error("New message started when msg '%d' has not been sent yet", gMsgType);
+		Sys_Error("%s: New message started when msg '%d' has not been sent yet", __func__, gMsgType);
 
 	if (msg_type == 0)
-		Sys_Error("Tried to create a message with a bogus message type ( 0 )");
+		Sys_Error("%s: Tried to create a message with a bogus message type ( 0 )", __func__);
 
 	gMsgStarted = 1;
 	gMsgType = msg_type;
@@ -2118,9 +2115,10 @@ void EXT_FUNC PF_MessageBegin_I(int msg_dest, int msg_type, const float *pOrigin
 			gMsgOrigin[1] = pOrigin[1];
 			gMsgOrigin[2] = pOrigin[2];
 		}
-
+#ifndef REHLDS_FIXES
 		//No idea why is it called here
-		//Host_IsSinglePlayerGame();
+		Host_IsSinglePlayerGame();
+#endif
 	}
 
 	gMsgBuffer.flags = SIZEBUF_ALLOW_OVERFLOW;
@@ -2131,14 +2129,14 @@ void EXT_FUNC PF_MessageEnd_I(void)
 {
 	qboolean MsgIsVarLength = 0;
 	if (!gMsgStarted)
-		Sys_Error("MESSAGE_END called with no active message\n");
+		Sys_Error("%s: called with no active message\n", __func__);
 	gMsgStarted = 0;
 
 	if (gMsgEntity && (gMsgEntity->v.flags & FL_FAKECLIENT))
 		return;
 
 	if (gMsgBuffer.flags & SIZEBUF_OVERFLOWED)
-		Sys_Error("MESSAGE_END called, but message buffer from .dll had overflowed\n");
+		Sys_Error("%s: called, but message buffer from .dll had overflowed\n", __func__);
 
 
 	if (gMsgType > svc_startofusermessages)
@@ -2156,7 +2154,7 @@ void EXT_FUNC PF_MessageEnd_I(void)
 
 		if (!pUserMsg)
 		{
-			Con_DPrintf("PF_MessageEnd_I:  Unknown User Msg %d\n", gMsgType);
+			Con_DPrintf("%s:  Unknown User Msg %d\n", __func__, gMsgType);
 			return;
 		}
 
@@ -2166,22 +2164,12 @@ void EXT_FUNC PF_MessageEnd_I(void)
 
 			// Limit packet sizes
 			if (gMsgBuffer.cursize > MAX_USER_MSG_DATA)
-				Host_Error(
-					"PF_MessageEnd_I:  Refusing to send user message %s of %i bytes to client, user message size limit is %i bytes\n",
-					pUserMsg->szName,
-					gMsgBuffer.cursize,
-					MAX_USER_MSG_DATA
-				);
+				Host_Error("%s: Refusing to send user message %s of %i bytes to client, user message size limit is %i bytes\n", __func__, pUserMsg->szName, gMsgBuffer.cursize, MAX_USER_MSG_DATA);
 		}
 		else
 		{
 			if (pUserMsg->iSize != gMsgBuffer.cursize)
-				Sys_Error(
-					"User Msg '%s': %d bytes written, expected %d\n",
-					pUserMsg->szName,
-					gMsgBuffer.cursize,
-					pUserMsg->iSize
-				);
+				Sys_Error("%s: User Msg '%s': %d bytes written, expected %d\n", __func__, pUserMsg->szName, gMsgBuffer.cursize, pUserMsg->iSize);
 		}
 	}
 #ifdef REHLDS_FIXES
@@ -2196,7 +2184,7 @@ void EXT_FUNC PF_MessageEnd_I(void)
 		{
 			int entnum = NUM_FOR_EDICT((const edict_t *)gMsgEntity);
 			if (entnum < 1 || entnum > g_psvs.maxclients)
-				Host_Error("WriteDest_Parm: not a client");
+				Host_Error("%s: not a client", __func__);
 
 			client_t* client = &g_psvs.clients[entnum - 1];
 			if (client->fakeclient || !client->hasusrmsgs || (!client->active && !client->spawned))
@@ -2211,9 +2199,11 @@ void EXT_FUNC PF_MessageEnd_I(void)
 #ifdef REHLDS_FIXES
 	;
 
-	if (gMsgDest == MSG_ALL) {
+	if (gMsgDest == MSG_ALL)
+	{
 		gMsgDest = MSG_ONE;
-		for (int i = 0; i < g_psvs.maxclients; i++) {
+		for (int i = 0; i < g_psvs.maxclients; i++)
+		{
 			gMsgEntity = g_psvs.clients[i].edict;
 			if (gMsgEntity == nullptr)
 				continue;
@@ -2221,7 +2211,9 @@ void EXT_FUNC PF_MessageEnd_I(void)
 				continue;
 			writer();
 		}
-	} else {
+	}
+	else
+	{
 		writer();
 	}
 #endif
@@ -2252,56 +2244,56 @@ void EXT_FUNC PF_MessageEnd_I(void)
 void EXT_FUNC PF_WriteByte_I(int iValue)
 {
 	if (!gMsgStarted)
-		Sys_Error(__FUNCTION__ " called with no active message\n");
+		Sys_Error("%s: called with no active message\n", __func__);
 	MSG_WriteByte(&gMsgBuffer, iValue);
 }
 
 void EXT_FUNC PF_WriteChar_I(int iValue)
 {
 	if (!gMsgStarted)
-		Sys_Error(__FUNCTION__ " called with no active message\n");
+		Sys_Error("%s: called with no active message\n", __func__);
 	MSG_WriteChar(&gMsgBuffer, iValue);
 }
 
 void EXT_FUNC PF_WriteShort_I(int iValue)
 {
 	if (!gMsgStarted)
-		Sys_Error(__FUNCTION__ " called with no active message\n");
+		Sys_Error("%s: called with no active message\n", __func__);
 	MSG_WriteShort(&gMsgBuffer, iValue);
 }
 
 void EXT_FUNC PF_WriteLong_I(int iValue)
 {
 	if (!gMsgStarted)
-		Sys_Error(__FUNCTION__ " called with no active message\n");
+		Sys_Error("%s: called with no active message\n", __func__);
 	MSG_WriteLong(&gMsgBuffer, iValue);
 }
 
 void EXT_FUNC PF_WriteAngle_I(float flValue)
 {
 	if (!gMsgStarted)
-		Sys_Error(__FUNCTION__ " called with no active message\n");
+		Sys_Error("%s: called with no active message\n", __func__);
 	MSG_WriteAngle(&gMsgBuffer, flValue);
 }
 
 void EXT_FUNC PF_WriteCoord_I(float flValue)
 {
 	if (!gMsgStarted)
-		Sys_Error(__FUNCTION__ " called with no active message\n");
+		Sys_Error("%s: called with no active message\n", __func__);
 	MSG_WriteShort(&gMsgBuffer, (int)(flValue * 8.0));
 }
 
 void EXT_FUNC PF_WriteString_I(const char *sz)
 {
 	if (!gMsgStarted)
-		Sys_Error(__FUNCTION__ " called with no active message\n");
+		Sys_Error("%s: called with no active message\n", __func__);
 	MSG_WriteString(&gMsgBuffer, sz);
 }
 
 void EXT_FUNC PF_WriteEntity_I(int iValue)
 {
 	if (!gMsgStarted)
-		Sys_Error(__FUNCTION__ " called with no active message\n");
+		Sys_Error("%s: called with no active message\n", __func__);
 	MSG_WriteShort(&gMsgBuffer, iValue);
 }
 
@@ -2351,7 +2343,7 @@ void EXT_FUNC PF_setspawnparms_I(edict_t *ent)
 {
 	int i = NUM_FOR_EDICT(ent);
 	if (i < 1 || i > g_psvs.maxclients)
-		Host_Error("Entity is not a client");
+		Host_Error("%s: Entity is not a client", __func__);
 }
 
 void EXT_FUNC PF_changelevel_I(const char *s1, const char *s2)
@@ -2382,11 +2374,13 @@ void SeedRandomNumberGenerator(void)
 	}
 }
 
-#define IA 16807
-#define IM 2147483647
-#define IQ 127773
-#define IR 2836
-#define NTAB 32
+const int IA = 16807;
+const int IM = 2147483647;
+const int IQ = 127773;
+const int IR = 2836;
+
+const int NTAB = 32;
+
 #define NDIV (1+(IM-1)/NTAB)
 
 int32 ran1(void)
@@ -2548,10 +2542,12 @@ const char* EXT_FUNC PF_GetPlayerAuthId(edict_t *e)
 			Q_strcpy(szAuthID[count], "BOT");
 		}
 //		AUTH_IDTYPE_LOCAL is handled inside SV_GetIDString(), no need to do it here
-//		else if (cl->network_userid.idtype == AUTH_IDTYPE_LOCAL)
-//		{
-//			Q_strcpy(szAuthID[count], "HLTV");
-//		}
+#ifndef REHLDS_FIXES
+		else if (cl->network_userid.idtype == AUTH_IDTYPE_LOCAL)
+		{
+			Q_strcpy(szAuthID[count], "HLTV");
+		}
+#endif
 		else
 		{
 			Q_snprintf(szAuthID[count], sizeof(szAuthID[count]) - 1, "%s", SV_GetClientIDString(cl));
@@ -2585,7 +2581,7 @@ const char* EXT_FUNC PF_GetPhysicsInfoString(const edict_t *pClient)
 	int entnum = NUM_FOR_EDICT(pClient);
 	if (entnum < 1 || entnum > g_psvs.maxclients)
 	{
-		Con_Printf("tried to PF_GetPhysicsInfoString a non-client\n");
+		Con_Printf("tried to %s a non-client\n", __func__);
 		return "";
 	}
 
@@ -2598,7 +2594,7 @@ const char* EXT_FUNC PF_GetPhysicsKeyValue(const edict_t *pClient, const char *k
 	int entnum = NUM_FOR_EDICT(pClient);
 	if (entnum < 1 || entnum > g_psvs.maxclients)
 	{
-		Con_Printf("tried to PF_GetPhysicsKeyValue a non-client\n");
+		Con_Printf("tried to %s a non-client\n", __func__);
 		return "";
 	}
 
@@ -2610,7 +2606,7 @@ void EXT_FUNC PF_SetPhysicsKeyValue(const edict_t *pClient, const char *key, con
 {
 	int entnum = NUM_FOR_EDICT(pClient);
 	if (entnum < 1 || entnum > g_psvs.maxclients)
-		Con_Printf("tried to PF_SetPhysicsKeyValue a non-client\n");
+		Con_Printf("tried to %s a non-client\n", __func__);
 
 	client_t* client = &g_psvs.clients[entnum - 1];
 	Info_SetValueForKey(client->physinfo, key, value, MAX_INFO_STRING);
@@ -2630,7 +2626,7 @@ int EXT_FUNC PF_CanSkipPlayer(const edict_t *pClient)
 	int entnum = NUM_FOR_EDICT(pClient);
 	if (entnum < 1 || entnum > g_psvs.maxclients)
 	{
-		Con_Printf("tried to PF_CanSkipPlayer a non-client\n");
+		Con_Printf("tried to %s a non-client\n", __func__);
 		return 0;
 	}
 
@@ -2666,10 +2662,10 @@ void EXT_FUNC PF_ForceUnmodified(FORCE_TYPE type, float *mins, float *maxs, cons
 	int i;
 
 	if (!filename)
-		Host_Error(__FUNCTION__ ": NULL pointer");
+		Host_Error("%s: NULL pointer", __func__);
 
 	if (PR_IsEmptyString(filename))
-		Host_Error(__FUNCTION__ ": Bad string '%s'", filename);
+		Host_Error("%s: Bad string '%s'", __func__, filename);
 
 	if (g_psv.state == ss_loading)
 	{
@@ -2684,7 +2680,7 @@ void EXT_FUNC PF_ForceUnmodified(FORCE_TYPE type, float *mins, float *maxs, cons
 			++i;
 
 			if (i >= 512)
-				Host_Error(__FUNCTION__ ": '%s' overflow", filename);
+				Host_Error("%s: '%s' overflow", __func__, filename);
 		}
 
 		cnode->check_type = type;
@@ -2711,7 +2707,7 @@ void EXT_FUNC PF_ForceUnmodified(FORCE_TYPE type, float *mins, float *maxs, cons
 			++cnode;
 			++i;
 			if (i >= 512)
-				Host_Error(__FUNCTION__ ": '%s' Precache can only be done in spawn functions", filename);
+				Host_Error("%s: '%s' Precache can only be done in spawn functions", __func__, filename);
 		}
 	}
 }
@@ -2723,7 +2719,7 @@ void EXT_FUNC PF_GetPlayerStats(const edict_t *pClient, int *ping, int *packet_l
 	int c = NUM_FOR_EDICT(pClient);
 	if (c < 1 || c > g_psvs.maxclients)
 	{
-		Con_Printf("tried to PF_GetPlayerStats a non-client\n");
+		Con_Printf("tried to %s a non-client\n", __func__);
 		return;
 	}
 
@@ -2792,7 +2788,7 @@ void EXT_FUNC QueryClientCvarValue(const edict_t *player, const char *cvarName)
 		if (gNewDLLFunctions.pfnCvarValue)
 			gNewDLLFunctions.pfnCvarValue(player, "Bad Player");
 
-		Con_Printf("tried to QueryClientCvarValue a non-client\n");
+		Con_Printf("tried to %s a non-client\n", __func__);
 		return;
 	}
 	client_t *client = &g_psvs.clients[entnum - 1];
@@ -2808,7 +2804,11 @@ void EXT_FUNC QueryClientCvarValue2(const edict_t *player, const char *cvarName,
 		if (gNewDLLFunctions.pfnCvarValue2)
 			gNewDLLFunctions.pfnCvarValue2(player, requestID, cvarName, "Bad Player");
 
+#ifdef REHLDS_FIXES
+		Con_Printf("tried to %s a non-client\n", __func__);
+#else
 		Con_Printf("tried to QueryClientCvarValue a non-client\n");
+#endif
 		return;
 	}
 	client_t *client = &g_psvs.clients[entnum - 1];

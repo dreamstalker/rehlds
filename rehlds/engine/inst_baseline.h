@@ -26,15 +26,11 @@
 *
 */
 
-#ifndef INST_BASELINE_H
-#define INST_BASELINE_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #include "entity_state.h"
 
-#define NUM_BASELINES 64
+const int NUM_BASELINES = 64;
 
 typedef struct extra_baselines_s
 {
@@ -42,5 +38,3 @@ typedef struct extra_baselines_s
 	int classname[NUM_BASELINES];
 	entity_state_t baseline[NUM_BASELINES];
 } extra_baselines_t;
-
-#endif // INST_BASELINE_H

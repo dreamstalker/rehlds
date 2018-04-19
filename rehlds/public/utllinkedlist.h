@@ -18,7 +18,6 @@
 #pragma once
 #endif
 
-#include "osconfig.h"
 #include "basetypes.h"
 #include "utlmemory.h"
 #include "tier0/dbg.h"

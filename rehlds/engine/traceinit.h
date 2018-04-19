@@ -26,18 +26,9 @@
 *
 */
 
-#ifndef TRACEINIT_H
-#define TRACEINIT_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #include "utlvector.h"
-
-#ifndef HOOK_ENGINE
-#define CInitTracker_construct CInitTracker
-#define CInitTracker_destruct ~CInitTracker
-#endif
 
 class CInitTracker
 {
@@ -71,13 +62,7 @@ private:
 	CUtlVector<InitFunc *> m_Funcs[NUM_LISTS];
 };
 
-#ifdef HOOK_ENGINE
-#define g_InitTracker (*pg_InitTracker)
-#endif
-
 extern CInitTracker g_InitTracker;
 
 void TraceInit(const char *i, const char *s, int listnum);
 void TraceShutdown(const char *s, int listnum);
-
-#endif // TRACEINIT_H

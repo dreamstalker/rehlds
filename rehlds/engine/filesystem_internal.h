@@ -26,22 +26,12 @@
 *
 */
 
-#ifndef _FILESYSTEM_INTERNAL_H
-#define _FILESYSTEM_INTERNAL_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #include "maintypes.h"
 #include "FileSystem.h"
 
-
-#ifdef HOOK_ENGINE
-#define g_pFileSystem (*pg_pFileSystem)
-#endif // HOOK_ENGINE
-
 extern IFileSystem *g_pFileSystem;
-
 
 void FS_RemoveAllSearchPaths(void);
 void FS_AddSearchPath(const char *pPath, const char *pathID);
@@ -88,6 +78,3 @@ void FS_ReleaseReadBuffer(FileHandle_t file, void *buffer);
 void FS_Unlink(const char *filename);
 void FS_Rename(const char *originalName, const char *newName);
 void *FS_LoadLibrary(const char *dllName);
-
-#endif // _FILESYSTEM_INTERNAL_H
-

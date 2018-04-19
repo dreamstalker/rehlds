@@ -39,13 +39,6 @@ uint16 g_FRMsg_Log;
 
 cvar_t rehlds_flrec_frame = { "rehlds_flrec_frame", "1", 0, 1.0f, NULL };
 cvar_t rehlds_flrec_pvdata = { "rehlds_flrec_privdata", "1", 0, 1.0f, NULL };
-void FR_CheckInit() {
-#if defined(HOOK_ENGINE)
-	if (!g_FlightRecorder) {
-		FR_Init();
-	}
-#endif
-}
 
 void FR_Dump_f() {
 	const char* fname = "rehlds_flightrec.bin";
@@ -70,7 +63,6 @@ void FR_Rehlds_Init() {
 }
 
 void FR_StartFrame(long frameCounter) {
-	FR_CheckInit();
 	g_FlightRecorder->StartMessage(g_FRMsg_Frame, true);
 	g_FlightRecorder->WriteInt64(frameCounter);
 	g_FlightRecorder->WriteDouble(realtime);
@@ -78,14 +70,12 @@ void FR_StartFrame(long frameCounter) {
 }
 
 void FR_EndFrame(long frameCounter) {
-	FR_CheckInit();
 	g_FlightRecorder->StartMessage(g_FRMsg_Frame, false);
 	g_FlightRecorder->WriteInt64(frameCounter);
 	g_FlightRecorder->EndMessage(g_FRMsg_Frame, false);
 }
 
 void FR_AllocEntPrivateData(void* res, int size) {
-	FR_CheckInit();
 	g_FlightRecorder->StartMessage(g_FRMsg_AllocEntPrivateData, true);
 	g_FlightRecorder->WriteUInt32((size_t)res);
 	g_FlightRecorder->WriteInt32(size);
@@ -93,14 +83,12 @@ void FR_AllocEntPrivateData(void* res, int size) {
 }
 
 void FR_FreeEntPrivateData(void* data) {
-	FR_CheckInit();
 	g_FlightRecorder->StartMessage(g_FRMsg_FreeEntPrivateData, true);
 	g_FlightRecorder->WriteUInt32((size_t)data);
 	g_FlightRecorder->EndMessage(g_FRMsg_FreeEntPrivateData, true);
 }
 
 void FR_Log(const char* prefix, const char* msg) {
-	FR_CheckInit();
 	if (g_FlightRecorder == NULL) { 
 		return; //During server initialization some messages could be written in console/log before flightrecorder is initialized
 	}

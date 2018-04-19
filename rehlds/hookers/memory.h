@@ -31,9 +31,7 @@
 
 #include "osconfig.h"
 
-
-#define MAX_PATTERN 128
-
+const int MAX_PATTERN = 128;
 
 struct Section;
 struct Section
@@ -62,7 +60,7 @@ struct Module
 
 struct Address
 {
-	// Keeps offset for SWDS on application start; during HookEngine() an real address is written here.
+	// Keeps offset for SWDS on application start; during HookModule() an real address is written here.
 	size_t			originalAddress;
 	const char		*symbolName;
 	size_t			address;
@@ -71,7 +69,7 @@ struct Address
 
 struct FunctionHook
 {
-	// Keeps offset for SWDS on application start; during HookEngine() an real address is written here.
+	// Keeps offset for SWDS on application start; during HookModule() an real address is written here.
 	size_t			originalAddress;
 	const char		*symbolName;
 	size_t			handlerFunc;
@@ -80,7 +78,7 @@ struct FunctionHook
 
 struct AddressRef
 {
-	// Keeps offset for SWDS on application start; during HookEngine() an real address is written here.
+	// Keeps offset for SWDS on application start; during HookModule() an real address is written here.
 	size_t			originalAddress;
 	const char		*symbolName;
 	size_t			addressRef;

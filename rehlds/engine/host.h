@@ -26,11 +26,7 @@
 *
 */
 
-#ifndef HOST_H
-#define HOST_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #include "maintypes.h"
 #include "filesystem_internal.h"
@@ -38,7 +34,7 @@
 #include "server.h"
 #include "rehlds_api.h"
 
-#define MAX_COMMAND_LINE_PARAMS 50
+const int MAX_COMMAND_LINE_PARAMS = 50;
 
 typedef struct quakeparms_s
 {
@@ -49,40 +45,6 @@ typedef struct quakeparms_s
 	void *membase;
 	int memsize;
 } quakeparms_t;
-
-#ifdef HOOK_ENGINE
-#define host_name (*phost_name)
-#define host_speeds (*phost_speeds)
-#define host_profile (*phost_profile)
-#define developer (*pdeveloper)
-#define host_limitlocal (*phost_limitlocal)
-#define skill (*pskill)
-#define deathmatch (*pdeathmatch)
-#define coop (*pcoop)
-#define sys_ticrate (*psys_ticrate)
-#define sys_timescale (*psys_timescale)
-#define fps_max (*pfps_max)
-#define host_killtime (*phost_killtime)
-#define sv_stats (*psv_stats)
-#define fps_override (*pfps_override)
-#define host_framerate (*phost_framerate)
-#define pausable (*ppausable)
-#define suitvolume (*psuitvolume)
-
-#define realtime (*prealtime)
-#define rolling_fps (*prolling_fps)
-#define host_parms (*phost_parms)
-#define host_initialized (*phost_initialized)
-#define host_frametime (*phost_frametime)
-#define host_framecount (*phost_framecount)
-#define host_client (*phost_client)
-#define gfNoMasterServer (*pgfNoMasterServer)
-#define oldrealtime (*poldrealtime)
-#define host_hunklevel (*phost_hunklevel)
-#define host_abortserver (*phost_abortserver)
-#define host_enddemo (*phost_enddemo)
-#define host_basepal (*phost_basepal)
-#endif // HOOK_ENGINE
 
 extern cvar_t host_name;
 extern cvar_t host_speeds;
@@ -119,7 +81,7 @@ extern unsigned short *host_basepal;
 NOXREF void Host_EndGame(const char *message, ...);
 void NORETURN Host_Error(const char *error, ...);
 void Host_InitLocal(void);
-NOBODY void Info_WriteVars(FileHandle_t fp);
+NOXREF void Info_WriteVars(FileHandle_t fp);
 void Host_WriteConfiguration(void);
 void Host_WriteCustomConfig(void);
 void SV_ClientPrintf(const char *fmt, ...);
@@ -150,5 +112,3 @@ qboolean Host_IsServerActive(void);
 void Host_Version(void);
 int Host_Init(quakeparms_t *parms);
 void Host_Shutdown(void);
-
-#endif // HOST_H

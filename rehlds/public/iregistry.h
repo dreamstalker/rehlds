@@ -30,11 +30,6 @@ public:
 	virtual void			WriteString(const char *key, const char *value) = 0;
 };
 
-
-#ifdef HOOK_ENGINE
-#define registry (*pregistry)
-#endif // HOOK_ENGINE
-
 extern IRegistry *registry;
 
 #endif // UTIL_REGISTRY_H

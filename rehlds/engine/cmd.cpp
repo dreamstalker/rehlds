@@ -57,13 +57,13 @@ void Cbuf_Init(void)
 
 // As new commands are generated from the console or keybindings,
 // the text is added to the end of the command buffer.
-void Cbuf_AddText(char *text)
+void Cbuf_AddText(const char *text)
 {
 	int len = Q_strlen(text);
 
 	if (cmd_text.cursize + len >= cmd_text.maxsize)
 	{
-		Con_Printf(__FUNCTION__ ": overflow\n");
+		Con_Printf("%s: overflow\n", __func__);
 		return;
 	}
 
@@ -73,7 +73,7 @@ void Cbuf_AddText(char *text)
 // When a command wants to issue other commands immediately, the text is
 // inserted at the beginning of the buffer, before any remaining unexecuted
 // commands.
-void Cbuf_InsertText(char *text)
+void Cbuf_InsertText(const char *text)
 {
 
 	int addLen = Q_strlen(text);
@@ -81,7 +81,7 @@ void Cbuf_InsertText(char *text)
 
 	if (cmd_text.cursize + addLen >= cmd_text.maxsize)
 	{
-		Con_Printf(__FUNCTION__ ": overflow\n");
+		Con_Printf("%s: overflow\n", __func__);
 		return;
 	}
 
@@ -112,14 +112,14 @@ void Cbuf_InsertText(char *text)
 #endif // REHLDS_FIXES
 }
 
-void Cbuf_InsertTextLines(char *text)
+void Cbuf_InsertTextLines(const char *text)
 {
 	int addLen = Q_strlen(text);
 	int currLen = cmd_text.cursize;
 
 	if (cmd_text.cursize + addLen + 2 >= cmd_text.maxsize)
 	{
-		Con_Printf(__FUNCTION__ ": overflow\n");
+		Con_Printf("%s: overflow\n", __func__);
 		return;
 	}
 
@@ -378,19 +378,28 @@ void Cmd_Exec_f(void)
 	pszFileData[nAddLen] = 0;
 	FS_Close(hFile);
 
+	char *configContents = pszFileData;
+#ifdef REHLDS_FIXES
+	if (configContents[0] == char(0xEF) && configContents[1] == char(0xBB) && configContents[2] == char(0xBF))
+	{
+		configContents += 3;
+		nAddLen -= 3;
+	}
+#endif
+
 	Con_DPrintf("execing %s\n", pszFileName);
 
 	if (cmd_text.cursize + nAddLen + 2 < cmd_text.maxsize)
 	{
-		Cbuf_InsertTextLines(pszFileData);
+		Cbuf_InsertTextLines(configContents);
 	}
 	else
 	{
-		char *pszDataPtr = pszFileData;
+		char *pszDataPtr = configContents;
 		while (true)
 		{
 			Cbuf_Execute();	// TODO: This doesn't obey the rule to first execute commands from the file, and then the others in the buffer
-			pszDataPtr = COM_ParseLine(pszDataPtr);
+			pszDataPtr = COM_ParseLine(pszDataPtr); // TODO: COM_ParseLine can be const char*
 
 			if (com_token[0] == 0)
 			{
@@ -417,7 +426,7 @@ void Cmd_Echo_f(void)
 	Con_Printf("\n");
 }
 
-char *CopyString(char *in)
+char *CopyString(const char *in)
 {
 	char *out = (char *)Z_Malloc(Q_strlen(in) + 1);
 	Q_strcpy(out, in);
@@ -461,7 +470,7 @@ void Cmd_Alias_f(void)
 #ifndef REHLDS_FIXES
 	SetCStrikeFlags();	// DONE: Do this once somewhere at the server start
 #endif
-	if ((g_bIsCStrike || g_bIsCZero) &&
+	if ((g_eGameType == GT_CStrike || g_eGameType == GT_CZero) &&
 		(!Q_stricmp(s, "cl_autobuy")
 		|| !Q_stricmp(s, "cl_rebuy")
 		|| !Q_stricmp(s, "gl_ztrick")
@@ -473,7 +482,7 @@ void Cmd_Alias_f(void)
 	}
 
 	// Say hello to my little friend! (c)
-	if (g_bIsTFC && (!Q_stricmp(s, "_special") || !Q_stricmp(s, "special")))
+	if (g_eGameType == GT_TFC && (!Q_stricmp(s, "_special") || !Q_stricmp(s, "special")))
 	{
 		Con_Printf("Alias name is invalid\n");
 		return;
@@ -652,7 +661,7 @@ void EXT_FUNC Cmd_TokenizeString(char *text)
 	}
 }
 
-NOXREF cmd_function_t *Cmd_FindCmd(char *cmd_name)
+NOXREF cmd_function_t *Cmd_FindCmd(const char *cmd_name)
 {
 	NOXREFCHECK;
 
@@ -669,7 +678,7 @@ NOXREF cmd_function_t *Cmd_FindCmd(char *cmd_name)
 	return NULL;
 }
 
-cmd_function_t *Cmd_FindCmdPrev(char *cmd_name)
+cmd_function_t *Cmd_FindCmdPrev(const char *cmd_name)
 {
 	cmd_function_t *cmd = NULL;
 
@@ -715,26 +724,26 @@ void Cmd_InsertCommand(cmd_function_t *cmd)
 }
 
 // Use this for engine inside call only, not from user code, because it doesn't alloc string for the name.
-void Cmd_AddCommand(char *cmd_name, xcommand_t function)
+void Cmd_AddCommand(const char *cmd_name, xcommand_t function)
 {
 	cmd_function_t *cmd;
 
 	if (host_initialized)
 	{
-		Sys_Error(__FUNCTION__ " after host_initialized");
+		Sys_Error("%s: called after host_initialized", __func__);
 	}
 
 	// Check in variables list
 	if (Cvar_FindVar(cmd_name) != NULL)
 	{
-		Con_Printf(__FUNCTION__ ": \"%s\" already defined as a var\n", cmd_name);
+		Con_Printf("%s: \"%s\" already defined as a var\n", __func__, cmd_name);
 		return;
 	}
 
 	// Check if this command is already defined
 	if (Cmd_Exists(cmd_name))
 	{
-		Con_Printf(__FUNCTION__ ": \"%s\" already defined\n", cmd_name);
+		Con_Printf("%s: \"%s\" already defined\n", __func__, cmd_name);
 		return;
 	}
 
@@ -748,21 +757,21 @@ void Cmd_AddCommand(char *cmd_name, xcommand_t function)
 }
 
 // Use this for call from user code, because it alloc string for the name.
-void Cmd_AddMallocCommand(char *cmd_name, xcommand_t function, int flag)
+void Cmd_AddMallocCommand(const char *cmd_name, xcommand_t function, int flag)
 {
 	cmd_function_t *cmd;
 
 	// Check in variables list
 	if (Cvar_FindVar(cmd_name) != NULL)
 	{
-		Con_Printf(__FUNCTION__ ": \"%s\" already defined as a var\n", cmd_name);
+		Con_Printf("%s: \"%s\" already defined as a var\n", __func__, cmd_name);
 		return;
 	}
 
 	// Check if this command is already defined
 	if (Cmd_Exists(cmd_name))
 	{
-		Con_Printf(__FUNCTION__ ": \"%s\" already defined\n", cmd_name);
+		Con_Printf("%s: \"%s\" already defined\n", __func__, cmd_name);
 		return;
 	}
 
@@ -775,26 +784,24 @@ void Cmd_AddMallocCommand(char *cmd_name, xcommand_t function, int flag)
 	Cmd_InsertCommand(cmd);
 }
 
-NOXREF void Cmd_AddHUDCommand(char *cmd_name, xcommand_t function)
+NOXREF void Cmd_AddHUDCommand(const char *cmd_name, xcommand_t function)
 {
 	NOXREFCHECK;
 
 	Cmd_AddMallocCommand(cmd_name, function, FCMD_HUD_COMMAND);
 }
 
-NOXREF void Cmd_AddWrapperCommand(char *cmd_name, xcommand_t function)
+void Cmd_AddWrapperCommand(const char *cmd_name, xcommand_t function)
 {
-	NOXREFCHECK;
-
 	Cmd_AddMallocCommand(cmd_name, function, FCMD_WRAPPER_COMMAND);
 }
 
-void EXT_FUNC Cmd_AddGameCommand(char *cmd_name, xcommand_t function)
+void EXT_FUNC Cmd_AddGameCommand(const char *cmd_name, xcommand_t function)
 {
 	Cmd_AddMallocCommand(cmd_name, function, FCMD_GAME_COMMAND);
 }
 
-void EXT_FUNC Cmd_RemoveCmd(char *cmd_name)
+void EXT_FUNC Cmd_RemoveCmd(const char *cmd_name)
 {
 	auto prev = Cmd_FindCmdPrev(cmd_name);
 
@@ -802,7 +809,7 @@ void EXT_FUNC Cmd_RemoveCmd(char *cmd_name)
 		auto cmd = prev->next;
 		prev->next = cmd->next;
 
-		Z_Free(cmd->name);
+		Z_Free((void*)cmd->name);
 		Mem_Free(cmd);
 	}
 }
@@ -818,7 +825,7 @@ void Cmd_RemoveMallocedCmds(int flag)
 		if (c->flags & flag)
 		{
 			*p = c->next;
-			Z_Free(c->name);
+			Z_Free((void*)c->name);
 			Mem_Free(c);
 			c = *p;
 			continue;
@@ -862,7 +869,7 @@ qboolean Cmd_Exists(const char *cmd_name)
 	return FALSE;
 }
 
-NOXREF char *Cmd_CompleteCommand(char *search, int forward)
+NOXREF const char *Cmd_CompleteCommand(const char *search, int forward)
 {
 	NOXREFCHECK;
 
@@ -1007,10 +1014,12 @@ qboolean Cmd_ForwardToServerInternal(sizebuf_t *pBuf)
 		return FALSE;
 	}
 
-	char tempData[4096];
+	char tempData[4096], buffername[64];
 	sizebuf_t tempBuf;
 
-	tempBuf.buffername = __FUNCTION__ "::tempBuf";
+	Q_sprintf(buffername, "%s::%s", __func__, nameof_variable(tempBuf));
+
+	tempBuf.buffername = buffername;
 	tempBuf.data = (byte *)tempData;
 	tempBuf.maxsize = 4096;
 	tempBuf.cursize = 0;
@@ -1055,13 +1064,13 @@ qboolean Cmd_ForwardToServerUnreliable(void)
 
 // Returns the position (1 to argc-1) in the command's argument list
 // where the given parameter apears, or 0 if not present.
-NOXREF int Cmd_CheckParm(char *parm)
+NOXREF int Cmd_CheckParm(const char *parm)
 {
 	NOXREFCHECK;
 
 	if (!parm)
 	{
-		Sys_Error(__FUNCTION__ ": NULL");
+		Sys_Error("%s: NULL", __func__);
 	}
 
 	int c = Cmd_Argc();

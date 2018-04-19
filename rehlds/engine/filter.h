@@ -26,21 +26,12 @@
 *
 */
 
-#ifndef FILTER_H
-#define FILTER_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #include "userid.h"
 
-#ifdef REHLDS_FIXES
-#define MAX_IPFILTERS		4096
-#define MAX_USERFILTERS		4096
-#else
-#define MAX_IPFILTERS		32768
-#define MAX_USERFILTERS		32768
-#endif // REHLDS_FIXES
+const int MAX_IPFILTERS   = 32768;
+const int MAX_USERFILTERS = 32768;
 
 typedef struct ipfilter_s
 {
@@ -62,5 +53,3 @@ typedef struct userfilter_s
 	float banEndTime;
 	float banTime;
 } userfilter_t;
-
-#endif // FILTER_H

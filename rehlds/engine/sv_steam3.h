@@ -26,11 +26,7 @@
 *
 */
 
-#ifndef SV_STEAM3_H
-#define SV_STEAM3_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #include "maintypes.h"
 #include "common.h"
@@ -54,7 +50,7 @@ protected:
 	virtual ~CSteam3() {}
 	virtual void Shutdown() = 0;
 
-	void GSSendUserStatusResponse(CSteamID &, int, int);
+	void GSSendUserStatusResponse(CSteamID &steamID, int nSecondsConnected, int nSecondsSinceLast);
 	bool InitModule();
 };
 
@@ -79,11 +75,11 @@ public:
 
 	NOBODY void SetServerType();
 	NOBODY void SetSpawnCount(int count);
-	NOBODY bool BSecure();
-	NOBODY bool BLanOnly();
 
-	bool BWantsSecure() { return m_bWantToBeSecure; }
-	bool BLoggedOn() { return m_bLoggedOn; }
+	bool BSecure()      const { return m_bWantToBeSecure; }
+	bool BLanOnly()     const { return m_bLanOnly; };
+	bool BWantsSecure() const { return m_bWantToBeSecure; }
+	bool BLoggedOn()    const { return m_bLoggedOn; }
 
 	uint64 GetSteamID();
 
@@ -123,15 +119,8 @@ public:
 	void RunFrame();
 };
 
-#ifdef HOOK_ENGINE
-#define s_Steam3Server (*ps_Steam3Server)
-#define s_Steam3Client (*ps_Steam3Client)
-#endif // HOOK_ENGINE
-
 extern CSteam3Server *s_Steam3Server;
 extern CSteam3Client s_Steam3Client;
-
-extern bool (CSteam3Server::*pNotifyClientConnect)(client_t *client, const void *pvSteam2Key, uint32 ucbSteam2Key);
 
 uint64 ISteamGameServer_CreateUnauthenticatedUserConnection();
 bool ISteamGameServer_BUpdateUserData(uint64 steamid, const char *netname, uint32 score);
@@ -167,5 +156,3 @@ CSteam3Server *Steam3Server();
 CSteam3Client *Steam3Client();
 void Master_SetMaster_f();
 void Steam_HandleIncomingPacket(byte *data, int len, int fromip, uint16 port);
-
-#endif // SV_STEAM3_H

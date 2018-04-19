@@ -47,11 +47,6 @@ unsigned short *host_basepal;
 //unsigned char *host_colormap;
 //const char *g_InGameAdsAllowed[3];
 
-/*
-* Globals initialization
-*/
-#ifndef HOOK_ENGINE
-
 cvar_t host_name = { "hostname", "Half-Life", 0, 0.0f, NULL };
 cvar_t host_speeds = { "host_speeds", "0", 0, 0.0f, NULL };
 cvar_t host_profile = { "host_profile", "0", 0, 0.0f, NULL };
@@ -71,29 +66,6 @@ cvar_t host_framerate = { "host_framerate", "0", 0, 0.0f, NULL };
 cvar_t pausable = { "pausable", "1", FCVAR_SERVER, 0.0f, NULL };
 cvar_t suitvolume = { "suitvolume", "0.25", FCVAR_ARCHIVE, 0.0f, NULL };
 
-#else // HOOK_ENGINE
-
-cvar_t host_name;
-cvar_t host_speeds;
-cvar_t host_profile;
-cvar_t developer;
-cvar_t host_limitlocal;
-cvar_t skill;
-cvar_t deathmatch;
-cvar_t coop;
-
-cvar_t sys_ticrate;
-cvar_t sys_timescale;
-cvar_t fps_max;
-cvar_t host_killtime;
-cvar_t sv_stats;
-cvar_t fps_override;
-cvar_t host_framerate;
-cvar_t pausable;
-cvar_t suitvolume;
-
-#endif // HOOK_ENGINE
-
 NOXREF void Host_EndGame(const char *message, ...)
 {
 	NOXREFCHECK;
@@ -105,7 +77,7 @@ NOXREF void Host_EndGame(const char *message, ...)
 	Q_vsnprintf(string, sizeof(string), message, argptr);
 	va_end(argptr);
 
-	Con_DPrintf(__FUNCTION__ ": %s\n", string);
+	Con_DPrintf("%s: %s\n", __func__, string);
 
 	oldn = g_pcls.demonum;
 
@@ -116,7 +88,7 @@ NOXREF void Host_EndGame(const char *message, ...)
 
 	if (!g_pcls.state)
 	{
-		Sys_Error(__FUNCTION__ ": %s\n", string);
+		Sys_Error("%s: %s\n", __func__, string);
 	}
 
 	if (oldn != -1)
@@ -142,7 +114,7 @@ void NORETURN Host_Error(const char *error, ...)
 	va_start(argptr, error);
 
 	if (inerror)
-		Sys_Error(__FUNCTION__ ": recursively entered");
+		Sys_Error("%s: recursively entered", __func__);
 
 	inerror = TRUE;
 	SCR_EndLoadingPlaque();
@@ -152,7 +124,7 @@ void NORETURN Host_Error(const char *error, ...)
 	if (g_psv.active && developer.value != 0.0 )
 		CL_WriteMessageHistory(0, 0);
 
-	Con_Printf(__FUNCTION__ ": %s\n", string);
+	Con_Printf("%s: %s\n", __func__, string);
 	if (g_psv.active)
 		Host_ShutdownServer(FALSE);
 
@@ -163,7 +135,7 @@ void NORETURN Host_Error(const char *error, ...)
 		inerror = FALSE;
 		longjmp(host_abortserver, 1);
 	}
-	Sys_Error(__FUNCTION__ ": %s\n", string);
+	Sys_Error("%s: %s\n", __func__, string);
 }
 
 void Host_InitLocal(void)
@@ -519,6 +491,16 @@ void SV_DropClient_internal(client_t *cl, qboolean crash, const char *string)
 	cl->connection_started = realtime;
 	cl->proxy = FALSE;
 	COM_ClearCustomizationList(&cl->customdata, FALSE);
+#ifdef REHLDS_FIXES
+	if (cl->edict)
+	{
+		// Reset flags, leave FL_DORMANT used by CS
+		cl->edict->v.flags &= FL_DORMANT;
+		// Since the edict doesn't get deleted, fix it so it doesn't interfere.
+		cl->edict->v.takedamage = DAMAGE_NO;	// don't attract autoaim
+		cl->edict->v.solid = SOLID_NOT;
+	}
+#endif // REHLDS_FIXES
 	cl->edict = NULL;
 	Q_memset(cl->userinfo, 0, sizeof(cl->userinfo));
 	Q_memset(cl->physinfo, 0, sizeof(cl->physinfo));
@@ -824,7 +806,7 @@ void Host_Speeds(double *time)
 	}
 
 #ifndef SWDS
-	if (cl_gg.value != 0.0f)
+	if (cl_gg.value != 0.0f)	// cvar_t cl_gamegauge
 	{
 		//sub_1D10B2D
 		CL_GGSpeeds(time[3]);
@@ -883,7 +865,7 @@ void _Host_Frame(float time)
 	}
 #endif //REHLDS_FLIGHT_REC
 
-	//SystemWrapper_RunFrame(host_frametime);
+	SystemWrapper_RunFrame(host_frametime);
 
 	if (g_modfuncs.m_pfnFrameBegin)
 		g_modfuncs.m_pfnFrameBegin();
@@ -970,7 +952,7 @@ int Host_Frame(float time, int iState, int *stateInfo)
 		time1 = Sys_FloatTime();
 
 	_Host_Frame(time);
-	if (host_profile.value != 0.0)
+	if (host_profile.value != 0.0f)
 		time2 = Sys_FloatTime();
 
 	if (giStateInfo)
@@ -980,7 +962,7 @@ int Host_Frame(float time, int iState, int *stateInfo)
 		Cbuf_Execute();
 	}
 
-	if (host_profile.value != 0.0)
+	if (host_profile.value != 0.0f)
 	{
 		static double timetotal;
 		static int timecount;
@@ -1009,7 +991,7 @@ int Host_Frame(float time, int iState, int *stateInfo)
 void CheckGore(void)
 {
 	float fValue = bLowViolenceBuild ? 0.0f : 1.0f;
-	
+
 	Cvar_SetValue("violence_hblood", fValue);
 	Cvar_SetValue("violence_hgibs", fValue);
 	Cvar_SetValue("violence_ablood", fValue);
@@ -1146,7 +1128,7 @@ int Host_Init(quakeparms_t *parms)
 	Netchan_Init();
 	DELTA_Init();
 	SV_Init();
-	//SystemWrapper_Init();
+	SystemWrapper_Init();
 	Host_Version();
 
 	//Rehlds Security
@@ -1161,11 +1143,11 @@ int Host_Init(quakeparms_t *parms)
 	Q_memset(&g_module, 0, sizeof(g_module));
 	if (g_pcls.state != ca_dedicated)
 	{
-		//Sys_Error("Only dedicated server mode is supported");
+		//Sys_Error("%s: Only dedicated server mode is supported", __func__);
 
 		color24 *disk_basepal = (color24 *)COM_LoadHunkFile("gfx/palette.lmp");
 		if (!disk_basepal)
-			Sys_Error("Host_Init: Couldn't load gfx/palette.lmp");
+			Sys_Error("%s: Couldn't load gfx/palette.lmp", __func__);
 
 		host_basepal = (unsigned short *)Hunk_AllocName(sizeof(PackedColorVec) * 256, "palette.lmp");
 		for (int i = 0; i < 256; i++)
@@ -1253,7 +1235,7 @@ void Host_Shutdown(void)
 		SV_ClearFrames(&pclient->frames);
 
 	SV_Shutdown();
-	//SystemWrapper_ShutDown();
+	SystemWrapper_ShutDown();
 	NET_Shutdown();
 	S_Shutdown();
 	Con_Shutdown();

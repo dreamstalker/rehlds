@@ -26,11 +26,7 @@
 *
 */
 
-#ifndef NET_WS_H
-#define NET_WS_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #include "maintypes.h"
 #include "enums.h"
@@ -50,13 +46,15 @@
 
 #endif // _WIN32
 
-#define MAX_ROUTEABLE_PACKET	1400
+const int MAX_ROUTEABLE_PACKET = 1400;
 
 #define SPLIT_SIZE				(MAX_ROUTEABLE_PACKET - sizeof(SPLITPACKET))
 
 // Create general message queues
-#define NUM_MSG_QUEUES 40
-#define MSG_QUEUE_SIZE 1536
+const int NUM_MSG_QUEUES = 40;
+const int MSG_QUEUE_SIZE = 1536;
+
+const int NET_HEADER_FLAG_SPLITPACKET = -2;
 
 typedef struct loopmsg_s
 {
@@ -64,7 +62,7 @@ typedef struct loopmsg_s
 	int datalen;
 } loopmsg_t;
 
-#define MAX_LOOPBACK 4
+const int MAX_LOOPBACK = 4;
 
 typedef struct loopback_s
 {
@@ -112,60 +110,7 @@ typedef struct SPLITPACKET_t
 } SPLITPACKET;
 #pragma pack(pop)
 
-#define NET_WS_MAX_FRAGMENTS 5
-
-#ifdef HOOK_ENGINE
-#define net_thread_initialized (*pnet_thread_initialized)
-#define net_address (*pnet_address)
-#define ipname (*pipname)
-#define defport (*pdefport)
-#define ip_clientport (*pip_clientport)
-#define clientport (*pclientport)
-#define net_sleepforever (*pnet_sleepforever)
-#define loopbacks (*ploopbacks)
-#define g_pLagData (*pg_pLagData)
-#define gFakeLag (*pgFakeLag)
-#define net_configured (*pnet_configured)
-#define net_message (*pnet_message)
-#ifdef _WIN32
-#define net_local_ipx_adr (*pnet_local_ipx_adr)
-#endif // _WIN32
-#define net_local_adr (*pnet_local_adr)
-#define net_from (*pnet_from)
-#define noip (*pnoip)
-#ifdef _WIN32
-#define noipx (*pnoipx)
-#endif // _WIN32
-#define clockwindow (*pclockwindow)
-#define use_thread (*puse_thread)
-#define iphostport (*piphostport)
-#define hostport (*phostport)
-#define multicastport (*pmulticastport)
-#ifdef _WIN32
-#define ipx_hostport (*pipx_hostport)
-#define ipx_clientport (*pipx_clientport)
-#endif // _WIN32
-#define fakelag (*pfakelag)
-#define fakeloss (*pfakeloss)
-
-#define net_graph (*pnet_graph)
-#define net_graphwidth (*pnet_graphwidth)
-#define net_scale (*pnet_scale)
-#define net_graphpos (*pnet_graphpos)
-#define net_message_buffer (*pnet_message_buffer)
-#define in_message_buf (*pin_message_buf)
-
-#define in_message (*pin_message)
-#define in_from (*pin_from)
-#define ip_sockets (*pip_sockets)
-#ifdef _WIN32
-#define ipx_sockets (*pipx_sockets)
-#endif // _WIN32
-#define gNetSplit (*pgNetSplit)
-#define messages (*pmessages)
-#define normalqueue (*pnormalqueue)
-#endif // HOOK_ENGINE
-
+const int NET_WS_MAX_FRAGMENTS = 5;
 
 extern qboolean net_thread_initialized;
 extern cvar_t net_address;
@@ -189,7 +134,7 @@ extern qboolean noipx;
 #endif // _WIN32
 extern sizebuf_t net_message;
 extern cvar_t clockwindow;
-extern int use_thread;
+extern qboolean use_thread;
 extern cvar_t iphostport;
 extern cvar_t hostport;
 #ifdef _WIN32
@@ -207,17 +152,17 @@ extern unsigned char net_message_buffer[NET_MAX_PAYLOAD];
 extern unsigned char in_message_buf[NET_MAX_PAYLOAD];
 extern sizebuf_t in_message;
 extern netadr_t in_from;
-extern int ip_sockets[3];
+extern SOCKET ip_sockets[3];
 #ifdef _WIN32
-extern int ipx_sockets[3];
+extern SOCKET ipx_sockets[3];
 #endif // _WIN32
 extern LONGPACKET gNetSplit;
 extern net_messages_t *messages[3];
 extern net_messages_t *normalqueue;
 
 
-void NET_ThreadLock(void);
-void NET_ThreadUnlock(void);
+void NET_ThreadLock();
+void NET_ThreadUnlock();
 unsigned short Q_ntohs(unsigned short netshort);
 void NetadrToSockadr(const netadr_t *a, struct sockaddr *s);
 void SockadrToNetadr(const struct sockaddr *s, netadr_t *a);
@@ -239,35 +184,34 @@ void NET_RemoveFromPacketList(packetlag_t *pPacket);
 NOXREF int NET_CountLaggedList(packetlag_t *pList);
 void NET_ClearLaggedList(packetlag_t *pList);
 void NET_AddToLagged(netsrc_t sock, packetlag_t *pList, packetlag_t *pPacket, netadr_t *net_from_, sizebuf_t messagedata, float timestamp);
-void NET_AdjustLag(void);
+void NET_AdjustLag();
 qboolean NET_LagPacket(qboolean newdata, netsrc_t sock, netadr_t *from, sizebuf_t *data);
 void NET_FlushSocket(netsrc_t sock);
 qboolean NET_GetLong(unsigned char *pData, int size, int *outSize);
 qboolean NET_QueuePacket(netsrc_t sock);
-int NET_Sleep(void);
-void NET_StartThread(void);
-void NET_StopThread(void);
+int NET_Sleep();
+void NET_StartThread();
+void NET_StopThread();
 void *net_malloc(size_t size);
 net_messages_t *NET_AllocMsg(int size);
 void NET_FreeMsg(net_messages_t *pmsg);
 qboolean NET_GetPacket(netsrc_t sock);
-void NET_AllocateQueues(void);
-void NET_FlushQueues(void);
-int NET_SendLong(netsrc_t sock, int s, const char *buf, int len, int flags, const struct sockaddr *to, int tolen);
+void NET_AllocateQueues();
+void NET_FlushQueues();
+int NET_SendLong(netsrc_t sock, SOCKET s, const char *buf, int len, int flags, const struct sockaddr *to, int tolen);
 void NET_SendPacket_api(unsigned int length, void *data, const netadr_t &to);
 void NET_SendPacket(netsrc_t sock, int length, void *data, const netadr_t& to);
-int NET_IPSocket(char *net_interface, int port, qboolean multicast);
-void NET_OpenIP(void);
-int NET_IPXSocket(int hostshort);
-void NET_OpenIPX(void);
-void NET_GetLocalAddress(void);
-int NET_IsConfigured(void);
+SOCKET NET_IPSocket(char *net_interface, int port, qboolean multicast);
+void NET_OpenIP();
+SOCKET NET_IPXSocket(int hostshort);
+void NET_OpenIPX();
+void NET_GetLocalAddress();
+int NET_IsConfigured();
+bool NET_CheckPort(int port);
 void NET_Config(qboolean multiplayer);
-void MaxPlayers_f(void);
-void NET_Init(void);
+void MaxPlayers_f();
+void NET_Init();
 void NET_ClearLagData(qboolean bClient, qboolean bServer);
-void NET_Shutdown(void);
-qboolean NET_JoinGroup(netsrc_t sock, netadr_t& addr);
-qboolean NET_LeaveGroup(netsrc_t sock, netadr_t& addr);
-
-#endif // NET_WS_H
+void NET_Shutdown();
+NOXREF qboolean NET_JoinGroup(netsrc_t sock, netadr_t& addr);
+NOXREF qboolean NET_LeaveGroup(netsrc_t sock, netadr_t& addr);

@@ -1,5 +1,4 @@
-#ifndef __APIPROXY__
-#define __APIPROXY__
+#pragma once
 
 #include "netadr.h"
 #include "Sequence.h"
@@ -9,7 +8,7 @@
 #include "enums.h"
 #endif
 
-#define MAX_ALIAS_NAME 32
+const int MAX_ALIAS_NAME = 32;
 
 typedef struct cmdalias_s
 {
@@ -576,7 +575,7 @@ typedef void(*pfnEngDst_pfnGetScreenFade_t)						(struct screenfade_s **);
 typedef void(*pfnEngDst_pfnSetScreenFade_t)						(struct screenfade_s **);
 typedef void(*pfnEngDst_VGui_GetPanel_t)						();
 typedef void(*pfnEngDst_VGui_ViewportPaintBackground_t)			(int **);
-typedef void(*pfnEngDst_COM_LoadFile_t)							(char **, int *, int **);
+typedef void(*pfnEngDst_COM_LoadFile_t)							(const char **, int *, int **);
 typedef void(*pfnEngDst_COM_ParseFile_t)						(char **, char **);
 typedef void(*pfnEngDst_COM_FreeFile_t)							(void **);
 typedef void(*pfnEngDst_IsSpectateOnly_t)						(void);
@@ -911,12 +910,13 @@ typedef struct modfuncs_s
 	int m_nVoid9;
 } modfuncs_t;
 
-
-#define k_nEngineVersion15Base		0
-#define k_nEngineVersion15Patch		1
-#define k_nEngineVersion16Base		2
-#define k_nEngineVersion16Validated	3		// 1.6 engine with built-in validation
-
+enum
+{
+	k_nEngineVersion15Base	= 0,
+	k_nEngineVersion15Patch,
+	k_nEngineVersion16Base,
+	k_nEngineVersion16Validated	// 1.6 engine with built-in validation
+};
 
 typedef struct validator_s
 {
@@ -934,6 +934,3 @@ typedef struct validator_s
 #define k_nChecksumCompensator 0x36a8f09c	// Don't change this value: it's hardcorded in cdll_int.cpp, 
 
 #define k_nModuleVersionCur 0x43210004
-
-
-#endif // __APIPROXY__

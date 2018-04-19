@@ -26,11 +26,7 @@
 *
 */
 
-#ifndef WAD_H
-#define WAD_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #include "maintypes.h"
 
@@ -72,11 +68,7 @@ typedef struct wadlist_s
 typedef struct wadlist_s wadlist_t;
 typedef struct lumpinfo_s lumpinfo_t;
 
-#define NUM_WADS 2
-
-#ifdef HOOK_ENGINE
-#define wads (*pwads)
-#endif
+const int NUM_WADS = 2;
 
 extern wadlist_t wads[NUM_WADS];
 
@@ -87,5 +79,3 @@ void *W_GetLumpName(int wad, char *name);
 NOXREF void *W_GetLumpNum(int wad, int num);
 void W_Shutdown(void);
 void SwapPic(qpic_t *pic);
-
-#endif // WAD_H

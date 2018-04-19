@@ -26,31 +26,11 @@
 *
 */
 
-#ifndef NET_CHAN_H
-#define NET_CHAN_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #include "maintypes.h"
 #include "cvar.h"
 #include "net.h"
-
-
-#ifdef HOOK_ENGINE
-
-#define gDownloadFile (*pgDownloadFile)
-
-#define net_drop (*pnet_drop)
-#define net_log (*pnet_log)
-#define net_showpackets (*pnet_showpackets)
-#define net_showdrop (*pnet_showdrop)
-#define net_drawslider (*pnet_drawslider)
-#define net_chokeloopback (*pnet_chokeloopback)
-#define sv_filetransfercompression (*psv_filetransfercompression)
-#define sv_filetransfermaxsize (*psv_filetransfermaxsize)
-
-#endif // HOOK_ENGINE
 
 extern char gDownloadFile[256];
 
@@ -62,8 +42,6 @@ extern cvar_t net_drawslider;
 extern cvar_t net_chokeloopback;
 extern cvar_t sv_filetransfercompression;
 extern cvar_t sv_filetransfermaxsize;
-
-
 
 void Netchan_UnlinkFragment(fragbuf_t *buf, fragbuf_t **list);
 void Netchan_OutOfBand(netsrc_t sock, netadr_t adr, int length, byte *data);
@@ -100,5 +78,3 @@ NOXREF void Netchan_UpdateProgress(netchan_t *chan);
 void Netchan_Init(void);
 NOXREF qboolean Netchan_CompressPacket(sizebuf_t *chan);
 NOXREF qboolean Netchan_DecompressPacket(sizebuf_t *chan);
-
-#endif // NET_CHAN_H

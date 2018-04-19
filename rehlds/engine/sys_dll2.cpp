@@ -33,22 +33,9 @@ qboolean g_bIsWin95;
 qboolean g_bIsWin98;
 double g_flLastSteamProgressUpdateTime;
 
-/*
-* Globals initialization
-*/
-#ifndef HOOK_ENGINE
-
 char *szCommonPreloads = "multiplayer_preloads";
 char *szReslistsBaseDir = "reslists";
 char *szReslistsExt = ".lst";
-
-#else // HOOK_ENGINE
-
-char *szCommonPreloads;
-char *szReslistsBaseDir;
-char *szReslistsExt;
-
-#endif // HOOK_ENGINE
 
 const char *GetCurrentSteamAppName(void)
 {
@@ -88,11 +75,11 @@ NOXREF const char *GetRateRegistrySetting(const char *pchDef)
 	return registry->ReadString("rate", pchDef);
 }
 
-void EXPORT F(IEngineAPI **api)
+DLL_EXPORT void F(IEngineAPI **api)
 {
 	CreateInterfaceFn fn;
 	fn = Sys_GetFactoryThis();
-	*api = (IEngineAPI *)fn("VENGINE_LAUNCHER_API_VERSION002", NULL);
+	*api = (IEngineAPI *)fn(VENGINE_LAUNCHER_API_VERSION, NULL);
 }
 
 void Sys_GetCDKey(char *pszCDKey, int *nLength, int *bDedicated)
@@ -203,7 +190,7 @@ void Sys_CheckOSVersion(void)
 	Q_memset(&verInfo, 0, sizeof(verInfo));
 	verInfo.dwOSVersionInfoSize = sizeof(verInfo);
 	if (!GetVersionEx(&verInfo))
-		Sys_Error("Couldn't get OS info");
+		Sys_Error("%s: Couldn't get OS info", __func__);
 
 	g_WinNTOrHigher = verInfo.dwMajorVersion >= 4;
 	if (verInfo.dwPlatformId == 1 && verInfo.dwMajorVersion == 4)
@@ -348,7 +335,7 @@ void Sys_InitMemory(void)
 		if (lpBuffer.dwTotalPhys)
 		{
 			if (lpBuffer.dwTotalPhys < FIFTEEN_MB)
-				Sys_Error("Available memory less than 15MB!!! %i", host_parms.memsize);
+				Sys_Error("%s: Available memory less than 15MB!!! %i", __func__, host_parms.memsize);
 
 			host_parms.memsize = (int)(lpBuffer.dwTotalPhys >> 1);
 			if (host_parms.memsize < MINIMUM_WIN_MEMORY)
@@ -376,7 +363,7 @@ void Sys_InitMemory(void)
 #endif // _WIN32
 
 	if (!host_parms.membase)
-		Sys_Error("Unable to allocate %.2f MB\n", (float)host_parms.memsize / (1024.0f * 1024.0f));
+		Sys_Error("%s: Unable to allocate %.2f MB\n", __func__, (float)host_parms.memsize / (1024.0f * 1024.0f));
 }
 
 void Sys_ShutdownMemory(void)
@@ -524,10 +511,7 @@ int Sys_InitGame(char *lpOrgCmdLine, char *pBaseDir, void *pwnd, int bIsDedicate
 		ClientDLL_ActivateMouse();
 
 	char MessageText[512];
-	const char en_US[12];
-
-	Q_strcpy(en_US, "en_US.UTF-8");
-	en_US[16] = 0;
+	const char en_US[] = "en_US.UTF-8";
 
 	char *cat = setlocale(6, NULL);
 	if (!cat)
@@ -574,25 +558,16 @@ void ClearIOStates(void)
 #endif // SWDS
 }
 
-
-class CEngineAPI : public IEngineAPI
+class CEngineAPI: public IEngineAPI
 {
 public:
-
-	int Run(void *instance, char *basedir, char *cmdline, char *postRestartCmdLineArgs, CreateInterfaceFn launcherFactory, CreateInterfaceFn filesystemFactory)
+	EXT_FUNC int Run(void *instance, char *basedir, char *cmdline, char *postRestartCmdLineArgs, CreateInterfaceFn launcherFactory, CreateInterfaceFn filesystemFactory)
 	{
 		return 0;
 	}
 };
 
-CEngineAPI g_CEngineAPI;
-
-IBaseInterface *CreateCEngineAPI(void)
-{
-	return &g_CEngineAPI;
-};
-
-InterfaceReg g_CreateCEngineAPI = InterfaceReg(CreateCEngineAPI, "VENGINE_LAUNCHER_API_VERSION002");
+EXPOSE_SINGLE_INTERFACE(CEngineAPI, IEngineAPI, VENGINE_LAUNCHER_API_VERSION);
 
 // TODO: Needs rechecking
 /*
@@ -667,11 +642,6 @@ NOXREF int BuildMapCycleListHints(char **hints)
 
 bool CDedicatedServerAPI::Init(char *basedir, char *cmdline, CreateInterfaceFn launcherFactory, CreateInterfaceFn filesystemFactory)
 {
-	return Init_noVirt(basedir, cmdline, launcherFactory, filesystemFactory);
-}
-
-bool CDedicatedServerAPI::Init_noVirt(char *basedir, char *cmdline, CreateInterfaceFn launcherFactory, CreateInterfaceFn filesystemFactory)
-{
 	dedicated_ = (IDedicatedExports *)launcherFactory(VENGINE_DEDICATEDEXPORTS_API_VERSION, NULL);
 	if (!dedicated_)
 		return false;
@@ -693,7 +663,7 @@ bool CDedicatedServerAPI::Init_noVirt(char *basedir, char *cmdline, CreateInterf
 
 	g_bIsDedicatedServer = TRUE;
 	TraceInit("FileSystem_Init(basedir, (void *)filesystemFactory)", "FileSystem_Shutdown()", 0);
-	if (FileSystem_Init(basedir, filesystemFactory) && game->Init(0) && eng->Load(true, basedir, cmdline))
+	if (FileSystem_Init(basedir, (void *)filesystemFactory) && game->Init(0) && eng->Load(true, basedir, cmdline))
 	{
 		char text[256];
 		Q_snprintf(text, ARRAYSIZE(text), "exec %s\n", servercfgfile.string);
@@ -709,12 +679,7 @@ bool CDedicatedServerAPI::Init_noVirt(char *basedir, char *cmdline, CreateInterf
 	return false;
 }
 
-int CDedicatedServerAPI::Shutdown(void)
-{
-	return Shutdown_noVirt();
-}
-
-int CDedicatedServerAPI::Shutdown_noVirt(void)
+int CDedicatedServerAPI::Shutdown()
 {
 	eng->Unload();
 	game->Shutdown();
@@ -729,12 +694,7 @@ int CDedicatedServerAPI::Shutdown_noVirt(void)
 	return giActive;
 }
 
-bool CDedicatedServerAPI::RunFrame(void)
-{
-	return RunFrame_noVirt();
-}
-
-bool CDedicatedServerAPI::RunFrame_noVirt(void)
+bool CDedicatedServerAPI::RunFrame()
 {
 	if (eng->GetQuitting())
 		return false;
@@ -745,27 +705,12 @@ bool CDedicatedServerAPI::RunFrame_noVirt(void)
 
 void CDedicatedServerAPI::AddConsoleText(char *text)
 {
-	AddConsoleText_noVirt(text);
-}
-
-void CDedicatedServerAPI::AddConsoleText_noVirt(char *text)
-{
 	Cbuf_AddText(text);
 }
 
 void CDedicatedServerAPI::UpdateStatus(float *fps, int *nActive, int *nMaxPlayers, char *pszMap)
 {
-	UpdateStatus_noVirt(fps, nActive, nMaxPlayers, pszMap);
-}
-
-void CDedicatedServerAPI::UpdateStatus_noVirt(float *fps, int *nActive, int *nMaxPlayers, char *pszMap)
-{
 	Host_GetHostInfo(fps, nActive, NULL, nMaxPlayers, pszMap);
 }
 
-#ifndef HOOK_ENGINE
-
 EXPOSE_SINGLE_INTERFACE(CDedicatedServerAPI, IDedicatedServerAPI, VENGINE_HLDS_API_VERSION);
-
-#endif // HOOK_ENGINE
-

@@ -12,8 +12,11 @@
 *   without written permission from Valve LLC.
 *
 ****/
+
 // Customization.h
+
 #pragma once
+
 #include "custom.h"
 
 void		COM_ClearCustomizationList( struct customization_s *pHead, qboolean bCleanDecals);

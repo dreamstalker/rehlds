@@ -34,17 +34,8 @@ private:
 	HKEY			m_hKey;
 };
 
-// Expose to launcher
-#ifndef HOOK_ENGINE
-
 static CRegistry g_Registry;
 IRegistry *registry = (IRegistry *)&g_Registry;
-
-#else
-
-IRegistry *registry;
-
-#endif
 
 //-----------------------------------------------------------------------------
 // Purpose: 

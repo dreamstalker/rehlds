@@ -25,6 +25,7 @@
 *    version.
 *
 */
+
 #pragma once
 
 #include "maintypes.h"
@@ -32,62 +33,11 @@
 #include "FileSystem.h"
 #include "pr_dlls.h"
 
-//vmodes.h must be included before cdll_int.h (wrect_t declaration)
+// vmodes.h must be included before cdll_int.h (wrect_t declaration)
 #include "vmodes.h"
 #include "cdll_int.h"
 
-
-#define CONST_INTEGER_AS_STRING(x) #x //Wraps the integer in quotes, allowing us to form constant strings with it
-#define __HACK_LINE_AS_STRING__(x) CONST_INTEGER_AS_STRING(x) //__LINE__ can only be converted to an actual number by going through this, otherwise the output is literally "__LINE__"
-#define __LINE__AS_STRING __HACK_LINE_AS_STRING__(__LINE__) //Gives you the line number in constant string form
-
-#if defined _MSC_VER || defined __INTEL_COMPILER
-#define NOXREFCHECK		   __asm { push [ebp + 4] } Sys_Error("[NOXREFCHECK]:" __FUNCTION__ " (" __FILE__ ":"__LINE__AS_STRING") NOXREF, but called from 0x%.08x")
-#else
-#define NOXREFCHECK		   const char* noxref_msg = "[NOXREFCHECK]:" __FUNCTION__ " (" __FILE__ ":"__LINE__AS_STRING") NOXREF, but called from 0x%.08x"; \
-						   asm volatile (				\
-								"pushl 4(%%ebp)\n\t"	\
-								"pushl %0\n\t"			\
-								"call $Sys_Error\n\t"	\
-								"addl %%esp, $8\n\t"	\
-								::						\
-								"m" (noxref_msg)			\
-							);
-#endif
-
-
-#define MAX_DISCONNECT_REASON 256
-
-
-#ifdef HOOK_ENGINE
-#define g_hfind (*pg_hfind)
-
-#define g_engfuncsExportedToDlls (*pg_engfuncsExportedToDlls)
-
-#define gszDisconnectReason (*pgszDisconnectReason)
-#define gszExtendedDisconnectReason (*pgszExtendedDisconnectReason)
-#define gfExtendedError (*pgfExtendedError)
-#define g_bIsDedicatedServer (*pg_bIsDedicatedServer)
-#define giSubState (*pgiSubState)
-#define giActive (*pgiActive)
-#define giStateInfo (*pgiStateInfo)
-#define gEntityInterface (*pgEntityInterface)
-#define gNewDLLFunctions (*pgNewDLLFunctions)
-#define g_modfuncs (*pg_modfuncs)
-#define g_rgextdll (*pg_rgextdll)
-#define g_iextdllMac (*pg_iextdllMac)
-#define gmodinfo (*pgmodinfo)
-#define gfBackground (*pgfBackground)
-
-#ifndef _WIN32
-#define gHasMMXTechnology (*pgHasMMXTechnology)
-#endif
-
-#define con_debuglog (*pcon_debuglog)
-#define g_bPrintingKeepAliveDots (*pg_bPrintingKeepAliveDots)
-#define Launcher_ConsolePrintf (*pLauncher_ConsolePrintf)
-#endif // HOOK_ENGINE
-
+const int MAX_DISCONNECT_REASON = 256;
 
 extern FileFindHandle_t g_hfind;
 extern enginefuncs_t g_engfuncsExportedToDlls;
@@ -103,8 +53,6 @@ extern int giStateInfo;
 extern DLL_FUNCTIONS gEntityInterface;
 extern NEW_DLL_FUNCTIONS gNewDLLFunctions;
 extern modfuncs_t g_modfuncs;
-
-
 extern extensiondll_t g_rgextdll[50];
 
 extern int g_iextdllMac;
@@ -120,23 +68,6 @@ extern qboolean con_debuglog;
 extern void(*Launcher_ConsolePrintf)(char *, ...);
 
 #ifdef _WIN32
-	#ifdef HOOK_ENGINE
-		#define g_PerfCounterInitialized (*pg_PerfCounterInitialized)
-		#define g_PerfCounterMutex (*pg_PerfCounterMutex)
-
-		#define g_PerfCounterShiftRightAmount (*pg_PerfCounterShiftRightAmount)
-		#define g_PerfCounterSlice (*pg_PerfCounterSlice)
-		#define g_CurrentTime (*pg_CurrentTime)
-		#define g_StartTime (*pg_StartTime)
-
-		#define g_FPUCW_Mask_Prec_64Bit (*pg_FPUCW_Mask_Prec_64Bit)
-		#define g_FPUCW_Mask_Prec_64Bit_2 (*pg_FPUCW_Mask_Prec_64Bit_2)
-		#define g_FPUCW_Mask_Round_Trunc (*pg_FPUCW_Mask_Round_Trunc)
-		#define g_FPUCW_Mask_Round_Up (*pg_FPUCW_Mask_Round_Up)
-
-		#define g_WinNTOrHigher (*pg_WinNTOrHigher)
-	#endif
-
 	extern int g_PerfCounterInitialized;
 	extern CRITICAL_SECTION g_PerfCounterMutex;
 
@@ -170,9 +101,9 @@ NOBODY void Sys_PushFPCW_SetHigh(void);
 NOBODY void Sys_PopFPCW(void);
 NOBODY void MaskExceptions(void);
 NOBODY void Sys_Init(void);
-NOXREF void Sys_Sleep(int msec);
+void Sys_Sleep(int msec);
 NOBODY void Sys_DebugOutStraight(const char *pStr);
-NOBODY void NORETURN Sys_Error(const char *error, ...);
+void NORETURN Sys_Error(const char *error, ...);
 NOXREF void Sys_Warning(const char *pszWarning, ...);
 void Sys_Printf(const char *fmt, ...);
 void Sys_Quit(void);

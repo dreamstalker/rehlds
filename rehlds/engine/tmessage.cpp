@@ -31,11 +31,6 @@
 char gNetworkTextMessageBuffer[MAX_NETMESSAGE][512];
 client_textmessage_t gMessageParms;
 
-/*
-* Globals initialization
-*/
-#ifndef HOOK_ENGINE
-
 client_textmessage_t *gMessageTable = NULL;
 int gMessageTableCount = 0;
 
@@ -61,16 +56,6 @@ client_textmessage_t gNetworkTextMessage[MAX_NETMESSAGE] =
 	NETWORK_MESSAGE1,// pName message name.
 	gNetworkTextMessageBuffer[0] // pMessage
 };
-
-#else // HOOK_ENGINE
-
-client_textmessage_t *gMessageTable;
-int gMessageTableCount;
-
-const char *gNetworkMessageNames[MAX_NETMESSAGE];
-client_textmessage_t gNetworkTextMessage[MAX_NETMESSAGE];
-
-#endif // HOOK_ENGINE
 
 char* EXT_FUNC memfgets(unsigned char *pMemFile, int fileSize, int *pFilePos, char *pBuffer, int bufferSize)
 {
@@ -115,17 +100,19 @@ char* EXT_FUNC memfgets(unsigned char *pMemFile, int fileSize, int *pFilePos, ch
 
 int IsComment(char *pText)
 {
-	int length;
 	if (!pText)
-	{
 		return TRUE;
-	}
 
-	length = Q_strlen(pText);
-	if (length >= 2 && pText[0] == '/' && pText[1] == '/' || length <= 0)
+#ifdef REHLDS_FIXES
+	if ((pText[0] == '/' && pText[1] == '/') || !pText[0])
+		return TRUE;
+#else
+	int length = Q_strlen(pText);
+	if ((length >= 2 && pText[0] == '/' && pText[1] == '/') || length <= 0)
 	{
 		return TRUE;
 	}
+#endif
 
 	return FALSE;
 }
@@ -142,7 +129,11 @@ int IsEndOfText(char *pText)
 
 int IsWhiteSpace(char space)
 {
+#ifdef REHLDS_FIXES
+	return isspace(space);
+#else
 	return space == ' ' || space == '\t' || space == '\r' || space == '\n';
+#endif
 }
 
 NOXREF const char *SkipSpace(const char *pText)
@@ -347,7 +338,7 @@ NOXREF void TextMessageParse(unsigned char *pMemFile, int fileSize)
 	while (memfgets(pMemFile, fileSize, &filePos, buf, 512) != NULL)
 	{
 		if(messageCount >= MAX_MESSAGES)
-			Sys_Error("tmessage::TextMessageParse : messageCount>=MAX_MESSAGES");
+			Sys_Error("%s: messageCount >= MAX_MESSAGES", __func__);
 
 		TrimSpace(buf, trim);
 		switch (mode)

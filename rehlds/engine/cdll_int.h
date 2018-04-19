@@ -18,7 +18,7 @@
 // 4-23-98  
 // JOHN:  client dll interface declarations
 //
-#pragma once 
+#pragma once
 
 #ifdef __cplusplus
 extern "C" {
@@ -32,8 +32,11 @@ extern "C" {
 
 typedef int HSPRITE_t;	// handle to a graphic
 
-#define SCRINFO_SCREENFLASH 1
-#define SCRINFO_STRETCHED	2
+enum
+{
+	SCRINFO_SCREENFLASH = 1,
+	SCRINFO_STRETCHED
+};
 
 typedef struct SCREENINFO_s
 {
@@ -99,7 +102,7 @@ typedef struct module_s
 #include "in_buttons.h"
 #endif
 
-#define CLDLL_INTERFACE_VERSION		7
+const int CLDLL_INTERFACE_VERSION = 7;
 
 extern void LoadSecurityModuleFromDisk(char * pszDllName);
 extern void LoadSecurityModuleFromMemory( unsigned char * pCode, int nSize );
@@ -157,19 +160,11 @@ extern void ClientDLL_ChatInputPosition( int *x, int *y );
 
 extern cldll_func_t cl_funcs;
 extern cl_enginefunc_t cl_engsrcProxies;
-
-#ifdef HOOK_ENGINE
-#define g_engdstAddrs (*pg_engdstAddrs)
-#define g_module (*pg_module)
-#endif
-
 extern cl_enginefunc_dst_t g_engdstAddrs;
 extern module_t	g_module;
 
-
 // Module exports
 extern modfuncs_t g_modfuncs;
-
 
 // Macros for exported engine funcs
 #define RecEngSPR_Load(a)									(g_engdstAddrs.pfnSPR_Load(&a))
@@ -462,4 +457,3 @@ extern void NullDst(void);
 #ifdef __cplusplus
 }
 #endif
-

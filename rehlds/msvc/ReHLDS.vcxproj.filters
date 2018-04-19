@@ -1,17 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
-      <ParseFiles>false</ParseFiles>
-    </Filter>
     <Filter Include="Resource Files">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
-    <Filter Include="hookers">
-      <UniqueIdentifier>{7be88557-a49b-4c62-8df3-d7134a578201}</UniqueIdentifier>
     </Filter>
     <Filter Include="engine">
       <UniqueIdentifier>{eeaac718-712b-453f-9d34-4cefc9e0fe59}</UniqueIdentifier>
@@ -61,15 +53,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\hookers\memory.cpp">
-      <Filter>hookers</Filter>
-    </ClCompile>
-    <ClCompile Include="..\hookers\hooker.cpp">
-      <Filter>hookers</Filter>
-    </ClCompile>
-    <ClCompile Include="..\hookers\6132_hooker.cpp">
-      <Filter>hookers</Filter>
-    </ClCompile>
     <ClCompile Include="..\engine\common.cpp">
       <Filter>engine\common</Filter>
     </ClCompile>
@@ -105,9 +88,6 @@
     </ClCompile>
     <ClCompile Include="..\engine\cvar.cpp">
       <Filter>engine\common</Filter>
-    </ClCompile>
-    <ClCompile Include="..\hookers\main.cpp">
-      <Filter>hookers</Filter>
     </ClCompile>
     <ClCompile Include="..\public\interface.cpp">
       <Filter>public</Filter>
@@ -202,9 +182,6 @@
     <ClCompile Include="..\engine\hashpak.cpp">
       <Filter>engine\common</Filter>
     </ClCompile>
-    <ClCompile Include="..\hookers\rehlds_debug.cpp">
-      <Filter>hookers</Filter>
-    </ClCompile>
     <ClCompile Include="..\unittests\TestRunner.cpp">
       <Filter>unittests</Filter>
     </ClCompile>
@@ -234,12 +211,6 @@
     </ClCompile>
     <ClCompile Include="..\public\utlbuffer.cpp">
       <Filter>public</Filter>
-    </ClCompile>
-    <ClCompile Include="..\public\tier0\platform_win32.cpp">
-      <Filter>public\tier0</Filter>
-    </ClCompile>
-    <ClCompile Include="..\public\tier0\platform_linux.cpp">
-      <Filter>public\tier0</Filter>
     </ClCompile>
     <ClCompile Include="..\engine\sv_remoteaccess.cpp">
       <Filter>engine</Filter>
@@ -271,9 +242,6 @@
     <ClCompile Include="..\engine\ipratelimit.cpp">
       <Filter>engine\server</Filter>
     </ClCompile>
-    <ClCompile Include="..\engine\ipratelimitWrapper.cpp">
-      <Filter>engine\server</Filter>
-    </ClCompile>
     <ClCompile Include="..\engine\decals.cpp">
       <Filter>engine\common</Filter>
     </ClCompile>
@@ -288,9 +256,6 @@
     </ClCompile>
     <ClCompile Include="..\engine\traceinit.cpp">
       <Filter>engine\common</Filter>
-    </ClCompile>
-    <ClCompile Include="..\hookers\main_swds.cpp">
-      <Filter>hookers</Filter>
     </ClCompile>
     <ClCompile Include="..\rehlds\hookchains_impl.cpp">
       <Filter>rehlds</Filter>
@@ -349,19 +314,40 @@
     <ClCompile Include="..\engine\sse_mathfun.cpp">
       <Filter>engine</Filter>
     </ClCompile>
+    <ClCompile Include="..\unittests\security_tests.cpp">
+      <Filter>unittests</Filter>
+    </ClCompile>
+    <ClCompile Include="..\engine\md5.cpp">
+      <Filter>engine\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\BaseSystemModule.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\ObjectList.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\TokenLine.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\engine\SystemWrapper.cpp">
+      <Filter>engine\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\engine\mathlib_sse.cpp">
+      <Filter>engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rehlds\main.cpp">
+      <Filter>rehlds</Filter>
+    </ClCompile>
+    <ClCompile Include="..\hookers\memory.cpp">
+      <Filter>rehlds</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\hookers\memory.h">
-      <Filter>hookers</Filter>
-    </ClInclude>
     <ClInclude Include="..\version\version.h">
       <Filter>version</Filter>
     </ClInclude>
     <ClInclude Include="..\engine\common.h">
       <Filter>engine\common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\hookers\engine.h">
-      <Filter>hookers</Filter>
     </ClInclude>
     <ClInclude Include="..\engine\sys_dll.h">
       <Filter>engine\common</Filter>
@@ -412,6 +398,9 @@
       <Filter>common</Filter>
     </ClInclude>
     <ClInclude Include="..\common\crc.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\md5.h">
       <Filter>common</Filter>
     </ClInclude>
     <ClInclude Include="..\common\cvardef.h">
@@ -576,9 +565,6 @@
     <ClInclude Include="..\engine\filter.h">
       <Filter>engine\server</Filter>
     </ClInclude>
-    <ClInclude Include="..\engine\pr_dlls.h">
-      <Filter>engine\common</Filter>
-    </ClInclude>
     <ClInclude Include="..\engine\sys_dll2.h">
       <Filter>engine\server</Filter>
     </ClInclude>
@@ -729,14 +715,8 @@
     <ClInclude Include="..\engine\hashpak.h">
       <Filter>engine\common</Filter>
     </ClInclude>
-    <ClInclude Include="..\hookers\rehlds_debug.h">
-      <Filter>hookers</Filter>
-    </ClInclude>
     <ClInclude Include="..\rehlds\precompiled.h">
       <Filter>rehlds</Filter>
-    </ClInclude>
-    <ClInclude Include="..\hookers\hooker.h">
-      <Filter>hookers</Filter>
     </ClInclude>
     <ClInclude Include="..\engine\tmessage.h">
       <Filter>engine\common</Filter>
@@ -765,16 +745,10 @@
     <ClInclude Include="..\public\tier0\platform.h">
       <Filter>public\tier0</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\tier0\fasttimer.h">
-      <Filter>public\tier0</Filter>
-    </ClInclude>
     <ClInclude Include="..\public\tier0\dbg.h">
       <Filter>public\tier0</Filter>
     </ClInclude>
     <ClInclude Include="..\public\basetypes.h">
-      <Filter>public</Filter>
-    </ClInclude>
-    <ClInclude Include="..\public\protected_things.h">
       <Filter>public</Filter>
     </ClInclude>
     <ClInclude Include="..\public\commonmacros.h">
@@ -785,18 +759,6 @@
     </ClInclude>
     <ClInclude Include="..\public\string_t.h">
       <Filter>public</Filter>
-    </ClInclude>
-    <ClInclude Include="..\public\tier0\memalloc.h">
-      <Filter>public\tier0</Filter>
-    </ClInclude>
-    <ClInclude Include="..\public\tier0\mem.h">
-      <Filter>public\tier0</Filter>
-    </ClInclude>
-    <ClInclude Include="..\public\tier0\memdbgon.h">
-      <Filter>public\tier0</Filter>
-    </ClInclude>
-    <ClInclude Include="..\public\tier0\memdbgoff.h">
-      <Filter>public\tier0</Filter>
     </ClInclude>
     <ClInclude Include="..\public\utllinkedlist.h">
       <Filter>public</Filter>
@@ -817,9 +779,6 @@
       <Filter>public</Filter>
     </ClInclude>
     <ClInclude Include="..\engine\ipratelimit.h">
-      <Filter>engine\server</Filter>
-    </ClInclude>
-    <ClInclude Include="..\engine\ipratelimitWrapper.h">
       <Filter>engine\server</Filter>
     </ClInclude>
     <ClInclude Include="..\public\savegame_version.h">
@@ -865,6 +824,9 @@
       <Filter>public\rehlds</Filter>
     </ClInclude>
     <ClInclude Include="..\public\rehlds\rehlds_api.h">
+      <Filter>public\rehlds</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\rehlds\pr_dlls.h">
       <Filter>public\rehlds</Filter>
     </ClInclude>
     <ClInclude Include="..\rehlds\hookchains_impl.h">
@@ -1059,9 +1021,6 @@
     <ClInclude Include="..\public\rehlds\crc32c.h">
       <Filter>public\rehlds</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\iosutil.h">
-      <Filter>public</Filter>
-    </ClInclude>
     <ClInclude Include="..\unittests\rehlds_tests_shared.h">
       <Filter>unittests</Filter>
     </ClInclude>
@@ -1073,6 +1032,33 @@
     </ClInclude>
     <ClInclude Include="..\engine\sse_mathfun.h">
       <Filter>engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\rehlds\model.h">
+      <Filter>public\rehlds</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\rehlds\modelgen.h">
+      <Filter>public\rehlds</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\rehlds\spritegn.h">
+      <Filter>public\rehlds</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\rehlds\studio.h">
+      <Filter>public\rehlds</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rehlds\engine.h">
+      <Filter>rehlds</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\SystemWrapper.h">
+      <Filter>engine\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\strtools.h">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\mathlib_sse.h">
+      <Filter>engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hookers\memory.h">
+      <Filter>rehlds</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

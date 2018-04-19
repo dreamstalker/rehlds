@@ -26,11 +26,7 @@
 *
 */
 
-#ifndef HASHPAK_H
-#define HASHPAK_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #include "maintypes.h"
 #include "custom.h"
@@ -71,12 +67,6 @@ typedef struct hash_pack_header_s
 	int nDirectoryOffset;
 } hash_pack_header_t;
 
-#ifdef HOOK_ENGINE
-#define gp_hpak_queue (*pgp_hpak_queue)
-#define hash_pack_dir (*phash_pack_dir)
-#define hash_pack_header (*phash_pack_header)
-#endif // HOOK_ENGINE
-
 extern hash_pack_queue_t *gp_hpak_queue;
 
 // TODO: used only in hashpak
@@ -101,5 +91,3 @@ NOXREF char *HPAK_GetItem(int item);
 void HPAK_CheckSize(char *pakname);
 void HPAK_ValidatePak(char *fullpakname);
 void HPAK_CheckIntegrity(char *pakname);
-
-#endif // HASHPAK_H

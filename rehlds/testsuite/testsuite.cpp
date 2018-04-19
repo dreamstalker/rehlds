@@ -2,7 +2,7 @@
 
 
 /* ============================================================================
-                                external function hooks
+								external function hooks
  ============================================================================*/
 uint32 __cdecl time_hooked(uint32* pTime)
 {
@@ -12,7 +12,7 @@ uint32 __cdecl time_hooked(uint32* pTime)
 struct tm* __cdecl localtime_hooked(uint32* pTime)
 {
 	if (pTime == NULL)
-		rehlds_syserror("%s: pTime is NULL", __FUNCTION__);
+		rehlds_syserror("%s: pTime is NULL", __func__);
 
 	return CRehldsPlatformHolder::get()->localtime(*pTime);
 }
@@ -119,12 +119,12 @@ int __stdcall gethostname_hooked(char *name, int namelen)
 
 void __cdecl SteamAPI_SetMiniDumpComment_hooked(const char *pchMsg)
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 }
 
 void __cdecl SteamAPI_WriteMiniDump_hooked(uint32 uStructuredExceptionCode, void* pvExceptionInfo, uint32 uBuildID)
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 }
 
 void __cdecl SteamAPI_RegisterCallback_hooked(class CCallbackBase *pCallback, int iCallback)
@@ -144,14 +144,14 @@ bool __cdecl SteamAPI_Init_hooked()
 
 ISteamUser* __cdecl SteamUser_hooked()
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
-	return NULL;
+	rehlds_syserror("%s: not implemented", __func__);
+	//return NULL;
 }
 
 ISteamFriends* __cdecl SteamFriends_hooked()
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
-	return NULL;
+	rehlds_syserror("%s: not implemented", __func__);
+	//return NULL;
 }
 
 void __cdecl SteamGameServer_RunCallbacks_hooked()
@@ -161,7 +161,7 @@ void __cdecl SteamGameServer_RunCallbacks_hooked()
 
 void __cdecl SteamAPI_Shutdown_hooked()
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 }
 
 void __cdecl SteamGameServer_Shutdown_hooked()
@@ -191,13 +191,13 @@ void __cdecl SteamAPI_SetBreakpadAppID_hooked(uint32 unAppID)
 
 void __cdecl SteamAPI_RegisterCallResult_hooked(class CCallbackBase *pCallback, SteamAPICall_t hAPICall)
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 }
 
 ISteamHTTP* __cdecl SteamHTTP_hooked()
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
-	return NULL;
+	rehlds_syserror("%s: not implemented", __func__);
+	//return NULL;
 }
 
 void __cdecl SteamAPI_UnregisterCallResult_hooked(class CCallbackBase *pCallback, SteamAPICall_t hAPICall)
@@ -216,7 +216,7 @@ void __cdecl SteamAPI_UseBreakpadCrashHandler_hooked(char const *pchVersion, cha
 }
 
 /* ============================================================================
-                               Hooks installation
+							   Hooks installation
  ============================================================================*/
 HMODULE getModuleHandleOrDie(const char* moduleName) {
 	HMODULE res = GetModuleHandleA(moduleName);

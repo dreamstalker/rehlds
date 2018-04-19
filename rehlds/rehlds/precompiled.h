@@ -16,18 +16,15 @@
 #include "ed_strpool.h"
 
 #include "memory.h"
+#include "strtools.h"
+
+// Valve libs stuff
+#include "tier0/platform.h"
+#include "tier0/dbg.h"
+
 #include "engine.h"
 #include "platform.h"
 #include "RehldsRuntimeConfig.h"
-#include "rehlds_debug.h"
-
-#ifdef HOOK_ENGINE
-#include "hooker.h"
-#endif
-
-//valve libs stuff
-#include "tier0/platform.h"
-#include "tier0/dbg.h"
 
 #include "interface.h"
 #include "iregistry.h"
@@ -35,9 +32,7 @@
 #include "utlbuffer.h"
 #include "utlrbtree.h"
 
-#include "iosutil.h"
-
-//testsuite
+// Testsuite
 #include "testsuite.h"
 #include "funccalls.h"
 #include "recorder.h"
@@ -59,3 +54,4 @@
 #include "rehlds_security.h"
 
 #include "dlls/cdll_dll.h"
+#include "hltv.h"

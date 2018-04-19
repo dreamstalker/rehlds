@@ -26,11 +26,7 @@
 *
 */
 
-#ifndef HOST_CMD_H
-#define HOST_CMD_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #include "maintypes.h"
 #include "eiface.h"
@@ -73,7 +69,7 @@ typedef struct SAVE_HEADER_s
 typedef struct SAVELIGHTSTYLE_s
 {
 	int index;
-	char style[64];
+	char style[MAX_LIGHTSTYLE_SIZE];
 } SAVELIGHTSTYLE;
 
 typedef struct TITLECOMMENT_s
@@ -81,31 +77,6 @@ typedef struct TITLECOMMENT_s
 	char *pBSPName;
 	char *pTitleName;
 } TITLECOMMENT;
-
-#ifdef HOOK_ENGINE
-
-#define r_dointerp (*pr_dointerp)
-#define r_origin (*pr_origin)
-#define cpuPercent (*pcpuPercent)
-#define startTime (*pstartTime)
-#define current_skill (*pcurrent_skill)
-#define gHostSpawnCount (*pgHostSpawnCount)
-#define g_careerState (*pg_careerState)
-#define g_pSaveGameCommentFunc (*pg_pSaveGameCommentFunc)
-#define g_bMajorMapChange (*pg_bMajorMapChange)
-#define voice_recordtofile (*pvoice_recordtofile)
-#define voice_inputfromfile (*pvoice_inputfromfile)
-#define gTitleComments (*pgTitleComments)
-#define gGameHeaderDescription (*pgGameHeaderDescription)
-#define gSaveHeaderDescription (*pgSaveHeaderDescription)
-#define gAdjacencyDescription (*pgAdjacencyDescription)
-#define gEntityTableDescription (*pgEntityTableDescription)
-#define gLightstyleDescription (*pgLightstyleDescription)
-#define gHostMap (*pgHostMap)
-#define g_iQuitCommandIssued (*pg_iQuitCommandIssued)
-#define g_pPostRestartCmdLineArgs pg_pPostRestartCmdLineArgs
-
-#endif // HOOK_ENGINE
 
 extern int r_dointerp;
 extern vec3_t r_origin;
@@ -209,8 +180,12 @@ void Host_KillServer_f(void);
 void Host_VoiceRecordStart_f(void);
 void Host_VoiceRecordStop_f(void);
 void Host_Crash_f(void);
+
+#ifdef REHLDS_FIXES
+void Host_ResourcesList_f();
+void Host_ResourcesCount_f();
+#endif
+
 void Host_InitCommands(void);
 void SV_CheckBlendingInterface(void);
 void SV_CheckSaveGameCommentInterface(void);
-
-#endif // HOST_CMD_H

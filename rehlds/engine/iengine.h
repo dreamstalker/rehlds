@@ -26,11 +26,7 @@
 *
 */
 
-#ifndef IENGINE_H
-#define IENGINE_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #include "maintypes.h"
 
@@ -69,5 +65,3 @@ public:
 };
 
 extern IEngine *eng;
-
-#endif // IENGINE_H

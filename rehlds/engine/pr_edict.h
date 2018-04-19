@@ -26,17 +26,12 @@
 *
 */
 
-#ifndef PR_EDICT_H
-#define PR_EDICT_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #include "maintypes.h"
 #include "cvar.h"
 #include "pm_defs.h"
 #include "progdefs.h"
-
 
 void ED_ClearEdict(edict_t *e);
 edict_t *ED_Alloc(void);
@@ -71,5 +66,3 @@ void CVarRegister(cvar_t *pCvar);
 int AllocEngineString(const char *szValue);
 void SaveSpawnParms(edict_t *pEdict);
 void *GetModelPtr(edict_t *pEdict);
-
-#endif // PR_EDICT_H

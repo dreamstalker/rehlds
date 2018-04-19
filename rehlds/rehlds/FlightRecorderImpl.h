@@ -79,7 +79,7 @@ private:
 	template<typename T>
 	void WritePrimitive(T v) {
 		if (m_pRecorderState->curMessage == 0) {
-			Sys_Error(__FUNCTION__ ": Could not write, invalid state");
+			Sys_Error("%s: Could not write, invalid state", __func__);
 		}
 
 		CheckSize(sizeof(T));
@@ -99,26 +99,26 @@ public:
 	virtual ~CRehldsFlightRecorder();
 	void dump(const char* fname);
 
-	virtual void StartMessage(uint16 msg, bool entrance);
-	virtual void EndMessage(uint16 msg, bool entrance);
+	EXT_FUNC virtual void StartMessage(uint16 msg, bool entrance);
+	EXT_FUNC virtual void EndMessage(uint16 msg, bool entrance);
 
-	virtual void WriteInt8(int8 v);
-	virtual void WriteUInt8(uint8 v);
+	EXT_FUNC virtual void WriteInt8(int8 v);
+	EXT_FUNC virtual void WriteUInt8(uint8 v);
 
-	virtual void WriteInt16(int16 v);
-	virtual void WriteUInt16(uint16 v);
+	EXT_FUNC virtual void WriteInt16(int16 v);
+	EXT_FUNC virtual void WriteUInt16(uint16 v);
 
-	virtual void WriteInt32(int32 v);
-	virtual void WriteUInt32(uint32 v);
+	EXT_FUNC virtual void WriteInt32(int32 v);
+	EXT_FUNC virtual void WriteUInt32(uint32 v);
 
-	virtual void WriteInt64(int64 v);
-	virtual void WriteUInt64(uint64 v);
+	EXT_FUNC virtual void WriteInt64(int64 v);
+	EXT_FUNC virtual void WriteUInt64(uint64 v);
 
-	virtual void WriteFloat(float v);
-	virtual void WriteDouble(double v);
+	EXT_FUNC virtual void WriteFloat(float v);
+	EXT_FUNC virtual void WriteDouble(double v);
 
-	virtual void WriteBuffer(const void* data, unsigned int len);
-	virtual void WriteString(const char* s);
+	EXT_FUNC virtual void WriteBuffer(const void* data, unsigned int len);
+	EXT_FUNC virtual void WriteString(const char* s);
 
-	virtual uint16 RegisterMessage(const char* module, const char *message, unsigned int version, bool inOut);
+	EXT_FUNC virtual uint16 RegisterMessage(const char* module, const char *message, unsigned int version, bool inOut);
 };

@@ -40,7 +40,7 @@ void PrintBinaryArray(const char* data, int dataLen, std::stringstream &ss)
 {
 	ss << "[";
 	for (int i = 0; i < dataLen; i++)
-		ss << " " << (unsigned int) (unsigned char)data[i];
+		ss << " " << (unsigned int)(unsigned char)data[i];
 	ss << "]";
 }
 
@@ -66,14 +66,14 @@ bool CompareSockAddrs(void* ps1, void* ps2) {
 		break;
 
 	default:
-		rehlds_syserror("%s: Unknown sockaddr family %u", __FUNCTION__, sa1->sa_family);
+		rehlds_syserror("%s: Unknown sockaddr family %u", __func__, sa1->sa_family);
 	}
 
 	return 0 == memcmp(ps1, ps2, compareSize);
 }
 
 /* ============================================================================
-                                 CSleepExtCall
+								 CSleepExtCall
 ============================================================================ */
 CSleepExtCall::CSleepExtCall(DWORD time)
 {
@@ -109,7 +109,7 @@ void CSleepExtCall::readPrologue(std::istream &stream)
 
 
 /* ============================================================================
-                               CQueryPerfFreqCall
+							   CQueryPerfFreqCall
 ============================================================================ */
 std::string CQueryPerfFreqCall::toString()
 {
@@ -142,7 +142,7 @@ void CQueryPerfFreqCall::readEpilogue(std::istream &stream) {
 
 
 /* ============================================================================
-                              CQueryPerfCounterCall
+							  CQueryPerfCounterCall
 ============================================================================ */
 std::string CQueryPerfCounterCall::toString()
 {
@@ -176,7 +176,7 @@ void CQueryPerfCounterCall::readEpilogue(std::istream &stream) {
 
 
 /* ============================================================================
-                               CGetTickCountCall
+							   CGetTickCountCall
 ============================================================================ */
 std::string CGetTickCountCall::toString()
 {
@@ -207,7 +207,7 @@ void CGetTickCountCall::readEpilogue(std::istream &stream) {
 
 
 /* ============================================================================
-                             CGetTickCountCall
+							 CGetTickCountCall
 ============================================================================ */
 
 std::string CGetLocalTimeCall::toString()
@@ -239,7 +239,7 @@ void CGetLocalTimeCall::readEpilogue(std::istream &stream) {
 
 
 /* ============================================================================
-                        CGetSystemTimeCall
+						CGetSystemTimeCall
 ============================================================================ */
 std::string CGetSystemTimeCall::toString()
 {
@@ -270,7 +270,7 @@ void CGetSystemTimeCall::readEpilogue(std::istream &stream) {
 
 
 /* ============================================================================
-                               CGetTimeZoneInfoCall
+							   CGetTimeZoneInfoCall
 ============================================================================ */
 std::string CGetTimeZoneInfoCall::toString()
 {
@@ -279,7 +279,7 @@ std::string CGetTimeZoneInfoCall::toString()
 		<< " Bias: " << m_Res.Bias
 		<< " StandardName: " << m_Res.StandardName
 		<< " StandardDate: "; PrintSystemTime(&m_Res.StandardDate, ss);
-	
+
 	ss << " StandardBias: " << m_Res.StandardBias
 		<< " DaylightName: " << m_Res.DaylightName
 		<< " DaylightDate: "; PrintSystemTime(&m_Res.DaylightDate, ss);
@@ -309,7 +309,7 @@ void CGetTimeZoneInfoCall::readEpilogue(std::istream &stream) {
 
 
 /* ============================================================================
-                         CSocketCall
+						 CSocketCall
 ============================================================================ */
 CSocketCall::CSocketCall(int af, int type, int protocol)
 {
@@ -364,7 +364,7 @@ void CSocketCall::readEpilogue(std::istream &stream) {
 
 
 /* ============================================================================
-                              CIoCtlSocketCall
+							  CIoCtlSocketCall
 ============================================================================ */
 CIoCtlSocketCall::CIoCtlSocketCall(SOCKET s, long cmd, u_long inValue)
 {
@@ -430,7 +430,7 @@ void CIoCtlSocketCall::readEpilogue(std::istream &stream) {
 
 
 /* ============================================================================
-                               CSetSockOptCall
+							   CSetSockOptCall
 ============================================================================ */
 CSetSockOptCall::CSetSockOptCall(SOCKET s, int level, int optname, const char* optval, int optlen)
 {
@@ -508,7 +508,7 @@ void CSetSockOptCall::readEpilogue(std::istream &stream) {
 
 
 /* ============================================================================
-                               CCloseSocketCall
+							   CCloseSocketCall
 ============================================================================ */
 CCloseSocketCall::CCloseSocketCall(SOCKET s)
 {
@@ -553,7 +553,7 @@ void CCloseSocketCall::readEpilogue(std::istream &stream) {
 
 
 /* ============================================================================
-                             CRecvFromCall
+							 CRecvFromCall
 ============================================================================ */
 CRecvFromCall::CRecvFromCall(SOCKET s, int len, int flags, int fromlen)
 {
@@ -599,15 +599,15 @@ bool CRecvFromCall::compareInputArgs(IEngExtCall* other, bool strict)
 void CRecvFromCall::setResult(const void* data, const void* from, int fromLen, int res)
 {
 	if (res > 0 && res > sizeof(m_Data))
-		rehlds_syserror("%s: too large datalen (%d max %d)", __FUNCTION__, res, sizeof(m_Data));
+		rehlds_syserror("%s: too large datalen (%d max %d)", __func__, res, sizeof(m_Data));
 
 	if (fromLen > sizeof(m_From))
-		rehlds_syserror("%s: too large fromlen (%d max %d)", __FUNCTION__, res, sizeof(m_From));
+		rehlds_syserror("%s: too large fromlen (%d max %d)", __func__, res, sizeof(m_From));
 
 	m_FromLenOut = fromLen;
 	m_Res = res;
 
-	if (res > 0) 
+	if (res > 0)
 		memcpy(m_Data, data, res);
 
 	if (fromLen > 0)
@@ -652,15 +652,15 @@ void CRecvFromCall::readEpilogue(std::istream &stream) {
 
 
 /* ============================================================================
-                              CSendToCall
+							  CSendToCall
 ============================================================================ */
 CSendToCall::CSendToCall(SOCKET s, const void* buf, int len, int flags, const void* to, int tolen)
 {
 	if (len > sizeof(m_Data))
-		rehlds_syserror("%s: too large datalen (%d max %d)", __FUNCTION__, len, sizeof(m_Data));
+		rehlds_syserror("%s: too large datalen (%d max %d)", __func__, len, sizeof(m_Data));
 
 	if (tolen > sizeof(m_To))
-		rehlds_syserror("%s: too large tolen (%d max %d)", __FUNCTION__, tolen, sizeof(m_To));
+		rehlds_syserror("%s: too large tolen (%d max %d)", __func__, tolen, sizeof(m_To));
 
 	m_Socket = s;
 	m_Len = len;
@@ -695,15 +695,19 @@ bool CSendToCall::compareInputArgs(IEngExtCall* other, bool strict)
 	if (strict) {
 		if (otherCall->m_Len != m_Len)
 			return false;
-	} else {
+	}
+	else {
 		int maxDiff;
 		if (m_Len < 40) {
 			maxDiff = 10;
-		} else if (m_Len < 90) {
+		}
+		else if (m_Len < 90) {
 			maxDiff = 15;
-		} else if (m_Len < 120) {
+		}
+		else if (m_Len < 120) {
 			maxDiff = 18;
-		} else {
+		}
+		else {
 			maxDiff = m_Len / 8;
 		}
 		if (abs(otherCall->m_Len - m_Len) > maxDiff)
@@ -761,12 +765,12 @@ void CSendToCall::readEpilogue(std::istream &stream) {
 
 
 /* ============================================================================
-                                    CBindCall
+									CBindCall
 ============================================================================ */
 CBindCall::CBindCall(SOCKET s, const void* addr, int addrlen)
 {
 	if (addrlen > sizeof(m_Addr))
-		rehlds_syserror("%s: too large tolen (%d max %d)", __FUNCTION__, addrlen, sizeof(m_Addr));
+		rehlds_syserror("%s: too large tolen (%d max %d)", __func__, addrlen, sizeof(m_Addr));
 
 	m_Socket = s;
 	m_AddrLen = addrlen;
@@ -829,7 +833,7 @@ void CBindCall::readEpilogue(std::istream &stream) {
 
 
 /* ============================================================================
-                          CGetSockNameCall
+						  CGetSockNameCall
 ============================================================================ */
 CGetSockNameCall::CGetSockNameCall(SOCKET s, int addrlen)
 {
@@ -850,7 +854,7 @@ std::string CGetSockNameCall::toString()
 void CGetSockNameCall::setResult(const void* addr, int addrlen, int res)
 {
 	if (addrlen > sizeof(m_Addr))
-		rehlds_syserror("%s: too large tolen (%d max %d)", __FUNCTION__, addrlen, sizeof(m_Addr));
+		rehlds_syserror("%s: too large tolen (%d max %d)", __func__, addrlen, sizeof(m_Addr));
 
 	m_Res = res;
 	m_AddrLenOut = addrlen;
@@ -898,7 +902,7 @@ void CGetSockNameCall::readEpilogue(std::istream &stream) {
 		.read((char*)&m_Res, 4);
 
 	stream.read((char*)&m_Addr, m_AddrLenOut);
-		
+
 }
 
 
@@ -907,7 +911,7 @@ void CGetSockNameCall::readEpilogue(std::istream &stream) {
 
 
 /* ============================================================================
-                           CWSAGetLastErrorCall
+						   CWSAGetLastErrorCall
 ============================================================================ */
 std::string CWSAGetLastErrorCall::toString()
 {
@@ -937,12 +941,12 @@ void CWSAGetLastErrorCall::readEpilogue(std::istream &stream) {
 
 
 /* ============================================================================
-                              CSteamCallbackCall1
+							  CSteamCallbackCall1
 ============================================================================ */
 CSteamCallbackCall1::CSteamCallbackCall1(int cbId, void* data, int dataSize, CCallbackBase* cb)
 {
 	if (dataSize > sizeof(m_Data))
-		rehlds_syserror("%s: too large data (%d, max %d)", __FUNCTION__, dataSize, sizeof(m_Data));
+		rehlds_syserror("%s: too large data (%d, max %d)", __func__, dataSize, sizeof(m_Data));
 
 	m_CallbackId = cbId;
 	m_DataSize = dataSize;
@@ -1000,12 +1004,12 @@ void CSteamCallbackCall1::readEpilogue(std::istream &stream) {
 
 
 /* ============================================================================
-                                 CSteamCallbackCall2
+								 CSteamCallbackCall2
 ============================================================================ */
 CSteamCallbackCall2::CSteamCallbackCall2(int cbId, void* data, int dataSize, bool ioFailure, SteamAPICall_t apiCall, CCallbackBase* cb)
 {
 	if (dataSize > sizeof(m_Data))
-		rehlds_syserror("%s: too large data (%d, max %d)", __FUNCTION__, dataSize, sizeof(m_Data));
+		rehlds_syserror("%s: too large data (%d, max %d)", __func__, dataSize, sizeof(m_Data));
 
 	m_CallbackId = cbId;
 	m_DataSize = dataSize;
@@ -1069,7 +1073,7 @@ void CSteamCallbackCall2::readEpilogue(std::istream &stream) {
 }
 
 /* ============================================================================
-                         CSteamApiRegisterCallbackCall
+						 CSteamApiRegisterCallbackCall
 ============================================================================ */
 CSteamApiRegisterCallbackCall::CSteamApiRegisterCallbackCall(int rehldsCallbackId, int steamCallbackId, CCallbackBase* cb)
 {
@@ -1131,7 +1135,7 @@ void CSteamApiRegisterCallbackCall::readEpilogue(std::istream &stream) {
 
 
 /* ============================================================================
-                         CSteamApiInitCall
+						 CSteamApiInitCall
 ============================================================================ */
 
 std::string CSteamApiInitCall::toString()
@@ -1164,7 +1168,7 @@ void CSteamApiInitCall::readEpilogue(std::istream &stream) {
 
 
 /* ============================================================================
-                   CSteamApiUnrigestierCallResultCall
+				   CSteamApiUnrigestierCallResultCall
 ============================================================================ */
 CSteamApiUnrigestierCallResultCall::CSteamApiUnrigestierCallResultCall(int rehldsCallbackId, SteamAPICall_t steamApiCall, CCallbackBase* cb)
 {
@@ -1225,7 +1229,7 @@ void CSteamApiUnrigestierCallResultCall::readEpilogue(std::istream &stream) {
 
 
 /* ============================================================================
-                              CSteamAppsCall
+							  CSteamAppsCall
 ============================================================================ */
 std::string CSteamAppsCall::toString()
 {
@@ -1256,7 +1260,7 @@ void CSteamAppsCall::readEpilogue(std::istream &stream) {
 
 
 /* ============================================================================
-                       CSteamAppGetCurrentGameLanguageCall
+					   CSteamAppGetCurrentGameLanguageCall
 ============================================================================ */
 
 std::string CSteamAppGetCurrentGameLanguageCall::toString()
@@ -1269,11 +1273,11 @@ std::string CSteamAppGetCurrentGameLanguageCall::toString()
 void CSteamAppGetCurrentGameLanguageCall::setResult(const char* res)
 {
 	if (res == NULL)
-		rehlds_syserror("%s: null result", __FUNCTION__);
+		rehlds_syserror("%s: null result", __func__);
 
 	m_ResLen = strlen(res) + 1;
 	if (m_ResLen > sizeof(m_Res))
-		rehlds_syserror("%s: too large result", __FUNCTION__);
+		rehlds_syserror("%s: too large result", __func__);
 
 	memcpy(m_Res, res, m_ResLen);
 }
@@ -1303,16 +1307,16 @@ void CSteamAppGetCurrentGameLanguageCall::readEpilogue(std::istream &stream) {
 
 
 /* ============================================================================
-                    CSteamGameServerInitCall
+					CSteamGameServerInitCall
 ============================================================================ */
 CSteamGameServerInitCall::CSteamGameServerInitCall(uint32 unIP, uint16 usSteamPort, uint16 usGamePort, uint16 usQueryPort, EServerMode eServerMode, const char *pchVersionString)
 {
 	if (pchVersionString == NULL)
-		rehlds_syserror("%s: version is null", __FUNCTION__);
+		rehlds_syserror("%s: version is null", __func__);
 
 	m_VersionLen = strlen(pchVersionString) + 1;
 	if (m_VersionLen > sizeof(m_Version))
-		rehlds_syserror("%s: too long version string", __FUNCTION__);
+		rehlds_syserror("%s: too long version string", __func__);
 
 	memcpy(m_Version, pchVersionString, m_VersionLen);
 	m_IP = unIP;
@@ -1398,7 +1402,7 @@ void CSteamGameServerInitCall::readEpilogue(std::istream &stream) {
 
 
 /* ============================================================================
-                     CSteamGameServerCall
+					 CSteamGameServerCall
 ============================================================================ */
 std::string CSteamGameServerCall::toString()
 {
@@ -1430,16 +1434,16 @@ void CSteamGameServerCall::readEpilogue(std::istream &stream) {
 
 
 /* ============================================================================
-                 CGameServerSetProductCall
+				 CGameServerSetProductCall
 ============================================================================ */
 CGameServerSetProductCall::CGameServerSetProductCall(const char* product)
 {
 	if (product == NULL)
-		rehlds_syserror("%s: product is null", __FUNCTION__);
+		rehlds_syserror("%s: product is null", __func__);
 
 	m_ProductLen = strlen(product) + 1;
 	if (m_ProductLen > sizeof(m_Product))
-		rehlds_syserror("%s: too long product string", __FUNCTION__);
+		rehlds_syserror("%s: too long product string", __func__);
 
 	memcpy(m_Product, product, m_ProductLen);
 }
@@ -1482,16 +1486,16 @@ void CGameServerSetProductCall::readPrologue(std::istream &stream) {
 
 
 /* ============================================================================
-                     CGameServerSetModDirCall
+					 CGameServerSetModDirCall
 ============================================================================ */
 CGameServerSetModDirCall::CGameServerSetModDirCall(const char* dir)
 {
 	if (dir == NULL)
-		rehlds_syserror("%s: dir is null", __FUNCTION__);
+		rehlds_syserror("%s: dir is null", __func__);
 
 	m_DirLen = strlen(dir) + 1;
 	if (m_DirLen > sizeof(m_Dir))
-		rehlds_syserror("%s: too long dir string", __FUNCTION__);
+		rehlds_syserror("%s: too long dir string", __func__);
 
 	memcpy(m_Dir, dir, m_DirLen);
 }
@@ -1534,7 +1538,7 @@ void CGameServerSetModDirCall::readPrologue(std::istream &stream) {
 
 
 /* ============================================================================
-                 CGameServerSetDedicatedServerCall
+				 CGameServerSetDedicatedServerCall
 ============================================================================ */
 CGameServerSetDedicatedServerCall::CGameServerSetDedicatedServerCall(bool dedicated)
 {
@@ -1574,16 +1578,16 @@ void CGameServerSetDedicatedServerCall::readPrologue(std::istream &stream) {
 
 
 /* ============================================================================
-                   CGameServerSetGameDescCall
+				   CGameServerSetGameDescCall
 ============================================================================ */
 CGameServerSetGameDescCall::CGameServerSetGameDescCall(const char* desc)
 {
 	if (desc == NULL)
-		rehlds_syserror("%s: desc is null", __FUNCTION__);
+		rehlds_syserror("%s: desc is null", __func__);
 
 	m_DescLen = strlen(desc) + 1;
 	if (m_DescLen > sizeof(m_Desc))
-		rehlds_syserror("%s: too long dir string", __FUNCTION__);
+		rehlds_syserror("%s: too long dir string", __func__);
 
 	memcpy(m_Desc, desc, m_DescLen);
 }
@@ -1625,7 +1629,7 @@ void CGameServerSetGameDescCall::readPrologue(std::istream &stream) {
 
 
 /* ============================================================================
-                      CGameServerLogOnAnonymousCall
+					  CGameServerLogOnAnonymousCall
 ============================================================================ */
 std::string CGameServerLogOnAnonymousCall::toString()
 {
@@ -1648,7 +1652,7 @@ bool CGameServerLogOnAnonymousCall::compareInputArgs(IEngExtCall* other, bool st
 
 
 /* ============================================================================
-                          CGameServerEnableHeartbeatsCall
+						  CGameServerEnableHeartbeatsCall
 ============================================================================ */
 CGameServerEnableHeartbeatsCall::CGameServerEnableHeartbeatsCall(bool hearbeats)
 {
@@ -1688,7 +1692,7 @@ void CGameServerEnableHeartbeatsCall::readPrologue(std::istream &stream) {
 
 
 /* ============================================================================
-                  CGameServerSetHeartbeatIntervalCall
+				  CGameServerSetHeartbeatIntervalCall
 ============================================================================ */
 CGameServerSetHeartbeatIntervalCall::CGameServerSetHeartbeatIntervalCall(int interval)
 {
@@ -1726,7 +1730,7 @@ void CGameServerSetHeartbeatIntervalCall::readPrologue(std::istream &stream) {
 
 
 /* ============================================================================
-                       CGameServerSetMaxPlayersCall
+					   CGameServerSetMaxPlayersCall
 ============================================================================ */
 CGameServerSetMaxPlayersCall::CGameServerSetMaxPlayersCall(int maxPlayers)
 {
@@ -1765,7 +1769,7 @@ void CGameServerSetMaxPlayersCall::readPrologue(std::istream &stream) {
 
 
 /* ============================================================================
-                       CGameServerSetBotCountCall
+					   CGameServerSetBotCountCall
 ============================================================================ */
 CGameServerSetBotCountCall::CGameServerSetBotCountCall(int numBots)
 {
@@ -1804,16 +1808,16 @@ void CGameServerSetBotCountCall::readPrologue(std::istream &stream) {
 
 
 /* ============================================================================
-                    CGameServerSetServerNameCall
+					CGameServerSetServerNameCall
 ============================================================================ */
 CGameServerSetServerNameCall::CGameServerSetServerNameCall(const char* serverName)
 {
 	if (serverName == NULL)
-		rehlds_syserror("%s: serverName is null", __FUNCTION__);
+		rehlds_syserror("%s: serverName is null", __func__);
 
 	m_ServerNameLen = strlen(serverName) + 1;
 	if (m_ServerNameLen > sizeof(m_ServerName))
-		rehlds_syserror("%s: too long serverName string", __FUNCTION__);
+		rehlds_syserror("%s: too long serverName string", __func__);
 
 	memcpy(m_ServerName, serverName, m_ServerNameLen);
 }
@@ -1856,16 +1860,16 @@ void CGameServerSetServerNameCall::readPrologue(std::istream &stream) {
 
 
 /* ============================================================================
-                     CGameServerSetMapNameCall
+					 CGameServerSetMapNameCall
 ============================================================================ */
 CGameServerSetMapNameCall::CGameServerSetMapNameCall(const char* mapName)
 {
 	if (mapName == NULL)
-		rehlds_syserror("%s: serverName is null", __FUNCTION__);
+		rehlds_syserror("%s: serverName is null", __func__);
 
 	m_MapNameLen = strlen(mapName) + 1;
 	if (m_MapNameLen > sizeof(m_MapName))
-		rehlds_syserror("%s: too long mapName string", __FUNCTION__);
+		rehlds_syserror("%s: too long mapName string", __func__);
 
 	memcpy(m_MapName, mapName, m_MapNameLen);
 }
@@ -1908,7 +1912,7 @@ void CGameServerSetMapNameCall::readPrologue(std::istream &stream) {
 
 
 /* ============================================================================
-                  CGameServerSetPasswordProtectedCall
+				  CGameServerSetPasswordProtectedCall
 ============================================================================ */
 CGameServerSetPasswordProtectedCall::CGameServerSetPasswordProtectedCall(bool passwordProtected)
 {
@@ -1948,7 +1952,7 @@ void CGameServerSetPasswordProtectedCall::readPrologue(std::istream &stream) {
 
 
 /* ============================================================================
-                       CGameServerClearAllKVsCall
+					   CGameServerClearAllKVsCall
 ============================================================================ */
 std::string CGameServerClearAllKVsCall::toString()
 {
@@ -1971,25 +1975,25 @@ bool CGameServerClearAllKVsCall::compareInputArgs(IEngExtCall* other, bool stric
 
 
 /* ============================================================================
-                      CGameServerSetKeyValueCall
+					  CGameServerSetKeyValueCall
 ============================================================================ */
 CGameServerSetKeyValueCall::CGameServerSetKeyValueCall(const char* key, const char* value)
 {
 	if (key == NULL)
-		rehlds_syserror("%s: key is null", __FUNCTION__);
+		rehlds_syserror("%s: key is null", __func__);
 
 	m_KeyLen = strlen(key) + 1;
 	if (m_KeyLen > sizeof(m_Key))
-		rehlds_syserror("%s: too long key string", __FUNCTION__);
+		rehlds_syserror("%s: too long key string", __func__);
 
 	memcpy(m_Key, key, m_KeyLen);
 
 	if (value == NULL)
-		rehlds_syserror("%s: value is null", __FUNCTION__);
+		rehlds_syserror("%s: value is null", __func__);
 
 	m_ValueLen = strlen(value) + 1;
 	if (m_ValueLen > sizeof(m_Value))
-		rehlds_syserror("%s: too long value string", __FUNCTION__);
+		rehlds_syserror("%s: too long value string", __func__);
 
 	memcpy(m_Value, value, m_ValueLen);
 }
@@ -2034,7 +2038,7 @@ void CGameServerSetKeyValueCall::readPrologue(std::istream &stream) {
 	stream
 		.read((char*)&m_ValueLen, sizeof(m_ValueLen))
 		.read((char*)&m_KeyLen, sizeof(m_KeyLen));
-	
+
 	stream
 		.read(m_Value, m_ValueLen)
 		.read(m_Key, m_KeyLen);
@@ -2044,7 +2048,7 @@ void CGameServerSetKeyValueCall::readPrologue(std::istream &stream) {
 
 
 /* ============================================================================
-                     CSteamApiSetBreakpadAppIdCall
+					 CSteamApiSetBreakpadAppIdCall
 ============================================================================ */
 CSteamApiSetBreakpadAppIdCall::CSteamApiSetBreakpadAppIdCall(uint32 appId)
 {
@@ -2084,7 +2088,7 @@ void CSteamApiSetBreakpadAppIdCall::readPrologue(std::istream &stream) {
 
 
 /* ============================================================================
-                  CGameServerWasRestartRequestedCall
+				  CGameServerWasRestartRequestedCall
 ============================================================================ */
 std::string CGameServerWasRestartRequestedCall::toString()
 {
@@ -2116,7 +2120,7 @@ void CGameServerWasRestartRequestedCall::readPrologue(std::istream &stream) {
 
 
 /* ============================================================================
-                    CSteamGameServerRunCallbacksCall
+					CSteamGameServerRunCallbacksCall
 ============================================================================ */
 std::string CSteamGameServerRunCallbacksCall::toString()
 {
@@ -2139,7 +2143,7 @@ bool CSteamGameServerRunCallbacksCall::compareInputArgs(IEngExtCall* other, bool
 
 
 /* ============================================================================
-                   CGameServerGetNextOutgoingPacketCall
+				   CGameServerGetNextOutgoingPacketCall
 ============================================================================ */
 CGameServerGetNextOutgoingPacketCall::CGameServerGetNextOutgoingPacketCall(int maxOut)
 {
@@ -2152,17 +2156,17 @@ void CGameServerGetNextOutgoingPacketCall::setResult(void* buf, int res, uint32*
 	m_BufLen = res > 0 ? res : 0;
 	if (m_BufLen > 0) {
 		if (m_BufLen > sizeof(m_Buf))
-			rehlds_syserror("%s: too long buffer returned", __FUNCTION__);
+			rehlds_syserror("%s: too long buffer returned", __func__);
 
 		memcpy(m_Buf, buf, m_BufLen);
 	}
 	m_Result = res;
 
 	if (pAddr == NULL)
-		rehlds_syserror("%s: pAddr is NULL", __FUNCTION__);
+		rehlds_syserror("%s: pAddr is NULL", __func__);
 
 	if (pPort == NULL)
-		rehlds_syserror("%s: pPort is NULL", __FUNCTION__);
+		rehlds_syserror("%s: pPort is NULL", __func__);
 
 	m_Addr = *pAddr;
 	m_Port = *pPort;
@@ -2221,7 +2225,7 @@ void CGameServerGetNextOutgoingPacketCall::readEpilogue(std::istream &stream) {
 
 
 /* ============================================================================
-                            CSteamApiRunCallbacksCall
+							CSteamApiRunCallbacksCall
 ============================================================================ */
 std::string CSteamApiRunCallbacksCall::toString()
 {
@@ -2244,7 +2248,7 @@ bool CSteamApiRunCallbacksCall::compareInputArgs(IEngExtCall* other, bool strict
 
 
 /* ============================================================================
-                     CGameServerGetSteamIdCall
+					 CGameServerGetSteamIdCall
 ============================================================================ */
 std::string CGameServerGetSteamIdCall::toString()
 {
@@ -2275,7 +2279,7 @@ void CGameServerGetSteamIdCall::readEpilogue(std::istream &stream) {
 
 
 /* ============================================================================
-                  CGameServerBSecureCall
+				  CGameServerBSecureCall
 ============================================================================ */
 std::string CGameServerBSecureCall::toString()
 {
@@ -2307,14 +2311,14 @@ void CGameServerBSecureCall::readEpilogue(std::istream &stream) {
 
 
 /* ============================================================================
-                   CGameServerHandleIncomingPacketCall
+				   CGameServerHandleIncomingPacketCall
 ============================================================================ */
 
 CGameServerHandleIncomingPacketCall::CGameServerHandleIncomingPacketCall(const void *pData, int cbData, uint32 srcIP, uint16 srcPort)
 {
 	m_Len = cbData;
 	if (m_Len > sizeof(m_Data))
-		rehlds_syserror("%s: too long packet", __FUNCTION__);
+		rehlds_syserror("%s: too long packet", __func__);
 
 	memcpy(m_Data, pData, m_Len);
 	m_Ip = srcIP;
@@ -2380,13 +2384,13 @@ void CGameServerHandleIncomingPacketCall::readEpilogue(std::istream &stream) {
 
 
 /* ============================================================================
-              CGameServerSendUserConnectAndAuthenticateCall
+			  CGameServerSendUserConnectAndAuthenticateCall
 ============================================================================ */
 CGameServerSendUserConnectAndAuthenticateCall::CGameServerSendUserConnectAndAuthenticateCall(uint32 unIPClient, const void *pvAuthBlob, uint32 cubAuthBlobSize)
 {
 	m_AuthBlobLen = cubAuthBlobSize;
 	if (m_AuthBlobLen > sizeof(m_AuthBlob))
-		rehlds_syserror("%s: too long auth blob", __FUNCTION__);
+		rehlds_syserror("%s: too long auth blob", __func__);
 
 	memcpy(m_AuthBlob, pvAuthBlob, m_AuthBlobLen);
 	m_IP = unIPClient;
@@ -2456,7 +2460,7 @@ void CGameServerSendUserConnectAndAuthenticateCall::readEpilogue(std::istream &s
 
 
 /* ============================================================================
-             CGameServerSendUserDisconnectCall
+			 CGameServerSendUserDisconnectCall
 ============================================================================ */
 std::string CGameServerSendUserDisconnectCall::toString()
 {
@@ -2490,13 +2494,13 @@ void CGameServerSendUserDisconnectCall::readPrologue(std::istream &stream) {
 
 
 /* ============================================================================
-                   CGameServerBUpdateUserDataCall
+				   CGameServerBUpdateUserDataCall
 ============================================================================ */
 CGameServerBUpdateUserDataCall::CGameServerBUpdateUserDataCall(CSteamID steamIDUser, const char *pchPlayerName, uint32 uScore)
 {
 	m_PlayerNameLen = strlen(pchPlayerName) + 1;
 	if (m_PlayerNameLen > sizeof(m_PlayerName))
-		rehlds_syserror("%s: too long player name", __FUNCTION__);
+		rehlds_syserror("%s: too long player name", __func__);
 
 	memcpy(m_PlayerName, pchPlayerName, m_PlayerNameLen);
 	m_SteamId = steamIDUser.ConvertToUint64();
@@ -2563,7 +2567,7 @@ void CGameServerBUpdateUserDataCall::readEpilogue(std::istream &stream) {
 
 
 /* ============================================================================
-              CGameServerCreateUnauthUserConnectionCall
+			  CGameServerCreateUnauthUserConnectionCall
 ============================================================================ */
 std::string CGameServerCreateUnauthUserConnectionCall::toString()
 {
@@ -2596,7 +2600,7 @@ void CGameServerCreateUnauthUserConnectionCall::readEpilogue(std::istream &strea
 
 
 /* ============================================================================
-                              CGetHostNameCall
+							  CGetHostNameCall
 ============================================================================ */
 std::string CGetHostNameCall::toString()
 {
@@ -2622,7 +2626,7 @@ void CGetHostNameCall::setResult(char* hostName, int res) {
 	m_NameLenOut = strlen(hostName) + 1;
 
 	if (m_NameLenOut > sizeof(m_Name))
-		rehlds_syserror("%s: too long host name", __FUNCTION__);
+		rehlds_syserror("%s: too long host name", __func__);
 
 	strcpy(m_Name, hostName);
 	m_Res = res;
@@ -2655,13 +2659,13 @@ void CGetHostNameCall::readEpilogue(std::istream &stream) {
 
 
 /* ============================================================================
-                           CGetHostByNameCall
+						   CGetHostByNameCall
 ============================================================================ */
 CGetHostByNameCall::CGetHostByNameCall(const char* name)
 {
 	m_NameLen = strlen(name) + 1;
 	if (m_NameLen > sizeof(m_Name))
-		rehlds_syserror("%s: too long name", __FUNCTION__);
+		rehlds_syserror("%s: too long name", __func__);
 
 	strcpy(m_Name, name);
 }
@@ -2692,19 +2696,19 @@ bool CGetHostByNameCall::compareInputArgs(IEngExtCall* other, bool strict)
 void CGetHostByNameCall::setResult(const hostent* hostEnt) {
 	m_HostentData.hostNameLen = strlen(hostEnt->h_name) + 1;
 	if (m_HostentData.hostNameLen > sizeof(m_HostentData.hostName)) {
-		rehlds_syserror("%s: too long host name", __FUNCTION__);
+		rehlds_syserror("%s: too long host name", __func__);
 	}
 
 	strcpy(m_HostentData.hostName, hostEnt->h_name);
 	int i = 0;
 	while (hostEnt->h_aliases[i]) {
 		if (i >= HOSTENT_DATA_MAX_ALIASES) {
-			rehlds_syserror("%s: too many aliases", __FUNCTION__);
+			rehlds_syserror("%s: too many aliases", __func__);
 		}
 
 		m_HostentData.aliasesLengths[i] = strlen(hostEnt->h_aliases[i]) + 1;
 		if (m_HostentData.aliasesLengths[i] > sizeof(m_HostentData.aliases[i])) {
-			rehlds_syserror("%s: too long alias", __FUNCTION__);
+			rehlds_syserror("%s: too long alias", __func__);
 		}
 
 		strcpy(m_HostentData.aliases[i], hostEnt->h_aliases[i]);
@@ -2715,13 +2719,13 @@ void CGetHostByNameCall::setResult(const hostent* hostEnt) {
 	m_HostentData.addrtype = hostEnt->h_addrtype;
 	m_HostentData.addrLen = hostEnt->h_length;
 	if (m_HostentData.addrLen > sizeof(m_HostentData.addrs[0])) {
-		rehlds_syserror("%s: too long addr", __FUNCTION__);
+		rehlds_syserror("%s: too long addr", __func__);
 	}
 
 	i = 0;
 	while (hostEnt->h_addr_list[i]) {
 		if (i >= HOSTENT_DATA_MAX_ADDRS) {
-			rehlds_syserror("%s: too many addrs", __FUNCTION__);
+			rehlds_syserror("%s: too many addrs", __func__);
 		}
 
 		memcpy(m_HostentData.addrs[i], hostEnt->h_addr_list[i], m_HostentData.addrLen);
@@ -2784,12 +2788,12 @@ void CGetHostByNameCall::readEpilogue(std::istream &stream) {
 
 
 /* ============================================================================
-                           CGetProcessTimesCall
+						   CGetProcessTimesCall
 ============================================================================ */
 std::string CGetProcessTimesCall::toString()
 {
 	std::stringstream ss;
-	
+
 	ss << "GetProcessTimes( creationTime: "; PrintFileTime(&m_CreationTime, ss);
 	ss << "; exitTime: "; PrintFileTime(&m_ExitTime, ss);
 	ss << "; kernelTime: "; PrintFileTime(&m_KernelTime, ss);
@@ -2839,7 +2843,7 @@ void CGetProcessTimesCall::readEpilogue(std::istream &stream) {
 
 
 /* ============================================================================
-                   CGetSystemTimeAsFileTimeCall
+				   CGetSystemTimeAsFileTimeCall
 ============================================================================ */
 std::string CGetSystemTimeAsFileTimeCall::toString()
 {
@@ -2877,7 +2881,7 @@ void CGetSystemTimeAsFileTimeCall::readEpilogue(std::istream &stream) {
 
 
 /* ============================================================================
-                            CStdTimeCall
+							CStdTimeCall
 ============================================================================ */
 CStdTimeCall::CStdTimeCall(uint32* inTime)
 {
@@ -2931,7 +2935,7 @@ void CStdTimeCall::readEpilogue(std::istream &stream) {
 
 
 /* ============================================================================
-                          CStdLocalTimeCall
+						  CStdLocalTimeCall
 ============================================================================ */
 CStdLocalTimeCall::CStdLocalTimeCall(uint32 inTime)
 {
@@ -2985,7 +2989,7 @@ void CStdLocalTimeCall::readEpilogue(std::istream &stream) {
 
 
 /* ============================================================================
-                    CStdSrandCall
+					CStdSrandCall
 ============================================================================ */
 std::string CStdSrandCall::toString()
 {
@@ -3020,7 +3024,7 @@ void CStdSrandCall::readPrologue(std::istream &stream) {
 
 
 /* ============================================================================
-                              CStdRandCall
+							  CStdRandCall
 ============================================================================ */
 std::string CStdRandCall::toString()
 {
@@ -3052,7 +3056,7 @@ void CStdRandCall::readEpilogue(std::istream &stream) {
 
 
 /* ============================================================================
-                  CGameServerLogOffCall
+				  CGameServerLogOffCall
 ============================================================================ */
 std::string CGameServerLogOffCall::toString()
 {
@@ -3075,7 +3079,7 @@ bool CGameServerLogOffCall::compareInputArgs(IEngExtCall* other, bool strict)
 
 
 /* ============================================================================
-                         CSteamGameServerShutdownCall
+						 CSteamGameServerShutdownCall
 ============================================================================ */
 std::string CSteamGameServerShutdownCall::toString()
 {
@@ -3099,7 +3103,7 @@ bool CSteamGameServerShutdownCall::compareInputArgs(IEngExtCall* other, bool str
 
 
 /* ============================================================================
-                   CSteamApiUnregisterCallbackCall
+				   CSteamApiUnregisterCallbackCall
 ============================================================================ */
 CSteamApiUnregisterCallbackCall::CSteamApiUnregisterCallbackCall(int rehldsCallbackId, CCallbackBase* cb)
 {
@@ -3155,7 +3159,7 @@ void CSteamApiUnregisterCallbackCall::readEpilogue(std::istream &stream) {
 
 
 /* ============================================================================
-                  CGameServerBLoggedOnCall
+				  CGameServerBLoggedOnCall
 ============================================================================ */
 std::string CGameServerBLoggedOnCall::toString()
 {
@@ -3201,7 +3205,7 @@ virtual void readEpilogue(std::istream &stream);
 */
 
 #define IEngExtCallFactory_CreateFuncCall(clazz, buf, bufLen) \
-	if (sizeof(clazz) > bufLen) rehlds_syserror("%s: buffer to small", __FUNCTION__); \
+	if (sizeof(clazz) > bufLen) rehlds_syserror("%s: buffer to small", __func__); \
 	return new(buf) clazz();
 
 IEngExtCall* IEngExtCallFactory::createByOpcode(ExtCallFuncs opc, void* buf, int ptrSize) {
@@ -3220,7 +3224,7 @@ IEngExtCall* IEngExtCallFactory::createByOpcode(ExtCallFuncs opc, void* buf, int
 	case ECF_CLOSE_SOCKET: IEngExtCallFactory_CreateFuncCall(CCloseSocketCall, buf, ptrSize);
 	case ECF_RECVFROM: IEngExtCallFactory_CreateFuncCall(CRecvFromCall, buf, ptrSize);
 	case ECF_SENDTO: IEngExtCallFactory_CreateFuncCall(CSendToCall, buf, ptrSize);
-	case ECF_BIND: IEngExtCallFactory_CreateFuncCall(CBindCall , buf, ptrSize);
+	case ECF_BIND: IEngExtCallFactory_CreateFuncCall(CBindCall, buf, ptrSize);
 	case ECF_GET_SOCK_NAME: IEngExtCallFactory_CreateFuncCall(CGetSockNameCall, buf, ptrSize);
 	case ECF_WSA_GET_LAST_ERROR: IEngExtCallFactory_CreateFuncCall(CWSAGetLastErrorCall, buf, ptrSize);
 
@@ -3263,7 +3267,7 @@ IEngExtCall* IEngExtCallFactory::createByOpcode(ExtCallFuncs opc, void* buf, int
 	case ECF_GS_CREATE_UNAUTH_USER_CONNECTION: IEngExtCallFactory_CreateFuncCall(CGameServerCreateUnauthUserConnectionCall, buf, ptrSize);
 	case ECF_GET_HOST_BY_NAME: IEngExtCallFactory_CreateFuncCall(CGetHostByNameCall, buf, ptrSize);
 	case ECF_GET_HOST_NAME: IEngExtCallFactory_CreateFuncCall(CGetHostNameCall, buf, ptrSize);
-	
+
 	case ECF_GET_PROCESS_TIMES: IEngExtCallFactory_CreateFuncCall(CGetProcessTimesCall, buf, ptrSize);
 	case ECF_GET_SYSTEM_TIME_AS_FILE_TIME: IEngExtCallFactory_CreateFuncCall(CGetSystemTimeAsFileTimeCall, buf, ptrSize);
 
@@ -3279,10 +3283,9 @@ IEngExtCall* IEngExtCallFactory::createByOpcode(ExtCallFuncs opc, void* buf, int
 	case ECF_STEAM_API_UNREGISTER_CALLBACK: IEngExtCallFactory_CreateFuncCall(CSteamApiUnregisterCallbackCall, buf, ptrSize);
 
 	case ECF_GS_BLOGGEDON: IEngExtCallFactory_CreateFuncCall(CGameServerBLoggedOnCall, buf, ptrSize);
-	
+
 
 	default:
-		rehlds_syserror("%s: unknown funccall opcode %d", __FUNCTION__, opc);
-		return NULL;
+		rehlds_syserror("%s: unknown funccall opcode %d", __func__, opc);
 	}
 }

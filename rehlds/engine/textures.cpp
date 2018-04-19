@@ -39,23 +39,12 @@ texture_t * r_notexture_mip;
 int nummiptex;
 char miptex[512][64];
 
-/*
- * Globals initialization
- */
-#ifndef HOOK_ENGINE
-
 cvar_t r_wadtextures = { "r_wadtextures", "0", 0, 0.0f, NULL };
-
-#else // HOOK_ENGINE
-
-cvar_t r_wadtextures;
-
-#endif // HOOK_ENGINE
 
 void SafeRead(FileHandle_t f, void *buffer, int count)
 {
 	if (FS_Read(buffer, count, 1, f) != count)
-		Sys_Error("File read failure");
+		Sys_Error("%s: File read failure", __func__);
 }
 
 void CleanupName(char *in, char *out)
@@ -122,12 +111,12 @@ qboolean TEX_InitFromWad(char *path)
 		texfile = FS_Open(wadPath, "rb");
 		texfiles[nTexFiles++] = texfile;
 		if (!texfile)
-			Sys_Error("WARNING: couldn't open %s\n", wadPath);
+			Sys_Error("%s: couldn't open %s\n", __func__, wadPath);
 
 		Con_DPrintf("Using WAD File: %s\n", wadPath);
 		SafeRead(texfile, &header, 12);
 		if (Q_strncmp(header.identification, "WAD2", 4) && Q_strncmp(header.identification, "WAD3", 4))
-			Sys_Error("TEX_InitFromWad: %s isn't a wadfile", wadPath);
+			Sys_Error("%s: %s isn't a wadfile", __func__, wadPath);
 
 		header.numlumps = LittleLong(header.numlumps);
 		header.infotableofs = LittleLong(header.infotableofs);
@@ -139,7 +128,7 @@ qboolean TEX_InitFromWad(char *path)
 			SafeRead(texfile, &lumpinfo[nTexLumps], sizeof(lumpinfo_t));
 			CleanupName(lumpinfo[nTexLumps].lump.name, lumpinfo[nTexLumps].lump.name);
 			lumpinfo[nTexLumps].lump.filepos = LittleLong(lumpinfo[nTexLumps].lump.filepos);
-			lumpinfo[nTexLumps].lump.disksize = LittleLong(lumpinfo[nTexLumps].lump.disksize);;
+			lumpinfo[nTexLumps].lump.disksize = LittleLong(lumpinfo[nTexLumps].lump.disksize);
 			lumpinfo[nTexLumps].iTexFile = nTexFiles - 1;
 		}
 
@@ -196,7 +185,7 @@ int FindMiptex(char *name)
 	}
 
 	if (nummiptex == 512)
-		Sys_Error("Exceeded MAX_MAP_TEXTURES");
+		Sys_Error("%s: Exceeded MAX_MAP_TEXTURES", __func__);
 
 	Q_strncpy(miptex[i], name, 63);
 	miptex[i][63] = 0;
@@ -214,8 +203,8 @@ void TEX_AddAnimatingTextures(void)
 		if (miptex[i][0] != '+' && miptex[i][0] != '-')
 			continue;
 
-		Q_strncpy(name, miptex[i], 0x1Fu);
-		name[31] = 0;
+		Q_strncpy(name, miptex[i], sizeof(name) - 1);
+		name[sizeof(name) - 1] = 0;
 
 		for (int j = 0; j < 20; j++)
 		{

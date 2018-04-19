@@ -78,7 +78,7 @@ void Draw_CacheWadInitFromFile(FileHandle_t hFile, int len, char *name, int cach
 #ifdef REHLDS_FIXES
 		FS_Close(hFile);
 #endif
-		Sys_Error("Wad file %s doesn't have WAD3 id\n", name);
+		Sys_Error("%s: Wad file %s doesn't have WAD3 id\n", __func__, name);
 	}
 
 	wad->lumps = (lumpinfo_s *)Mem_Malloc(len - header.infotableofs);
@@ -103,7 +103,7 @@ void Draw_CacheWadInit(char *name, int cacheMax, cachewad_t *wad)
 	int len;
 	FileHandle_t hFile = FS_Open(name, "rb");
 	if (!hFile)
-		Sys_Error("Draw_LoadWad: Couldn't open %s\n", name);
+		Sys_Error("%s: Couldn't open %s\n", __func__, name);
 	len = FS_Size(hFile);
 	Draw_CacheWadInitFromFile(hFile, len, name, cacheMax, wad);
 	FS_Close(hFile);
@@ -180,7 +180,7 @@ void Draw_MiptexTexture(cachewad_t *wad, unsigned char *data)
 	byte *pal;
 
 	if (wad->cacheExtra != DECAL_EXTRASIZE)
-		Sys_Error("Draw_MiptexTexture: Bad cached wad %s\n", wad->name);
+		Sys_Error("%s: Bad cached wad %s\n", __func__, wad->name);
 
 	tex = (texture_t *)data;
 	mip = (miptex_t *)(data + wad->cacheExtra);
@@ -198,7 +198,7 @@ void Draw_MiptexTexture(cachewad_t *wad, unsigned char *data)
 		tex->offsets[i] = wad->cacheExtra + LittleLong(tmp.offsets[i]);
 
 	pix = tex->width * tex->height;
-	palette = (pix>>2) + (pix>>4) + (pix>>6) + pix;
+	palette = (pix >> 2) + (pix >> 4) + (pix >> 6) + pix;
 	paloffset = tex->offsets[0] + palette + 2;
 	nSize = *(u_short *)&data[wad->cacheExtra + 40 + palette];
 	pal = (byte *)tex + paloffset;
@@ -228,6 +228,7 @@ void Draw_MiptexTexture(cachewad_t *wad, unsigned char *data)
 		if (gfCustomBuild)
 			GL_UnloadTexture(tex);
 		paloffset = GL_LoadTexture2(data, GLT_DECAL, tex->width, tex->height, v8, TRUE, 3, pal, gl_filter_max);
+	}
 	else
 	{
 		tex->name[0] = '{';
@@ -273,14 +274,14 @@ void Draw_FreeWad(cachewad_t *pWad)
 	}
 	if (pWad->cache)
 	{
-		#ifndef SWDS
+#ifndef SWDS
 		if (pWad->tempWad)
 		{
 			Mem_Free(pWad->cache);
 			pWad->cache = NULL;
 			return;
 		}
-		#endif // SWDS
+#endif // SWDS
 		for (i = 0, pic = pWad->cache; i < pWad->cacheCount; i++, pic++)
 		{
 			if (Cache_Check(&pic->cache))
@@ -310,7 +311,7 @@ NOXREF int Draw_DecalIndex(int id)
 	char tmp[32];
 	char *pName;
 	if (!decal_names[id][0])
-		Sys_Error("Used decal #%d without a name\n", id);
+		Sys_Error("%s: Used decal #%d without a name\n", __func__, id);
 
 	pName = decal_names[id];
 	if (!Host_IsServerActive() && violence_hblood.value == 0.0f && !Q_strncmp(pName, "{blood", 6))
@@ -359,7 +360,7 @@ NOXREF texture_t *Draw_DecalTexture(int index)
 	{
 		pCust = g_pcl.players[~index].customdata.pNext;
 		if (!pCust || !pCust->bInUse || !pCust->pInfo || !pCust->pBuffer)
-			Sys_Error("Failed to load custom decal for player #%i:%s using default decal 0.\n",~index,g_pcl.players[~index].name);
+			Sys_Error("%s: Failed to load custom decal for player #%i:%s using default decal 0.\n", __func__, ~index, g_pcl.players[~index].name);
 
 		retval = (texture_t *)Draw_CustomCacheGet((cachewad_t *)pCust->pInfo, pCust->pBuffer, pCust->resource.nDownloadSize, pCust->nUserData1);
 		if (!retval)
@@ -382,7 +383,7 @@ int Draw_CacheByIndex(cachewad_t *wad, int nIndex, int playernum)
 	if (i == wad->cacheCount)
 	{
 		if (i == wad->cacheMax)
-			Sys_Error("Cache wad (%s) out of %d entries", wad->name, i);
+			Sys_Error("%s: Cache wad (%s) out of %d entries", __func__, wad->name, i);
 		wad->cacheCount++;
 		Q_snprintf(pic->name, sizeof(pic->name), "%s", szTestName);
 	}
@@ -459,7 +460,7 @@ void Decal_MergeInDecals(cachewad_t *pwad, const char *pathID)
 	cachewad_t *final;
 
 	if (!pwad)
-		Sys_Error("Decal_MergeInDecals called with NULL wad\n");
+		Sys_Error("%s: called with NULL wad\n", __func__);
 
 	lumplist = NULL;
 	if (!decal_wad)
@@ -545,7 +546,7 @@ void Decal_Init(void)
 #else
 		if (i == 0 && !hfile)
 #endif
-			Sys_Error("Couldn't find '%s' in \"%s\" search path\n", "decals.wad", pszPathID[i]);
+			Sys_Error("%s: Couldn't find '%s' in \"%s\" search path\n", __func__, "decals.wad", pszPathID[i]);
 
 #ifdef REHLDS_FIXES
 		found = true;
@@ -563,7 +564,7 @@ void Decal_Init(void)
 
 	sv_decalnamecount = Draw_DecalCount();
 	if (sv_decalnamecount > MAX_DECALS)
-		Sys_Error("Too many decals: %d / %d\n", sv_decalnamecount, MAX_DECALS);
+		Sys_Error("%s: Too many decals: %d / %d\n", __func__, sv_decalnamecount, MAX_DECALS);
 
 	for (i = 0; i < sv_decalnamecount; i++)
 	{
@@ -614,7 +615,7 @@ NOXREF void *Draw_CacheGet(cachewad_t *wad, int index)
 	lumpinfo_t *pLump;
 
 	if (index >= wad->cacheCount)
-		Sys_Error("Cache wad indexed before load %s: %d", wad->name, index);
+		Sys_Error("%s: Cache wad indexed before load %s: %d", __func__, wad->name, index);
 
 	pic = wad->cache;
 	dat = Cache_Check(&pic[index].cache);
@@ -639,7 +640,7 @@ NOXREF void *Draw_CacheGet(cachewad_t *wad, int index)
 		if (Draw_CacheReload(wad, i, pLump, pic, clean, path))
 		{
 			if (pic->cache.data == NULL)
-				Sys_Error("Draw_CacheGet: failed to load %s", path);
+				Sys_Error("%s: failed to load %s", __func__, path);
 			dat = pic->cache.data;
 		}
 	}
@@ -654,7 +655,7 @@ void *Draw_CustomCacheGet(cachewad_t *wad, void *raw, int rawsize, int index)
 	char clean[16];
 
 	if (wad->cacheCount <= index)
-		Sys_Error("Cache wad indexed before load %s: %d", wad->name, index);
+		Sys_Error("%s: Cache wad indexed before load %s: %d", __func__, wad->name, index);
 
 	pic = &wad->cache[index];
 	pdata = Cache_Check(&pic->cache);
@@ -666,7 +667,7 @@ void *Draw_CustomCacheGet(cachewad_t *wad, void *raw, int rawsize, int index)
 		if (Draw_CacheLoadFromCustom(clean, wad, raw, rawsize, pic))
 		{
 			if (!pic->cache.data)
-				Sys_Error("Draw_CacheGet: failed to load %s", pic->name);
+				Sys_Error("%s: failed to load %s", __func__, pic->name);
 			pdata = pic->cache.data;
 		}
 	}
@@ -696,9 +697,9 @@ NOXREF qboolean Draw_CacheReload(cachewad_t *wad, int i, lumpinfo_t *pLump, cach
 	}
 	else
 #endif // SWDS
-	buf = (byte *)Cache_Alloc(&pic->cache, wad->cacheExtra + pLump->size + 1, clean);
+		buf = (byte *)Cache_Alloc(&pic->cache, wad->cacheExtra + pLump->size + 1, clean);
 	if (!buf)
-		Sys_Error("Draw_CacheGet: not enough space for %s in %s", path, wad->name);
+		Sys_Error("%s: not enough space for %s in %s", __func__, path, wad->name);
 	buf[pLump->size + wad->cacheExtra] = 0;
 
 	FS_Seek(hFile, pLump->filepos, FILESYSTEM_SEEK_HEAD);
@@ -725,7 +726,7 @@ qboolean Draw_ValidateCustomLogo(cachewad_t *wad, unsigned char *data, lumpinfo_
 
 	if (wad->cacheExtra != DECAL_EXTRASIZE)
 	{
-		Con_Printf(__FUNCTION__ ": Bad cached wad %s\n", wad->name);
+		Con_Printf("%s: Bad cached wad %s\n", __func__, wad->name);
 		return FALSE;
 	}
 
@@ -745,29 +746,29 @@ qboolean Draw_ValidateCustomLogo(cachewad_t *wad, unsigned char *data, lumpinfo_
 		tex.offsets[i] = wad->cacheExtra + LittleLong(tmp.offsets[i]);
 
 	pix = tex.width * tex.height;
-	pixoffset = pix + (pix>>2) + (pix>>4) + (pix>>6);
-	paloffset = (pix>>2) + tmp.offsets[0] + pix;
-	palettesize = (pix>>4) + paloffset;
+	pixoffset = pix + (pix >> 2) + (pix >> 4) + (pix >> 6);
+	paloffset = (pix >> 2) + tmp.offsets[0] + pix;
+	palettesize = (pix >> 4) + paloffset;
 	nPalleteCount = *(u_short *)(data + pixoffset + sizeof(texture_t));
 
 	if (!tex.width || tex.width > 256 || tex.height > 256
 		|| (tmp.offsets[0] + pix != tmp.offsets[1])
 		|| paloffset != tmp.offsets[2] || palettesize != tmp.offsets[3])
 	{
-		Con_Printf(__FUNCTION__ ": Bad cached wad %s\n", wad->name);
+		Con_Printf("%s: Bad cached wad %s\n", __func__, wad->name);
 		return FALSE;
 	}
 
 	if (nPalleteCount > 256)
 	{
-		Con_Printf(__FUNCTION__ ": Bad cached wad palette size %i on %s\n", nPalleteCount, wad->name);
+		Con_Printf("%s: Bad cached wad palette size %i on %s\n", __func__, nPalleteCount, wad->name);
 		return FALSE;
 	}
 
 	nSize = pixoffset + LittleLong(tmp.offsets[0]) + 3 * nPalleteCount + 2;
 	if (nSize > lump->disksize)
 	{
-		Con_Printf(__FUNCTION__ ": Bad cached wad %s\n", wad->name);
+		Con_Printf("%s: Bad cached wad %s\n", __func__, wad->name);
 		return FALSE;
 	}
 
@@ -791,7 +792,7 @@ qboolean Draw_CacheLoadFromCustom(char *clean, cachewad_t *wad, void *raw, int r
 	pLump = &wad->lumps[idx];
 	buf = (byte *)Cache_Alloc(&pic->cache, wad->cacheExtra + pLump->size + 1, clean);
 	if (!buf)
-		Sys_Error("Draw_CacheGet: not enough space for %s in %s", clean, wad->name);
+		Sys_Error("%s: not enough space for %s in %s", __func__, clean, wad->name);
 
 	buf[wad->cacheExtra + pLump->size] = 0;
 	Q_memcpy((char *)buf + wad->cacheExtra, (char *)raw + pLump->filepos, pLump->size);
@@ -824,7 +825,7 @@ NOXREF int Draw_CacheIndex(cachewad_t *wad, char *path)
 	if (i == wad->cacheCount)
 	{
 		if (wad->cacheMax == wad->cacheCount)
-			Sys_Error("Cache wad (%s) out of %d entries");
+			Sys_Error("%s: Cache wad (%s) out of %d entries", __func__);
 
 		wad->cacheCount++;
 		Q_strncpy(wad->name, path, 63);

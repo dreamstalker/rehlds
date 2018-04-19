@@ -1,0 +1,198 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{e272c141-8f15-473d-9ea7-8c46b9f2db19}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HLTV">
+      <UniqueIdentifier>{b7066def-60e7-4352-8787-a31a8f9dec0d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HLTV\common">
+      <UniqueIdentifier>{feda00f0-7c09-4c63-b5a1-e4fbcdfc6b69}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\hookers">
+      <UniqueIdentifier>{199d99ef-8924-48fc-8c8a-2859f8d40c82}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="engine">
+      <UniqueIdentifier>{1777708a-8593-40c0-8caa-9154180854dc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common">
+      <UniqueIdentifier>{ee194364-02f4-428c-a25f-0a60a7d20263}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\common\BaseClient.cpp">
+      <Filter>HLTV\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\BitBuffer.cpp">
+      <Filter>HLTV\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\DemoFile.cpp">
+      <Filter>HLTV\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\DirectorCmd.cpp">
+      <Filter>HLTV\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\InfoString.cpp">
+      <Filter>HLTV\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\mathlib.cpp">
+      <Filter>HLTV\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\md5.cpp">
+      <Filter>HLTV\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\munge.cpp">
+      <Filter>HLTV\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\NetAddress.cpp">
+      <Filter>HLTV\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\NetChannel.cpp">
+      <Filter>HLTV\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\DemoClient.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\FakeClient.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Master.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\precompiled.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Proxy.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ProxyClient.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\public_amalgamation.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Status.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\common.cpp">
+      <Filter>HLTV\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\random.cpp">
+      <Filter>HLTV\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\byteorder.cpp">
+      <Filter>HLTV\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\hookers\HLTV\Proxy\hooklist.cpp">
+      <Filter>src\hookers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\hookers\HLTV\Proxy\main.cpp">
+      <Filter>src\hookers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Director\src\Director.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\common\BaseSystemModule.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\common\ObjectDictionary.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\common\ObjectList.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\common\TokenLine.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\engine\mem.cpp">
+      <Filter>engine</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\common\BitBuffer.h">
+      <Filter>HLTV\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\DemoFile.h">
+      <Filter>HLTV\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\DirectorCmd.h">
+      <Filter>HLTV\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\InfoString.h">
+      <Filter>HLTV\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\mathlib_internal.h">
+      <Filter>HLTV\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\md5.h">
+      <Filter>HLTV\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\munge.h">
+      <Filter>HLTV\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\precompiled.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Proxy.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\DemoClient.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\BaseClient.h">
+      <Filter>HLTV\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\FakeClient.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Master.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ProxyClient.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Status.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\common_hltv.h">
+      <Filter>HLTV\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\net_internal.h">
+      <Filter>HLTV\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\NetChannel.h">
+      <Filter>HLTV\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\random.h">
+      <Filter>HLTV\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\byteorder.h">
+      <Filter>HLTV\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\NetAddress.h">
+      <Filter>HLTV\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hookers\HLTV\Proxy\hooklist.h">
+      <Filter>src\hookers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\BaseSystemModule.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\ObjectDictionary.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\ObjectList.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\TokenLine.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\engine\mem.h">
+      <Filter>engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Director\src\Director.h">
+      <Filter>src</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

@@ -26,26 +26,10 @@
 *
 */
 
-#ifndef SV_MOVE_H
-#define SV_MOVE_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #include "maintypes.h"
 #include "server.h"
-
-#define DI_NODIR	-1
-
-#ifdef HOOK_ENGINE
-
-#define c_yes (*pc_yes)
-#define c_no (*pc_no)
-
-#endif // HOOK_ENGINE
-
-extern int c_yes;
-extern int c_no;
 
 qboolean SV_CheckBottom(edict_t *ent);
 qboolean SV_movetest(edict_t *ent, vec_t *move, qboolean relink);
@@ -57,6 +41,4 @@ NOXREF void SV_NewChaseDir(edict_t *actor, edict_t *enemy, float dist);
 NOXREF qboolean SV_CloseEnough(edict_t *ent, edict_t *goal, float dist);
 NOXREF qboolean SV_ReachedGoal(edict_t *ent, vec_t *vecGoal, float flDist);
 void SV_NewChaseDir2(edict_t *actor, vec_t *vecGoal, float dist);
-void SV_MoveToOrigin_I(edict_t *ent, const float *pflGoal, float dist, int iStrafe);
-
-#endif // SV_MOVE_H
+void SV_MoveToOrigin_I(edict_t *ent, const float *pflGoal, float dist, int iMoveType);

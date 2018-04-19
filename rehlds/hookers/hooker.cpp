@@ -28,13 +28,14 @@
 
 #include "precompiled.h"
 
+Module g_Module = { NULL, NULL, NULL, NULL };
 
-HIDDEN Module g_EngineModule = { NULL, NULL, NULL, NULL };
-
-extern const size_t g_BaseOffset;
-extern FunctionHook g_FunctionHooks[];
-extern AddressRef g_FunctionRefs[];
-extern AddressRef g_DataRefs[];
+// Offset where module assumed be loaded to ajust hooks offsets. NULL for the Linux to trigger symbols searching.
+#ifdef _WIN32
+const size_t g_BaseOffset = 0x01D00000;
+#else
+const size_t g_BaseOffset = NULL;
+#endif
 
 void *GetOriginalFuncAddrOrDie(const char *funcName)
 {
@@ -44,8 +45,7 @@ void *GetOriginalFuncAddrOrDie(const char *funcName)
 			return (void*) cfh->originalAddress;
 	}
 
-	rehlds_syserror("%s: Could not find function '%s'", __FUNCTION__, funcName);
-	return NULL;
+	rehlds_syserror("%s: Could not find function '%s'", __func__, funcName);
 }
 
 void *GetOriginalFuncAddrOrDefault(const char *funcName, void *def)
@@ -67,8 +67,7 @@ void *GetFuncRefAddrOrDie(const char *funcName)
 			return (void*)cfh->originalAddress;
 	}
 
-	rehlds_syserror("%s: Could not find function '%s'", __FUNCTION__, funcName);
-	return NULL;
+	rehlds_syserror("%s: Could not find function '%s'", __func__, funcName);
 }
 
 void *GetFuncRefAddrOrDefault(const char *funcName, void *def)
@@ -82,10 +81,9 @@ void *GetFuncRefAddrOrDefault(const char *funcName, void *def)
 	return def;
 }
 
-int HookEngine(size_t addr)
+int HookModule(const char *pszAppName, size_t addr)
 {
-	if (addr == NULL || !FindModuleByAddress(addr, &g_EngineModule))
-	{
+	if (addr == NULL || !FindModuleByAddress(addr, &g_Module)) {
 		return (FALSE);
 	}
 
@@ -95,10 +93,10 @@ int HookEngine(size_t addr)
 	AddressRef *refData = g_DataRefs;
 	while (refData->symbolName != NULL)
 	{
-		if (!GetAddress(&g_EngineModule, (Address*)refData, g_BaseOffset))
+		if (!GetAddress(&g_Module, (Address*)refData, g_BaseOffset))
 		{
 #if _DEBUG
-			printf("%s: symbol not found \"%s\", symbol index: %i\n", __FUNCTION__, refData->symbolName, refData->symbolIndex);
+			printf("%s: symbol not found \"%s\", symbol index: %i\n", __func__, refData->symbolName, refData->symbolIndex);
 			success = false;
 #endif
 		}
@@ -108,10 +106,10 @@ int HookEngine(size_t addr)
 	AddressRef *refFunc = g_FunctionRefs;
 	while (refFunc->symbolName != NULL)
 	{
-		if (!GetAddress(&g_EngineModule, (Address*)refFunc, g_BaseOffset))
+		if (!GetAddress(&g_Module, (Address*)refFunc, g_BaseOffset))
 		{
 #if _DEBUG
-			printf("%s: symbol not found \"%s\", symbol index: %i\n", __FUNCTION__, refData->symbolName, refData->symbolIndex);
+			printf("%s: symbol not found \"%s\", symbol index: %i\n", __func__, refData->symbolName, refData->symbolIndex);
 			success = false;
 #endif
 		}
@@ -121,10 +119,10 @@ int HookEngine(size_t addr)
 	FunctionHook *hookFunc = g_FunctionHooks;
 	while (hookFunc->handlerFunc != NULL)
 	{
-		if (!GetAddress(&g_EngineModule, (Address*)hookFunc, g_BaseOffset))
+		if (!GetAddress(&g_Module, (Address*)hookFunc, g_BaseOffset))
 		{
 #if _DEBUG
-			printf("%s: symbol not found \"%s\", symbol index: %i\n", __FUNCTION__, refData->symbolName, refData->symbolIndex);
+			printf("%s: symbol not found \"%s\", symbol index: %i\n", __func__, refData->symbolName, refData->symbolIndex);
 			success = false;
 #endif
 		}
@@ -134,24 +132,15 @@ int HookEngine(size_t addr)
 	if (!success)
 	{
 #if _DEBUG
-		printf("%s: failed to hook engine!\n", __FUNCTION__);
+		printf("%s: failed to hook module!\n", __func__);
 #endif
 		return (FALSE);
 	}
 
-#ifdef _WIN32
-	Module hlds_exe;
-	if (!FindModuleByName("hlds.exe", &hlds_exe))
-		printf("%s: launcher is not hlds.exe, tests playing/recording is disabled!\n", __FUNCTION__);
-	else
-		TestSuite_Init(&g_EngineModule, &hlds_exe, g_FunctionRefs);
-#endif
-
-
 	refData = g_DataRefs;
 	while (refData->addressRef != NULL)
 	{
-		if (!FindDataRef(&g_EngineModule, refData))
+		if (!FindDataRef(&g_Module, refData))
 			return (FALSE);
 		refData++;
 	}
@@ -159,26 +148,60 @@ int HookEngine(size_t addr)
 	refFunc = g_FunctionRefs;
 	while (refFunc->addressRef != NULL)
 	{
-		if (!FindDataRef(&g_EngineModule, refFunc))
+		if (!FindDataRef(&g_Module, refFunc))
 			return (FALSE);
 		refFunc++;
 	}
 
-	// Actually hook all things
-	if (!g_RehldsRuntimeConfig.disableAllHooks)
+	hookFunc = g_FunctionHooks;
+	while (hookFunc->handlerFunc != NULL)
 	{
-		hookFunc = g_FunctionHooks;
-		while (hookFunc->handlerFunc != NULL)
-		{
-			if (!HookFunction(&g_EngineModule, hookFunc))
-				return (FALSE);
-			hookFunc++;
-		}
+		if (!HookFunction(&g_Module, hookFunc))
+			return (FALSE);
+		hookFunc++;
 	}
 
-#ifdef _WIN32
-	Rehlds_Debug_Init(&g_EngineModule);
-#endif
-
 	return (TRUE);
+}
+
+#ifdef _WIN32
+
+void *malloc_wrapper(size_t size) {
+	return malloc(size);
+}
+
+void *realloc_wrapper(void *orig, size_t newSize) {
+	return realloc(orig, newSize);
+}
+
+void free_wrapper(void *mem) {
+	free(mem);
+}
+
+void *calloc_wrapper(size_t count, size_t size) {
+	return calloc(count, size);
+}
+
+void *__nh_malloc_wrapper(size_t sz, int unk) {
+	return malloc(sz);
+}
+
+char *strdup_wrapper(const char *s) {
+	return _strdup(s);
+}
+
+#endif // _WIN32
+
+void logf(const char *fmt, ...)
+{
+	va_list argptr;
+	static char string[8192];
+
+	va_start(argptr, fmt);
+	_vsnprintf(string, sizeof(string), fmt, argptr);
+	string[sizeof(string) - 1] = 0;
+
+	FILE *fl = fopen("hooker.log", "a");
+	fprintf(fl, "%s\n", string);
+	fclose(fl);
 }

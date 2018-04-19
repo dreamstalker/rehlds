@@ -1,4 +1,3 @@
-#pragma once
 /*
 *
 *    This program is free software; you can redistribute it and/or modify it
@@ -26,6 +25,9 @@
 *    version.
 *
 */
+
+#pragma once
+
 #include "common_rehlds.h"
 #include "bspfile.h"
 #include "FileSystem.h"
@@ -46,42 +48,6 @@
 	#define __BUILD_TIME__ APP_COMMIT_TIME
 	#define __BUILD_DATE__ APP_COMMIT_DATE
 #endif // REHLDS_FIXES
-
-#ifdef HOOK_ENGINE
-#define serverinfo (*pserverinfo)
-
-#define gpszVersionString (*pgpszVersionString)
-#define gpszProductString (*pgpszProductString)
-
-#define bfread (*pbfread)
-#define bfwrite (*pbfwrite)
-
-#define msg_badread (*pmsg_badread)
-#define msg_readcount (*pmsg_readcount)
-
-#define bigendien (*pbigendien)
-
-#define BigShort (*pBigShort)
-#define LittleShort (*pLittleShort)
-#define BigLong (*pBigLong)
-#define LittleLong (*pLittleLong)
-#define BigFloat (*pBigFloat)
-#define LittleFloat (*pLittleFloat)
-
-#define com_argc (*pcom_argc)
-#define com_argv (*pcom_argv)
-#define com_token (*pcom_token)
-#define com_ignorecolons (*pcom_ignorecolons)
-#define s_com_token_unget (*ps_com_token_unget)
-#define com_clientfallback (*pcom_clientfallback)
-#define com_gamedir (*pcom_gamedir)
-#define com_cmdline (*pcom_cmdline)
-
-#define loadcache (*ploadcache)
-#define loadbuf (*ploadbuf)
-#define loadsize (*ploadsize)
-#endif // HOOK_ENGINE
-
 
 extern char serverinfo[MAX_INFO_STRING];
 
@@ -120,106 +86,6 @@ extern char com_cmdline[COM_MAX_CMD_LINE];
 extern cache_user_t *loadcache;
 extern unsigned char *loadbuf;
 extern int loadsize;
-
-
-//#define Q_functions
-#ifndef Q_functions
-
-#ifndef _WIN32
-#define _strlwr(p) for (int i = 0; p[i] != 0; i++) p[i] = tolower(p[i]);
-#endif
-
-#if defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)
-#define Q_memset A_memset
-#define Q_memcpy A_memcpy
-#define Q_memmove A_memmove
-#define Q_strlen A_strlen
-#define Q_memcmp A_memcmp
-#define Q_strcpy A_strcpy
-#define Q_strncpy strncpy
-#define Q_strrchr strrchr
-#define Q_strcat A_strcat
-#define Q_strncat strncat
-#define Q_strcmp A_strcmp
-#define Q_strncmp strncmp
-//#define Q_strcasecmp _stricmp		// Use Q_stricmp
-//#define Q_strncasecmp _strnicmp	// Use Q_strnicmp
-#define Q_stricmp A_stricmp
-#define Q_strnicmp _strnicmp
-#define Q_strstr A_strstr
-#define Q_strchr strchr
-#define Q_strlwr A_strtolower
-#define Q_sprintf sprintf
-#define Q_snprintf _snprintf
-#define Q_atoi atoi
-#define Q_atof atof
-#define Q_sqrt M_sqrt
-#define Q_min M_min
-#define Q_max M_max
-#define Q_clamp M_clamp
-//#define Q_strtoull strtoull
-//#define Q_FileNameCmp FileNameCmp
-#define Q_vsnprintf _vsnprintf
-#else
-#define Q_memset memset
-#define Q_memcpy memcpy
-#define Q_memmove memmove
-#define Q_strlen strlen
-#define Q_memcmp memcmp
-#define Q_strcpy strcpy
-#define Q_strncpy strncpy
-#define Q_strrchr strrchr
-#define Q_strcat strcat
-#define Q_strncat strncat
-#define Q_strcmp strcmp
-#define Q_strncmp strncmp
-//#define Q_strcasecmp _stricmp		// Use Q_stricmp
-//#define Q_strncasecmp _strnicmp	// Use Q_strnicmp
-#define Q_stricmp _stricmp
-#define Q_strnicmp _strnicmp
-#define Q_strstr strstr
-#define Q_strchr strchr
-#define Q_strlwr _strlwr
-#define Q_sprintf sprintf
-#define Q_snprintf _snprintf
-#define Q_atoi atoi
-#define Q_atof atof
-#define Q_sqrt sqrt
-#define Q_min min
-#define Q_max max
-#define Q_clamp clamp
-//#define Q_strtoull strtoull
-//#define Q_FileNameCmp FileNameCmp
-#define Q_vsnprintf _vsnprintf
-#endif // defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)
-
-#else // Q_functions
-
-void Q_strcpy(char *dest, const char *src);
-int Q_strlen(const char *str);
-NOBODY void Q_memset(void *dest, int fill, int count);
-NOBODY void Q_memcpy(void *dest, const void *src, int count);
-NOBODY int Q_memcmp(void *m1, void *m2, int count);
-NOBODY void Q_strncpy(char *dest, const char *src, int count);
-NOBODY char *Q_strrchr(char *s, char c);
-NOBODY void Q_strcat(char *dest, char *src);
-NOBODY int Q_strcmp(const char *s1, const char *s2);
-NOBODY int Q_strncmp(const char *s1, const char *s2, int count);
-NOBODY int Q_strncasecmp(const char *s1, const char *s2, int n);
-NOBODY int Q_strcasecmp(const char *s1, const char *s2);
-NOBODY int Q_stricmp(const char *s1, const char *s2);
-NOBODY int Q_strnicmp(const char *s1, const char *s2, int n);
-NOBODY int Q_atoi(const char *str);
-NOBODY float Q_atof(const char *str);
-NOBODY char *Q_strlwr(char *src);
-NOBODY int Q_FileNameCmp(char *file1, char *file2);
-NOBODY char *Q_strstr(const char *s1, const char *search);
-NOBODY uint64 Q_strtoull(char *str);
-
-#endif // Q_functions
-
-//strcpy that works correctly with overlapping src and dst buffers
-char* strcpy_safe(char* dst, char* src);
 
 int build_number(void);
 char *Info_Serverinfo(void);
@@ -306,7 +172,7 @@ void COM_UngetToken(void);
 char *COM_Parse(char *data);
 char *COM_ParseLine(char *data);
 int COM_TokenWaiting(char *buffer);
-int COM_CheckParm(char *parm);
+int COM_CheckParm(const char *parm);
 void COM_InitArgv(int argc, char *argv[]);
 void COM_Init(char *basedir);
 char *va(char *format, ...);
@@ -317,7 +183,7 @@ void COM_FixSlashes(char *pname);
 void COM_CreatePath(char *path);
 NOXREF void COM_CopyFile(char *netpath, char *cachepath);
 NOXREF int COM_ExpandFilename(char *filename);
-int COM_FileSize(char *filename);
+int COM_FileSize(const char *filename);
 unsigned char *COM_LoadFile(const char *path, int usehunk, int *pLength);
 void COM_FreeFile(void *buffer);
 void COM_CopyFileChunk(FileHandle_t dst, FileHandle_t src, int nSize);
@@ -335,7 +201,7 @@ qboolean COM_SetupDirectories(void);
 void COM_CheckPrintMap(dheader_t *header, const char *mapname, qboolean bShowOutdated);
 void COM_ListMaps(char *pszSubString);
 void COM_Log(char *pszFile, char *fmt, ...);
-unsigned char *COM_LoadFileForMe(char *filename, int *pLength);
+unsigned char *COM_LoadFileForMe(const char *filename, int *pLength);
 int COM_CompareFileTime(char *filename1, char *filename2, int *iCompare);
 void COM_GetGameDir(char *szGameDir);
 int COM_EntsForPlayerSlots(int nPlayers);

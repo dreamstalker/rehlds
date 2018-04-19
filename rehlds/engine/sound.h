@@ -26,16 +26,12 @@
 *
 */
 
-#ifndef SOUND_H
-#define SOUND_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #include "quakedef.h"
 
 // max number of sentences in game. NOTE: this must match CVOXFILESENTENCEMAX in dlls\util.h!!!
-#define CVOXFILESENTENCEMAX		1536
+const int CVOXFILESENTENCEMAX = 1536;
 
 typedef struct sfx_s
 {
@@ -69,5 +65,3 @@ void Voice_RegisterCvars();
 void Voice_Deinit();
 void Voice_Idle(float frametime);
 qboolean Voice_RecordStop();
-
-#endif // SOUND_H

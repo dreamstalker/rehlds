@@ -26,37 +26,18 @@
 *
 */
 
-#ifndef TEXTURES_H
-#define TEXTURES_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #include "maintypes.h"
 #include "wad.h"
 
-#define MAX_MAP_TEXTURES 512
+const int MAX_MAP_TEXTURES = 512;
 
 typedef struct texlumpinfo_s
 {
 	lumpinfo_t lump;
 	int iTexFile;
 } texlumpinfo_t;
-
-#ifdef HOOK_ENGINE
-#define lumpinfo (*plumpinfo)
-#define nTexLumps (*pnTexLumps)
-#define texfiles (*ptexfiles)
-#define nTexFiles (*pnTexFiles)
-
-#define texgammatable (*ptexgammatable)
-#define r_notexture_mip (*pr_notexture_mip)
-
-#define nummiptex (*pnummiptex)
-#define miptex (*pmiptex)
-
-#define r_wadtextures (*pr_wadtextures)
-#endif
 
 extern texlumpinfo_t* lumpinfo;
 extern int nTexLumps;
@@ -80,5 +61,3 @@ void TEX_CleanupWadInfo(void);
 int TEX_LoadLump(char *name, unsigned char *dest);
 int FindMiptex(char *name);
 void TEX_AddAnimatingTextures(void);
-
-#endif // TEXTURES_H

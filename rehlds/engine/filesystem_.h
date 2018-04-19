@@ -26,30 +26,11 @@
 *
 */
 
-#ifndef FILESYSTEM__H
-#define FILESYSTEM__H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #include "maintypes.h"
 #include "iregistry.h"
 #include "utlvector.h"
-
-#ifdef _WIN32
-#define FILESYSTEM_DLL_NAME "filesystem_stdio.dll"
-#else
-#define FILESYSTEM_DLL_NAME "filesystem_stdio.so"
-#endif
-
-#ifdef HOOK_ENGINE
-#define g_fallbackLocalizationFiles (*pg_fallbackLocalizationFiles)
-#define s_pBaseDir (*ps_pBaseDir)
-#define bLowViolenceBuild (*pbLowViolenceBuild)
-
-#define g_pFileSystemModule (*pg_pFileSystemModule)
-#define g_FileSystemFactory (*pg_FileSystemFactory)
-#endif // HOOK_ENGINE
 
 extern CUtlVector<char *> g_fallbackLocalizationFiles;
 extern char s_pBaseDir[512];
@@ -72,6 +53,4 @@ void CheckLiblistForFallbackDir(const char *pGameDir, bool bLanguage, const char
 int FileSystem_SetGameDirectory(const char *pDefaultDir, const char *pGameDir);
 int FileSystem_AddFallbackGameDir(const char *pGameDir);
 int FileSystem_Init(char *basedir, void *voidfilesystemFactory);
-void FileSystem_Shutdown(void); 
-
-#endif // FILESYSTEM__H
+void FileSystem_Shutdown(void);

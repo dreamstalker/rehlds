@@ -25,23 +25,28 @@
 *    version.
 *
 */
+
 #pragma once
 
 #include "maintypes.h"
 
-#define DELTA_MAX_FIELDS		56		// 7*8
+const int DELTA_MAX_FIELDS = 56;	// 7*8
 
-#define DT_BYTE				BIT(0)		// A byte
-#define DT_SHORT			BIT(1)		// 2 byte field
-#define DT_FLOAT			BIT(2)		// A floating point field
-#define DT_INTEGER			BIT(3)		// 4 byte integer
-#define DT_ANGLE			BIT(4)		// A floating point angle
-#define DT_TIMEWINDOW_8			BIT(5)		// A floating point timestamp relative to server time
-#define DT_TIMEWINDOW_BIG		BIT(6)		// A floating point timestamp relative to server time (with more precision and custom multiplier)
-#define DT_STRING			BIT(7)		// A null terminated string, sent as 8 byte chars
-#define DT_SIGNED			BIT(31)		// sign modificator
+enum
+{
+	DT_BYTE				= BIT(0),	// A byte
+	DT_SHORT			= BIT(1),	// 2 byte field
+	DT_FLOAT			= BIT(2),	// A floating point field
+	DT_INTEGER			= BIT(3),	// 4 byte integer
+	DT_ANGLE			= BIT(4),	// A floating point angle
+	DT_TIMEWINDOW_8		= BIT(5),	// A floating point timestamp relative to server time
+	DT_TIMEWINDOW_BIG	= BIT(6),	// A floating point timestamp relative to server time (with more precision and custom multiplier)
+	DT_STRING			= BIT(7),	// A null terminated string, sent as 8 byte chars
+	
+	DT_SIGNED			= BIT(31)	// sign modificator
+};
 
-#define FDT_MARK			BIT(0)		// Delta mark for sending
+const int FDT_MARK = BIT(0);		// Delta mark for sending
 
 typedef struct delta_s delta_t;
 typedef void(*encoder_t)(delta_t *, const unsigned char *, const unsigned char *);
@@ -67,6 +72,12 @@ typedef struct delta_description_s
 
 class CDeltaJit;
 
+union delta_marked_mask_t {
+	uint8 u8[8];
+	uint32 u32[2];
+	uint64 u64;
+};
+
 typedef struct delta_s
 {
 	int dynamic;
@@ -75,8 +86,10 @@ typedef struct delta_s
 	encoder_t conditionalencode;
 	delta_description_t *pdd;
 
-#ifdef REHLDS_FIXES
+#if defined(REHLDS_JIT)
 	CDeltaJit* jit;
+#elif defined(REHLDS_FIXES)
+	delta_marked_mask_t originalMarkedFieldsMask;
 #endif
 } delta_t;
 
@@ -103,12 +116,6 @@ typedef struct delta_info_s
 	delta_t *delta;
 } delta_info_t;
 
-#ifdef HOOK_ENGINE
-#define g_defs (*pg_defs)
-#define g_encoders (*pg_encoders)
-#define g_deltaregistry (*pg_deltaregistry)
-#endif // HOOK_ENGINE
-
 extern delta_definition_list_t *g_defs;
 extern delta_encoder_t *g_encoders;
 extern delta_registry_t *g_deltaregistry;
@@ -131,12 +138,14 @@ qboolean DELTA_CheckDelta(unsigned char *from, unsigned char *to, delta_t *pFiel
 
 #ifdef REHLDS_FIXES //Fix for https://github.com/dreamstalker/rehlds/issues/24
 qboolean DELTA_WriteDeltaForceMask(unsigned char *from, unsigned char *to, qboolean force, delta_t *pFields, void(*callback)(void), void* pForceMask);
+uint64 DELTA_GetOriginalMask(delta_t* pFields);
+uint64 DELTA_GetMaskU64(delta_t* pFields);
 #endif
 
 qboolean DELTA_WriteDelta(unsigned char *from, unsigned char *to, qboolean force, delta_t *pFields, void(*callback)(void));
 qboolean _DELTA_WriteDelta(unsigned char *from, unsigned char *to, qboolean force, delta_t *pFields, void(*callback)(void), qboolean sendfields);
 int DELTA_ParseDelta(unsigned char *from, unsigned char *to, delta_t *pFields);
-void DELTA_AddEncoder(char *name, void(*conditionalencode)(struct delta_s *, const unsigned char *, const unsigned char *));
+void DELTA_AddEncoder(const char *name, void(*conditionalencode)(struct delta_s *, const unsigned char *, const unsigned char *));
 void DELTA_ClearEncoders(void);
 encoder_t DELTA_LookupEncoder(char *name);
 int DELTA_CountLinks(delta_link_t *plinks);

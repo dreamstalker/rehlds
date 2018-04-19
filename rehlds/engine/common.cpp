@@ -33,71 +33,10 @@ char serverinfo[MAX_INFO_STRING];
 char gpszVersionString[32];
 char gpszProductString[32];
 
-char* strcpy_safe(char* dst, char* src) {
-	int len = Q_strlen(src);
-	Q_memmove(dst, src, len + 1);
-	return dst;
-}
-
 char *Info_Serverinfo(void)
 {
 	return serverinfo;
 }
-
-#ifdef Q_functions
-
-NOBODY void Q_memset(void *dest, int fill, int count);
-NOBODY void Q_memcpy(void *dest, const void *src, int count);
-NOBODY int Q_memcmp(void *m1, void *m2, int count);
-
-void Q_strcpy(char *dest, const char *src)
-{
-	char *c;
-	const char *s;
-
-	s = src;
-	for (c = dest; s; *c++ = *s++)
-	{
-		if (!c)
-			break;
-		if (!*s)
-			break;
-	}
-	*c = 0;
-}
-
-NOBODY void Q_strncpy(char *dest, const char *src, int count);
-
-int Q_strlen(const char *str)
-{
-	int result = 0;
-	if (str)
-	{
-		if (*str)
-		{
-			while (str[result++ + 1]);
-		}
-	}
-	return result;
-}
-
-
-NOBODY char *Q_strrchr(char *s, char c);
-NOBODY void Q_strcat(char *dest, char *src);
-NOBODY int Q_strcmp(const char *s1, const char *s2);
-NOBODY int Q_strncmp(const char *s1, const char *s2, int count);
-NOBODY int Q_strncasecmp(const char *s1, const char *s2, int n);
-NOBODY int Q_strcasecmp(const char *s1, const char *s2);
-NOBODY int Q_stricmp(const char *s1, const char *s2);
-NOBODY int Q_strnicmp(const char *s1, const char *s2, int n);
-NOBODY int Q_atoi(const char *str);
-NOBODY float Q_atof(const char *str);
-NOBODY char *Q_strlwr(char *src);
-NOBODY int Q_FileNameCmp(char *file1, char *file2);
-NOBODY char *Q_strstr(const char *s1, const char *search);
-NOBODY uint64 Q_strtoull(char *str);
-
-#endif // Q_functions
 
 #ifndef COM_Functions_region
 
@@ -651,7 +590,7 @@ void MSG_WriteBitAngle(float fAngle, int numbits)
 {
 	if (numbits >= 32)
 	{
-		Sys_Error(__FUNCTION__ ": Can't write bit angle with 32 bits precision\n");
+		Sys_Error("%s: Can't write bit angle with 32 bits precision\n", __func__);
 	}
 
 	uint32 shift = (1 << numbits);
@@ -759,7 +698,7 @@ uint32 MSG_ReadBits(int numbits)
 
 #ifdef REHLDS_FIXES
 	if (numbits > 32) {
-		Sys_Error(__FUNCTION__ ": invalid numbits %d\n", numbits);
+		Sys_Error("%s: invalid numbits %d\n", __func__, numbits);
 	}
 #endif // REHLDS_FIXES
 
@@ -1243,7 +1182,7 @@ void *EXT_FUNC SZ_GetSpace(sizebuf_t *buf, int length)
 
 	if (length < 0)
 	{
-		Sys_Error(__FUNCTION__ ": %i negative length on %s", length, buffername);
+		Sys_Error("%s: %i negative length on %s", __func__, length, buffername);
 	}
 
 	if (buf->cursize + length > buf->maxsize)
@@ -1253,32 +1192,32 @@ void *EXT_FUNC SZ_GetSpace(sizebuf_t *buf, int length)
 		{
 			if (!buf->maxsize)
 			{
-				Sys_Error(__FUNCTION__ ": tried to write to an uninitialized sizebuf_t: %s", buffername);
+				Sys_Error("%s: tried to write to an uninitialized sizebuf_t: %s", __func__, buffername);
 			}
 			else if (length > buf->maxsize)
 			{
-				Sys_Error(__FUNCTION__ ": %i is > full buffer size on %s", length, buffername);
+				Sys_Error("%s: %i is > full buffer size on %s", __func__, length, buffername);
 			}
 			else
 			{
-				Sys_Error(__FUNCTION__ ": overflow without FSB_ALLOWOVERFLOW set on %s", buffername);
+				Sys_Error("%s: overflow without FSB_ALLOWOVERFLOW set on %s", __func__, buffername);
 			}
 		}
 
 		if (length > buf->maxsize)
 		{
-			Con_DPrintf(__FUNCTION__ ": %i is > full buffer size on %s, ignoring", length, buffername);
+			Con_DPrintf("%s: %i is > full buffer size on %s, ignoring", __func__, length, buffername);
 		}
 #else // REHLDS_FIXES
 		if (!(buf->flags & SIZEBUF_ALLOW_OVERFLOW))
 		{
 			if (!buf->maxsize)
 			{
-				Sys_Error(__FUNCTION__ ": Tried to write to an uninitialized sizebuf_t: %s", buffername);
+				Sys_Error("%s: Tried to write to an uninitialized sizebuf_t: %s", __func__, buffername);
 			}
 			else
 			{
-				Sys_Error(__FUNCTION__ ": overflow without FSB_ALLOWOVERFLOW set on %s", buffername);
+				Sys_Error("%s: overflow without FSB_ALLOWOVERFLOW set on %s", __func__, buffername);
 			}
 		}
 
@@ -1286,14 +1225,14 @@ void *EXT_FUNC SZ_GetSpace(sizebuf_t *buf, int length)
 		{
 			if (!(buf->flags & SIZEBUF_ALLOW_OVERFLOW))
 			{
-				Sys_Error(__FUNCTION__ ": %i is > full buffer size on %s", length, buffername);
+				Sys_Error("%s: %i is > full buffer size on %s", __func__, length, buffername);
 			}
 
-			Con_DPrintf(__FUNCTION__ ": %i is > full buffer size on %s, ignoring", length, buffername);
+			Con_DPrintf("%s: %i is > full buffer size on %s, ignoring", __func__, length, buffername);
 		}
 #endif // REHLDS_FIXES
 
-		Con_Printf(__FUNCTION__ ": overflow on %s\n", buffername);
+		Con_Printf("%s: overflow on %s\n", __func__, buffername);
 
 		SZ_Clear(buf);
 		buf->flags |= SIZEBUF_OVERFLOWED;
@@ -1707,7 +1646,7 @@ int COM_TokenWaiting(char *buffer)
 	return 0;
 }
 
-int COM_CheckParm(char *parm)
+int COM_CheckParm(const char *parm)
 {
 	int i;
 
@@ -1874,13 +1813,13 @@ NOXREF void COM_WriteFile(char *filename, void *data, int len)
 
 	if (fp)
 	{
-		Sys_Printf(__FUNCTION__ ": %s\n", path);
+		Sys_Printf("%s: %s\n", __func__, path);
 		FS_Write(data, len, 1, fp);
 		FS_Close(fp);
 	}
 	else
 	{
-		Sys_Printf(__FUNCTION__ ": failed on %s\n", path);
+		Sys_Printf("%s: failed on %s\n", __func__, path);
 	}
 }
 
@@ -1973,7 +1912,7 @@ NOXREF int COM_ExpandFilename(char *filename)
 	return *filename != 0;
 }
 
-int EXT_FUNC COM_FileSize(char *filename)
+int EXT_FUNC COM_FileSize(const char *filename)
 {
 	FileHandle_t fp;
 	int iSize;
@@ -2050,7 +1989,7 @@ unsigned char* EXT_FUNC COM_LoadFile(const char *path, int usehunk, int *pLength
 #ifdef REHLDS_FIXES
 		FS_Close(hFile);
 #endif
-		Sys_Error(__FUNCTION__ ": bad usehunk");
+		Sys_Error("%s: bad usehunk", __func__);
 	}
 
 	if (!buf)
@@ -2058,7 +1997,7 @@ unsigned char* EXT_FUNC COM_LoadFile(const char *path, int usehunk, int *pLength
 #ifdef REHLDS_FIXES
 		FS_Close(hFile);
 #endif
-		Sys_Error(__FUNCTION__ ": not enough space for %s", path);
+		Sys_Error("%s: not enough space for %s", __func__, path);
 	}
 
 	FS_Read(buf, len, 1, hFile);
@@ -2129,7 +2068,7 @@ NOXREF unsigned char *COM_LoadFileLimit(char *path, int pos, int cbmax, int *pcb
 #ifdef REHLDS_FIXES
 		FS_Close(hFile);
 #endif
-		Sys_Error(__FUNCTION__ ": invalid seek position for %s", path);
+		Sys_Error("%s: invalid seek position for %s", __func__, path);
 	}
 
 	FS_Seek(hFile, pos, FILESYSTEM_SEEK_HEAD);
@@ -2152,7 +2091,7 @@ NOXREF unsigned char *COM_LoadFileLimit(char *path, int pos, int cbmax, int *pcb
 #ifdef REHLDS_FIXES
 			FS_Close(hFile);
 #endif
-			Sys_Error(__FUNCTION__ ": not enough space for %s", path);
+			Sys_Error("%s: not enough space for %s", __func__, path);
 		}
 
 		FS_Close(hFile);
@@ -2228,7 +2167,7 @@ void COM_StripTrailingSlash(char *ppath)
 void COM_ParseDirectoryFromCmd(const char *pCmdName, char *pDirName, const char *pDefault)
 {
 	const char *pParameter = NULL;
-	int cmdParameterIndex = COM_CheckParm((char *)pCmdName);
+	int cmdParameterIndex = COM_CheckParm(pCmdName);
 
 	if (cmdParameterIndex && cmdParameterIndex < com_argc - 1)
 	{
@@ -2385,7 +2324,7 @@ void COM_Log(char *pszFile, char *fmt, ...)
 	}
 }
 
-unsigned char* EXT_FUNC COM_LoadFileForMe(char *filename, int *pLength)
+unsigned char* EXT_FUNC COM_LoadFileForMe(const char *filename, int *pLength)
 {
 	return COM_LoadFile(filename, 5, pLength);
 }
@@ -2798,7 +2737,7 @@ typedef struct
 	unsigned short wBitsPerSample;
 } FormatChunk;
 
-#define WAVE_HEADER_LENGTH 128
+const int WAVE_HEADER_LENGTH = 128;
 
 unsigned int EXT_FUNC COM_GetApproxWavePlayLength(const char *filepath)
 {

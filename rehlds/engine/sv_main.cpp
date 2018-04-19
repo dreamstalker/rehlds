@@ -99,24 +99,8 @@ char outputbuf[MAX_ROUTEABLE_PACKET];
 redirect_t sv_redirected;
 netadr_t sv_redirectto;
 
-// DONE: make one global var with mods enum.
-#ifdef REHLDS_FIXES
 GameType_e g_eGameType = GT_Unitialized;
-#else
-int g_bCS_CZ_Flags_Initialized;
-int g_bIsCZero;
-int g_bIsCZeroRitual;
-int g_bIsTerrorStrike;
-int g_bIsTFC;
-int g_bIsHL1;
-int g_bIsCStrike;
-#endif
 qboolean allow_cheats;
-
-/*
- * Globals initialization
- */
-#ifndef HOOK_ENGINE
 
 char *gNullString = "";
 int SV_UPDATE_BACKUP = SINGLEPLAYER_BACKUP;
@@ -190,10 +174,6 @@ cvar_t sv_max_upload = { "sv_uploadmax", "0.5", FCVAR_SERVER, 0.0f, NULL };
 cvar_t hpk_maxsize = { "hpk_maxsize", "4", FCVAR_ARCHIVE, 0.0f, NULL };
 cvar_t sv_visiblemaxplayers = { "sv_visiblemaxplayers", "-1", 0, 0.0f, NULL };
 
-cvar_t max_queries_sec = { "max_queries_sec", "3.0", FCVAR_SERVER | FCVAR_PROTECTED, 0.0f, NULL };
-cvar_t max_queries_sec_global = { "max_queries_sec_global", "30", FCVAR_SERVER | FCVAR_PROTECTED, 0.0f, NULL };
-cvar_t max_queries_window = { "max_queries_window", "60", FCVAR_SERVER | FCVAR_PROTECTED, 0.0f, NULL };
-cvar_t sv_logblocks = { "sv_logblocks", "0", FCVAR_SERVER, 0.0f, NULL };
 cvar_t sv_downloadurl = { "sv_downloadurl", "", FCVAR_PROTECTED, 0.0f, NULL };
 cvar_t sv_allow_dlfile = { "sv_allow_dlfile", "1", 0, 0.0f, NULL };
 #ifdef REHLDS_FIXES
@@ -209,97 +189,6 @@ cvar_t sv_rcon_banpenalty = { "sv_rcon_banpenalty", "0", 0, 0.0f, NULL };
 
 cvar_t scr_downloading = { "scr_downloading", "0", 0, 0.0f, NULL };
 
-#else //HOOK_ENGINE
-
-char *gNullString;
-int SV_UPDATE_BACKUP;
-int SV_UPDATE_MASK;
-int giNextUserMsg;
-
-cvar_t sv_lan;
-cvar_t sv_lan_rate;
-cvar_t sv_aim;
-
-cvar_t sv_skycolor_r;
-cvar_t sv_skycolor_g;
-cvar_t sv_skycolor_b;
-cvar_t sv_skyvec_x;
-cvar_t sv_skyvec_y;
-cvar_t sv_skyvec_z;
-
-cvar_t sv_spectatormaxspeed;
-cvar_t sv_airaccelerate;
-cvar_t sv_wateraccelerate;
-cvar_t sv_waterfriction;
-cvar_t sv_zmax;
-cvar_t sv_wateramp;
-
-cvar_t sv_skyname;
-cvar_t mapcyclefile;
-cvar_t motdfile;
-cvar_t servercfgfile;
-cvar_t lservercfgfile;
-cvar_t logsdir;
-cvar_t bannedcfgfile;
-
-int g_userid;
-
-cvar_t rcon_password;
-cvar_t sv_enableoldqueries;
-
-cvar_t sv_instancedbaseline;
-cvar_t sv_contact;
-cvar_t sv_maxupdaterate;
-cvar_t sv_minupdaterate;
-cvar_t sv_filterban;
-cvar_t sv_minrate;
-cvar_t sv_maxrate;
-cvar_t sv_logrelay;
-
-cvar_t violence_hblood;
-cvar_t violence_ablood;
-cvar_t violence_hgibs;
-cvar_t violence_agibs;
-cvar_t sv_newunit;
-
-cvar_t sv_clienttrace;
-cvar_t sv_timeout;
-cvar_t sv_failuretime;
-cvar_t sv_cheats;
-cvar_t sv_password;
-cvar_t sv_proxies;
-cvar_t sv_outofdatetime;
-cvar_t mapchangecfgfile;
-
-cvar_t sv_allow_download;
-cvar_t sv_send_logos;
-cvar_t sv_send_resources;
-cvar_t sv_log_singleplayer;
-cvar_t sv_logsecret;
-cvar_t sv_log_onefile;
-cvar_t sv_logbans;
-cvar_t sv_allow_upload;
-cvar_t sv_max_upload;
-cvar_t hpk_maxsize;
-cvar_t sv_visiblemaxplayers;
-
-cvar_t max_queries_sec;
-cvar_t max_queries_sec_global;
-cvar_t max_queries_window;
-cvar_t sv_logblocks;
-cvar_t sv_downloadurl;
-cvar_t sv_allow_dlfile;
-cvar_t sv_version;
-
-cvar_t sv_rcon_minfailures;
-cvar_t sv_rcon_maxfailures;
-cvar_t sv_rcon_minfailuretime;
-cvar_t sv_rcon_banpenalty;
-
-cvar_t scr_downloading;
-
-#endif //HOOK_ENGINE
-
 #ifdef REHLDS_FIXES
 cvar_t sv_echo_unknown_cmd = { "sv_echo_unknown_cmd", "0", 0, 0.0f, NULL };
 cvar_t sv_auto_precache_sounds_in_models = { "sv_auto_precache_sounds_in_models", "0", 0, 0.0f, nullptr };
@@ -312,6 +201,7 @@ cvar_t sv_rcon_condebug = { "sv_rcon_condebug", "1", 0, 1.0f, nullptr };
 cvar_t sv_rehlds_userinfo_transmitted_fields = { "sv_rehlds_userinfo_transmitted_fields", "", 0, 0.0f, nullptr };
 cvar_t sv_rehlds_attachedentities_playeranimationspeed_fix = {"sv_rehlds_attachedentities_playeranimationspeed_fix", "0", 0, 0.0f, nullptr};
 cvar_t sv_rehlds_local_gametime = {"sv_rehlds_local_gametime", "0", 0, 0.0f, nullptr};
+cvar_t sv_rehlds_send_mapcycle = { "sv_rehlds_send_mapcycle", "0", 0, 0.0f, nullptr };
 #endif
 
 delta_t *SV_LookupDelta(char *name)
@@ -327,9 +217,7 @@ delta_t *SV_LookupDelta(char *name)
 		p = p->next;
 	}
 
-	Sys_Error(__FUNCTION__ ": Couldn't find delta for %s\n", name);
-
-	return NULL;
+	Sys_Error("%s: Couldn't find delta for %s\n", __func__, name);
 }
 
 NOXREF void SV_DownloadingModules(void)
@@ -423,7 +311,7 @@ void SV_ReallocateDynamicData(void)
 {
 	if (!g_psv.max_edicts)
 	{
-		Con_DPrintf(__FUNCTION__ " with sv.max_edicts == 0\n");
+		Con_DPrintf("%s: sv.max_edicts == 0\n", __func__);
 		return;
 	}
 
@@ -470,6 +358,7 @@ qboolean SV_IsPlayerIndex(int index)
 	return (index >= 1 && index <= g_psvs.maxclients);
 }
 
+#ifdef _WIN32
 qboolean __declspec(naked) SV_IsPlayerIndex_wrapped(int index)
 {
 	// Original SV_IsPlayerIndex in swds.dll doesn't modify ecx nor edx.
@@ -488,6 +377,12 @@ qboolean __declspec(naked) SV_IsPlayerIndex_wrapped(int index)
 		retn;
 	}
 }
+#else // _WIN32
+qboolean SV_IsPlayerIndex_wrapped(int index)
+{
+	return SV_IsPlayerIndex(index);
+}
+#endif // _WIN32
 
 void SV_ClearPacketEntities(client_frame_t *frame)
 {
@@ -703,7 +598,7 @@ void SV_FindModelNumbers(void)
 
 		// use case-sensitive names to increase performance
 #ifdef REHLDS_FIXES
-		if (!Q_stricmp(g_psv.model_precache[i], "models/player.mdl"))
+		if (!Q_strcmp(g_psv.model_precache[i], "models/player.mdl"))
 			sv_playermodel = i;
 #else
 		if (!Q_stricmp(g_psv.model_precache[i], "models/player.mdl"))
@@ -777,22 +672,22 @@ qboolean SV_BuildSoundMsg(edict_t *entity, int channel, const char *sample, int 
 
 	if (volume < 0 || volume > 255)
 	{
-		Con_Printf(__FUNCTION__ ": volume = %i", volume);
+		Con_Printf("%s: volume = %i", __func__, volume);
 		volume = (volume < 0) ? 0 : 255;
 	}
 	if (attenuation < 0.0f || attenuation > 4.0f)
 	{
-		Con_Printf(__FUNCTION__ ": attenuation = %f", attenuation);
+		Con_Printf("%s: attenuation = %f", __func__, attenuation);
 		attenuation = (attenuation < 0.0f) ? 0.0f : 4.0f;
 	}
 	if (channel < 0 || channel > 7)
 	{
-		Con_Printf(__FUNCTION__ ": channel = %i", channel);
+		Con_Printf("%s: channel = %i", __func__, channel);
 		channel = (channel < 0) ? CHAN_AUTO : CHAN_NETWORKVOICE_BASE;
 	}
 	if (pitch < 0 || pitch > 255)
 	{
-		Con_Printf(__FUNCTION__ ": pitch = %i", pitch);
+		Con_Printf("%s: pitch = %i", __func__, pitch);
 		pitch = (pitch < 0) ? 0 : 255;
 	}
 
@@ -804,7 +699,7 @@ qboolean SV_BuildSoundMsg(edict_t *entity, int channel, const char *sample, int 
 		sound_num = Q_atoi(sample + 1);
 		if (sound_num >= CVOXFILESENTENCEMAX)
 		{
-			Con_Printf(__FUNCTION__ ": invalid sentence number: %s", sample + 1);
+			Con_Printf("%s: invalid sentence number: %s", __func__, sample + 1);
 			return FALSE;
 		}
 	}
@@ -818,7 +713,7 @@ qboolean SV_BuildSoundMsg(edict_t *entity, int channel, const char *sample, int 
 		sound_num = SV_LookupSoundIndex(sample);
 		if (!sound_num || !g_psv.sound_precache[sound_num])
 		{
-			Con_Printf(__FUNCTION__ ": %s not precached (%d)\n", sample, sound_num);
+			Con_Printf("%s: %s not precached (%d)\n", __func__, sample, sound_num);
 			return FALSE;
 		}
 	}
@@ -927,7 +822,7 @@ void SV_AddSampleToHashedLookupTable(const char *pszSample, int iSampleIndex)
 			index = 0;
 
 		if (index == starting_index)
-			Sys_Error(__FUNCTION__ ": NO FREE SLOTS IN SOUND LOOKUP TABLE");
+			Sys_Error("%s: NO FREE SLOTS IN SOUND LOOKUP TABLE", __func__);
 	}
 
 	g_psv.sound_precache_hashedlookup[index] = iSampleIndex;
@@ -1214,23 +1109,34 @@ void SV_SendServerinfo_internal(sizebuf_t *msg, client_t *client)
 	MSG_WriteString(msg, Cvar_VariableString("hostname"));
 	MSG_WriteString(msg, g_psv.modelname);
 
-	int len = 0;
-	unsigned char *mapcyclelist = COM_LoadFileForMe(mapcyclefile.string, &len);
 #ifdef REHLDS_FIXES
-	if (mapcyclelist && len)
+	if (sv_rehlds_send_mapcycle.value)
 	{
-		MSG_WriteString(msg, (const char *)mapcyclelist);
+		int len = 0;
+		unsigned char *mapcyclelist = COM_LoadFileForMe(mapcyclefile.string, &len);
+		if (mapcyclelist && len)
+		{
+			// Trim to 8190 (see MSG_ReadString, also 1 less than expected - see READ_STRING in HLSDK), otherwise client will be unable to parse message
+			mapcyclelist[8190] = 0;
+			MSG_WriteString(msg, (const char *)mapcyclelist);
+		}
+		else
+		{
+			MSG_WriteString(msg, "mapcycle failure");
+		}
+		// FIXED: Mem leak.
+		if (mapcyclelist)
+		{
+			COM_FreeFile(mapcyclelist);
+		}
 	}
 	else
 	{
-		MSG_WriteString(msg, "mapcycle failure");
-	}
-	// FIXED: Mem leak.
-	if (mapcyclelist)
-	{
-		COM_FreeFile(mapcyclelist);
+		MSG_WriteString(msg, "");
 	}
 #else // REHLDS_FIXES
+	int len = 0;
+	unsigned char *mapcyclelist = COM_LoadFileForMe(mapcyclefile.string, &len);
 	if (mapcyclelist && len)
 	{
 		MSG_WriteString(msg, (const char *)mapcyclelist);
@@ -1241,6 +1147,8 @@ void SV_SendServerinfo_internal(sizebuf_t *msg, client_t *client)
 		MSG_WriteString(msg, "mapcycle failure");
 	}
 #endif // REHLDS_FIXES
+
+	// isVAC2Secure
 	MSG_WriteByte(msg, 0);
 
 	MSG_WriteByte(msg, svc_sendextrainfo);
@@ -1389,7 +1297,7 @@ void SV_WriteClientdataToMessage(client_t *client, sizebuf_t *msg)
 #ifdef REHLDS_FIXES
 			// So, HL and CS games send absolute gametime in these vars, DMC and Ricochet games don't send absolute gametime
 			// TODO: idk about other games
-			// FIXME: there is a loss of precision, because gamedll has already written float gametime in them 
+			// FIXME: there is a loss of precision, because gamedll has already written float gametime in them
 			if (sv_rehlds_local_gametime.value != 0.0f)
 			{
 				auto convertGlobalGameTimeToLocal =
@@ -1398,9 +1306,9 @@ void SV_WriteClientdataToMessage(client_t *client, sizebuf_t *msg)
 					if (globalGameTime > 0.0f)
 						globalGameTime -= (float)g_GameClients[host_client - g_psvs.clients]->GetLocalGameTimeBase();
 				};
-				if (g_bIsCStrike || g_bIsCZero)
+				if (g_eGameType == GT_CStrike || g_eGameType == GT_CZero)
 					convertGlobalGameTimeToLocal(std::ref(tdata->m_fAimedDamage));
-				if (g_bIsHL1 || g_bIsCStrike || g_bIsCZero)
+				if (g_eGameType == GT_HL1 || g_eGameType == GT_CStrike || g_eGameType == GT_CZero)
 				{
 					convertGlobalGameTimeToLocal(std::ref(tdata->fuser2));
 					convertGlobalGameTimeToLocal(std::ref(tdata->fuser3));
@@ -1848,7 +1756,7 @@ int EXT_FUNC SV_CheckProtocol_internal(netadr_t *adr, int nProtocol)
 {
 	if (adr == NULL)
 	{
-		Sys_Error(__FUNCTION__ ":  Null address\n");
+		Sys_Error("%s:  Null address\n", __func__);
 	}
 
 	if (nProtocol == PROTOCOL_VERSION)
@@ -1901,7 +1809,7 @@ bool EXT_FUNC SV_CheckChallenge_api(const netadr_t &adr, int nChallengeValue) {
 int SV_CheckChallenge(netadr_t *adr, int nChallengeValue)
 {
 	if (!adr)
-		Sys_Error(__FUNCTION__ ":  Null address\n");
+		Sys_Error("%s:  Null address\n", __func__);
 
 	if (NET_IsLocalAddress(*adr))
 		return 1;
@@ -1992,7 +1900,7 @@ int EXT_FUNC SV_FinishCertificateCheck_internal(netadr_t *adr, int nAuthProtocol
 
 	const char *val = Info_ValueForKey(userinfo, "*hltv");
 
-	if (val[0] == 0 || Q_atoi(val) != 1)
+	if (val[0] == 0 || Q_atoi(val) != TYPE_PROXY)
 	{
 		SV_RejectConnection(adr, "Invalid CD Key.\n");
 		return 0;
@@ -2069,29 +1977,29 @@ int SV_CheckForDuplicateSteamID(client_t *client)
 
 int SV_CheckForDuplicateNames(char *userinfo, qboolean bIsReconnecting, int nExcludeSlot)
 {
-	const char *val;
-	int i;
-	client_t *client;
 	int dupc = 0;
-	char rawname[MAX_NAME];
-	char newname[MAX_NAME];
 	int changed = FALSE;
 
-	val = Info_ValueForKey(userinfo, "name");
+	const char *val = Info_ValueForKey(userinfo, "name");
+
+	char rawname[MAX_NAME];
 	Q_strncpy(rawname, val, MAX_NAME - 1);
 
 	while (true)
 	{
-		for (i = 0, client = g_psvs.clients; i < g_psvs.maxclients; i++, client++)
+		int clientId = 0;
+		client_t *client = &g_psvs.clients[0];
+		for (; clientId < g_psvs.maxclients; clientId++, client++)
 		{
-			if (client->connected && !(i == nExcludeSlot && bIsReconnecting) && !Q_stricmp(client->name, val))
+			if (client->connected && !(clientId == nExcludeSlot && bIsReconnecting) && !Q_stricmp(client->name, val))
 				break;
 		}
 
 		// no duplicates for current name
-		if (i == g_psvs.maxclients)
+		if (clientId == g_psvs.maxclients)
 			return changed;
 
+		char newname[MAX_NAME];
 		Q_snprintf(newname, sizeof(newname), "(%d)%-0.*s", ++dupc, 28, rawname);
 #ifdef REHLDS_FIXES
 		// Fix possibly incorrectly cut UTF8 chars
@@ -2104,8 +2012,6 @@ int SV_CheckForDuplicateNames(char *userinfo, qboolean bIsReconnecting, int nExc
 		val = Info_ValueForKey(userinfo, "name");
 		changed = TRUE;
 	}
-
-	return changed;
 }
 
 #ifdef REHLDS_FIXES
@@ -2215,7 +2121,11 @@ int SV_CheckUserInfo(netadr_t *adr, char *userinfo, qboolean bIsReconnecting, in
 	}
 #endif
 
+#ifdef REHLDS_FIXES
+	if (name[0] == 0 || !Q_stricmp(name, "console") || Q_strstr(name, "..") || Q_strstr(name, "\"") || Q_strstr(name, "\\"))
+#else // REHLDS_FIXES
 	if (name[0] == 0 || !Q_stricmp(name, "console") || Q_strstr(name, "..") != NULL)
+#endif // REHLDS_FIXES
 	{
 		Info_SetValueForKey(userinfo, "name", "unnamed", MAX_INFO_STRING);
 	}
@@ -2237,10 +2147,10 @@ int SV_CheckUserInfo(netadr_t *adr, char *userinfo, qboolean bIsReconnecting, in
 
 	switch (Q_atoi(s))
 	{
-	case 0:
+	case TYPE_CLIENT:
 		return 1;
 
-	case 1:
+	case TYPE_PROXY:
 		SV_CountProxies(&proxies);
 		if (proxies >= sv_proxies.value && !bIsReconnecting)
 		{
@@ -2249,7 +2159,7 @@ int SV_CheckUserInfo(netadr_t *adr, char *userinfo, qboolean bIsReconnecting, in
 		}
 		return 1;
 
-	case 3:
+	case TYPE_COMMENTATOR:
 		SV_RejectConnection(adr, "Please connect to HLTV master proxy.\n");
 		return 0;
 
@@ -2300,7 +2210,7 @@ void EXT_FUNC SV_ConnectClient_internal(void)
 	char userinfo[1024];
 #endif
 	char protinfo[1024];
-	char cdkey[64];
+	char cdkey[64] = {};
 	const char *s;
 	char name[32];
 	char szRawCertificate[512];
@@ -2453,7 +2363,7 @@ void EXT_FUNC SV_ConnectClient_internal(void)
 			SV_RejectConnection(&adr, "Invalid validation type\n");
 			return;
 		}
-		if (Q_atoi(val) != 1)
+		if (Q_atoi(val) != TYPE_PROXY)
 		{
 			SV_RejectConnection(&adr, "Invalid validation type\n");
 			return;
@@ -2491,9 +2401,16 @@ void EXT_FUNC SV_ConnectClient_internal(void)
 	{
 		Con_DPrintf("Client %s connected\nAdr: %s\n", name, NET_AdrToString(host_client->netchan.remote_address));
 	}
+#ifndef REHLDS_OPT_PEDANTIC
 	Q_strncpy(host_client->hashedcdkey, cdkey, 32);
+	host_client->hashedcdkey[32] = '\0';
+#else
+	MD5Context_t ctx;
+	MD5Init(&ctx);
+	MD5Update(&ctx, (unsigned char *)cdkey, sizeof(cdkey));
+	MD5Final((unsigned char *)host_client->hashedcdkey, &ctx);
+#endif
 
-	host_client->hashedcdkey[32] = 0;
 	host_client->active = FALSE;
 	host_client->spawned = FALSE;
 	host_client->connected = TRUE;
@@ -2582,6 +2499,11 @@ int EXT_FUNC SV_GetChallenge(const netadr_t& adr)
 
 void SVC_GetChallenge(void)
 {
+#ifdef REHLDS_FIXES
+	if (!g_psv.active)
+		return;
+#endif
+
 	char data[1024];
 	qboolean steam = (Cmd_Argc() == 2 && !Q_stricmp(Cmd_Argv(1), "steam"));
 	int challenge = SV_GetChallenge(net_from);
@@ -2646,19 +2568,19 @@ void SV_ResetModInfo(void)
 	nFileSize = FS_Size(hLibListFile);
 	if (!nFileSize || (signed int)nFileSize > 256 * 1024)
 	{
-		Sys_Error("Game listing file size is bogus [%s: size %i]", "liblist.gam", nFileSize);
+		Sys_Error("%s: Game listing file size is bogus [%s: size %i]", __func__, "liblist.gam", nFileSize);
 	}
 
 	pszInputStream = (char *)Mem_Malloc(nFileSize + 1);
 	if (!pszInputStream)
 	{
-		Sys_Error("Could not allocate space for game listing file of %i bytes", nFileSize + 1);
+		Sys_Error("%s: Could not allocate space for game listing file of %i bytes", __func__, nFileSize + 1);
 	}
 
 	nBytesRead = FS_Read(pszInputStream, nFileSize, 1, hLibListFile);
 	if (nBytesRead != nFileSize)
 	{
-		Sys_Error("Error reading in game listing file, expected %i bytes, read %i", nFileSize, nBytesRead);
+		Sys_Error("%s: Error reading in game listing file, expected %i bytes, read %i", __func__, nFileSize, nBytesRead);
 	}
 
 	pszInputStream[nFileSize] = 0;
@@ -2808,7 +2730,7 @@ NOXREF void ReplyServerChallenge(netadr_t *adr)
 	buf.flags = SIZEBUF_ALLOW_OVERFLOW;
 
 	MSG_WriteLong(&buf, 0xffffffff);
-	MSG_WriteByte(&buf, 65);
+	MSG_WriteByte(&buf, S2C_CHALLENGE);
 	MSG_WriteLong(&buf, GetChallengeNr(adr));
 	NET_SendPacket(NS_SERVER, buf.cursize, (char *)buf.data, *adr);
 }
@@ -2976,7 +2898,7 @@ NOXREF void SVC_Info(qboolean bDetailed)
 	}
 
 	MSG_WriteLong(&buf, 0xffffffff);
-	MSG_WriteByte(&buf, bDetailed ? 109 : 67);
+	MSG_WriteByte(&buf, bDetailed ? S2A_INFO_DETAILED : S2A_INFO);
 
 	if (noip)
 	{
@@ -3078,7 +3000,7 @@ NOXREF void SVC_PlayerInfo(void)
 	buf.flags = SIZEBUF_ALLOW_OVERFLOW;
 
 	MSG_WriteLong(&buf, 0xffffffff);
-	MSG_WriteByte(&buf, 68);
+	MSG_WriteByte(&buf, S2A_PLAYERS);
 
 	for (i = 0; i < g_psvs.maxclients; i++)
 	{
@@ -3130,7 +3052,7 @@ NOXREF void SVC_RuleInfo(void)
 		return;
 
 	MSG_WriteLong(&buf, 0xffffffff);
-	MSG_WriteByte(&buf, 69);
+	MSG_WriteByte(&buf, S2A_RULES);
 	MSG_WriteShort(&buf, nNumRules);
 
 	var = cvar_vars;
@@ -3192,7 +3114,7 @@ void SV_FlushRedirect(void)
 		buf.flags = SIZEBUF_ALLOW_OVERFLOW;
 
 		MSG_WriteLong(&buf, -1);
-		MSG_WriteByte(&buf, 0x6Cu);
+		MSG_WriteByte(&buf, A2A_PRINT);
 		MSG_WriteString(&buf, outputbuf);
 		MSG_WriteByte(&buf, 0);
 		NET_SendPacket(NS_SERVER, buf.cursize, buf.data, sv_redirectto);
@@ -3222,8 +3144,8 @@ void SV_BeginRedirect(redirect_t rd, netadr_t *addr)
 	outputbuf[0] = 0;
 }
 
-#define MAX_RCON_FAILURES_STORAGE 32
-#define MAX_RCON_FAILURES 20
+const int MAX_RCON_FAILURES_STORAGE = 32;
+const int MAX_RCON_FAILURES = 20;
 
 typedef struct rcon_failure_s
 {
@@ -3569,13 +3491,13 @@ void SV_ProcessFile(client_t *cl, char *filename)
 
 	if (!bFound)
 	{
-		Con_Printf("SV_ProcessFile:  Unrequested decal\n");
+		Con_Printf("%s:  Unrequested decal\n", __func__);
 		return;
 	}
 
 	if (resource->nDownloadSize != cl->netchan.tempbuffersize)
 	{
-		Con_Printf("SV_ProcessFile:  Downloaded %i bytes for purported %i byte file\n", cl->netchan.tempbuffersize, resource->nDownloadSize);
+		Con_Printf("%s:  Downloaded %i bytes for purported %i byte file\n", __func__, cl->netchan.tempbuffersize, resource->nDownloadSize);
 		return;
 	}
 
@@ -3654,15 +3576,12 @@ void SV_ReadPackets(void)
 		if (*(uint32 *)net_message.data == 0xFFFFFFFF)
 		{
 			// Connectionless packet
-			if (CheckIP(net_from))
+			if (SV_CheckConnectionLessRateLimits(net_from))
 			{
 				Steam_HandleIncomingPacket(net_message.data, net_message.cursize, ntohl(*(u_long *)&net_from.ip[0]), htons(net_from.port));
 				SV_ConnectionlessPacket();
 			}
-			else if (sv_logblocks.value != 0.0f)
-			{
-				Log_Printf("Traffic from %s was blocked for exceeding rate limits\n", NET_AdrToString(net_from));
-			}
+
 			continue;
 		}
 
@@ -3784,18 +3703,26 @@ int SV_CalcPing(client_t *cl)
 void EXT_FUNC SV_WriteFullClientUpdate_internal(IGameClient *client, char *info, size_t maxlen, sizebuf_t *sb, IGameClient *receiver)
 {
 	client_t* cl = client->GetClient();
-	MD5Context_t ctx;
+
+#ifndef REHLDS_OPT_PEDANTIC
 	unsigned char digest[16];
 
+	MD5Context_t ctx;
 	MD5Init(&ctx);
 	MD5Update(&ctx, (unsigned char*)cl->hashedcdkey, sizeof(cl->hashedcdkey));
 	MD5Final(digest, &ctx);
+#endif
 
 	MSG_WriteByte(sb, svc_updateuserinfo);
 	MSG_WriteByte(sb, cl - g_psvs.clients);
 	MSG_WriteLong(sb, cl->userid);
 	MSG_WriteString(sb, info);
+
+#ifndef REHLDS_OPT_PEDANTIC
 	MSG_WriteBuf(sb, sizeof(digest), digest);
+#else
+	MSG_WriteBuf(sb, 16, cl->hashedcdkey);
+#endif
 }
 
 void SV_SendFullClientUpdateForAll(client_t *client)
@@ -4313,7 +4240,11 @@ int SV_CreatePacketEntities_internal(sv_delta_t type, client_t *client, packet_e
 				newindex = 9999;
 		}
 
+#ifdef REHLDS_FIXES
+		if (oldnum < oldmax && from)
+#else
 		if (oldnum < oldmax)
+#endif
 			oldindex = from->entities[oldnum].number;
 		else
 			oldindex = 9999;
@@ -4399,8 +4330,8 @@ int SV_CreatePacketEntities_internal(sv_delta_t type, client_t *client, packet_e
 		);
 		baselineToIdx = -1;
 
-		uint64 origMask = DELTAJit_GetOriginalMask(delta);
-		uint64 usedMask = DELTAJit_GetMaskU64(delta);
+		uint64 origMask = DELTA_GetOriginalMask(delta);
+		uint64 usedMask = DELTA_GetMaskU64(delta);
 		uint64 diffMask = origMask ^ usedMask;
 
 		//Remember changed fields that was marked in original mask, but unmarked by the conditional encoder
@@ -4719,10 +4650,16 @@ qboolean SV_SendClientDatagram(client_t *client)
 
 void SV_UpdateUserInfo(client_t *client)
 {
+#ifndef REHLDS_FIXES
 	client->sendinfo = FALSE;
 	client->sendinfo_time = realtime + 1.0;
+#endif
 	SV_ExtractFromUserinfo(client);
 	SV_SendFullClientUpdateForAll(client);
+#ifdef REHLDS_FIXES
+	client->sendinfo = FALSE;
+	client->sendinfo_time = realtime + 1.0;
+#endif
 }
 
 void SV_UpdateToReliableMessages(void)
@@ -4969,7 +4906,7 @@ void SV_ExtractFromUserinfo(client_t *cl)
 
 	if (newname[0] == '\0' || !Q_stricmp(newname, "console")
 #ifdef REHLDS_FIXES
-		|| Q_strstr(newname, "..") != NULL)
+		|| Q_strstr(newname, "..") || Q_strstr(newname, "\"") || Q_strstr(newname, "\\"))
 #else // REHLDS_FIXES
 		)
 #endif // REHLDS_FIXES
@@ -5028,7 +4965,7 @@ void SV_ExtractFromUserinfo(client_t *cl)
 	cl->lc = val[0] != 0 ? Q_atoi(val) != 0 : 0;
 
 	val = Info_ValueForKey(userinfo, "*hltv");
-	cl->proxy = val[0] != 0 ? Q_atoi(val) == 1 : 0;
+	cl->proxy = val[0] != 0 ? Q_atoi(val) == TYPE_PROXY : 0;
 
 	SV_CheckUpdateRate(&cl->next_messageinterval);
 	SV_CheckRate(cl);
@@ -5055,7 +4992,7 @@ int SV_ModelIndex(const char *name)
 	};
 #endif
 
-	Sys_Error("SV_ModelIndex: model %s not precached", name);
+	Sys_Error("%s: SV_ModelIndex: model %s not precached", __func__, name);
 }
 
 void EXT_FUNC SV_AddResource(resourcetype_t type, const char *name, int size, unsigned char flags, int index)
@@ -5063,26 +5000,60 @@ void EXT_FUNC SV_AddResource(resourcetype_t type, const char *name, int size, un
 	resource_t *r;
 #ifdef REHLDS_FIXES
 	if (g_psv.num_resources >= ARRAYSIZE(g_rehlds_sv.resources))
-#else // REHLDS_FIXES
+#else
 	if (g_psv.num_resources >= MAX_RESOURCE_LIST)
-#endif // REHLDS_FIXES
+#endif
 	{
-		Sys_Error("Too many resources on server.");
+		Sys_Error("%s: Too many resources on server.", __func__);
 	}
 
 #ifdef REHLDS_FIXES
 	r = &g_rehlds_sv.resources[g_psv.num_resources++];
-
 	Q_memset(r, 0, sizeof(*r));
-#else // REHLDS_FIXES
+#else
 	r = &g_psv.resourcelist[g_psv.num_resources++];
 #endif
+
 	r->type = type;
-	Q_strncpy(r->szFileName, name, sizeof(r->szFileName) - 1);
-	r->szFileName[sizeof(r->szFileName) - 1] = 0;
 	r->ucFlags = flags;
 	r->nDownloadSize = size;
 	r->nIndex = index;
+
+	Q_strlcpy(r->szFileName, name);
+}
+
+size_t SV_CountResourceByType(resourcetype_t type, resource_t **pResourceList, size_t nListMax, size_t *nWidthFileNameMax)
+{
+	if (type < t_sound || type >= rt_max)
+		return 0;
+
+	if (pResourceList && nListMax <= 0)
+		return 0;
+
+	resource_t *r;
+#ifdef REHLDS_FIXES
+	r = &g_rehlds_sv.resources[0];
+#else
+	r = &g_psv.resourcelist[0];
+#endif
+
+	size_t nCount = 0;
+	for (int i = 0; i < g_psv.num_resources; i++, r++)
+	{
+		if (r->type != type)
+			continue;
+
+		if (pResourceList)
+			pResourceList[nCount] = r;
+
+		if (nWidthFileNameMax)
+			*nWidthFileNameMax = Q_max(*nWidthFileNameMax, Q_strlen(r->szFileName));
+
+		if (++nCount >= nListMax && nListMax > 0)
+			break;
+	}
+
+	return nCount;
 }
 
 #ifdef REHLDS_FIXES
@@ -5232,7 +5203,7 @@ void SV_CreateGenericResources(void)
 				Con_Printf("Can't precache .dll files:  %s\n", com_token);
 			else
 				successful = true;
-				
+
 		}
 		else
 			successful = true;
@@ -5426,38 +5397,6 @@ void EXT_FUNC SV_WriteVoiceCodec_internal(sizebuf_t *pBuf)
 	MSG_WriteByte(pBuf, 0);
 }
 
-/*
- * Interface between engine and gamedll has a flaw which can lead to inconsistent behavior when passing arguments of type vec3_t to gamedll
- * Consider function func(vec3_t v) defined in gamedll. vec3_t defined in gamedll as a class (not array), therefore it's expected that all vector components (12 bytes) will be written in the stack,
- * i.e. the function signature may be represented as func(float v_0, float v_1, float v_2).
- * In the engine, on the other hand, vec3_t is an array of vec_t (vec_t[3]). C/C++ compiler treats arguments of array type as pointers to array's first element, thus, on attempt to
- * invoke gamedll's func(vec3_t v) from engine, only pointer to first vector's element will be passed in stack, while gamedll expects all 3 vector elements.
- * This inconsistency in the interface between gamedll and engine leads to exposure of some data from stack of caller function to vector's elements in gamedll, which, in turn,
- * leads to inconsistent behavior (since stack data may contain pointers) across different systems
- *
- * This functions emulates swds.dll behavior, i.e. it sends the same garbage when invoking CreateBaseline as swds.dll does.
- * This is required since not emulating this behavior will break rehlds test demos
- */
-void __invokeValvesBuggedCreateBaseline(void* func, int player, int eindex, struct entity_state_s *baseline, struct edict_s *entity, int playermodelindex, vec_t* pmins, vec_t* pmaxs)
-{
-	__asm {
-		mov ecx, func
-		push 0
-		push 1
-		push 0
-		push 0
-		push pmaxs
-		push pmins
-		push playermodelindex
-		push entity
-		push baseline
-		push eindex
-		push player
-		call ecx
-		add esp, 0x2C
-	}
-}
-
 void SV_CreateBaseline(void)
 {
 	edict_t *svent;
@@ -5487,7 +5426,37 @@ void SV_CreateBaseline(void)
 				else
 					g_psv.baselines[entnum].entityType = ENTITY_NORMAL;
 
-				__invokeValvesBuggedCreateBaseline((void *)gEntityInterface.pfnCreateBaseline, player, entnum, &(g_psv.baselines[entnum]), svent, sv_playermodel, player_mins[0], player_maxs[0]);
+				/*
+				* Interface between engine and gamedll has a flaw which can lead to inconsistent behavior when passing arguments of type vec3_t to gamedll
+				* Consider function func(vec3_t v) defined in gamedll. vec3_t defined in gamedll as a class (not array), therefore it's expected that all vector components (12 bytes) will be written in the stack,
+				* i.e. the function signature may be represented as func(float v_0, float v_1, float v_2).
+				* In the engine, on the other hand, vec3_t is an array of vec_t (vec_t[3]). C/C++ compiler treats arguments of array type as pointers to array's first element, thus, on attempt to
+				* invoke gamedll's func(vec3_t v) from engine, only pointer to first vector's element will be passed in stack, while gamedll expects all 3 vector elements.
+				* This inconsistency in the interface between gamedll and engine leads to exposure of some data from stack of caller function to vector's elements in gamedll, which, in turn,
+				* leads to inconsistent behavior (since stack data may contain pointers) across different systems.
+				*/
+				/*
+				* This is true in theory, but in reality things might differs. In Valve's Linux all builds hl.so (and cs.so) expects pointers instead of array elements.
+				* This looks like a flaw in the compilers or some option, because code specifies to pass a class object which should be passed by a value in that case.
+				* And this is correctly happen in MSVC, ICC and modern GCC.
+				* Also, there often will be a metamod in between that is designed to get and pass pointers.
+				* So, we have no choice but to pass data but reference so functions that expects references don't crash on dereference
+				* and append some fake data for the cases when called function will be the one that expects pass by value.
+				*/
+				/*
+				* If you are the mod author, you can correctly receive the data by changing CreateBaseline signature:
+				* vec3_t player_mins, vec3_t player_maxs
+				* into
+				* vec3_t& player_mins, vec3_t& player_maxs
+				* so after macro expantion it will be the class passed by reference.
+				*/
+				/*
+				* This function call emulates swds.dll behavior, i.e. it sends the same garbage when invoking CreateBaseline as swds.dll does.
+				* This is required since not emulating this behavior will break rehlds test demos.
+				*/
+				typedef void CreateBaseline_t(int player_, int eindex_, struct entity_state_s *baseline_, struct edict_s *entity_, int playermodelindex_, vec3_t player_mins_, vec3_t player_maxs_, int dummy1, int dummy2, int dummy3, int dummy4);
+				((CreateBaseline_t*)gEntityInterface.pfnCreateBaseline)(player, entnum, &(g_psv.baselines[entnum]), svent, sv_playermodel, player_mins[0], player_maxs[0], 0, 0, 1, 0);
+
 				sv_lastnum = entnum;
 			}
 		}
@@ -5547,7 +5516,7 @@ void SV_BroadcastCommand(char *fmt, ...)
 	MSG_WriteByte(&msg, svc_stufftext);
 	MSG_WriteString(&msg, string);
 	if (msg.flags & SIZEBUF_OVERFLOWED)
-		Sys_Error("SV_BroadcastCommand:  Overflowed on %s, %i is max size\n", string, msg.maxsize);
+		Sys_Error("%s: Overflowed on %s, %i is max size\n", __func__, string, msg.maxsize);
 
 	for (int i = 0; i < g_psvs.maxclients; ++i)
 	{
@@ -5593,64 +5562,32 @@ NOXREF void SV_ReconnectAllClients(void)
 
 void SetCStrikeFlags(void)
 {
-#ifdef REHLDS_FIXES
-	if(g_eGameType==GT_Unitialized)
-#else
-	if (!g_bCS_CZ_Flags_Initialized)	// DONE: Convert these to enum
-#endif
+	if (g_eGameType == GT_Unitialized)
 	{
 		if (!Q_stricmp(com_gamedir, "valve"))
 		{
-#ifdef REHLDS_FIXES
 			g_eGameType = GT_HL1;
-#else
-			g_bIsHL1 = 1;
-#endif
 		}
 		else if (!Q_stricmp(com_gamedir, "cstrike") || !Q_stricmp(com_gamedir, "cstrike_beta"))
 		{
-#ifdef REHLDS_FIXES
 			g_eGameType = GT_CStrike;
-#else
-			g_bIsCStrike = 1;
-#endif
 		}
 		else if (!Q_stricmp(com_gamedir, "czero"))
 		{
-#ifdef REHLDS_FIXES
 			g_eGameType = GT_CZero;
-#else
-			g_bIsCZero = 1;
-#endif			
 		}
 		else if (!Q_stricmp(com_gamedir, "czeror"))
 		{
-#ifdef REHLDS_FIXES
 			g_eGameType = GT_CZeroRitual;
-#else
-			g_bIsCZeroRitual = 1;
-#endif		
 		}
 		else if (!Q_stricmp(com_gamedir, "terror"))
 		{
-#ifdef REHLDS_FIXES
 			g_eGameType = GT_TerrorStrike;
-#else
-			g_bIsTerrorStrike = 1;
-#endif		
 		}
 		else if (!Q_stricmp(com_gamedir, "tfc"))
 		{
-#ifdef REHLDS_FIXES
 			g_eGameType = GT_TFC;
-#else
-			g_bIsTFC = 1;
-#endif	
 		}
-
-#ifndef REHLDS_FIXES
-		g_bCS_CZ_Flags_Initialized = 1;
-#endif
 	}
 }
 
@@ -6472,7 +6409,7 @@ void SV_BanId_f(void)
 		}
 		if (id == NULL)
 		{
-			Con_Printf(__FUNCTION__ ":  Couldn't find #userid %u\n", search);
+			Con_Printf("%s:  Couldn't find #userid %u\n", __func__, search);
 			return;
 		}
 	}
@@ -6501,7 +6438,7 @@ void SV_BanId_f(void)
 
 		if (id == NULL)
 		{
-			Con_Printf(__FUNCTION__ ":  Couldn't resolve uniqueid %s.\n", idstring);
+			Con_Printf("%s:  Couldn't resolve uniqueid %s.\n", __func__, idstring);
 			Con_Printf("Usage:  banid <minutes> <uniqueid or #userid> { kick }\n");
 			Con_Printf("Use 0 minutes for permanent\n");
 			return;
@@ -6519,7 +6456,7 @@ void SV_BanId_f(void)
 	{
 		if (numuserfilters >= MAX_USERFILTERS)
 		{
-			Con_Printf(__FUNCTION__ ":  User filter list is full\n");
+			Con_Printf("%s:  User filter list is full\n", __func__);
 			return;
 		}
 		numuserfilters++;
@@ -6632,7 +6569,11 @@ void Host_Kick_f(void)
 
 	if (Cmd_Argc() <= 1)
 	{
+#ifdef REHLDS_FIXES
+		Con_Printf("usage:  kick < name > | < # userid > [reason]\n");
+#else
 		Con_Printf("usage:  kick < name > | < # userid >\n");
+#endif
 		return;
 	}
 
@@ -6806,7 +6747,7 @@ void SV_RemoveId_f(void)
 
 	if (!idstring[0])
 	{
-		Con_Printf(__FUNCTION__ ":  Id string is empty!\n");
+		Con_Printf("%s:  Id string is empty!\n", __func__);
 		return;
 	}
 
@@ -6815,7 +6756,7 @@ void SV_RemoveId_f(void)
 		int slot = Q_atoi(&idstring[1]);
 		if (slot <= 0 || slot > numuserfilters)
 		{
-			Con_Printf(__FUNCTION__ ":  invalid slot #%i\n", slot);
+			Con_Printf("%s:  invalid slot #%i\n", __func__, slot);
 			return;
 		}
 		slot--;
@@ -7316,7 +7257,10 @@ qboolean IsSafeFileToDownload(const char *filename)
 
 	first = Q_strchr(lwrfilename, '.');
 #ifdef REHLDS_FIXES
-	last = Q_strrchr(first, '.');
+	if(first)
+		last = Q_strrchr(first, '.');
+	else
+		last = nullptr;
 #else
 	last = Q_strrchr(lwrfilename, '.');
 #endif
@@ -7324,9 +7268,11 @@ qboolean IsSafeFileToDownload(const char *filename)
 	if (lwrfilename[0] == '/'
 		|| Q_strstr(lwrfilename, "\\")
 		|| Q_strstr(lwrfilename, ":")
+#ifndef REHLDS_FIXES // Redundant check
 		|| Q_strstr(lwrfilename, "..")
+#endif
 		|| Q_strstr(lwrfilename, "~")
-		|| first != last
+		|| first != last // This and below line make sure that dot count is always equal to one
 		|| !first
 		|| Q_strlen(first) != 4
 		|| Q_strstr(lwrfilename, "halflife.wad")
@@ -7342,8 +7288,8 @@ qboolean IsSafeFileToDownload(const char *filename)
 		|| Q_strcmp(first, ".dll") == 0
 		|| Q_strcmp(first, ".ini") == 0
 		|| Q_strcmp(first, ".log") == 0
-//		|| Q_strcmp(lwrfilename, ".so") == 0 // Extension length must be 4 to get here
-//		|| Q_strcmp(lwrfilename, ".dylib") == 0
+//		|| Q_strcmp(first, ".so") == 0 // We can't get here, because of extension length check
+//		|| Q_strcmp(first, ".dylib") == 0
 		|| Q_strcmp(first, ".sys") == 0)
 #else
 		|| Q_strstr(lwrfilename, ".cfg")
@@ -7659,7 +7605,7 @@ void SV_RegisterDelta(char *name, char *loadfile)
 {
 	delta_t *pdesc = NULL;
 	if (!DELTA_Load(name, &pdesc, loadfile))
-		Sys_Error("Error parsing %s!!!\n", loadfile);
+		Sys_Error("%s: Error parsing %s!!!\n", __func__, loadfile);
 
 	delta_info_t *p = (delta_info_t *)Mem_ZeroMalloc(sizeof(delta_info_t));
 	p->loadfile = Mem_Strdup(loadfile);
@@ -7668,7 +7614,7 @@ void SV_RegisterDelta(char *name, char *loadfile)
 	p->next = g_sv_delta;
 	g_sv_delta = p;
 
-#if defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)
+#if (defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)) && defined REHLDS_JIT
 	g_DeltaJitRegistry.CreateAndRegisterDeltaJIT(pdesc);
 #endif
 }
@@ -7686,35 +7632,35 @@ void SV_InitDeltas(void)
 
 	g_pplayerdelta = SV_LookupDelta("entity_state_player_t");
 	if (!g_pplayerdelta)
-		Sys_Error("No entity_state_player_t encoder on server!\n");
+		Sys_Error("%s: No entity_state_player_t encoder on server!\n", __func__);
 
 	g_pentitydelta = SV_LookupDelta("entity_state_t");
 	if (!g_pentitydelta)
-		Sys_Error("No entity_state_t encoder on server!\n");
+		Sys_Error("%s: No entity_state_t encoder on server!\n", __func__);
 
 	g_pcustomentitydelta = SV_LookupDelta("custom_entity_state_t");
 	if (!g_pcustomentitydelta)
-		Sys_Error("No custom_entity_state_t encoder on server!\n");
+		Sys_Error("%s: No custom_entity_state_t encoder on server!\n", __func__);
 
 	g_pclientdelta = SV_LookupDelta("clientdata_t");
 	if (!g_pclientdelta)
-		Sys_Error("No clientdata_t encoder on server!\n");
+		Sys_Error("%s: No clientdata_t encoder on server!\n", __func__);
 
 	g_pweapondelta = SV_LookupDelta("weapon_data_t");
 	if (!g_pweapondelta)
-		Sys_Error("No weapon_data_t encoder on server!\n");
+		Sys_Error("%s: No weapon_data_t encoder on server!\n", __func__);
 
 	g_peventdelta = SV_LookupDelta("event_t");
 	if (!g_peventdelta)
-		Sys_Error("No event_t encoder on server!\n");
+		Sys_Error("%s: No event_t encoder on server!\n", __func__);
 
 #ifdef REHLDS_OPT_PEDANTIC
 	g_pusercmddelta = SV_LookupDelta("usercmd_t");
 	if (!g_pusercmddelta)
-		Sys_Error("No usercmd_t encoder on server!\n");
+		Sys_Error("%s: No usercmd_t encoder on server!\n", __func__);
 #endif
 
-#if defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)
+#if (defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)) && defined REHLDS_JIT
 	g_DeltaJitRegistry.CreateAndRegisterDeltaJIT(&g_MetaDelta[0]);
 #endif
 }
@@ -7733,36 +7679,6 @@ void SV_InitEncoders(void)
 
 void SV_Init(void)
 {
-#ifdef HOOK_ENGINE
-
-	Cmd_AddCommand("banid", (xcommand_t)GetOriginalFuncAddrOrDefault("SV_BanId_f", (void *)SV_BanId_f));
-	Cmd_AddCommand("removeid", (xcommand_t)GetOriginalFuncAddrOrDefault("SV_RemoveId_f", (void *)SV_RemoveId_f));
-	Cmd_AddCommand("listid", (xcommand_t)GetOriginalFuncAddrOrDefault("SV_ListId_f", (void *)SV_ListId_f));
-	Cmd_AddCommand("writeid", (xcommand_t)GetOriginalFuncAddrOrDefault("SV_WriteId_f", (void *)SV_WriteId_f));
-	Cmd_AddCommand("resetrcon", (xcommand_t)GetOriginalFuncAddrOrDefault("SV_ResetRcon_f", (void *)SV_ResetRcon_f));
-	Cmd_AddCommand("logaddress", (xcommand_t)GetOriginalFuncAddrOrDefault("SV_SetLogAddress_f", (void *)SV_SetLogAddress_f));
-	Cmd_AddCommand("logaddress_add", (xcommand_t)GetOriginalFuncAddrOrDefault("SV_AddLogAddress_f", (void *)SV_AddLogAddress_f));
-	Cmd_AddCommand("logaddress_del", (xcommand_t)GetOriginalFuncAddrOrDefault("SV_DelLogAddress_f", (void *)SV_DelLogAddress_f));
-	Cmd_AddCommand("log", (xcommand_t)GetOriginalFuncAddrOrDefault("SV_ServerLog_f", (void *)SV_ServerLog_f));
-	Cmd_AddCommand("serverinfo", (xcommand_t)GetOriginalFuncAddrOrDefault("SV_Serverinfo_f", (void *)SV_Serverinfo_f));
-	Cmd_AddCommand("localinfo", (xcommand_t)GetOriginalFuncAddrOrDefault("SV_Localinfo_f", (void *)SV_Localinfo_f));
-	Cmd_AddCommand("showinfo", (xcommand_t)GetOriginalFuncAddrOrDefault("SV_ShowServerinfo_f", (void *)SV_ShowServerinfo_f));
-	Cmd_AddCommand("user", (xcommand_t)GetOriginalFuncAddrOrDefault("SV_User_f", (void *)SV_User_f));
-	Cmd_AddCommand("users", (xcommand_t)GetOriginalFuncAddrOrDefault("SV_Users_f", (void *)SV_Users_f));
-	Cmd_AddCommand("dlfile", (xcommand_t)GetOriginalFuncAddrOrDefault("SV_BeginFileDownload_f", (void *)SV_BeginFileDownload_f));
-	Cmd_AddCommand("addip", (xcommand_t)GetOriginalFuncAddrOrDefault("SV_AddIP_f", (void *)SV_AddIP_f));
-	Cmd_AddCommand("removeip", (xcommand_t)GetOriginalFuncAddrOrDefault("SV_RemoveIP_f", (void *)SV_RemoveIP_f));
-	Cmd_AddCommand("listip", (xcommand_t)GetOriginalFuncAddrOrDefault("SV_ListIP_f", (void *)SV_ListIP_f));
-	Cmd_AddCommand("writeip", (xcommand_t)GetOriginalFuncAddrOrDefault("SV_WriteIP_f", (void *)SV_WriteIP_f));
-	Cmd_AddCommand("dropclient", (xcommand_t)GetOriginalFuncAddrOrDefault("SV_Drop_f", (void *)SV_Drop_f));
-	Cmd_AddCommand("spawn", (xcommand_t)GetOriginalFuncAddrOrDefault("SV_Spawn_f", (void *)SV_Spawn_f));
-	Cmd_AddCommand("new", (xcommand_t)GetOriginalFuncAddrOrDefault("SV_New_f", (void *)SV_New_f));
-	Cmd_AddCommand("sendres", (xcommand_t)GetOriginalFuncAddrOrDefault("SV_SendRes_f", (void *)SV_SendRes_f));
-	Cmd_AddCommand("sendents", (xcommand_t)GetOriginalFuncAddrOrDefault("SV_SendEnts_f", (void *)SV_SendEnts_f));
-	Cmd_AddCommand("fullupdate", (xcommand_t)GetOriginalFuncAddrOrDefault("SV_FullUpdate_f", (void *)SV_FullUpdate_f));
-
-#else // HOOK_ENGINE
-
 	Cmd_AddCommand("banid", SV_BanId_f);
 	Cmd_AddCommand("removeid", SV_RemoveId_f);
 	Cmd_AddCommand("listid", SV_ListId_f);
@@ -7788,8 +7704,6 @@ void SV_Init(void)
 	Cmd_AddCommand("sendres", SV_SendRes_f);
 	Cmd_AddCommand("sendents", SV_SendEnts_f);
 	Cmd_AddCommand("fullupdate", SV_FullUpdate_f);
-
-#endif // HOOK_ENGINE
 
 	Cvar_RegisterVariable(&sv_failuretime);
 	Cvar_RegisterVariable(&sv_voiceenable);
@@ -7889,6 +7803,10 @@ void SV_Init(void)
 	Cvar_RegisterVariable(&sv_rehlds_userinfo_transmitted_fields);
 	Cvar_RegisterVariable(&sv_rehlds_attachedentities_playeranimationspeed_fix);
 	Cvar_RegisterVariable(&sv_rehlds_local_gametime);
+	Cvar_RegisterVariable(&sv_rehlds_send_mapcycle);
+	
+	Cvar_RegisterVariable(&sv_rollspeed);
+	Cvar_RegisterVariable(&sv_rollangle);
 #endif
 
 	for (int i = 0; i < MAX_MODELS; i++)
@@ -7916,7 +7834,9 @@ void SV_Init(void)
 
 void SV_Shutdown(void)
 {
+#if (defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)) && defined REHLDS_JIT
 	g_DeltaJitRegistry.Cleanup();
+#endif
 	delta_info_t *p = g_sv_delta;
 	while (p)
 	{

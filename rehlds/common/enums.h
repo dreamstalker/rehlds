@@ -16,12 +16,13 @@
 #ifndef ENUMS_H
 #define ENUMS_H
 
+// Used as array indexer
 typedef enum netsrc_s
 {
-	NS_CLIENT,
+	NS_CLIENT = 0,
 	NS_SERVER,
-	NS_MULTICAST	// xxxMO
+	NS_MULTICAST,	// xxxMO
+	NS_MAX
 } netsrc_t;
 
 #endif
-

@@ -19,8 +19,8 @@ CSteamCallbackRecordingWrapper::CSteamCallbackRecordingWrapper(CRecordingEngExtI
 
 void CSteamCallbackRecordingWrapper::Run(void *pvParam)
 {
-	if (m_Wrapped->GetICallback() != this->GetICallback()) rehlds_syserror("%s: iCallback desync", __FUNCTION__);
-	if (m_Wrapped->GetFlags() != this->GetFlags()) rehlds_syserror("%s: flags desync", __FUNCTION__);
+	if (m_Wrapped->GetICallback() != this->GetICallback()) rehlds_syserror("%s: iCallback desync", __func__);
+	if (m_Wrapped->GetFlags() != this->GetFlags()) rehlds_syserror("%s: flags desync", __func__);
 
 	CSteamCallbackCall1 fcall(m_Id, pvParam, m_Size, m_Wrapped); CRecorderFuncCall frec(&fcall);
 	m_Recorder->PushFunc(&frec);
@@ -33,8 +33,8 @@ void CSteamCallbackRecordingWrapper::Run(void *pvParam)
 
 void CSteamCallbackRecordingWrapper::Run(void *pvParam, bool bIOFailure, SteamAPICall_t hSteamAPICall)
 {
-	if (m_Wrapped->GetICallback() != this->GetICallback()) rehlds_syserror("%s: iCallback desync", __FUNCTION__);
-	if (m_Wrapped->GetFlags() != this->GetFlags()) rehlds_syserror("%s: flags desync", __FUNCTION__);
+	if (m_Wrapped->GetICallback() != this->GetICallback()) rehlds_syserror("%s: iCallback desync", __func__);
+	if (m_Wrapped->GetFlags() != this->GetFlags()) rehlds_syserror("%s: flags desync", __func__);
 
 	CSteamCallbackCall2 fcall(m_Id, pvParam, m_Size, bIOFailure, hSteamAPICall, m_Wrapped); CRecorderFuncCall frec(&fcall);
 	m_Recorder->PushFunc(&frec);
@@ -61,25 +61,25 @@ CSteamAppsRecordingWrapper::CSteamAppsRecordingWrapper(ISteamApps* original, CRe
 
 bool CSteamAppsRecordingWrapper::BIsSubscribed()
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 	return false;
 }
 
 bool CSteamAppsRecordingWrapper::BIsLowViolence()
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 	return false;
 }
 
 bool CSteamAppsRecordingWrapper::BIsCybercafe()
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 	return false;
 }
 
 bool CSteamAppsRecordingWrapper::BIsVACBanned()
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 	return false;
 }
 
@@ -95,82 +95,82 @@ const char* CSteamAppsRecordingWrapper::GetCurrentGameLanguage()
 
 const char* CSteamAppsRecordingWrapper::GetAvailableGameLanguages()
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 	return NULL;
 }
 
 bool CSteamAppsRecordingWrapper::BIsSubscribedApp(AppId_t appID)
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 	return false;
 }
 
 bool CSteamAppsRecordingWrapper::BIsDlcInstalled(AppId_t appID)
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 	return false;
 }
 
 uint32 CSteamAppsRecordingWrapper::GetEarliestPurchaseUnixTime(AppId_t nAppID)
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 	return 0;
 }
 
 bool CSteamAppsRecordingWrapper::BIsSubscribedFromFreeWeekend()
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 	return false;
 }
 
 int CSteamAppsRecordingWrapper::GetDLCCount()
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 	return 0;
 }
 
 bool CSteamAppsRecordingWrapper::BGetDLCDataByIndex(int iDLC, AppId_t *pAppID, bool *pbAvailable, char *pchName, int cchNameBufferSize)
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 	return false;
 }
 
 void CSteamAppsRecordingWrapper::InstallDLC(AppId_t nAppID)
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 }
 
 void CSteamAppsRecordingWrapper::UninstallDLC(AppId_t nAppID)
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 }
 
 void CSteamAppsRecordingWrapper::RequestAppProofOfPurchaseKey(AppId_t nAppID)
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 }
 
 bool CSteamAppsRecordingWrapper::GetCurrentBetaName(char *pchName, int cchNameBufferSize)
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 	return false;
 }
 
 bool CSteamAppsRecordingWrapper::MarkContentCorrupt(bool bMissingFilesOnly)
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 	return false;
 }
 
 uint32 CSteamAppsRecordingWrapper::GetInstalledDepots(DepotId_t *pvecDepots, uint32 cMaxDepots)
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 	return 0;
 }
 
 uint32 CSteamAppsRecordingWrapper::GetAppInstallDir(AppId_t appID, char *pchFolder, uint32 cchFolderBufferSize)
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 	return 0;
 }
 
@@ -183,7 +183,7 @@ CSteamGameServerRecordingWrapper::CSteamGameServerRecordingWrapper(ISteamGameSer
 
 bool CSteamGameServerRecordingWrapper::InitGameServer(uint32 unIP, uint16 usGamePort, uint16 usQueryPort, uint32 unFlags, AppId_t nGameAppId, const char *pchVersionString)
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 	return false;
 }
 
@@ -221,7 +221,7 @@ void CSteamGameServerRecordingWrapper::SetDedicatedServer(bool bDedicated)
 
 void CSteamGameServerRecordingWrapper::LogOn(const char *pszAccountName, const char *pszPassword)
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 }
 
 void CSteamGameServerRecordingWrapper::LogOnAnonymous()
@@ -322,12 +322,12 @@ void CSteamGameServerRecordingWrapper::SetPasswordProtected(bool bPasswordProtec
 
 void CSteamGameServerRecordingWrapper::SetSpectatorPort(uint16 unSpectatorPort)
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 }
 
 void CSteamGameServerRecordingWrapper::SetSpectatorServerName(const char *pszSpectatorServerName)
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 }
 
 void CSteamGameServerRecordingWrapper::ClearAllKeyValues()
@@ -348,17 +348,17 @@ void CSteamGameServerRecordingWrapper::SetKeyValue(const char *pKey, const char 
 
 void CSteamGameServerRecordingWrapper::SetGameTags(const char *pchGameTags)
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 }
 
 void CSteamGameServerRecordingWrapper::SetGameData(const char *pchGameData)
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 }
 
 void CSteamGameServerRecordingWrapper::SetRegion(const char *pszRegion)
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 }
 
 bool CSteamGameServerRecordingWrapper::SendUserConnectAndAuthenticate(uint32 unIPClient, const void *pvAuthBlob, uint32 cubAuthBlobSize, CSteamID *pSteamIDUser)
@@ -401,52 +401,52 @@ bool CSteamGameServerRecordingWrapper::BUpdateUserData(CSteamID steamIDUser, con
 
 HAuthTicket CSteamGameServerRecordingWrapper::GetAuthSessionTicket(void *pTicket, int cbMaxTicket, uint32 *pcbTicket)
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 	return k_HAuthTicketInvalid;
 }
 
 EBeginAuthSessionResult CSteamGameServerRecordingWrapper::BeginAuthSession(const void *pAuthTicket, int cbAuthTicket, CSteamID steamID)
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 	return k_EBeginAuthSessionResultInvalidTicket;
 }
 
 void CSteamGameServerRecordingWrapper::EndAuthSession(CSteamID steamID)
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 }
 
 void CSteamGameServerRecordingWrapper::CancelAuthTicket(HAuthTicket hAuthTicket)
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 }
 
 EUserHasLicenseForAppResult CSteamGameServerRecordingWrapper::UserHasLicenseForApp(CSteamID steamID, AppId_t appID)
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 	return k_EUserHasLicenseResultDoesNotHaveLicense;
 }
 
 bool CSteamGameServerRecordingWrapper::RequestUserGroupStatus(CSteamID steamIDUser, CSteamID steamIDGroup)
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 	return false;
 }
 
 void CSteamGameServerRecordingWrapper::GetGameplayStats()
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 }
 
 SteamAPICall_t CSteamGameServerRecordingWrapper::GetServerReputation()
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 	return k_uAPICallInvalid;
 }
 
 uint32 CSteamGameServerRecordingWrapper::GetPublicIP()
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 	return 0;
 }
 
@@ -488,18 +488,18 @@ void CSteamGameServerRecordingWrapper::SetHeartbeatInterval(int iHeartbeatInterv
 
 void CSteamGameServerRecordingWrapper::ForceHeartbeat()
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 }
 
 SteamAPICall_t CSteamGameServerRecordingWrapper::AssociateWithClan(CSteamID steamIDClan)
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 	return k_uAPICallInvalid;
 }
 
 SteamAPICall_t CSteamGameServerRecordingWrapper::ComputeNewPlayerCompatibility(CSteamID steamIDNewPlayer)
 {
-	rehlds_syserror("%s: not implemented", __FUNCTION__);
+	rehlds_syserror("%s: not implemented", __func__);
 	return k_uAPICallInvalid;
 }
 
@@ -574,7 +574,7 @@ void CRecordingEngExtInterceptor::PushFunc(CRecorderFuncCall* func)
 void CRecordingEngExtInterceptor::PopFunc(CRecorderFuncCall* func)
 {
 	if (func != m_LastFunc)
-		rehlds_syserror("%s: stack corrupted", __FUNCTION__);
+		rehlds_syserror("%s: stack corrupted", __func__);
 
 	writeCall(!func->m_StartWritten, true, func->m_FuncCall);
 	if (m_LastFunc->m_Prev == NULL) {
@@ -842,8 +842,8 @@ void CRecordingEngExtInterceptor::SteamAPI_RegisterCallback(CCallbackBase *pCall
 {
 	CSteamCallbackRecordingWrapper* wrappee = getOrCreateCallbackWrapper(pCallback);
 
-	if (wrappee->GetFlags() != pCallback->GetFlags()) rehlds_syserror("%s: flags desync", __FUNCTION__);
-	//if (wrappee->GetICallback() != pCallback->GetICallback()) rehlds_syserror("%s: flags desync", __FUNCTION__);
+	if (wrappee->GetFlags() != pCallback->GetFlags()) rehlds_syserror("%s: flags desync", __func__);
+	//if (wrappee->GetICallback() != pCallback->GetICallback()) rehlds_syserror("%s: flags desync", __func__);
 
 	CSteamApiRegisterCallbackCall fcall(wrappee->getRehldsCallbackId(), iCallback, wrappee); CRecorderFuncCall frec(&fcall);
 	PushFunc(&frec);
@@ -870,8 +870,8 @@ void CRecordingEngExtInterceptor::SteamAPI_UnregisterCallResult(class CCallbackB
 {
 	CSteamCallbackRecordingWrapper* wrappee = getOrCreateCallbackWrapper(pCallback);
 
-	if (wrappee->GetFlags() != pCallback->GetFlags()) rehlds_syserror("%s: flags desync", __FUNCTION__);
-	if (wrappee->GetICallback() != pCallback->GetICallback()) rehlds_syserror("%s: flags desync", __FUNCTION__);
+	if (wrappee->GetFlags() != pCallback->GetFlags()) rehlds_syserror("%s: flags desync", __func__);
+	if (wrappee->GetICallback() != pCallback->GetICallback()) rehlds_syserror("%s: flags desync", __func__);
 
 	CSteamApiUnrigestierCallResultCall fcall(wrappee->getRehldsCallbackId(), hAPICall, wrappee); CRecorderFuncCall frec(&fcall);
 	
@@ -981,8 +981,8 @@ void CRecordingEngExtInterceptor::SteamAPI_UnregisterCallback(CCallbackBase *pCa
 {
 	CSteamCallbackRecordingWrapper* wrappee = getOrCreateCallbackWrapper(pCallback);
 
-	if (wrappee->GetFlags() != pCallback->GetFlags()) rehlds_syserror("%s: flags desync", __FUNCTION__);
-	if (wrappee->GetICallback() != pCallback->GetICallback()) rehlds_syserror("%s: flags desync", __FUNCTION__);
+	if (wrappee->GetFlags() != pCallback->GetFlags()) rehlds_syserror("%s: flags desync", __func__);
+	if (wrappee->GetICallback() != pCallback->GetICallback()) rehlds_syserror("%s: flags desync", __func__);
 
 	CSteamApiUnregisterCallbackCall fcall(wrappee->getRehldsCallbackId(), wrappee); CRecorderFuncCall frec(&fcall);
 	PushFunc(&frec);

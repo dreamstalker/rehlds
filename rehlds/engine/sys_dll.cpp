@@ -59,7 +59,7 @@ int giStateInfo;
 DLL_FUNCTIONS gEntityInterface;
 NEW_DLL_FUNCTIONS gNewDLLFunctions;
 
-extensiondll_t g_rgextdll[50];
+extensiondll_t g_rgextdll[MAX_EXTENSION_DLL];
 
 int g_iextdllMac;
 modinfo_t gmodinfo;
@@ -92,11 +92,6 @@ double g_StartTime;
 
 int g_WinNTOrHigher;
 #endif // _WIN32
-
-/*
-* Globals initialization
-*/
-#ifndef HOOK_ENGINE
 
 int g_FPUCW_Mask_Prec_64Bit = 0;
 int g_FPUCW_Mask_Prec_64Bit_2 = 0;
@@ -196,19 +191,6 @@ enginefuncs_t g_engfuncsExportedToDlls = {
 	EngCheckParm
 };
 
-#else // HOOK_ENGINE
-
-int g_FPUCW_Mask_Prec_64Bit;
-int g_FPUCW_Mask_Prec_64Bit_2;
-int g_FPUCW_Mask_Round_Trunc;
-int g_FPUCW_Mask_Round_Up;
-
-FileFindHandle_t g_hfind;
-
-enginefuncs_t g_engfuncsExportedToDlls;
-
-#endif // HOOK_ENGINE
-
 #ifdef _WIN32
 void Sys_SetupFPUOptions()
 {
@@ -263,7 +245,7 @@ void __cdecl Sys_InitHardwareTimer()
 	Sys_InitFPUControlWords();
 
 	if (!CRehldsPlatformHolder::get()->QueryPerfFreq(&perfFreq))
-		Sys_Error("No hardware timer available");
+		Sys_Error("%s: No hardware timer available", __func__);
 
 	perfHighPart = perfFreq.HighPart;
 	perfLowPart = perfFreq.LowPart;
@@ -308,7 +290,7 @@ const char *Sys_FindFirst(const char *path, char *basename)
 {
 	if (g_hfind != -1)
 	{
-		Sys_Error(__FUNCTION__ " without close");
+		Sys_Error("%s: called without close", __func__);
 	}
 
 	const char *psz = FS_FindFirst(path, &g_hfind, 0);
@@ -333,7 +315,10 @@ const char *Sys_FindFirstPathID(const char *path, char *pathid)
 {
 	//const char *psz;//unused?
 	if (g_hfind != -1)
-		Sys_Error("Sys_FindFirst without close");
+	{
+		Sys_Error("%s: called without close", __func__);
+	}
+
 	return FS_FindFirst(path, &g_hfind, pathid);
 }
 
@@ -403,7 +388,7 @@ NOXREF void Sys_MakeCodeWriteable(uint32 startaddr, uint32 length)
 	NOXREFCHECK;
 #ifdef _WIN32
 	if (!VirtualProtect((LPVOID)startaddr, length, PAGE_EXECUTE_READWRITE, (PDWORD)&length))
-		Sys_Error("Protection change failed.");
+		Sys_Error("%s: Protection change failed.", __func__);
 #endif // _WIN32
 }
 
@@ -425,13 +410,12 @@ NOBODY void MaskExceptions(void);
 
 NOBODY void Sys_Init(void);
 
-NOXREF void Sys_Sleep(int msec)
+void Sys_Sleep(int msec)
 {
-	NOXREFCHECK;
 #ifdef _WIN32
 	Sleep(msec);
 #else
-	usleep(1000 *msec);
+	usleep(1000 * msec);
 #endif // _WIN32
 }
 
@@ -505,9 +489,10 @@ void NORETURN Sys_Error(const char *error, ...)
 	}
 #endif // SWDS
 
-	//exit(-1);
 	//Allahu akbar!
-	*(int *)NULL = NULL;
+	int *null = 0;
+	*null = 0;
+	exit(-1);
 }
 
 NOXREF void Sys_Warning(const char *pszWarning, ...)
@@ -615,15 +600,15 @@ double EXT_FUNC Sys_FloatTime(void)
 double Sys_FloatTime(void)
 {
 	static struct timespec start_time;
-	static bool bInitialized;
+	static bool bInitialized = false;
 	struct timespec now;
 
 	if ( !bInitialized )
 	{
-		bInitialized = 1;
-		clock_gettime(1, &start_time);
+		bInitialized = true;
+		clock_gettime(CLOCK_MONOTONIC, &start_time);
 	}
-	clock_gettime(1, &now);
+	clock_gettime(CLOCK_MONOTONIC, &now);
 	return (now.tv_sec - start_time.tv_sec) + now.tv_nsec * 0.000000001;
 }
 
@@ -785,7 +770,7 @@ const char* EXT_FUNC NameForFunction(uint32 function)
 	return NULL;
 }
 
-ENTITYINIT GetEntityInit(char *pClassName)
+ENTITYINIT EXT_FUNC GetEntityInit(char *pClassName)
 {
 	return (ENTITYINIT)GetDispatch(pClassName);
 }
@@ -901,15 +886,15 @@ void LoadEntityDLLs(const char *szBaseDir)
 		nFileSize = FS_Size(hLibListFile);
 		nFileSize2 = nFileSize;
 		if (!nFileSize || (signed int)nFileSize > 262144)
-			Sys_Error("Game listing file size is bogus [%s: size %i]", "liblist.gam", nFileSize);
+			Sys_Error("%s: Game listing file size is bogus [%s: size %i]", __func__, "liblist.gam", nFileSize);
 
 		pszInputStream = (char *)Mem_Malloc(nFileSize + 1);
 		if (!pszInputStream)
-			Sys_Error("Could not allocate space for game listing file of %i bytes", nFileSize2 + 1);
+			Sys_Error("%s: Could not allocate space for game listing file of %i bytes", __func__, nFileSize2 + 1);
 
 		nBytesRead = FS_Read(pszInputStream, nFileSize2, 1, hLibListFile);
 		if (nBytesRead != nFileSize2)
-			Sys_Error("Error reading in game listing file, expected %i bytes, read %i", nFileSize2, nBytesRead);
+			Sys_Error("%s: Error reading in game listing file, expected %i bytes, read %i", __func__, nFileSize2, nBytesRead);
 
 		pszInputStream[nFileSize2] = 0;
 		pStreamPos = pszInputStream;
@@ -1063,7 +1048,11 @@ void LoadThisDll(const char *szDllFilename)
 		goto IgnoreThisDLL;
 	}
 #else // _WIN32
+#ifdef REHLDS_FIXES
+	void *hDLL = dlopen(szDllFilename, RTLD_NOW | RTLD_DEEPBIND | RTLD_LOCAL);
+#else // REHLDS_FIXES
 	void *hDLL = dlopen(szDllFilename, RTLD_NOW);
+#endif // REHLDS_FIXES
 	if (!hDLL)
 	{
 		Con_Printf("LoadLibrary failed on %s: %s\n", szDllFilename, dlerror());
@@ -1085,7 +1074,7 @@ void LoadThisDll(const char *szDllFilename)
 	}
 
 	pfnGiveFnptrsToDll(&g_engfuncsExportedToDlls, &gGlobalVariables);
-	if (g_iextdllMac == 50)
+	if (g_iextdllMac == MAX_EXTENSION_DLL)
 	{
 		Con_Printf("Too many DLLs, ignoring remainder\n");
 		goto IgnoreThisDLL;
@@ -1289,12 +1278,7 @@ void Con_Init(void)
 {
 	con_debuglog = COM_CheckParm("-condebug");
 	Con_DPrintf("Console initialized.\n");
-
-#ifdef HOOK_ENGINE
-	Cmd_AddCommand("condebug", (xcommand_t)GetOriginalFuncAddrOrDefault("Con_Debug_f", (void *)Con_Debug_f));
-#else
 	Cmd_AddCommand("condebug", Con_Debug_f);
-#endif
 }
 
 void Con_DebugLog(const char *file, const char *fmt, ...)

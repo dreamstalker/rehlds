@@ -1,9 +1,38 @@
+/*
+*
+*    This program is free software; you can redistribute it and/or modify it
+*    under the terms of the GNU General Public License as published by the
+*    Free Software Foundation; either version 2 of the License, or (at
+*    your option) any later version.
+*
+*    This program is distributed in the hope that it will be useful, but
+*    WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+*    General Public License for more details.
+*
+*    You should have received a copy of the GNU General Public License
+*    along with this program; if not, write to the Free Software Foundation,
+*    Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+*
+*    In addition, as a special exception, the author gives permission to
+*    link the code of this program with the Half-Life Game Engine ("HL
+*    Engine") and Modified Game Libraries ("MODs") developed by Valve,
+*    L.L.C ("Valve").  You must obey the GNU General Public License in all
+*    respects for all of the code used other than the HL Engine and MODs
+*    from Valve.  If you modify this file, you may extend this exception
+*    to your version of the file, but you are not obligated to do so.  If
+*    you do not wish to do so, delete this exception statement from your
+*    version.
+*
+*/
+
 #pragma once
 
 #include "maintypes.h"
 
-#define DELTAJIT_MAX_BLOCKS 32
-#define DELTAJIT_MAX_FIELDS 56
+#ifdef REHLDS_JIT
+const int DELTAJIT_MAX_BLOCKS = 32;
+const int DELTAJIT_MAX_FIELDS = 56;
 
 struct deltajit_field {
 	unsigned int id;
@@ -59,23 +88,16 @@ public:
 	void Cleanup();
 };
 
-union delta_marked_mask_t {
-	uint8 u8[8];
-	uint32 u32[2];
-	uint64 u64;
-};
-
-
 extern CDeltaJitRegistry g_DeltaJitRegistry;
 
 extern int DELTAJit_Fields_Clear_Mark_Check(unsigned char *from, unsigned char *to, delta_t *pFields, void* pForceMarkMask);
 extern int DELTAJit_TestDelta(unsigned char *from, unsigned char *to, delta_t *pFields);
 extern void DELTAJit_SetSendFlagBits(delta_t *pFields, int *bits, int *bytecount);
-extern void DELTAJit_SetFieldByIndex(struct delta_s *pFields, int fieldNumber);
-extern void DELTAJit_UnsetFieldByIndex(struct delta_s *pFields, int fieldNumber);
+extern void DELTAJit_SetFieldByIndex(delta_t *pFields, int fieldNumber);
+extern void DELTAJit_UnsetFieldByIndex(delta_t *pFields, int fieldNumber);
 extern qboolean DELTAJit_IsFieldMarked(delta_t* pFields, int fieldNumber);
 
 /* Returns original mask, before it was changed by the conditional encoder */
 extern uint64 DELTAJit_GetOriginalMask(delta_t* pFields);
-
 extern uint64 DELTAJit_GetMaskU64(delta_t* pFields);
+#endif

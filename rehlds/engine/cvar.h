@@ -26,25 +26,16 @@
 *
 */
 
-#ifndef CVAR_H
-#define CVAR_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #include "maintypes.h"
 #include "cvardef.h"
 #include "FileSystem.h"
 
-
-#define MAX_CVAR_VALUE 1024
-
-#ifdef HOOK_ENGINE
-#define cvar_vars (*pcvar_vars)
-#endif // HOOK_ENGINE
+const int MAX_CVAR_VALUE     = 1024;
+const int MAX_CVARLIST_FILES = 100;
 
 extern cvar_t *cvar_vars;
-
 
 void Cvar_Init(void);
 void Cvar_Shutdown(void);
@@ -67,5 +58,3 @@ void Cmd_CvarList_f(void);
 NOXREF int Cvar_CountServerVariables(void);
 void Cvar_UnlinkExternals(void);
 void Cvar_CmdInit(void);
-
-#endif // CVAR_H

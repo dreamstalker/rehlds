@@ -36,7 +36,7 @@ extern "C"
 #if defined ( _WIN32 )
 
 #ifdef STEAM_EXPORTS
-#define STEAM_API __declspec(dllexport)
+#define STEAM_API __declspec(dllexport) EXT_FUNC
 #else
 #define STEAM_API __declspec(dllimport)
 #endif
@@ -45,7 +45,11 @@ extern "C"
 
 #else
 
+#ifdef STEAM_EXPORTS
+#define STEAM_API EXT_FUNC
+#else
 #define STEAM_API /* */
+#endif
 #define STEAM_CALL /* */
 
 #endif

@@ -39,7 +39,7 @@ typedef struct delta_link_s
 typedef struct delta_definition_s
 {
 	char *fieldName;
-	int fieldOffset;
+	size_t fieldOffset;
 } delta_definition_t;
 
 typedef struct delta_definition_list_s
@@ -326,7 +326,7 @@ delta_description_t *DELTA_FindField(delta_t *pFields, const char *pszField)
 		}
 	}
 
-	Con_Printf(__FUNCTION__ ":  Warning, couldn't find %s\n", pszField);
+	Con_Printf("%s:  Warning, couldn't find %s\n", __func__, pszField);
 	return NULL;
 }
 
@@ -343,7 +343,7 @@ int EXT_FUNC DELTA_FindFieldIndex(struct delta_s *pFields, const char *fieldname
 		}
 	}
 
-	Con_Printf(__FUNCTION__ ":  Warning, couldn't find %s\n", fieldname);
+	Con_Printf("%s:  Warning, couldn't find %s\n", __func__, fieldname);
 	return -1;
 }
 
@@ -383,7 +383,7 @@ void EXT_FUNC DELTA_UnsetField(struct delta_s *pFields, const char *fieldname)
 
 void EXT_FUNC DELTA_SetFieldByIndex(struct delta_s *pFields, int fieldNumber)
 {
-#if defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)
+#if (defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)) && defined REHLDS_JIT
 	DELTAJit_SetFieldByIndex(pFields, fieldNumber);
 #else
 	pFields->pdd[fieldNumber].flags |= FDT_MARK;
@@ -392,7 +392,7 @@ void EXT_FUNC DELTA_SetFieldByIndex(struct delta_s *pFields, int fieldNumber)
 
 void EXT_FUNC DELTA_UnsetFieldByIndex(struct delta_s *pFields, int fieldNumber)
 {
-#if defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)
+#if (defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)) && defined REHLDS_JIT
 	DELTAJit_UnsetFieldByIndex(pFields, fieldNumber);
 #else
 	pFields->pdd[fieldNumber].flags &= ~FDT_MARK;
@@ -407,11 +407,14 @@ void DELTA_ClearFlags(delta_t *pFields)
 	{
 		pitem->flags = 0;
 	}
+#if defined REHLDS_FIXES && !defined REHLDS_JIT
+	pFields->originalMarkedFieldsMask.u64 = 0;
+#endif
 }
 
 int DELTA_TestDelta(unsigned char *from, unsigned char *to, delta_t *pFields)
 {
-#if defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)
+#if (defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)) && defined REHLDSJIT
 	return DELTAJit_TestDelta(from, to, pFields);
 #else
 	int i;
@@ -419,7 +422,7 @@ int DELTA_TestDelta(unsigned char *from, unsigned char *to, delta_t *pFields)
 	delta_description_t *pTest;
 	int fieldType;
 	int fieldCount = pFields->fieldCount;
-	int length;
+	int length = 0;
 	int different;
 	int neededBits = 0;
 	int highestBit = -1;
@@ -462,16 +465,16 @@ int DELTA_TestDelta(unsigned char *from, unsigned char *to, delta_t *pFields)
 			st2 = (char*)&to[pTest->fieldOffset];
 			if (!(!*st1 && !*st2 || *st1 && *st2 && !Q_stricmp(st1, st2)))	// Not sure why it is case insensitive, but it looks so
 			{
-#ifdef REHLDS_FIXES
+#ifndef REHLDS_FIXES
+				pTest->flags |= FDT_MARK;
+#endif // REHLDS_FIXES
+
 				different = TRUE;
 				length = Q_strlen(st2) * 8;
-#else // REHLDS_FIXES
-				length = Q_strlen(st2);
-#endif // REHLDS_FIXES
 			}
 			break;
 		default:
-			Con_Printf(__FUNCTION__ ": Bad field type %i\n", fieldType);
+			Con_Printf("%s: Bad field type %i\n", __func__, fieldType);
 			break;
 		}
 
@@ -559,9 +562,14 @@ void DELTA_MarkSendFields(unsigned char *from, unsigned char *to, delta_t *pFiel
 				pTest->flags |= FDT_MARK;
 			break;
 		default:
-			Con_Printf(__FUNCTION__ ": Bad field type %i\n", fieldType);
+			Con_Printf("%s: Bad field type %i\n", __func__, fieldType);
 			break;
 		}
+
+#if defined REHLDS_FIXES && !defined REHLDS_JIT
+		if (pTest->flags & FDT_MARK)
+			pFields->originalMarkedFieldsMask.u32[i >> 5] |= (1 << (i & 31));
+#endif
 	}
 	if (pFields->conditionalencode)
 		pFields->conditionalencode(pFields, from, to);
@@ -599,7 +607,7 @@ void DELTA_SetSendFlagBits(delta_t *pFields, int *bits, int *bytecount)
 
 qboolean DELTA_IsFieldMarked(delta_t* pFields, int fieldNumber)
 {
-#if defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)
+#if (defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)) && defined REHLDS_JIT
 	return DELTAJit_IsFieldMarked(pFields, fieldNumber);
 #else
 	return pFields->pdd[fieldNumber].flags & FDT_MARK;
@@ -715,7 +723,7 @@ void DELTA_WriteMarkedFields(unsigned char *from, unsigned char *to, delta_t *pF
 			MSG_WriteBitString((const char *)&to[pTest->fieldOffset]);
 			break;
 		default:
-			Con_Printf(__FUNCTION__ ": unknown send field type\n");
+			Con_Printf("%s: unknown send field type\n", __func__);
 			break;
 		}
 	}
@@ -725,7 +733,7 @@ qboolean DELTA_CheckDelta(unsigned char *from, unsigned char *to, delta_t *pFiel
 {
 	qboolean sendfields;
 
-#if defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)
+#if (defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)) && defined REHLDS_JIT
 	sendfields = DELTAJit_Fields_Clear_Mark_Check(from, to, pFields, NULL);
 #else
 	DELTA_ClearFlags(pFields);
@@ -740,7 +748,7 @@ NOINLINE qboolean DELTA_WriteDelta(unsigned char *from, unsigned char *to, qbool
 {
 	qboolean sendfields;
 
-#if defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)
+#if (defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)) && defined REHLDS_JIT
 	sendfields = DELTAJit_Fields_Clear_Mark_Check(from, to, pFields, NULL);
 #else // REHLDS_OPT_PEDANTIC || REHLDS_FIXES
 	DELTA_ClearFlags(pFields);
@@ -754,9 +762,57 @@ NOINLINE qboolean DELTA_WriteDelta(unsigned char *from, unsigned char *to, qbool
 
 #ifdef REHLDS_FIXES //Fix for https://github.com/dreamstalker/rehlds/issues/24
 qboolean DELTA_WriteDeltaForceMask(unsigned char *from, unsigned char *to, qboolean force, delta_t *pFields, void(*callback)(void), void* pForceMask) {
+#ifdef REHLDS_JIT
 	qboolean sendfields = DELTAJit_Fields_Clear_Mark_Check(from, to, pFields, pForceMask);
 	_DELTA_WriteDelta(from, to, force, pFields, callback, sendfields);
 	return sendfields;
+#else
+	DELTA_ClearFlags(pFields);
+
+	// force fields
+	if (pForceMask) {
+		delta_description_t *pTest;
+		int i;
+		delta_marked_mask_t forceMask = *(delta_marked_mask_t *)pForceMask;
+
+		for (i = 0, pTest = pFields->pdd; i < pFields->fieldCount; i++, pTest++) {
+			int mark = (forceMask.u32[i >> 5] & (1 << (i & 31))) ? FDT_MARK : 0;
+			pTest->flags |= mark;
+		}
+	}
+
+	DELTA_MarkSendFields(from, to, pFields);
+	qboolean sendfields = DELTA_CountSendFields(pFields);
+	_DELTA_WriteDelta(from, to, force, pFields, callback, sendfields);
+	return sendfields;
+#endif
+}
+
+uint64 DELTA_GetOriginalMask(delta_t* pFields)
+{
+#ifdef REHLDS_JIT
+	return DELTAJit_GetOriginalMask(pFields);
+#else
+	return pFields->originalMarkedFieldsMask.u64;
+#endif
+}
+
+uint64 DELTA_GetMaskU64(delta_t* pFields)
+{
+#ifdef REHLDS_JIT
+	return DELTAJit_GetMaskU64(pFields);
+#else
+	delta_description_t *pTest;
+	int i;
+	delta_marked_mask_t mask = {};
+
+	for (i = 0, pTest = pFields->pdd; i < pFields->fieldCount; i++, pTest++) {
+		if (pTest->flags & FDT_MARK)
+			mask.u32[i >> 5] |= (1 << (i & 31));
+	}
+
+	return mask.u64;
+#endif
 }
 #endif
 
@@ -768,7 +824,7 @@ qboolean _DELTA_WriteDelta(unsigned char *from, unsigned char *to, qboolean forc
 
 	if (sendfields || force)
 	{
-#if defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)
+#if (defined(REHLDS_OPT_PEDANTIC) || defined(REHLDS_FIXES)) && defined REHLDS_JIT
 		DELTAJit_SetSendFlagBits(pFields, bits, &bytecount);
 #else
 		DELTA_SetSendFlagBits(pFields, bits, &bytecount);
@@ -843,7 +899,7 @@ int DELTA_ParseDelta(unsigned char *from, unsigned char *to, delta_t *pFields)
 				Q_strcpy((char *)&to[pTest->fieldOffset], (char *)&from[pTest->fieldOffset]);
 				break;
 			default:
-				Con_Printf(__FUNCTION__ ": unparseable field type %i\n", fieldType);
+				Con_Printf("%s: unparseable field type %i\n", __func__, fieldType);
 			}
 			continue;
 		}
@@ -985,7 +1041,7 @@ int DELTA_ParseDelta(unsigned char *from, unsigned char *to, delta_t *pFields)
 			} while (c);
 			break;
 		default:
-			Con_Printf(__FUNCTION__ ": unparseable field type %i\n", fieldType);
+			Con_Printf("%s: unparseable field type %i\n", __func__, fieldType);
 			break;
 		}
 	}
@@ -993,7 +1049,7 @@ int DELTA_ParseDelta(unsigned char *from, unsigned char *to, delta_t *pFields)
 	return MSG_CurrentBit() - startbit;
 }
 
-void EXT_FUNC DELTA_AddEncoder(char *name, void(*conditionalencode)(struct delta_s *, const unsigned char *, const unsigned char *))
+void EXT_FUNC DELTA_AddEncoder(const char *name, void(*conditionalencode)(struct delta_s *, const unsigned char *, const unsigned char *))
 {
 	delta_encoder_t *p = (delta_encoder_t *)Mem_ZeroMalloc(sizeof(delta_encoder_t));
 	p->name = Mem_Strdup(name);
@@ -1085,7 +1141,7 @@ delta_t *DELTA_BuildFromLinks(delta_link_t **pplinks)
 
 #ifdef REHLDS_FIXES
 	if (count > DELTA_MAX_FIELDS)
-		Sys_Error(__FUNCTION__ ": Too many fields in delta description %i (MAX %i)\n", count, DELTA_MAX_FIELDS);
+		Sys_Error("%s: Too many fields in delta description %i (MAX %i)\n", __func__, count, DELTA_MAX_FIELDS);
 #endif
 
 	pdesc = (delta_description_t *)Mem_ZeroMalloc(sizeof(delta_description_t) * count);
@@ -1116,7 +1172,7 @@ int DELTA_FindOffset(int count, delta_definition_t *pdef, char *fieldname)
 		}
 	}
 
-	Sys_Error(__FUNCTION__ ": Couldn't find offset for %s!!!\n", fieldname);
+	Sys_Error("%s: Couldn't find offset for %s!!!\n", __func__, fieldname);
 }
 
 qboolean DELTA_ParseType(delta_description_t *pdelta, char **pstream)
@@ -1150,12 +1206,11 @@ qboolean DELTA_ParseType(delta_description_t *pdelta, char **pstream)
 		else if (!Q_stricmp(com_token, "DT_STRING"))
 			pdelta->fieldType |= DT_STRING;
 		else
-			Sys_Error(__FUNCTION__ ":  Unknown type or type flag %s\n", com_token);
+			Sys_Error("%s:  Unknown type or type flag %s\n", __func__, com_token);
 	}
 
 	// We are hit the end of the stream
-	Sys_Error(__FUNCTION__ ":  Expecting fieldtype info\n");	// Was Con_Printf here
-	return FALSE;
+	Sys_Error("%s:  Expecting fieldtype info\n", __func__);	// Was Con_Printf here
 }
 
 qboolean DELTA_ParseField(int count, delta_definition_t *pdefinition, delta_link_t *pField, char **pstream)
@@ -1167,7 +1222,7 @@ qboolean DELTA_ParseField(int count, delta_definition_t *pdefinition, delta_link
 	{
 		if (Q_stricmp(com_token, "DEFINE_DELTA_POST"))
 		{
-			Sys_Error(__FUNCTION__ ":  Expecting DEFINE_*, got %s\n", com_token);
+			Sys_Error("%s:  Expecting DEFINE_*, got %s\n", __func__, com_token);
 		}
 		readpost = 1;
 	}
@@ -1175,13 +1230,13 @@ qboolean DELTA_ParseField(int count, delta_definition_t *pdefinition, delta_link
 	*pstream = COM_Parse(*pstream);
 	if (Q_stricmp(com_token, "("))
 	{
-		Sys_Error(__FUNCTION__ ":  Expecting (, got %s\n", com_token);
+		Sys_Error("%s:  Expecting (, got %s\n", __func__, com_token);
 	}
 
 	*pstream = COM_Parse(*pstream);
 	if (com_token[0] == 0)
 	{
-		Sys_Error(__FUNCTION__ ":  Expecting fieldname\n");
+		Sys_Error("%s:  Expecting fieldname\n", __func__);
 	}
 
 	Q_strncpy(pField->delta->fieldName, com_token, 31);
@@ -1215,8 +1270,7 @@ qboolean DELTA_ParseField(int count, delta_definition_t *pdefinition, delta_link
 	*pstream = COM_Parse(*pstream);
 	if (Q_stricmp(com_token, ")"))
 	{
-		Sys_Error(__FUNCTION__ ":  Expecting ), got %s\n", com_token);	// Was Con_Printf here
-		return FALSE;
+		Sys_Error("%s:  Expecting ), got %s\n", __func__, com_token);	// Was Con_Printf here
 	}
 
 	*pstream = COM_Parse(*pstream);
@@ -1309,7 +1363,7 @@ void DELTA_SkipDescription(char **pstream)
 		*pstream = COM_Parse(*pstream);
 		if (com_token[0] == 0)
 		{
-			Sys_Error(__FUNCTION__ ": Error during description skip");
+			Sys_Error("%s: Error during description skip", __func__);
 		}
 	} while (Q_stricmp(com_token, "}"));
 }
@@ -1363,13 +1417,13 @@ qboolean DELTA_ParseDescription(char *name, delta_t **ppdesc, char *pstream)
 
 	if (!ppdesc)
 	{
-		Sys_Error(__FUNCTION__ " with no delta_description_t\n");
+		Sys_Error("%s: called with no delta_description_t\n", __func__);
 	}
 	*ppdesc = 0;
 
 	if (!pstream)
 	{
-		Sys_Error(__FUNCTION__ " with no data stream\n");
+		Sys_Error("%s: called with no data stream\n", __func__);
 	}
 
 	while (true)
@@ -1389,14 +1443,14 @@ qboolean DELTA_ParseDescription(char *name, delta_t **ppdesc, char *pstream)
 			pdefinition = DELTA_FindDefinition(com_token, &count);
 			if (!pdefinition)
 			{
-				Sys_Error(__FUNCTION__ ":  Unknown data type:  %s\n", com_token);
+				Sys_Error("%s:  Unknown data type:  %s\n", __func__, com_token);
 			}
 
 			// Parse source of conditional encoder
 			pstream = COM_Parse(pstream);
 			if (com_token[0] == 0)
 			{
-				Sys_Error(__FUNCTION__ ":  Unknown encoder :  %s\nValid values:\nnone\ngamedll funcname\nclientdll funcname\n", com_token);
+				Sys_Error("%s:  Unknown encoder :  %s\nValid values:\nnone\ngamedll funcname\nclientdll funcname\n", __func__, com_token);
 			}
 			if (Q_stricmp(com_token, "none"))
 			{
@@ -1407,7 +1461,7 @@ qboolean DELTA_ParseDescription(char *name, delta_t **ppdesc, char *pstream)
 				pstream = COM_Parse(pstream);
 				if (com_token[0] == 0)
 				{
-					Sys_Error(__FUNCTION__ ":  Expecting encoder\n");
+					Sys_Error("%s:  Expecting encoder\n", __func__);
 				}
 
 				Q_strncpy(encoder, com_token, sizeof(encoder)-1);
@@ -1428,8 +1482,7 @@ qboolean DELTA_ParseDescription(char *name, delta_t **ppdesc, char *pstream)
 				}
 				if (Q_stricmp(com_token, "{"))
 				{
-					Sys_Error(__FUNCTION__ ":  Expecting {, got %s\n", com_token);	// Was Con_Printf here
-					return FALSE;
+					Sys_Error("%s:  Expecting {, got %s\n", __func__, com_token);	// Was Con_Printf here
 				}
 				if (!DELTA_ParseOneField(&pstream, &links, count, pdefinition))
 				{
@@ -1459,7 +1512,7 @@ qboolean DELTA_Load(char *name, delta_t **ppdesc, char *pszFile)
 	pbuf = (char *)COM_LoadFile(pszFile, 5, 0);
 	if (!pbuf)
 	{
-		Sys_Error(__FUNCTION__ ":  Couldn't load file %s\n", pszFile);
+		Sys_Error("%s:  Couldn't load file %s\n", __func__, pszFile);
 	}
 
 	bret = DELTA_ParseDescription(name, ppdesc, pbuf);

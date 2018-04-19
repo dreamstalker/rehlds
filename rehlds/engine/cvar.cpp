@@ -174,6 +174,15 @@ NOXREF const char *Cvar_CompleteVariable(const char *search, int forward)
 	return NULL;
 }
 
+void Cvar_FireListeners(const char *var_name, const char *value)
+{
+	for (auto var : g_CvarsListeners) {
+		if (Q_strcmp(var->name, var_name) == 0) {
+			var->func(value);
+		}
+	}
+}
+
 void EXT_FUNC Cvar_DirectSet_internal(struct cvar_s *var, const char *value)
 {
 	if (!var || !value)
@@ -239,7 +248,6 @@ void EXT_FUNC Cvar_DirectSet_internal(struct cvar_s *var, const char *value)
 	}
 
 	qboolean changed = Q_strcmp(var->string, pszValue);
-
 	if (var->flags & FCVAR_USERINFO)
 	{
 		if (g_pcls.state == ca_dedicated)
@@ -296,6 +304,12 @@ void EXT_FUNC Cvar_DirectSet_internal(struct cvar_s *var, const char *value)
 	var->string = (char *)Z_Malloc(Q_strlen(pszValue) + 1);
 	Q_strcpy(var->string, pszValue);
 	var->value = (float)Q_atof(var->string);
+
+#ifdef REHLDS_API
+	if (changed) {
+		Cvar_FireListeners(var->name, pszValue);
+	}
+#endif
 }
 
 void Cvar_DirectSet(struct cvar_s *var, const char *value)
@@ -309,7 +323,7 @@ void Cvar_Set(const char *var_name, const char *value)
 
 	if (!var)
 	{
-		Con_DPrintf(__FUNCTION__ ": variable \"%s\" not found\n", var_name);
+		Con_DPrintf("%s: variable \"%s\" not found\n", __func__, var_name);
 		return;
 	}
 
@@ -351,7 +365,7 @@ void EXT_FUNC Cvar_RegisterVariable(cvar_t *variable)
 
 	if (Cmd_Exists(variable->name))
 	{
-		Con_Printf(__FUNCTION__ ": \"%s\" is a command\n", variable->name);
+		Con_Printf("%s: \"%s\" is a command\n", __func__, variable->name);
 		return;
 	}
 
@@ -586,7 +600,7 @@ void Cmd_CvarList_f(void)
 		{
 			// Open log
 			int i;
-			for (i = 0; i < 100; i++)
+			for (i = 0; i < MAX_CVARLIST_FILES; i++)
 			{
 				Q_snprintf(szTemp, ARRAYSIZE(szTemp) - 1, "cvarlist%02d.txt", i);
 				szTemp[ARRAYSIZE(szTemp) - 1] = 0;
@@ -599,7 +613,7 @@ void Cmd_CvarList_f(void)
 				FS_Close(fp);
 			}
 
-			if (i >= 100)
+			if (i >= MAX_CVARLIST_FILES)
 			{
 				Con_Printf("Can't cvarlist! Too many existing cvarlist output files in the gamedir!\n");
 				return;

@@ -25,7 +25,10 @@
 *    version.
 *
 */
+
 #pragma once
+
+#include <vector>
 
 #include "archtypes.h"
 #include "rehlds_api.h"
@@ -183,6 +186,10 @@ typedef IHookChainRegistryImpl<int, sv_delta_t, IGameClient *, packet_entities_t
 typedef IHookChainImpl<bool, edict_t *, IGameClient *, int, const char*, float, float, int, int, int, const float*> CRehldsHook_SV_EmitSound2;
 typedef IHookChainRegistryImpl<bool, edict_t *, IGameClient *, int, const char*, float, float, int, int, int, const float*> CRehldsHookRegistry_SV_EmitSound2;
 
+//CreateFakeClient hook
+typedef IHookChainImpl<edict_t *, const char *> CRehldsHook_CreateFakeClient;
+typedef IHookChainRegistryImpl<edict_t *, const char *> CRehldsHookRegistry_CreateFakeClient;
+
 class CRehldsHookchains : public IRehldsHookchains {
 public:
 	CRehldsHookRegistry_Steam_NotifyClientConnect m_Steam_NotifyClientConnect;
@@ -223,46 +230,48 @@ public:
 	CRehldsHookRegistry_SV_Spawn_f m_SV_Spawn_f;
 	CRehldsHookRegistry_SV_CreatePacketEntities m_SV_CreatePacketEntities;
 	CRehldsHookRegistry_SV_EmitSound2 m_SV_EmitSound2;
+	CRehldsHookRegistry_CreateFakeClient m_CreateFakeClient;
 
 public:
-	virtual IRehldsHookRegistry_Steam_NotifyClientConnect* Steam_NotifyClientConnect();
-	virtual IRehldsHookRegistry_SV_ConnectClient* SV_ConnectClient();
-	virtual IRehldsHookRegistry_SV_GetIDString* SV_GetIDString();
-	virtual IRehldsHookRegistry_SV_SendServerinfo* SV_SendServerinfo();
-	virtual IRehldsHookRegistry_SV_CheckProtocol* SV_CheckProtocol();
-	virtual IRehldsHookRegistry_SVC_GetChallenge_mod* SVC_GetChallenge_mod();
-	virtual IRehldsHookRegistry_SV_CheckKeyInfo* SV_CheckKeyInfo();
-	virtual IRehldsHookRegistry_SV_CheckIPRestrictions* SV_CheckIPRestrictions();
-	virtual IRehldsHookRegistry_SV_FinishCertificateCheck* SV_FinishCertificateCheck();
-	virtual IRehldsHookRegistry_Steam_NotifyBotConnect* Steam_NotifyBotConnect();
-	virtual IRehldsHookRegistry_SerializeSteamId* SerializeSteamId();
-	virtual IRehldsHookRegistry_SV_CompareUserID* SV_CompareUserID();
-	virtual IRehldsHookRegistry_Steam_NotifyClientDisconnect* Steam_NotifyClientDisconnect();
-	virtual IRehldsHookRegistry_PreprocessPacket* PreprocessPacket();
-	virtual IRehldsHookRegistry_ValidateCommand* ValidateCommand();
-	virtual IRehldsHookRegistry_ClientConnected* ClientConnected();
-	virtual IRehldsHookRegistry_HandleNetCommand* HandleNetCommand();
-	virtual IRehldsHookRegistry_Mod_LoadBrushModel* Mod_LoadBrushModel();
-	virtual IRehldsHookRegistry_Mod_LoadStudioModel* Mod_LoadStudioModel();
-	virtual IRehldsHookRegistry_ExecuteServerStringCmd* ExecuteServerStringCmd();
-	virtual IRehldsHookRegistry_SV_EmitEvents* SV_EmitEvents();
-	virtual IRehldsHookRegistry_EV_PlayReliableEvent* EV_PlayReliableEvent();
-	virtual IRehldsHookRegistry_SV_StartSound* SV_StartSound();
-	virtual IRehldsHookRegistry_PF_Remove_I* PF_Remove_I();
-	virtual IRehldsHookRegistry_PF_BuildSoundMsg_I* PF_BuildSoundMsg_I();
-	virtual IRehldsHookRegistry_SV_WriteFullClientUpdate* SV_WriteFullClientUpdate();
-	virtual IRehldsHookRegistry_SV_CheckConsistencyResponse* SV_CheckConsistencyResponse();
-	virtual	IRehldsHookRegistry_SV_DropClient* SV_DropClient();
-	virtual	IRehldsHookRegistry_SV_ActivateServer* SV_ActivateServer();
-	virtual	IRehldsHookRegistry_SV_WriteVoiceCodec* SV_WriteVoiceCodec();
-	virtual IRehldsHookRegistry_Steam_GSGetSteamID* Steam_GSGetSteamID();
-	virtual IRehldsHookRegistry_SV_TransferConsistencyInfo* SV_TransferConsistencyInfo();
-	virtual IRehldsHookRegistry_Steam_GSBUpdateUserData* Steam_GSBUpdateUserData();
-	virtual IRehldsHookRegistry_Cvar_DirectSet* Cvar_DirectSet();
-	virtual IRehldsHookRegistry_SV_EstablishTimeBase* SV_EstablishTimeBase();
-	virtual	IRehldsHookRegistry_SV_Spawn_f* SV_Spawn_f();
-	virtual	IRehldsHookRegistry_SV_CreatePacketEntities* SV_CreatePacketEntities();
-	virtual	IRehldsHookRegistry_SV_EmitSound2* SV_EmitSound2();
+	EXT_FUNC virtual IRehldsHookRegistry_Steam_NotifyClientConnect* Steam_NotifyClientConnect();
+	EXT_FUNC virtual IRehldsHookRegistry_SV_ConnectClient* SV_ConnectClient();
+	EXT_FUNC virtual IRehldsHookRegistry_SV_GetIDString* SV_GetIDString();
+	EXT_FUNC virtual IRehldsHookRegistry_SV_SendServerinfo* SV_SendServerinfo();
+	EXT_FUNC virtual IRehldsHookRegistry_SV_CheckProtocol* SV_CheckProtocol();
+	EXT_FUNC virtual IRehldsHookRegistry_SVC_GetChallenge_mod* SVC_GetChallenge_mod();
+	EXT_FUNC virtual IRehldsHookRegistry_SV_CheckKeyInfo* SV_CheckKeyInfo();
+	EXT_FUNC virtual IRehldsHookRegistry_SV_CheckIPRestrictions* SV_CheckIPRestrictions();
+	EXT_FUNC virtual IRehldsHookRegistry_SV_FinishCertificateCheck* SV_FinishCertificateCheck();
+	EXT_FUNC virtual IRehldsHookRegistry_Steam_NotifyBotConnect* Steam_NotifyBotConnect();
+	EXT_FUNC virtual IRehldsHookRegistry_SerializeSteamId* SerializeSteamId();
+	EXT_FUNC virtual IRehldsHookRegistry_SV_CompareUserID* SV_CompareUserID();
+	EXT_FUNC virtual IRehldsHookRegistry_Steam_NotifyClientDisconnect* Steam_NotifyClientDisconnect();
+	EXT_FUNC virtual IRehldsHookRegistry_PreprocessPacket* PreprocessPacket();
+	EXT_FUNC virtual IRehldsHookRegistry_ValidateCommand* ValidateCommand();
+	EXT_FUNC virtual IRehldsHookRegistry_ClientConnected* ClientConnected();
+	EXT_FUNC virtual IRehldsHookRegistry_HandleNetCommand* HandleNetCommand();
+	EXT_FUNC virtual IRehldsHookRegistry_Mod_LoadBrushModel* Mod_LoadBrushModel();
+	EXT_FUNC virtual IRehldsHookRegistry_Mod_LoadStudioModel* Mod_LoadStudioModel();
+	EXT_FUNC virtual IRehldsHookRegistry_ExecuteServerStringCmd* ExecuteServerStringCmd();
+	EXT_FUNC virtual IRehldsHookRegistry_SV_EmitEvents* SV_EmitEvents();
+	EXT_FUNC virtual IRehldsHookRegistry_EV_PlayReliableEvent* EV_PlayReliableEvent();
+	EXT_FUNC virtual IRehldsHookRegistry_SV_StartSound* SV_StartSound();
+	EXT_FUNC virtual IRehldsHookRegistry_PF_Remove_I* PF_Remove_I();
+	EXT_FUNC virtual IRehldsHookRegistry_PF_BuildSoundMsg_I* PF_BuildSoundMsg_I();
+	EXT_FUNC virtual IRehldsHookRegistry_SV_WriteFullClientUpdate* SV_WriteFullClientUpdate();
+	EXT_FUNC virtual IRehldsHookRegistry_SV_CheckConsistencyResponse* SV_CheckConsistencyResponse();
+	EXT_FUNC virtual	IRehldsHookRegistry_SV_DropClient* SV_DropClient();
+	EXT_FUNC virtual	IRehldsHookRegistry_SV_ActivateServer* SV_ActivateServer();
+	EXT_FUNC virtual	IRehldsHookRegistry_SV_WriteVoiceCodec* SV_WriteVoiceCodec();
+	EXT_FUNC virtual IRehldsHookRegistry_Steam_GSGetSteamID* Steam_GSGetSteamID();
+	EXT_FUNC virtual IRehldsHookRegistry_SV_TransferConsistencyInfo* SV_TransferConsistencyInfo();
+	EXT_FUNC virtual IRehldsHookRegistry_Steam_GSBUpdateUserData* Steam_GSBUpdateUserData();
+	EXT_FUNC virtual IRehldsHookRegistry_Cvar_DirectSet* Cvar_DirectSet();
+	EXT_FUNC virtual IRehldsHookRegistry_SV_EstablishTimeBase* SV_EstablishTimeBase();
+	EXT_FUNC virtual	IRehldsHookRegistry_SV_Spawn_f* SV_Spawn_f();
+	EXT_FUNC virtual	IRehldsHookRegistry_SV_CreatePacketEntities* SV_CreatePacketEntities();
+	EXT_FUNC virtual	IRehldsHookRegistry_SV_EmitSound2* SV_EmitSound2();
+	EXT_FUNC virtual	IRehldsHookRegistry_CreateFakeClient* CreateFakeClient();
 };
 
 extern CRehldsHookchains g_RehldsHookchains;
@@ -285,5 +294,6 @@ public:
 extern sizebuf_t* GetNetMessage_api();
 extern IGameClient* GetHostClient_api();
 extern int* GetMsgReadCount_api();
+extern std::vector<cvar_listener_t *> g_CvarsListeners;
 
 bool SV_EmitSound2_api(edict_t *entity, IGameClient *receiver, int channel, const char *sample, float volume, float attenuation, int fFlags, int pitch, int emitFlags, const float *pOrigin);

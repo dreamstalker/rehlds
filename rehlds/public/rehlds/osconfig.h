@@ -48,6 +48,7 @@
 #include <functional>
 
 #ifdef _WIN32 // WINDOWS
+	#define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
 	#include <windows.h>
 	#include <winsock.h>
 	#include <wsipx.h> // for support IPX
@@ -70,6 +71,7 @@
 	#include <link.h>
 	#include <netdb.h>
 	#include <netinet/in.h>
+	#include <netinet/ip.h>
 	#include <pthread.h>
 	#include <sys/ioctl.h>
 	#include <sys/mman.h>
@@ -79,9 +81,6 @@
 	#include <sys/types.h>
 	#include <sys/sysinfo.h>
 	#include <unistd.h>
-
-	// Deail with stupid macro in kernel.h
-	#undef __FUNCTION__
 #endif // _WIN32
 
 #include <string>
@@ -92,19 +91,32 @@
 #include <smmintrin.h>
 #include <xmmintrin.h>
 
+
 #ifdef _WIN32 // WINDOWS
+	// Define __func__ on VS less than 2015
+	#if _MSC_VER < 1900
+		#define __func__ __FUNCTION__
+	#endif
+
 	#define _CRT_SECURE_NO_WARNINGS
 	#define WIN32_LEAN_AND_MEAN
 
 	#ifndef CDECL
 		#define CDECL __cdecl
 	#endif
+	#define FASTCALL __fastcall
 	#define STDCALL __stdcall
 	#define HIDDEN
+	#define FORCEINLINE __forceinline
 	#define NOINLINE __declspec(noinline)
 	#define ALIGN16 __declspec(align(16))
 	#define NORETURN __declspec(noreturn)
 	#define FORCE_STACK_ALIGN
+	#define FUNC_TARGET(x)
+
+	#define __builtin_bswap16 _byteswap_ushort
+	#define __builtin_bswap32 _byteswap_ulong
+	#define __builtin_bswap64 _byteswap_uint64
 
 	//inline bool SOCKET_FIONBIO(SOCKET s, int m) { return (ioctlsocket(s, FIONBIO, (u_long*)&m) == 0); }
 	//inline int SOCKET_MSGLEN(SOCKET s, u_long& r) { return ioctlsocket(s, FIONREAD, (u_long*)&r); }
@@ -124,11 +136,6 @@
 		VirtualFree(ptr, 0, MEM_RELEASE);
 	}
 #else // _WIN32
-	#ifdef __FUNCTION__
-		#undef __FUNCTION__
-	#endif
-	#define __FUNCTION__ __func__
-
 	#ifndef PAGESIZE
 		#define PAGESIZE 4096
 	#endif
@@ -144,13 +151,25 @@
 	typedef unsigned short WORD;
 	typedef unsigned int UNINT32;
 
+	#define FASTCALL
 	#define CDECL __attribute__ ((cdecl))
 	#define STDCALL __attribute__ ((stdcall))
 	#define HIDDEN __attribute__((visibility("hidden")))
+	#define FORCEINLINE inline
 	#define NOINLINE __attribute__((noinline))
 	#define ALIGN16 __attribute__((aligned(16)))
 	#define NORETURN __attribute__((noreturn))
 	#define FORCE_STACK_ALIGN __attribute__((force_align_arg_pointer))
+
+#if defined __INTEL_COMPILER
+	#define FUNC_TARGET(x)
+
+	#define __builtin_bswap16 _bswap16
+	#define __builtin_bswap32 _bswap
+	#define __builtin_bswap64 _bswap64
+#else
+	#define FUNC_TARGET(x) __attribute__((target(x)))
+#endif // __INTEL_COMPILER
 
 	//inline bool SOCKET_FIONBIO(SOCKET s, int m) { return (ioctl(s, FIONBIO, (int*)&m) == 0); }
 	//inline int SOCKET_MSGLEN(SOCKET s, u_long& r) { return ioctl(s, FIONREAD, (int*)&r); }
@@ -163,6 +182,10 @@
 	#define SOCKET_CLOSE(s) close(s)
 	#define SOCKET_AGAIN() (errno == EAGAIN)
 	#define SOCKET_ERROR -1
+
+	inline int ioctlsocket(int fd, int cmd, unsigned int *argp) { return ioctl(fd, cmd, argp); }
+	inline int closesocket(int fd) { return close(fd); }
+	inline int WSAGetLastError() { return errno; }
 
 	inline void* sys_allocmem(unsigned int size) {
 		return mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
@@ -190,5 +213,9 @@
 #endif
 
 #define EXT_FUNC FORCE_STACK_ALIGN
+
+// Used to obtain the string name of a variable.
+#define nameof_variable(name) template_nameof_variable(name, #name)
+template <typename T> const char* template_nameof_variable(const T& /*validate_type*/, const char* name) { return name; }
 
 #endif // _OSCONFIG_H

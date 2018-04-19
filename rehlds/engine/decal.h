@@ -26,18 +26,15 @@
 *
 */
 
-#ifndef DECAL_H
-#define DECAL_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #include "maintypes.h"
 #include "model.h"
 #include "wad.h"
 
-#define MAX_DECALS				512
-#define DECAL_EXTRASIZE				sizeof(texture_t) - sizeof(miptex_t)
+const int MAX_DECALS = 512;
+
+#define DECAL_EXTRASIZE sizeof(texture_t) - sizeof(miptex_t)
 
 typedef struct decalname_s
 {
@@ -51,15 +48,6 @@ typedef struct lumplist_s
 	qboolean breplaced;
 	lumplist_s *next;
 } lumplist_t;
-
-#ifdef HOOK_ENGINE
-#define decal_wad (*pdecal_wad)
-#define menu_wad (*pmenu_wad)
-#define szCustName (*pszCustName)
-#define decal_names (*pdecal_names)
-#define m_bDrawInitialized (*pm_bDrawInitialized)
-#define gfCustomBuild (*pgfCustomBuild)
-#endif // HOOK_ENGINE
 
 extern cachewad_t *decal_wad;
 extern cachewad_t *menu_wad;
@@ -99,5 +87,3 @@ qboolean Draw_ValidateCustomLogo(cachewad_t *wad, unsigned char *data, lumpinfo_
 qboolean Draw_CacheLoadFromCustom(char *clean, cachewad_t *wad, void *raw, int rawsize, cachepic_t *pic);
 NOXREF int Draw_CacheIndex(cachewad_t *wad, char *path);
 NOXREF int Draw_CacheFindIndex(cachewad_t *wad, char *path);
-
-#endif // DECAL_H

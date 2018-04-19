@@ -25,6 +25,7 @@
 *    version.
 *
 */
+
 #pragma once
 
 #include "maintypes.h"
@@ -35,9 +36,9 @@
 All command/alias names are case insensitive! Arguments not.
 */
 
-#define MAX_CMD_BUFFER	16384
-#define MAX_CMD_TOKENS	80
-#define MAX_CMD_LINE	1024
+const int MAX_CMD_BUFFER = 16384;
+const int MAX_CMD_TOKENS = 80;
+const int MAX_CMD_LINE   = 1024;
 
 /*
 
@@ -60,19 +61,6 @@ not apropriate.
 
 */
 
-#ifdef HOOK_ENGINE
-#define cmd_argc (*pcmd_argc)
-#define cmd_argv (*pcmd_argv)
-#define cmd_args (*pcmd_args)
-
-#define cmd_text (*pcmd_text)
-#define cmd_source (*pcmd_source)
-#define cmd_wait (*pcmd_wait)
-
-#define cmd_functions (*pcmd_functions)
-#define cmd_alias (*pcmd_alias)
-#endif // HOOK_ENGINE
-
 extern int cmd_argc;
 extern char *cmd_argv[80];
 extern char *cmd_args;
@@ -86,14 +74,14 @@ extern cmdalias_t *cmd_alias;
 
 void Cmd_Wait_f(void);
 void Cbuf_Init(void);
-void Cbuf_AddText(char *text);
-void Cbuf_InsertText(char *text);
-void Cbuf_InsertTextLines(char *text);
+void Cbuf_AddText(const char *text);
+void Cbuf_InsertText(const char *text);
+void Cbuf_InsertTextLines(const char *text);
 void Cbuf_Execute(void);
 void Cmd_StuffCmds_f(void);
 void Cmd_Exec_f(void);
 void Cmd_Echo_f(void);
-char *CopyString(char *in);
+char *CopyString(const char *in);
 void Cmd_Alias_f(void);
 struct cmd_function_s *Cmd_GetFirstCmd(void);
 void Cmd_Init(void);
@@ -102,23 +90,23 @@ int Cmd_Argc(void);
 const char *Cmd_Argv(int arg);
 const char *Cmd_Args(void);
 void Cmd_TokenizeString(char *text);
-NOXREF cmd_function_t *Cmd_FindCmd(char *cmd_name);
-cmd_function_t *Cmd_FindCmdPrev(char *cmd_name);
-void Cmd_AddCommand(char *cmd_name, xcommand_t function);
-void Cmd_AddMallocCommand(char *cmd_name, xcommand_t function, int flag);
-NOXREF void Cmd_AddHUDCommand(char *cmd_name, xcommand_t function);
-NOXREF void Cmd_AddWrapperCommand(char *cmd_name, xcommand_t function);
-void Cmd_AddGameCommand(char *cmd_name, xcommand_t function);
-void Cmd_RemoveCmd(char *cmd_name);
+NOXREF cmd_function_t *Cmd_FindCmd(const char *cmd_name);
+cmd_function_t *Cmd_FindCmdPrev(const char *cmd_name);
+void Cmd_AddCommand(const char *cmd_name, xcommand_t function);
+void Cmd_AddMallocCommand(const char *cmd_name, xcommand_t function, int flag);
+NOXREF void Cmd_AddHUDCommand(const char *cmd_name, xcommand_t function);
+void Cmd_AddWrapperCommand(const char *cmd_name, xcommand_t function);
+void Cmd_AddGameCommand(const char *cmd_name, xcommand_t function);
+void Cmd_RemoveCmd(const char *cmd_name);
 void Cmd_RemoveMallocedCmds(int flag);
 NOXREF void Cmd_RemoveHudCmds(void);
 void Cmd_RemoveGameCmds(void);
 void Cmd_RemoveWrapperCmds(void);
 qboolean Cmd_Exists(const char *cmd_name);
-NOXREF char *Cmd_CompleteCommand(char *search, int forward);
+NOXREF const char *Cmd_CompleteCommand(const char *search, int forward);
 void Cmd_ExecuteString(char *text, cmd_source_t src);
 qboolean Cmd_ForwardToServerInternal(sizebuf_t *pBuf);
 void Cmd_ForwardToServer(void);
 qboolean Cmd_ForwardToServerUnreliable(void);
-NOXREF int Cmd_CheckParm(char *parm);
+NOXREF int Cmd_CheckParm(const char *parm);
 void Cmd_CmdList_f(void);

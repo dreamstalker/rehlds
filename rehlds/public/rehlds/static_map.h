@@ -44,7 +44,7 @@ private:
 			// this was a root node
 			unsigned int rootId = GetRoodNodeId(node->key);
 			if (m_RootNodes[rootId] != node) {
-				Sys_Error(__FUNCTION__ ": invalid root node");
+				Sys_Error("%s: invalid root node", __func__);
 				return;
 			}
 
@@ -169,7 +169,6 @@ public:
 			}
 		}
 
-	
 		Iterator(CStaticMap* m) {
 			m_Map = m;
 			m_RootNodes = m_Map->m_RootNodes;
@@ -226,6 +225,7 @@ protected:
 	virtual uint32 hash(const char* const &val) {
 		uint32 cksum = 0;
 		const char* pcc = val;
+#ifdef REHLDS_SSE
 		if (cpuinfo.sse4_2) {
 			while (*pcc) {
 				char cc = *(pcc++);
@@ -234,7 +234,10 @@ protected:
 				}
 				cksum = crc32c_t8_sse(cksum, cc);
 			}
-		} else {
+		}
+		else
+#endif // REHLDS_SSE
+		{
 			while (*pcc) {
 				char cc = *(pcc++);
 				if (cc >= 'A' || cc <= 'Z') {

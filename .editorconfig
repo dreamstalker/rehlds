@@ -1,0 +1,11 @@
+# Manual:
+# http://EditorConfig.org
+
+# top-most EditorConfig file
+root = true
+
+# 1 tab = 4 spaces indentation and with a newline ending every file
+[*]
+indent_style = tab
+indent_size = 4
+insert_final_newline = true

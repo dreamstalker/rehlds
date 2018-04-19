@@ -43,11 +43,6 @@ qboolean g_bMajorMapChange;
 int g_iQuitCommandIssued;
 char *g_pPostRestartCmdLineArgs;
 
-/*
-* Globals initialization
-*/
-#ifndef HOOK_ENGINE
-
 int r_dointerp = 1;
 
 SV_SAVEGAMECOMMENT_FUNC g_pSaveGameCommentFunc = &Host_SavegameComment;
@@ -167,25 +162,6 @@ TYPEDESCRIPTION gLightstyleDescription[] =
 	DEFINE_FIELD(SAVELIGHTSTYLE, index, FIELD_INTEGER),
 	DEFINE_ARRAY(SAVELIGHTSTYLE, style, FIELD_CHARACTER, MAX_LIGHTSTYLES),
 };
-
-#else // HOOK_ENGINE
-
-int r_dointerp;
-
-SV_SAVEGAMECOMMENT_FUNC g_pSaveGameCommentFunc;
-
-cvar_t voice_recordtofile;
-cvar_t voice_inputfromfile;
-cvar_t gHostMap;
-
-TITLECOMMENT gTitleComments[66];
-TYPEDESCRIPTION gGameHeaderDescription[3];
-TYPEDESCRIPTION gSaveHeaderDescription[13];
-TYPEDESCRIPTION gAdjacencyDescription[4];
-TYPEDESCRIPTION gEntityTableDescription[5];
-TYPEDESCRIPTION gLightstyleDescription[2];
-
-#endif // HOOK_ENGINE
 
 void SV_GetPlayerHulls(void)
 {
@@ -518,8 +494,9 @@ void Host_Status_Printf(qboolean conprint, qboolean log, char *fmt, ...)
 {
 	va_list argptr;
 	char string[4096];
+#ifndef REHLDS_FIXES
 	char szfile[260];
-
+#endif
 	va_start(argptr, fmt);
 	vsprintf(string, fmt, argptr);
 	va_end(argptr);
@@ -531,8 +508,12 @@ void Host_Status_Printf(qboolean conprint, qboolean log, char *fmt, ...)
 
 	if (log)
 	{
+#ifdef REHLDS_FIXES
+		COM_Log("status.log", "%s", string);
+#else
 		Q_snprintf(szfile, sizeof(szfile), "%s", "status.log");
 		COM_Log(szfile, "%s", string);
+#endif
 	}
 }
 
@@ -1631,8 +1612,7 @@ SAVERESTOREDATA *SaveGamestate(void)
 		if (g_psv.lightstyles[i])
 		{
 			light.index = i;
-			Q_strncpy(light.style, g_psv.lightstyles[i], 63);
-			light.style[63] = 0;
+			Q_strlcpy(light.style, g_psv.lightstyles[i]);
 			gEntityInterface.pfnSaveWriteFields(pSaveData, "LIGHTSTYLE", &light, gLightstyleDescription, ARRAYSIZE(gLightstyleDescription));
 		}
 	}
@@ -1715,7 +1695,7 @@ void EntityInit(edict_t *pEdict, int className)
 {
 	ENTITYINIT pEntityInit;
 	if (!className)
-		Sys_Error("Bad class!!\n");
+		Sys_Error("%s: Bad class!!\n", __func__);
 
 	ReleaseEntityDLLFields(pEdict);
 	InitEntityDLLFields(pEdict);
@@ -1839,9 +1819,15 @@ void ParseSaveTables(SAVERESTOREDATA *pSaveData, SAVE_HEADER *pHeader, int updat
 		gEntityInterface.pfnSaveReadFields(pSaveData, "LIGHTSTYLE", &light, gLightstyleDescription, ARRAYSIZE(gLightstyleDescription));
 		if (updateGlobals)
 		{
-			g_psv.lightstyles[light.index] = (char *)Hunk_Alloc(Q_strlen(light.style) + 1);
-			Q_strncpy(g_psv.lightstyles[light.index], light.style, 3);
-			g_psv.lightstyles[light.index][3] = 0;
+#ifdef REHLDS_FIXES
+			Q_strlcpy(g_rehlds_sv.lightstyleBuffers[light.index], light.style);
+			g_psv.lightstyles[light.index] = g_rehlds_sv.lightstyleBuffers[light.index];
+#else // REHLDS_FIXES
+			char *val = (char *)Hunk_Alloc(Q_strlen(light.style) + 1);
+			Q_strncpy(val, light.style, ARRAYSIZE(val) - 1);
+			val[ARRAYSIZE(val) - 1] = '\0';
+			g_psv.lightstyles[light.index] = val;
+#endif // REHLDS_FIXES
 		}
 	}
 }
@@ -1935,7 +1921,7 @@ int LoadGamestate(char *level, int createPlayers)
 				else
 				{
 					if (!(pEntInfo->flags & FENTTABLE_PLAYER))
-						Sys_Error("ENTITY IS NOT A PLAYER: %d\n", i);
+						Sys_Error("%s: ENTITY IS NOT A PLAYER: %d\n", __func__, i);
 
 					pent = g_psvs.clients[pEntInfo->id - 1].edict;
 					if (createPlayers && pent)
@@ -2048,7 +2034,7 @@ int CreateEntityList(SAVERESTOREDATA *pSaveData, int levelMask)
 					if (pent && !pent->free)
 					{
 						if (!(pEntInfo->flags & FENTTABLE_PLAYER))
-							Sys_Error("ENTITY IS NOT A PLAYER: %d\n", i);
+							Sys_Error("%s: ENTITY IS NOT A PLAYER: %d\n", __func__, i);
 
 						if (cl->active)
 							EntityInit(pent, pEntInfo->classname);
@@ -2339,7 +2325,7 @@ void Host_Changelevel2_f(void)
 	FS_LogLevelLoadStarted(level);
 
 	if (!SV_SpawnServer(FALSE, level, startspot))
-		Sys_Error("Host_Changelevel2: Couldn't load map %s\n", level);
+		Sys_Error("%s: Couldn't load map %s\n", __func__, level);
 
 	if (pSaveData)
 		SaveExit(pSaveData);
@@ -2461,6 +2447,7 @@ void Host_Say(qboolean teamonly)
 	int j;
 	char *p;
 	char text[128];
+	const size_t maxTextLength = sizeof(text) - 1;
 	//qboolean fromServer;//unsued?
 
 	if (g_pcls.state != ca_dedicated)
@@ -2472,7 +2459,7 @@ void Host_Say(qboolean teamonly)
 		return;
 	}
 
-	if (Cmd_Argc () < 2)
+	if (Cmd_Argc() < 2)
 		return;
 
 	p = (char *)Cmd_Args();
@@ -2480,28 +2467,72 @@ void Host_Say(qboolean teamonly)
 		return;
 
 	save = host_client;
+	// Removes quotes, "text" -> text
 	if (*p == '"')
 	{
 		p++;
-		p[Q_strlen(p) - 1] = 0;
+		p[Q_strlen(p) - 1] = '\0';
 	}
 
 #ifdef REHLDS_FIXES
-	// I think '\x01' don't need in TextMsg
+	// We can skip '\x01' cause there is no colors in message
 	Q_snprintf(text, sizeof(text), "<%s> ", Cvar_VariableString("hostname"));
 #else // REHLDS_FIXES
 	Q_snprintf(text, sizeof(text), "%c<%s> ", 1, Cvar_VariableString("hostname"));
 #endif // REHLDS_FIXES
 
-	if (Q_strlen(p) > 63)
-		p[63] = 0;
+	const size_t maxBeginningLength = 63;
+	//if (Q_strlen(p) > maxBeginningLength)
+	{
+		p[maxBeginningLength] = '\0';
+	}
 
-	j = sizeof(text) - 2 - Q_strlen(text);
-	if (Q_strlen(p) > (unsigned int)j)
-		p[j] = 0;
+#ifdef REHLDS_FIXES
+	j = maxTextLength - Q_strlen(text);
+#else // REHLDS_FIXES
+	// 1 cell for '\n'
+	j = maxTextLength - (Q_strlen(text) + 1);
+#endif // REHLDS_FIXES
+	//if (Q_strlen(p) > (unsigned int)j)
+	{
+		p[j] = '\0';
+	}
 
 	Q_strcat(text, p);
+	// '\n' is added by the client, so we can skip it
+#ifndef REHLDS_FIXES
 	Q_strcat(text, "\n");
+#endif // REHLDS_FIXES
+
+#ifdef REHLDS_FIXES
+	char preparedText[128];
+	const size_t preparedTextMaxLength = sizeof(preparedText) - 1;
+	size_t preparedTextLength = 0;
+	for (size_t i = 0; text[i] != '\0'; i++)
+	{
+		if (text[i] == '#' || text[i] == '%')
+		{
+			if (preparedTextLength + 3 > preparedTextMaxLength)
+				break;
+
+			// http://unicode-table.com/blocks/halfwidth-and-fullwidth-forms/
+			preparedText[preparedTextLength++] = char(0xEF);
+			preparedText[preparedTextLength++] = char(0xBC);
+			if (text[i] == '#')
+				preparedText[preparedTextLength++] = char(0x83);
+			else if (text[i] == '%')
+				preparedText[preparedTextLength++] = char(0x85);
+		}
+		else
+		{
+			if (preparedTextLength + 1 > preparedTextMaxLength)
+				break;
+
+			preparedText[preparedTextLength++] = text[i];
+		}
+	}
+	preparedText[preparedTextLength] = '\0';
+#endif // REHLDS_FIXES
 
 	for (j = 0, client = g_psvs.clients; j < g_psvs.maxclients; j++, client++)
 	{
@@ -2510,23 +2541,23 @@ void Host_Say(qboolean teamonly)
 
 		host_client = client;
 
-#ifdef REHLDS_FIXES
-		// Text can be unsafe (format %, localize #) therefore need to send text as argument. TextMsg is used here instead of SayText, because SayText in Half-Life doesn't support arguments.
-		PF_MessageBegin_I(MSG_ONE, RegUserMsg("TextMsg", -1), NULL, &g_psv.edicts[j + 1]);
-		PF_WriteByte_I(HUD_PRINTTALK);
-		PF_WriteString_I("%s");
-		PF_WriteString_I(text);
-		PF_MessageEnd_I();
-#else // REHLDS_FIXES
 		PF_MessageBegin_I(MSG_ONE, RegUserMsg("SayText", -1), NULL, &g_psv.edicts[j + 1]);
 		PF_WriteByte_I(0);
+#ifdef REHLDS_FIXES
+		PF_WriteString_I(preparedText);
+#else // REHLDS_FIXES
 		PF_WriteString_I(text);
-		PF_MessageEnd_I();
 #endif // REHLDS_FIXES
+		PF_MessageEnd_I();
 	}
 
 	host_client = save;
+#ifdef REHLDS_FIXES
+	Sys_Printf("%s\n", text);
+#else // REHLDS_FIXES
+	// Cause we have '\x01' in the beginning
 	Sys_Printf("%s", &text[1]);
+#endif // REHLDS_FIXES
 	Log_Printf("Server say \"%s\"\n", p);
 }
 
@@ -2607,7 +2638,7 @@ void Host_Kill_f(void)
 		Cmd_ForwardToServer();
 		return;
 	}
-	
+
 	if (sv_player->v.health <= 0.0f
 #ifdef REHLDS_FIXES
 	    || sv_player->v.deadflag != DEAD_NO
@@ -2808,7 +2839,7 @@ void Host_Stopdemo_f(void)
 	}
 }
 
-NOXREF void Host_EndSection(const char *pszSection)
+NOXREF void EXT_FUNC Host_EndSection(const char *pszSection)
 {
 	NOXREFCHECK;
 	giActive = DLL_PAUSED;
@@ -2923,68 +2954,98 @@ void Host_VoiceRecordStop_f(void)
 	}
 }
 
-void Host_Crash_f(void)
+NOXREF void Host_Crash_f(void)
 {
+	NOXREFCHECK;
 	int *p = NULL;
 	*p = 0xffffffff;
 }
 
+#ifdef REHLDS_FIXES
+void Host_ResourcesCount_f()
+{
+	if (g_psv.num_resources <= 0) {
+		Con_Printf("--------------\nNo precached resources.\n\n");
+		return;
+	}
+
+	Con_Printf("\n  %-4s    : %-5s %-5s\n\n", "Type", "Total", "Limit");
+	Con_Printf("  model   : %-5d %-5d\n", SV_CountResourceByType(t_model), MAX_MODELS - 2); // CL_LoadModel expects last model slot is empty
+	Con_Printf("  sound   : %-5d %-5d\n", SV_CountResourceByType(t_sound), MAX_SOUNDS - 1);
+	Con_Printf("  generic : %-5d %-5d\n", SV_CountResourceByType(t_generic), ARRAYSIZE(g_rehlds_sv.precachedGenericResourceNames));
+	Con_Printf("  event   : %-5d %-5d\n", SV_CountResourceByType(t_eventscript), MAX_EVENTS - 1);
+	Con_Printf("  decal   : %-5d %-5d\n", SV_CountResourceByType(t_decal), MAX_DECALS - 1);
+	Con_Printf("------------------------\n%d Total of precached resource count\n\n", g_psv.num_resources, RESOURCE_MAX_COUNT);
+}
+
+void Host_ResourcesList_f()
+{
+	const char *pszType = Cmd_Argv(1);
+	if (Cmd_Argc() == 1
+		|| (pszType[0]
+			&& Q_stricmp(pszType, "sound")
+			&& Q_stricmp(pszType, "model")
+			&& Q_stricmp(pszType, "decal")
+			&& Q_stricmp(pszType, "generic")
+			&& Q_stricmp(pszType, "event")))
+	{
+		Con_Printf("Usage:  reslist <sound | model | decal | generic | event>\n");
+		return;
+	}
+
+	resourcetype_t type;
+	switch (pszType[0])
+	{
+	default:
+	case 's': type = t_sound;       break;
+	case 'm': type = t_model;       break;
+	case 'd': type = t_decal;       break;
+	case 'g': type = t_generic;     break;
+	case 'e': type = t_eventscript; break;
+	}
+
+	size_t nWidthFileName = 8;
+	resource_t *pResourseList[RESOURCE_MAX_COUNT];
+	size_t nCountRes = SV_CountResourceByType(type, pResourseList, ARRAYSIZE(pResourseList), &nWidthFileName);
+
+	char szMD5Hash[9], szFlags[32];
+	Con_Printf("\n%4s  %-4s : %-*s %-10s %-8s %-26s\n\n", "#", "Index", nWidthFileName, "FileName", "Size", "MD5", "Flags");
+	for (size_t i = 0; i < nCountRes; i++)
+	{
+		szFlags[0] = '\0';
+		if (pResourseList[i]->ucFlags & RES_CHECKFILE) {
+			Q_strlcat(szFlags, "CHECKFILE");
+		}
+		if (pResourseList[i]->ucFlags & RES_FATALIFMISSING) {
+			Q_strlcat(szFlags, " FATALIFMISSING");
+		}
+
+		TrimSpace(szFlags, szFlags);
+
+		// copy only 4 bytes
+		Q_strlcpy(szMD5Hash, MD5_Print(pResourseList[i]->rgucMD5_hash));
+		Con_Printf("%4d. %-4d  : %-*s %-10s %-8s %-26s\n", i + 1, pResourseList[i]->nIndex, nWidthFileName, pResourseList[i]->szFileName, va("%.2fK", pResourseList[i]->nDownloadSize / 1024.0f), szMD5Hash, (szFlags[0] == '\0') ? "-" : szFlags);
+	}
+
+	Con_Printf("--------------\n%d Total %s's\n\n", nCountRes, pszType);
+}
+#endif
+
 void Host_InitCommands(void)
 {
-#ifdef HOOK_ENGINE
-	Cmd_AddCommand("shutdownserver", (xcommand_t)GetOriginalFuncAddrOrDefault("Host_KillServer_f", (void *)Host_KillServer_f));
-	Cmd_AddCommand("soundfade", (xcommand_t)GetOriginalFuncAddrOrDefault("Host_Soundfade_f", (void *)Host_Soundfade_f));
-	Cmd_AddCommand("status", (xcommand_t)GetOriginalFuncAddrOrDefault("Host_Status_f", (void *)Host_Status_f));
-	Cmd_AddCommand("stat", (xcommand_t)GetOriginalFuncAddrOrDefault("Host_Status_Formatted_f", (void *)Host_Status_Formatted_f));
-	Cmd_AddCommand("quit", (xcommand_t)GetOriginalFuncAddrOrDefault("Host_Quit_f", (void *)Host_Quit_f));
-	Cmd_AddCommand("_restart", (xcommand_t)GetOriginalFuncAddrOrDefault("Host_Quit_Restart_f", (void *)Host_Quit_Restart_f));
-	Cmd_AddCommand("exit", (xcommand_t)GetOriginalFuncAddrOrDefault("Host_Quit_f", (void *)Host_Quit_f));
-	Cmd_AddCommand("map", (xcommand_t)GetOriginalFuncAddrOrDefault("Host_Map_f", (void *)Host_Map_f));
-	Cmd_AddCommand("career", (xcommand_t)GetOriginalFuncAddrOrDefault("Host_Career_f", (void *)Host_Career_f));
-	Cmd_AddCommand("maps", (xcommand_t)GetOriginalFuncAddrOrDefault("Host_Maps_f", (void *)Host_Maps_f));
-	Cmd_AddCommand("restart", (xcommand_t)GetOriginalFuncAddrOrDefault("Host_Restart_f", (void *)Host_Restart_f));
-	Cmd_AddCommand("reload", (xcommand_t)GetOriginalFuncAddrOrDefault("Host_Reload_f", (void *)Host_Reload_f));
-	Cmd_AddCommand("changelevel", (xcommand_t)GetOriginalFuncAddrOrDefault("Host_Changelevel_f", (void *)Host_Changelevel_f));
-	Cmd_AddCommand("changelevel2", (xcommand_t)GetOriginalFuncAddrOrDefault("Host_Changelevel2_f", (void *)Host_Changelevel2_f));
-	Cmd_AddCommand("reconnect", (xcommand_t)GetOriginalFuncAddrOrDefault("Host_Reconnect_f", (void *)Host_Reconnect_f));
-	Cmd_AddCommand("version", (xcommand_t)GetOriginalFuncAddrOrDefault("Host_Version_f", (void *)Host_Version_f));
-	Cmd_AddCommand("say", (xcommand_t)GetOriginalFuncAddrOrDefault("Host_Say_f", (void *)Host_Say_f));
-	Cmd_AddCommand("say_team", (xcommand_t)GetOriginalFuncAddrOrDefault("Host_Say_Team_f", (void *)Host_Say_Team_f));
-	Cmd_AddCommand("tell", (xcommand_t)GetOriginalFuncAddrOrDefault("Host_Tell_f", (void *)Host_Tell_f));
-	Cmd_AddCommand("kill", (xcommand_t)GetOriginalFuncAddrOrDefault("Host_Kill_f", (void *)Host_Kill_f));
-	Cmd_AddCommand("pause", (xcommand_t)GetOriginalFuncAddrOrDefault("Host_TogglePause_f", (void *)Host_TogglePause_f));
-	Cmd_AddCommand("setpause", (xcommand_t)GetOriginalFuncAddrOrDefault("Host_Pause_f", (void *)Host_Pause_f));
-	Cmd_AddCommand("unpause", (xcommand_t)GetOriginalFuncAddrOrDefault("Host_Unpause_f", (void *)Host_Unpause_f));
-	Cmd_AddCommand("kick", (xcommand_t)GetOriginalFuncAddrOrDefault("Host_Kick_f", (void *)Host_Kick_f));
-	Cmd_AddCommand("ping", (xcommand_t)GetOriginalFuncAddrOrDefault("Host_Ping_f", (void *)Host_Ping_f));
-	Cmd_AddCommand("motd", (xcommand_t)GetOriginalFuncAddrOrDefault("Host_Motd_f", (void *)Host_Motd_f));
-	Cmd_AddCommand("motd_write", (xcommand_t)GetOriginalFuncAddrOrDefault("Host_Motd_Write_f", (void *)Host_Motd_Write_f));
-	Cmd_AddCommand("stats", (xcommand_t)GetOriginalFuncAddrOrDefault("Host_Stats_f", (void *)Host_Stats_f));
-	Cmd_AddCommand("load", (xcommand_t)GetOriginalFuncAddrOrDefault("Host_Loadgame_f", (void *)Host_Loadgame_f));
-	Cmd_AddCommand("save", (xcommand_t)GetOriginalFuncAddrOrDefault("Host_Savegame_f", (void *)Host_Savegame_f));
-	Cmd_AddCommand("autosave", (xcommand_t)GetOriginalFuncAddrOrDefault("Host_AutoSave_f", (void *)Host_AutoSave_f));
-	Cmd_AddCommand("writecfg", (xcommand_t)GetOriginalFuncAddrOrDefault("Host_WriteCustomConfig", (void *)Host_WriteCustomConfig));
-	Cmd_AddCommand("startdemos", (xcommand_t)GetOriginalFuncAddrOrDefault("Host_Startdemos_f", (void *)Host_Startdemos_f));
-	Cmd_AddCommand("demos", (xcommand_t)GetOriginalFuncAddrOrDefault("Host_Demos_f", (void *)Host_Demos_f));
-	Cmd_AddCommand("stopdemo", (xcommand_t)GetOriginalFuncAddrOrDefault("Host_Stopdemo_f", (void *)Host_Stopdemo_f));
-	Cmd_AddCommand("setinfo", (xcommand_t)GetOriginalFuncAddrOrDefault("Host_SetInfo_f", (void *)Host_SetInfo_f));
-	Cmd_AddCommand("fullinfo", (xcommand_t)GetOriginalFuncAddrOrDefault("Host_FullInfo_f", (void *)Host_FullInfo_f));
-	Cmd_AddCommand("mcache", (xcommand_t)GetOriginalFuncAddrOrDefault("Mod_Print", (void *)Mod_Print));
-	Cmd_AddCommand("interp", (xcommand_t)GetOriginalFuncAddrOrDefault("Host_Interp_f", (void *)Host_Interp_f));
-	Cmd_AddCommand("setmaster", (xcommand_t)GetOriginalFuncAddrOrDefault("Master_SetMaster_f", (void *)Master_SetMaster_f));
-	Cmd_AddCommand("heartbeat", (xcommand_t)GetOriginalFuncAddrOrDefault("Master_Heartbeat_f", (void *)Master_Heartbeat_f));
-#else // HOOK_ENGINE
 #ifndef SWDS
 	Cmd_AddCommand("cd", CD_Command_f);
 	Cmd_AddCommand("mp3", MP3_Command_f);
 	Cmd_AddCommand("_careeraudio", CareerAudio_Command_f);
-#endif // SWDS
+#endif
+
 	Cmd_AddCommand("shutdownserver", Host_KillServer_f);
 	Cmd_AddCommand("soundfade", Host_Soundfade_f);
 	Cmd_AddCommand("status", Host_Status_f);
 	Cmd_AddCommand("stat", Host_Status_Formatted_f);
 	Cmd_AddCommand("quit", Host_Quit_f);
 	Cmd_AddCommand("_restart", Host_Quit_Restart_f);
+
 #ifndef SWDS
 	Cmd_AddCommand("_setrenderer", Host_SetRenderer_f);
 	Cmd_AddCommand("_setvideomode", Host_SetVideoMode_f);
@@ -2992,7 +3053,8 @@ void Host_InitCommands(void)
 	Cmd_AddCommand("_sethdmodels", Host_SetHDModels_f);
 	Cmd_AddCommand("_setaddons_folder", Host_SetAddonsFolder_f);
 	Cmd_AddCommand("_set_vid_level", Host_SetVideoLevel_f);
-#endif // SWDS
+#endif
+
 	Cmd_AddCommand("exit", Host_Quit_f);
 	Cmd_AddCommand("map", Host_Map_f);
 	Cmd_AddCommand("career", Host_Career_f);
@@ -3019,15 +3081,18 @@ void Host_InitCommands(void)
 	Cmd_AddCommand("save", Host_Savegame_f);
 	Cmd_AddCommand("autosave", Host_AutoSave_f);
 	Cmd_AddCommand("writecfg", Host_WriteCustomConfig);
+
 #ifndef SWDS
 	Cmd_AddCommand("+voicerecord", Host_VoiceRecordStart_f);
 	Cmd_AddCommand("-voicerecord", Host_VoiceRecordStop_f);
-#endif // SWDS
+#endif
+
 	Cmd_AddCommand("startdemos", Host_Startdemos_f);
 	Cmd_AddCommand("demos", Host_Demos_f);
 	Cmd_AddCommand("stopdemo", Host_Stopdemo_f);
 	Cmd_AddCommand("setinfo", Host_SetInfo_f);
 	Cmd_AddCommand("fullinfo", Host_FullInfo_f);
+
 #ifndef SWDS
 	Cmd_AddCommand("god", Host_God_f);
 	Cmd_AddCommand("notarget", Host_Notarget_f);
@@ -3037,12 +3102,17 @@ void Host_InitCommands(void)
 	Cmd_AddCommand("viewframe", Host_Viewframe_f);
 	Cmd_AddCommand("viewnext", Host_Viewnext_f);
 	Cmd_AddCommand("viewprev", Host_Viewprev_f);
-#endif // SWDS
+#endif
+
 	Cmd_AddCommand("mcache", Mod_Print);
 	Cmd_AddCommand("interp", Host_Interp_f);
 	Cmd_AddCommand("setmaster", Master_SetMaster_f);
 	Cmd_AddCommand("heartbeat", Master_Heartbeat_f);
-#endif // HOOK_ENGINE
+
+#ifdef REHLDS_FIXES
+	Cmd_AddCommand("rescount", Host_ResourcesCount_f);
+	Cmd_AddCommand("reslist", Host_ResourcesList_f);
+#endif
 
 	Cvar_RegisterVariable(&gHostMap);
 	Cvar_RegisterVariable(&voice_recordtofile);

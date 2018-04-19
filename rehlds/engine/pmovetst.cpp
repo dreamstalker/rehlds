@@ -113,7 +113,7 @@ int EXT_FUNC PM_HullPointContents(hull_t *hull, int num, vec_t *p)
 	while (num >= 0)
 	{
 		if (num < hull->firstclipnode || num > hull->lastclipnode)
-			Sys_Error("PM_HullPointContents: bad node number");
+			Sys_Error("%s: bad node number", __func__);
 		node = &hull->clipnodes[num];
 		plane = &hull->planes[node->planenum];
 
@@ -433,7 +433,7 @@ pmtrace_t _PM_PlayerTrace(vec_t *start, vec_t *end, int traceFlags, int numphyse
 					continue;
 
 
-				if (pe->studiomodel->type == mod_studio && (pe->studiomodel->flags & 0x200 || (pmove->usehull == 2 && !(traceFlags & PM_STUDIO_BOX))))
+				if (pe->studiomodel->type == mod_studio && (pe->studiomodel->flags & STUDIO_TRACE_HITBOX || (pmove->usehull == 2 && !(traceFlags & PM_STUDIO_BOX))))
 				{
 					hull = PM_HullForStudioModel(pe->studiomodel, offset, pe->frame, pe->sequence, pe->angles, pe->origin, pe->controller, pe->blending, &pNumHulls);
 				}
@@ -501,7 +501,7 @@ pmtrace_t _PM_PlayerTrace(vec_t *start, vec_t *end, int traceFlags, int numphyse
 				closest = 0;
 				for (int j = 0; j < pNumHulls; j++)
 				{
-					Q_memset(&testtrace, 0, 0x44u);
+					Q_memset(&testtrace, 0, sizeof(testtrace));
 					testtrace.endpos[0] = end[0];
 					testtrace.endpos[1] = end[1];
 					testtrace.endpos[2] = end[2];
@@ -730,7 +730,7 @@ qboolean PM_RecursiveHullCheck(hull_t *hull, int num, float p1f, float p2f, cons
 		return 0;
 	}
 
-	while (1)
+	while (true)
 	{
 		midf = (float)(midf - 0.05);
 		if (midf < 0.0)
@@ -773,7 +773,7 @@ qboolean PM_RecursiveHullCheck(hull_t *hull, int num, float p1f, float p2f, cons
 
 	float DIST_EPSILON = 0.03125f;
 
-	while (1)
+	while (true)
 	{
 		if (num < 0)
 		{
@@ -896,7 +896,7 @@ qboolean PM_RecursiveHullCheck(hull_t *hull, int num, float p1f, float p2f, cons
 			return 0;
 		}
 
-		while (1)
+		while (true)
 		{
 			midf = (float)(midf - 0.05);
 			if (midf < 0.0)
@@ -923,7 +923,5 @@ qboolean PM_RecursiveHullCheck(hull_t *hull, int num, float p1f, float p2f, cons
 		Con_DPrintf("Trace backed up past 0.0.\n");
 		return 0;
 	}
-
-	return 0;
 }
 #endif // REHLDS_OPT_PEDANTIC
