@@ -333,6 +333,7 @@ void EXT_FUNC PF_sound_I(edict_t *entity, int channel, const char *sample, float
 	if (pitch < 0 || pitch > 255)
 		Sys_Error("%s: pitch = %i", __func__, pitch);
 #endif
+
 	SV_StartSound(0, entity, channel, sample, (int)(volume * 255), attenuation, fFlags, pitch);
 }
 
