@@ -34,31 +34,30 @@
 struct info_field_t
 {
 	char*	name;
-	bool	forceSend; // important public fields
 	bool	integer;
 };
 
 info_field_t g_info_important_fields[] =
 {
-	// name				force	integer
-	{ "name",			true,	false },
-	{ "model",			true,	false },
+	// name				integer
+	{ "name",			false },
+	{ "model",			false },
 
 	// model colors
-	{ "topcolor",		false,	true },
-	{ "bottomcolor",	false,	true },
+	{ "topcolor",		true },
+	{ "bottomcolor",	true },
 
 	// network
-	{ "rate",			false,	true },
-	{ "cl_updaterate",	false,	true },
-	{ "cl_lw",			false,	true },
-	{ "cl_lc",			false,	true },
+	{ "rate",			true },
+	{ "cl_updaterate",	true },
+	{ "cl_lw",			true },
+	{ "cl_lc",			true },
 
 	// hltv flag
-	{ "*hltv",			true,	true },
+	{ "*hltv",			true },
 
 	// avatars
-	{ "*sid",			true,	false } // transmit as string because it's int64
+	{ "*sid",			false } // transmit as string because it's int64
 };
 
 std::vector<info_field_t *> g_info_transmitted_fields;
@@ -199,14 +198,14 @@ void Info_RemoveKey(char *s, const char *lookup)
 		while (*s != '\\' && *s != '\0')
 			s++;
 
-		if (keyLen < lookupLen)
+		if (keyLen != lookupLen)
 			continue;
 
 		if (!Q_memcmp(key, lookup, lookupLen))
 		{
 			// cut key and value
 			Q_memmove(start, s, Q_strlen(s) + 1);
-			s = start;
+			break;
 		}
 	}
 #else
@@ -383,17 +382,25 @@ void Info_RemovePrefixedKeys(char *s, const char prefix)
 }
 
 #ifdef REHLDS_FIXES
-qboolean Info_IsKeyImportant(const char *key, size_t keyLen)
+qboolean Info_IsKeyImportant(const char *key)
 {
 	if (key[0] == '*')
 		return true;
 
 	for (auto& field : g_info_important_fields) {
-		if (!Q_strncmp(key, field.name, keyLen))
+		if (!Q_strcmp(key, field.name))
 			return true;
 	}
 
 	return false;
+}
+
+qboolean Info_IsKeyImportant(const char *key, size_t keyLen)
+{
+	char copy[MAX_KV_LEN];
+	Q_strncpy(copy, key, keyLen);
+	copy[sizeof(copy) - 1] = '\0';
+	return Info_IsKeyImportant(copy);
 }
 #else
 qboolean Info_IsKeyImportant(const char *key)
@@ -609,7 +616,7 @@ qboolean Info_SetValueForStarKey(char *s, const char *key, const char *value, si
 	if (Q_strlen(s) + neededLength >= maxsize)
 	{
 		// no more room in the buffer to add key/value
-		if (!Info_IsKeyImportant(key, keyLen))
+		if (!Info_IsKeyImportant(key))
 		{
 			// no room to add setting
 			Con_Printf("Info string length exceeded\n");
@@ -977,16 +984,6 @@ void Info_SetFieldsToTransmit()
 	}
 	g_info_transmitted_fields.clear();
 
-	// add default engine keys
-	for (auto& x : g_info_important_fields) {
-		if (x.forceSend) {
-			auto field = new info_field_t(x);
-			field->name = Q_strdup(field->name);
-			g_info_transmitted_fields.push_back(field);
-		}
-	}
-
-	// add user's keys
 	char keys[512];
 	Q_strlcpy(keys, sv_rehlds_userinfo_transmitted_fields.string);
 
@@ -1002,19 +999,18 @@ void Info_SetFieldsToTransmit()
 	for (char *key = Q_strtok(keys, "\\"); key; key = Q_strtok(nullptr, "\\"))
 	{
 		if (key[0] == '_') {
-			Con_Printf("%s: private keys couldn't be transmitted.\n", __FUNCTION__);
+			Con_Printf("%s: private key '%s' couldn't be transmitted.\n", __FUNCTION__, key);
 			continue;
 		}
 
 		if (Q_strlen(key) >= MAX_KV_LEN) {
-			Con_Printf("%s: keys and values must be < %i characters\n", __FUNCTION__, MAX_KV_LEN);
+			Con_Printf("%s: key '%s' is too long (should be < %i characters)\n", __FUNCTION__, key, MAX_KV_LEN);
 			continue;
 		}
 
 		if (std::find_if(g_info_transmitted_fields.begin(), g_info_transmitted_fields.end(), [key](info_field_t* field) { return !Q_strcmp(key, field->name); }) == g_info_transmitted_fields.end()) {
 			auto field = new info_field_t;
 			field->name = Q_strdup(key);
-			field->forceSend = true;
 			field->integer = isIntegerField(key);
 			g_info_transmitted_fields.push_back(field);
 		}
