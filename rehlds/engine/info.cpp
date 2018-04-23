@@ -1023,6 +1023,11 @@ void Info_SetFieldsToTransmit()
 
 void Info_CollectFields(char *destInfo, const char *srcInfo, size_t maxsize)
 {
+	if (g_info_transmitted_fields.empty()) {
+		Q_strlcpy(destInfo, srcInfo, maxsize);
+		return;
+	}
+
 	char add[512], valueBuf[32];
 	size_t userInfoLength = 0;
 
