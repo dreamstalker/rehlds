@@ -265,10 +265,9 @@ TEST(InfoCollectFields, Info, 1000)
 	testdata_t testdata[] = {
 		{ "\\cl_updaterate\\100\\topcolor\\60\\name\\abcdefghijklmnop\\*sid\\12332432525345\\_vgui_menus\\1\\model\\urban", "", "" },
 		{ "\\cl_updaterate\\100\\topcolor\\60\\name\\abcdefghijklmnop\\*sid\\12332432525345\\_vgui_menus\\1\\model\\urban", "_vgui_menus", "" },
-		{ "\\cl_updaterate\\100\\topcolor\\60\\name\\abcdefghijklmnop\\*sid\\12332432525345\\_vgui_menus\\1\\model\\urban", "topcolor\\sid\\_vgui_menus", "\\topcolor\\60\\*sid\\12332432525345" },
-		{ "\\*hltv\\1dsgs", "hltv", "\\*hltv\\1" },
+		{ "\\cl_updaterate\\100\\topcolor\\60\\name\\abcdefghijklmnop\\*sid\\12332432525345\\_vgui_menus\\1\\model\\urban", "topcolor\\*sid\\_vgui_menus", "\\topcolor\\60\\*sid\\12332432525345" },
+		{ "\\*hltv\\1dsgs", "*hltv", "\\*hltv\\1" },
 		{ "\\name\\player", "bottomcolor\\name", "\\name\\player" },
-		{ "\\team\\AbCd", "team", "\\team\\abcd" }
 	};
 
 	for (int i = 0; i < ARRAYSIZE(testdata); i++) {

@@ -57,7 +57,10 @@ info_field_t g_info_important_fields[] =
 	{ "*hltv",			true },
 
 	// avatars
-	{ "*sid",			false } // transmit as string because it's int64
+	{ "*sid",			false }, // transmit as string because it's int64
+
+	// gui/text menus
+	{ "_vgui_menus",	true }
 };
 
 std::vector<info_field_t *> g_info_transmitted_fields;
@@ -1048,5 +1051,7 @@ void Info_CollectFields(char *destInfo, const char *srcInfo, size_t maxsize)
 			userInfoLength += len;
 		}
 	}
+
+	destInfo[userInfoLength] = '\0';
 }
 #endif // REHLDS_FIXES
