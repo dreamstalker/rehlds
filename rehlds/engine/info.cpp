@@ -1028,6 +1028,7 @@ void Info_CollectFields(char *destInfo, const char *srcInfo, size_t maxsize)
 {
 	if (g_info_transmitted_fields.empty()) {
 		Q_strlcpy(destInfo, srcInfo, maxsize);
+		Info_RemovePrefixedKeys(destInfo, '_');
 		return;
 	}
 
