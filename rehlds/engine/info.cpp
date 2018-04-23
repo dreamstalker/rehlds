@@ -843,7 +843,7 @@ qboolean Info_IsValid(const char *s)
 	struct {
 		const char*	start;
 		size_t		len;
-	} existingKeys[MAX_INFO_STRING / 4];
+	} existingKeys[MAX_INFO_STRING * 2 / 4];
 	size_t existingKeysNum = 0;
 
 	auto isAlreadyExists = [&](const char* key, size_t len)
@@ -906,6 +906,9 @@ qboolean Info_IsValid(const char *s)
 
 		if (*s == '\0')
 			return TRUE;
+
+		if (existingKeysNum == ARRAYSIZE(existingKeys))
+			return FALSE;
 
 		existingKeys[existingKeysNum].start = key;
 		existingKeys[existingKeysNum].len = keyLen;
