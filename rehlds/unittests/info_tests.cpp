@@ -144,7 +144,11 @@ TEST(RemoveKeyValue, Info, 1000) {
 		{ "\\a\\b", "a", "" },
 		{ "\\a\\b\\c\\d\\e\\f", "d", "\\a\\b\\c\\d\\e\\f" },
 		{ "\\a\\b\\c\\d\\e\\f", "c", "\\a\\b\\e\\f" },
+#ifdef REHLDS_FIXES
+		{ "\\abc\\def\\x\\y\\ab\\cd", "ab", "\\abc\\def\\x\\y" },
+#else
 		{ "\\abc\\def\\x\\y\\ab\\cd", "ab", "\\x\\y" },
+#endif
 		{ "\\ab\\cd", "abc", "\\ab\\cd" }
 	};
 
@@ -193,6 +197,7 @@ TEST(FindLargestKey, Info, 1000) {
 	testdata_t testdata[] = {
 		{ "", "" },
 		{ "\\name\\a\\model\\b", "" },
+		{ "\\name\\a\\model\\b\\c\\d", "c" },
 		{ "\\name\\a\\1234567890abcdef\\b\\model\\c\\1234567890abcdefghi\\d\\rate\\1000", "1234567890abcdefghi" },
 		{ "\\name\\a\\1234567890abcdefghi\\b\\model\\c\\1234567890abcdef\\d\\rate\\1000", "1234567890abcdefghi" }
 	};
@@ -258,12 +263,12 @@ TEST(InfoCollectFields, Info, 1000)
 	};
 
 	testdata_t testdata[] = {
-		{ "\\cl_updaterate\\100\\topcolor\\60\\name\\abcdefghijklmnop\\*sid\\12332432525345\\_vgui_menus\\1\\model\\urban", "", "\\name\\abcdefghijklmnop\\model\\urban\\*sid\\12332432525345" },
-		{ "\\cl_updaterate\\100\\topcolor\\60\\name\\abcdefghijklmnop\\*sid\\12332432525345\\_vgui_menus\\1\\model\\urban", "_vgui_menus", "\\name\\abcdefghijklmnop\\model\\urban\\*sid\\12332432525345" },
-		{ "\\cl_updaterate\\100\\topcolor\\60\\name\\abcdefghijklmnop\\*sid\\12332432525345\\_vgui_menus\\1\\model\\urban", "topcolor", "\\name\\abcdefghijklmnop\\model\\urban\\*sid\\12332432525345\\topcolor\\60" },
-		{ "\\cl_updaterate\\100\\topcolor\\60abv123\\name\\abcdefghijklmnop\\*sid\\12332432525345\\_vgui_menus\\1\\model\\urban", "topcolor", "\\name\\abcdefghijklmnop\\model\\urban\\*sid\\12332432525345\\topcolor\\60" },
-		{ "\\*hltv\\1dsgs", "", "\\*hltv\\1" },
-		{ "\\name\\player", "bottomcolor", "\\name\\player" },
+		{ "\\cl_updaterate\\100\\topcolor\\60\\name\\abcdefghijklmnop\\*sid\\12332432525345\\_vgui_menus\\1\\model\\urban", "", "" },
+		{ "\\cl_updaterate\\100\\topcolor\\60\\name\\abcdefghijklmnop\\*sid\\12332432525345\\_vgui_menus\\1\\model\\urban", "_vgui_menus", "" },
+		{ "\\cl_updaterate\\100\\topcolor\\60\\name\\abcdefghijklmnop\\*sid\\12332432525345\\_vgui_menus\\1\\model\\urban", "topcolor\\sid\\_vgui_menus", "\\topcolor\\60\\*sid\\12332432525345" },
+		{ "\\*hltv\\1dsgs", "hltv", "\\*hltv\\1" },
+		{ "\\name\\player", "bottomcolor\\name", "\\name\\player" },
+		{ "\\team\\AbCd", "team", "\\team\\abcd" }
 	};
 
 	for (int i = 0; i < ARRAYSIZE(testdata); i++) {
@@ -278,3 +283,27 @@ TEST(InfoCollectFields, Info, 1000)
 	}
 }
 #endif
+
+TEST(Info_IsKeyImportant, Info, 1000)
+{
+	struct testdata_t {
+		const char* key;
+		bool result;
+	};
+
+	testdata_t testdata[] = {
+		{ "bottomcolor", true },
+		{ "bot", false },
+		{ "*any", true },
+		{ "_any", false },
+		{ "model2", false }
+	};
+
+	for (int i = 0; i < ARRAYSIZE(testdata); i++) {
+		testdata_t* d = &testdata[i];
+
+		bool result = Info_IsKeyImportant(d->key);
+
+		CHECK("wrong result", d->result == result);
+	}
+}

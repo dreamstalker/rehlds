@@ -398,8 +398,9 @@ qboolean Info_IsKeyImportant(const char *key)
 qboolean Info_IsKeyImportant(const char *key, size_t keyLen)
 {
 	char copy[MAX_KV_LEN];
-	Q_strncpy(copy, key, keyLen);
-	copy[sizeof(copy) - 1] = '\0';
+	keyLen = min(keyLen, sizeof(copy) - 1);
+	Q_memcpy(copy, key, keyLen);
+	copy[keyLen] = '\0';
 	return Info_IsKeyImportant(copy);
 }
 #else
