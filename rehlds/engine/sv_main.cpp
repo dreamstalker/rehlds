@@ -202,6 +202,7 @@ cvar_t sv_rehlds_userinfo_transmitted_fields = { "sv_rehlds_userinfo_transmitted
 cvar_t sv_rehlds_attachedentities_playeranimationspeed_fix = {"sv_rehlds_attachedentities_playeranimationspeed_fix", "0", 0, 0.0f, nullptr};
 cvar_t sv_rehlds_local_gametime = {"sv_rehlds_local_gametime", "0", 0, 0.0f, nullptr};
 cvar_t sv_rehlds_send_mapcycle = { "sv_rehlds_send_mapcycle", "0", 0, 0.0f, nullptr };
+cvar_t sv_rehlds_maxclients_from_single_ip = { "sv_rehlds_maxclients_from_single_ip", "5", 0, 5.0f, nullptr };
 #endif
 
 delta_t *SV_LookupDelta(char *name)
@@ -1860,11 +1861,20 @@ int SV_CheckIPConnectionReuse(netadr_t *adr)
 		}
 	}
 
+#ifdef REHLDS_FIXES
+	if (count > (int)sv_rehlds_maxclients_from_single_ip.value)
+	{
+		Log_Printf("Too many connect packets from %s (%i>%i)\n", NET_AdrToString(*adr), count, (int)sv_rehlds_maxclients_from_single_ip.value);
+		SV_RejectConnection(adr, "Too many connect packets from your ip address\n");
+		return 0;
+	}
+#else
 	if (count > 5)
 	{
 		Log_Printf("Too many connect packets from %s\n", NET_AdrToString(*adr));
 		return 0;
 	}
+#endif
 
 	return 1;
 }
@@ -7804,6 +7814,7 @@ void SV_Init(void)
 	Cvar_RegisterVariable(&sv_rehlds_attachedentities_playeranimationspeed_fix);
 	Cvar_RegisterVariable(&sv_rehlds_local_gametime);
 	Cvar_RegisterVariable(&sv_rehlds_send_mapcycle);
+	Cvar_RegisterVariable(&sv_rehlds_maxclients_from_single_ip);
 	
 	Cvar_RegisterVariable(&sv_rollspeed);
 	Cvar_RegisterVariable(&sv_rollangle);
