@@ -16,11 +16,12 @@ project.ext.dep_bzip2 = project(':dep/bzip2')
 
 void setupToolchain(NativeBinarySpec b) {
 	boolean useGcc = project.hasProperty("useGcc")
+
 	def cfg = rootProject.createToolchainConfig(b);
 	cfg.projectInclude(project, '/..', '/../..', '/src', '/../Director/src', '/../../common', '/../../engine', '/../../public', '/../../public/rehlds', '/../../pm_shared');
 	cfg.projectInclude(dep_bzip2, '/include')
 
-	cfg.singleDefines 'USE_BREAKPAD_HANDLER', 'HLTV', 'CORE_MODULE'
+	cfg.singleDefines 'USE_BREAKPAD_HANDLER', 'HLTV', 'HLTV_FIXES', 'PROXY_MODULE'
 
 	if (cfg instanceof MsvcToolchainConfig) {
 		cfg.compilerOptions.pchConfig = new MsvcToolchainConfig.PrecompiledHeadersConfig(

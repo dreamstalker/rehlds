@@ -51,32 +51,41 @@ enum
 	MAX_FLOWS
 };
 
-#define MAX_LATENT				32
-#define FRAGMENT_MAX_SIZE		1400		// Size of fragmentation buffer internal buffers
+#define MAX_LATENT                     32
+#define FRAGMENT_MAX_SIZE              1400		// Size of fragmentation buffer internal buffers
+#define CLIENT_FRAGMENT_SIZE_ONCONNECT 128
+#define CUSTOMIZATION_MAX_SIZE         20480
 
-#define UDP_HEADER_SIZE			28
-#define MAX_RELIABLE_PAYLOAD	1200
+// Client sends normal fragments only while connecting
+#define MAX_NORMAL_FRAGMENTS           (MAX_POSSIBLE_MSG / CLIENT_FRAGMENT_SIZE_ONCONNECT)
 
-#define MAKE_FRAGID(id, count)	(((id & 0xffff) << 16) | (count & 0xffff))
-#define FRAG_GETID(fragid)		((fragid >> 16) & 0xffff)
-#define FRAG_GETCOUNT(fragid)	(fragid & 0xffff)
+// While client is connecting it sending fragments with minimal size, also it transfers sprays with minimal fragments...
+// But with sv_delayed_spray_upload it sends with cl_dlmax fragment size
+#define MAX_FILE_FRAGMENTS             (CUSTOMIZATION_MAX_SIZE / FRAGMENT_C2S_MIN_SIZE)
+
+#define UDP_HEADER_SIZE                28
+#define MAX_RELIABLE_PAYLOAD           1200
+
+#define MAKE_FRAGID(id, count)         (((id & 0xffff) << 16) | (count & 0xffff))
+#define FRAG_GETID(fragid)             ((fragid >> 16) & 0xffff)
+#define FRAG_GETCOUNT(fragid)          (fragid & 0xffff)
 
 // Max length of a reliable message
-#define	MAX_MSGLEN				3990		// 10 reserved for fragheader?
-#define MAX_POSSIBLE_MSG		65536
+#define MAX_MSGLEN                     3990		// 10 reserved for fragheader?
+#define MAX_POSSIBLE_MSG               65536
 
-#define MAX_ROUTEABLE_PACKET	1400
-#define MIN_ROUTEABLE_PACKET	16
+#define MAX_ROUTEABLE_PACKET           1400
+#define MIN_ROUTEABLE_PACKET           16
 
-#define SPLIT_SIZE				(MAX_ROUTEABLE_PACKET - sizeof(SPLITPACKET))
+#define SPLIT_SIZE                     (MAX_ROUTEABLE_PACKET - sizeof(SPLITPACKET))
 
 // Pad this to next higher 16 byte boundary
 // This is the largest packet that can come in/out over the wire, before processing the header
 // bytes will be stripped by the networking channel layer
 // #define NET_MAX_MESSAGE PAD_NUMBER( ( MAX_MSGLEN + HEADER_BYTES ), 16 )
 // This is currently used value in the engine. TODO: define above gives 4016, check it why.
-#define NET_MAX_MESSAGE 4037
-#define NET_HEADER_FLAG_SPLITPACKET -2
+#define NET_MAX_MESSAGE                4037
+#define NET_HEADER_FLAG_SPLITPACKET    -2
 
 class IBaseSystem;
 
@@ -116,7 +125,7 @@ public:
 	typedef struct flowstats_s
 	{
 		int size;		// Size of message sent/received
-		double time;		// Time that message was sent/received
+		double time;	// Time that message was sent/received
 	} flowstats_t;
 
 	typedef struct flow_s
@@ -134,24 +143,25 @@ public:
 	typedef struct fragbuf_s
 	{
 		struct fragbuf_s *next;			// Next buffer in chain
-		int bufferId;				// Id of this buffer
-		byte data[FRAGMENT_MAX_SIZE];		// The actual data sits here
+		int bufferId;					// Id of this buffer
+		byte data[FRAGMENT_MAX_SIZE];	// The actual data sits here
 
-		int size;				// Size of data to read at that offset
-		bool isfile;				// Is this a file buffer?
-		bool isbuffer;				// Is this file buffer from memory ( custom decal, etc. ).
+		int size;						// Size of data to read at that offset
+		bool isfile;					// Is this a file buffer?
+		bool isbuffer;					// Is this file buffer from memory ( custom decal, etc. ).
 		char fileName[MAX_PATH];		// Name of the file to save out on remote host
-		int fOffset;				// Offset in file from which to read data
+		int fOffset;					// Offset in file from which to read data
 	} fragbuf_t;
 
 	// Waiting list of fragbuf chains
 	typedef struct fragbufwaiting_s
 	{
-		struct fragbufwaiting_s *next;		// Next chain in waiting list
-		int fragbufcount;			// Number of buffers in this chain
+		struct fragbufwaiting_s *next;	// Next chain in waiting list
+		int fragbufcount;				// Number of buffers in this chain
 		fragbuf_t *fragbufs;			// The actual buffers
 	} fragbufwaiting_t;
 
+	bool ValidateFragments(BitBuffer &buf, bool *frag_message, unsigned int *fragid, int *frag_offset, int *frag_length);
 	bool CreateFragmentsFromFile(char *fileName);
 	bool CopyFileFragments();
 	void GetFlowStats(float *avgInKBSec, float *avgOutKBSec);
@@ -179,25 +189,25 @@ public:
 	NetAddress m_remote_address;		// Address this channel is talking to.
 	double m_last_received;
 	double m_last_send;
-	double m_connect_time;			// Time when channel was connected.
+	double m_connect_time;				// Time when channel was connected.
 	float m_timeout;
 	int m_max_bandwidth_rate;
 	double m_send_interval;
-	int m_updaterate;			// Bandwidth choke, bytes per second
-	double m_cleartime;			// If realtime > cleartime, free to send next packet
+	int m_updaterate;					// Bandwidth choke, bytes per second
+	double m_cleartime;					// If realtime > cleartime, free to send next packet
 
 	bool m_keep_alive;
 	bool m_crashed;
 	bool m_connected;
 
 	// Sequencing variables
-	int m_incoming_sequence;		// Increasing count of sequence numbers
-	int m_incoming_acknowledged;		// # of last outgoing message that has been ack'd.
+	int m_incoming_sequence;				// Increasing count of sequence numbers
+	int m_incoming_acknowledged;			// # of last outgoing message that has been ack'd.
 	int m_incoming_reliable_acknowledged;	// Toggles T/F as reliable messages are received.
-	int m_incoming_reliable_sequence;	// single bit, maintained local
-	int m_outgoing_sequence;		// Message we are sending to remote
-	int m_reliable_sequence;		// Whether the message contains reliable payload, single bit
-	int m_last_reliable_sequence;		// Outgoing sequence number of last send that had reliable data
+	int m_incoming_reliable_sequence;		// single bit, maintained local
+	int m_outgoing_sequence;				// Message we are sending to remote
+	int m_reliable_sequence;				// Whether the message contains reliable payload, single bit
+	int m_last_reliable_sequence;			// Outgoing sequence number of last send that had reliable data
 
 	void *m_connection_status;
 
@@ -216,11 +226,11 @@ public:
 	int m_reliable_fragment[MAX_STREAMS];			// Is reliable waiting buf a fragment?
 	size_t m_reliable_fragid[MAX_STREAMS];			// Buffer id for each waiting fragment
 
-	fragbuf_t *m_fragbufs[MAX_STREAMS];			// The current fragment being set
-	int m_fragbufcount[MAX_STREAMS];			// The total number of fragments in this stream
+	fragbuf_t *m_fragbufs[MAX_STREAMS];				// The current fragment being set
+	int m_fragbufcount[MAX_STREAMS];				// The total number of fragments in this stream
 
-	int16 m_frag_startpos[MAX_STREAMS];			// Position in outgoing buffer where frag data starts
-	int16 m_frag_length[MAX_STREAMS];			// Length of frag data in the buffer
+	int16 m_frag_startpos[MAX_STREAMS];				// Position in outgoing buffer where frag data starts
+	int16 m_frag_length[MAX_STREAMS];				// Length of frag data in the buffer
 
 	fragbuf_t *m_incomingbufs[MAX_STREAMS];			// Incoming fragments are stored here
 
