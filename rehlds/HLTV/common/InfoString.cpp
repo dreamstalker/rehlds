@@ -81,7 +81,7 @@ bool InfoString::SetString(char *string)
 		return false;
 	}
 
-	Q_strnlcpy(m_String, string, m_MaxSize);
+	Q_strlcpy(m_String, string, m_MaxSize);
 	return true;
 }
 
@@ -95,7 +95,7 @@ void InfoString::SetMaxSize(unsigned int maxSize)
 	if (m_String)
 	{
 		if (maxSize > Q_strlen(m_String)) {
-			Q_strnlcpy(newBuffer, m_String, maxSize);
+			Q_strlcpy(newBuffer, m_String, maxSize);
 		}
 
 		Mem_Free(m_String);

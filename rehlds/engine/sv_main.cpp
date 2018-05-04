@@ -1927,7 +1927,7 @@ int EXT_FUNC SV_CheckKeyInfo_internal(netadr_t *adr, char *protinfo, unsigned sh
 
 	s = Info_ValueForKey(protinfo, "raw");
 
-	if (s[0] == 0 || (nAuthProtocol == 2 && Q_strlen(s) != 32))
+	if (s[0] == '\0' || (nAuthProtocol == 2 && Q_strlen(s) != 32))
 	{
 		SV_RejectConnection(adr, "Invalid authentication certificate length.\n");
 		return 0;
@@ -2051,7 +2051,6 @@ int SV_CheckUserInfo(netadr_t *adr, char *userinfo, qboolean bIsReconnecting, in
 	const char *s;
 	char newname[MAX_NAME];
 	int proxies;
-	int i;
 
 	if (!NET_IsLocalAddress(*adr))
 	{
@@ -2076,13 +2075,15 @@ int SV_CheckUserInfo(netadr_t *adr, char *userinfo, qboolean bIsReconnecting, in
 		}
 	}
 
-	i = Q_strlen(userinfo);
+#ifndef REHLDS_FIXES
+	int i = Q_strlen(userinfo);
 	if (i <= 4 || Q_strstr(userinfo, "\\\\") || userinfo[i - 1] == '\\')
 	{
 		SV_RejectConnection(adr, "Unknown HLTV client type.\n");
 
 		return 0;
 	}
+#endif
 
 	Info_RemoveKey(userinfo, "password");
 
@@ -2122,9 +2123,9 @@ int SV_CheckUserInfo(netadr_t *adr, char *userinfo, qboolean bIsReconnecting, in
 #endif
 
 #ifdef REHLDS_FIXES
-	if (name[0] == 0 || !Q_stricmp(name, "console") || Q_strstr(name, "..") || Q_strstr(name, "\"") || Q_strstr(name, "\\"))
+	if (name[0] == '\0' || !Q_stricmp(name, "console"))
 #else // REHLDS_FIXES
-	if (name[0] == 0 || !Q_stricmp(name, "console") || Q_strstr(name, "..") != NULL)
+	if (name[0] == '\0' || !Q_stricmp(name, "console") || Q_strstr(name, "..") != NULL)
 #endif // REHLDS_FIXES
 	{
 		Info_SetValueForKey(userinfo, "name", "unnamed", MAX_INFO_STRING);
@@ -2137,11 +2138,10 @@ int SV_CheckUserInfo(netadr_t *adr, char *userinfo, qboolean bIsReconnecting, in
 	if (SV_CheckForDuplicateNames(userinfo, bIsReconnecting, nReconnectSlot))
 	{
 		Q_strncpy(name, Info_ValueForKey(userinfo, "name"), MAX_NAME - 1);
-		name[MAX_NAME - 1] = 0;
+		name[MAX_NAME - 1] = '\0';
 	}
 
 	s = Info_ValueForKey(userinfo, "*hltv");
-
 	if (!s[0])
 		return 1;
 
@@ -3750,17 +3750,12 @@ void SV_FullClientUpdate(client_t *cl, sizebuf_t *sb)
 	char info[MAX_INFO_STRING];
 
 #ifdef REHLDS_FIXES
-	if (sv_rehlds_userinfo_transmitted_fields.string[0] != '\0')
-	{
-		Info_CollectFields(info, cl->userinfo, sv_rehlds_userinfo_transmitted_fields.string);
-	}
-	else
+	Info_CollectFields(info, cl->userinfo, MAX_INFO_STRING);
+#else // REHLDS_FIXES
+	Q_strncpy(info, cl->userinfo, sizeof(info) - 1);
+	info[sizeof(info) - 1] = '\0';
+	Info_RemovePrefixedKeys(info, '_');
 #endif // REHLDS_FIXES
-	{
-		Q_strncpy(info, cl->userinfo, sizeof(info) - 1);
-		info[sizeof(info) - 1] = 0;
-		Info_RemovePrefixedKeys(info, '_');
-	}
 
 	g_RehldsHookchains.m_SV_WriteFullClientUpdate.callChain(SV_WriteFullClientUpdate_internal, GetRehldsApiClient(cl), info, MAX_INFO_STRING, sb, GetRehldsApiClient((sb == &g_psv.reliable_datagram) ? nullptr : host_client));
 }
@@ -4904,12 +4899,7 @@ void SV_ExtractFromUserinfo(client_t *cl)
 		Q_UnicodeRepair(newname);
 	}
 
-	if (newname[0] == '\0' || !Q_stricmp(newname, "console")
-#ifdef REHLDS_FIXES
-		|| Q_strstr(newname, "..") || Q_strstr(newname, "\"") || Q_strstr(newname, "\\"))
-#else // REHLDS_FIXES
-		)
-#endif // REHLDS_FIXES
+	if (newname[0] == '\0' || !Q_stricmp(newname, "console"))
 	{
 		Info_SetValueForKey(userinfo, "name", "unnamed", MAX_INFO_STRING);
 	}
@@ -4930,26 +4920,26 @@ void SV_ExtractFromUserinfo(client_t *cl)
 	ISteamGameServer_BUpdateUserData(cl->network_userid.m_SteamID, cl->name, 0);
 
 	val = Info_ValueForKey(userinfo, "rate");
-	if (val[0] != 0)
+	if (val[0] != '\0')
 	{
 		i = Q_atoi(val);
 		cl->netchan.rate = Q_clamp(float(i), MIN_RATE, MAX_RATE);
 	}
 
 	val = Info_ValueForKey(userinfo, "topcolor");
-	if (val[0] != 0)
+	if (val[0] != '\0')
 		cl->topcolor = Q_atoi(val);
 	else
 		Con_DPrintf("topcolor unchanged for %s\n", cl->name);
 
 	val = Info_ValueForKey(userinfo, "bottomcolor");
-	if (val[0] != 0)
+	if (val[0] != '\0')
 		cl->bottomcolor = Q_atoi(val);
 	else
 		Con_DPrintf("bottomcolor unchanged for %s\n", cl->name);
 
 	val = Info_ValueForKey(userinfo, "cl_updaterate");
-	if (val[0] != 0)
+	if (val[0] != '\0')
 	{
 		i = Q_atoi(val);
 		if (i >= 10)
@@ -4959,13 +4949,13 @@ void SV_ExtractFromUserinfo(client_t *cl)
 	}
 
 	val = Info_ValueForKey(userinfo, "cl_lw");
-	cl->lw = val[0] != 0 ? Q_atoi(val) != 0 : 0;
+	cl->lw = val[0] != '\0' ? Q_atoi(val) != 0 : 0;
 
 	val = Info_ValueForKey(userinfo, "cl_lc");
-	cl->lc = val[0] != 0 ? Q_atoi(val) != 0 : 0;
+	cl->lc = val[0] != '\0' ? Q_atoi(val) != 0 : 0;
 
 	val = Info_ValueForKey(userinfo, "*hltv");
-	cl->proxy = val[0] != 0 ? Q_atoi(val) == TYPE_PROXY : 0;
+	cl->proxy = val[0] != '\0' ? Q_atoi(val) == TYPE_PROXY : 0;
 
 	SV_CheckUpdateRate(&cl->next_messageinterval);
 	SV_CheckRate(cl);
@@ -5803,6 +5793,10 @@ void EXT_FUNC SV_ActivateServer_internal(int runPhysics)
 		Q_sprintf(szCommand, "exec %s\n", mapchangecfgfile.string);
 		Cbuf_AddText(szCommand);
 	}
+
+#ifdef REHLDS_FIXES
+	Info_SetFieldsToTransmit();
+#endif
 }
 
 void SV_ServerShutdown(void)
