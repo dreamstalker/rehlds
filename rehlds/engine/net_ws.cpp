@@ -776,14 +776,6 @@ qboolean NET_GetLong(unsigned char *pData, int size, int *outSize)
 		gNetSplit.currentSequence = pHeader->sequenceNumber;
 		gNetSplit.splitCount = packetCount;
 
-#ifdef REHLDS_FIXES
-		gNetSplit.totalSize = 0;
-
-		// clear part's sequence
-		for (int i = 0; i < NET_WS_MAX_FRAGMENTS; i++)
-			gNetSplitFlags[i] = -1;
-#endif
-
 		if (net_showpackets.value == 4.0f)
 			Con_Printf("<-- Split packet restart %i count %i seq\n", gNetSplit.splitCount, sequenceNumber);
 	}
@@ -809,9 +801,6 @@ qboolean NET_GetLong(unsigned char *pData, int size, int *outSize)
 		if (SPLIT_SIZE * packetNumber + packetPayloadSize > MAX_UDP_PACKET)
 		{
 			Con_NetPrintf("Malformed packet size (%i, %i)\n", SPLIT_SIZE * packetNumber, packetPayloadSize);
-#ifdef REHLDS_FIXES
-			gNetSplit.currentSequence = -1;
-#endif
 			return FALSE;
 		}
 
@@ -833,9 +822,6 @@ qboolean NET_GetLong(unsigned char *pData, int size, int *outSize)
 					i + 1,
 					gNetSplitFlags[i],
 					gNetSplit.currentSequence);
-#ifdef REHLDS_FIXES
-				gNetSplit.currentSequence = -1; // no more parts can be attached, clear it
-#endif
 				return FALSE;
 			}
 		}
@@ -850,9 +836,6 @@ qboolean NET_GetLong(unsigned char *pData, int size, int *outSize)
 	}
 	else
 	{
-#ifdef REHLDS_FIXES
-		*outSize = 0;
-#endif
 		Con_NetPrintf("Split packet too large! %d bytes\n", gNetSplit.totalSize);
 		return FALSE;
 	}
@@ -928,21 +911,18 @@ qboolean NET_QueuePacket(netsrc_t sock)
 	{
 		return NET_LagPacket(TRUE, sock, &in_from, &in_message);
 	}
+#ifdef REHLDS_FIXES
+	else
+	{
+		return TRUE;
+	}
+#endif
 
 	if (in_message.cursize < 9)
 	{
 		Con_NetPrintf("Invalid split packet length %i\n", in_message.cursize);
 		return FALSE;
 	}
-
-#ifdef REHLDS_FIXES
-	// Only server can send split packets, there is no server<->server communication, so server can't receive split packets
-	if (sock == NS_SERVER)
-	{
-		Con_NetPrintf("Someone tries to send split packet to the server\n");
-		return FALSE;
-	}
-#endif
 
 	return NET_GetLong(in_message.data, ret, &in_message.cursize);
 }
