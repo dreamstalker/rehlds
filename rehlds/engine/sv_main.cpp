@@ -5811,11 +5811,6 @@ void SV_ServerShutdown(void)
 	}
 }
 
-bool SV_IsLocalModelTransmittable(const char *modelname)
-{
-	return ED_FindFromFile(g_psv.worldmodel->entities, "model", modelname);
-}
-
 int SV_SpawnServer(qboolean bIsDemo, char *server, char *startspot)
 {
 	client_t *cl;
@@ -6048,18 +6043,9 @@ int SV_SpawnServer(qboolean bIsDemo, char *server, char *startspot)
 	g_psv.model_precache[0] = pr_strings;
 #ifndef REHLDS_FIXES
 	g_psv.generic_precache[0] = pr_strings;
-#endif // REHLDS_FIXES
 
 	for (i = 1; i < g_psv.worldmodel->numsubmodels; i++)
 	{
-#ifdef REHLDS_FIXES
-		if (!SV_IsLocalModelTransmittable(localmodels[i]))
-		{
-			Con_DPrintf("Local model (%s) skipping precache, no entities transmittable.\n", localmodels[i]);
-			continue;
-		}
-#endif
-
 		g_psv.model_precache[i + 1] = localmodels[i];
 		g_psv.models[i + 1] = Mod_ForName(localmodels[i], FALSE, FALSE);
 		g_psv.model_precache_flags[i + 1] |= RES_FATALIFMISSING;
@@ -6071,6 +6057,7 @@ int SV_SpawnServer(qboolean bIsDemo, char *server, char *startspot)
 		}
 #endif
 	}
+#endif // REHLDS_FIXES
 
 	Q_memset(&g_psv.edicts->v, 0, sizeof(entvars_t));
 

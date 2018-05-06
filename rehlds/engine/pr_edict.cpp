@@ -265,6 +265,35 @@ char *ED_ParseEdict(char *data, edict_t *ent)
 
 				Q_strcpy(keyname, "angles");
 			}
+#ifdef REHLDS_FIXES
+			else if (!Q_strcmp(keyname, "model"))
+			{
+				// local model?
+				if (com_token[0] == '*')
+				{
+					// find empty slot
+					int i;
+					for (i = 0; i < MAX_MODELS; i++)
+					{
+						if (!g_psv.model_precache[i])
+							break;
+					}
+
+					int index = Q_atoi(com_token + 1);
+
+					g_psv.model_precache[i] = localmodels[index];
+					g_psv.models[i] = Mod_ForName(localmodels[index], FALSE, FALSE);
+					g_psv.model_precache_flags[i] |= RES_FATALIFMISSING;
+
+#ifdef REHLDS_OPT_PEDANTIC
+					{
+						int __itmp = i;
+						g_rehlds_sv.modelsMap.put(g_psv.model_precache[i], __itmp);
+					}
+#endif
+				}
+			}
+#endif
 
 			kvd.szClassName = className;
 			kvd.szKeyName = keyname;
@@ -280,68 +309,6 @@ char *ED_ParseEdict(char *data, edict_t *ent)
 		ent->serialnumber++;
 	}
 	return data;
-}
-
-bool ED_FindFromFile(char *data, const char *key, const char *lookup)
-{
-	char keyBuf[512], valueBuf[512];
-
-	while (true)
-	{
-		data = COM_Parse(data);
-
-		if (!data)
-		{
-			break;
-		}
-
-		if (com_token[0] != '{')
-		{
-			Host_Error("%s: found %s when expecting {", __func__, com_token);
-		}
-
-		while (true)
-		{
-			data = COM_Parse(data);
-
-			if (com_token[0] == '}')
-			{
-				break;
-			}
-
-			if (!data)
-			{
-				Host_Error("%s: EOF without closing brace", __func__);
-			}
-
-			Q_strlcpy(keyBuf, com_token);
-
-			// Remove tail spaces
-			for (int n = Q_strlen(keyBuf) - 1; n >= 0 && keyBuf[n] == ' '; n--)
-			{
-				keyBuf[n] = '\0';
-			}
-
-			data = COM_Parse(data);
-
-			if (!data)
-			{
-				Host_Error("%s: EOF without closing brace", __func__);
-			}
-
-			if (com_token[0] == '}')
-			{
-				Host_Error("%s: closing brace without data", __func__);
-			}
-
-			if (!Q_strcmp(keyBuf, key) && !Q_strcmp(lookup, com_token))
-			{
-				return true;
-			}
-		}
-	}
-
-	return false;
 }
 
 void ED_LoadFromFile(char *data)
