@@ -105,7 +105,7 @@
 	extern char g_szEXEName[ 4096 ];
 
 	#define _snprintf snprintf
-	
+
 	#if defined(OSX)
 		#define SO_ARCH_SUFFIX ".dylib"
 	#else

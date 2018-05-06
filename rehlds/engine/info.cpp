@@ -73,6 +73,7 @@ const char* EXT_FUNC Info_ValueForKey(const char *s, const char *lookup)
 	static char valueBuf[INFO_MAX_BUFFER_VALUES][MAX_KV_LEN];
 	static int valueIndex;
 
+	size_t lookupLen = Q_strlen(lookup);
 	while (*s == '\\')
 	{
 		// skip starting slash
@@ -87,7 +88,6 @@ const char* EXT_FUNC Info_ValueForKey(const char *s, const char *lookup)
 			s++;
 		}
 
-		size_t keyLen = s - key;
 		const char* value = ++s; // skip separating slash
 
 		// skip value
@@ -96,7 +96,7 @@ const char* EXT_FUNC Info_ValueForKey(const char *s, const char *lookup)
 
 		size_t valueLen = Q_min(s - value, MAX_KV_LEN - 1);
 
-		if (!Q_strncmp(key, lookup, keyLen))
+		if (!Q_strncmp(key, lookup, lookupLen))
 		{
 			char* dest = valueBuf[valueIndex];
 			Q_memcpy(dest, value, valueLen);
@@ -865,7 +865,7 @@ qboolean Info_IsValid(const char *s)
 			// key should end with a '\', not a NULL
 			if (*s == '\0')
 				return FALSE;
-	
+
 			// quotes are deprecated
 			if (*s == '"')
 				return FALSE;
