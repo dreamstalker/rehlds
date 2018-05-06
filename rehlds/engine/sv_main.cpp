@@ -5811,6 +5811,11 @@ void SV_ServerShutdown(void)
 	}
 }
 
+bool SV_IsLocalModelTransmittable(const char *modelname)
+{
+	return ED_FindFromFile(g_psv.worldmodel->entities, "model", modelname);
+}
+
 int SV_SpawnServer(qboolean bIsDemo, char *server, char *startspot)
 {
 	client_t *cl;
@@ -6047,6 +6052,14 @@ int SV_SpawnServer(qboolean bIsDemo, char *server, char *startspot)
 
 	for (i = 1; i < g_psv.worldmodel->numsubmodels; i++)
 	{
+#ifdef REHLDS_FIXES
+		if (!SV_IsLocalModelTransmittable(localmodels[i]))
+		{
+			Con_DPrintf("Local model (%s) skipping precache, no entities transmittable.\n", localmodels[i]);
+			continue;
+		}
+#endif
+
 		g_psv.model_precache[i + 1] = localmodels[i];
 		g_psv.models[i + 1] = Mod_ForName(localmodels[i], FALSE, FALSE);
 		g_psv.model_precache_flags[i + 1] |= RES_FATALIFMISSING;
@@ -7798,7 +7811,7 @@ void SV_Init(void)
 	Cvar_RegisterVariable(&sv_rehlds_attachedentities_playeranimationspeed_fix);
 	Cvar_RegisterVariable(&sv_rehlds_local_gametime);
 	Cvar_RegisterVariable(&sv_rehlds_send_mapcycle);
-	
+
 	Cvar_RegisterVariable(&sv_rollspeed);
 	Cvar_RegisterVariable(&sv_rollangle);
 #endif

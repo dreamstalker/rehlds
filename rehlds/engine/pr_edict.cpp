@@ -282,6 +282,68 @@ char *ED_ParseEdict(char *data, edict_t *ent)
 	return data;
 }
 
+bool ED_FindFromFile(char *data, const char *key, const char *lookup)
+{
+	char keyBuf[512], valueBuf[512];
+
+	while (true)
+	{
+		data = COM_Parse(data);
+
+		if (!data)
+		{
+			break;
+		}
+
+		if (com_token[0] != '{')
+		{
+			Host_Error("%s: found %s when expecting {", __func__, com_token);
+		}
+
+		while (true)
+		{
+			data = COM_Parse(data);
+
+			if (com_token[0] == '}')
+			{
+				break;
+			}
+
+			if (!data)
+			{
+				Host_Error("%s: EOF without closing brace", __func__);
+			}
+
+			Q_strlcpy(keyBuf, com_token);
+
+			// Remove tail spaces
+			for (int n = Q_strlen(keyBuf) - 1; n >= 0 && keyBuf[n] == ' '; n--)
+			{
+				keyBuf[n] = '\0';
+			}
+
+			data = COM_Parse(data);
+
+			if (!data)
+			{
+				Host_Error("%s: EOF without closing brace", __func__);
+			}
+
+			if (com_token[0] == '}')
+			{
+				Host_Error("%s: closing brace without data", __func__);
+			}
+
+			if (!Q_strcmp(keyBuf, key) && !Q_strcmp(lookup, com_token))
+			{
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
 void ED_LoadFromFile(char *data)
 {
 	edict_t *ent;

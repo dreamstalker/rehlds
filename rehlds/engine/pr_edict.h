@@ -40,6 +40,7 @@ NOXREF void ED_Count(void);
 char *ED_NewString(const char *string);
 char *ED_ParseEdict(char *data, edict_t *ent);
 void ED_LoadFromFile(char *data);
+bool ED_FindFromFile(char *data, const char *key, const char *lookup);
 NOXREF void PR_Init(void);
 edict_t *EDICT_NUM(int n);
 int NUM_FOR_EDICT(const edict_t *e);
