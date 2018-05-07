@@ -6043,7 +6043,6 @@ int SV_SpawnServer(qboolean bIsDemo, char *server, char *startspot)
 	g_psv.model_precache[0] = pr_strings;
 #ifndef REHLDS_FIXES
 	g_psv.generic_precache[0] = pr_strings;
-#endif // REHLDS_FIXES
 
 	for (i = 1; i < g_psv.worldmodel->numsubmodels; i++)
 	{
@@ -6058,6 +6057,7 @@ int SV_SpawnServer(qboolean bIsDemo, char *server, char *startspot)
 		}
 #endif
 	}
+#endif // REHLDS_FIXES
 
 	Q_memset(&g_psv.edicts->v, 0, sizeof(entvars_t));
 
@@ -7798,7 +7798,7 @@ void SV_Init(void)
 	Cvar_RegisterVariable(&sv_rehlds_attachedentities_playeranimationspeed_fix);
 	Cvar_RegisterVariable(&sv_rehlds_local_gametime);
 	Cvar_RegisterVariable(&sv_rehlds_send_mapcycle);
-	
+
 	Cvar_RegisterVariable(&sv_rollspeed);
 	Cvar_RegisterVariable(&sv_rollangle);
 #endif
