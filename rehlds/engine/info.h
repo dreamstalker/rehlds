@@ -48,11 +48,16 @@ const char *Info_ValueForKey(const char *s, const char *key);
 void Info_RemoveKey(char *s, const char *key);
 void Info_RemovePrefixedKeys(char *s, const char prefix);
 qboolean Info_IsKeyImportant(const char *key);
-char *Info_FindLargestKey(char *s, int maxsize);
+const char *Info_FindLargestKey(const char *s, int maxsize);
+#ifdef REHLDS_FIXES
+qboolean Info_SetValueForStarKey(char *s, const char *key, const char *value, size_t maxsize);
+#else
 void Info_SetValueForStarKey(char *s, const char *key, const char *value, int maxsize);
+#endif
 void Info_SetValueForKey(char *s, const char *key, const char *value, int maxsize);
 void Info_Print(const char *s);
 qboolean Info_IsValid(const char *s);
 #ifdef REHLDS_FIXES
-void Info_CollectFields(char *destInfo, const char *srcInfo, const char *collectedKeysOfFields);
+void Info_SetFieldsToTransmit();
+void Info_CollectFields(char *destInfo, const char *srcInfo, size_t maxsize);
 #endif

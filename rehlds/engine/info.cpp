@@ -31,10 +31,85 @@
 // NOTE: This file contains a lot of fixes that are not covered by REHLDS_FIXES define.
 // TODO: Most of the Info_ functions can be speedup via removing unneded copy of key and values.
 
+struct info_field_t
+{
+	char*	name;
+	bool	integer;
+};
+
+info_field_t g_info_important_fields[] =
+{
+	// name				integer
+	{ "name",			false },
+	{ "model",			false },
+
+	// model colors
+	{ "topcolor",		true },
+	{ "bottomcolor",	true },
+
+	// network
+	{ "rate",			true },
+	{ "cl_updaterate",	true },
+	{ "cl_lw",			true },
+	{ "cl_lc",			true },
+
+	// hltv flag
+	{ "*hltv",			true },
+
+	// avatars
+	{ "*sid",			false }, // transmit as string because it's int64
+
+	// gui/text menus
+	{ "_vgui_menus",	true }
+};
+
+std::vector<info_field_t *> g_info_transmitted_fields;
+
 // Searches the string for the given
 // key and returns the associated value, or an empty string.
-const char* EXT_FUNC Info_ValueForKey(const char *s, const char *key)
+const char* EXT_FUNC Info_ValueForKey(const char *s, const char *lookup)
 {
+#ifdef REHLDS_FIXES
+	static char valueBuf[INFO_MAX_BUFFER_VALUES][MAX_KV_LEN];
+	static int valueIndex;
+
+	size_t lookupLen = Q_strlen(lookup);
+	while (*s == '\\')
+	{
+		// skip starting slash
+		const char* key = ++s;
+
+		// skip key
+		while (*s != '\\') {
+			// Add some sanity checks because it's external function
+			if (*s == '\0')
+				return "";
+
+			s++;
+		}
+
+		size_t keyLen = s - key;
+		const char* value = ++s; // skip separating slash
+
+		// skip value
+		while (*s != '\\' && *s != '\0')
+			s++;
+
+		size_t valueLen = Q_min(s - value, MAX_KV_LEN - 1);
+
+		if (keyLen == lookupLen && !Q_strncmp(key, lookup, lookupLen))
+		{
+			char* dest = valueBuf[valueIndex];
+			Q_memcpy(dest, value, valueLen);
+			dest[valueLen] = '\0';
+
+			valueIndex = (valueIndex + 1) % INFO_MAX_BUFFER_VALUES;
+			return dest;
+		}
+	}
+
+	return "";
+#else
 	// use few (two?) buffers so compares work without stomping on each other
 	static char value[INFO_MAX_BUFFER_VALUES][MAX_KV_LEN];
 	static int valueindex;
@@ -69,7 +144,7 @@ const char* EXT_FUNC Info_ValueForKey(const char *s, const char *key)
 		*c = 0;
 		s++;	// skip the slash
 
-		// Copy a value
+				// Copy a value
 		nCount = 0;
 		c = value[valueindex];
 		while (*s != '\\')
@@ -88,7 +163,7 @@ const char* EXT_FUNC Info_ValueForKey(const char *s, const char *key)
 		}
 		*c = 0;
 
-		if (!Q_strcmp(key, pkey))
+		if (!Q_strcmp(lookup, pkey))
 		{
 			c = value[valueindex];
 			valueindex = (valueindex + 1) % INFO_MAX_BUFFER_VALUES;
@@ -97,10 +172,47 @@ const char* EXT_FUNC Info_ValueForKey(const char *s, const char *key)
 	}
 
 	return "";
+#endif
 }
 
-void Info_RemoveKey(char *s, const char *key)
+void Info_RemoveKey(char *s, const char *lookup)
 {
+#ifdef REHLDS_FIXES
+	size_t lookupLen = Q_strlen(lookup);
+
+	while (*s == '\\')
+	{
+		char* start = s;
+
+		// skip starting slash
+		const char* key = ++s;
+
+		// skip key
+		while (*s != '\\') {
+			if (*s == '\0')
+				return;
+
+			s++;
+		}
+
+		size_t keyLen = s - key;
+		++s; // skip separating slash
+
+		// skip value
+		while (*s != '\\' && *s != '\0')
+			s++;
+
+		if (keyLen != lookupLen)
+			continue;
+
+		if (!Q_memcmp(key, lookup, lookupLen))
+		{
+			// cut key and value
+			Q_memmove(start, s, Q_strlen(s) + 1);
+			break;
+		}
+	}
+#else
 	char pkey[MAX_KV_LEN];
 	char value[MAX_KV_LEN];
 	char *start;
@@ -108,13 +220,13 @@ void Info_RemoveKey(char *s, const char *key)
 	int cmpsize;
 	int nCount;
 
-	if (Q_strstr(key, "\\"))
+	if (Q_strstr(lookup, "\\"))
 	{
 		Con_Printf("Can't use a key with a \\\n");
 		return;
 	}
 
-	cmpsize = Q_strlen(key);
+	cmpsize = Q_strlen(lookup);
 	if (cmpsize > MAX_KV_LEN - 1)
 		cmpsize = MAX_KV_LEN - 1;
 
@@ -168,16 +280,47 @@ void Info_RemoveKey(char *s, const char *key)
 		*c = 0;
 
 		// Compare keys
-		if (!Q_strncmp(key, pkey, cmpsize))
+		if (!Q_strncmp(lookup, pkey, cmpsize))
 		{
 			Q_strcpy_s(start, s);	// remove this part
 			s = start;	// continue searching
 		}
 	}
+#endif
 }
 
 void Info_RemovePrefixedKeys(char *s, const char prefix)
 {
+#ifdef REHLDS_FIXES
+	while (*s == '\\')
+	{
+		char* start = s;
+
+		// skip starting slash
+		const char* key = ++s;
+
+		// skip key
+		while (*s != '\\') {
+			if (*s == '\0')
+				return;
+
+			s++;
+		}
+
+		// skip separating slash
+		++s;
+
+		// skip value
+		while (*s != '\\' && *s != '\0')
+			s++;
+
+		if (key[0] == prefix)
+		{
+			Q_memmove(start, s, Q_strlen(s) + 1);
+			s = start;
+		}
+	}
+#else
 	char pkey[MAX_KV_LEN];
 	char value[MAX_KV_LEN];
 	char *start;
@@ -239,12 +382,37 @@ void Info_RemovePrefixedKeys(char *s, const char prefix)
 			s = start;	// continue searching
 		}
 	}
+#endif
 }
 
+#ifdef REHLDS_FIXES
 qboolean Info_IsKeyImportant(const char *key)
 {
 	if (key[0] == '*')
 		return true;
+
+	for (auto& field : g_info_important_fields) {
+		if (!Q_strcmp(key, field.name))
+			return true;
+	}
+
+	return false;
+}
+
+qboolean Info_IsKeyImportant(const char *key, size_t keyLen)
+{
+	char copy[MAX_KV_LEN];
+	keyLen = min(keyLen, sizeof(copy) - 1);
+	Q_memcpy(copy, key, keyLen);
+	copy[keyLen] = '\0';
+	return Info_IsKeyImportant(copy);
+}
+#else
+qboolean Info_IsKeyImportant(const char *key)
+{
+	if (key[0] == '*')
+		return true;
+
 	if (!Q_strcmp(key, "name"))
 		return true;
 	if (!Q_strcmp(key, "model"))
@@ -261,19 +429,53 @@ qboolean Info_IsKeyImportant(const char *key)
 		return true;
 	if (!Q_strcmp(key, "cl_lc"))
 		return true;
-#ifndef REHLDS_FIXES
-	// keys starts from '*' already checked
 	if (!Q_strcmp(key, "*hltv"))
 		return true;
 	if (!Q_strcmp(key, "*sid"))
 		return true;
-#endif
 
 	return false;
 }
+#endif
 
-char *Info_FindLargestKey(char *s, int maxsize)
+const char *Info_FindLargestKey(const char *s, int maxsize)
 {
+#ifdef REHLDS_FIXES
+	static char largestKey[MAX_KV_LEN];
+	size_t largestLen = 0;
+
+	while (*s == '\\')
+	{
+		// skip starting slash
+		const char* key = ++s;
+
+		// skip key
+		while (*s != '\\') {
+			if (*s == '\0')
+				return "";
+
+			s++;
+		}
+
+		size_t keyLen = s - key;
+		const char* value = ++s; // skip separating slash
+
+			 // skip value
+		while (*s != '\\' && *s != '\0')
+			s++;
+
+		size_t valueLen = s - value;
+		size_t totalLen = keyLen + valueLen;
+
+		if (totalLen > largestLen && !Info_IsKeyImportant(key, keyLen)) {
+			largestLen = totalLen;
+			Q_memcpy(largestKey, key, keyLen);
+			largestKey[keyLen] = '\0';
+		}
+	}
+
+	return largestLen ? largestKey : "";
+#else
 	static char largest_key[MAX_KV_LEN];
 	char key[MAX_KV_LEN];
 	char value[MAX_KV_LEN];
@@ -347,8 +549,104 @@ char *Info_FindLargestKey(char *s, int maxsize)
 	}
 
 	return largest_key;
+#endif
 }
 
+#ifdef REHLDS_FIXES
+qboolean Info_SetValueForStarKey(char *s, const char *key, const char *value, size_t maxsize)
+{
+	char newArray[MAX_INFO_STRING], valueBuf[MAX_KV_LEN];
+
+	if (!key || !value)
+	{
+		Con_Printf("Keys and values can't be null\n");
+		return FALSE;
+	}
+
+	if (key[0] == '\0')
+	{
+		Con_Printf("Keys can't be an empty string\n");
+		return FALSE;
+	}
+
+	if (Q_strchr(key, '\\') || Q_strchr(value, '\\'))
+	{
+		Con_Printf("Can't use keys or values with a \\\n");
+		return FALSE;
+	}
+
+	if (Q_strchr(key, '\"') || Q_strchr(value, '\"'))
+	{
+		Con_Printf("Can't use keys or values with a \"\n");
+		return FALSE;
+	}
+
+	if (Q_strstr(key, "..") || Q_strstr(value, ".."))
+	{
+		Con_Printf("Can't use keys or values with a ..\n");
+		return FALSE;
+	}
+
+	int keyLen = Q_strlen(key);
+	int valueLen = Q_strlen(value);
+
+	if (keyLen >= MAX_KV_LEN || valueLen >= MAX_KV_LEN)
+	{
+		Con_Printf("Keys and values must be < %i characters\n", MAX_KV_LEN);
+		return FALSE;
+	}
+
+	if (!Q_UnicodeValidate(key) || !Q_UnicodeValidate(value))
+	{
+		Con_Printf("Keys and values must be valid utf8 text\n");
+		return FALSE;
+	}
+
+	// Remove current key/value and return if we doesn't specified to set a value
+	Info_RemoveKey(s, key);
+	if (value[0] == '\0')
+	{
+		return TRUE;
+	}
+
+	// auto lowercase team
+	if (!Q_strcmp(key, "team")) {
+		value = Q_strcpy(valueBuf, value);
+		Q_strlwr(valueBuf);
+	}
+
+	// Create key/value pair
+	size_t neededLength = Q_snprintf(newArray, sizeof newArray, "\\%s\\%s", key, value);
+
+	if (Q_strlen(s) + neededLength >= maxsize)
+	{
+		// no more room in the buffer to add key/value
+		if (!Info_IsKeyImportant(key))
+		{
+			// no room to add setting
+			Con_Printf("Info string length exceeded\n");
+			return FALSE;
+		}
+
+		// keep removing the largest key/values until we have a room
+		do
+		{
+			const char* largekey = Info_FindLargestKey(s, maxsize);
+			if (largekey[0] == '\0')
+			{
+				// no room to add setting
+				Con_Printf("Info string length exceeded\n");
+				return FALSE;
+			}
+			Info_RemoveKey(s, largekey);
+		} while ((int)Q_strlen(s) + neededLength >= maxsize);
+	}
+
+	Q_strcat(s, newArray);
+
+	return TRUE;
+}
+#else
 void Info_SetValueForStarKey(char *s, const char *key, const char *value, int maxsize)
 {
 	char newArray[MAX_INFO_STRING];
@@ -424,7 +722,7 @@ void Info_SetValueForStarKey(char *s, const char *key, const char *value, int ma
 		}
 
 		// keep removing the largest key/values until we have a room
-		char *largekey;
+		const char *largekey;
 		do
 		{
 			largekey = Info_FindLargestKey(s, maxsize);
@@ -453,6 +751,7 @@ void Info_SetValueForStarKey(char *s, const char *key, const char *value, int ma
 	}
 	*s = 0;
 }
+#endif
 
 void Info_SetValueForKey(char *s, const char *key, const char *value, int maxsize)
 {
@@ -541,6 +840,89 @@ void Info_Print(const char *s)
 
 qboolean Info_IsValid(const char *s)
 {
+#ifdef REHLDS_FIXES
+	struct {
+		const char*	start;
+		size_t		len;
+	} existingKeys[MAX_INFO_STRING * 2 / 4];
+	size_t existingKeysNum = 0;
+
+	auto isAlreadyExists = [&](const char* key, size_t len)
+	{
+		for (size_t i = 0; i < existingKeysNum; i++) {
+			if (len == existingKeys[i].len && !Q_memcmp(key, existingKeys[i].start, existingKeys[i].len))
+				return true;
+		}
+		return false;
+	};
+
+	while (*s == '\\')
+	{
+		const char* key = ++s;
+
+		// keys and values are separated by another slash
+		while (*s != '\\')
+		{
+			// key should end with a '\', not a NULL
+			if (*s == '\0')
+				return FALSE;
+
+			// quotes are deprecated
+			if (*s == '"')
+				return FALSE;
+
+			// ".." deprecated. don't know why. model path?
+			if (*s == '.' && *(s + 1) == '.')
+				return FALSE;
+
+			s++;
+		}
+
+		size_t keyLen = s - key;
+		if (keyLen == 0 || keyLen >= MAX_KV_LEN)
+			return FALSE;
+
+		if (isAlreadyExists(key, keyLen))
+			return FALSE;
+
+		const char* value = ++s; // skip the slash
+
+		// values should be ended by eos or slash
+		while (*s != '\\' && *s != '\0')
+		{
+			// quotes are deprecated
+			if (*s == '"')
+				return FALSE;
+
+			// ".." deprecated
+			if (*s == '.' && *(s + 1) == '.')
+				return FALSE;
+
+			s++;
+		}
+
+		size_t valueLen = s - value;
+		if (valueLen == 0 || valueLen >= MAX_KV_LEN)
+			return FALSE;
+
+		if (*s == '\0')
+			return TRUE;
+
+		if (existingKeysNum == ARRAYSIZE(existingKeys))
+			return FALSE;
+
+		existingKeys[existingKeysNum].start = key;
+		existingKeys[existingKeysNum].len = keyLen;
+		existingKeysNum++;
+	}
+
+	return FALSE;
+#else
+	char key[MAX_KV_LEN];
+	char value[MAX_KV_LEN];
+	char *c;
+	int nCount;
+
 	while (*s)
 	{
 		if (*s == '\\')
@@ -548,48 +930,46 @@ qboolean Info_IsValid(const char *s)
 			s++;	// skip the slash
 		}
 
-		// Returns character count
-		// -1 - error
-		//  0 - string size is zero
-		enum class AllowNull {
-			Yes,
-			No,
-		};
-		auto validate = [&s](AllowNull allowNull) -> int
+		// Copy a key
+		nCount = 0;
+		c = key;
+		while (*s != '\\')
 		{
-			int nCount = 0;
-
-			for(; *s != '\\'; nCount++, s++)
+			if (!*s)
 			{
-				if (!*s)
-				{
-					return (allowNull == AllowNull::Yes) ? nCount : -1;
-				}
-
-				if (nCount >= MAX_KV_LEN)
-				{
-					return -1;		// string length should be less then MAX_KV_LEN
-				}
-
-#ifdef REHLDS_FIXES
-				if (*s == '\"')
-				{
-					return -1; // string should not contain "
-				}
-#endif
+				return FALSE;		// key should end with a \, not a NULL
 			}
-			return nCount;
-		};
-
-		if (validate(AllowNull::No) == -1)
-		{
-			return FALSE;
+			if (nCount >= MAX_KV_LEN)
+			{
+				return FALSE;		// key length should be less then MAX_KV_LEN
+			}
+			*c++ = *s++;
+			nCount++;
 		}
-		s++; // Skip slash
+		*c = 0;
+		s++;	// skip the slash
 
-		if (validate(AllowNull::Yes) <= 0)
+				// Copy a value
+		nCount = 0;
+		c = value;
+		while (*s != '\\')
 		{
-			return FALSE;
+			if (!*s)
+			{
+				break;				// allow value to be ended with NULL
+			}
+			if (nCount >= MAX_KV_LEN)
+			{
+				return FALSE;		// value length should be less then MAX_KV_LEN
+			}
+			*c++ = *s++;
+			nCount++;
+		}
+		*c = 0;
+
+		if (value[0] == 0)
+		{
+			return FALSE;	// empty values are not valid
 		}
 
 		if (!*s)
@@ -599,52 +979,89 @@ qboolean Info_IsValid(const char *s)
 	}
 
 	return FALSE;
+#endif
 }
 
 #ifdef REHLDS_FIXES
-void Info_CollectFields(char *destInfo, const char *srcInfo, const char *collectedKeysOfFields)
+void Info_SetFieldsToTransmit()
 {
-	char keys[MAX_INFO_STRING];
-	Q_strcpy(keys, collectedKeysOfFields);
+	// clean all
+	for (auto field : g_info_transmitted_fields) {
+		free(field->name);
+		delete field;
+	}
+	g_info_transmitted_fields.clear();
 
-	size_t userInfoLength = 0;
-	for (const char *key = strtok(keys, "\\"); key; key = strtok(nullptr, "\\"))
+	char keys[512];
+	Q_strlcpy(keys, sv_rehlds_userinfo_transmitted_fields.string);
+
+	auto isIntegerField = [](const char* key)
 	{
-		const char *value = Info_ValueForKey(srcInfo, key);
+		for (auto& x : g_info_important_fields) {
+			if (!Q_strcmp(key, x.name))
+				return x.integer;
+		}
+		return false;
+	};
 
+	for (char *key = Q_strtok(keys, "\\"); key; key = Q_strtok(nullptr, "\\"))
+	{
+		if (key[0] == '_') {
+			Con_Printf("%s: private key '%s' couldn't be transmitted.\n", __FUNCTION__, key);
+			continue;
+		}
+
+		if (Q_strlen(key) >= MAX_KV_LEN) {
+			Con_Printf("%s: key '%s' is too long (should be < %i characters)\n", __FUNCTION__, key, MAX_KV_LEN);
+			continue;
+		}
+
+		if (std::find_if(g_info_transmitted_fields.begin(), g_info_transmitted_fields.end(), [key](info_field_t* field) { return !Q_strcmp(key, field->name); }) == g_info_transmitted_fields.end()) {
+			auto field = new info_field_t;
+			field->name = Q_strdup(key);
+			field->integer = isIntegerField(key);
+			g_info_transmitted_fields.push_back(field);
+		}
+	}
+}
+
+void Info_CollectFields(char *destInfo, const char *srcInfo, size_t maxsize)
+{
+	if (g_info_transmitted_fields.empty()) {
+		Q_strlcpy(destInfo, srcInfo, maxsize);
+		Info_RemovePrefixedKeys(destInfo, '_');
+		return;
+	}
+
+	char add[512], valueBuf[32];
+	size_t userInfoLength = 0;
+
+	for (auto field : g_info_transmitted_fields)
+	{
+		const char *value = Info_ValueForKey(srcInfo, field->name);
 		if (value[0] == '\0')
 			continue;
 
-		// Integer fields
-		if (!Q_strcmp(key, "*hltv")
-		 || !Q_strcmp(key, "bottomcolor")
-		 || !Q_strcmp(key, "topcolor"))
+		// clean garbage from integer fields
+		if (field->integer)
 		{
+			// don't send zero fields
 			int intValue = Q_atoi(value);
-
 			if (!intValue)
 				continue;
 
-			destInfo[userInfoLength++] = '\\';
-			Q_strcpy(&destInfo[userInfoLength], key);
-			userInfoLength += Q_strlen(key);
-
-			destInfo[userInfoLength++] = '\\';
-			userInfoLength += Q_sprintf(&destInfo[userInfoLength], "%d", intValue);
-		}
-		// String fields
-		else
-		{
-			destInfo[userInfoLength++] = '\\';
-			Q_strcpy(&destInfo[userInfoLength], key);
-			userInfoLength += Q_strlen(key);
-
-			destInfo[userInfoLength++] = '\\';
-			Q_strcpy(&destInfo[userInfoLength], value);
-			userInfoLength += Q_strlen(value);
+			Q_sprintf(valueBuf, "%i", intValue);
+			value = valueBuf;
 		}
 
+		// don't write truncated keys/values
+		size_t len = Q_sprintf(add, "\\%s\\%s", field->name, value);
+		if (userInfoLength + len < maxsize) {
+			Q_strcpy(destInfo + userInfoLength, add);
+			userInfoLength += len;
+		}
 	}
+
 	destInfo[userInfoLength] = '\0';
 }
 #endif // REHLDS_FIXES

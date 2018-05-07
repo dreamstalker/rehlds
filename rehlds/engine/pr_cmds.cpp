@@ -356,7 +356,6 @@ void EXT_FUNC PF_traceline_DLL(const float *v1, const float *v2, int fNoMonsters
 
 void EXT_FUNC TraceHull(const float *v1, const float *v2, int fNoMonsters, int hullNumber, edict_t *pentToSkip, TraceResult *ptr)
 {
-	hullNumber = hullNumber;
 	if (hullNumber < 0 || hullNumber > 3)
 		hullNumber = 0;
 

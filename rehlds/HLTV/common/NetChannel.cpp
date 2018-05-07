@@ -310,7 +310,12 @@ void NetChannel::UpdateFlow(int stream)
 
 void NetChannel::TransmitOutgoing()
 {
+#ifdef HLTV_FIXES
+	byte send_buf[MAX_UDP_PACKET];
+#else
 	byte send_buf[NET_MAX_MESSAGE];
+#endif
+
 	BitBuffer data(send_buf, sizeof(send_buf));
 
 	bool send_reliable;
@@ -336,7 +341,7 @@ void NetChannel::TransmitOutgoing()
 	// check for reliable message overflow
 	if (m_reliableStream.IsOverflowed())
 	{
-		m_System->DPrintf("Transmit:Outgoing m_reliableStream overflow (%s)\n", m_remote_address.ToString());
+		m_System->DPrintf("NetChannel::Transmit:Outgoing m_reliableStream overflow (%s)\n", m_remote_address.ToString());
 		m_reliableStream.Clear();
 		return;
 	}
@@ -344,7 +349,7 @@ void NetChannel::TransmitOutgoing()
 	// check for unreliable message overflow
 	if (m_unreliableStream.IsOverflowed())
 	{
-		m_System->DPrintf("Transmit:Outgoing m_unreliableStream overflow (%s)\n", m_remote_address.ToString());
+		m_System->DPrintf("NetChannel::Transmit:Outgoing m_unreliableStream overflow (%s)\n", m_remote_address.ToString());
 		m_unreliableStream.Clear();
 	}
 
@@ -653,6 +658,46 @@ bool NetChannel::CheckForCompletion(int stream, int intotalbuffers)
 	return false;
 }
 
+bool NetChannel::ValidateFragments(BitBuffer &buf, bool *frag_message, unsigned int *fragid, int *frag_offset, int *frag_length)
+{
+	for (int i = 0; i < MAX_STREAMS; i++)
+	{
+		if (!frag_message[i])
+			continue;
+
+		// total fragments should be <= MAX_FRAGMENTS and current fragment can't be > total fragments
+		if (i == FRAG_NORMAL_STREAM && FRAG_GETCOUNT(fragid[i]) > MAX_NORMAL_FRAGMENTS)
+			return false;
+
+		if (i == FRAG_FILE_STREAM && FRAG_GETCOUNT(fragid[i]) > MAX_FILE_FRAGMENTS)
+			return false;
+
+		if (FRAG_GETID(fragid[i]) > FRAG_GETCOUNT(fragid[i]))
+			return false;
+
+		if (!frag_length[i])
+			return false;
+
+		if ((size_t)frag_length[i] > FRAGMENT_MAX_SIZE || (size_t)frag_offset[i] > MAX_POSSIBLE_MSG - 1)
+			return false;
+
+		int frag_end = frag_offset[i] + frag_length[i];
+
+		// end of fragment is out of the packet
+		if (frag_end + buf.CurrentSize() > buf.GetMaxSize())
+			return false;
+
+		// fragment overlaps next stream's fragment or placed after it
+		for (int j = i + 1; j < MAX_STREAMS; j++)
+		{
+			if (frag_end > frag_offset[j] && frag_message[j]) // don't add buf.CurrentSize() for comparison
+				return false;
+		}
+	}
+
+	return true;
+}
+
 void NetChannel::ProcessIncoming(unsigned char *data, int size)
 {
 	BitBuffer message(data, size);
@@ -721,6 +766,11 @@ void NetChannel::ProcessIncoming(unsigned char *data, int size)
 				frag_length[i] = message.ReadShort();
 			}
 		}
+
+#ifdef HLTV_FIXES
+		if (!ValidateFragments(message, frag_message, fragid, frag_offset, frag_length))
+			return;
+#endif
 	}
 
 	sequence &= ~(1 << 31);
@@ -758,7 +808,12 @@ void NetChannel::ProcessIncoming(unsigned char *data, int size)
 	// clear the buffer to make way for the next
 	if (reliable_ack == (unsigned int)m_reliable_sequence)
 	{
+		// Make sure we actually could have ack'd this message
+#ifdef HLTV_FIXES
+		if (sequence_ack >= (unsigned)m_last_reliable_sequence)
+#else
 		if (m_incoming_acknowledged + 1 >= m_last_reliable_sequence)
+#endif
 		{
 			// it has been received
 			m_reliableOutSize = 0;
@@ -1103,6 +1158,24 @@ void NetChannel::CopyNormalFragments()
 		Mem_Free(p);
 		p = n;
 	}
+
+#ifdef HLTV_FIXES
+	if (packet->data.IsOverflowed())
+	{
+		if (packet->address.IsValid())
+		{
+			m_System->Printf("WARNING! NetChannel::CopyNormalFragments: Incoming overflowed from %s\n", packet->address.ToString());
+		}
+		else
+		{
+			m_System->Printf("WARNING! NetChannel::CopyNormalFragments: Incoming overflowed\n");
+		}
+
+		packet->data.Clear();
+		m_incomingbufs[FRAG_NORMAL_STREAM] = nullptr;
+		return;
+	}
+#endif
 
 	if (*(uint32 *)packet->data.GetData() == MAKEID('B', 'Z', '2', '\0'))
 	{

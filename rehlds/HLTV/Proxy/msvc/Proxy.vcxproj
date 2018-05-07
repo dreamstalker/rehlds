@@ -384,7 +384,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>HLTV;WIN32;_DEBUG;_WINDOWS;_USRDLL;PROXY_MODULE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>HLTV;HLTV_FIXES;WIN32;_DEBUG;_WINDOWS;_USRDLL;PROXY_MODULE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir)\..\src;$(ProjectDir)\..\..\;$(ProjectDir)\..\..\..\;$(ProjectDir)\..\..\Director\src;$(ProjectDir)\..\..\..\common;$(ProjectDir)\..\..\..\engine;$(ProjectDir)\..\..\..\public;$(ProjectDir)\..\..\..\public\rehlds;$(ProjectDir)\..\..\..\pm_shared;$(ProjectDir)\..\..\..\..\dep\bzip2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>precompiled.h</PrecompiledHeaderFile>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -418,7 +418,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>HLTV;WIN32;NDEBUG;_WINDOWS;_USRDLL;PROXY_MODULE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>HLTV;HLTV_FIXES;WIN32;NDEBUG;_WINDOWS;_USRDLL;PROXY_MODULE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir)\..\src;$(ProjectDir)\..\..\;$(ProjectDir)\..\..\..\;$(ProjectDir)\..\..\Director\src;$(ProjectDir)\..\..\..\common;$(ProjectDir)\..\..\..\engine;$(ProjectDir)\..\..\..\public;$(ProjectDir)\..\..\..\public\rehlds;$(ProjectDir)\..\..\..\pm_shared;$(ProjectDir)\..\..\..\..\dep\bzip2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>precompiled.h</PrecompiledHeaderFile>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>

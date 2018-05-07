@@ -265,6 +265,35 @@ char *ED_ParseEdict(char *data, edict_t *ent)
 
 				Q_strcpy(keyname, "angles");
 			}
+#ifdef REHLDS_FIXES
+			else if (!Q_strcmp(keyname, "model"))
+			{
+				// local model?
+				if (com_token[0] == '*')
+				{
+					// find empty slot
+					int i;
+					for (i = 0; i < MAX_MODELS; i++)
+					{
+						if (!g_psv.model_precache[i])
+							break;
+					}
+
+					int index = Q_atoi(com_token + 1);
+
+					g_psv.model_precache[i] = localmodels[index];
+					g_psv.models[i] = Mod_ForName(localmodels[index], FALSE, FALSE);
+					g_psv.model_precache_flags[i] |= RES_FATALIFMISSING;
+
+#ifdef REHLDS_OPT_PEDANTIC
+					{
+						int __itmp = i;
+						g_rehlds_sv.modelsMap.put(g_psv.model_precache[i], __itmp);
+					}
+#endif
+				}
+			}
+#endif
 
 			kvd.szClassName = className;
 			kvd.szKeyName = keyname;

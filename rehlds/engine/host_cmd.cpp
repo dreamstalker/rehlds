@@ -2365,16 +2365,55 @@ void Host_Version_f(void)
 
 void Host_FullInfo_f(void)
 {
-	char key[512];
-	char value[512];
-	char *o;
-	char *s;
-
 	if (Cmd_Argc() != 2)
 	{
 		Con_Printf("fullinfo <complete info string>\n");
 		return;
 	}
+
+#ifdef REHLDS_FIXES
+	char copy[MAX_INFO_STRING];
+	Q_strlcpy(copy, Cmd_Argv(1));
+
+	char* s = copy;
+	if (*s != '\\')
+		return;
+
+	bool eos = false;
+	while (!eos) {
+		const char* key = ++s;
+
+		// key
+		while (*s != '\\')
+		{
+			// key should end with a '\', not a NULL
+			if (*s == '\0') {
+				Con_Printf("MISSING VALUE\n");
+				return;
+			}
+
+			s++;
+		}
+
+		*s = '\0';
+		const char* value = ++s;
+
+		// value
+		while (*s != '\\') {
+			if (*s == '\0') {
+				eos = true;
+				break;
+			}
+
+			s++;
+		}
+
+		*s = '\0';
+#else
+	char key[512];
+	char value[512];
+	char *o;
+	char *s;
 
 	s = (char *)Cmd_Argv(1);
 	if (*s == '\\')
@@ -2400,6 +2439,7 @@ void Host_FullInfo_f(void)
 		*o = 0;
 		if (*s)
 			s++;
+#endif
 
 		if (cmd_source == src_command)
 		{
