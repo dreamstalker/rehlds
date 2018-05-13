@@ -114,6 +114,7 @@ void setupToolchain(NativeBinarySpec b) {
 	boolean unitTestExecutable = b.component.name.endsWith('_tests')
 	boolean swdsLib = b.name.toLowerCase().contains('swds')
 	boolean rehldsFixes = b.flavor.name.contains('rehldsFixes')
+	boolean release = b.buildType.name.toLowerCase() == 'release';
 
 	ToolchainConfig cfg = rootProject.createToolchainConfig(b)
 	cfg.projectInclude(project, '', '/public/rehlds', '/engine', '/common', '/pm_shared', '/rehlds', '/testsuite', '/hookers', '/public')
@@ -125,7 +126,7 @@ void setupToolchain(NativeBinarySpec b) {
 	}
 	b.lib LazyNativeDepSet.create(dep_bzip2, 'bzip2', b.buildType.name, true)
 
-	cfg.singleDefines 'USE_BREAKPAD_HANDLER', 'DEDICATED', 'SWDS', 'REHLDS_SELF', 'REHLDS_OPT_PEDANTIC', 'REHLDS_FLIGHT_REC', 'REHLDS_API'
+	cfg.singleDefines 'USE_BREAKPAD_HANDLER', 'DEDICATED', 'SWDS', 'REHLDS_SELF', 'REHLDS_OPT_PEDANTIC', 'REHLDS_API'
 
 	if (cfg instanceof MsvcToolchainConfig) {
 		cfg.compilerOptions.pchConfig = new MsvcToolchainConfig.PrecompiledHeadersConfig(
@@ -185,6 +186,10 @@ void setupToolchain(NativeBinarySpec b) {
 
 	if (rehldsFixes) {
 		cfg.singleDefines 'REHLDS_FIXES', 'REHLDS_SSE', 'REHLDS_JIT', 'REHLDS_CHECKS', 'HAVE_OPT_STRTOOLS'
+	}
+
+	if (!release) {
+		cfg.singleDefines 'REHLDS_FLIGHT_REC'
 	}
 
 	ToolchainConfigUtils.apply(project, cfg, b)
