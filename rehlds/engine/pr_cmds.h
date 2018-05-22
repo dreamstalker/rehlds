@@ -79,6 +79,7 @@ void PF_setsize_I(edict_t *e, const float *rgflMin, const float *rgflMax);
 void PF_setmodel_I(edict_t *e, const char *m);
 int PF_modelindex(const char *pstr);
 int ModelFrames(int modelIndex);
+int SV_LookupModelIndex(const char *name);
 void PF_bprint(char *s);
 void PF_sprint(char *s, int entnum);
 void ServerPrint(const char *szMsg);

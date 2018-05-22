@@ -271,26 +271,30 @@ char *ED_ParseEdict(char *data, edict_t *ent)
 				// local model?
 				if (com_token[0] == '*')
 				{
-					// find empty slot
-					int i;
-					for (i = 0; i < MAX_MODELS; i++)
+					// make sure that local model not pre-cached yet
+					if (!SV_LookupModelIndex(com_token))
 					{
-						if (!g_psv.model_precache[i])
-							break;
-					}
+						// find empty slot
+						int i;
+						for (i = 0; i < MAX_MODELS; i++)
+						{
+							if (!g_psv.model_precache[i])
+								break;
+						}
 
-					int index = Q_atoi(com_token + 1);
+						int index = Q_atoi(com_token + 1);
 
-					g_psv.model_precache[i] = localmodels[index];
-					g_psv.models[i] = Mod_ForName(localmodels[index], FALSE, FALSE);
-					g_psv.model_precache_flags[i] |= RES_FATALIFMISSING;
+						g_psv.model_precache[i] = localmodels[index];
+						g_psv.models[i] = Mod_ForName(localmodels[index], FALSE, FALSE);
+						g_psv.model_precache_flags[i] |= RES_FATALIFMISSING;
 
 #ifdef REHLDS_OPT_PEDANTIC
-					{
-						int __itmp = i;
-						g_rehlds_sv.modelsMap.put(g_psv.model_precache[i], __itmp);
-					}
+						{
+							int __itmp = i;
+							g_rehlds_sv.modelsMap.put(g_psv.model_precache[i], __itmp);
+						}
 #endif
+					}
 				}
 			}
 #endif

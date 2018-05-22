@@ -1345,7 +1345,6 @@ void EXT_FUNC EV_SV_Playback(int flags, int clientindex, unsigned short eventind
 	EV_Playback(flags,pEdict, eventindex, delay, origin, angles, fparam1, fparam2, iparam1, iparam2, bparam1, bparam2);
 }
 
-#ifdef REHLDS_FIXES
 int SV_LookupModelIndex(const char *name)
 {
 	if (!name || !name[0])
@@ -1369,7 +1368,6 @@ int SV_LookupModelIndex(const char *name)
 
 	return 0;
 }
-#endif // REHLDS_FIXES
 
 int EXT_FUNC PF_precache_model_I(const char *s)
 {
