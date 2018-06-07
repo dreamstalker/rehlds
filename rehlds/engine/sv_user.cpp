@@ -1159,6 +1159,89 @@ entity_state_t *SV_FindEntInPack(int index, packet_entities_t *pack)
 	return NULL;
 }
 
+#ifdef REHLDS_FIXES
+void VectorsAngles( const vec3_t forward, const vec3_t right, const vec3_t up, vec3_t angles )
+{
+	float	pitch, cpitch, yaw, roll;
+
+	pitch = -asin( forward[2] );
+	cpitch = cos( pitch );
+
+	if( fabs( cpitch ) > 0.001f )	// gimball lock?
+	{
+		cpitch = 1.0f / cpitch;
+		pitch = RAD2DEG( pitch );
+		yaw = RAD2DEG( atan2( forward[1] * cpitch, forward[0] * cpitch ));
+		roll = RAD2DEG( atan2( -right[2] * cpitch, up[2] * cpitch ));
+	}
+	else
+	{
+		pitch = forward[2] > 0 ? -90.0f : 90.0f;
+		yaw = RAD2DEG( atan2( right[0], -right[1] ));
+		roll = 180.0f;
+	}
+
+	angles[0] = pitch;
+	angles[1] = yaw;
+	angles[2] = roll;
+}
+
+static void LerpRotationMatrix(const float from[3][4], const float to[3][4], float s, float out[3][4])
+{
+	vec3_t f1, r1, u1, pos1, ang1;
+	vec3_t f2, r2, u2, pos2, ang2;
+	vec4_t q1, q2, q3;
+	float s1 = 1.0f - s; // backlerp
+	
+	for( int j = 0; j < 3; j++ )
+	{
+		f1[j]   = from[j][0];
+		r1[j]   = from[j][1];
+		u2[j]   = from[j][2];
+		pos1[j] = from[j][3];
+		
+		f1[j]   = to[j][0];
+		r1[j]   = to[j][1];
+		u1[j]   = to[j][2];
+		pos2[j] = to[j][3];
+	}
+		
+	VectorsAngles( f1, r1, u1, ang1 );
+	VectorsAngles( f2, r2, u2, ang2 );
+	
+	AngleQuaternion( ang1, q1 );
+	AngleQuaternion( ang2, q2 );
+	
+	QuaternionSlerp(q1, q2, s, q3);
+	pos1[0] = pos1[0] * s1 + pos2[0] * s;
+	pos1[1] = pos1[1] * s1 + pos2[1] * s;
+	pos1[2] = pos1[2] * s1 + pos2[2] * s;
+	
+	// result
+	QuaternionMatrix(q3, out);
+	out[0][3] = pos1[0];
+	out[1][3] = pos1[1];
+	out[2][3] = pos1[2];
+}
+
+static client_bone_state_t SV_StudioUnlagSlerpBones(const client_bone_state_t *from, const client_bone_state_t *to, float s)
+{
+	client_bone_state_t ret;
+	
+	ret.valid = true;
+	ret.numbones = from->numbones;
+	
+	for (int i = 0; i < from->numbones; i++)
+	{
+		LerpRotationMatrix(from->bonetransform[i], to->bonetransform[i], s, ret.bonetransform[i]);
+	}
+	
+	LerpRotationMatrix(from->rotationmatrix, to->rotationmatrix, s, ret.rotationmatrix);
+	
+	return ret;
+}
+#endif // REHLDS_FIXES
+
 void SV_SetupMove(client_t *_host_client)
 {
 	struct client_s *cl;
@@ -1355,8 +1438,7 @@ void SV_SetupMove(client_t *_host_client)
 		{
 			if( frame->bonestate.valid )
 			{
-				// TODO: interpolate
-				pos->bonestate = nextFrame->bonestate;
+				pos->bonestate = SV_StudioUnlagSlerpBones(&frame->bonestate, &nextFrame->bonestate, frac);
 			}
 			else
 			{
@@ -1964,6 +2046,7 @@ void SV_SaveBoneState(client_t *_host_client, const edict_t *edict)
 	
 	// copy bones
 	frame->bonestate.valid = true;
+	frame->bonestate.numbones = pstudiohdr->numbones;
 	Q_memcpy( frame->bonestate.bonetransform, bonetransform, sizeof( bonetransform ));
 	Q_memcpy( frame->bonestate.rotationmatrix, rotationmatrix, sizeof( rotationmatrix ));
 

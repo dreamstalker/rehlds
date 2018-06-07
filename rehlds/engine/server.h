@@ -182,6 +182,7 @@ typedef struct client_bone_state_s
 {
 	bonetransform_t bonetransform;
 	float rotationmatrix[3][4];
+	int numbones;
 	qboolean valid;
 } client_bone_state_t;
 #endif // REHLDS_FIXES
