@@ -7717,6 +7717,9 @@ void SV_Init(void)
 	Cvar_RegisterVariable(&sv_instancedbaseline);
 	Cvar_RegisterVariable(&sv_contact);
 	Cvar_RegisterVariable(&sv_unlag);
+#ifdef REHLDS_FIXES
+	Cvar_RegisterVariable(&sv_bone_unlag);
+#endif
 	Cvar_RegisterVariable(&sv_maxunlag);
 	Cvar_RegisterVariable(&sv_unlagpush);
 	Cvar_RegisterVariable(&sv_unlagsamples);

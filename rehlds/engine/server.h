@@ -53,6 +53,7 @@ const int MAX_NAME   = 32;
 #include "pm_defs.h"
 #include "inst_baseline.h"
 #include "net_ws.h"
+#include "studio_rehlds.h"
 
 const int DEFAULT_SOUND_PACKET_VOLUME			= 255;
 const float DEFAULT_SOUND_PACKET_ATTENUATION	= 1.0f;
@@ -175,6 +176,16 @@ struct rehlds_server_t {
 #endif
 };
 
+#ifdef REHLDS_FIXES
+// a1batross: "bone position"-based unlag
+typedef struct client_bone_state_s
+{
+	bonetransform_t bonetransform;
+	float rotationmatrix[3][4];
+	qboolean valid;
+} client_bone_state_t;
+#endif // REHLDS_FIXES
+
 typedef struct client_frame_s
 {
 	double senttime;
@@ -182,6 +193,9 @@ typedef struct client_frame_s
 	clientdata_t clientdata;
 	weapon_data_t weapondata[64];
 	packet_entities_t entities;
+#ifdef REHLDS_FIXES // a1batross: "bone position"-based unlag
+	client_bone_state_t bonestate;
+#endif // REHLDS_FIXES
 } client_frame_t;
 
 typedef struct client_s

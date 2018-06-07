@@ -627,7 +627,11 @@ hull_t *R_StudioHull(model_t *pModel, float frame, int sequence, const vec_t *an
 	pstudiohdr = (studiohdr_t *)Mod_Extradata(pModel);
 
 	vec_t angles2[3] = { -angles[0], angles[1], angles[2] };
+#ifdef REHLDS_FIXES
+	SV_StudioSetupUnlagBones( pModel, frame, sequence, angles2, origin, pcontroller, pblending, -1, pEdict );
+#else
 	g_pSvBlendingAPI->SV_StudioSetupBones(pModel, frame, sequence, angles2, origin, pcontroller, pblending, -1, pEdict);
+#endif
 
 	mstudiobbox_t *pbbox = (mstudiobbox_t *)((char *)pstudiohdr + pstudiohdr->hitboxindex);
 	for (int i = 0; i < pstudiohdr->numhitboxes; i++)
@@ -874,6 +878,17 @@ void EXT_FUNC AnimationAutomove(const edict_t *pEdict, float flTime)
 void EXT_FUNC GetBonePosition(const edict_t *pEdict, int iBone, float *rgflOrigin, float *rgflAngles)
 {
 	pstudiohdr = (studiohdr_t *)Mod_Extradata(g_psv.models[pEdict->v.modelindex]);
+#ifdef REHLDS_FIXES
+	SV_StudioSetupUnlagBones( g_psv.models[pEdict->v.modelindex],
+		pEdict->v.frame,
+		pEdict->v.sequence,
+		pEdict->v.angles,
+		pEdict->v.origin,
+		pEdict->v.controller,
+		pEdict->v.blending,
+		iBone,
+		pEdict );
+#else
 	g_pSvBlendingAPI->SV_StudioSetupBones(
 		g_psv.models[pEdict->v.modelindex],
 		pEdict->v.frame,
@@ -885,6 +900,7 @@ void EXT_FUNC GetBonePosition(const edict_t *pEdict, int iBone, float *rgflOrigi
 		iBone,
 		pEdict
 	);
+#endif
 
 	if (rgflOrigin)
 	{
@@ -907,6 +923,20 @@ void EXT_FUNC GetAttachment(const edict_t *pEdict, int iAttachment, float *rgflO
 	pattachment = (mstudioattachment_t *)((char *)pstudiohdr + pstudiohdr->attachmentindex);
 	pattachment += iAttachment;
 
+#ifdef REHLDS_FIXES
+	SV_StudioSetupUnlagBones( 
+		g_psv.models[pEdict->v.modelindex],
+		pEdict->v.frame,
+		pEdict->v.sequence,
+		angles,
+		pEdict->v.origin,
+		pEdict->v.controller,
+		pEdict->v.blending,
+		pattachment->bone,
+		pEdict 
+	);
+#else
+
 	g_pSvBlendingAPI->SV_StudioSetupBones(
 		g_psv.models[pEdict->v.modelindex],
 		pEdict->v.frame,
@@ -918,6 +948,7 @@ void EXT_FUNC GetAttachment(const edict_t *pEdict, int iAttachment, float *rgflO
 		pattachment->bone,
 		pEdict
 	);
+#endif
 
 	if (rgflOrigin)
 		VectorTransform(pattachment->org, bonetransform[pattachment->bone], rgflOrigin);

@@ -49,6 +49,9 @@ typedef struct sv_adjusted_positions_s
 	int deadflag;
 	vec3_t temp_org;
 	int temp_org_setflag;
+#ifdef REHLDS_FIXES
+	client_bone_state_t bonestate;
+#endif // REHLDS_FIXES
 } sv_adjusted_positions_t;
 
 typedef struct clc_func_s
@@ -71,6 +74,9 @@ extern cvar_t sv_footsteps;
 extern cvar_t sv_rollspeed;
 extern cvar_t sv_rollangle;
 extern cvar_t sv_unlag;
+#ifdef REHLDS_FIXES
+extern cvar_t sv_bone_unlag;
+#endif
 extern cvar_t sv_maxunlag;
 extern cvar_t sv_unlagpush;
 extern cvar_t sv_unlagsamples;
@@ -117,3 +123,10 @@ qboolean SV_SetPlayer(int idnum);
 void SV_ShowServerinfo_f(void);
 void SV_SendEnts_f(void);
 void SV_FullUpdate_f(void);
+
+#ifdef REHLDS_FIXES
+void SV_SaveBoneState( client_t *cl, const edict_t *edict );
+
+// "bone position"-based sv_unlag
+void SV_StudioSetupUnlagBones( model_t *pModel, float frame, int sequence, const vec_t *angles, const vec_t *origin, const unsigned char *pcontroller, const unsigned char *pblending, int iBone, const edict_t *edict );
+#endif // REHLDS_FIXES

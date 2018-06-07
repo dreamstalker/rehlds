@@ -59,6 +59,9 @@ cvar_t sv_footsteps = { "mp_footsteps", "1", FCVAR_SERVER, 0.0f, NULL };
 cvar_t sv_rollspeed = { "sv_rollspeed", "0.0", 0, 0.0f, NULL };
 cvar_t sv_rollangle = { "sv_rollangle", "0.0", 0, 0.0f, NULL };
 cvar_t sv_unlag = { "sv_unlag", "1", 0, 0.0f, NULL };
+#ifdef REHLDS_FIXES
+cvar_t sv_bone_unlag = { "sv_bone_unlag", "0", 0, 0.0f, NULL };
+#endif // REHLDS_FIXES
 cvar_t sv_maxunlag = { "sv_maxunlag", "0.5", 0, 0.0f, NULL };
 cvar_t sv_unlagpush = { "sv_unlagpush", "0.0", 0, 0.0f, NULL };
 cvar_t sv_unlagsamples = { "sv_unlagsamples", "1", 0, 0.0f, NULL };
@@ -1008,6 +1011,10 @@ void SV_RunCmd(usercmd_t *ucmd, int random_seed)
 	gGlobalVariables.frametime = frametime;
 	gEntityInterface.pfnPlayerPostThink(sv_player);
 	gEntityInterface.pfnCmdEnd(sv_player);
+	
+#ifdef REHLDS_FIXES
+	SV_SaveBoneState( host_client, sv_player );
+#endif
 
 	if (!host_client->fakeclient)
 		SV_RestoreMove(host_client);
@@ -1320,7 +1327,7 @@ void SV_SetupMove(client_t *_host_client)
 		frame = nextFrame;
 		frac = 0.0;
 	}
-
+	
 	for (i = 0; i < nextFrame->entities.num_entities; i++)
 	{
 		state = &nextFrame->entities.entities[i];
@@ -1342,6 +1349,25 @@ void SV_SetupMove(client_t *_host_client)
 		}
 
 		pnextstate = SV_FindEntInPack(state->number, &frame->entities);
+		
+#ifdef REHLDS_FIXES
+		if( nextFrame->bonestate.valid )
+		{
+			if( frame->bonestate.valid )
+			{
+				// TODO: interpolate
+				pos->bonestate = nextFrame->bonestate;
+			}
+			else
+			{
+				pos->bonestate = nextFrame->bonestate;
+			}
+		}
+		else
+		{
+			pos->bonestate.valid = false;
+		}
+#endif // REHLDS_FIXES
 
 		if (pnextstate)
 		{
@@ -1409,7 +1435,11 @@ void SV_RestoreMove(client_t *_host_client)
 			Con_DPrintf("SV_RestoreMove:  Tried to restore 'inactive' player %i/%s\n", i, &cli->name[4]);
 			continue;
 		}
-
+		
+#ifdef REHLDS_FIXES
+		pos->bonestate.valid = false;
+#endif // REHLDS_FIXES
+		
 		if (VectorCompare(pos->initial_correction_org, cli->edict->v.origin))
 		{
 			cli->edict->v.origin[0] = pos->oldorg[0];
@@ -1910,3 +1940,63 @@ void SV_FullUpdate_f(void)
 	gEntityInterface.pfnClientCommand(sv_player);
 #endif // REHLDS_FIXES
 }
+
+#ifdef REHLDS_FIXES
+void SV_SaveBoneState(client_t *_host_client, const edict_t *edict)
+{
+	int num = NUM_FOR_EDICT( edict );
+	client_frame_t *frame;
+	extern bonetransform_t bonetransform; // in r_studio.cpp
+	extern float rotationmatrix[3][4]; // in r_studio.cpp
+
+	if( !SV_IsPlayerIndex( num )) // just in case
+		return;
+	
+	// get last outgoing frame
+	frame = &_host_client->frames[SV_UPDATE_MASK & (_host_client->netchan.outgoing_sequence)];
+	
+	// set up bones
+	g_pSvBlendingAPI->SV_StudioSetupBones(
+		g_psv.models[edict->v.modelindex],
+		edict->v.frame, edict->v.sequence, edict->v.angles, edict->v.origin,
+		edict->v.controller, edict->v.blending, -1, edict
+	);
+	
+	// copy bones
+	frame->bonestate.valid = true;
+	Q_memcpy( frame->bonestate.bonetransform, bonetransform, sizeof( bonetransform ));
+	Q_memcpy( frame->bonestate.rotationmatrix, rotationmatrix, sizeof( rotationmatrix ));
+
+}
+
+void SV_StudioSetupUnlagBones( model_t *pModel, float frame, int sequence, const vec_t *angles, const vec_t *origin, const unsigned char *pcontroller, const unsigned char *pblending, int iBone, const edict_t *edict )
+{
+	// a1ba: carefully check everything, otherwise we may get broken bones!
+	if( edict && sv_bone_unlag.value ) // check is this a server or disabled
+	{
+		if( !nofind ) // unlag is enabled
+		{			
+			if( edict->v.flags & FL_CLIENT ) 
+			{
+				int num = NUM_FOR_EDICT( edict );	
+
+				if( truepositions[num].active &&
+					!truepositions[num].needrelink && // TODO: will this work for moving clients?
+					truepositions[num].bonestate.valid ) // bones are correct
+				{
+					// in r_studio.cpp
+					extern bonetransform_t bonetransform;
+					extern float rotationmatrix[3][4];
+					
+					Q_memcpy( bonetransform, truepositions[num].bonestate.bonetransform, sizeof( bonetransform ));
+					Q_memcpy( rotationmatrix, truepositions[num].bonestate.rotationmatrix, sizeof( rotationmatrix ));
+					return;
+				}
+			}
+		}
+	}
+	
+	// fallback to original SV_StudioSetupBones
+	g_pSvBlendingAPI->SV_StudioSetupBones(pModel, frame, sequence, angles, origin, pcontroller, pblending, iBone, edict);
+}
+#endif // REHLDS_FIXES
