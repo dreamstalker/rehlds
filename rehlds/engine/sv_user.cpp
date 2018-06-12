@@ -1012,12 +1012,12 @@ void SV_RunCmd(usercmd_t *ucmd, int random_seed)
 	gEntityInterface.pfnPlayerPostThink(sv_player);
 	gEntityInterface.pfnCmdEnd(sv_player);
 	
+	if (!host_client->fakeclient)
+		SV_RestoreMove(host_client);
+	
 #ifdef REHLDS_FIXES
 	SV_SaveBoneState( host_client, sv_player );
 #endif
-
-	if (!host_client->fakeclient)
-		SV_RestoreMove(host_client);
 }
 
 int SV_ValidateClientCommand(char *pszCommand)
@@ -2037,6 +2037,22 @@ void SV_SaveBoneState(client_t *_host_client, const edict_t *edict)
 	// get last outgoing frame
 	frame = &_host_client->frames[SV_UPDATE_MASK & (_host_client->netchan.outgoing_sequence)];
 	
+	// not a studio model
+	if( g_psv.models[i]->type != mod_studio )
+	{
+		frame->bonestate.valid = false;
+		return;
+	}
+	
+	studiohdr_t *hdr = (studiohdr_t*)Mod_Extradata(g_psv.models[edict->v.modelindex]);
+	
+	// shouldn't really happen
+	if( !hdr )
+	{
+		frame->bonestate.valid = false;
+		return;
+	}
+	
 	// set up bones
 	g_pSvBlendingAPI->SV_StudioSetupBones(
 		g_psv.models[edict->v.modelindex],
@@ -2046,7 +2062,7 @@ void SV_SaveBoneState(client_t *_host_client, const edict_t *edict)
 	
 	// copy bones
 	frame->bonestate.valid = true;
-	frame->bonestate.numbones = pstudiohdr->numbones;
+	frame->bonestate.numbones = hdr->numbones;
 	Q_memcpy( frame->bonestate.bonetransform, bonetransform, sizeof( bonetransform ));
 	Q_memcpy( frame->bonestate.rotationmatrix, rotationmatrix, sizeof( rotationmatrix ));
 
