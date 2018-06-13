@@ -2038,7 +2038,7 @@ void SV_SaveBoneState(client_t *_host_client, const edict_t *edict)
 	frame = &_host_client->frames[SV_UPDATE_MASK & (_host_client->netchan.outgoing_sequence)];
 	
 	// not a studio model
-	if( g_psv.models[i]->type != mod_studio )
+	if( g_psv.models[edict->v.modelindex]->type != mod_studio )
 	{
 		frame->bonestate.valid = false;
 		return;
