@@ -1159,7 +1159,7 @@ entity_state_t *SV_FindEntInPack(int index, packet_entities_t *pack)
 	return NULL;
 }
 
-#ifdef REHLDS_FIXES
+
 void VectorsAngles( const vec3_t forward, const vec3_t right, const vec3_t up, vec3_t angles )
 {
 	float	pitch, cpitch, yaw, roll;
@@ -1224,6 +1224,7 @@ static void LerpRotationMatrix(const float from[3][4], const float to[3][4], flo
 	out[2][3] = pos1[2];
 }
 
+#ifdef REHLDS_FIXES
 static client_bone_state_t SV_StudioUnlagSlerpBones(const client_bone_state_t *from, const client_bone_state_t *to, float s)
 {
 	client_bone_state_t ret;
