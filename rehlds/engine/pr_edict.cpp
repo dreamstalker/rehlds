@@ -283,16 +283,19 @@ char *ED_ParseEdict(char *data, edict_t *ent)
 						}
 
 						int index = Q_atoi(com_token + 1);
+						if (i == MAX_MODELS)
+						{
+							Host_Error("%s: Model '%s' failed to precache because the item count is over the %d limit.\n"
+								"Reduce the number of brush models and/or regular models in the map to correct this.", __func__,
+								localmodels[index], MAX_MODELS);
+						}
 
 						g_psv.model_precache[i] = localmodels[index];
 						g_psv.models[i] = Mod_ForName(localmodels[index], FALSE, FALSE);
 						g_psv.model_precache_flags[i] |= RES_FATALIFMISSING;
 
 #ifdef REHLDS_OPT_PEDANTIC
-						{
-							int __itmp = i;
-							g_rehlds_sv.modelsMap.put(g_psv.model_precache[i], __itmp);
-						}
+						g_rehlds_sv.modelsMap.put(g_psv.model_precache[i], i);
 #endif
 					}
 				}
