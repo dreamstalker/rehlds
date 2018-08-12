@@ -3571,8 +3571,14 @@ bool EXT_FUNC NET_GetPacketPreprocessor(uint8* data, unsigned int len, const net
 
 void SV_ReadPackets(void)
 {
-	while (NET_GetPacket(NS_SERVER))
+	int ret;
+	while ((ret = NET_GetPacket(NS_SERVER)) != NET_STOP)
 	{
+#ifdef REHLDS_FIXES
+		if (ret == NET_SKIP)
+			continue;
+#endif // REHLDS_FIXES
+
 		if (SV_FilterPacket())
 		{
 			SV_SendBan();
@@ -7518,8 +7524,14 @@ void SV_CheckForRcon(void)
 	if (g_psv.active || g_pcls.state != ca_dedicated || giActive == DLL_CLOSE || !host_initialized)
 		return;
 
-	while (NET_GetPacket(NS_SERVER))
+	int ret;
+	while ((ret = NET_GetPacket(NS_SERVER)) != NET_STOP)
 	{
+#ifdef REHLDS_FIXES
+		if (ret == NET_SKIP)
+			continue;
+#endif // REHLDS_FIXES
+
 		if (SV_FilterPacket())
 		{
 			SV_SendBan();
