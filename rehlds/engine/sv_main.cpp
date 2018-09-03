@@ -4555,28 +4555,34 @@ void SV_WriteEntitiesToClient(client_t *client, sizebuf_t *msg)
 	}
 
 #ifdef REHLDS_FIXES
-	if (sv_rehlds_attachedentities_playeranimationspeed_fix.value != 0)
+	int attachedEntCount[MAX_CLIENTS + 1] = {};
+	for (int i = curPack->num_entities - 1; i >= 0; i--)
 	{
-		int attachedEntCount[MAX_CLIENTS + 1] = {};
-		for (int i = curPack->num_entities - 1; i >= 0; i--)
+		auto &entityState = curPack->entities[i];
+		if (entityState.number > MAX_CLIENTS)
 		{
-			auto &entityState = curPack->entities[i];
-			if (entityState.number > MAX_CLIENTS)
+			if (sv_rehlds_attachedentities_playeranimationspeed_fix.string[0] == '1'
+				&& entityState.movetype == MOVETYPE_FOLLOW
+				&& 1 <= entityState.aiment && entityState.aiment <= MAX_CLIENTS)
 			{
-				if (entityState.movetype == MOVETYPE_FOLLOW
-					&& 1 <= entityState.aiment && entityState.aiment <= MAX_CLIENTS)
-				{
-					attachedEntCount[entityState.aiment]++;
-				}
+				attachedEntCount[entityState.aiment]++;
 			}
-			else
+
+			// Prevent spam "Non-sprite set to glow!" in console on client-side
+			if (entityState.rendermode == kRenderGlow
+				&& (entityState.modelindex >= 0 && entityState.modelindex < MAX_MODELS)
+				&& g_psv.models[entityState.modelindex]->type != mod_sprite)
 			{
-				if (attachedEntCount[entityState.number] != 0)
-				{
-					// Each attached entity causes StudioProcessGait for player
-					// But this will slow down normal animation predicting on client
-					entityState.framerate /= (1 + attachedEntCount[entityState.number]);
-				}
+				entityState.rendermode = kRenderNormal;
+			}
+		}
+		else
+		{
+			if (attachedEntCount[entityState.number] != 0)
+			{
+				// Each attached entity causes StudioProcessGait for player
+				// But this will slow down normal animation predicting on client
+				entityState.framerate /= (1 + attachedEntCount[entityState.number]);
 			}
 		}
 	}
