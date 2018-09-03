@@ -34,6 +34,8 @@ char *COM_SkipPath(char *pathname);
 char *COM_GetBaseDir();
 void COM_FixSlashes(char *pname);
 void COM_FileBase(char *in, char *out);
+void COM_DefaultExtension(char *path, char *extension);
+char *COM_FileExtension(char *in);
 void COM_UngetToken();
 char *COM_Parse(char *data);
 char *COM_VarArgs(char *format, ...);

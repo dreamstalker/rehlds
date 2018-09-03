@@ -181,6 +181,62 @@ void COM_FileBase(char *in, char *out)
 	out[len] = '\0';
 }
 
+void COM_DefaultExtension(char *path, char *extension)
+{
+	char *src;
+	src = path + Q_strlen(path) - 1;
+
+	while (*src != '/' && *src != '\\' && src != path)
+	{
+		if (*src == '.')
+		{
+			return;
+		}
+
+		src--;
+	}
+
+	Q_strcat(path, extension);
+}
+
+char *COM_FileExtension(char *in)
+{
+	static char exten[MAX_PATH];
+	char *c, *d = nullptr;
+	int i;
+
+	// Search for the first dot after the last path separator
+	c = in;
+	while (*c)
+	{
+		if (*c == '/' || *c == '\\')
+		{
+			d = nullptr;	// reset dot location on path separator
+		}
+		else if (d == nullptr && *c == '.')
+		{
+			d = c;		// store first dot location in the file name
+		}
+		c++;
+	}
+
+	if (d == nullptr)
+	{
+		return "";
+	}
+
+	d++;	// skip dot
+
+	// Copy extension
+	for (i = 0; i < (ARRAYSIZE(exten) - 1) && *d; i++, d++)
+	{
+		exten[i] = *d;
+	}
+
+	exten[i] = '\0';
+	return exten;
+}
+
 char com_token[COM_TOKEN_LEN];
 qboolean s_com_token_unget = FALSE;
 

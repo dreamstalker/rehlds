@@ -1985,12 +1985,20 @@ int SV_CheckForDuplicateSteamID(client_t *client)
 	return -1;
 }
 
-int SV_CheckForDuplicateNames(char *userinfo, qboolean bIsReconnecting, int nExcludeSlot)
+qboolean SV_CheckForDuplicateNames(char *userinfo, qboolean bIsReconnecting, int nExcludeSlot)
 {
 	int dupc = 0;
-	int changed = FALSE;
+	qboolean changed = FALSE;
 
 	const char *val = Info_ValueForKey(userinfo, "name");
+
+#ifndef REHLDS_FIXES
+ 	if (!val || val[0] == '\0' || Q_strstr(val, "..") != NULL || Q_strstr(val, "\"") != NULL || Q_strstr(val, "\\") != NULL)
+	{
+		Info_SetValueForKey(userinfo, "name", "unnamed", MAX_INFO_STRING);
+		return TRUE;
+	}
+#endif // REHLDS_FIXES
 
 	char rawname[MAX_NAME];
 	Q_strncpy(rawname, val, MAX_NAME - 1);
@@ -2011,6 +2019,7 @@ int SV_CheckForDuplicateNames(char *userinfo, qboolean bIsReconnecting, int nExc
 
 		char newname[MAX_NAME];
 		Q_snprintf(newname, sizeof(newname), "(%d)%-0.*s", ++dupc, 28, rawname);
+
 #ifdef REHLDS_FIXES
 		// Fix possibly incorrectly cut UTF8 chars
 		if (!Q_UnicodeValidate(newname))
@@ -2018,6 +2027,7 @@ int SV_CheckForDuplicateNames(char *userinfo, qboolean bIsReconnecting, int nExc
 			Q_UnicodeRepair(newname);
 		}
 #endif // REHLDS_FIXES
+
 		Info_SetValueForKey(userinfo, "name", newname, MAX_INFO_STRING);
 		val = Info_ValueForKey(userinfo, "name");
 		changed = TRUE;
@@ -6816,8 +6826,26 @@ void SV_RemoveId_f(void)
 
 void SV_WriteId_f(void)
 {
+	if (bannedcfgfile.string[0] == '/' ||
+		Q_strstr(bannedcfgfile.string, ":") ||
+		Q_strstr(bannedcfgfile.string, "..") ||
+		Q_strstr(bannedcfgfile.string, "\\"))
+	{
+		Con_Printf("Couldn't open %s (contains illegal characters).\n", bannedcfgfile.string);
+		return;
+	}
+
 	char name[MAX_PATH];
-	Q_snprintf(name, MAX_PATH, "%s", bannedcfgfile.string);
+	Q_strlcpy(name, bannedcfgfile.string);
+	COM_DefaultExtension(name, ".cfg");
+
+	const char *pszFileExt = COM_FileExtension(name);
+	if (Q_stricmp(pszFileExt, "cfg") != 0)
+	{
+		Con_Printf("Couldn't open %s (wrong file extension, must be .cfg).\n", name);
+		return;
+	}
+
 	Con_Printf("Writing %s.\n", name);
 
 	FILE *f = FS_Open(name, "wt");
