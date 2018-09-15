@@ -175,7 +175,7 @@ char *NET_AdrToString(const netadr_t& a);
 char *NET_BaseAdrToString(netadr_t& a);
 qboolean NET_StringToSockaddr(const char *s, struct sockaddr *sadr);
 qboolean NET_StringToAdr(const char *s, netadr_t *a);
-qboolean NET_IsLocalAddress(netadr_t& adr);
+qboolean NET_IsLocalAddress(const netadr_t& adr);
 char *NET_ErrorString(int code);
 void NET_TransferRawData(sizebuf_t *msg, unsigned char *pStart, int nSize);
 qboolean NET_GetLoopPacket(netsrc_t sock, netadr_t *in_from_, sizebuf_t *msg);
