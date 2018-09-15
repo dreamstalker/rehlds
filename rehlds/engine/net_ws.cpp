@@ -435,7 +435,7 @@ qboolean NET_StringToAdr(const char *s, netadr_t *a)
 	return TRUE;
 }
 
-qboolean NET_IsLocalAddress(netadr_t& adr)
+qboolean NET_IsLocalAddress(const netadr_t& adr)
 {
 	return adr.type == NA_LOOPBACK ? TRUE : FALSE;
 }

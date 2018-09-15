@@ -1803,8 +1803,15 @@ int g_oldest_challenge = 0;
 #endif
 
 bool EXT_FUNC SV_CheckChallenge_api(const netadr_t &adr, int nChallengeValue) {
-	netadr_t localAdr = adr;
-	return SV_CheckChallenge(&localAdr, nChallengeValue) != 0;
+	if (NET_IsLocalAddress(adr))
+		return TRUE;
+
+	for (int i = 0; i < MAX_CHALLENGES; i++) {
+		if (NET_CompareBaseAdr(adr, g_rg_sv_challenges[i].adr))
+			return nChallengeValue == g_rg_sv_challenges[i].challenge;
+	}
+
+	return FALSE;
 }
 
 int SV_CheckChallenge(netadr_t *adr, int nChallengeValue)
@@ -1813,7 +1820,7 @@ int SV_CheckChallenge(netadr_t *adr, int nChallengeValue)
 		Sys_Error("%s:  Null address\n", __func__);
 
 	if (NET_IsLocalAddress(*adr))
-		return 1;
+		return TRUE;
 
 	for (int i = 0; i < MAX_CHALLENGES; i++)
 	{
@@ -1822,13 +1829,13 @@ int SV_CheckChallenge(netadr_t *adr, int nChallengeValue)
 			if (nChallengeValue != g_rg_sv_challenges[i].challenge)
 			{
 				SV_RejectConnection(adr, "Bad challenge.\n");
-				return 0;
+				return FALSE;
 			}
-			return 1;
+			return TRUE;
 		}
 	}
 	SV_RejectConnection(adr, "No challenge for your address.\n");
-	return 0;
+	return FALSE;
 }
 
 int SV_CheckIPRestrictions(netadr_t *adr, int nAuthProtocol)
