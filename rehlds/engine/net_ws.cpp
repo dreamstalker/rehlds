@@ -672,7 +672,7 @@ void NET_AdjustLag()
 	}
 }
 
-qboolean NET_LagPacket(qboolean newdata, netsrc_t sock, netadr_t *from, sizebuf_t *data)
+int NET_LagPacket(int newdata, netsrc_t sock, netadr_t *from, sizebuf_t *data)
 {
 	if (gFakeLag <= 0.0)
 	{
@@ -755,7 +755,7 @@ void NET_FlushSocket(netsrc_t sock)
 	}
 }
 
-qboolean NET_GetLong(unsigned char *pData, int size, int *outSize)
+int NET_GetLong(unsigned char *pData, int size, int *outSize)
 {
 	static int gNetSplitFlags[NET_WS_MAX_FRAGMENTS];
 	SPLITPACKET *pHeader = (SPLITPACKET *) pData;
@@ -768,7 +768,7 @@ qboolean NET_GetLong(unsigned char *pData, int size, int *outSize)
 	if (packetNumber >= NET_WS_MAX_FRAGMENTS || packetCount > NET_WS_MAX_FRAGMENTS)
 	{
 		Con_NetPrintf("Malformed packet number (%i/%i)\n", packetNumber + 1, packetCount);
-		return FALSE;
+		return NET_SKIP;
 	}
 
 	if (gNetSplit.currentSequence == -1 || sequenceNumber != gNetSplit.currentSequence)
@@ -812,14 +812,14 @@ qboolean NET_GetLong(unsigned char *pData, int size, int *outSize)
 #ifdef REHLDS_FIXES
 			gNetSplit.currentSequence = -1;
 #endif
-			return FALSE;
+			return NET_SKIP;
 		}
 
 		Q_memcpy(&gNetSplit.buffer[SPLIT_SIZE * packetNumber], pHeader + 1, packetPayloadSize);
 	}
 
 	if (gNetSplit.splitCount > 0)
-		return FALSE;
+		return NET_SKIP;
 
 	if (packetCount > 0)
 	{
@@ -836,7 +836,7 @@ qboolean NET_GetLong(unsigned char *pData, int size, int *outSize)
 #ifdef REHLDS_FIXES
 				gNetSplit.currentSequence = -1; // no more parts can be attached, clear it
 #endif
-				return FALSE;
+				return NET_SKIP;
 			}
 		}
 	}
@@ -846,7 +846,7 @@ qboolean NET_GetLong(unsigned char *pData, int size, int *outSize)
 	{
 		Q_memcpy(pData, gNetSplit.buffer, gNetSplit.totalSize);
 		*outSize = gNetSplit.totalSize;
-		return TRUE;
+		return NET_PROCESS;
 	}
 	else
 	{
@@ -854,11 +854,11 @@ qboolean NET_GetLong(unsigned char *pData, int size, int *outSize)
 		*outSize = 0;
 #endif
 		Con_NetPrintf("Split packet too large! %d bytes\n", gNetSplit.totalSize);
-		return FALSE;
+		return NET_SKIP;
 	}
 }
 
-qboolean NET_QueuePacket(netsrc_t sock)
+int NET_QueuePacket(netsrc_t sock)
 {
 	int ret = -1;
 	unsigned char buf[MAX_UDP_PACKET];
@@ -919,20 +919,20 @@ qboolean NET_QueuePacket(netsrc_t sock)
 
 	if (ret == -1 || ret == MAX_UDP_PACKET)
 	{
-		return NET_LagPacket(FALSE, sock, NULL, NULL);
+		return NET_LagPacket(NET_STOP, sock, NULL, NULL); // Should we skip on MAX_UDP_PACKET?
 	}
 
 	NET_TransferRawData(&in_message, buf, ret);
 
 	if (*(int32 *)in_message.data != NET_HEADER_FLAG_SPLITPACKET)
 	{
-		return NET_LagPacket(TRUE, sock, &in_from, &in_message);
+		return NET_LagPacket(NET_PROCESS, sock, &in_from, &in_message);
 	}
 
 	if (in_message.cursize < 9)
 	{
 		Con_NetPrintf("Invalid split packet length %i\n", in_message.cursize);
-		return FALSE;
+		return NET_SKIP;
 	}
 
 #ifdef REHLDS_FIXES
@@ -940,7 +940,7 @@ qboolean NET_QueuePacket(netsrc_t sock)
 	if (sock == NS_SERVER)
 	{
 		Con_NetPrintf("Someone tries to send split packet to the server\n");
-		return FALSE;
+		return NET_SKIP;
 	}
 #endif
 
@@ -1059,13 +1059,13 @@ DWORD WINAPI NET_ThreadMain(LPVOID lpThreadParameter)
 	{
 		while (NET_Sleep())
 		{
-			qboolean bret = FALSE;
+			int bret = NET_STOP;
 			for (int sock = 0; sock < NS_MAX; sock++)
 			{
 				NET_ThreadLock();
 
 				bret = NET_QueuePacket((netsrc_t)sock);
-				if (bret)
+				if (bret == NET_PROCESS)
 				{
 					net_messages_t *pmsg = NET_AllocMsg(in_message.cursize);
 					pmsg->next = nullptr;
@@ -1091,7 +1091,7 @@ DWORD WINAPI NET_ThreadMain(LPVOID lpThreadParameter)
 				NET_ThreadUnlock();
 			}
 
-			if (!bret)
+			if (bret == NET_STOP)
 				break;
 		}
 
@@ -1181,31 +1181,31 @@ void NET_FreeMsg(net_messages_t *pmsg)
 	}
 }
 
-qboolean NET_GetPacket(netsrc_t sock)
+int NET_GetPacket(netsrc_t sock)
 {
-	qboolean bret;
+	int bret;
 
 	NET_AdjustLag();
 	NET_ThreadLock();
 	if (NET_GetLoopPacket(sock, &in_from, &in_message))
 	{
-		bret = NET_LagPacket(TRUE, sock, &in_from, &in_message);
+		bret = NET_LagPacket(NET_PROCESS, sock, &in_from, &in_message);
 	}
 	else
 	{
 		if (!use_thread)
 		{
 			bret = NET_QueuePacket(sock);
-			if (!bret)
-				bret = NET_LagPacket(FALSE, sock, NULL, NULL);
+			if (bret == NET_STOP)
+				bret = NET_LagPacket(NET_STOP, sock, NULL, NULL);
 		}
 		else
 		{
-			bret = NET_LagPacket(FALSE, sock, NULL, NULL);
+			bret = NET_LagPacket(NET_STOP, sock, NULL, NULL);
 		}
 	}
 
-	if (bret)
+	if (bret == NET_PROCESS)
 	{
 		Q_memcpy(net_message.data, in_message.data, in_message.cursize);
 		net_message.cursize = in_message.cursize;
@@ -1223,7 +1223,7 @@ qboolean NET_GetPacket(netsrc_t sock)
 		net_from = pmsg->from;
 		msg_readcount = 0;
 		NET_FreeMsg(pmsg);
-		bret = TRUE;
+		bret = NET_PROCESS;
 	}
 	NET_ThreadUnlock();
 	return bret;

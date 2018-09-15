@@ -414,3 +414,13 @@ typedef struct netchan_s
 #else // REHLDS_FIXES
 #define Con_NetPrintf Con_Printf
 #endif // REHLDS_FIXES
+
+#ifdef REHLDS_FIXES
+#define NET_SKIP -1
+#define NET_STOP 0
+#define NET_PROCESS 1
+#else // REHLDS_FIXES
+#define NET_SKIP FALSE
+#define NET_STOP FALSE
+#define NET_PROCESS TRUE
+#endif // REHLDS_FIXES
