@@ -860,91 +860,120 @@ qboolean NET_GetLong(unsigned char *pData, int size, int *outSize)
 
 qboolean NET_QueuePacket(netsrc_t sock)
 {
-	int ret = -1;
-	unsigned char buf[MAX_UDP_PACKET];
-
-#ifdef _WIN32
-	for (int protocol = 0; protocol < 2; protocol++)
-#else
-	for (int protocol = 0; protocol < 1; protocol++)
-#endif // _WIN32
+#ifdef REHLDS_FIXES
+	while (true)
+#endif // REHLDS_FIXES
 	{
-		SOCKET net_socket;
+		int ret = -1;
+		unsigned char buf[MAX_UDP_PACKET];
 
-		if (protocol == 0)
-			net_socket = ip_sockets[sock];
 #ifdef _WIN32
-		else
-			net_socket = ipx_sockets[sock];
+		for (int protocol = 0; protocol < 2; protocol++)
+#else
+		for (int protocol = 0; protocol < 1; protocol++)
+#endif // _WIN32
+		{
+			SOCKET net_socket;
+
+			if (protocol == 0)
+				net_socket = ip_sockets[sock];
+#ifdef _WIN32
+			else
+				net_socket = ipx_sockets[sock];
 #endif // _WIN32
 
-		if (net_socket == INV_SOCK)
-			continue;
+			if (net_socket == INV_SOCK)
+				continue;
 
-		struct sockaddr from;
-		socklen_t fromlen = sizeof(from);
-		ret = CRehldsPlatformHolder::get()->recvfrom(net_socket, (char *)buf, sizeof buf, 0, &from, &fromlen);
+			struct sockaddr from;
+			socklen_t fromlen = sizeof(from);
+			ret = CRehldsPlatformHolder::get()->recvfrom(net_socket, (char *)buf, sizeof buf, 0, &from, &fromlen);
+			if (ret == -1)
+			{
+				int err = NET_GetLastError();
+#ifdef _WIN32
+				if (err == WSAENETRESET)
+					continue;
+#endif // _WIN32
+
+				if (err != WSAEWOULDBLOCK && err != WSAECONNRESET && err != WSAECONNREFUSED)
+				{
+					if (err == WSAEMSGSIZE)
+					{
+						Con_DPrintf("%s: Ignoring oversized network message\n", __func__);
+					}
+					else
+					{
+						if (g_pcls.state != ca_dedicated)
+						{
+							Sys_Error("%s: %s", __func__, NET_ErrorString(err));
+						}
+						Con_Printf("%s: %s\n", __func__, NET_ErrorString(err));
+					}
+				}
+				continue;
+			}
+
+			SockadrToNetadr(&from, &in_from);
+			if (ret != MAX_UDP_PACKET)
+				break;
+
+			Con_NetPrintf("%s: Oversize packet from %s\n", __func__, NET_AdrToString(in_from));
+		}
+
+#ifdef REHLDS_FIXES
 		if (ret == -1)
 		{
-			int err = NET_GetLastError();
-#ifdef _WIN32
-			if (err == WSAENETRESET)
-				continue;
-#endif // _WIN32
+			return NET_LagPacket(FALSE, sock, NULL, NULL);
+		}
+		if (ret == MAX_UDP_PACKET)
+		{
+			continue;
+		}
+#else // REHLDS_FIXES
+		if (ret == -1 || ret == MAX_UDP_PACKET)
+		{
+			return NET_LagPacket(FALSE, sock, NULL, NULL);
+		}
+#endif // REHLDS_FIXES
 
-			if (err != WSAEWOULDBLOCK && err != WSAECONNRESET && err != WSAECONNREFUSED)
-			{
-				if (err == WSAEMSGSIZE)
-				{
-					Con_DPrintf("%s: Ignoring oversized network message\n", __func__);
-				}
-				else
-				{
-					if (g_pcls.state != ca_dedicated)
-					{
-						Sys_Error("%s: %s", __func__, NET_ErrorString(err));
-					}
-					Con_Printf("%s: %s\n", __func__, NET_ErrorString(err));
-				}
-			}
+		NET_TransferRawData(&in_message, buf, ret);
+
+		if (*(int32 *)in_message.data != NET_HEADER_FLAG_SPLITPACKET)
+		{
+			return NET_LagPacket(TRUE, sock, &in_from, &in_message);
+		}
+
+		if (in_message.cursize < 9)
+		{
+			Con_NetPrintf("Invalid split packet length %i\n", in_message.cursize);
+#ifdef REHLDS_FIXES
+			continue;
+#else // REHLDS_FIXES
+			return FALSE;
+#endif // REHLDS_FIXES
+		}
+
+#ifdef REHLDS_FIXES
+		// Only server can send split packets, there is no server<->server communication, so server can't receive split packets
+		if (sock == NS_SERVER)
+		{
+			Con_NetPrintf("Someone tries to send split packet to the server\n");
+			continue;
+		}
+#endif
+
+#ifdef REHLDS_FIXES
+		if (!NET_GetLong(in_message.data, ret, &in_message.cursize))
+		{
 			continue;
 		}
 
-		SockadrToNetadr(&from, &in_from);
-		if (ret != MAX_UDP_PACKET)
-			break;
-
-		Con_NetPrintf("%s: Oversize packet from %s\n", __func__, NET_AdrToString(in_from));
+		return TRUE;
+#else // REHLDS_FIXES
+		return NET_GetLong(in_message.data, ret, &in_message.cursize);
+#endif // REHLDS_FIXES
 	}
-
-	if (ret == -1 || ret == MAX_UDP_PACKET)
-	{
-		return NET_LagPacket(FALSE, sock, NULL, NULL);
-	}
-
-	NET_TransferRawData(&in_message, buf, ret);
-
-	if (*(int32 *)in_message.data != NET_HEADER_FLAG_SPLITPACKET)
-	{
-		return NET_LagPacket(TRUE, sock, &in_from, &in_message);
-	}
-
-	if (in_message.cursize < 9)
-	{
-		Con_NetPrintf("Invalid split packet length %i\n", in_message.cursize);
-		return FALSE;
-	}
-
-#ifdef REHLDS_FIXES
-	// Only server can send split packets, there is no server<->server communication, so server can't receive split packets
-	if (sock == NS_SERVER)
-	{
-		Con_NetPrintf("Someone tries to send split packet to the server\n");
-		return FALSE;
-	}
-#endif
-
-	return NET_GetLong(in_message.data, ret, &in_message.cursize);
 }
 
 DLL_EXPORT int NET_Sleep_Timeout()
