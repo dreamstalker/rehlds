@@ -145,7 +145,7 @@ int PM_LinkContents(vec_t *p, int *pIndex)
 		test[0] = p[0] - pe->origin[0];
 		test[1] = p[1] - pe->origin[1];
 		test[2] = p[2] - pe->origin[2];
-		if (PM_HullPointContents(model->hulls, model->hulls[0].firstclipnode, test) != CONTENTS_EMPTY) {
+		if (PM_HullPointContents(model->hulls, model->hulls[point_hull].firstclipnode, test) != CONTENTS_EMPTY) {
 			if (pIndex)
 				*pIndex = pe->info;
 			return pe->skin;
@@ -165,7 +165,7 @@ int EXT_FUNC PM_PointContents(vec_t *p, int *truecontents)
 	{
 		int entityContents = PM_HullPointContents(
 			pmove->physents[0].model->hulls,
-			pmove->physents[0].model->hulls[0].firstclipnode,
+			pmove->physents[0].model->hulls[point_hull].firstclipnode,
 			p);
 		if (truecontents)
 			*truecontents = entityContents;
@@ -198,7 +198,7 @@ int PM_WaterEntity(vec_t *p)
 #endif
 
 	model_t* model = pmove->physents[0].model;
-	cont = PM_HullPointContents(model->hulls, model->hulls[0].firstclipnode, p);
+	cont = PM_HullPointContents(model->hulls, model->hulls[point_hull].firstclipnode, p);
 	if (cont == CONTENTS_SOLID) {
 		return CONTENTS_EMPTY;
 	}
@@ -212,7 +212,7 @@ int EXT_FUNC PM_TruePointContents(vec_t *p)
 	if ((int)pmove->physents[0].model == -208)
 		return CONTENTS_EMPTY;
 	else
-		return PM_HullPointContents(pmove->physents[0].model->hulls, pmove->physents[0].model->hulls[0].firstclipnode, p);
+		return PM_HullPointContents(pmove->physents[0].model->hulls, pmove->physents[0].model->hulls[point_hull].firstclipnode, p);
 }
 
 hull_t *PM_HullForStudioModel(model_t *pModel, vec_t *offset, float frame, int sequence, const vec_t *angles, const vec_t *origin, const unsigned char *pcontroller, const unsigned char *pblending, int *pNumHulls)
@@ -235,19 +235,19 @@ hull_t* EXT_FUNC PM_HullForBsp(physent_t *pe, vec_t *offset)
 
 	switch (pmove->usehull) {
 	case 1:
-		hull = &pe->model->hulls[3];
+		hull = &pe->model->hulls[head_hull];
 		break;
 
 	case 2:
-		hull = &pe->model->hulls[0];
+		hull = &pe->model->hulls[point_hull];
 		break;
 
 	case 3:
-		hull = &pe->model->hulls[2];
+		hull = &pe->model->hulls[large_hull];
 		break;
 
 	default:
-		hull = &pe->model->hulls[1];
+		hull = &pe->model->hulls[human_hull];
 		break;
 	}
 
@@ -405,16 +405,16 @@ pmtrace_t _PM_PlayerTrace(vec_t *start, vec_t *end, int traceFlags, int numphyse
 			switch (pmove->usehull)
 			{
 			case 1:
-				hull = &pe->model->hulls[3];
+				hull = &pe->model->hulls[head_hull];
 				break;
 			case 2:
-				hull = &pe->model->hulls[0];
+				hull = &pe->model->hulls[point_hull];
 				break;
 			case 3:
-				hull = &pe->model->hulls[2];
+				hull = &pe->model->hulls[large_hull];
 				break;
 			default:
-				hull = &pe->model->hulls[1];
+				hull = &pe->model->hulls[human_hull];
 				break;
 			}
 			offset[0] = hull->clip_mins[0] - player_mins[pmove->usehull][0];
