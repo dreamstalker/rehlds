@@ -3586,11 +3586,13 @@ void SV_ReadPackets(void)
 {
 	while (NET_GetPacket(NS_SERVER))
 	{
+#ifndef REHLDS_FIXES
 		if (SV_FilterPacket())
 		{
 			SV_SendBan();
 			continue;
 		}
+#endif
 
 		bool pass = g_RehldsHookchains.m_PreprocessPacket.callChain(NET_GetPacketPreprocessor, net_message.data, net_message.cursize, net_from);
 		if (!pass)
@@ -3601,6 +3603,14 @@ void SV_ReadPackets(void)
 			// Connectionless packet
 			if (SV_CheckConnectionLessRateLimits(net_from))
 			{
+#ifdef REHLDS_FIXES
+				if (SV_FilterPacket())
+				{
+					SV_SendBan();
+					continue;
+				}
+#endif
+
 				Steam_HandleIncomingPacket(net_message.data, net_message.cursize, ntohl(*(u_long *)&net_from.ip[0]), htons(net_from.port));
 				SV_ConnectionlessPacket();
 			}
