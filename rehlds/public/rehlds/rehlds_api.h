@@ -37,7 +37,7 @@
 #include "pr_dlls.h"
 
 #define REHLDS_API_VERSION_MAJOR 3
-#define REHLDS_API_VERSION_MINOR 4
+#define REHLDS_API_VERSION_MINOR 5
 
 //Steam_NotifyClientConnect hook
 typedef IHookChain<qboolean, IGameClient*, const void*, unsigned int> IRehldsHook_Steam_NotifyClientConnect;
@@ -195,6 +195,10 @@ typedef IHookChainRegistry<bool, edict_t *, IGameClient *, int, const char*, flo
 typedef IHookChain<edict_t *, const char *> IRehldsHook_CreateFakeClient;
 typedef IHookChainRegistry<edict_t *, const char *> IRehldsHookRegistry_CreateFakeClient;
 
+//SV_CheckConnectionLessRateLimits
+typedef IHookChain<bool, netadr_t &, const uint8_t *, int> IRehldsHook_SV_CheckConnectionLessRateLimits;
+typedef IHookChainRegistry<bool, netadr_t &, const uint8_t *, int> IRehldsHookRegistry_SV_CheckConnectionLessRateLimits;
+
 class IRehldsHookchains {
 public:
 	virtual ~IRehldsHookchains() { }
@@ -238,6 +242,7 @@ public:
 	virtual IRehldsHookRegistry_SV_CreatePacketEntities* SV_CreatePacketEntities() = 0;
 	virtual IRehldsHookRegistry_SV_EmitSound2* SV_EmitSound2() = 0;
 	virtual IRehldsHookRegistry_CreateFakeClient* CreateFakeClient() = 0;
+	virtual IRehldsHookRegistry_SV_CheckConnectionLessRateLimits* SV_CheckConnectionLessRateLimits() = 0;
 };
 
 struct RehldsFuncs_t {

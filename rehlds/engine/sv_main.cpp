@@ -3599,7 +3599,7 @@ void SV_ReadPackets(void)
 		if (*(uint32 *)net_message.data == 0xFFFFFFFF)
 		{
 			// Connectionless packet
-			if (SV_CheckConnectionLessRateLimits(net_from))
+			if (g_RehldsHookchains.m_SV_CheckConnectionLessRateLimits.callChain([](netadr_t& net_from, const uint8_t *, int) { return SV_CheckConnectionLessRateLimits(net_from); }, net_from, net_message.data, net_message.cursize))
 			{
 				Steam_HandleIncomingPacket(net_message.data, net_message.cursize, ntohl(*(u_long *)&net_from.ip[0]), htons(net_from.port));
 				SV_ConnectionlessPacket();

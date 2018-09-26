@@ -190,6 +190,10 @@ typedef IHookChainRegistryImpl<bool, edict_t *, IGameClient *, int, const char*,
 typedef IHookChainImpl<edict_t *, const char *> CRehldsHook_CreateFakeClient;
 typedef IHookChainRegistryImpl<edict_t *, const char *> CRehldsHookRegistry_CreateFakeClient;
 
+//SV_CheckConnectionLessRateLimits hook
+typedef IHookChainImpl<bool, netadr_t &, const uint8_t *, int> CRehldsHook_SV_CheckConnectionLessRateLimits;
+typedef IHookChainRegistryImpl<bool, netadr_t &, const uint8_t *, int> CRehldsHookRegistry_SV_CheckConnectionLessRateLimits;
+
 class CRehldsHookchains : public IRehldsHookchains {
 public:
 	CRehldsHookRegistry_Steam_NotifyClientConnect m_Steam_NotifyClientConnect;
@@ -231,6 +235,7 @@ public:
 	CRehldsHookRegistry_SV_CreatePacketEntities m_SV_CreatePacketEntities;
 	CRehldsHookRegistry_SV_EmitSound2 m_SV_EmitSound2;
 	CRehldsHookRegistry_CreateFakeClient m_CreateFakeClient;
+	CRehldsHookRegistry_SV_CheckConnectionLessRateLimits m_SV_CheckConnectionLessRateLimits;
 
 public:
 	EXT_FUNC virtual IRehldsHookRegistry_Steam_NotifyClientConnect* Steam_NotifyClientConnect();
@@ -260,18 +265,19 @@ public:
 	EXT_FUNC virtual IRehldsHookRegistry_PF_BuildSoundMsg_I* PF_BuildSoundMsg_I();
 	EXT_FUNC virtual IRehldsHookRegistry_SV_WriteFullClientUpdate* SV_WriteFullClientUpdate();
 	EXT_FUNC virtual IRehldsHookRegistry_SV_CheckConsistencyResponse* SV_CheckConsistencyResponse();
-	EXT_FUNC virtual	IRehldsHookRegistry_SV_DropClient* SV_DropClient();
-	EXT_FUNC virtual	IRehldsHookRegistry_SV_ActivateServer* SV_ActivateServer();
-	EXT_FUNC virtual	IRehldsHookRegistry_SV_WriteVoiceCodec* SV_WriteVoiceCodec();
+	EXT_FUNC virtual IRehldsHookRegistry_SV_DropClient* SV_DropClient();
+	EXT_FUNC virtual IRehldsHookRegistry_SV_ActivateServer* SV_ActivateServer();
+	EXT_FUNC virtual IRehldsHookRegistry_SV_WriteVoiceCodec* SV_WriteVoiceCodec();
 	EXT_FUNC virtual IRehldsHookRegistry_Steam_GSGetSteamID* Steam_GSGetSteamID();
 	EXT_FUNC virtual IRehldsHookRegistry_SV_TransferConsistencyInfo* SV_TransferConsistencyInfo();
 	EXT_FUNC virtual IRehldsHookRegistry_Steam_GSBUpdateUserData* Steam_GSBUpdateUserData();
 	EXT_FUNC virtual IRehldsHookRegistry_Cvar_DirectSet* Cvar_DirectSet();
 	EXT_FUNC virtual IRehldsHookRegistry_SV_EstablishTimeBase* SV_EstablishTimeBase();
-	EXT_FUNC virtual	IRehldsHookRegistry_SV_Spawn_f* SV_Spawn_f();
-	EXT_FUNC virtual	IRehldsHookRegistry_SV_CreatePacketEntities* SV_CreatePacketEntities();
-	EXT_FUNC virtual	IRehldsHookRegistry_SV_EmitSound2* SV_EmitSound2();
-	EXT_FUNC virtual	IRehldsHookRegistry_CreateFakeClient* CreateFakeClient();
+	EXT_FUNC virtual IRehldsHookRegistry_SV_Spawn_f* SV_Spawn_f();
+	EXT_FUNC virtual IRehldsHookRegistry_SV_CreatePacketEntities* SV_CreatePacketEntities();
+	EXT_FUNC virtual IRehldsHookRegistry_SV_EmitSound2* SV_EmitSound2();
+	EXT_FUNC virtual IRehldsHookRegistry_CreateFakeClient* CreateFakeClient();
+	EXT_FUNC virtual IRehldsHookRegistry_SV_CheckConnectionLessRateLimits* SV_CheckConnectionLessRateLimits();
 };
 
 extern CRehldsHookchains g_RehldsHookchains;
