@@ -578,9 +578,9 @@ struct pmtrace_s* EXT_FUNC PM_TraceLine(float *start, float *end, int flags, int
 
 	oldhull = pmove->usehull;
 	pmove->usehull = usehull;
-	if (flags)
+	if (flags != PM_TRACELINE_PHYSENTSONLY)
 	{
-		if (flags == 1)
+		if (flags == PM_TRACELINE_ANYVISIBLE)
 			tr = _PM_PlayerTrace(start, end, PM_NORMAL, pmove->numvisent, pmove->visents, ignore_pe, NULL);
 	}
 	else
@@ -598,7 +598,7 @@ struct pmtrace_s* EXT_FUNC PM_TraceLineEx(float *start, float *end, int flags, i
 
 	oldhull = pmove->usehull;
 	pmove->usehull = usehull;
-	if (flags)
+	if (flags != PM_TRACELINE_PHYSENTSONLY)
 	{
 		tr = _PM_PlayerTrace(start, end, PM_NORMAL, pmove->numvisent, pmove->visents, -1, pfnIgnore);
 	}
