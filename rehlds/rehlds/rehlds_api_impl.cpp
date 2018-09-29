@@ -571,6 +571,11 @@ IRehldsHookRegistry_CreateFakeClient* CRehldsHookchains::CreateFakeClient() {
 	return &m_CreateFakeClient;
 }
 
+IRehldsHookRegistry_SV_CheckConnectionLessRateLimits* CRehldsHookchains::SV_CheckConnectionLessRateLimits()
+{
+	return &m_SV_CheckConnectionLessRateLimits;
+}
+
 int EXT_FUNC CRehldsApi::GetMajorVersion()
 {
 	return REHLDS_API_VERSION_MAJOR;
