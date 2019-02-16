@@ -1559,7 +1559,7 @@ void SV_New_f(void)
 
 void SV_SendRes_f(void)
 {
-	unsigned char data[NET_MAX_PAYLOAD];
+	unsigned char data[131072];
 	sizebuf_t msg;
 
 	Q_memset(&msg, 0, sizeof(msg));
