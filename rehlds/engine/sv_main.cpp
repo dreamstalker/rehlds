@@ -5833,7 +5833,7 @@ void EXT_FUNC SV_ActivateServer_internal(int runPhysics)
 	if (mapchangecfgfile.string && *mapchangecfgfile.string)
 	{
 		AlertMessage(at_console, "Executing map change config file\n");
-		Q_sprintf(szCommand, "exec %s\n", mapchangecfgfile.string);
+		Q_snprintf(szCommand, sizeof(szCommand), "exec %s\n", mapchangecfgfile.string);
 		Cbuf_AddText(szCommand);
 	}
 
