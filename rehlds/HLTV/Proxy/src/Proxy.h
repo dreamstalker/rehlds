@@ -45,8 +45,8 @@ class IDirector;
 class IBaseSystem;
 
 #define MAX_NAME				32
-#define MAX_PROXY_RATE			20000
-#define MAX_PROXY_UPDATERATE	40
+#define MAX_PROXY_RATE			100000
+#define MAX_PROXY_UPDATERATE	102
 
 #define PROXY_CHALLENGE_LIFE	40.0f
 #define PROXY_PRIVATE			0x8000
