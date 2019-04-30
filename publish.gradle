@@ -83,7 +83,7 @@ task publishPrepareFiles {
 		copy {
 			from 'rehlds/public'
 			into 'publish/publishRoot/hlsdk/public'
-			exclude '**/rehlds/*', '**/tier0/*'
+			exclude '**/rehlds/*'
 		}
 		copy {
 			from 'rehlds/public/rehlds'

@@ -37,7 +37,7 @@
 #include "pr_dlls.h"
 
 #define REHLDS_API_VERSION_MAJOR 3
-#define REHLDS_API_VERSION_MINOR 5
+#define REHLDS_API_VERSION_MINOR 6
 
 //Steam_NotifyClientConnect hook
 typedef IHookChain<qboolean, IGameClient*, const void*, unsigned int> IRehldsHook_Steam_NotifyClientConnect;
@@ -301,6 +301,55 @@ struct RehldsFuncs_t {
 	void(*RemoveExtDll)(void *hModule);
 	void(*RemoveCvarListener)(const char *var_name, cvar_callback_t func);
 	ENTITYINIT(*GetEntityInit)(char *pszClassName);
+
+	// Read functions
+	int(*MSG_ReadChar)();
+	int(*MSG_ReadByte)();
+	int(*MSG_ReadLong)();
+	float(*MSG_ReadFloat)();
+	char*(*MSG_ReadString)();
+	char*(*MSG_ReadStringLine)();
+	float(*MSG_ReadAngle)();
+	float(*MSG_ReadHiresAngle)();
+	void(*MSG_ReadUsercmd)(usercmd_t *to, usercmd_t *from);
+	float(*MSG_ReadCoord)();
+	void(*MSG_ReadVec3Coord)(sizebuf_t *sb, vec3_t fa);
+
+	// Read bit functions
+	bool(*MSG_IsBitReading)();
+	void(*MSG_StartBitReading)(sizebuf_t *buf);
+	void(*MSG_EndBitReading)(sizebuf_t *buf);
+	uint32(*MSG_PeekBits)(int numbits);
+	int(*MSG_ReadOneBit)();
+	uint32(*MSG_ReadBits)(int numbits);
+	int(*MSG_ReadSBits)(int numbits);
+	float(*MSG_ReadBitCoord)();
+	void(*MSG_ReadBitVec3Coord)(vec_t *fa);
+	float(*MSG_ReadBitAngle)(int numbits);
+	int(*MSG_ReadBitData)(void *dest, int length);
+	char*(*MSG_ReadBitString)();
+	int(*MSG_CurrentBit)();
+
+	// Write functions
+	void(*MSG_WriteLong)(sizebuf_t *sb, int c);
+	void(*MSG_WriteFloat)(sizebuf_t *sb, float f);
+	void(*MSG_WriteAngle)(sizebuf_t *sb, float f);
+	void(*MSG_WriteHiresAngle)(sizebuf_t *sb, float f);
+	void(*MSG_WriteUsercmd)(sizebuf_t *sb, usercmd_t *to, usercmd_t *from);
+	void(*MSG_WriteCoord)(sizebuf_t *sb, float f);
+	void(*MSG_WriteVec3Coord)(sizebuf_t *sb, const vec3_t fa);
+
+	// Write bit functions
+	bool(*MSG_IsBitWriting)();
+	void(*MSG_WriteOneBit)(int nValue);
+	void(*MSG_WriteSBits)(uint32 data, int numbits);
+	void(*MSG_WriteBitCoord)(float f);
+	void(*MSG_WriteBitAngle)(float fAngle, int numbits);
+	void(*MSG_WriteBitData)(void *src, int length);
+	void(*MSG_WriteBitString)(const char *p);
+	void(*SZ_Write)(sizebuf_t *buf, const void *data, int length);
+	void(*SZ_Print)(sizebuf_t *buf, const char *data);
+	void(*SZ_Clear)(sizebuf_t *buf);
 };
 
 class IRehldsApi {

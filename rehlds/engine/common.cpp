@@ -531,10 +531,8 @@ void MSG_WriteBits(uint32 data, int numbits)
 
 #endif //defined(REHLDS_FIXES)
 
-NOXREF qboolean MSG_IsBitWriting(void)
+qboolean MSG_IsBitWriting(void)
 {
-	NOXREFCHECK;
-
 	return bfwrite.pbuf != 0;
 }
 
@@ -622,10 +620,8 @@ int MSG_CurrentBit(void)
 	return nbits;
 }
 
-NOXREF qboolean MSG_IsBitReading(void)
+qboolean MSG_IsBitReading(void)
 {
-	NOXREFCHECK;
-
 	return bfread.pbuf != 0;
 }
 
@@ -758,10 +754,8 @@ uint32 MSG_ReadBits(int numbits)
 	return result;
 }
 
-NOXREF uint32 MSG_PeekBits(int numbits)
+uint32 MSG_PeekBits(int numbits)
 {
-	NOXREFCHECK;
-
 	bf_read_t savebf = bfread;
 	uint32 r = MSG_ReadBits(numbits);
 	bfread = savebf;
@@ -782,10 +776,8 @@ int MSG_ReadSBits(int numbits)
 	return result;
 }
 
-NOXREF char *MSG_ReadBitString(void)
+char *MSG_ReadBitString(void)
 {
-	NOXREFCHECK;
-
 	static char buf[8192];
 
 	char *p = &buf[0];
@@ -825,10 +817,8 @@ int MSG_ReadBitData(void *dest, int length)
 	return length;
 }
 
-NOXREF float MSG_ReadBitCoord(void)
+float MSG_ReadBitCoord(void)
 {
-	NOXREFCHECK;
-
 	float value = 0;
 
 	int intval = MSG_ReadOneBit();
@@ -878,10 +868,8 @@ void MSG_WriteBitCoord(const float f)
 	}
 }
 
-NOXREF void MSG_ReadBitVec3Coord(vec3_t fa)
+void MSG_ReadBitVec3Coord(vec3_t fa)
 {
-	NOXREFCHECK;
-
 	int xflag = MSG_ReadOneBit();
 	int yflag = MSG_ReadOneBit();
 	int zflag = MSG_ReadOneBit();
@@ -912,10 +900,8 @@ void MSG_WriteBitVec3Coord(const vec3_t fa)
 		MSG_WriteBitCoord(fa[2]);
 }
 
-NOXREF float MSG_ReadCoord(void)
+float MSG_ReadCoord(void)
 {
-	NOXREFCHECK;
-
 	return (float)(MSG_ReadShort() * (1.0 / 8));
 }
 
@@ -924,10 +910,8 @@ void MSG_WriteCoord(sizebuf_t *sb, const float f)
 	MSG_WriteShort(sb, (int)(f * 8.0));
 }
 
-NOXREF void MSG_ReadVec3Coord(sizebuf_t *sb, vec3_t fa)
+void MSG_ReadVec3Coord(sizebuf_t *sb, vec3_t fa)
 {
-	NOXREFCHECK;
-
 	if (MSG_IsBitReading())
 	{
 		MSG_ReadBitVec3Coord(fa);
@@ -940,10 +924,8 @@ NOXREF void MSG_ReadVec3Coord(sizebuf_t *sb, vec3_t fa)
 	}
 }
 
-NOXREF void MSG_WriteVec3Coord(sizebuf_t *sb, const vec3_t fa)
+void MSG_WriteVec3Coord(sizebuf_t *sb, const vec3_t fa)
 {
-	NOXREFCHECK;
-
 	MSG_StartBitWriting(sb);
 	MSG_WriteBitVec3Coord(fa);
 	MSG_EndBitWriting(sb);
@@ -1047,10 +1029,8 @@ int MSG_ReadLong(void)
 	return c;
 }
 
-NOXREF float MSG_ReadFloat(void)
+float MSG_ReadFloat(void)
 {
-	NOXREFCHECK;
-
 	float f;
 
 	if (msg_readcount + 4 <= net_message.cursize)
@@ -1109,10 +1089,8 @@ char *MSG_ReadStringLine(void)
 	return string;
 }
 
-NOXREF float MSG_ReadAngle(void)
+float MSG_ReadAngle(void)
 {
-	NOXREFCHECK;
-
 	int c = MSG_ReadChar();
 #ifdef REHLDS_FIXES
 	if (c == -1)	// FIXED: Added check for wrong value, but just return 0 instead of -1 * (360.0 / 256)
@@ -1123,10 +1101,8 @@ NOXREF float MSG_ReadAngle(void)
 	return (float)(c * (360.0 / 256));
 }
 
-NOXREF float MSG_ReadHiresAngle(void)
+float MSG_ReadHiresAngle(void)
 {
-	NOXREFCHECK;
-
 	int c = MSG_ReadShort();
 #ifdef REHLDS_FIXES
 	if (c == -1)	// FIXED: Added check for wrong value, but just return 0 instead of -1 * (360.0 / 65536)
