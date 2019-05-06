@@ -6138,7 +6138,7 @@ void SV_LoadEntities(void)
 			FILE *f = FS_Open(name, "wb");
 			if (f != NULL)
 			{
-				FS_Write(g_psv.worldmodel->entities, strlen(g_psv.worldmodel->entities), 1, f);
+				FS_Write(g_psv.worldmodel->entities, Q_strlen(g_psv.worldmodel->entities), 1, f);
 				FS_Close(f);
 			}
 		}
@@ -6148,24 +6148,24 @@ void SV_LoadEntities(void)
 			if (f != NULL)
 			{
 				Con_Printf("Using custom entity file: %s\n", name);
-				
+
 				unsigned int nFileSize = FS_Size(f);
 				char *pszInputStream = (char *)Mem_Malloc(nFileSize + 1);
 				if (!pszInputStream)
 				{
 					Sys_Error("%s: Could not allocate space for entity file of %i bytes", __func__, nFileSize + 1);
 				}
-				
+
 				FS_Read(pszInputStream, nFileSize, 1, f);
-				pszInputStream[nFileSize] = 0;
-				
+				pszInputStream[nFileSize] = '\0';
+
 				ED_LoadFromFile(pszInputStream);
 				Mem_Free(pszInputStream);
 				FS_Close(f);
 				return;
 			}
 		}
-		
+
 		Con_Printf("Using default entities...\n");
 	}
 	
