@@ -6168,7 +6168,6 @@ void SV_LoadEntities(void)
 	}
 	
 	Con_Printf( "Using default entities...\n");
-
 #endif  // REHLDS_FIXES
 	ED_LoadFromFile(g_psv.worldmodel->entities);
 }
