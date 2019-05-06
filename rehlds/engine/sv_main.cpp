@@ -203,7 +203,7 @@ cvar_t sv_rehlds_attachedentities_playeranimationspeed_fix = {"sv_rehlds_attache
 cvar_t sv_rehlds_local_gametime = {"sv_rehlds_local_gametime", "0", 0, 0.0f, nullptr};
 cvar_t sv_rehlds_send_mapcycle = { "sv_rehlds_send_mapcycle", "0", 0, 0.0f, nullptr };
 cvar_t sv_rehlds_maxclients_from_single_ip = { "sv_rehlds_maxclients_from_single_ip", "5", 0, 5.0f, nullptr };
-cvar_t sv_entityeditor = { "sv_entityeditor", "0", 0, 0.0f, NULL };
+cvar_t sv_entityeditor = { "sv_entityeditor", "0", 0, 0.0f, nullptr };
 #endif
 
 delta_t *SV_LookupDelta(char *name)
@@ -6128,46 +6128,46 @@ int SV_SpawnServer(qboolean bIsDemo, char *server, char *startspot)
 void SV_LoadEntities(void)
 {
 #ifdef REHLDS_FIXES
-	if ( sv_entityeditor.value > 0.0f )
+	if (sv_entityeditor.value > 0.0f)
 	{
-		Con_Printf( "sv_entityeditor = 1\nInitialized entity editor.\nEntity path: maps/%s.ent\n", g_psv.name );
+		Con_Printf("sv_entityeditor = 1\nInitialized entity editor.\nEntity path: maps/%s.ent\n", g_psv.name);
 
-		if ( !FS_FileExists( va( "%s/%s.ent", "maps/", g_psv.name ) ) )
+		if (!FS_FileExists(va("%s/%s.ent", "maps/", g_psv.name)))
 		{
-			FILE *f = FS_Open( va( "%s/%s.ent", "maps/", g_psv.name ), "wb" );
-			if ( !f )
+			FILE *f = FS_Open(va("%s/%s.ent", "maps/", g_psv.name), "wb");
+			if (!f)
 			{
 				ED_LoadFromFile(g_psv.worldmodel->entities);
 				return;
 			}
-			FS_Write( g_psv.worldmodel->entities, strlen( g_psv.worldmodel->entities ), 1, f );
-			FS_Close( f );
+			FS_Write(g_psv.worldmodel->entities, strlen( g_psv.worldmodel->entities ), 1, f);
+			FS_Close(f);
 		}
 
-		if ( FS_FileExists( va( "%s/%s.ent", "maps/", g_psv.name ) ) )
+		if (FS_FileExists(va("%s/%s.ent", "maps/", g_psv.name)))
 		{
-			FILE *f = FS_Open( va( "%s/%s.ent", "maps/", g_psv.name ), "rb" );
-			if ( !f )
+			FILE *f = FS_Open(va("%s/%s.ent", "maps/", g_psv.name), "rb");
+			if (!f)
 			{
 				ED_LoadFromFile(g_psv.worldmodel->entities);
 				return;
 			}
-			unsigned int nFileSize = FS_Size( f );
+			unsigned int nFileSize = FS_Size(f);
 			char *pszInputStream;
 			int nBytesRead;
-			pszInputStream = ( char * )Mem_ZeroMalloc( nFileSize + 1 );
-			nBytesRead = FS_Read( pszInputStream, nFileSize, 1, f );
+			pszInputStream = (char *)Mem_ZeroMalloc(nFileSize + 1);
+			nBytesRead = FS_Read( pszInputStream, nFileSize, 1, f);
 			auto oldval = g_psv.worldmodel->entities;
 			g_psv.worldmodel->entities = pszInputStream;
-			ED_LoadFromFile( g_psv.worldmodel->entities );
+			ED_LoadFromFile(g_psv.worldmodel->entities);
 			g_psv.worldmodel->entities = oldval;
-			Mem_Free( pszInputStream );
-			FS_Close( f );
+			Mem_Free(pszInputStream);
+			FS_Close(f);
 			return;
 		}
 	}
 	
-	Con_Printf( "Using default entities...\n");
+	Con_Printf("Using default entities...\n");
 #endif  // REHLDS_FIXES
 	ED_LoadFromFile(g_psv.worldmodel->entities);
 }
