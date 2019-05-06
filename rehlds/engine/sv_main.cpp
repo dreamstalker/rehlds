@@ -6143,8 +6143,7 @@ void SV_LoadEntities(void)
 			FS_Write(g_psv.worldmodel->entities, strlen(g_psv.worldmodel->entities), 1, f);
 			FS_Close(f);
 		}
-
-		if (FS_FileExists(va("%s/%s.ent", "maps/", g_psv.name)))
+		else
 		{
 			FILE *f = FS_Open(va("%s/%s.ent", "maps/", g_psv.name), "rb");
 			if (!f)
