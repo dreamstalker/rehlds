@@ -203,7 +203,7 @@ cvar_t sv_rehlds_attachedentities_playeranimationspeed_fix = {"sv_rehlds_attache
 cvar_t sv_rehlds_local_gametime = {"sv_rehlds_local_gametime", "0", 0, 0.0f, nullptr};
 cvar_t sv_rehlds_send_mapcycle = { "sv_rehlds_send_mapcycle", "0", 0, 0.0f, nullptr };
 cvar_t sv_rehlds_maxclients_from_single_ip = { "sv_rehlds_maxclients_from_single_ip", "5", 0, 5.0f, nullptr };
-cvar_t sv_entityeditor = { "sv_entityeditor", "0", 0, 0.0f, nullptr };
+cvar_t sv_use_entity_file = { "sv_use_entity_file", "0", 0, 0.0f, nullptr };
 #endif
 
 delta_t *SV_LookupDelta(char *name)
@@ -6128,9 +6128,9 @@ int SV_SpawnServer(qboolean bIsDemo, char *server, char *startspot)
 void SV_LoadEntities(void)
 {
 #ifdef REHLDS_FIXES
-	if (sv_entityeditor.value > 0.0f)
+	if (sv_use_entity_file.value > 0.0f)
 	{
-		Con_Printf("sv_entityeditor = 1\nInitialized entity editor.\nEntity path: maps/%s.ent\n", g_psv.name);
+		Con_Printf("sv_use_entity_file = 1\nInitialized entity editor.\nEntity path: maps/%s.ent\n", g_psv.name);
 
 		if (!FS_FileExists(va("%s/%s.ent", "maps/", g_psv.name)))
 		{
@@ -7897,7 +7897,7 @@ void SV_Init(void)
 
 	Cvar_RegisterVariable(&sv_rollspeed);
 	Cvar_RegisterVariable(&sv_rollangle);
-	Cvar_RegisterVariable(&sv_entityeditor);
+	Cvar_RegisterVariable(&sv_use_entity_file);
 #endif
 
 	for (int i = 0; i < MAX_MODELS; i++)
