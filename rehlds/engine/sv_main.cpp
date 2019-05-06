@@ -6137,6 +6137,7 @@ void SV_LoadEntities(void)
 			FILE *f = FS_Open( va( "%s/%s.ent", "maps/", g_psv.name ), "wb" );
 			if ( !f )
 			{
+				ED_LoadFromFile(g_psv.worldmodel->entities);
 				return;
 			}
 			FS_Write( g_psv.worldmodel->entities, strlen( g_psv.worldmodel->entities ), 1, f );
@@ -6147,7 +6148,10 @@ void SV_LoadEntities(void)
 		{
 			FILE *f = FS_Open( va( "%s/%s.ent", "maps/", g_psv.name ), "rb" );
 			if ( !f )
+			{
+				ED_LoadFromFile(g_psv.worldmodel->entities);
 				return;
+			}
 			unsigned int nFileSize = FS_Size( f );
 			char *pszInputStream;
 			int nBytesRead;
