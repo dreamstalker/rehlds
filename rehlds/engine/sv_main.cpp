@@ -6133,7 +6133,7 @@ void SV_LoadEntities(void)
 		char name[MAX_PATH];
 		Q_snprintf(name, sizeof(name), "maps/%s.ent", g_psv.name);
 
-		if (!FS_FileExists(name)
+		if (!FS_FileExists(name))
 		{
 			FILE *f = FS_Open(name, "wb");
 			if (f != NULL)
