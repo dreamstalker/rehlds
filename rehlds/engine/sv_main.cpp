@@ -6140,7 +6140,7 @@ void SV_LoadEntities(void)
 				ED_LoadFromFile(g_psv.worldmodel->entities);
 				return;
 			}
-			FS_Write(g_psv.worldmodel->entities, strlen( g_psv.worldmodel->entities ), 1, f);
+			FS_Write(g_psv.worldmodel->entities, strlen(g_psv.worldmodel->entities), 1, f);
 			FS_Close(f);
 		}
 
@@ -6156,7 +6156,7 @@ void SV_LoadEntities(void)
 			char *pszInputStream;
 			int nBytesRead;
 			pszInputStream = (char *)Mem_ZeroMalloc(nFileSize + 1);
-			nBytesRead = FS_Read( pszInputStream, nFileSize, 1, f);
+			nBytesRead = FS_Read(pszInputStream, nFileSize, 1, f);
 			auto oldval = g_psv.worldmodel->entities;
 			g_psv.worldmodel->entities = pszInputStream;
 			ED_LoadFromFile(g_psv.worldmodel->entities);
