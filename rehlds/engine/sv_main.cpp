@@ -6130,11 +6130,12 @@ void SV_LoadEntities(void)
 #ifdef REHLDS_FIXES
 	if (sv_use_entity_file.value > 0.0f)
 	{
-		Con_Printf("sv_use_entity_file = 1\nInitialized entity editor.\nEntity path: maps/%s.ent\n", g_psv.name);
+		char name[MAX_PATH];
+		Q_snprintf(name, sizeof(name), "maps/%s.ent", g_psv.name);
 
-		if (!FS_FileExists(va("%s/%s.ent", "maps/", g_psv.name)))
+		if (!FS_FileExists(name)
 		{
-			FILE *f = FS_Open(va("%s/%s.ent", "maps/", g_psv.name), "wb");
+			FILE *f = FS_Open(name, "wb");
 			if (f != NULL)
 			{
 				FS_Write(g_psv.worldmodel->entities, strlen(g_psv.worldmodel->entities), 1, f);
@@ -6143,12 +6144,21 @@ void SV_LoadEntities(void)
 		}
 		else
 		{
-			FILE *f = FS_Open(va("%s/%s.ent", "maps/", g_psv.name), "rb");
+			FILE *f = FS_Open(name, "rb");
 			if (f != NULL)
 			{
+				Con_Printf("Using custom entity file: %s\n", name);
+				
 				unsigned int nFileSize = FS_Size(f);
-				char *pszInputStream = (char *)Mem_ZeroMalloc(nFileSize + 1);
+				char *pszInputStream = (char *)Mem_Malloc(nFileSize + 1);
+				if (!pszInputStream)
+				{
+					Sys_Error("%s: Could not allocate space for entity file of %i bytes", __func__, nFileSize + 1);
+				}
+				
 				FS_Read(pszInputStream, nFileSize, 1, f);
+				pszInputStream[nFileSize] = 0;
+				
 				ED_LoadFromFile(pszInputStream);
 				Mem_Free(pszInputStream);
 				FS_Close(f);
