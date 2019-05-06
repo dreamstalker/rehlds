@@ -6152,14 +6152,9 @@ void SV_LoadEntities(void)
 				return;
 			}
 			unsigned int nFileSize = FS_Size(f);
-			char *pszInputStream;
-			int nBytesRead;
-			pszInputStream = (char *)Mem_ZeroMalloc(nFileSize + 1);
-			nBytesRead = FS_Read(pszInputStream, nFileSize, 1, f);
-			auto oldval = g_psv.worldmodel->entities;
-			g_psv.worldmodel->entities = pszInputStream;
-			ED_LoadFromFile(g_psv.worldmodel->entities);
-			g_psv.worldmodel->entities = oldval;
+			char *pszInputStream = (char *)Mem_ZeroMalloc(nFileSize + 1);
+			FS_Read(pszInputStream, nFileSize, 1, f);
+			ED_LoadFromFile(pszInputStream);
 			Mem_Free(pszInputStream);
 			FS_Close(f);
 			return;
