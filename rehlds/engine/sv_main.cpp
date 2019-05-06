@@ -6135,33 +6135,30 @@ void SV_LoadEntities(void)
 		if (!FS_FileExists(va("%s/%s.ent", "maps/", g_psv.name)))
 		{
 			FILE *f = FS_Open(va("%s/%s.ent", "maps/", g_psv.name), "wb");
-			if (!f)
+			if (f != NULL)
 			{
-				ED_LoadFromFile(g_psv.worldmodel->entities);
-				return;
+				FS_Write(g_psv.worldmodel->entities, strlen(g_psv.worldmodel->entities), 1, f);
+				FS_Close(f);
 			}
-			FS_Write(g_psv.worldmodel->entities, strlen(g_psv.worldmodel->entities), 1, f);
-			FS_Close(f);
 		}
 		else
 		{
 			FILE *f = FS_Open(va("%s/%s.ent", "maps/", g_psv.name), "rb");
-			if (!f)
+			if (f != NULL)
 			{
-				ED_LoadFromFile(g_psv.worldmodel->entities);
+				unsigned int nFileSize = FS_Size(f);
+				char *pszInputStream = (char *)Mem_ZeroMalloc(nFileSize + 1);
+				FS_Read(pszInputStream, nFileSize, 1, f);
+				ED_LoadFromFile(pszInputStream);
+				Mem_Free(pszInputStream);
+				FS_Close(f);
 				return;
 			}
-			unsigned int nFileSize = FS_Size(f);
-			char *pszInputStream = (char *)Mem_ZeroMalloc(nFileSize + 1);
-			FS_Read(pszInputStream, nFileSize, 1, f);
-			ED_LoadFromFile(pszInputStream);
-			Mem_Free(pszInputStream);
-			FS_Close(f);
-			return;
 		}
+		
+		Con_Printf("Using default entities...\n");
 	}
 	
-	Con_Printf("Using default entities...\n");
 #endif  // REHLDS_FIXES
 	ED_LoadFromFile(g_psv.worldmodel->entities);
 }
