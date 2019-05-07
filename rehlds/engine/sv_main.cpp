@@ -6136,7 +6136,7 @@ void SV_LoadEntities(void)
 		if (!FS_FileExists(name))
 		{
 			FILE *f = FS_Open(name, "wb");
-			if (f != NULL)
+			if (f)
 			{
 				FS_Write(g_psv.worldmodel->entities, Q_strlen(g_psv.worldmodel->entities), 1, f);
 				FS_Close(f);
@@ -6145,7 +6145,7 @@ void SV_LoadEntities(void)
 		else
 		{
 			FILE *f = FS_Open(name, "rb");
-			if (f != NULL)
+			if (f)
 			{
 				Con_Printf("Using custom entity file: %s\n", name);
 
