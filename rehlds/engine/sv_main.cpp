@@ -203,6 +203,7 @@ cvar_t sv_rehlds_attachedentities_playeranimationspeed_fix = {"sv_rehlds_attache
 cvar_t sv_rehlds_local_gametime = {"sv_rehlds_local_gametime", "0", 0, 0.0f, nullptr};
 cvar_t sv_rehlds_send_mapcycle = { "sv_rehlds_send_mapcycle", "0", 0, 0.0f, nullptr };
 cvar_t sv_rehlds_maxclients_from_single_ip = { "sv_rehlds_maxclients_from_single_ip", "5", 0, 5.0f, nullptr };
+cvar_t sv_use_entity_file = { "sv_use_entity_file", "0", 0, 0.0f, nullptr };
 #endif
 
 delta_t *SV_LookupDelta(char *name)
@@ -6126,6 +6127,49 @@ int SV_SpawnServer(qboolean bIsDemo, char *server, char *startspot)
 
 void SV_LoadEntities(void)
 {
+#ifdef REHLDS_FIXES
+	if (sv_use_entity_file.value > 0.0f)
+	{
+		char name[MAX_PATH];
+		Q_snprintf(name, sizeof(name), "maps/%s.ent", g_psv.name);
+
+		if (!FS_FileExists(name))
+		{
+			FILE *f = FS_Open(name, "wb");
+			if (f)
+			{
+				FS_Write(g_psv.worldmodel->entities, Q_strlen(g_psv.worldmodel->entities), 1, f);
+				FS_Close(f);
+			}
+		}
+		else
+		{
+			FILE *f = FS_Open(name, "rb");
+			if (f)
+			{
+				Con_Printf("Using custom entity file: %s\n", name);
+
+				unsigned int nFileSize = FS_Size(f);
+				char *pszInputStream = (char *)Mem_Malloc(nFileSize + 1);
+				if (!pszInputStream)
+				{
+					Sys_Error("%s: Could not allocate space for entity file of %i bytes", __func__, nFileSize + 1);
+				}
+
+				FS_Read(pszInputStream, nFileSize, 1, f);
+				pszInputStream[nFileSize] = '\0';
+
+				ED_LoadFromFile(pszInputStream);
+				Mem_Free(pszInputStream);
+				FS_Close(f);
+				return;
+			}
+		}
+
+		Con_Printf("Using default entities...\n");
+	}
+	
+#endif  // REHLDS_FIXES
 	ED_LoadFromFile(g_psv.worldmodel->entities);
 }
 
@@ -7863,6 +7907,7 @@ void SV_Init(void)
 
 	Cvar_RegisterVariable(&sv_rollspeed);
 	Cvar_RegisterVariable(&sv_rollangle);
+	Cvar_RegisterVariable(&sv_use_entity_file);
 #endif
 
 	for (int i = 0; i < MAX_MODELS; i++)
