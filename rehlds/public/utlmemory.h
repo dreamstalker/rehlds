@@ -262,6 +262,7 @@ void CUtlMemory<T, I>::Grow(int num)
 	// Make sure we have at least numallocated + num allocations.
 	// Use the grow rules specified for this memory (in m_nGrowSize)
 	int nAllocationRequested = m_nAllocationCount + num;
+	bool needToReallocate = false;
 	while (m_nAllocationCount < nAllocationRequested)
 	{
 		if (m_nAllocationCount != 0)
@@ -274,6 +275,7 @@ void CUtlMemory<T, I>::Grow(int num)
 			{
 				m_nAllocationCount += m_nAllocationCount;
 			}
+			needToReallocate = true;
 		}
 		else
 		{
@@ -283,11 +285,11 @@ void CUtlMemory<T, I>::Grow(int num)
 		}
 	}
 
-	if (m_pMemory)
+	if (m_pMemory && needToReallocate)
 	{
 		m_pMemory = (T *)realloc(m_pMemory, m_nAllocationCount * sizeof(T));
 	}
-	else
+	else if (!m_pMemory)
 	{
 		m_pMemory = (T *)malloc(m_nAllocationCount * sizeof(T));
 	}
