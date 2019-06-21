@@ -319,15 +319,15 @@ static void ConsoleCtrlHandler(int signal)
 	if (signal == SIGINT || signal == SIGTERM)
 	{
 		g_bAppHasBeenTerminated.store(true, std::memory_order_release);
-	}    
+	}
 }
 
 bool Sys_SetupConsole()
 {
 	struct sigaction action;
-    action.sa_handler = ConsoleCtrlHandler;
-    sigaction(SIGINT, &action, NULL);
-    sigaction(SIGTERM, &action, NULL);
+	action.sa_handler = ConsoleCtrlHandler;
+	sigaction(SIGINT, &action, NULL);
+	sigaction(SIGTERM, &action, NULL);
 	return true;
 }
 
@@ -339,6 +339,10 @@ int main(int argc, char *argv[])
 {
 	Q_snprintf(g_szEXEName, sizeof(g_szEXEName), "%s", argv[0]);
 	char* cmdline = BuildCmdLine(argc, argv);
-	auto ret = StartServer(cmdline);
-	return ret == LAUNCHER_OK ? 0 : 1;
+#ifdef REHLDS_FIXES
+	return StartServer(cmdline) == LAUNCHER_OK ? EXIT_SUCCESS : EXIT_FAILURE;
+#else // REHLDS_FIXES
+	StartServer(cmdline);
+	return 0;
+#endif
 }
