@@ -1,5 +1,7 @@
 #pragma once
 
+#include <atomic>
+
 #include "basetypes.h"
 #include "FileSystem.h"
 #include "strtools.h"

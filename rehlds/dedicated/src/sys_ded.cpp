@@ -30,7 +30,7 @@
 
 bool g_bVGui = false;
 char *gpszCvars = nullptr;
-bool g_bAppHasBeenTerminated = false;
+std::atomic<bool> g_bAppHasBeenTerminated(false);
 
 CSysModule *g_pEngineModule = nullptr;
 IDedicatedServerAPI *engineAPI = nullptr;
@@ -160,7 +160,7 @@ int RunEngine()
 
 		Sys_PrepareConsoleInput();
 
-		if (g_bAppHasBeenTerminated)
+		if (g_bAppHasBeenTerminated.load(std::memory_order_acquire))
 			break;
 
 #ifdef VGUI
@@ -193,14 +193,14 @@ int RunEngine()
 	VGUIFinishedConfig();
 
 	if (iret == DLL_CLOSE)
-		g_bAppHasBeenTerminated = true;
+		g_bAppHasBeenTerminated.store(true, std::memory_order_release);
 
 	return LAUNCHER_OK;
 }
 
 int StartServer(char* cmdline)
 {
-	g_bAppHasBeenTerminated = false;
+	g_bAppHasBeenTerminated.store(false, std::memory_order_release);
 
 	do {
 		CommandLine()->CreateCmdLine(cmdline);
@@ -293,7 +293,7 @@ int StartServer(char* cmdline)
 		Sys_UnloadModule(g_pFileSystemModule);
 		Sys_UnloadModule(g_pEngineModule);
 
-	} while (!g_bAppHasBeenTerminated);
+	} while (!g_bAppHasBeenTerminated.load(std::memory_order_acquire));
 
 	return LAUNCHER_OK;
 }

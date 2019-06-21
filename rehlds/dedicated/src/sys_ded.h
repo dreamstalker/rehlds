@@ -29,7 +29,7 @@
 #pragma once
 
 extern char *gpszCvars;
-extern bool g_bAppHasBeenTerminated;
+extern std::atomic<bool> g_bAppHasBeenTerminated;
 extern IFileSystem *g_pFileSystemInterface;
 extern CSysModule *g_pEngineModule;
 extern CSysModule *g_pFileSystemModule;

@@ -193,7 +193,7 @@ BOOL WINAPI ConsoleCtrlHandler(DWORD CtrlType)
 	case CTRL_CLOSE_EVENT:
 	case CTRL_LOGOFF_EVENT:
 	case CTRL_SHUTDOWN_EVENT:
-		g_bAppHasBeenTerminated = true;
+		g_bAppHasBeenTerminated.store(true, std::memory_order_release);
 		return TRUE;
 	default:
 		break;
