@@ -381,11 +381,11 @@ void InfoString::RemovePrefixedKeys(char prefix)
 bool InfoString::SetValueForStarKey(const char *key, const char *value)
 {
 	char newtoken[MAX_INFO_LEN + 4];
-	if (Q_strstr(key, "\\") || Q_strstr(value, "\\")) {
+	if (Q_strchr(key, '\\') || Q_strchr(value, '\\')) {
 		return false;
 	}
 
-	if (Q_strstr(key, "\"") || Q_strstr(value, "\"")) {
+	if (Q_strchr(key, '"') || Q_strchr(value, '"')) {
 		return false;
 	}
 

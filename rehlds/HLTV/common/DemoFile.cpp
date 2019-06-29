@@ -256,9 +256,9 @@ bool DemoFile::StartRecording(char *newName)
 	COM_DefaultExtension(m_FileName, ".dem");
 
 	if (m_FileName[0] == '/'
-		|| Q_strstr(m_FileName, ":")
+		|| Q_strchr(m_FileName, ':')
 		|| Q_strstr(m_FileName, "..")
-		|| Q_strstr(m_FileName, "\\"))
+		|| Q_strchr(m_FileName, '\\'))
 	{
 		m_System->Printf("WARNING! DemoFile::StartRecording: unable to open %s (contains illegal characters).\n", m_FileName);
 		return false;

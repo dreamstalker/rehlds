@@ -298,7 +298,7 @@ bool Network::ResolveAddress(char *string, NetAddress *address)
 
 	// Parse address
 	// Validate IPv4
-	if (copy[0] >= '0' && copy[0] <= '9' && Q_strstr(copy, "."))
+	if (copy[0] >= '0' && copy[0] <= '9' && Q_strchr(copy, '.'))
 	{
 		uint32 ret = inet_addr(copy);
 		if (ret == INADDR_NONE) {
