@@ -1171,6 +1171,8 @@ void NetChannel::CopyNormalFragments()
 
 		packet->data.Clear();
 		m_incomingbufs[FRAG_NORMAL_STREAM] = nullptr;
+
+		delete packet;
 		return;
 	}
 #endif
