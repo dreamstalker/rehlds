@@ -398,9 +398,7 @@ NetPacket *NetSocket::ReceivePacket()
 
 void NetSocket::FreePacket(NetPacket *packet)
 {
-	if (packet) {
-		delete packet;
-	}
+	delete packet;
 }
 
 void NetSocket::AddPacket(NetPacket *packet)

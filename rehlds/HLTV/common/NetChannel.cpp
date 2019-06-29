@@ -1107,9 +1107,7 @@ NetPacket *NetChannel::GetPacket()
 
 void NetChannel::FreePacket(NetPacket *packet)
 {
-	if (packet) {
-		delete packet;
-	}
+	delete packet;
 }
 
 void NetChannel::SetUpdateRate(int newupdaterate)
