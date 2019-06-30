@@ -618,11 +618,11 @@ char *DirectorCmd::ToString()
 		break;
 	case DRC_CMD_MESSAGE:
 		GetMessageData(i1, i2, v1, f1, f2, f3, f4, t2);
-		Q_sprintf(s, "%s \"%s\" %i %x (%.2f %.2f) %.1f, %.1f %.1f %.1f", t1, t2, i1, i2, v1[0], v1[1], f1, f2, f3, f4);
+		Q_snprintf(s, std::size(s), "%s \"%s\" %i %x (%.2f %.2f) %.1f, %.1f %.1f %.1f", t1, t2, i1, i2, v1[0], v1[1], f1, f2, f3, f4);
 		break;
 	case DRC_CMD_SOUND:
 		GetSoundData(t2, f1);
-		Q_sprintf(s, "%s \"%s\" %.2f", t1, t2, f1);
+		Q_snprintf(s, std::size(s), "%s \"%s\" %.2f", t1, t2, f1);
 		break;
 	case DRC_CMD_STATUS:
 		GetStatusData(i1, i2, i3);
@@ -630,11 +630,11 @@ char *DirectorCmd::ToString()
 		break;
 	case DRC_CMD_BANNER:
 		GetBannerData(t2);
-		Q_sprintf(s, "%s \"%s\"", t1, t2);
+		Q_snprintf(s, std::size(s), "%s \"%s\"", t1, t2);
 		break;
 	case DRC_CMD_STUFFTEXT:
 		GetStuffTextData(t2);
-		Q_sprintf(s, "%s \"%s\"", t1, t2);
+		Q_snprintf(s, std::size(s), "%s \"%s\"", t1, t2);
 		break;
 	case DRC_CMD_CHASE:
 		GetChaseData(i1, i2, f1, i3);
