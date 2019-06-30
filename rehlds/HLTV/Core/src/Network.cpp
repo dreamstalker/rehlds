@@ -446,7 +446,7 @@ int Network::GetVersion()
 IBaseInterface *CreateNetwork()
 {
 	INetwork *pNetwork = new Network;
-	return (IBaseInterface *)pNetwork;
+	return pNetwork;
 }
 
 #ifndef HOOK_HLTV

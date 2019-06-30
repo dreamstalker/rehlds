@@ -31,7 +31,7 @@
 #include "ISystemModule.h"
 
 class INetSocket;
-class INetwork {
+class INetwork : public IBaseInterface {
 public:
 	virtual ~INetwork() {};
 
