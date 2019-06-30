@@ -455,15 +455,8 @@ void Server::AcceptChallenge(char *cmdLine)
 	m_AuthProtocol = Q_atoi(params.GetToken(2));
 	m_AuthProtocol = 2;
 
-	if (m_AuthProtocol == 2)
-	{
-		m_System->Printf("Get challenge (HASHEDCDKEY)\n");
-		SetState(SERVER_CONNECTING);
-	}
-	else
-	{
-		m_System->Printf("Invalid auth type\n");
-	}
+	m_System->Printf("Get challenge (HASHEDCDKEY)\n");
+	SetState(SERVER_CONNECTING);
 
 	m_CurrentRetry = 0;
 }
