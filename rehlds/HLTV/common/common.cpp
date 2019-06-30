@@ -32,7 +32,7 @@ static char *date = __DATE__;
 static char *mon[12] = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
 static char mond[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 
-int COM_BuildNumber()
+static int COM_BuildNumber_Helper() 
 {
 	int m = 0;
 	int d = 0;
@@ -61,6 +61,12 @@ int COM_BuildNumber()
 	// return days since initial commit on Apr 12 2014 (Happy Cosmonautics Day!)
 	b -= 41374;
 	return b;
+}
+
+int COM_BuildNumber()
+{
+	static int buildnumber = COM_BuildNumber_Helper();
+	return buildnumber;
 }
 
 char *COM_TimeString()
