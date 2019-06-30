@@ -89,9 +89,7 @@ void Director::ShutDown()
 		return;
 	}
 
-	if (m_history) {
-		free(m_history);
-	}
+	free(m_history);
 
 	if (m_World) {
 		m_World->RemoveListener(this);
