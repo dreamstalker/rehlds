@@ -270,13 +270,14 @@ bool CBaseFileSystem::IsDirectory(const char *pFileName)
 {
 	// Allow for UNC-type syntax to specify the path ID.
 	struct _stat buf;
+	const int fileNameLen = Q_strlen(pFileName);
 
 	for (int i = 0; i < m_SearchPaths.Count(); i++)
 	{
 		CSearchPath *sp = &m_SearchPaths[i];
 		if (!sp->IsPackFile())
 		{
-			int len = Q_strlen(sp->GetPath().String()) + Q_strlen(pFileName);
+			int len = Q_strlen(sp->GetPath().String()) + fileNameLen;
 			char *pTmpFileName = (char *)alloca((len + 1) * sizeof(char));
 			Q_strcpy(pTmpFileName, sp->GetPath().String());
 			Q_strcat(pTmpFileName, pFileName);
@@ -774,6 +775,8 @@ const char *CBaseFileSystem::GetLocalPath(const char *pFileName, char *pLocalPat
 		return pLocalPath;
 	}
 
+	const int fileNameLen = Q_strlen(pFileName);
+
 	struct _stat buf;
 	for (int i = 0; i < m_SearchPaths.Count(); i++)
 	{
@@ -794,8 +797,7 @@ const char *CBaseFileSystem::GetLocalPath(const char *pFileName, char *pLocalPat
 			int searchresult = pSearchPath->m_PackFiles.Find(search);
 			if (searchresult != pSearchPath->m_PackFiles.InvalidIndex())
 			{
-				int len = Q_strlen(pFileName);
-				char *pTmpFileName = (char *)alloca((len + 1) * sizeof(char));
+				char *pTmpFileName = (char *)alloca((fileNameLen + 1) * sizeof(char));
 				Q_strcpy(pTmpFileName, pFileName);
 
 				Q_snprintf(pLocalPath, localPathBufferSize - 1, "%s%s", pSearchPath->GetPath().String(), pTmpFileName);
@@ -806,7 +808,7 @@ const char *CBaseFileSystem::GetLocalPath(const char *pFileName, char *pLocalPat
 		}
 		else
 		{
-			int len = Q_strlen(pSearchPath->GetPath().String()) + Q_strlen(pFileName);
+			int len = Q_strlen(pSearchPath->GetPath().String()) + fileNameLen;
 			char *pTmpFileName = (char *)alloca((len + 1) * sizeof(char));
 			Q_strcpy(pTmpFileName, pSearchPath->GetPath().String());
 			Q_strcat(pTmpFileName, pFileName);
@@ -1290,6 +1292,7 @@ bool CBaseFileSystem::FileInSearchPaths(const char *pSearchWildcard, const char 
 	Q_strncpy(pFileNameWithPath, pSearchWildcard, pathStrLen);
 	pFileNameWithPath[pathStrLen] = '\0';
 	Q_strcat(pFileNameWithPath, pFileName);
+	const int fileNameWithPathLen = strlen(pFileNameWithPath);
 
 	for (int i = minSearchPathID; i <= maxSearchPathID; i++)
 	{
@@ -1297,7 +1300,7 @@ bool CBaseFileSystem::FileInSearchPaths(const char *pSearchWildcard, const char 
 
 		if (!pSearchPath->IsPackFile())
 		{
-			int len = Q_strlen(pFileNameWithPath) + Q_strlen(pSearchPath->GetPath().String());
+			int len = fileNameWithPathLen + Q_strlen(pSearchPath->GetPath().String());
 			char *fullFilePath = (char *)alloca((len + 1) * sizeof(char));
 			Q_strcpy(fullFilePath, pSearchPath->GetPath().String());
 			Q_strcat(fullFilePath, pFileNameWithPath);
