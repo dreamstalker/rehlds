@@ -133,7 +133,7 @@ INetSocket *Network::CreateSocket(int port, bool reuse, bool loopback)
 		return socket;
 	}
 
-	socket = new NetSocket;
+	socket = new (std::nothrow) NetSocket;
 	if (!socket) {
 		m_System->Printf("ERROR! Network::CreateSocket: out of memory.\n");
 		return nullptr;
