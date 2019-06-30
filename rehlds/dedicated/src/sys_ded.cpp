@@ -283,8 +283,7 @@ int StartServer(char* cmdline)
 			}
 		}
 
-		if (gpszCvars)
-			free(gpszCvars);
+		free(gpszCvars);
 
 		// Unmount filesystem
 		pFullFileSystem->Unmount();
