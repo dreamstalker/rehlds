@@ -452,7 +452,6 @@ void Server::AcceptChallenge(char *cmdLine)
 	}
 
 	m_ChallengeNumber = Q_atoi(params.GetToken(1));
-	m_AuthProtocol = Q_atoi(params.GetToken(2));
 	m_AuthProtocol = 2;
 
 	m_System->Printf("Get challenge (HASHEDCDKEY)\n");
