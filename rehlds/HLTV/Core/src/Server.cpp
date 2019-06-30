@@ -2381,7 +2381,7 @@ int Server::GetVersion()
 IBaseInterface *CreateServer()
 {
 	IServer *pServer = new Server;
-	return (IBaseInterface *)pServer;
+	return pServer;
 }
 
 #ifndef HOOK_HLTV

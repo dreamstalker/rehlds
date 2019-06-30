@@ -41,7 +41,7 @@ class NetAddress;
 class InfoString;
 class BitBuffer;
 
-class IServer {
+class IServer : public IBaseInterface {
 public:
 	virtual ~IServer() {}
 

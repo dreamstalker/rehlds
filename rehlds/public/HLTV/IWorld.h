@@ -67,7 +67,7 @@ typedef struct frame_s
 class InfoString;
 class NetAddress;
 
-class IWorld {
+class IWorld : public IBaseInterface {
 public:
 	virtual ~IWorld() {}
 

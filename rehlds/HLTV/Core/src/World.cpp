@@ -2334,7 +2334,7 @@ int World::GetVersion()
 IBaseInterface *CreateWorld()
 {
 	IWorld *pWorld = new World;
-	return (IBaseInterface *)pWorld;
+	return pWorld;
 }
 
 #ifndef HOOK_HLTV
