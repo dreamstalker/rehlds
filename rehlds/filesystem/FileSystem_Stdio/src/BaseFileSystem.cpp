@@ -377,7 +377,7 @@ FileHandle_t CBaseFileSystem::Open(const char *pFileName, const char *pOptions, 
 {
 	// Try each of the search paths in succession
 	// FIXME: call createdirhierarchy upon opening for write.
-	if (Q_strstr(pOptions, "r") && !Q_strstr(pOptions, "+"))
+	if (Q_strchr(pOptions, 'r') && !Q_strchr(pOptions, '+'))
 	{
 		CUtlSymbol lookup(pathID);
 		for (int i = 0; i < m_SearchPaths.Count(); i++)
