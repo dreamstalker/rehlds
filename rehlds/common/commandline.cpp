@@ -113,8 +113,7 @@ void CCommandLine::LoadParametersFromFile(const char *&pSrc, char *&pDst, int ma
 	FILE *fp = fopen(szFileName, "r");
 	if (fp)
 	{
-		char c;
-		c = (char)fgetc(fp);
+		int c = fgetc(fp);
 		while (c != EOF)
 		{
 			// Turn return characters into spaces
@@ -130,7 +129,7 @@ void CCommandLine::LoadParametersFromFile(const char *&pSrc, char *&pDst, int ma
 #endif
 
 			// Get the next character, if there are more
-			c = (char)fgetc(fp);
+			c = fgetc(fp);
 		}
 
 		// Add a terminating space character
