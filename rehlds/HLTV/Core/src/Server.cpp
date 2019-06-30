@@ -575,6 +575,7 @@ void Server::SendConnectPacket()
 
 	char data[2048];
 	char buffer[1024];
+	buffer[0] = '\0';
 	InfoString protinfo(1024);
 
 	static float nextRetry = 0;
