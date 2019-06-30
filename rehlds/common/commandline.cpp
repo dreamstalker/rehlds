@@ -79,7 +79,6 @@ void CCommandLine::CreateCmdLine(int argc, const char *argv[])
 		Q_strlcat(cmdline, " ");
 	}
 
-	cmdline[Q_strlen(cmdline)] = '\0';
 	CreateCmdLine(cmdline);
 }
 
