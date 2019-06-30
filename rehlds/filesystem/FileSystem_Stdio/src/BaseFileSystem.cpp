@@ -1638,9 +1638,7 @@ bool CBaseFileSystem::COpenedFile::operator==(COpenedFile const &src) const
 
 void CBaseFileSystem::COpenedFile::SetName(const char *name)
 {
-	if (m_pName) {
-		delete[] m_pName;
-	}
+	delete[] m_pName;
 
 	m_pName = new char [Q_strlen(name) + 1];
 	Q_strcpy(m_pName, name);
