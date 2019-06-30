@@ -66,9 +66,9 @@ enum
 #define UDP_HEADER_SIZE                28
 #define MAX_RELIABLE_PAYLOAD           1200
 
-#define MAKE_FRAGID(id, count)         (((id & 0xffff) << 16) | (count & 0xffff))
-#define FRAG_GETID(fragid)             ((fragid >> 16) & 0xffff)
-#define FRAG_GETCOUNT(fragid)          (fragid & 0xffff)
+#define MAKE_FRAGID(id, count)         ((((id) & 0xffff) << 16) | ((count) & 0xffff))
+#define FRAG_GETID(fragid)             (((fragid) >> 16) & 0xffff)
+#define FRAG_GETCOUNT(fragid)          ((fragid) & 0xffff)
 
 // Max length of a reliable message
 #define MAX_MSGLEN                     3990		// 10 reserved for fragheader?
