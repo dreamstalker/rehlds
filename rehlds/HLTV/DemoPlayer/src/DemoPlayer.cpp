@@ -836,7 +836,7 @@ void DemoPlayer::ShutDown()
 char *DemoPlayer::FormatTime(float time)
 {
 	static char timeCode[16];
-	Q_snprintf(timeCode, sizeof(timeCode), "%02u:%02u:%02u", (int)time / 60, (int)time % 60, (int)(time * 100) % 100);
+	Q_snprintf(timeCode, sizeof(timeCode), "%02d:%02d:%02d", (int)time / 60, (int)time % 60, (int)(time * 100) % 100);
 	return timeCode;
 }
 
