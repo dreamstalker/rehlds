@@ -497,7 +497,7 @@ int Director::GetClosestPlayer(frame_t *frame, int entityIndex)
 	{
 		entity_state_t *ent = &((entity_state_t *)frame->entities)[i];
 		if (ent->number == entityIndex) {
-			VectorCopy(origin, ent->origin);
+			VectorCopy(ent->origin, origin);
 			break;
 		}
 	}
