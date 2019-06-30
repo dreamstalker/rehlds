@@ -522,8 +522,15 @@ void NORETURN HLTV_SysError(const char *fmt, ...)
 	printf("%s\n", string);
 
 	FILE* fl = fopen("hltv_error.txt", "w");
-	fprintf(fl, "%s\n", string);
-	fclose(fl);
+	if (fl) 
+	{
+		fprintf(fl, "%s\n", string);
+		fclose(fl);
+	} 
+	else
+	{
+		fprintf(stderr, "hltv_error.txt open error: %s\n", strerror(errno));
+	}
 
 	int *null = 0;
 	*null = 0;
