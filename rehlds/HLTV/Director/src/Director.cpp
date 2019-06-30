@@ -492,7 +492,7 @@ int Director::GetClosestPlayer(frame_t *frame, int entityIndex)
 		return 0;
 	}
 
-	vec3_t origin;
+	vec3_t origin = {0, 0, 0};
 	for (i = 0; i < frame->entitynum; i++)
 	{
 		entity_state_t *ent = &((entity_state_t *)frame->entities)[i];
