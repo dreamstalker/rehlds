@@ -375,14 +375,14 @@ void NetChannel::TransmitOutgoing()
 
 		// Will be true if we are active and should let chan->message get some bandwidth
 		int send_from_frag[MAX_STREAMS] = { 0, 0 };
-		int send_from_regular = 0;
+		bool send_from_regular = false;
 
 		// If we have data in the waiting list(s) and we have cleared the current queue(s), then
 		// push the m_waitlist(s) into the current queue(s)
 		FragSend();
 
 		// Sending regular payload
-		send_from_regular = m_reliableStream.CurrentSize() ? 1 : 0;
+		send_from_regular = m_reliableStream.CurrentSize() ? true : false;
 
 		// Check to see if we are sending a frag payload
 		for (i = 0; i < MAX_STREAMS; i++)

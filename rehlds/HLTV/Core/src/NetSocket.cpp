@@ -168,7 +168,7 @@ int NetSocket::ReceivePacketIntern(NetAddress *fromHost)
 			}
 		}
 
-		return false;
+		return 0;
 	}
 
 	if (size == 0 || RandomFloat(0, 1) < m_Network->m_FakeLoss) {
