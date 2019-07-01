@@ -199,6 +199,7 @@
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\common\minidump.h" />
     <ClInclude Include="..\..\common\ObjectList.h" />
     <ClInclude Include="..\..\common\SteamAppStartUp.h" />
     <ClInclude Include="..\..\common\textconsole.h" />
@@ -220,6 +221,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\common\commandline.cpp" />
+    <ClCompile Include="..\..\common\minidump.cpp" />
     <ClCompile Include="..\..\common\ObjectList.cpp" />
     <ClCompile Include="..\..\common\SteamAppStartUp.cpp" />
     <ClCompile Include="..\..\common\textconsole.cpp" />

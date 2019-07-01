@@ -19,6 +19,7 @@
     <ClInclude Include="..\..\..\common\ObjectList.h" />
     <ClInclude Include="..\..\..\common\textconsole.h" />
     <ClInclude Include="..\..\..\common\TokenLine.h" />
+    <ClInclude Include="..\..\..\common\minidump.h" />
     <ClInclude Include="..\..\..\engine\mem.h" />
     <ClInclude Include="..\..\..\game_shared\bitvec.h" />
     <ClInclude Include="..\..\..\game_shared\perf_counter.h" />
@@ -59,6 +60,11 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release Swds|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\..\common\minidump.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release Swds|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\..\..\engine\mem.cpp" />
     <ClCompile Include="..\..\common\common.cpp">

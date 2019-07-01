@@ -1092,8 +1092,15 @@ unsigned char *System::LoadFile(const char *name, int *length)
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
-	gSystem.BuildCommandLine(lpCmdLine);
-	return gSystem.Run();
+#ifdef HLTV_FIXES
+	return CatchAndWriteMiniDump([=]()
+	{
+#endif
+		gSystem.BuildCommandLine(lpCmdLine);
+		return gSystem.Run();
+#ifdef HLTV_FIXES
+	});
+#endif
 }
 
 void System::BuildCommandLine(char *argv)

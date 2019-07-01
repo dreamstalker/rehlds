@@ -239,11 +239,18 @@ void Sys_WriteProcessIdFile()
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
-	if (ShouldLaunchAppViaSteam(lpCmdLine, STDIO_FILESYSTEM_LIB, STDIO_FILESYSTEM_LIB))
-		return 0;
+#ifdef LAUNCHER_FIXES
+	return CatchAndWriteMiniDump([=]()
+	{
+#endif
+		if (ShouldLaunchAppViaSteam(lpCmdLine, STDIO_FILESYSTEM_LIB, STDIO_FILESYSTEM_LIB))
+			return 0;
 
-	//auto command = CommandLineToArgvW(GetCommandLineW(), (int *)&lpCmdLine);
-	auto ret = StartServer(lpCmdLine);
-	//LocalFree(command);
-	return ret;
+		//auto command = CommandLineToArgvW(GetCommandLineW(), (int *)&lpCmdLine);
+		auto ret = StartServer(lpCmdLine);
+		//LocalFree(command);
+		return ret;
+#ifdef LAUNCHER_FIXES
+	});
+#endif
 }

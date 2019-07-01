@@ -16,3 +16,7 @@
 // Console stuff
 #include "System.h"
 #include "common/random.h"
+
+#ifdef _WIN32
+#include "minidump.h"
+#endif

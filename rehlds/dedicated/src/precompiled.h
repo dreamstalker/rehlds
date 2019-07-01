@@ -23,6 +23,7 @@
 
 #ifdef _WIN32
 	#include "conproc.h"
+	#include "minidump.h"
 	#include <mmsystem.h> // timeGetTime
 #else
 	#include <signal.h>
