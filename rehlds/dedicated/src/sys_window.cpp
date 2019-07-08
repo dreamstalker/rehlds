@@ -251,6 +251,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		//LocalFree(command);
 		return ret;
 #ifdef LAUNCHER_FIXES
-	});
+	}, lpCmdLine);
 #endif
 }

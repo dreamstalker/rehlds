@@ -21,12 +21,12 @@ static HRESULT WriteMiniDumpUsingExceptionInfo(unsigned int exceptionCode,
 	HRESULT errorCode{dbghelpModule ? S_OK : GetLastHresult()};
 
 	using MiniDumpWriteDumpFn = decltype(&MiniDumpWriteDump);
-	MiniDumpWriteDumpFn minidumWriteDump{nullptr};
+	MiniDumpWriteDumpFn minidumpWriteDump{nullptr};
 	if (SUCCEEDED(errorCode)) 
 	{
-		minidumWriteDump = reinterpret_cast<MiniDumpWriteDumpFn>(GetProcAddress(
+		minidumpWriteDump = reinterpret_cast<MiniDumpWriteDumpFn>(GetProcAddress(
 			dbghelpModule, "MiniDumpWriteDump"));
-		errorCode = minidumWriteDump ? S_OK : GetLastHresult();
+		errorCode = minidumpWriteDump ? S_OK : GetLastHresult();
 	}
 
 	// Creates a unique filename for the minidump based on the current time and
@@ -76,7 +76,7 @@ static HRESULT WriteMiniDumpUsingExceptionInfo(unsigned int exceptionCode,
 		errorCode = minidumpFile != INVALID_HANDLE_VALUE ? S_OK : GetLastHresult();
 	}
 
-	if (SUCCEEDED(errorCode) && minidumWriteDump)
+	if (SUCCEEDED(errorCode) && minidumpWriteDump)
 	{
 		// Dump the exception information into the file.
 		MINIDUMP_EXCEPTION_INFORMATION exInfo;
@@ -84,7 +84,7 @@ static HRESULT WriteMiniDumpUsingExceptionInfo(unsigned int exceptionCode,
 		exInfo.ExceptionPointers = exceptionInfo;
 		exInfo.ClientPointers = FALSE;
 
-		const BOOL wasWrittenMinidump{minidumWriteDump(
+		const BOOL wasWrittenMinidump{minidumpWriteDump(
 			GetCurrentProcess(), GetCurrentProcessId(), minidumpFile,
 			minidumpType, &exInfo, nullptr, nullptr)};
 
@@ -128,10 +128,29 @@ void WriteMiniDump(unsigned int exceptionCode,
 	}
 }
 
-// Determines either debugger attached to process or not.
+// Determines either debugger attached to a process or not.
 bool HasDebuggerPresent()
 {
 	return ::IsDebuggerPresent() != FALSE;
+}
+
+// Determines either writing mini dumps is enabled or not (-nominidumps).  Same as in Source games.
+bool IsWriteMiniDumpsEnabled(const char *commandLine) 
+{
+	if (!commandLine)
+	{
+		return true;
+	}
+	
+	const char *noMiniDumps{strstr(commandLine, "-nominidumps")};
+	if (!noMiniDumps)
+	{
+		return true;
+	}
+
+	const char *nextCharAfterNoMiniDumps{noMiniDumps + ARRAYSIZE("-nominidumps")};
+	// Command line ends with -nominidumps or has space after -nominidumps -> not mini dump.
+	return !(nextCharAfterNoMiniDumps[0] == '\0' || isspace(nextCharAfterNoMiniDumps[0]));
 }
 
 #endif  // _WIN32

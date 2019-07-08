@@ -37,15 +37,18 @@
 void WriteMiniDump(unsigned int exceptionCode,
                    struct _EXCEPTION_POINTERS *exceptionInfo);
 
-// Determines either debugger attached to process or not.
+// Determines either debugger attached to a process or not.
 bool HasDebuggerPresent();
+
+// Determines either writing mini dumps is enabled or not.  Same as in Source games.
+bool IsWriteMiniDumpsEnabled(const char *commandLine);
 
 // Catches and writes out any exception thrown by the specified function.
 template <typename F>
-int CatchAndWriteMiniDump(F function) 
+int CatchAndWriteMiniDump(F function, const char *commandLine)
 {
-	// Don't mask exceptions when running in the debugger.
-	if (HasDebuggerPresent())
+	// Don't mask exceptions when mini dumps disabled (-nominidumps) or running in the debugger.
+	if (!IsWriteMiniDumpsEnabled(commandLine) || HasDebuggerPresent())
 	{
 		return function();
 	}

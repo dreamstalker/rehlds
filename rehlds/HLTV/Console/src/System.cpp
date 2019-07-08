@@ -1099,7 +1099,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		gSystem.BuildCommandLine(lpCmdLine);
 		return gSystem.Run();
 #ifdef HLTV_FIXES
-	});
+	}, lpCmdLine);
 #endif
 }
 
