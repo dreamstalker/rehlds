@@ -116,6 +116,7 @@ model {
 						include "ObjectList.cpp"
 						include "TokenLine.cpp"
 						include "textconsole.cpp"
+						include "minidump.cpp"
 						if (GradleCppUtils.windows) {
 							include "TextConsoleWin32.cpp"
 						}

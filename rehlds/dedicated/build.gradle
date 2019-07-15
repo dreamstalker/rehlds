@@ -121,6 +121,7 @@ model {
 						include "SteamAppStartUp.cpp"
 						include "textconsole.cpp"
 						include "commandline.cpp"
+						include "minidump.cpp"
 						if (GradleCppUtils.windows) {
 							include "TextConsoleWin32.cpp"
 						}
