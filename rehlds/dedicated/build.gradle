@@ -24,7 +24,7 @@ void setupToolchain(NativeBinarySpec b) {
 	boolean useGcc = project.hasProperty("useGcc")
 
 	def cfg = rootProject.createToolchainConfig(b);
-	cfg.projectInclude(project, '/src', '/../engine', '/../common', '/../public', '/../public/rehlds');
+	cfg.projectInclude(project, '/src', '/../engine', '/../common', '/../public', '/../public/rehlds', '/../');
 
 	cfg.singleDefines 'USE_BREAKPAD_HANDLER', 'DEDICATED', 'LAUNCHER_FIXES', '_CONSOLE'
 

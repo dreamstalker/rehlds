@@ -31,8 +31,6 @@
 #if defined(HLTV_FIXES) || defined(LAUNCHER_FIXES)
 #ifdef _WIN32
 
-#include <DbgHelp.h>
-
 // Writes process mini dump by exception code and info.
 void WriteMiniDump(unsigned int exceptionCode,
                    struct _EXCEPTION_POINTERS *exceptionInfo);

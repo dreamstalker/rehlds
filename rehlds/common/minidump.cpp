@@ -4,10 +4,49 @@
 #if defined(HLTV_FIXES) || defined(LAUNCHER_FIXES)
 #ifdef _WIN32
 
+#include <DbgHelp.h>
+
 // Gets last error.
 static inline HRESULT GetLastHresult()
 {
 	return HRESULT_FROM_WIN32(GetLastError());
+}
+
+#define WIDE_TEXT_HELPER_(quote) L##quote
+#define WIDE_TEXT(quote) WIDE_TEXT_HELPER_(quote)
+
+// Gets application version which is safe for use in minidump file name.  Can be entirely constexpr with C++17 and std::array.
+template<size_t appVersionSize>
+static wchar_t* GetAppVersionForMiniDumpName(wchar_t (&appVersion)[appVersionSize]) {
+	constexpr wchar_t rawAppVersion[]{WIDE_TEXT(APP_VERSION)};
+
+	static_assert(appVersionSize >= ARRAYSIZE(rawAppVersion), "App version buffer size should be enough to store app version.");
+
+	// See https://docs.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-pathcleanupspec#remarks for details.
+	constexpr wchar_t invalidPathChars[]{L'\\', L'/', L':', L'*', L'?', L'"', L'<',  L'>', L'|', L';', L','};
+	
+	size_t outIt{0};
+	for (size_t rawIt{0}; rawIt < ARRAYSIZE(rawAppVersion); ++rawIt) 
+	{
+		const wchar_t currentRawIt{rawAppVersion[rawIt]};
+		bool isValidRaw{true};
+
+		for (size_t invalidIt{0}; invalidIt < ARRAYSIZE(invalidPathChars); ++invalidIt)
+		{
+			isValidRaw = invalidPathChars[invalidIt] != currentRawIt;
+
+			if (!isValidRaw)
+			{
+				break;
+			}
+		}
+
+		if (isValidRaw) {
+			appVersion[outIt++] = currentRawIt;
+		}
+	}
+
+	return appVersion;
 }
 
 // Creates a new minidump file and dumps the exception info into it.
@@ -21,12 +60,12 @@ static HRESULT WriteMiniDumpUsingExceptionInfo(unsigned int exceptionCode,
 	HRESULT errorCode{dbghelpModule ? S_OK : GetLastHresult()};
 
 	using MiniDumpWriteDumpFn = decltype(&MiniDumpWriteDump);
-	MiniDumpWriteDumpFn minidumpWriteDump{nullptr};
+	MiniDumpWriteDumpFn miniDumpWriteDump{nullptr};
 	if (SUCCEEDED(errorCode)) 
 	{
-		minidumpWriteDump = reinterpret_cast<MiniDumpWriteDumpFn>(GetProcAddress(
+		miniDumpWriteDump = reinterpret_cast<MiniDumpWriteDumpFn>(GetProcAddress(
 			dbghelpModule, "MiniDumpWriteDump"));
-		errorCode = minidumpWriteDump ? S_OK : GetLastHresult();
+		errorCode = miniDumpWriteDump ? S_OK : GetLastHresult();
 	}
 
 	// Creates a unique filename for the minidump based on the current time and
@@ -60,8 +99,11 @@ static HRESULT WriteMiniDumpUsingExceptionInfo(unsigned int exceptionCode,
 		// Move past the last slash.
 		if (strippedModuleName) ++strippedModuleName;
 
-		swprintf(fileName, ARRAYSIZE(fileName), L"%s_crash_%d%.2d%.2d_%.2d%.2d%.2d_%d.mdmp",
+		wchar_t appVersion[ARRAYSIZE(APP_VERSION)];
+		// <exe name>_<app version>_crash_<date YYYYMMDD>_<time HHMMSS>_<unique counter>.mdmp
+		swprintf(fileName, ARRAYSIZE(fileName), L"%s_%s_crash_%d%.2d%.2d_%.2d%.2d%.2d_%d.mdmp",
 			strippedModuleName ? strippedModuleName : L"unknown",
+			GetAppVersionForMiniDumpName(appVersion),
 			localTimeNow->tm_year + 1900, /* Year less 2000 */
 			localTimeNow->tm_mon + 1,     /* month (0 - 11 : 0 = January) */
 			localTimeNow->tm_mday,        /* day of month (1 - 31) */
@@ -76,7 +118,7 @@ static HRESULT WriteMiniDumpUsingExceptionInfo(unsigned int exceptionCode,
 		errorCode = minidumpFile != INVALID_HANDLE_VALUE ? S_OK : GetLastHresult();
 	}
 
-	if (SUCCEEDED(errorCode) && minidumpWriteDump)
+	if (SUCCEEDED(errorCode) && miniDumpWriteDump)
 	{
 		// Dump the exception information into the file.
 		MINIDUMP_EXCEPTION_INFORMATION exInfo;
@@ -84,7 +126,7 @@ static HRESULT WriteMiniDumpUsingExceptionInfo(unsigned int exceptionCode,
 		exInfo.ExceptionPointers = exceptionInfo;
 		exInfo.ClientPointers = FALSE;
 
-		const BOOL wasWrittenMinidump{minidumpWriteDump(
+		const BOOL wasWrittenMinidump{miniDumpWriteDump(
 			GetCurrentProcess(), GetCurrentProcessId(), minidumpFile,
 			minidumpType, &exInfo, nullptr, nullptr)};
 
