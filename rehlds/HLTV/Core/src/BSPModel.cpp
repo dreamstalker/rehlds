@@ -175,12 +175,7 @@ byte *BSPModel::DecompressVis(unsigned char *in)
 		return m_novis;
 	}
 
-	int row = (m_model.numleafs + 7) / 8;
-	if (row < 0 || row > MODEL_MAX_PVS) {
-		m_System->Errorf("BSPModel::DecompressVis: oversized m_model.numleafs: %i\n", m_model.numleafs);
-	}
-
-	DecompressPVS(in, decompressed, row);
+	DecompressPVS(in, decompressed, (m_model.numleafs + 7) / 8);
 	return decompressed;
 }
 

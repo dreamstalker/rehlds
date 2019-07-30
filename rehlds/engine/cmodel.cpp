@@ -47,18 +47,8 @@ unsigned char *Mod_DecompressVis(unsigned char *in, model_t *model)
 	{
 		return mod_novis;
 	}
-#ifdef REHLDS_FIXES
+
 	CM_DecompressPVS(in, decompressed, (model->numleafs + 7) / 8);
-#else
-	int row = (model->numleafs + 7) / 8;
-
-	if (row < 0 || row > MODEL_MAX_PVS)
-	{
-		Sys_Error("%s: oversized model->numleafs: %i", __func__, model->numleafs);
-	}
-
-	CM_DecompressPVS(in, decompressed, row);
-#endif
 	return decompressed;
 }
 

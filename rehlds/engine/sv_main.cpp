@@ -6041,6 +6041,18 @@ int SV_SpawnServer(qboolean bIsDemo, char *server, char *startspot)
 		return 0;
 	}
 
+#ifdef REHLDS_FIXES
+	// Originally check was called only in singleplayer mode, that is why this "if" here (see Mod_LeafPVS, gPVS is not NULL for multiplayer)
+	if (g_psvs.maxclients <= 1)
+	{
+		int row = (g_psv.worldmodel->numleafs + 7) / 8;
+		if (row < 0 || row > MODEL_MAX_PVS)
+		{
+			Sys_Error("%s: oversized g_psv.worldmodel->numleafs: %i", __func__, g_psv.worldmodel->numleafs);
+		}
+	}
+#endif
+
 	Sequence_OnLevelLoad(server);
 	ContinueLoadingProgressBar("Server", 4, 0.0);
 	if (gmodinfo.clientcrccheck)
@@ -6168,7 +6180,7 @@ void SV_LoadEntities(void)
 
 		Con_Printf("Using default entities...\n");
 	}
-	
+
 #endif  // REHLDS_FIXES
 	ED_LoadFromFile(g_psv.worldmodel->entities);
 }
