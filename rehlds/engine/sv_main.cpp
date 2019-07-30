@@ -2446,7 +2446,12 @@ void EXT_FUNC SV_ConnectClient_internal(void)
 #endif // REHLDS_FIXES
 
 	bIsSecure = Steam_GSBSecure();
-	Netchan_OutOfBandPrint(NS_SERVER, adr, "%c %i \"%s\" %i %i", S2C_CONNECTION, host_client->userid, NET_AdrToString(host_client->netchan.remote_address), bIsSecure, build_number());
+	Netchan_OutOfBandPrint(NS_SERVER, adr, "%c %i \"%s\" %i %i", S2C_CONNECTION, host_client->userid, NET_AdrToString(host_client->netchan.remote_address), bIsSecure, build_number()
+#ifdef REHLDS_FIXES
+		+ 5970 // Send a fake build number greater than 5970 because the client checks for an older server build into CL_Move
+#endif
+	);
+
 	Log_Printf("\"%s<%i><%s><>\" connected, address \"%s\"\n", name, host_client->userid, SV_GetClientIDString(host_client), NET_AdrToString(host_client->netchan.remote_address));
 #ifdef REHLDS_FIXES
 	Q_strncpy(host_client->userinfo, userinfo, MAX_INFO_STRING - 1);
