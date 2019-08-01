@@ -583,11 +583,15 @@ bool EXT_FUNC SV_EmitSound2_internal(edict_t *entity, IGameClient *pReceiver, in
 		{
 			SV_Multicast(entity, origin, msg_destination | MSG_FL_BROADCAST, TRUE);
 		}
+
 		return true;
 	}
 
 	sizebuf_t *pBuffer;
 	client_t *receiver = pReceiver->GetClient();
+
+	if (receiver->fakeclient || (!receiver->connected && !receiver->active && !receiver->spawned))
+		return false;
 
 	if (bSendPAS && receiver->edict != entity) // if the sound for myself, then do not check PAS.
 	{
