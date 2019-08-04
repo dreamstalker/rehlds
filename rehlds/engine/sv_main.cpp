@@ -6152,11 +6152,14 @@ void SV_LoadEntities(void)
 
 		if (!FS_FileExists(name))
 		{
-			FILE *f = FS_Open(name, "wb");
-			if (f)
+			if (sv_use_entity_file.value > 1.0f)
 			{
-				FS_Write(g_psv.worldmodel->entities, Q_strlen(g_psv.worldmodel->entities), 1, f);
-				FS_Close(f);
+				FILE *f = FS_Open(name, "wb");
+				if (f)
+				{
+					FS_Write(g_psv.worldmodel->entities, Q_strlen(g_psv.worldmodel->entities), 1, f);
+					FS_Close(f);
+				}
 			}
 		}
 		else
