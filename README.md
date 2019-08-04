@@ -57,6 +57,7 @@ Bugfixed version of rehlds contains an additional cvars:
 <li>sv_rehlds_maxclients_from_single_ip // Limit number of connections from the single ip address. Default: 5
 <li>sv_use_entity_file // Use custom entity file for a map. Path to an entity file will be "maps/[map name].ent". 0 - use original entities. 1 - use .ent files from maps directory. 2 - use .ent files from maps directory and create new .ent file if not exist.
 </ul>
+	
 ## Commands
 Bugfixed version of rehlds contains an additional commands:
 <ul>
