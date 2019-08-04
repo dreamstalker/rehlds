@@ -186,6 +186,9 @@ cvar_t sv_rcon_minfailures = { "sv_rcon_minfailures", "5", 0, 0.0f, NULL };
 cvar_t sv_rcon_maxfailures = { "sv_rcon_maxfailures", "10", 0, 0.0f, NULL };
 cvar_t sv_rcon_minfailuretime = { "sv_rcon_minfailuretime", "30", 0, 0.0f, NULL };
 cvar_t sv_rcon_banpenalty = { "sv_rcon_banpenalty", "0", 0, 0.0f, NULL };
+#ifdef REHLDS_FIXES
+cvar_t sv_rcon_allowexternal = { "sv_rcon_allowexternal", "1", 0, 0.0f, NULL };
+#endif
 
 cvar_t scr_downloading = { "scr_downloading", "0", 0, 0.0f, NULL };
 
@@ -3359,6 +3362,15 @@ void SV_Rcon(netadr_t *net_from_)
 
 	Q_memcpy(remaining, &net_message.data[Q_strlen("rcon")], len);
 	remaining[len] = 0;
+
+	#ifdef REHLDS_FIXES
+	if(!sv_rcon_allowexternal.value && !NET_CompareBaseAdr(*net_from_, net_local_adr))
+	{
+		Con_Printf("Rcon denied from %s\n", NET_AdrToString(*net_from_));
+		Log_Printf("Rcon denied from %s\n", NET_AdrToString(*net_from_));
+		return;
+	}
+	#endif
 
 #ifdef REHLDS_FIXES
 	if (sv_rcon_condebug.value > 0.0f)
@@ -7899,6 +7911,9 @@ void SV_Init(void)
 	Cvar_RegisterVariable(&sv_rcon_maxfailures);
 	Cvar_RegisterVariable(&sv_rcon_minfailuretime);
 	Cvar_RegisterVariable(&sv_rcon_banpenalty);
+#ifdef REHLDS_FIXES
+	Cvar_RegisterVariable(&sv_rcon_allowexternal);
+#endif
 	Cvar_RegisterVariable(&sv_minrate);
 	Cvar_RegisterVariable(&sv_maxrate);
 	Cvar_RegisterVariable(&max_queries_sec);
