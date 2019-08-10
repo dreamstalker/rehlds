@@ -67,7 +67,6 @@
     <ProjectGuid>{05292761-0847-4A68-BA10-9D384DC0D3EE}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>DemoPlayer</RootNamespace>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
