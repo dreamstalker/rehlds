@@ -904,7 +904,7 @@ bool Proxy::SetMaxClients(int number)
 
 void Proxy::SetMaxLoss(float maxloss)
 {
-	m_MaxLoss = Q_clamp(maxloss, 0.0f, 1.0f);
+	m_MaxLoss = clamp(maxloss, 0.0f, 1.0f);
 }
 
 int Proxy::GetMaxClients()
@@ -1162,8 +1162,15 @@ void Proxy::CMD_Record(char *cmdLine)
 		return;
 	}
 
-	if (m_DemoClient.Connect()) {
+	if (m_DemoClient.Connect())
+	{
 		m_DemoClient.SetFileName(params.GetToken(1));
+
+#ifdef HLTV_FIXES
+		// Increased rate for recording demofile
+		m_DemoClient.SetUpdateRate(m_MaxUpdateRate);
+		m_DemoClient.SetRate(m_MaxRate);
+#endif
 	}
 }
 
@@ -1680,7 +1687,7 @@ void Proxy::CMD_ChatMode(char *cmdLine)
 		return;
 	}
 
-	m_ChatMode = Q_clamp((ChatMode_e)Q_atoi(params.GetToken(1)), CHAT_OFF, CHAT_GLOBAL);
+	m_ChatMode = clamp((ChatMode_e)Q_atoi(params.GetToken(1)), CHAT_OFF, CHAT_GLOBAL);
 }
 
 void Proxy::CMD_MaxQueries(char *cmdLine)
@@ -1946,7 +1953,7 @@ void Proxy::CMD_DispatchMode(char *cmdLine)
 		return;
 	}
 
-	m_DispatchMode = Q_clamp((DispatchMode_e)Q_atoi(params.GetToken(1)), DISPATCH_OFF, DISPATCH_ALL);
+	m_DispatchMode = clamp((DispatchMode_e)Q_atoi(params.GetToken(1)), DISPATCH_OFF, DISPATCH_ALL);
 }
 
 bool Proxy::IsValidPassword(int type, char *pw)
@@ -2454,14 +2461,12 @@ void Proxy::CreateServerInfoString(InfoString *info)
 
 void Proxy::SetMaxRate(int rate)
 {
-	// maxrate:       1.000 - 20.000
-	m_MaxRate = Q_clamp(rate, 1000, MAX_PROXY_RATE);
+	m_MaxRate = clamp(rate, MIN_PROXY_RATE, MAX_PROXY_RATE);
 }
 
 void Proxy::SetMaxUpdateRate(int updaterate)
 {
-	// maxupdaterate: 1.0 - 40.0
-	m_MaxUpdateRate = Q_clamp(updaterate, 1, MAX_PROXY_UPDATERATE);
+	m_MaxUpdateRate = clamp(updaterate, MIN_PROXY_UPDATERATE, MAX_PROXY_UPDATERATE);
 }
 
 void Proxy::SetDelay(float seconds)
@@ -2495,7 +2500,7 @@ void Proxy::SetClientTime(double time, bool relative)
 void Proxy::SetClientTimeScale(float scale)
 {
 	BitBuffer buf(32);
-	m_ClientTimeScale = Q_clamp(scale, 0.5f, 4.0f);
+	m_ClientTimeScale = clamp(scale, 0.5f, 4.0f);
 
 	buf.WriteByte(svc_timescale);
 	buf.WriteFloat(m_ClientTimeScale);

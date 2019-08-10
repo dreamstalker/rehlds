@@ -49,6 +49,8 @@ public:
 	void DownloadFile(char *fileName);
 	void SendDatagram();
 	void ParseHLTV(NetPacket *packet);
+	void SetUpdateRate(int updaterate) {}
+	void SetRate(int rate) {}
 
 private:
 	enum LocalCommandIDs {

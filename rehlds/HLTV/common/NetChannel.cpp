@@ -1201,7 +1201,7 @@ void NetChannel::SetConnected(bool flag)
 
 void NetChannel::SetRate(int newRate)
 {
-	m_max_bandwidth_rate = Q_clamp(newRate, 1000, 20000);
+	m_max_bandwidth_rate = Q_clamp(newRate, MIN_NETCHAN_RATE, MAX_NETCHAN_RATE);
 }
 
 void NetChannel::GetFlowStats(float *avgInKBSec, float *avgOutKBSec)
