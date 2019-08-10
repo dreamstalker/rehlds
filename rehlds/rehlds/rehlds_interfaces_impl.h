@@ -145,6 +145,7 @@ public:
 	virtual void SetName(const char* name);
 	virtual ISteamGameServer *GetSteamGameServer();
 	virtual netadr_t *GetNetFrom();
+	virtual double GetOldTime();
 };
 
 extern CGameClient** g_GameClients;
