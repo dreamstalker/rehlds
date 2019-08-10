@@ -2446,7 +2446,12 @@ void EXT_FUNC SV_ConnectClient_internal(void)
 #endif // REHLDS_FIXES
 
 	bIsSecure = Steam_GSBSecure();
-	Netchan_OutOfBandPrint(NS_SERVER, adr, "%c %i \"%s\" %i %i", S2C_CONNECTION, host_client->userid, NET_AdrToString(host_client->netchan.remote_address), bIsSecure, build_number());
+	Netchan_OutOfBandPrint(NS_SERVER, adr, "%c %i \"%s\" %i %i", S2C_CONNECTION, host_client->userid, NET_AdrToString(host_client->netchan.remote_address), bIsSecure, build_number()
+#ifdef REHLDS_FIXES
+		+ 5970 // Send a fake build number greater than 5970 because the client checks for an older server build into CL_Move
+#endif
+	);
+
 	Log_Printf("\"%s<%i><%s><>\" connected, address \"%s\"\n", name, host_client->userid, SV_GetClientIDString(host_client), NET_AdrToString(host_client->netchan.remote_address));
 #ifdef REHLDS_FIXES
 	Q_strncpy(host_client->userinfo, userinfo, MAX_INFO_STRING - 1);
@@ -6041,6 +6046,18 @@ int SV_SpawnServer(qboolean bIsDemo, char *server, char *startspot)
 		return 0;
 	}
 
+#ifdef REHLDS_FIXES
+	// Originally check was called only in singleplayer mode, that is why this "if" here (see Mod_LeafPVS, gPVS is not NULL for multiplayer)
+	if (g_psvs.maxclients <= 1)
+	{
+		int row = (g_psv.worldmodel->numleafs + 7) / 8;
+		if (row < 0 || row > MODEL_MAX_PVS)
+		{
+			Sys_Error("%s: oversized g_psv.worldmodel->numleafs: %i", __func__, g_psv.worldmodel->numleafs);
+		}
+	}
+#endif
+
 	Sequence_OnLevelLoad(server);
 	ContinueLoadingProgressBar("Server", 4, 0.0);
 	if (gmodinfo.clientcrccheck)
@@ -6168,7 +6185,7 @@ void SV_LoadEntities(void)
 
 		Con_Printf("Using default entities...\n");
 	}
-	
+
 #endif  // REHLDS_FIXES
 	ED_LoadFromFile(g_psv.worldmodel->entities);
 }

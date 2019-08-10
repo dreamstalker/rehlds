@@ -1036,18 +1036,7 @@ void Mod_LoadLeafs(lump_t *l)
 
 	loadmodel->leafs = out;
 	loadmodel->numleafs = count;
-#ifdef REHLDS_FIXES
-	// Originally check was called only in singleplayer mode, that is why this "if" here (see Mod_LeafPVS, gPVS is not NULL for multiplayer)
-	if (g_psvs.maxclients <= 1)
-	{
-		int row = (loadmodel->numleafs + 7) / 8;
 
-		if (row < 0 || row > MODEL_MAX_PVS)
-		{
-			Sys_Error("%s: oversized loadmodel->numleafs: %i", __func__, loadmodel->numleafs);
-		}
-	}
-#endif
 	for (i = 0; i < count; i++, in++, out++)
 	{
 		for (j = 0; j < 3; j++)
