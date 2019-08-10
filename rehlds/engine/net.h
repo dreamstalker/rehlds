@@ -109,7 +109,7 @@ const float MAX_RATE		= 100000.0f;
 const float MIN_RATE		= 1000.0f;
 
 // Default data rate
-const float DEFAULT_RATE	= 9999.0f;
+const float DEFAULT_RATE	= 30000.0f;
 
 // NETWORKING INFO
 
