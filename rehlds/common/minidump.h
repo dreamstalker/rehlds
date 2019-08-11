@@ -55,7 +55,7 @@ int CatchAndWriteMiniDump(F function, const char *commandLine)
 	{
 		return function();
 	} __except (WriteMiniDump(GetExceptionCode(), GetExceptionInformation()),
-				EXCEPTION_EXECUTE_HANDLER) 
+				EXCEPTION_EXECUTE_HANDLER)
 	{
 		// Write the minidump from inside the filter.
 		return GetExceptionCode();

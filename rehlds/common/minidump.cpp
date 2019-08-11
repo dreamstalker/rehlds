@@ -1,10 +1,14 @@
 #include "precompiled.h"
 
-
 #if defined(HLTV_FIXES) || defined(LAUNCHER_FIXES)
 #ifdef _WIN32
 
+#if defined(_MSC_VER) && !defined(_IMAGEHLP_)
+#pragma warning(push)
+#pragma warning(disable:4091) // A microsoft header has warnings. Very nice.
 #include <DbgHelp.h>
+#pragma warning(pop)
+#endif
 
 // Gets last error.
 static inline HRESULT GetLastHresult()
@@ -18,15 +22,15 @@ static inline HRESULT GetLastHresult()
 // Gets application version which is safe for use in minidump file name.  Can be entirely constexpr with C++17 and std::array.
 template<size_t appVersionSize>
 static wchar_t* GetAppVersionForMiniDumpName(wchar_t (&appVersion)[appVersionSize]) {
-	constexpr wchar_t rawAppVersion[]{WIDE_TEXT(APP_VERSION)};
+	constexpr wchar_t rawAppVersion[]{WIDE_TEXT(APP_VERSION "-" APP_COMMIT_SHA)};
 
 	static_assert(appVersionSize >= ARRAYSIZE(rawAppVersion), "App version buffer size should be enough to store app version.");
 
 	// See https://docs.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-pathcleanupspec#remarks for details.
 	constexpr wchar_t invalidPathChars[]{L'\\', L'/', L':', L'*', L'?', L'"', L'<',  L'>', L'|', L';', L','};
-	
+
 	size_t outIt{0};
-	for (size_t rawIt{0}; rawIt < ARRAYSIZE(rawAppVersion); ++rawIt) 
+	for (size_t rawIt{0}; rawIt < ARRAYSIZE(rawAppVersion); ++rawIt)
 	{
 		const wchar_t currentRawIt{rawAppVersion[rawIt]};
 		bool isValidRaw{true};
@@ -61,7 +65,7 @@ static HRESULT WriteMiniDumpUsingExceptionInfo(unsigned int exceptionCode,
 
 	using MiniDumpWriteDumpFn = decltype(&MiniDumpWriteDump);
 	MiniDumpWriteDumpFn miniDumpWriteDump{nullptr};
-	if (SUCCEEDED(errorCode)) 
+	if (SUCCEEDED(errorCode))
 	{
 		miniDumpWriteDump = reinterpret_cast<MiniDumpWriteDumpFn>(GetProcAddress(
 			dbghelpModule, "MiniDumpWriteDump"));
@@ -99,8 +103,8 @@ static HRESULT WriteMiniDumpUsingExceptionInfo(unsigned int exceptionCode,
 		// Move past the last slash.
 		if (strippedModuleName) ++strippedModuleName;
 
-		wchar_t appVersion[ARRAYSIZE(APP_VERSION)];
-		// <exe name>_<app version>_crash_<date YYYYMMDD>_<time HHMMSS>_<unique counter>.mdmp
+		wchar_t appVersion[ARRAYSIZE(APP_VERSION) + ARRAYSIZE(APP_COMMIT_SHA) + 2];
+		// <exe name>_<app version-app hash build>_crash_<date YYYYMMDD>_<time HHMMSS>_<unique counter>.mdmp
 		swprintf(fileName, ARRAYSIZE(fileName), L"%s_%s_crash_%d%.2d%.2d_%.2d%.2d%.2d_%d.mdmp",
 			strippedModuleName ? strippedModuleName : L"unknown",
 			GetAppVersionForMiniDumpName(appVersion),
@@ -139,7 +143,7 @@ static HRESULT WriteMiniDumpUsingExceptionInfo(unsigned int exceptionCode,
 		errorCode = wasWrittenMinidump ? S_OK : static_cast<HRESULT>(GetLastError());
 	}
 
-	if (minidumpFile && minidumpFile != INVALID_HANDLE_VALUE) 
+	if (minidumpFile && minidumpFile != INVALID_HANDLE_VALUE)
 	{
 		CloseHandle(minidumpFile);
 	}
@@ -162,7 +166,7 @@ void WriteMiniDump(unsigned int exceptionCode,
 		MiniDumpWithDataSegs | MiniDumpWithHandleData | MiniDumpWithThreadInfo |
 		MiniDumpWithIndirectlyReferencedMemory);
 
-	if (FAILED(WriteMiniDumpUsingExceptionInfo(exceptionCode, exceptionInfo, minidumpType))) 
+	if (FAILED(WriteMiniDumpUsingExceptionInfo(exceptionCode, exceptionInfo, minidumpType)))
 	{
 		minidumpType = MiniDumpWithDataSegs;
 
@@ -177,20 +181,20 @@ bool HasDebuggerPresent()
 }
 
 // Determines either writing mini dumps is enabled or not (-nominidumps).  Same as in Source games.
-bool IsWriteMiniDumpsEnabled(const char *commandLine) 
+bool IsWriteMiniDumpsEnabled(const char *commandLine)
 {
 	if (!commandLine)
 	{
 		return true;
 	}
-	
+
 	const char *noMiniDumps{strstr(commandLine, "-nominidumps")};
 	if (!noMiniDumps)
 	{
 		return true;
 	}
 
-	const char *nextCharAfterNoMiniDumps{noMiniDumps + ARRAYSIZE("-nominidumps")};
+	const char *nextCharAfterNoMiniDumps{noMiniDumps + ARRAYSIZE("-nominidumps") - 1};
 	// Command line ends with -nominidumps or has space after -nominidumps -> not mini dump.
 	return !(nextCharAfterNoMiniDumps[0] == '\0' || isspace(nextCharAfterNoMiniDumps[0]));
 }
