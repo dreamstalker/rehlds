@@ -1,5 +1,7 @@
 #pragma once
 
+#include "version/appversion.h"
+
 #include "basetypes.h"
 #include "FileSystem.h"
 #include "strtools.h"
