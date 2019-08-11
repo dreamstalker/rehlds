@@ -480,13 +480,13 @@ void Server::SetVoiceBlocking(bool state)
 
 void Server::SetRate(int rate)
 {
-	m_Rate = Q_clamp(rate, 1000, MAX_SERVER_RATE);
+	m_Rate = clamp(rate, MIN_SERVER_RATE, MAX_SERVER_RATE);
 	SetUserInfo("rate", COM_VarArgs("%i", m_Rate));
 }
 
 void Server::SetUpdateRate(int updaterate)
 {
-	m_UpdateRate = Q_clamp(updaterate, 1, MAX_SERVER_UPDATERATE);
+	m_UpdateRate = clamp(updaterate, MIN_SERVER_UPDATERATE, MAX_SERVER_UPDATERATE);
 	SetUserInfo("cl_updaterate", COM_VarArgs("%i", m_UpdateRate));
 }
 
