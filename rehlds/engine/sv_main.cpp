@@ -204,6 +204,7 @@ cvar_t sv_rehlds_local_gametime = {"sv_rehlds_local_gametime", "0", 0, 0.0f, nul
 cvar_t sv_rehlds_send_mapcycle = { "sv_rehlds_send_mapcycle", "0", 0, 0.0f, nullptr };
 cvar_t sv_rehlds_maxclients_from_single_ip = { "sv_rehlds_maxclients_from_single_ip", "5", 0, 5.0f, nullptr };
 cvar_t sv_use_entity_file = { "sv_use_entity_file", "0", 0, 0.0f, nullptr };
+cvar_t sv_use_global_entity_file = { "sv_use_global_entity_file", "0", 0, 0.0f, nullptr };
 #endif
 
 delta_t *SV_LookupDelta(char *name)
@@ -6141,56 +6142,102 @@ int SV_SpawnServer(qboolean bIsDemo, char *server, char *startspot)
 
 	return 1;
 }
+#ifdef REHLDS_FIXES
+bool SV_LoadCutomEntities()
+{
+	char name[MAX_PATH];
+	Q_snprintf(name, sizeof(name), "maps/%s.ent", g_psv.name);
+
+	if (!FS_FileExists(name))
+	{
+		if (sv_use_entity_file.value > 1.0f)
+		{
+			FILE *f = FS_Open(name, "wb");
+			if (f)
+			{
+				FS_Write(g_psv.worldmodel->entities, Q_strlen(g_psv.worldmodel->entities), 1, f);
+				FS_Close(f);
+			}
+		}
+	}
+	else
+	{
+		FILE *f = FS_Open(name, "rb");
+		if (f)
+		{
+			Con_Printf("Using custom entity file: %s\n", name);
+
+			unsigned int nFileSize = FS_Size(f);
+			char *pszInputStream = (char *)Mem_Malloc(nFileSize + 1);
+			if (!pszInputStream)
+			{
+				Sys_Error("%s: Could not allocate space for entity file of %i bytes", __func__, nFileSize + 1);
+			}
+
+			FS_Read(pszInputStream, nFileSize, 1, f);
+			pszInputStream[nFileSize] = '\0';
+
+			ED_LoadFromFile(pszInputStream);
+			Mem_Free(pszInputStream);
+			FS_Close(f);
+			return true;
+		}
+	}
+
+	Con_Printf("Using default entities...\n");
+
+	return false;
+}
+
+bool SV_LoadGlobalEntities()
+{
+	const char * global_entity_filename = "maps/global_entity_file.ent";
+	if (FS_FileExists(global_entity_filename))
+	{
+		FILE *f = FS_Open(global_entity_filename, "rb");
+		if (f)
+		{
+			Con_Printf("Load global entity file: maps/global_entity_file.ent\n");
+
+			unsigned int nFileSize = FS_Size(f);
+			char *pszInputStream = (char *)Mem_Malloc(nFileSize + 1);
+			if (!pszInputStream)
+			{
+				Sys_Error("%s: Could not allocate space for entity file of %i bytes", __func__, nFileSize + 1);
+			}
+
+			FS_Read(pszInputStream, nFileSize, 1, f);
+			pszInputStream[nFileSize] = '\0';
+
+			ED_LoadFromFile(pszInputStream);
+			Mem_Free(pszInputStream);
+			FS_Close(f);
+			return true;
+		}
+	}
+	else
+	{
+		Sys_Error("Global entity file: maps/global_entity_file.ent not exist\n");
+	}
+
+	return false;
+}
+#endif
 
 void SV_LoadEntities(void)
 {
 #ifdef REHLDS_FIXES
-	if (sv_use_entity_file.value > 0.0f)
+	if (sv_use_entity_file.value == 0.0f || !SV_LoadCutomEntities())
 	{
-		char name[MAX_PATH];
-		Q_snprintf(name, sizeof(name), "maps/%s.ent", g_psv.name);
-
-		if (!FS_FileExists(name))
-		{
-			if (sv_use_entity_file.value > 1.0f)
-			{
-				FILE *f = FS_Open(name, "wb");
-				if (f)
-				{
-					FS_Write(g_psv.worldmodel->entities, Q_strlen(g_psv.worldmodel->entities), 1, f);
-					FS_Close(f);
-				}
-			}
-		}
-		else
-		{
-			FILE *f = FS_Open(name, "rb");
-			if (f)
-			{
-				Con_Printf("Using custom entity file: %s\n", name);
-
-				unsigned int nFileSize = FS_Size(f);
-				char *pszInputStream = (char *)Mem_Malloc(nFileSize + 1);
-				if (!pszInputStream)
-				{
-					Sys_Error("%s: Could not allocate space for entity file of %i bytes", __func__, nFileSize + 1);
-				}
-
-				FS_Read(pszInputStream, nFileSize, 1, f);
-				pszInputStream[nFileSize] = '\0';
-
-				ED_LoadFromFile(pszInputStream);
-				Mem_Free(pszInputStream);
-				FS_Close(f);
-				return;
-			}
-		}
-
-		Con_Printf("Using default entities...\n");
+		ED_LoadFromFile(g_psv.worldmodel->entities);
 	}
-
-#endif  // REHLDS_FIXES
+	if (sv_use_global_entity_file.value > 0.0f)
+	{
+		SV_LoadGlobalEntities();
+	}
+#else
 	ED_LoadFromFile(g_psv.worldmodel->entities);
+#endif  // REHLDS_FIXES
 }
 
 void SV_ClearEntities(void)
@@ -7933,6 +7980,7 @@ void SV_Init(void)
 	Cvar_RegisterVariable(&sv_rollspeed);
 	Cvar_RegisterVariable(&sv_rollangle);
 	Cvar_RegisterVariable(&sv_use_entity_file);
+	Cvar_RegisterVariable(&sv_use_global_entity_file);
 #endif
 
 	for (int i = 0; i < MAX_MODELS; i++)
