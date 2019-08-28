@@ -1354,6 +1354,23 @@ void COM_StripExtension(char *in, char *out)
 
 char *COM_FileExtension(char *in)
 {
+#ifdef REHLDS_FIXES
+	char *src = in + Q_strlen(in) - 1;
+
+	// back up until a . or the start
+	while (src != in && *(src - 1) != '.')
+	{
+		src--;
+	}
+
+	// check to see if the '.' is part of a input buffer
+	if (src == in || PATHSEPARATOR(*src))
+	{
+		return "";  // no extension
+	}
+
+	return src;
+#else // #ifdef REHLDS_FIXES
 	static char exten[MAX_PATH];
 	char *c, *d = NULL;
 	int i;
@@ -1385,8 +1402,8 @@ char *COM_FileExtension(char *in)
 		exten[i] = *d;
 	}
 	exten[i] = 0;
-
 	return exten;
+#endif // #ifdef REHLDS_FIXES
 }
 
 // Fills "out" with the file name without path and extension.

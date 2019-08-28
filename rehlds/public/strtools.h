@@ -29,9 +29,11 @@
 #pragma once
 
 #ifdef _WIN32
+#define PATHSEPARATOR(c) ((c) == '\\' || (c) == '/')
 const char CORRECT_PATH_SEPARATOR = '\\';
 const char INCORRECT_PATH_SEPARATOR = '/';
 #else
+#define PATHSEPARATOR(c) ((c) == '/')
 const char CORRECT_PATH_SEPARATOR = '/';
 const char INCORRECT_PATH_SEPARATOR = '\\';
 #endif

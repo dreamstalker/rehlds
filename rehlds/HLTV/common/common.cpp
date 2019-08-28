@@ -201,6 +201,23 @@ void COM_DefaultExtension(char *path, char *extension)
 
 char *COM_FileExtension(char *in)
 {
+#ifdef HLTV_FIXES
+	char *src = in + Q_strlen(in) - 1;
+
+	// back up until a . or the start
+	while (src != in && *(src - 1) != '.')
+	{
+		src--;
+	}
+
+	// check to see if the '.' is part of a input buffer
+	if (src == in || PATHSEPARATOR(*src))
+	{
+		return "";  // no extension
+	}
+
+	return src;
+#else // #ifdef HLTV_FIXES
 	static char exten[MAX_PATH];
 	char *c, *d = nullptr;
 	int i;
@@ -235,6 +252,7 @@ char *COM_FileExtension(char *in)
 
 	exten[i] = '\0';
 	return exten;
+#endif // #ifdef HLTV_FIXES
 }
 
 char com_token[COM_TOKEN_LEN];
