@@ -1355,21 +1355,31 @@ void COM_StripExtension(char *in, char *out)
 char *COM_FileExtension(char *in)
 {
 #ifdef REHLDS_FIXES
-	char *src = in + Q_strlen(in) - 1;
+	int len = Q_strlen(in);
+	if (len <= 0)
+		return "";  // no extension
+
+	char *src = in + len - 1;
 
 	// back up until a . or the start
-	while (src != in && *(src - 1) != '.')
+	while (src >= in && !PATHSEPARATOR(*src))
 	{
+		if (*src == '.')
+		{
+			src++; // skip dot
+
+			if (*src != '\0')
+			{
+				return src;
+			}
+
+			break;
+		}
+
 		src--;
 	}
 
-	// check to see if the '.' is part of a input buffer
-	if (src == in || PATHSEPARATOR(*src))
-	{
-		return "";  // no extension
-	}
-
-	return src;
+	return "";  // no extension
 #else // #ifdef REHLDS_FIXES
 	static char exten[MAX_PATH];
 	char *c, *d = NULL;
