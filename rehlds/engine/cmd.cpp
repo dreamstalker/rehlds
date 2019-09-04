@@ -164,8 +164,9 @@ void Cbuf_Execute(void)
 {
 	int i;
 	char *text;
-	char line[MAX_CMD_LINE];
+	char line[MAX_CMD_LINE] = {0};
 	int quotes;
+	bool commented;
 
 	while (cmd_text.cursize)
 	{
@@ -173,12 +174,21 @@ void Cbuf_Execute(void)
 		text = (char *)cmd_text.data;
 
 		quotes = 0;
+		commented = false;
+
+#ifdef REHLDS_FIXES
+		if (cmd_text.cursize > 1 && text[0] == '/' && text[1] == '/')
+			commented = true;
+#endif
+
 		for (i = 0; i < cmd_text.cursize; i++)
 		{
 			if (text[i] == '"')
 				quotes++;
-			if (!(quotes & 1) && text[i] == ';')
-				break;	// don't break if inside a quoted string
+
+			if (!(quotes & 1) && !commented && text[i] == ';')
+				break;	// don't break if inside a quoted or commented out strings
+
 			if (text[i] == '\n')
 				break;
 		}
