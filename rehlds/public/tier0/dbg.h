@@ -422,7 +422,7 @@ public:
 		va_list arg_ptr;
 
 		va_start(arg_ptr, pszFormat);
-#ifdef _WIN32
+#ifdef _WIN32 && !defined(_CRT_SECURE_NO_WARNINGS)
 		_vsnprintf_s(m_szBuf, sizeof(m_szBuf) - 1, sizeof(m_szBuf) - 1, pszFormat, arg_ptr);
 #else
 		_vsnprintf(m_szBuf, sizeof(m_szBuf) - 1, pszFormat, arg_ptr);
