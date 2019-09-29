@@ -37,7 +37,7 @@ void setupToolchain(NativeBinarySpec b) {
 
 		cfg.singleDefines('_CRT_SECURE_NO_WARNINGS');
 
-		cfg.linkerOptions.args('/SUBSYSTEM:WINDOWS,5.01');
+		cfg.linkerOptions.args('/SUBSYSTEM:CONSOLE,5.01');
 		cfg.compilerOptions.args '/Ob2', '/Oi', '/GF', '/GR-';
 		cfg.extraLibs "ws2_32.lib", "winmm.lib", "user32.lib", "advapi32.lib", "shell32.lib"
 	}

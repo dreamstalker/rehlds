@@ -237,12 +237,15 @@ void Sys_WriteProcessIdFile()
 	;
 }
 
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
+//int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
+int main(int argc, char *argv[])
 {
+	auto lpCmdLine = GetCommandLine();
 #ifdef LAUNCHER_FIXES
 	return CatchAndWriteMiniDump([=]()
 	{
 #endif
+		
 		if (ShouldLaunchAppViaSteam(lpCmdLine, STDIO_FILESYSTEM_LIB, STDIO_FILESYSTEM_LIB))
 			return 0;
 
