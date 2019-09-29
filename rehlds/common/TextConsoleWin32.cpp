@@ -81,6 +81,9 @@ CTextConsoleWin32::~CTextConsoleWin32()
 
 bool CTextConsoleWin32::Init(IBaseSystem *system)
 {
+#ifdef LAUNCHER_FIXES
+	if(!AttachConsole(ATTACH_PARENT_PROCESS))
+#endif
 	if (!AllocConsole())
 		m_System = system;
 
