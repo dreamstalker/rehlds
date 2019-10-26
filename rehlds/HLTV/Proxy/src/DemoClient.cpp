@@ -90,6 +90,24 @@ void DemoClient::Reconnect()
 	FinishDemo();
 }
 
+void DemoClient::SetUpdateRate(int updaterate)
+{
+	m_DemoChannel.SetUpdateRate(
+		clamp(updaterate,
+			MIN_PROXY_UPDATERATE,
+			MAX_PROXY_UPDATERATE)
+	);
+}
+
+void DemoClient::SetRate(int rate)
+{
+	m_DemoChannel.SetRate(
+		clamp(rate,
+			MIN_PROXY_RATE,
+			MAX_PROXY_RATE)
+	);
+}
+
 bool DemoClient::Connect(INetSocket *socket, NetAddress *adr, char *userinfo)
 {
 	if (IsActive())

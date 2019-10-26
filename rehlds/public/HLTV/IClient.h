@@ -46,6 +46,11 @@ public:
 	virtual bool IsActive() = 0;
 	virtual bool IsHearingVoices() = 0;
 	virtual bool HasChatEnabled() = 0;
+
+#ifdef HLTV_FIXES
+	virtual void SetUpdateRate(int updaterate) = 0;
+	virtual void SetRate(int rate) = 0;
+#endif // HLTV_FIXES
 };
 
 #define CLIENT_INTERFACE_VERSION "client001"

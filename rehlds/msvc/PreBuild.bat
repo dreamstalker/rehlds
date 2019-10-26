@@ -26,6 +26,14 @@ set "hour=%dt:~8,2%"
 set "min=%dt:~10,2%"
 set "sec=%dt:~12,2%"
 
+::
+:: Remove leading zero from MM (e.g 09 > 9)
+::
+for /f "tokens=* delims=0" %%I in ("%MM%") do set MM=%%I
+
+::
+:: Index into array to get month name
+::
 for /f "tokens=%MM%" %%I in ("Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec") do set "month=%%I"
 
 ::

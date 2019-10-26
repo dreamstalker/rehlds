@@ -194,6 +194,10 @@ typedef IHookChainRegistryImpl<edict_t *, const char *> CRehldsHookRegistry_Crea
 typedef IHookChainImpl<bool, netadr_t &, const uint8_t *, int> CRehldsHook_SV_CheckConnectionLessRateLimits;
 typedef IHookChainRegistryImpl<bool, netadr_t &, const uint8_t *, int> CRehldsHookRegistry_SV_CheckConnectionLessRateLimits;
 
+//SV_Frame hook
+typedef IVoidHookChainImpl<> CRehldsHook_SV_Frame;
+typedef IVoidHookChainRegistryImpl<> CRehldsHookRegistry_SV_Frame;
+
 class CRehldsHookchains : public IRehldsHookchains {
 public:
 	CRehldsHookRegistry_Steam_NotifyClientConnect m_Steam_NotifyClientConnect;
@@ -236,6 +240,7 @@ public:
 	CRehldsHookRegistry_SV_EmitSound2 m_SV_EmitSound2;
 	CRehldsHookRegistry_CreateFakeClient m_CreateFakeClient;
 	CRehldsHookRegistry_SV_CheckConnectionLessRateLimits m_SV_CheckConnectionLessRateLimits;
+	CRehldsHookRegistry_SV_Frame m_SV_Frame;
 
 public:
 	EXT_FUNC virtual IRehldsHookRegistry_Steam_NotifyClientConnect* Steam_NotifyClientConnect();
@@ -278,6 +283,7 @@ public:
 	EXT_FUNC virtual IRehldsHookRegistry_SV_EmitSound2* SV_EmitSound2();
 	EXT_FUNC virtual IRehldsHookRegistry_CreateFakeClient* CreateFakeClient();
 	EXT_FUNC virtual IRehldsHookRegistry_SV_CheckConnectionLessRateLimits* SV_CheckConnectionLessRateLimits();
+	EXT_FUNC virtual IRehldsHookRegistry_SV_Frame* SV_Frame();
 };
 
 extern CRehldsHookchains g_RehldsHookchains;

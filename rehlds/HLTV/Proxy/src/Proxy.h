@@ -45,8 +45,17 @@ class IDirector;
 class IBaseSystem;
 
 #define MAX_NAME				32
-#define MAX_PROXY_RATE			20000
-#define MAX_PROXY_UPDATERATE	40
+
+#ifdef HLTV_FIXES
+const int MAX_PROXY_RATE        = 100000;
+const int MAX_PROXY_UPDATERATE  = 100;
+#else
+const int MAX_PROXY_RATE        = 20000;
+const int MAX_PROXY_UPDATERATE  = 40;
+#endif
+
+const int MIN_PROXY_RATE        = 1000;
+const int MIN_PROXY_UPDATERATE  = 1;
 
 #define PROXY_CHALLENGE_LIFE	40.0f
 #define PROXY_PRIVATE			0x8000

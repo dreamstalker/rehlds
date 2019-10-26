@@ -51,6 +51,15 @@ enum
 	MAX_FLOWS
 };
 
+// Flow control bytes per second limits
+#ifdef HLTV_FIXES
+const int MAX_NETCHAN_RATE             = 100000.0f;
+#else
+const int MAX_NETCHAN_RATE             = 20000.0f;
+#endif
+
+const int MIN_NETCHAN_RATE             = 1000.0f;
+
 #define MAX_LATENT                     32
 #define FRAGMENT_MAX_SIZE              1400		// Size of fragmentation buffer internal buffers
 #define CLIENT_FRAGMENT_SIZE_ONCONNECT 128

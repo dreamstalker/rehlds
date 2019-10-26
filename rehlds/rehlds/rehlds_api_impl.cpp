@@ -56,7 +56,7 @@ int* EXT_FUNC GetAllowCheats_api() {
 }
 
 bool EXT_FUNC GSBSecure_api() {
-	return Steam_GSBSecure() != 0;
+	return Steam_GSBSecure() != FALSE;
 }
 
 int EXT_FUNC GetBuildNumber_api() {
@@ -65,6 +65,14 @@ int EXT_FUNC GetBuildNumber_api() {
 
 double EXT_FUNC GetRealTime_api() {
 	return realtime;
+}
+
+double EXT_FUNC GetHostFrameTime_api() {
+	return host_frametime;
+}
+
+cmd_function_t* EXT_FUNC GetFirstCmdFunctionHandle_api() {
+	return Cmd_GetFirstCmd();
 }
 
 int* EXT_FUNC GetMsgBadRead_api() {
@@ -312,6 +320,10 @@ void EXT_FUNC SZ_Clear_api(sizebuf_t *buf) {
 	SZ_Clear(buf);
 }
 
+void EXT_FUNC MSG_BeginReading_api() {
+	MSG_BeginReading();
+}
+
 cvar_t* EXT_FUNC GetCvarVars_api() {
 	return cvar_vars;
 }
@@ -545,6 +557,9 @@ RehldsFuncs_t g_RehldsApiFuncs =
 	&SZ_Write_api,
 	&SZ_Print_api,
 	&SZ_Clear_api,
+	&MSG_BeginReading_api,
+	&GetHostFrameTime_api,
+	&GetFirstCmdFunctionHandle_api
 };
 
 bool EXT_FUNC SV_EmitSound2_internal(edict_t *entity, IGameClient *pReceiver, int channel, const char *sample, float volume, float attenuation, int flags, int pitch, int emitFlags, const float *pOrigin)
@@ -806,6 +821,10 @@ IRehldsHookRegistry_CreateFakeClient* CRehldsHookchains::CreateFakeClient() {
 IRehldsHookRegistry_SV_CheckConnectionLessRateLimits* CRehldsHookchains::SV_CheckConnectionLessRateLimits()
 {
 	return &m_SV_CheckConnectionLessRateLimits;
+}
+
+IRehldsHookRegistry_SV_Frame* CRehldsHookchains::SV_Frame() {
+	return &m_SV_Frame;
 }
 
 int EXT_FUNC CRehldsApi::GetMajorVersion()

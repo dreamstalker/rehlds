@@ -6164,11 +6164,14 @@ void SV_LoadEntities(void)
 
 		if (!FS_FileExists(name))
 		{
-			FILE *f = FS_Open(name, "wb");
-			if (f)
+			if (sv_use_entity_file.value > 1.0f)
 			{
-				FS_Write(g_psv.worldmodel->entities, Q_strlen(g_psv.worldmodel->entities), 1, f);
-				FS_Close(f);
+				FILE *f = FS_Open(name, "wb");
+				if (f)
+				{
+					FS_Write(g_psv.worldmodel->entities, Q_strlen(g_psv.worldmodel->entities), 1, f);
+					FS_Close(f);
+				}
 			}
 		}
 		else
@@ -6459,7 +6462,7 @@ USERID_t *SV_StringToUserID(const char *str)
 	return &id;
 }
 
-void SV_SerializeSteamid(USERID_t* id, USERID_t* serialized)
+void EXT_FUNC SV_SerializeSteamid(USERID_t* id, USERID_t* serialized)
 {
 	*serialized = *id;
 }
@@ -7692,7 +7695,12 @@ void SV_CheckMapDifferences(void)
 	}
 }
 
-void SV_Frame(void)
+void SV_Frame()
+{
+	g_RehldsHookchains.m_SV_Frame.callChain(SV_Frame_Internal);
+}
+
+void EXT_FUNC SV_Frame_Internal()
 {
 	if (!g_psv.active)
 		return;

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "version/appversion.h"
+
 #include "basetypes.h"
 #include "FileSystem.h"
 #include "strtools.h"
@@ -16,3 +18,7 @@
 // Console stuff
 #include "System.h"
 #include "common/random.h"
+
+#ifdef _WIN32
+#include "minidump.h"
+#endif

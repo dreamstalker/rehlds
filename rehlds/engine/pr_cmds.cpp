@@ -2627,7 +2627,7 @@ void EXT_FUNC PF_SetGroupMask(int mask, int op)
 int EXT_FUNC PF_CreateInstancedBaseline(int classname, struct entity_state_s *baseline)
 {
 	extra_baselines_t *bls = g_psv.instance_baselines;
-	if (bls->number >= NUM_BASELINES)
+	if (bls->number >= NUM_BASELINES - 1)
 		return 0;
 
 	bls->classname[bls->number] = classname;

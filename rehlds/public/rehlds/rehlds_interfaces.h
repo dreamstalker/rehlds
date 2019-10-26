@@ -130,4 +130,5 @@ public:
 	virtual void SetName(const char* name) = 0;
 	virtual class ISteamGameServer *GetSteamGameServer() = 0;
 	virtual struct netadr_s *GetNetFrom() = 0;
+	virtual double GetOldTime() = 0;
 };

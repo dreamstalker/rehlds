@@ -629,10 +629,17 @@ hull_t *R_StudioHull(model_t *pModel, float frame, int sequence, const vec_t *an
 	vec_t angles2[3] = { -angles[0], angles[1], angles[2] };
 	g_pSvBlendingAPI->SV_StudioSetupBones(pModel, frame, sequence, angles2, origin, pcontroller, pblending, -1, pEdict);
 
+#ifdef REHLDS_FIXES
+	const int hitboxShieldIndex = 20;
+#else
+	// NOTE: numhitboxes range [0,21], so index 21 it's unreachable code for loop
+	const int hitboxShieldIndex = 21;
+#endif
+
 	mstudiobbox_t *pbbox = (mstudiobbox_t *)((char *)pstudiohdr + pstudiohdr->hitboxindex);
 	for (int i = 0; i < pstudiohdr->numhitboxes; i++)
 	{
-		if (bSkipShield && i == 21) continue;
+		if (bSkipShield && i == hitboxShieldIndex) continue;
 
 		studio_hull_hitgroup[i] = pbbox[i].group;
 
