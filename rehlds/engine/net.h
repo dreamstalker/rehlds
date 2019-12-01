@@ -208,7 +208,8 @@ typedef enum svc_commands_e
 	svc_resourcelocation,
 	svc_sendcvarvalue,
 	svc_sendcvarvalue2,
-	svc_startofusermessages = svc_sendcvarvalue2,
+	svc_exec,
+	svc_startofusermessages = svc_exec,
 	svc_endoflist = 255,
 } svc_commands_t;
 
