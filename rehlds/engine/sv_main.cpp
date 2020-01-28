@@ -2325,7 +2325,6 @@ void EXT_FUNC SV_ConnectClient_internal(void)
 
 	if (reconnect)
 	{
-		
 		if ((client->active || client->spawned) && client->edict)
 			gEntityInterface.pfnClientDisconnect(client->edict);
 		Steam_NotifyClientDisconnect(client);
