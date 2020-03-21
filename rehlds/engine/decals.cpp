@@ -749,16 +749,17 @@ qboolean Draw_ValidateCustomLogo(cachewad_t *wad, unsigned char *data, lumpinfo_
 	pixoffset = pix + (pix >> 2) + (pix >> 4) + (pix >> 6);
 	paloffset = (pix >> 2) + tmp.offsets[0] + pix;
 	palettesize = (pix >> 4) + paloffset;
-	nPalleteCount = *(u_short *)(data + pixoffset + sizeof(texture_t));
 
 	if (!tex.width || tex.width > 256 || tex.height > 256
 		|| (tmp.offsets[0] + pix != tmp.offsets[1])
-		|| paloffset != tmp.offsets[2] || palettesize != tmp.offsets[3])
+		|| paloffset != tmp.offsets[2] || palettesize != tmp.offsets[3]
+		|| pixoffset + sizeof(texture_t) > lump->size)
 	{
 		Con_Printf("%s: Bad cached wad %s\n", __func__, wad->name);
 		return FALSE;
 	}
 
+	nPalleteCount = *(u_short *)(data + pixoffset + sizeof(texture_t));
 	if (nPalleteCount > 256)
 	{
 		Con_Printf("%s: Bad cached wad palette size %i on %s\n", __func__, nPalleteCount, wad->name);
