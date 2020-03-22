@@ -757,7 +757,7 @@ qboolean Draw_ValidateCustomLogo(cachewad_t *wad, unsigned char *data, lumpinfo_
 #ifdef REHLDS_FIXES
 	// Ensure that pixoffset won't be exceed the pre allocated buffer
 	// This can happen when there are no color palettes in payload
-	if ((pixoffset + sizeof(texture_t)) >= (wad->cacheExtra + lump->size))
+	if ((pixoffset + sizeof(texture_t)) >= (unsigned)(wad->cacheExtra + lump->size))
 	{
 		Con_Printf("%s: Bad wad payload size %s\n", __func__, wad->name);
 		return FALSE;
