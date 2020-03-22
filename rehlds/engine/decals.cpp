@@ -769,7 +769,7 @@ qboolean Draw_ValidateCustomLogo(cachewad_t *wad, unsigned char *data, lumpinfo_
 
 	if ((tmp.offsets[0] + pix != tmp.offsets[1])
 		|| paloffset != tmp.offsets[2]
-		|| palettesize != tmp.offsets[3])		
+		|| palettesize != tmp.offsets[3])
 	{
 		Con_Printf("%s: Bad cached wad %s\n", __func__, wad->name);
 		return FALSE;
