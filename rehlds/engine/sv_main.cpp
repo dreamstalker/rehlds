@@ -2328,9 +2328,18 @@ void EXT_FUNC SV_ConnectClient_internal(void)
 
 	if (reconnect)
 	{
+#ifndef REHLDS_FIXES
 		Steam_NotifyClientDisconnect(client);
+#endif
+
 		if ((client->active || client->spawned) && client->edict)
 			gEntityInterface.pfnClientDisconnect(client->edict);
+
+#ifdef REHLDS_FIXES
+		// FIXED: Call after pfnClientDisconnect
+		// because 3rd-party may expects that useful data (eg steamid) hasn't reset yet
+		Steam_NotifyClientDisconnect(client);
+#endif
 
 		Con_Printf("%s:reconnect\n", NET_AdrToString(adr));
 	}
