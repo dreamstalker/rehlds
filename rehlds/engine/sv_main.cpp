@@ -3539,6 +3539,18 @@ void SV_ProcessFile(client_t *cl, char *filename)
 		return;
 	}
 
+	int iCustomFlags = 0;
+
+#ifdef REHLDS_FIXES
+	if (!CustomDecal_Validate(cl->netchan.tempbuffer, cl->netchan.tempbuffersize))
+	{
+		Con_Printf("Invalid custom decal from %s\n", cl->name);
+		return;
+	}
+
+	iCustomFlags |= FCUST_VALIDATED;
+#endif
+
 	HPAK_AddLump(TRUE, "custom.hpk", resource, cl->netchan.tempbuffer, NULL);
 	resource->ucFlags &= ~RES_WASMISSING;
 	SV_MoveToOnHandList(resource);
@@ -3552,7 +3564,8 @@ void SV_ProcessFile(client_t *cl, char *filename)
 		pList = pList->pNext;
 	}
 
-	if (!COM_CreateCustomization(&cl->customdata, resource, -1, (FCUST_FROMHPAK | FCUST_WIPEDATA | RES_CUSTOM), NULL, NULL))
+	iCustomFlags |= (FCUST_FROMHPAK | FCUST_WIPEDATA | RES_CUSTOM);
+	if (!COM_CreateCustomization(&cl->customdata, resource, -1, iCustomFlags, NULL, NULL))
 		Con_Printf("Error parsing custom decal from %s\n", cl->name);
 }
 
