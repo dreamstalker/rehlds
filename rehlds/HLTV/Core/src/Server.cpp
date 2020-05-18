@@ -89,6 +89,7 @@ Server::svc_func_s Server::m_ClientFuncs[]
 	{ svc_resourcelocation,    "svc_resourcelocation",    &Server::ParseResourceLocation },
 	{ svc_sendcvarvalue,       "svc_sendcvarvalue",       &Server::ParseSendCvarValue },
 	{ svc_sendcvarvalue2,      "svc_sendcvarvalue2",      &Server::ParseSendCvarValue2 },
+	{ svc_exec,                "svc_exec",                &Server::ParseExec },
 	{ svc_endoflist,           "End of List",             nullptr }
 };
 
@@ -2343,6 +2344,15 @@ void Server::ParseSendCvarValue2()
 {
 	int requestID = m_Instream->ReadLong();
 	char *name = m_Instream->ReadString();
+}
+
+void Server::ParseExec()
+{
+	bool execClassScript = m_Instream->ReadByte() != 0;
+	if (execClassScript)
+	{
+		int scriptId = m_Instream->ReadByte();
+	}
 }
 
 void Server::ReceiveSignal(ISystemModule *module, unsigned int signal, void *data)
