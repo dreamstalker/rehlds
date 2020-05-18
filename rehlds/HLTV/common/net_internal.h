@@ -160,15 +160,23 @@ enum svc_commands_e
 	svc_sendcvarvalue,
 	svc_sendcvarvalue2,
 	svc_exec,
+	svc_reserve60,
+	svc_reserve61,
+	svc_reserve62,
+	svc_reserve63,
 // Let's just use an id of the first user message instead of the last svc_*
 // This change doesn't make the parsing code forward-compatible with future svc_* additions, but error-reporting should be better
 #ifdef HLTV_FIXES
-	svc_startofusermessages = 64,
+	svc_startofusermessages = svc_reserve63 + 1,
 #else // HLTV_FIXES
 	svc_startofusermessages = svc_exec,
 #endif // HLTV_FIXES
 	svc_endoflist = 255,
 };
+
+#ifdef HLTV_FIXES
+static_assert(svc_startofusermessages == 64, "svc_startofusermessages should be equal to 64 for backward and forward compatibility");
+#endif // HLTV_FIXES
 
 enum clc_commands : byte
 {
