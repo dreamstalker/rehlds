@@ -209,7 +209,13 @@ typedef enum svc_commands_e
 	svc_sendcvarvalue,
 	svc_sendcvarvalue2,
 	svc_exec,
+// Let's just use an id of the first user message instead of the last svc_*
+// This change makes code in `PF_MessageEnd_I` forward-compatible with future svc_* additions
+#ifdef REHLDS_FIXES
+	svc_startofusermessages = 64,
+#else // REHLDS_FIXES
 	svc_startofusermessages = svc_exec,
+#endif // REHLDS_FIXES
 	svc_endoflist = 255,
 } svc_commands_t;
 

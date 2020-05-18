@@ -378,7 +378,12 @@ void Server::ProcessMessage(unsigned int seqNr)
 			break;
 		}
 
+// With `HLTV_FIXES` enabled meaning of `svc_startofusermessages` changed a bit: now it is an id of the first user message
+#ifdef HLTV_FIXES
+		if (cmd >= svc_startofusermessages)
+#else // HLTV_FIXES
 		if (cmd > svc_startofusermessages)
+#endif // HLTV_FIXES
 		{
 			if (!ParseUserMessage(cmd)) {
 				break;
@@ -2292,7 +2297,12 @@ void Server::Reset()
 char *Server::GetCmdName(int cmd)
 {
 	static char description[64];
+// With `HLTV_FIXES` enabled meaning of `svc_startofusermessages` changed a bit: now it is an id of the first user message
+#ifdef HLTV_FIXES
+	if (cmd >= svc_startofusermessages && m_World)
+#else // HLTV_FIXES
 	if (cmd > svc_startofusermessages && m_World)
+#endif // HLTV_FIXES
 	{
 		UserMsg *usermsg = m_World->GetUserMsg(cmd);
 		if (usermsg)

@@ -160,7 +160,13 @@ enum svc_commands_e
 	svc_sendcvarvalue,
 	svc_sendcvarvalue2,
 	svc_exec,
+// Let's just use an id of the first user message instead of the last svc_*
+// This change doesn't make the parsing code forward-compatible with future svc_* additions, but error-reporting should be better
+#ifdef HLTV_FIXES
+	svc_startofusermessages = 64,
+#else // HLTV_FIXES
 	svc_startofusermessages = svc_exec,
+#endif // HLTV_FIXES
 	svc_endoflist = 255,
 };
 

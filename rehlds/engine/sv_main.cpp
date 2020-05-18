@@ -105,7 +105,12 @@ qboolean allow_cheats;
 char *gNullString = "";
 int SV_UPDATE_BACKUP = SINGLEPLAYER_BACKUP;
 int SV_UPDATE_MASK = (SINGLEPLAYER_BACKUP - 1);
+// With `REHLDS_FIXES` enabled we can simply use `svc_startofusermessages` instead of the hard-coded constant
+#ifdef REHLDS_FIXES
+int giNextUserMsg = svc_startofusermessages;
+#else // REHLDS_FIXES
 int giNextUserMsg = 64;
+#endif // REHLDS_FIXES
 
 cvar_t sv_lan = { "sv_lan", "0", 0, 0.0f, NULL };
 cvar_t sv_lan_rate = { "sv_lan_rate", "20000.0", 0, 0.0f, NULL };
