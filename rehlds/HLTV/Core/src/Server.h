@@ -216,6 +216,7 @@ public:
 	void ParseResourceLocation();
 	void ParseSendCvarValue();
 	void ParseSendCvarValue2();
+	void ParseExec();
 
 protected:
 	struct svc_func_s {
