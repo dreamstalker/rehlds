@@ -856,7 +856,7 @@ edict_t* EXT_FUNC FindEntityInSphere(edict_t *pEdictStartSearchAfter, const floa
 {
 	int e = pEdictStartSearchAfter ? NUM_FOR_EDICT(pEdictStartSearchAfter) : 0;
 
-	for (int i = e + 1; i < g_psv.num_edicts; i++)
+	for (int i = e; i < g_psv.num_edicts; i++)
 	{
 		edict_t* ent = &g_psv.edicts[i];
 		if (ent->free || !ent->v.classname)
@@ -881,7 +881,7 @@ edict_t* EXT_FUNC FindEntityInSphere(edict_t *pEdictStartSearchAfter, const floa
 			return ent;
 	}
 
-	return &g_psv.edicts[0];
+	return nullptr;
 }
 
 edict_t* EXT_FUNC PF_Spawn_I(void)
