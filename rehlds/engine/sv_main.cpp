@@ -3514,7 +3514,7 @@ void SV_ProcessFile(client_t *cl, char *filename)
 
 	if (filename[0] != '!')
 	{
-		Con_Printf("Ignoring non-customization file upload of %s\n", filename);
+		Con_NetPrintf("Ignoring non-customization file upload of %s\n", filename);
 		return;
 	}
 
@@ -3534,13 +3534,13 @@ void SV_ProcessFile(client_t *cl, char *filename)
 
 	if (!bFound)
 	{
-		Con_Printf("%s:  Unrequested decal\n", __func__);
+		Con_NetPrintf("%s:  Unrequested decal\n", __func__);
 		return;
 	}
 
 	if (resource->nDownloadSize != cl->netchan.tempbuffersize)
 	{
-		Con_Printf("%s:  Downloaded %i bytes for purported %i byte file\n", __func__, cl->netchan.tempbuffersize, resource->nDownloadSize);
+		Con_NetPrintf("%s:  Downloaded %i bytes for purported %i byte file\n", __func__, cl->netchan.tempbuffersize, resource->nDownloadSize);
 		return;
 	}
 
@@ -3549,7 +3549,7 @@ void SV_ProcessFile(client_t *cl, char *filename)
 #ifdef REHLDS_FIXES
 	if (!CustomDecal_Validate(cl->netchan.tempbuffer, cl->netchan.tempbuffersize))
 	{
-		Con_Printf("Invalid custom decal from %s\n", cl->name);
+		Con_NetPrintf("Invalid custom decal from %s\n", cl->name);
 		return;
 	}
 
@@ -3571,7 +3571,7 @@ void SV_ProcessFile(client_t *cl, char *filename)
 
 	iCustomFlags |= (FCUST_FROMHPAK | FCUST_WIPEDATA | RES_CUSTOM);
 	if (!COM_CreateCustomization(&cl->customdata, resource, -1, iCustomFlags, NULL, NULL))
-		Con_Printf("Error parsing custom decal from %s\n", cl->name);
+		Con_NetPrintf("Error parsing custom decal from %s\n", cl->name);
 }
 
 qboolean SV_FilterPacket(void)
