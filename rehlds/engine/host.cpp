@@ -1234,6 +1234,15 @@ void Host_Shutdown(void)
 	for (i = 0; i < g_psvs.maxclientslimit; i++, pclient++)
 		SV_ClearFrames(&pclient->frames);
 
+#ifdef REHLDS_FIXES
+	host_client = g_psvs.clients;
+	for (i = 0; i < g_psvs.maxclients; i++, host_client++)
+	{
+		if (host_client->active || host_client->connected)
+			SV_DropClient(host_client, FALSE, "Server shutting down");
+	}
+#endif
+
 	SV_Shutdown();
 	SystemWrapper_ShutDown();
 	NET_Shutdown();
