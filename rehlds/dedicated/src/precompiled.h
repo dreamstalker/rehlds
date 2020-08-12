@@ -1,5 +1,7 @@
 #pragma once
 
+#include "version/appversion.h"
+
 #include "basetypes.h"
 #include "FileSystem.h"
 #include "strtools.h"
@@ -23,6 +25,7 @@
 
 #ifdef _WIN32
 	#include "conproc.h"
+	#include "minidump.h"
 	#include <mmsystem.h> // timeGetTime
 #else
 	#include <signal.h>

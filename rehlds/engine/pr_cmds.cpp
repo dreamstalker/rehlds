@@ -2122,8 +2122,12 @@ void EXT_FUNC PF_MessageEnd_I(void)
 	if (gMsgBuffer.flags & SIZEBUF_OVERFLOWED)
 		Sys_Error("%s: called, but message buffer from .dll had overflowed\n", __func__);
 
-
+// With `REHLDS_FIXES` enabled meaning of `svc_startofusermessages` changed a bit: now it is an id of the first user message
+#ifdef REHLDS_FIXES
+	if (gMsgType >= svc_startofusermessages)
+#else // REHLDS_FIXES
 	if (gMsgType > svc_startofusermessages)
+#endif // REHLDS_FIXES
 	{
 		UserMsg* pUserMsg = sv_gpUserMsgs;
 		while (pUserMsg && pUserMsg->iMsg != gMsgType)
@@ -2164,7 +2168,12 @@ void EXT_FUNC PF_MessageEnd_I(void)
 		if ((gMsgDest == MSG_BROADCAST && gMsgBuffer.cursize + pBuffer->cursize > pBuffer->maxsize) || !pBuffer->data)
 			return;
 
+// With `REHLDS_FIXES` enabled meaning of `svc_startofusermessages` changed a bit: now it is an id of the first user message
+#ifdef REHLDS_FIXES
+		if (gMsgType >= svc_startofusermessages && (gMsgDest == MSG_ONE || gMsgDest == MSG_ONE_UNRELIABLE))
+#else // REHLDS_FIXES
 		if (gMsgType > svc_startofusermessages && (gMsgDest == MSG_ONE || gMsgDest == MSG_ONE_UNRELIABLE))
+#endif // REHLDS_FIXES
 		{
 			int entnum = NUM_FOR_EDICT((const edict_t *)gMsgEntity);
 			if (entnum < 1 || entnum > g_psvs.maxclients)
@@ -2627,7 +2636,7 @@ void EXT_FUNC PF_SetGroupMask(int mask, int op)
 int EXT_FUNC PF_CreateInstancedBaseline(int classname, struct entity_state_s *baseline)
 {
 	extra_baselines_t *bls = g_psv.instance_baselines;
-	if (bls->number >= NUM_BASELINES)
+	if (bls->number >= NUM_BASELINES - 1)
 		return 0;
 
 	bls->classname[bls->number] = classname;

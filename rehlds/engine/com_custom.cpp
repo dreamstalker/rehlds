@@ -117,7 +117,9 @@ qboolean COM_CreateCustomization(customization_t *pListHead, resource_t *pResour
 	if ((pCust->resource.ucFlags & RES_CUSTOM) && pCust->resource.type == t_decal)
 	{
 		pCust->resource.playernum = playernumber;
-		if (!CustomDecal_Validate(pCust->pBuffer, pResource->nDownloadSize))
+
+		if (!(flags & FCUST_VALIDATED) && // Don't validate twice
+			!CustomDecal_Validate(pCust->pBuffer, pResource->nDownloadSize))
 		{
 			bError = TRUE;
 			goto CustomizationError;

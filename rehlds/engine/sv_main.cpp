@@ -105,7 +105,12 @@ qboolean allow_cheats;
 char *gNullString = "";
 int SV_UPDATE_BACKUP = SINGLEPLAYER_BACKUP;
 int SV_UPDATE_MASK = (SINGLEPLAYER_BACKUP - 1);
+// With `REHLDS_FIXES` enabled we can simply use `svc_startofusermessages` instead of the hard-coded constant
+#ifdef REHLDS_FIXES
+int giNextUserMsg = svc_startofusermessages;
+#else // REHLDS_FIXES
 int giNextUserMsg = 64;
+#endif // REHLDS_FIXES
 
 cvar_t sv_lan = { "sv_lan", "0", 0, 0.0f, NULL };
 cvar_t sv_lan_rate = { "sv_lan_rate", "20000.0", 0, 0.0f, NULL };
@@ -2325,9 +2330,18 @@ void EXT_FUNC SV_ConnectClient_internal(void)
 
 	if (reconnect)
 	{
+#ifndef REHLDS_FIXES
 		Steam_NotifyClientDisconnect(client);
+#endif
+
 		if ((client->active || client->spawned) && client->edict)
 			gEntityInterface.pfnClientDisconnect(client->edict);
+
+#ifdef REHLDS_FIXES
+		// FIXED: Call after pfnClientDisconnect
+		// because 3rd-party may expects that useful data (eg steamid) hasn't reset yet
+		Steam_NotifyClientDisconnect(client);
+#endif
 
 		Con_Printf("%s:reconnect\n", NET_AdrToString(adr));
 	}
@@ -3500,7 +3514,7 @@ void SV_ProcessFile(client_t *cl, char *filename)
 
 	if (filename[0] != '!')
 	{
-		Con_Printf("Ignoring non-customization file upload of %s\n", filename);
+		Con_NetPrintf("Ignoring non-customization file upload of %s\n", filename);
 		return;
 	}
 
@@ -3520,15 +3534,27 @@ void SV_ProcessFile(client_t *cl, char *filename)
 
 	if (!bFound)
 	{
-		Con_Printf("%s:  Unrequested decal\n", __func__);
+		Con_NetPrintf("%s:  Unrequested decal\n", __func__);
 		return;
 	}
 
 	if (resource->nDownloadSize != cl->netchan.tempbuffersize)
 	{
-		Con_Printf("%s:  Downloaded %i bytes for purported %i byte file\n", __func__, cl->netchan.tempbuffersize, resource->nDownloadSize);
+		Con_NetPrintf("%s:  Downloaded %i bytes for purported %i byte file\n", __func__, cl->netchan.tempbuffersize, resource->nDownloadSize);
 		return;
 	}
+
+	int iCustomFlags = 0;
+
+#ifdef REHLDS_FIXES
+	if (!CustomDecal_Validate(cl->netchan.tempbuffer, cl->netchan.tempbuffersize))
+	{
+		Con_NetPrintf("Invalid custom decal from %s\n", cl->name);
+		return;
+	}
+
+	iCustomFlags |= FCUST_VALIDATED;
+#endif
 
 	HPAK_AddLump(TRUE, "custom.hpk", resource, cl->netchan.tempbuffer, NULL);
 	resource->ucFlags &= ~RES_WASMISSING;
@@ -3543,8 +3569,9 @@ void SV_ProcessFile(client_t *cl, char *filename)
 		pList = pList->pNext;
 	}
 
-	if (!COM_CreateCustomization(&cl->customdata, resource, -1, (FCUST_FROMHPAK | FCUST_WIPEDATA | RES_CUSTOM), NULL, NULL))
-		Con_Printf("Error parsing custom decal from %s\n", cl->name);
+	iCustomFlags |= (FCUST_FROMHPAK | FCUST_WIPEDATA | RES_CUSTOM);
+	if (!COM_CreateCustomization(&cl->customdata, resource, -1, iCustomFlags, NULL, NULL))
+		Con_NetPrintf("Error parsing custom decal from %s\n", cl->name);
 }
 
 qboolean SV_FilterPacket(void)
@@ -6152,11 +6179,14 @@ void SV_LoadEntities(void)
 
 		if (!FS_FileExists(name))
 		{
-			FILE *f = FS_Open(name, "wb");
-			if (f)
+			if (sv_use_entity_file.value > 1.0f)
 			{
-				FS_Write(g_psv.worldmodel->entities, Q_strlen(g_psv.worldmodel->entities), 1, f);
-				FS_Close(f);
+				FILE *f = FS_Open(name, "wb");
+				if (f)
+				{
+					FS_Write(g_psv.worldmodel->entities, Q_strlen(g_psv.worldmodel->entities), 1, f);
+					FS_Close(f);
+				}
 			}
 		}
 		else
@@ -6447,7 +6477,7 @@ USERID_t *SV_StringToUserID(const char *str)
 	return &id;
 }
 
-void SV_SerializeSteamid(USERID_t* id, USERID_t* serialized)
+void EXT_FUNC SV_SerializeSteamid(USERID_t* id, USERID_t* serialized)
 {
 	*serialized = *id;
 }
@@ -7680,7 +7710,12 @@ void SV_CheckMapDifferences(void)
 	}
 }
 
-void SV_Frame(void)
+void SV_Frame()
+{
+	g_RehldsHookchains.m_SV_Frame.callChain(SV_Frame_Internal);
+}
+
+void EXT_FUNC SV_Frame_Internal()
 {
 	if (!g_psv.active)
 		return;

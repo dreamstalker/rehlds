@@ -89,6 +89,7 @@ Server::svc_func_s Server::m_ClientFuncs[]
 	{ svc_resourcelocation,    "svc_resourcelocation",    &Server::ParseResourceLocation },
 	{ svc_sendcvarvalue,       "svc_sendcvarvalue",       &Server::ParseSendCvarValue },
 	{ svc_sendcvarvalue2,      "svc_sendcvarvalue2",      &Server::ParseSendCvarValue2 },
+	{ svc_exec,                "svc_exec",                &Server::ParseExec },
 	{ svc_endoflist,           "End of List",             nullptr }
 };
 
@@ -377,7 +378,12 @@ void Server::ProcessMessage(unsigned int seqNr)
 			break;
 		}
 
+// With `HLTV_FIXES` enabled meaning of `svc_startofusermessages` changed a bit: now it is an id of the first user message
+#ifdef HLTV_FIXES
+		if (cmd >= svc_startofusermessages)
+#else // HLTV_FIXES
 		if (cmd > svc_startofusermessages)
+#endif // HLTV_FIXES
 		{
 			if (!ParseUserMessage(cmd)) {
 				break;
@@ -480,13 +486,13 @@ void Server::SetVoiceBlocking(bool state)
 
 void Server::SetRate(int rate)
 {
-	m_Rate = Q_clamp(rate, 1000, MAX_SERVER_RATE);
+	m_Rate = clamp(rate, MIN_SERVER_RATE, MAX_SERVER_RATE);
 	SetUserInfo("rate", COM_VarArgs("%i", m_Rate));
 }
 
 void Server::SetUpdateRate(int updaterate)
 {
-	m_UpdateRate = Q_clamp(updaterate, 1, MAX_SERVER_UPDATERATE);
+	m_UpdateRate = clamp(updaterate, MIN_SERVER_UPDATERATE, MAX_SERVER_UPDATERATE);
 	SetUserInfo("cl_updaterate", COM_VarArgs("%i", m_UpdateRate));
 }
 
@@ -2291,7 +2297,12 @@ void Server::Reset()
 char *Server::GetCmdName(int cmd)
 {
 	static char description[64];
+// With `HLTV_FIXES` enabled meaning of `svc_startofusermessages` changed a bit: now it is an id of the first user message
+#ifdef HLTV_FIXES
+	if (cmd >= svc_startofusermessages && m_World)
+#else // HLTV_FIXES
 	if (cmd > svc_startofusermessages && m_World)
+#endif // HLTV_FIXES
 	{
 		UserMsg *usermsg = m_World->GetUserMsg(cmd);
 		if (usermsg)
@@ -2343,6 +2354,15 @@ void Server::ParseSendCvarValue2()
 {
 	int requestID = m_Instream->ReadLong();
 	char *name = m_Instream->ReadString();
+}
+
+void Server::ParseExec()
+{
+	bool execClassScript = m_Instream->ReadByte() != 0;
+	if (execClassScript)
+	{
+		int scriptId = m_Instream->ReadByte();
+	}
 }
 
 void Server::ReceiveSignal(ISystemModule *module, unsigned int signal, void *data)

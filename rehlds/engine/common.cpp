@@ -1354,6 +1354,33 @@ void COM_StripExtension(char *in, char *out)
 
 char *COM_FileExtension(char *in)
 {
+#ifdef REHLDS_FIXES
+	int len = Q_strlen(in);
+	if (len <= 0)
+		return "";  // no extension
+
+	char *src = in + len - 1;
+
+	// back up until a . or the start
+	while (src >= in && !PATHSEPARATOR(*src))
+	{
+		if (*src == '.')
+		{
+			src++; // skip dot
+
+			if (*src != '\0')
+			{
+				return src;
+			}
+
+			break;
+		}
+
+		src--;
+	}
+
+	return "";  // no extension
+#else // #ifdef REHLDS_FIXES
 	static char exten[MAX_PATH];
 	char *c, *d = NULL;
 	int i;
@@ -1385,8 +1412,8 @@ char *COM_FileExtension(char *in)
 		exten[i] = *d;
 	}
 	exten[i] = 0;
-
 	return exten;
+#endif // #ifdef REHLDS_FIXES
 }
 
 // Fills "out" with the file name without path and extension.
@@ -1544,7 +1571,7 @@ inquotes:
 
 char *COM_ParseLine(char *data)
 {
-#ifndef REHLDS_FIXES
+#ifdef REHLDS_FIXES
 	unsigned int c;
 #else
 	int c;
@@ -1568,7 +1595,7 @@ char *COM_ParseLine(char *data)
 	c = *data;
 
 	// parse a line out of the data
-#ifndef REHLDS_FIXES
+#ifdef REHLDS_FIXES
 	while ((c >= ' ' || c == '\t') && (len < COM_TOKEN_LEN - 1))
 	{
 		com_token[len] = c;
@@ -1593,7 +1620,7 @@ char *COM_ParseLine(char *data)
 		return NULL;
 	}
 
-	// eat whitespace (LF,CR,etc.) at the end of this line
+	// skip end of the line (CR, LF, etc.., but not TAB)
 	while ((c = *data) < ' ' && c != '\t')
 	{
 		if (c == 0)

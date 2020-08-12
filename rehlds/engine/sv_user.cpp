@@ -1730,6 +1730,10 @@ void EXT_FUNC SV_HandleClientMessage_api(IGameClient* client, int8 opcode) {
 	client_t* cl = client->GetClient();
 	if (opcode < clc_bad || opcode > clc_cvarvalue2)
 	{
+		// TODO: Are we forced to use msg_badread for break the loop.
+		static_assert(REHLDS_API_VERSION_MAJOR <= 3, "Bump major API DETECTED!! You shall rework the hookchain, make function returnable");
+		msg_badread = 1;
+
 		Con_Printf("SV_ReadClientMessage: unknown command char (%d)\n", opcode);
 		SV_DropClient(cl, FALSE, "Bad command character in client command");
 		return;
@@ -1772,7 +1776,8 @@ void SV_ExecuteClientMessage(client_t *cl)
 		{
 #ifdef REHLDS_FIXES
 			Con_Printf("SV_ReadClientMessage: badread on %s\n", host_client->name);
-			SV_ClientPrintf("Badread\n");
+			if (host_client->active)
+				SV_ClientPrintf("Badread\n");
 #else // REHLDS_FIXES
 			Con_Printf("SV_ReadClientMessage: badread\n");
 #endif // REHLDS_FIXES
