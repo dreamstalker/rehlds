@@ -1212,7 +1212,12 @@ void Host_Shutdown(void)
 	if (host_initialized) // Client-side
 		Host_WriteConfiguration();
 
+#ifdef REHLDS_FIXES
+	Host_ShutdownServer(FALSE);
+#else
 	SV_ServerShutdown();
+#endif
+
 	Voice_Deinit();
 	host_initialized = FALSE;
 
@@ -1233,15 +1238,6 @@ void Host_Shutdown(void)
 	pclient = g_psvs.clients;
 	for (i = 0; i < g_psvs.maxclientslimit; i++, pclient++)
 		SV_ClearFrames(&pclient->frames);
-
-#ifdef REHLDS_FIXES
-	host_client = g_psvs.clients;
-	for (i = 0; i < g_psvs.maxclients; i++, host_client++)
-	{
-		if (host_client->active || host_client->connected)
-			SV_DropClient(host_client, FALSE, "Server shutting down");
-	}
-#endif
 
 	SV_Shutdown();
 	SystemWrapper_ShutDown();
