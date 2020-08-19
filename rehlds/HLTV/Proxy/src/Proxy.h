@@ -287,7 +287,7 @@ private:
 	void CMD_MaxLoss(char *cmdLine);
 	void CMD_Protocol(char *cmdLine);
 	void CMD_Region(char *cmdLine);
-	void CMD_ChatDelay(char* cmdLine);
+	void CMD_ChatDelay(char *cmdLine);
 
 	struct LocalCommandID_s {
 		char *name;

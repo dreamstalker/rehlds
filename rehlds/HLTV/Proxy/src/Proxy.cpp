@@ -2777,7 +2777,7 @@ const char *Proxy::GetDescription()
 	return "Private Server";
 }
 
-void Proxy::CMD_ChatDelay(char* cmdLine)
+void Proxy::CMD_ChatDelay(char *cmdLine)
 {
 	enum { param_ChatDelay = 1 };
 
