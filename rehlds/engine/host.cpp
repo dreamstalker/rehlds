@@ -1212,7 +1212,12 @@ void Host_Shutdown(void)
 	if (host_initialized) // Client-side
 		Host_WriteConfiguration();
 
+#ifdef REHLDS_FIXES
+	Host_ShutdownServer(FALSE);
+#else
 	SV_ServerShutdown();
+#endif
+
 	Voice_Deinit();
 	host_initialized = FALSE;
 

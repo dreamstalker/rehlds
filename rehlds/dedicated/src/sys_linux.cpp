@@ -314,8 +314,21 @@ char* BuildCmdLine(int argc, char **argv)
 	return linuxCmdline;
 }
 
+static void ConsoleCtrlHandler(int signal)
+{
+	if (signal == SIGINT || signal == SIGTERM)
+	{
+		g_bAppHasBeenTerminated = true;
+	}
+}
+
 bool Sys_SetupConsole()
 {
+	struct sigaction action;
+	action.sa_handler = ConsoleCtrlHandler;
+	sigaction(SIGINT, &action, NULL);
+	sigaction(SIGTERM, &action, NULL);
+
 	return true;
 }
 
@@ -327,7 +340,6 @@ int main(int argc, char *argv[])
 {
 	Q_snprintf(g_szEXEName, sizeof(g_szEXEName), "%s", argv[0]);
 	char* cmdline = BuildCmdLine(argc, argv);
-	StartServer(cmdline);
 
-	return 0;
+	return StartServer(cmdline) == LAUNCHER_OK ? EXIT_SUCCESS : EXIT_FAILURE;
 }
