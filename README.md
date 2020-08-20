@@ -1,4 +1,4 @@
-# Rehlds [![Build Status](http://teamcity.rehlds.org/app/rest/builds/buildType:(id:Rehlds_Publish)/statusIcon)](http://teamcity.rehlds.org/viewType.html?buildTypeId=Rehlds_Publish&guest=1) [![Download](https://camo.githubusercontent.com/65c70643ec7b40eea50971003624c2fb04d8d375/687474703a2f2f7265686c64732e6f72672f76657273696f6e2f7265686c64732e737667)](http://teamcity.rehlds.org/guestAuth/downloadArtifacts.html?buildTypeId=Rehlds_Publish&buildId=lastSuccessful)
+# Rehlds [![Build Status](http://teamcity.rehlds.org/app/rest/builds/buildType:(id:Rehlds_Publish)/statusIcon)](http://teamcity.rehlds.org/viewType.html?buildTypeId=Rehlds_Publish&guest=1) [![Download](https://camo.githubusercontent.com/65c70643ec7b40eea50971003624c2fb04d8d375/687474703a2f2f7265686c64732e6f72672f76657273696f6e2f7265686c64732e737667)](http://teamcity.rehlds.org/guestAuth/downloadArtifacts.html?buildTypeId=Rehlds_Publish&buildId=lastSuccessful) <img align="right" src="https://cloud.githubusercontent.com/assets/5860435/25316344/add057d4-288f-11e7-93ab-84706a388c3c.png" alt="ReHLDS"/>
 
 Reverse-engineered (and bugfixed) HLDS
 
