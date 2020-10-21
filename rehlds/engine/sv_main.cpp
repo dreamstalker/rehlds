@@ -1123,8 +1123,10 @@ void SV_SendServerinfo_internal(sizebuf_t *msg, client_t *client)
 		unsigned char *mapcyclelist = COM_LoadFileForMe(mapcyclefile.string, &len);
 		if (mapcyclelist && len)
 		{
-			// Trim to 8190 (see MSG_ReadString, also 1 less than expected - see READ_STRING in HLSDK), otherwise client will be unable to parse message
-			mapcyclelist[8190] = 0;
+			// Trim to 8190 (see MSG_ReadString, also 1 less than expected), otherwise client will be unable to parse message
+			if (len > 8190)
+				mapcyclelist[8190] = 0;
+
 			MSG_WriteString(msg, (const char *)mapcyclelist);
 		}
 		else
