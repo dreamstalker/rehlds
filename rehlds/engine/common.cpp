@@ -1033,10 +1033,24 @@ float MSG_ReadFloat(void)
 {
 	float f;
 
+	union
+	{
+		unsigned char    b[4];
+		float   f;
+		int     l;
+	} dat;
+
 	if (msg_readcount + 4 <= net_message.cursize)
 	{
-		f = *((float*)LittleLong(*(int *)&net_message.data[msg_readcount]));
+		dat.b[0] = net_message.data[msg_readcount];
+		dat.b[1] = net_message.data[msg_readcount + 1];
+		dat.b[2] = net_message.data[msg_readcount + 2];
+		dat.b[3] = net_message.data[msg_readcount + 3];
 		msg_readcount += 4;
+
+		dat.l = LittleLong(dat.l);
+
+		return dat.f;
 	}
 	else
 	{
