@@ -827,6 +827,10 @@ IRehldsHookRegistry_SV_Frame* CRehldsHookchains::SV_Frame() {
 	return &m_SV_Frame;
 }
 
+IRehldsHookRegistry_SV_ShouldSendConsistencyList* CRehldsHookchains::SV_ShouldSendConsistencyList() {
+	return &m_SV_ShouldSendConsistencyList;
+}
+
 int EXT_FUNC CRehldsApi::GetMajorVersion()
 {
 	return REHLDS_API_VERSION_MAJOR;

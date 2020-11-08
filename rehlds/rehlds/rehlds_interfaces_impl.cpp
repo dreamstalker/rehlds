@@ -71,6 +71,16 @@ void EXT_FUNC CGameClient::SetSpawned(bool spawned)
 	m_pClient->spawned = spawned ? 1 : 0;
 }
 
+bool EXT_FUNC CGameClient::IsProxy()
+{
+	return m_pClient->proxy != 0;
+}
+
+void EXT_FUNC CGameClient::SetProxy(bool proxy)
+{
+	m_pClient->proxy = proxy ? 1 : 0;
+}
+
 bool EXT_FUNC CGameClient::IsConnected() {
 	return m_pClient->connected != 0;
 }

@@ -311,11 +311,27 @@ int EXT_FUNC SV_TransferConsistencyInfo_internal(void)
 	return c;
 }
 
+bool EXT_FUNC SV_ShouldSendConsistencyList_mod(IGameClient *cl, bool forceConsistency)
+{
+	if (g_psvs.maxclients == 1 || g_psv.num_consistency == 0 || cl->IsProxy())
+		return false;
+
+	if ((!forceConsistency && mp_consistency.value == 0.0f))
+		return false;
+
+	return true;
+}
+
+bool SV_ShouldSendConsistencyList(client_t *client, bool forceConsistency)
+{
+	return g_RehldsHookchains.m_SV_ShouldSendConsistencyList.callChain(SV_ShouldSendConsistencyList_mod, GetRehldsApiClient(client), forceConsistency);
+}
+
 void SV_SendConsistencyList(sizebuf_t *msg)
 {
 	host_client->has_force_unmodified = FALSE;
 
-	if (g_psvs.maxclients == 1 || mp_consistency.value == 0.0f || g_psv.num_consistency == 0 || host_client->proxy)
+	if (!SV_ShouldSendConsistencyList(host_client, false))
 	{
 		MSG_WriteBits(0, 1);
 		return;

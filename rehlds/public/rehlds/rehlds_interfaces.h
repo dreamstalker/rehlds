@@ -73,6 +73,9 @@ public:
 	virtual bool GetLoopback() = 0;
 	virtual struct usercmd_s *GetLastCmd() = 0;
 
+	virtual bool IsProxy() = 0;
+	virtual void SetProxy(bool proxy) = 0;
+
 	// this must be the last virtual function in class
 #ifdef REHLDS_SELF
 	virtual client_t* GetClient() = 0;

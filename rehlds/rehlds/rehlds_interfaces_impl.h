@@ -98,6 +98,9 @@ public:
 	virtual bool GetLoopback();
 	virtual struct usercmd_s *GetLastCmd();
 
+	virtual bool IsProxy();
+	virtual void SetProxy(bool proxy);
+
 	virtual client_t* GetClient();
 
 public:
