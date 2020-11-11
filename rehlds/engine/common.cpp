@@ -2306,6 +2306,10 @@ void COM_ListMaps(char *pszSubString)
 					}
 				}
 			}
+			else
+			{
+				Con_Printf("Map name too long: %s\n", findfn);
+			}
 
 			findfn = Sys_FindNext(NULL);
 		}
