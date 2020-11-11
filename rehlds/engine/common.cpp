@@ -2280,25 +2280,33 @@ void COM_ListMaps(char *pszSubString)
 
 		while (findfn != NULL)
 		{
-			Q_snprintf(curDir, ARRAYSIZE(curDir), "maps/%s", findfn);
-			FS_GetLocalPath(curDir, curDir, ARRAYSIZE(curDir));
-
-			if (strstr(curDir, com_gamedir) && (!nSubStringLen || !Q_strnicmp(findfn, pszSubString, nSubStringLen)))
+			if (Q_snprintf(curDir, ARRAYSIZE(curDir), "maps/%s", findfn) < ARRAYSIZE(curDir))
 			{
-				Q_memset(&header, 0, sizeof(dheader_t));
-				Q_sprintf(pFileName, "maps/%s", findfn);
+				FS_GetLocalPath(curDir, curDir, ARRAYSIZE(curDir));
 
-				fp = FS_Open(pFileName, "rb");
-
-				if (fp)
+				if (strstr(curDir, com_gamedir) && (!nSubStringLen || !Q_strnicmp(findfn, pszSubString, nSubStringLen)))
 				{
-					FS_Read(&header, sizeof(dheader_t), 1, fp);
-					FS_Close(fp);
+					if (Q_snprintf(pFileName, ARRAYSIZE(pFileName), "maps/%s", findfn) < ARRAYSIZE(pFileName))
+					{
+						Q_memset(&header, 0, sizeof(dheader_t));
+
+						fp = FS_Open(pFileName, "rb");
+
+						if (fp)
+						{
+							FS_Read(&header, sizeof(dheader_t), 1, fp);
+							FS_Close(fp);
+						}
+
+						COM_CheckPrintMap(&header, findfn, bShowOutdated != 0);
+					}
+					else
+					{
+						Con_Printf("Map name too long: %s\n", findfn);
+					}
 				}
-
-				COM_CheckPrintMap(&header, findfn, bShowOutdated != 0);
 			}
-
+			
 			findfn = Sys_FindNext(NULL);
 		}
 
