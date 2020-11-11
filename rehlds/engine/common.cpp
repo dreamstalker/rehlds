@@ -2284,7 +2284,7 @@ void COM_ListMaps(char *pszSubString)
 			{
 				FS_GetLocalPath(curDir, curDir, ARRAYSIZE(curDir));
 
-				if (strstr(curDir, com_gamedir) && (!nSubStringLen || !Q_strnicmp(findfn, pszSubString, nSubStringLen)))
+				if (Q_strstr(curDir, com_gamedir) && (!nSubStringLen || !Q_strnicmp(findfn, pszSubString, nSubStringLen)))
 				{
 					if (Q_snprintf(pFileName, ARRAYSIZE(pFileName), "maps/%s", findfn) < ARRAYSIZE(pFileName))
 					{
