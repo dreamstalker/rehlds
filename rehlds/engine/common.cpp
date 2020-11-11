@@ -2306,7 +2306,7 @@ void COM_ListMaps(char *pszSubString)
 					}
 				}
 			}
-			
+
 			findfn = Sys_FindNext(NULL);
 		}
 
