@@ -320,6 +320,10 @@ void BaseClient::CMD_SetInfo(TokenLine *cmd)
 		return;
 	}
 
+	if (cmd->GetToken(1)[0] ==  '*') {
+		return;
+	}
+
 	m_Userinfo.SetValueForKey(cmd->GetToken(1), cmd->GetToken(2));
 	UpdateUserInfo();
 }
