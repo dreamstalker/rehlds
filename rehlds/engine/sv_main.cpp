@@ -1810,16 +1810,38 @@ challenge_t g_rg_sv_challenges[MAX_CHALLENGES];
 int g_oldest_challenge = 0;
 #endif
 
+typedef struct challenge_buf_s
+{
+	uint32_t ip;
+	uint16_t port;
+	uint32_t salt[14];
+} challenge_buf_t;
+
+challenge_buf_t g_raw_challenge_buf;
+
+void SV_ChallengesInit()
+{
+#ifdef REHLDS_FIXES
+	static_assert(sizeof(g_raw_challenge_buf) == 64u, "Invalid g_raw_challenge_buf size");
+	for (uint32_t& s : g_raw_challenge_buf.salt)
+		s = __rdtsc() * rand();
+#endif
+}
+
 bool EXT_FUNC SV_CheckChallenge_api(const netadr_t &adr, int nChallengeValue) {
 	if (NET_IsLocalAddress(adr))
 		return TRUE;
 
+#ifdef REHLDS_FIXES
+	return SV_GetChallenge(adr) == nChallengeValue;
+#else
 	for (int i = 0; i < MAX_CHALLENGES; i++) {
 		if (NET_CompareBaseAdr(adr, g_rg_sv_challenges[i].adr))
 			return nChallengeValue == g_rg_sv_challenges[i].challenge;
 	}
 
 	return FALSE;
+#endif
 }
 
 int SV_CheckChallenge(netadr_t *adr, int nChallengeValue)
@@ -1830,6 +1852,10 @@ int SV_CheckChallenge(netadr_t *adr, int nChallengeValue)
 	if (NET_IsLocalAddress(*adr))
 		return TRUE;
 
+#ifdef REHLDS_FIXES
+	if (SV_GetChallenge(*adr) == nChallengeValue)
+		return TRUE;
+#else
 	for (int i = 0; i < MAX_CHALLENGES; i++)
 	{
 		if (NET_CompareBaseAdr(net_from, g_rg_sv_challenges[i].adr))
@@ -1842,6 +1868,7 @@ int SV_CheckChallenge(netadr_t *adr, int nChallengeValue)
 			return TRUE;
 		}
 	}
+#endif
 	SV_RejectConnection(adr, "No challenge for your address.\n");
 	return FALSE;
 }
@@ -2499,6 +2526,16 @@ void SVC_Ping(void)
 
 int EXT_FUNC SV_GetChallenge(const netadr_t& adr)
 {
+#ifdef REHLDS_FIXES
+	uint8_t digest[16];
+	g_raw_challenge_buf.ip = *(uint32_t*)adr.ip;
+	g_raw_challenge_buf.port = adr.port;
+	MD5Context_t ctx;
+	MD5Init(&ctx);
+	MD5Update(&ctx, (uint8_t *)&g_raw_challenge_buf, sizeof(g_raw_challenge_buf));
+	MD5Final(digest, &ctx);
+	return *(int *)digest & 0x7FFFFFFF;
+#else
 	int i;
 #ifndef REHLDS_OPT_PEDANTIC
 	int oldest = 0;
@@ -2540,6 +2577,7 @@ int EXT_FUNC SV_GetChallenge(const netadr_t& adr)
 	}
 
 	return g_rg_sv_challenges[i].challenge;
+#endif
 }
 
 void SVC_GetChallenge(void)
@@ -7985,6 +8023,7 @@ void SV_Init(void)
 	PM_Init(&g_svmove);
 	SV_AllocClientFrames();
 	SV_InitDeltas();
+	SV_ChallengesInit();
 }
 
 void SV_Shutdown(void)
