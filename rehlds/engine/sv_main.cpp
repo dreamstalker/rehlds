@@ -1813,8 +1813,7 @@ int g_oldest_challenge = 0;
 typedef struct challenge_buf_s
 {
 	uint32_t ip;
-	uint16_t port;
-	uint32_t salt[14];
+	uint32_t salt[15];
 } challenge_buf_t;
 
 challenge_buf_t g_raw_challenge_buf;
@@ -2529,7 +2528,6 @@ int EXT_FUNC SV_GetChallenge(const netadr_t& adr)
 #ifdef REHLDS_FIXES
 	uint8_t digest[16];
 	g_raw_challenge_buf.ip = *(uint32_t*)adr.ip;
-	g_raw_challenge_buf.port = adr.port;
 	MD5Context_t ctx;
 	MD5Init(&ctx);
 	MD5Update(&ctx, (uint8_t *)&g_raw_challenge_buf, sizeof(g_raw_challenge_buf));
