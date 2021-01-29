@@ -80,6 +80,7 @@ Proxy::LocalCommandID_s Proxy::m_LocalCmdReg[] = {
 	{ "maxloss",           CMD_ID_MAXLOSS,            &Proxy::CMD_MaxLoss },
 	{ "protocol",          CMD_ID_PROTOCOL,           &Proxy::CMD_Protocol },
 	{ "region",            CMD_ID_REGION,             &Proxy::CMD_Region },
+	{ "chatdelay",         CMD_ID_CHATDELAY,          &Proxy::CMD_ChatDelay },
 };
 
 #ifndef HOOK_HLTV
@@ -188,6 +189,7 @@ bool Proxy::Init(IBaseSystem *system, int serial, char *name)
 	m_MaxClients = 128;
 	m_MaxQueries = 100;
 	m_Region = 255;
+	m_ChatDelay = 6;
 
 	const int maxRouteAblePacketSize = 1400;
 	m_InfoInfo.Resize(maxRouteAblePacketSize);
@@ -2773,4 +2775,29 @@ const char *Proxy::GetDescription()
 	}
 
 	return "Private Server";
+}
+
+void Proxy::CMD_ChatDelay(char *cmdLine)
+{
+	enum { param_ChatDelay = 1 };
+
+	TokenLine params(cmdLine);
+	if (params.CountToken() != 2)
+	{
+		m_System->Printf("Syntax: chatdelay <number>\n");
+		m_System->Printf("Current clients chat delay is %i.\n", GetChatDelay());
+		return;
+	}
+
+	SetChatDelay(Q_atoi(params.GetToken(param_ChatDelay)));
+}
+
+void Proxy::SetChatDelay(int delay)
+{
+	m_ChatDelay = delay;
+}
+
+int Proxy::GetChatDelay() const
+{
+	return m_ChatDelay;
 }

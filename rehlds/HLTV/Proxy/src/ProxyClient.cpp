@@ -126,7 +126,7 @@ void ProxyClient::CMD_Say(TokenLine *cmd)
 		return;
 	}
 
-	if (m_SystemTime >= m_LastChatTime + 6) {
+	if (m_SystemTime >= m_LastChatTime + m_Proxy->GetChatDelay()) {
 		m_Proxy->ChatSpectator(m_ClientName, chatText);
 		m_LastChatTime = float(m_SystemTime);
 		return;
