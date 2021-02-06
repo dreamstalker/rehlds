@@ -785,7 +785,7 @@ hull_t *SV_HullForStudioModel(const edict_t *pEdict, const vec_t *mins, const ve
 			int iBlend;
 			R_StudioPlayerBlend(pseqdesc, &iBlend, angles);
 
-			unsigned char blending = (unsigned char)iBlend;
+			unsigned char blending[2] = { (unsigned char)iBlend, 0 };
 			unsigned char controller[4] = { 0x7F, 0x7F, 0x7F, 0x7F };
 			return R_StudioHull(
 				g_psv.models[pEdict->v.modelindex],
@@ -795,7 +795,7 @@ hull_t *SV_HullForStudioModel(const edict_t *pEdict, const vec_t *mins, const ve
 				pEdict->v.origin,
 				size,
 				controller,
-				&blending,
+				blending,
 				pNumHulls,
 				pEdict,
 				bSkipShield);
