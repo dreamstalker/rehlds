@@ -398,11 +398,33 @@ void SV_ParseResourceList(client_t *pSenderClient)
 		SV_DropClient(host_client, false, "Too many resources in client resource list");
 		return;
 	}
-#endif // REHLDS_CHECKS
+	resource = (resource_t*)Mem_ZeroMalloc(sizeof(resource_t));
+	Q_strncpy(resource->szFileName, MSG_ReadString(), sizeof(resource->szFileName) - 1);
+	resource->szFileName[sizeof(resource->szFileName) - 1] = 0;
+	resource->type = (resourcetype_t)MSG_ReadByte();
+	resource->nIndex = MSG_ReadShort();
+	resource->nDownloadSize = MSG_ReadLong();
+	resource->ucFlags = MSG_ReadByte() & (~RES_WASMISSING);
+	if (resource->ucFlags & RES_CUSTOM)
+		MSG_ReadBuf(16, resource->rgucMD5_hash);
+	resource->pNext = NULL;
+	resource->pPrev = NULL;
 
+	SV_AddToResourceList(resource, &host_client->resourcesneeded);	// FIXED: Mem leak. Add to list to free current resource in SV_ClearResourceList if something goes wrong.
+
+	if (msg_badread || resource->type > t_world ||
+		resource->type != t_decal || !(resource->ucFlags & RES_CUSTOM) ||
+		Q_strcmp(resource->szFileName, "tempdecal.wad") != 0 || // client uses only tempdecal.wad for customization
+		resource->nDownloadSize <= 0 ||		// FIXED: Check that download size is valid
+		resource->nDownloadSize > 1024 * 1024 * 1024)	// FIXME: Are they gone crazy??!
+	{
+		SV_ClearResourceLists(host_client);
+		return;
+	}
+#else
 	for (i = 0; i < total; i++)
 	{
-		resource = (resource_t *)Mem_ZeroMalloc(sizeof(resource_t));
+		resource = (resource_t*)Mem_ZeroMalloc(sizeof(resource_t));
 		Q_strncpy(resource->szFileName, MSG_ReadString(), sizeof(resource->szFileName) - 1);
 		resource->szFileName[sizeof(resource->szFileName) - 1] = 0;
 		resource->type = (resourcetype_t)MSG_ReadByte();
@@ -414,30 +436,16 @@ void SV_ParseResourceList(client_t *pSenderClient)
 		resource->pNext = NULL;
 		resource->pPrev = NULL;
 
-#ifdef REHLDS_FIXES
-		SV_AddToResourceList(resource, &host_client->resourcesneeded);	// FIXED: Mem leak. Add to list to free current resource in SV_ClearResourceList if something goes wrong.
-#endif // REHLDS_FIXES
-
-		if (msg_badread || resource->type > t_world ||
-#ifdef REHLDS_FIXES
-			resource->type != t_decal || !(resource->ucFlags & RES_CUSTOM) || Q_strcmp(resource->szFileName, "tempdecal.wad") != 0 || // client uses only tempdecal.wad for customization
-			resource->nDownloadSize <= 0 ||		// FIXED: Check that download size is valid
-#endif // REHLDS_FIXES
-			resource->nDownloadSize > 1024 * 1024 * 1024)	// FIXME: Are they gone crazy??!
+		if (msg_badread || resource->type > t_world || resource->nDownloadSize > 1024 * 1024 * 1024)	// FIXME: Are they gone crazy??!
 		{
-#ifdef REHLDS_FIXES
-			SV_ClearResourceLists(host_client);
-#else // REHLDS_FIXES
 			SV_ClearResourceList(&host_client->resourcesneeded);
 			SV_ClearResourceList(&host_client->resourcesonhand);
-#endif // REHLDS_FIXES
 			return;
 		}
 
-#ifndef REHLDS_FIXES
 		SV_AddToResourceList(resource, &host_client->resourcesneeded);
-#endif // REHLDS_FIXES
 	}
+#endif
 
 	if (sv_allow_upload.value != 0.0f)
 	{
