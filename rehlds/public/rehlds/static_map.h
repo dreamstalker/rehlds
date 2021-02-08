@@ -229,7 +229,7 @@ protected:
 		if (cpuinfo.sse4_2) {
 			while (*pcc) {
 				char cc = *(pcc++);
-				if (cc >= 'A' || cc <= 'Z') {
+				if (cc >= 'A' && cc <= 'Z') {
 					cc |= 0x20;
 				}
 				cksum = crc32c_t8_sse(cksum, cc);
@@ -240,7 +240,7 @@ protected:
 		{
 			while (*pcc) {
 				char cc = *(pcc++);
-				if (cc >= 'A' || cc <= 'Z') {
+				if (cc >= 'A' && cc <= 'Z') {
 					cc |= 0x20;
 				}
 				cksum = crc32c_t8_nosse(cksum, cc);
