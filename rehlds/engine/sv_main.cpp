@@ -4372,6 +4372,11 @@ int SV_CreatePacketEntities_internal(sv_delta_t type, client_t *client, packet_e
 			}
 			continue;
 		}
+		
+#ifdef REHLDS_FIXES
+		if (newindex == 9999)
+			Sys_Error("%s: bad call from metamod/amxx plugin.", "SV_CreatePacketEntities");
+#endif
 
 		edict_t *ent = EDICT_NUM(newindex);
 		qboolean custom = to->entities[newnum].entityType & 0x2 ? TRUE : FALSE;
