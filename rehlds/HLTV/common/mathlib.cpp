@@ -306,7 +306,11 @@ float RadiusFromBounds(const vec_t *mins, const vec_t *maxs)
 	for (int i = 0; i < 3; i++)
 	{
 		float fmin = fabs(mins[i]);
+#ifdef REHLDS_FIXES
+		float fmax = fabs(maxs[i]);
+#else 
 		float fmax = fabs(mins[i]);
+#endif
 
 		if (fmin > fmax)
 			corner[i] = fmin;
