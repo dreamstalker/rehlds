@@ -316,7 +316,7 @@ bool EXT_FUNC SV_ShouldSendConsistencyList_mod(IGameClient *cl, bool forceConsis
 	if (g_psvs.maxclients == 1 || g_psv.num_consistency == 0 || cl->IsProxy())
 		return false;
 
-	if ((!forceConsistency && mp_consistency.value == 0.0f))
+	if (!forceConsistency && mp_consistency.value == 0.0f)
 		return false;
 
 	return true;
@@ -1496,7 +1496,7 @@ void SV_EstablishTimeBase_internal(client_t *cl, usercmd_t *cmds, int dropped, i
 	{
 		if (dropped > numbackup)
 		{
-			cmdnum = dropped - (dropped - numbackup);
+			cmdnum = numbackup;
 			runcmd_time = (double)cl->lastcmd.msec * (dropped - numbackup) / 1000.0;
 		}
 
