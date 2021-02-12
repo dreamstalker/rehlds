@@ -123,6 +123,9 @@ public:
 	EXT_FUNC char *GetHostName();
 	EXT_FUNC float GetPacketLoss();
 	EXT_FUNC int GetProtocol();
+#ifdef HLTV_FIXES
+	EXT_FUNC void SetWorld(IWorld* world);
+#endif
 
 private:
 public:

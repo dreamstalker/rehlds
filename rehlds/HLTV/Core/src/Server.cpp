@@ -1727,6 +1727,12 @@ char *Server::GetType()
 {
 	return SERVER_INTERFACE_VERSION;
 }
+#ifdef HLTV_FIXES
+void Server::SetWorld(IWorld* world)
+{
+	m_World = world;
+}
+#endif
 
 IWorld *Server::GetWorld()
 {

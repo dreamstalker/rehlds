@@ -288,7 +288,9 @@ private:
 	void CMD_Protocol(char *cmdLine);
 	void CMD_Region(char *cmdLine);
 	void CMD_ChatDelay(char *cmdLine);
-
+#ifdef HLTV_FIXES
+	void AddNextWorld();
+#endif
 	struct LocalCommandID_s {
 		char *name;
 		LocalCommandIDs id;
@@ -388,4 +390,7 @@ protected:
 	BitBuffer m_InfoDetails;
 	BitBuffer m_InfoInfo;
 	BitBuffer m_InfoString;
+#ifdef HLTV_FIXES
+	ObjectList m_Worlds;
+#endif
 };

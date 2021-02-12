@@ -96,6 +96,9 @@ public:
 	virtual bool GetAutoRetry() = 0;
 	virtual float GetPacketLoss() = 0;
 	virtual int GetProtocol() = 0;
+#ifdef HLTV_FIXES
+	virtual void SetWorld(IWorld* world) = 0;
+#endif
 };
 
 #define SERVER_INTERFACE_VERSION "server001"

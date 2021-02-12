@@ -86,7 +86,28 @@ Proxy::LocalCommandID_s Proxy::m_LocalCmdReg[] = {
 #ifndef HOOK_HLTV
 EXPOSE_SINGLE_INTERFACE(Proxy, IProxy, PROXY_INTERFACE_VERSION);
 #endif // HOOK_HLTV
+#ifdef HLTV_FIXES
+void Proxy::AddNextWorld()
+{
+	static int num_alloc = 0;
+	static char instance[64];
+	snprintf(instance, sizeof(instance), "AddNextWorld_%d", num_alloc++);
+	IWorld* nextWorld = (IWorld*)m_System->GetModule(WORLD_INTERFACE_VERSION, "core", instance);
+	if (!nextWorld)
+	{
+		m_System->Errorf("Proxy::AddNextWorld: couldn't load world module.\n");
+		return;
+	}
 
+	nextWorld->RegisterListener(this);
+
+	m_Worlds.AddTail(nextWorld);
+	m_Server->SetWorld(nextWorld);
+	if (m_Server->IsConnected()) {
+		m_Server->Reconnect();
+	}
+}
+#endif
 bool Proxy::Init(IBaseSystem *system, int serial, char *name)
 {
 	BaseSystemModule::Init(system, serial, name);
@@ -315,9 +336,42 @@ void Proxy::RunFrame(double time)
 			RunClocks();
 			if (m_IsFinishingBroadcast && m_ClientWorldTime > m_World->GetTime() && !m_IsReconnectRequested)
 			{
-				if (m_Server->IsConnected()) {
-					m_Server->Reconnect();
+#ifdef HLTV_FIXES
+				IWorld* head = (IWorld*)m_Worlds.GetFirst();
+
+				// If we just finished playback previous world record
+				if(head)
+				{
+					// We can't RemoveModule m_World right now because it will fire events to unload us.
+					// Store it in temp var to unload it after set new world
+					IWorld* oldWorld = m_World;
+					m_World = head;					
+					if (m_DemoClient.IsActive())
+					{
+						m_DemoClient.Disconnect("End of Record");
+						m_DemoClient.SetProxy(this);
+						m_DemoClient.SetWorld(m_World);
+						if (m_DemoClient.Connect())
+						{
+							m_DemoClient.SetUpdateRate(m_MaxUpdateRate);
+							m_DemoClient.SetRate(m_MaxRate);
+						}
+					}
+					m_Worlds.RemoveHead();
+					NewGameStarted();
+					ReconnectClients();
+					m_System->RemoveModule((ISystemModule*)oldWorld);
 				}
+				else
+				{
+#endif
+					if (m_Server->IsConnected()) {
+						m_Server->Reconnect();
+					}
+
+#ifdef HLTV_FIXES
+				}
+#endif
 				m_IsReconnectRequested = true;
 			}
 		}
@@ -1423,8 +1477,17 @@ void Proxy::ReceiveSignal(ISystemModule *module, unsigned int signal, void *data
 			break;
 		case 5:
 		case 6:
+		{
+#ifdef HLTV_FIXES
+			if (!m_IsFinishingBroadcast && m_ClientDelay > 0.0)
+			{				
+				//If we finished broadcast we need to get frames from next "World" (Next server map)				
+				AddNextWorld();
+			}
+#endif
 			m_IsFinishingBroadcast = true;
 			break;
+		}
 		case 7:
 			BroadcastRetryMessage();
 			break;
@@ -1441,15 +1504,26 @@ void Proxy::ReceiveSignal(ISystemModule *module, unsigned int signal, void *data
 		switch (signal)
 		{
 		case 2:
-			NewGameStarted();
-			ReconnectClients();
+
+#ifdef HLTV_FIXES
+			if(m_ClientDelay <= 0)
+#endif
+			{
+				NewGameStarted();
+				ReconnectClients();
+			}
 			break;
 		case 5:
 		case 6:
 			BroadcastPaused(signal == 5 ? true : false);
 			break;
 		case 8:
-			StopBroadcast("HLTV shutddown.");
+#ifdef HLTV_FIXES
+			if (m_ClientDelay <= 0)
+#endif
+			{
+				StopBroadcast("HLTV shutdown.");
+			}
 			break;
 		default:
 			break;
@@ -1841,6 +1915,9 @@ void Proxy::ReconnectClients()
 	IClient *client = (IClient *)m_Clients.GetFirst();
 	while (client)
 	{
+#ifdef HLTV_FIXES
+		client->SetWorld(m_World);
+#endif
 		client->Reconnect();
 		client = (IClient *)m_Clients.GetNext();
 	}
