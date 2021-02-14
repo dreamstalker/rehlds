@@ -372,7 +372,7 @@ float Director::AddBestGenericCut()
 	float sumTarget2Rank[MAX_CLIENTS];
 	float bestTarget2Rank, bestRank = 0;
 	float targetRankSum = 0;
-	int newTarget, newTarget2;
+	int newTarget = 0, newTarget2 = 0;
 	int bestTarget2;
 
 	for (int i = 0; i < MAX_CLIENTS; i++)

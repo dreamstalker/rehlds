@@ -100,16 +100,19 @@ void Proxy::AddNextWorld()
 	}
 
 	nextWorld->RegisterListener(this);
-
+		
 	m_Worlds.AddTail(nextWorld);
-	m_Server->SetWorld(nextWorld);
-	if (m_Server->IsConnected()) {
-		m_Server->Reconnect();
-	}
+
 	if (m_DemoClient.IsActive())
 	{
-		m_DemoClient.Reconnect();
-		m_DemoClient.SetWorld(nextWorld);
+		m_DemoClient.FinishDemo();
+	}
+	
+	m_Server->SetWorld(nextWorld);
+	m_DemoClient.SetWorld(nextWorld);
+	
+	if (m_Server->IsConnected()) {
+		m_Server->Reconnect();
 	}
 }
 #endif
