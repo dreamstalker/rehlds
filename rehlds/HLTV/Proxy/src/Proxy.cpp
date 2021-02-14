@@ -106,6 +106,11 @@ void Proxy::AddNextWorld()
 	if (m_Server->IsConnected()) {
 		m_Server->Reconnect();
 	}
+	if (m_DemoClient.IsActive())
+	{
+		m_DemoClient.Reconnect();
+		m_DemoClient.SetWorld(nextWorld);
+	}
 }
 #endif
 bool Proxy::Init(IBaseSystem *system, int serial, char *name)
@@ -345,18 +350,7 @@ void Proxy::RunFrame(double time)
 					// We can't RemoveModule m_World right now because it will fire events to unload us.
 					// Store it in temp var to unload it after set new world
 					IWorld* oldWorld = m_World;
-					m_World = head;					
-					if (m_DemoClient.IsActive())
-					{
-						m_DemoClient.Disconnect("End of Record");
-						m_DemoClient.SetProxy(this);
-						m_DemoClient.SetWorld(m_World);
-						if (m_DemoClient.Connect())
-						{
-							m_DemoClient.SetUpdateRate(m_MaxUpdateRate);
-							m_DemoClient.SetRate(m_MaxRate);
-						}
-					}
+					m_World = head;	
 					m_Worlds.RemoveHead();
 					NewGameStarted();
 					ReconnectClients();
