@@ -1918,8 +1918,14 @@ void Proxy::ReconnectClients()
 		client->Reconnect();
 		client = (IClient *)m_Clients.GetNext();
 	}
-
-	m_DemoClient.Reconnect();
+#ifdef HLTV_FIXES
+	// If delay set than m_DemoClient is already stopped demo in AddNextWorld
+	// Reconnect (Stoping demo) in this case will stop demo and write new one with lost frames
+	if (m_ClientDelay <= 0 && m_DemoClient.IsActive())
+#endif
+	{
+		m_DemoClient.Reconnect();		
+	}
 }
 
 void Proxy::CMD_OffLineText(char *cmdLine)
