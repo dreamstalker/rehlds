@@ -360,15 +360,12 @@ void Proxy::RunFrame(double time)
 					m_System->RemoveModule((ISystemModule*)oldWorld);
 				}
 				else
-				{
 #endif
+				{
 					if (m_Server->IsConnected()) {
 						m_Server->Reconnect();
 					}
-
-#ifdef HLTV_FIXES
 				}
-#endif
 				m_IsReconnectRequested = true;
 			}
 		}
@@ -2559,11 +2556,17 @@ void Proxy::SetDelay(float seconds)
 	{
 		m_ClientDelay = 0;
 		m_World->SetBufferSize(10);
+#ifdef HLTV_FIXES
+		m_Server->SetDelayReconnect(false);
+#endif
 	}
 	else
 	{
 		m_World->SetBufferSize(seconds + seconds);
 		m_ClientWorldTime = m_World->GetTime() - m_ClientDelay;
+#ifdef HLTV_FIXES
+		m_Server->SetDelayReconnect(true);
+#endif
 	}
 
 	m_Server->SetUserInfo("hdelay", COM_VarArgs("%u", (int)m_ClientDelay));
