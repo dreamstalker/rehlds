@@ -60,10 +60,16 @@ CSys::CSys()
 	WORD version = MAKEWORD(2, 0);
 	WSADATA wsaData;
 	WSAStartup(version, &wsaData);
+
+	// Request 1ms resolution for windows timer
+	timeBeginPeriod(1);
 }
 
 CSys::~CSys()
 {
+	// Clear previously set timer resolution
+	timeEndPeriod(1);
+
 	WSACleanup();
 	sys = nullptr;
 }
