@@ -120,12 +120,15 @@ public:
 	EXT_FUNC bool AddResource(resource_t *resource);
 	EXT_FUNC void AddLightStyle(int index, char *style);
 	EXT_FUNC bool AddSignonData(unsigned char type, unsigned char *data, int size);
+	bool AddSignonData(unsigned char* data, int size);
 	EXT_FUNC bool AddUserMessage(int msgNumber, int size, char *name);
 	EXT_FUNC void AddBaselineEntity(int index, entity_state_t *ent);
 	EXT_FUNC void AddInstancedBaselineEntity(int index, entity_state_t *ent);
 	EXT_FUNC void UpdatePlayer(int playerNum, int userId, char *infostring, char *hashedcdkey);
 
-	EXT_FUNC void WriteFrame(frame_t *frame, unsigned int lastFrameSeqnr, BitBuffer *reliableStream, BitBuffer *unreliableStream, unsigned int deltaSeqNr, unsigned int clientDelta, bool addVoice);
+	EXT_FUNC void WriteFrame(frame_t *frame, unsigned int lastFrameSeqnr, BitBuffer *reliableStream,
+	                         BitBuffer *unreliableStream, unsigned int deltaSeqNr, unsigned int clientDelta,
+	                         bool addVoice);
 	EXT_FUNC void WriteNewData(BitBuffer *stream);
 	EXT_FUNC void WriteClientUpdate(BitBuffer *stream, int playerIndex);
 	EXT_FUNC void WriteMovevars(BitBuffer *stream);
@@ -139,7 +142,8 @@ public:
 
 private:
 	int CompressFrame(frame_t *from, BitBuffer *stream);
-	int ParseDeltaHeader(BitBuffer *stream, bool &remove, bool &custom, int &numbase, bool &newbl, int &newblindex, bool full, int &offset);
+	int ParseDeltaHeader(BitBuffer *stream, bool &remove, bool &custom, int &numbase, bool &newbl, int &newblindex,
+	                     bool full, int &offset);
 	void SetDirector(IDirector *director);
 	void SetTimeScale(float scale);
 	void SetGameGroupAddress(NetAddress *addr);
@@ -158,7 +162,8 @@ private:
 	void WritePacketEntities(BitBuffer *stream, frame_t *frame, frame_t *deltaframe);
 	bool WriteDeltaEntities(BitBuffer *stream, frame_t *fullFrame, unsigned int deltaSeqNr, unsigned int clientDelta);
 
-	enum WorldState {
+	enum WorldState
+	{
 		WORLD_UNDEFINED,
 		WORLD_INITIALIZING,
 		WORLD_DISCONNECTED,
@@ -188,9 +193,9 @@ private:
 	delta_t *GetEventDelta() const;
 	delta_t *GetClientDelta() const;
 	delta_t *GetEntityDelta() const;
-	delta_t *GetWeaponDelta() const;
 	delta_t *GetDeltaEncoder(int index, bool custom);
 	bool IsDeltaEncoder() const;
+	delta_t* GetWeaponDelta() const;
 
 protected:
 	bool m_IsPaused;
@@ -209,7 +214,8 @@ protected:
 	int m_ViewEntity;
 	serverinfo_t m_DetailedServerInfo;
 
-	enum {
+	enum
+	{
 		MAX_ENTITIES            = 1380,
 		MAX_INSTANCED_BASELINES = 64,
 		MAX_FRAME_CACHE         = 32,

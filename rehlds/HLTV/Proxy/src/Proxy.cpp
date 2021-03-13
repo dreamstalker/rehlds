@@ -89,6 +89,8 @@ EXPOSE_SINGLE_INTERFACE(Proxy, IProxy, PROXY_INTERFACE_VERSION);
 #ifdef HLTV_FIXES
 void Proxy::AddNextWorld()
 {
+	BitBuffer temp_buff;
+	temp_buff.Resize(0x8000);
 	static int num_alloc = 0;
 	static char instance[64];
 	snprintf(instance, sizeof(instance), "AddNextWorld_%d", num_alloc++);
@@ -99,8 +101,11 @@ void Proxy::AddNextWorld()
 		return;
 	}
 
+	m_World->WriteSigonData(&temp_buff);
+	nextWorld->AddSignonData(temp_buff.GetData(), temp_buff.CurrentSize());
+	
 	nextWorld->RegisterListener(this);
-		
+	
 	m_Worlds.AddTail(nextWorld);
 
 	if (m_DemoClient.IsActive())
@@ -1473,7 +1478,7 @@ void Proxy::ReceiveSignal(ISystemModule *module, unsigned int signal, void *data
 		case 6:
 		{
 #ifdef HLTV_FIXES
-			if (!m_IsFinishingBroadcast && m_ClientDelay > 0.0)
+			if (!m_IsFinishingBroadcast && m_ClientDelay > 0.f)
 			{				
 				//If we finished broadcast we need to get frames from next "World" (Next server map)				
 				AddNextWorld();
