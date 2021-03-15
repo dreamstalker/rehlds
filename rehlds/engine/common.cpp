@@ -2393,7 +2393,7 @@ void EXT_FUNC COM_GetGameDir(char *szGameDir)
 {
 	if (szGameDir)
 	{
-		Q_snprintf(szGameDir, MAX_PATH - 1 , "%s", com_gamedir);
+		Q_snprintf(szGameDir, MAX_PATH, "%s", com_gamedir);
 	}
 }
 

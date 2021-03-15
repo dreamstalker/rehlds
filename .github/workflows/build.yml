@@ -1,0 +1,183 @@
+name: C/C++ CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    types: [opened, reopened, synchronize]
+  release:
+    types: [published]
+
+jobs:
+  windows:
+    name: 'Windows'
+    runs-on: windows-latest
+    env:
+      solution: 'msvc/ReHLDS.sln'
+      buildPlatform: 'Win32'
+      buildConfiguration: 'Release'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup Nuget
+        uses: nuget/setup-nuget@v1
+        with:
+          nuget-api-key: ${{ secrets.NuGetAPIKey }}
+          nuget-version: '5.x'
+      - run: nuget restore '${{ env.solution }}'
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v1.0.2
+        with:
+          vs-version: '16.8'
+
+      - name: Build ReHLDS
+        run:
+          msbuild ${{ env.solution }} /t:Clean,Build -p:Configuration="${{ env.buildConfiguration }}" /p:Platform=${{ env.buildPlatform }} /p:PlatformToolset=v140_xp /p:XPDeprecationWarning=false
+
+      - name: Move files
+        run: |
+          mkdir publish\debug
+          mkdir publish\bin\win32\valve\dlls
+          move msvc\${{ env.buildConfiguration }}\hlds.exe publish\bin\win32\hlds.exe
+          move msvc\${{ env.buildConfiguration }}\hltv.exe publish\bin\win32\hltv.exe
+          move msvc\${{ env.buildConfiguration }}\swds.dll publish\bin\win32\swds.dll
+          move msvc\${{ env.buildConfiguration }}\core.dll publish\bin\win32\core.dll
+          move msvc\${{ env.buildConfiguration }}\proxy.dll publish\bin\win32\proxy.dll
+          move msvc\${{ env.buildConfiguration }}\demoplayer.dll publish\bin\win32\demoplayer.dll
+          move msvc\${{ env.buildConfiguration }}\filesystem_stdio.dll publish\bin\win32\filesystem_stdio.dll
+          move msvc\${{ env.buildConfiguration }}\director.dll publish\bin\win32\valve\dlls\director.dll
+          move msvc\${{ env.buildConfiguration }}\hlds.pdb publish\debug\hlds.pdb
+          move msvc\${{ env.buildConfiguration }}\hltv.pdb publish\debug\hltv.pdb
+          move msvc\${{ env.buildConfiguration }}\swds.pdb publish\debug\swds.pdb
+          move msvc\${{ env.buildConfiguration }}\core.pdb publish\debug\core.pdb
+          move msvc\${{ env.buildConfiguration }}\proxy.pdb publish\debug\proxy.pdb
+          move msvc\${{ env.buildConfiguration }}\demoplayer.pdb publish\debug\demoplayer.pdb
+          move msvc\${{ env.buildConfiguration }}\filesystem_stdio.pdb publish\debug\filesystem_stdio.pdb
+          move msvc\${{ env.buildConfiguration }}\director.pdb publish\debug\director.pdb
+
+      - name: Deploy artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: win32
+          path: publish/*
+
+  linux:
+    name: 'Linux'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Check dependencies
+        run: |
+          sudo dpkg --add-architecture i386
+          sudo apt-get update
+          sudo apt-get install -y gcc-multilib g++-multilib
+          sudo apt-get install -y build-essential
+          sudo apt-get install -y libc6-dev libc6-dev-i386
+          sudo apt-get install -y p7zip-full
+
+      - name: Build
+        run: |
+          mkdir build
+          cd build
+          cmake ../
+          make
+
+      - name: Prepare HLSDK
+        run: |
+          mkdir -p publish/hlsdk
+          rsync -a rehlds/common/ publish/hlsdk/common/
+          rsync -a rehlds/dlls/ publish/hlsdk/dlls/
+          rsync -a rehlds/pm_shared/ publish/hlsdk/pm_shared/
+          rsync -a rehlds/public/ publish/hlsdk/public/ --exclude rehlds/
+          rsync -a rehlds/public/rehlds/ publish/hlsdk/engine
+
+      - name: Move files
+        run: |
+          mkdir -p publish/bin/linux32/valve/dlls
+          mv build/rehlds/engine_i486.so publish/bin/linux32/engine_i486.so
+          mv rehlds/version/appversion.h publish/appversion.h
+          mv build/rehlds/dedicated/hlds_linux publish/bin/linux32/hlds_linux
+          mv build/rehlds/HLTV/Console/hltv publish/bin/linux32/hltv
+          mv build/rehlds/HLTV/Core/core.so publish/bin/linux32/core.so
+          mv build/rehlds/HLTV/Proxy/proxy.so publish/bin/linux32/proxy.so
+          mv build/rehlds/HLTV/DemoPlayer/demoplayer.so publish/bin/linux32/demoplayer.so
+          mv build/rehlds/HLTV/Director/director.so publish/bin/linux32/valve/dlls/director.so
+          mv build/rehlds/filesystem/FileSystem_Stdio/filesystem_stdio.so publish/bin/linux32/filesystem_stdio.so
+
+      - name: Deploy artifacts
+        uses: actions/upload-artifact@v2
+        id: upload-job
+        with:
+          name: linux32
+          path: publish/*
+
+      - name: Cleanup temporary artifacts
+        if: success() && steps.upload-job.outcome == 'success'
+        run: |
+          rm -rf hlsdk
+          rm -f appversion.h
+
+  publish:
+    needs: [windows, linux]
+    name: 'Publish'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploying linux artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: linux32
+
+      - name: Deploying windows artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: win32
+
+      - name: Reading appversion.h
+        run: |
+          if [ -e appversion.h ]; then
+          	APP_VERSION=$(cat appversion.h | grep -wi '#define APP_VERSION_STRD' | sed -e 's/#define APP_VERSION_STRD[ \t\r\n\v\f]\+\(.*\)/\1/i' -e 's/\r//g')
+          	if [ $? -ne 0 ]; then
+          		APP_VERSION=""
+          	else
+          		# Remove quotes
+          		APP_VERSION=$(echo $APP_VERSION | xargs)
+          		echo "APP_VERSION=${APP_VERSION}" >> $GITHUB_ENV
+          	fi
+          fi
+          rm -f appversion.h
+
+      - name: Packaging bin/dbg
+        id: packaging-job
+        if: |
+          github.event_name == 'release' &&
+          github.event.action == 'published' &&
+          startsWith(github.ref, 'refs/tags/')
+        run: |
+          7z a -tzip rehlds-bin-${{ env.APP_VERSION }}.zip bin/ hlsdk/
+          7z a -t7z -m0=lzma2 -mx=9 -mfb=64 -aoa rehlds-dbg-${{ env.APP_VERSION }}.7z debug/
+
+      - name: Publish artifacts
+        uses: softprops/action-gh-release@v1
+        id: publish-job
+        if: |
+          startsWith(github.ref, 'refs/tags/') &&
+          steps.packaging-job.outcome == 'success'
+        with:
+          files: |
+            *.zip
+            *.7z
+        env:
+          GITHUB_TOKEN: ${{ secrets.API_TOKEN }}
+
+      - name: Cleanup temporary artifacts
+        if: success() && steps.publish-job.outcome == 'success'
+        run: |
+          rm -rf bin debug hlsdk
+          rm -f *.7z *.zip appversion.h

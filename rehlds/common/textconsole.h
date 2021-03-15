@@ -39,16 +39,16 @@ public:
 
 	virtual bool Init(IBaseSystem *system = nullptr);
 	virtual void ShutDown();
-	virtual void Print(char *pszMsg);
+	virtual void Print(const char *pszMsg);
 
-	virtual void SetTitle(char *pszTitle) {}
-	virtual void SetStatusLine(char *pszStatus) {}
+	virtual void SetTitle(const char *pszTitle) {}
+	virtual void SetStatusLine(const char *pszStatus) {}
 	virtual void UpdateStatus() {}
 
 	// Must be provided by children
-	virtual void PrintRaw(char *pszMsg, int nChars = 0) = 0;
-	virtual void Echo(char *pszMsg, int nChars = 0) = 0;
-	virtual char *GetLine() = 0;
+	virtual void PrintRaw(const char *pszMsg, int nChars = 0) = 0;
+	virtual void Echo(const char *pszMsg, int nChars = 0) = 0;
+	virtual const char *GetLine() = 0;
 	virtual int GetWidth() = 0;
 
 	virtual void SetVisible(bool visible);
@@ -92,4 +92,4 @@ protected:
 	#include "TextConsoleUnix.h"
 #endif // defined(_WIN32)
 
-void Sys_Printf(char *fmt, ...);
+void Sys_Printf(const char *fmt, ...);

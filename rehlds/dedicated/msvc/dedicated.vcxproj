@@ -5,10 +5,6 @@
       <Configuration>Debug</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Release Swds|Win32">
-      <Configuration>Release Swds</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
     <ProjectConfiguration Include="Release|Win32">
       <Configuration>Release</Configuration>
       <Platform>Win32</Platform>
@@ -40,16 +36,6 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Swds|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
-    <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset Condition="'$(VisualStudioVersion)' == '12.0'">v120_xp</PlatformToolset>
-    <PlatformToolset Condition="'$(VisualStudioVersion)' == '14.0'">v140_xp</PlatformToolset>
-    <PlatformToolset Condition="'$(VisualStudioVersion)' == '15.0'">v141_xp</PlatformToolset>
-    <PlatformToolset Condition="'$(VisualStudioVersion)' == '16.0'">v142</PlatformToolset>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>MultiByte</CharacterSet>
-  </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
@@ -59,19 +45,12 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release Swds|Win32'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <TargetName>hlds</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <LinkIncremental>false</LinkIncremental>
-    <TargetName>hlds</TargetName>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Swds|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <TargetName>hlds</TargetName>
   </PropertyGroup>
@@ -155,51 +134,6 @@
       <Inputs>build.always.run</Inputs>
     </CustomBuildStep>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release Swds|Win32'">
-    <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <Optimization>Full</Optimization>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;LAUNCHER_FIXES;NDEBUG;DEDICATED;_CRT_SECURE_NO_WARNINGS;USE_BREAKPAD_HANDLER;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\src;$(ProjectDir)..\..\;$(ProjectDir)..\..\common;$(ProjectDir)..\..\engine;$(ProjectDir)..\..\public;$(ProjectDir)..\..\public\rehlds;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <BufferSecurityCheck>false</BufferSecurityCheck>
-      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
-      <FloatingPointModel>
-      </FloatingPointModel>
-      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
-      <OmitFramePointers>true</OmitFramePointers>
-      <StringPooling>true</StringPooling>
-      <PrecompiledHeaderFile>precompiled.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <Link>
-      <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>ws2_32.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
-    </Link>
-    <PreBuildEvent>
-      <Command>IF EXIST "$(ProjectDir)PreBuild.bat" (CALL "$(ProjectDir)PreBuild.bat" "$(ProjectDir)..\version\" "$(ProjectDir)..\")</Command>
-    </PreBuildEvent>
-    <PreBuildEvent>
-      <Message>Setup version from Git revision</Message>
-    </PreBuildEvent>
-    <PostBuildEvent>
-      <Command>IF EXIST "$(ProjectDir)PostBuild.bat" (CALL "$(ProjectDir)PostBuild.bat" "$(TargetDir)" "$(TargetName)" "$(TargetExt)" "$(ProjectDir)")</Command>
-    </PostBuildEvent>
-    <PostBuildEvent>
-      <Message>Automatic deployment script</Message>
-    </PostBuildEvent>
-    <CustomBuildStep>
-      <Command>echo Empty Action</Command>
-      <Message>Force build to run Pre-Build event</Message>
-      <Outputs>build.always.run</Outputs>
-      <Inputs>build.always.run</Inputs>
-    </CustomBuildStep>
-  </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\..\common\minidump.h" />
     <ClInclude Include="..\..\common\ObjectList.h" />
@@ -208,7 +142,6 @@
     <ClInclude Include="..\..\common\TextConsoleUnix.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Swds|Win32'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="..\..\common\TextConsoleWin32.h" />
     <ClInclude Include="..\src\conproc.h" />
@@ -230,7 +163,6 @@
     <ClCompile Include="..\..\common\TextConsoleUnix.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Swds|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\..\common\TextConsoleWin32.cpp" />
     <ClCompile Include="..\..\engine\mem.cpp" />
@@ -239,14 +171,12 @@
     <ClCompile Include="..\src\precompiled.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release Swds|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\src\public_amalgamation.cpp" />
     <ClCompile Include="..\src\sys_ded.cpp" />
     <ClCompile Include="..\src\sys_linux.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Swds|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\src\sys_window.cpp" />
     <ClCompile Include="..\src\vgui\vguihelpers.cpp" />

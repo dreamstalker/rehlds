@@ -71,7 +71,7 @@ void R_InitTextures()
 		{
 			for (int y = 0; y < texSize; y++, dest++)
 			{
-				if (x < (texSize / 2) == y < (texSize / 2))
+				if ((x < (texSize / 2)) == (y < (texSize / 2)))
 					*dest = -1;
 				else
 					*dest = 0;

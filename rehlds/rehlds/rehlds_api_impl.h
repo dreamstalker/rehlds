@@ -103,8 +103,8 @@ typedef IVoidHookChainImpl<IGameClient*> CRehldsHook_ClientConnected;
 typedef IVoidHookChainRegistryImpl<IGameClient*> CRehldsHookRegistry_ClientConnected;
 
 //HandleNetCommand
-typedef IVoidHookChainImpl<IGameClient*, int8> CRehldsHook_HandleNetCommand;
-typedef IVoidHookChainRegistryImpl<IGameClient*, int8> CRehldsHookRegistry_HandleNetCommand;
+typedef IVoidHookChainImpl<IGameClient*, uint8> CRehldsHook_HandleNetCommand;
+typedef IVoidHookChainRegistryImpl<IGameClient*, uint8> CRehldsHookRegistry_HandleNetCommand;
 
 //Mod_LoadBrushModel
 typedef IVoidHookChainImpl<model_t*, void*> CRehldsHook_Mod_LoadBrushModel;

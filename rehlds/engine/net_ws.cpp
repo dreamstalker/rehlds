@@ -873,7 +873,7 @@ qboolean NET_QueuePacket(netsrc_t sock)
 		for (int protocol = 0; protocol < 1; protocol++)
 #endif // _WIN32
 		{
-			SOCKET net_socket;
+			SOCKET net_socket = INV_SOCK;
 
 			if (protocol == 0)
 				net_socket = ip_sockets[sock];

@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#if !defined(_WIN32)
+#if !defined(_WIN32) && !defined(BUILD_STATIC_LIBSTDC) // if build with static libstdc++ then ignore
 void NORETURN Sys_Error(const char *error, ...);
 
 // This file adds the necessary compatibility tricks to avoid symbols with

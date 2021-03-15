@@ -1,5 +1,4 @@
-# Rehlds [![Build Status](http://teamcity.rehlds.org/app/rest/builds/buildType:(id:Rehlds_Publish)/statusIcon)](http://teamcity.rehlds.org/viewType.html?buildTypeId=Rehlds_Publish&guest=1) [![Download](https://camo.githubusercontent.com/65c70643ec7b40eea50971003624c2fb04d8d375/687474703a2f2f7265686c64732e6f72672f76657273696f6e2f7265686c64732e737667)](http://teamcity.rehlds.org/guestAuth/downloadArtifacts.html?buildTypeId=Rehlds_Publish&buildId=lastSuccessful) <img align="right" src="https://cloud.githubusercontent.com/assets/5860435/25316344/add057d4-288f-11e7-93ab-84706a388c3c.png" alt="ReHLDS"/>
-
+# ReHLDS [![C/C++ CI](https://github.com/dreamstalker/rehlds/actions/workflows/build.yml/badge.svg)](https://github.com/dreamstalker/rehlds/actions/workflows/build.yml) [![Download](https://camo.githubusercontent.com/7ab483250adb4037b26e9575331218ee51108190d0938b7836d32f1209ccf907/68747470733a2f2f696d672e736869656c64732e696f2f6769746875622f72656c656173652f647265616d7374616c6b65722f7265686c64732e737667)](https://github.com/dreamstalker/rehlds/releases/latest) [![Downloads](https://camo.githubusercontent.com/d37654956d99bb9fb7a348fdac39b214d6ae14a7cfb9f96bf873c6b46cdf9ef6/68747470733a2f2f696d672e736869656c64732e696f2f6769746875622f646f776e6c6f6164732f647265616d7374616c6b65722f7265686c64732f746f74616c3f636f6c6f723d696d706f7274616e74)]() [![Percentage of issues still open](http://isitmaintained.com/badge/open/dreamstalker/rehlds.svg)](http://isitmaintained.com/project/dreamstalker/rehlds "Percentage of issues still open") [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0) <img align="right" src="https://user-images.githubusercontent.com/5860435/111066129-040e5e00-84f0-11eb-9e1f-7a7e8611da2b.png" alt="ReHLDS" />
 Reverse-engineered (and bugfixed) HLDS
 
 ## What is this?
@@ -7,7 +6,7 @@ ReHLDS is a result of reverse engineering of original HLDS (build 6152/6153) usi
 
 Along with reverse engineering, a lot of defects and (potential) bugs were found and fixed
 
-You can try play on one of the servers that using rehlds: http://www.gametracker.com/search/?search_by=server_variable&search_by2=sv_version
+You can try play on one of the servers that using rehlds: [Game Tracker](http://www.gametracker.com/search/?search_by=server_variable&search_by2=sv_version)
 
 ## Goals of the project
 <ul>
@@ -19,7 +18,7 @@ You can try play on one of the servers that using rehlds: http://www.gametracker
 Rehlds is fully compatible with latest official HLDS downloaded by steamcmd. All you have to do is to download rehlds binaries and replace original swds.dll/engine_i486.so. For windows you can also copy a swds.pdb file with a debug information.
 <br /><b>Warning!</b> Rehlds is not compatible with an old 5xxx or below platforms downloaded by hldsupdatetool.
 
-Compiled binaries are available here: http://nexus.rehlds.org/nexus/content/repositories/rehlds-dev/rehlds/rehlds/
+Compiled binaries are available here: [Artifact releases](https://github.com/dreamstalker/rehlds/releases)
 
 Rehlds binaries require SSE, SSE2 and SSE3 instruction sets to run and can benefit from SSE4.1 and SSE4.2.
 

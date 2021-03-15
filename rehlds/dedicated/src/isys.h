@@ -36,18 +36,18 @@ public:
 	virtual bool GetExecutableName(char *out) = 0;
 	virtual void ErrorMessage(int level, const char *msg) = 0;
 
-	virtual void WriteStatusText(char *szText) = 0;
+	virtual void WriteStatusText(const char *szText) = 0;
 	virtual void UpdateStatus(int force) = 0;
 
-	virtual long LoadLibrary(char *lib) = 0;
+	virtual long LoadLibrary(const char *lib) = 0;
 	virtual void FreeLibrary(long library) = 0;
 
 	virtual bool CreateConsoleWindow(void) = 0;
 	virtual void DestroyConsoleWindow(void) = 0;
 
-	virtual void ConsoleOutput(char *string) = 0;
-	virtual char *ConsoleInput(void) = 0;
-	virtual void Printf(char *fmt, ...) = 0;
+	virtual void ConsoleOutput(const char *string) = 0;
+	virtual const char *ConsoleInput(void) = 0;
+	virtual void Printf(const char *fmt, ...) = 0;
 };
 
 extern ISys *sys;

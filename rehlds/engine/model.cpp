@@ -152,7 +152,7 @@ model_t *Mod_FindName(qboolean trackCRC, const char *name)
 
 		if (mod->needload == NL_UNREFERENCED)
 		{
-			if (!avail || mod->type != mod_alias && mod->type != mod_studio)
+			if (!avail || (mod->type != mod_alias && mod->type != mod_studio))
 				avail = mod;
 		}
 	}
@@ -1329,7 +1329,7 @@ void EXT_FUNC Mod_LoadBrushModel_internal(model_t *mod, void *buffer)
 
 		if (i < mod->numsubmodels - 1)
 		{
-			char name[10];
+			char name[12];
 			Q_snprintf(name, ARRAYSIZE(name), "*%i", i + 1);
 
 			loadmodel = Mod_FindName(0, name);

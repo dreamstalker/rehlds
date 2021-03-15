@@ -412,7 +412,7 @@ void Netchan_Transmit(netchan_t *chan, int length, byte *data)
 
 				// If it's not in-memory, then we'll need to copy it in frame the file handle.
 				if (pbuf->isfile && !pbuf->isbuffer)	{
-					char compressedfilename[MAX_PATH];
+					char compressedfilename[MAX_PATH+5]; // room for extension string
 					FileHandle_t hfile;
 					if (pbuf->iscompressed)
 					{

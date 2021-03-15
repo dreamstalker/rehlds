@@ -2059,7 +2059,9 @@ qboolean SV_CheckForDuplicateNames(char *userinfo, qboolean bIsReconnecting, int
 			return changed;
 
 		char newname[MAX_NAME];
-		Q_snprintf(newname, sizeof(newname), "(%d)%-0.*s", ++dupc, 28, rawname);
+		const int maxLenDupName = MAX_NAME - (sizeof("(d)") - 1);
+
+		Q_snprintf(newname, sizeof(newname), "(%d)%.*s", ++dupc, maxLenDupName - 1, rawname);
 
 #ifdef REHLDS_FIXES
 		// Fix possibly incorrectly cut UTF8 chars
@@ -5461,7 +5463,10 @@ void SV_PropagateCustomizations(void)
 	// For each active player
 	for (i = 0, pHost = g_psvs.clients; i < g_psvs.maxclients; i++, pHost++)
 	{
-		if (!pHost->active && !pHost->spawned || pHost->fakeclient)
+		if (pHost->fakeclient)
+			continue;
+
+		if (!pHost->active && !pHost->spawned)
 			continue;
 
 		// Send each customization to current player
@@ -6590,7 +6595,10 @@ void SV_BanId_f(void)
 		for (int i = 0; i < g_psvs.maxclients; i++)
 		{
 			client_t *cl = &g_psvs.clients[i];
-			if (!cl->active && !cl->connected && !cl->spawned || cl->fakeclient)
+			if (cl->fakeclient)
+				continue;
+
+			if (!cl->active && !cl->connected && !cl->spawned)
 				continue;
 
 			if (!Q_stricmp(SV_GetClientIDString(cl), idstring))
@@ -6663,7 +6671,10 @@ void SV_BanId_f(void)
 	for (int i = 0; i < g_psvs.maxclients; i++)
 	{
 		client_t *cl = &g_psvs.clients[i];
-		if (!cl->active && !cl->connected && !cl->spawned || cl->fakeclient)
+		if (cl->fakeclient)
+			continue;
+
+		if (!cl->active && !cl->connected && !cl->spawned)
 			continue;
 
 		if (SV_CompareUserID(&cl->network_userid, id))
@@ -7325,7 +7336,10 @@ void SV_KickPlayer(int nPlayerSlot, int nReason)
 	Q_sprintf(rgchT, "%s was automatically disconnected\nfrom this secure server.\n", client->name);
 	for (int i = 0; i < g_psvs.maxclients; i++)
 	{
-		if (!g_psvs.clients[i].active && !g_psvs.clients[i].spawned || g_psvs.clients[i].fakeclient)
+		if (g_psvs.clients[i].fakeclient)
+			continue;
+
+		if (!g_psvs.clients[i].active && !g_psvs.clients[i].spawned)
 			continue;
 
 		MSG_WriteByte(&g_psvs.clients[i].netchan.message, svc_centerprint);
@@ -7522,7 +7536,7 @@ void SV_BeginFileDownload_f(void)
 	{
 		if (host_client->fully_connected ||
 			sv_send_resources.value == 0.0f ||
-			sv_downloadurl.string != NULL && sv_downloadurl.string[0] != 0 && Q_strlen(sv_downloadurl.string) <= 128 && sv_allow_dlfile.value == 0.0f ||
+			(sv_downloadurl.string != NULL && sv_downloadurl.string[0] != 0 && Q_strlen(sv_downloadurl.string) <= 128 && sv_allow_dlfile.value == 0.0f) ||
 			Netchan_CreateFileFragments(TRUE, &host_client->netchan, name) == 0)
 		{
 			SV_FailDownload(name);
@@ -8166,17 +8180,17 @@ typedef struct GameToAppIDMapItem_s
 } GameToAppIDMapItem_t;
 
 GameToAppIDMapItem_t g_GameToAppIDMap[11] = {
-	0x0A, "cstrike",
-	0x14, "tfc",
-	0x1E, "dod",
-	0x28, "dmc",
-	0x32, "gearbox",
-	0x3C, "ricochet",
-	0x46, "valve",
-	0x50, "czero",
-	0x64, "czeror",
-	0x82, "bshift",
-	0x96, "cstrike_beta",
+	{ 0x0A, "cstrike" },
+	{ 0x14, "tfc" },
+	{ 0x1E, "dod" },
+	{ 0x28, "dmc" },
+	{ 0x32, "gearbox" },
+	{ 0x3C, "ricochet" },
+	{ 0x46, "valve" },
+	{ 0x50, "czero" },
+	{ 0x64, "czeror" },
+	{ 0x82, "bshift" },
+	{ 0x96, "cstrike_beta" },
 };
 
 int GetGameAppID(void)

@@ -63,13 +63,13 @@ delta_definition_t g_DeltaDataDefinition[] =
 
 delta_description_t g_MetaDescription[] =
 {
-	{ DT_INTEGER, DELTA_D_DEF(fieldType), 1, 32, 1.0, 1.0, 0, 0, 0 },
-	{ DT_STRING,  DELTA_D_DEF(fieldName), 1, 1, 1.0, 1.0, 0, 0, 0 },
-	{ DT_INTEGER, DELTA_D_DEF(fieldOffset), 1, 16, 1.0, 1.0, 0, 0, 0 },
-	{ DT_INTEGER, DELTA_D_DEF(fieldSize), 1, 8, 1.0, 1.0, 0, 0, 0 },
-	{ DT_INTEGER, DELTA_D_DEF(significant_bits), 1, 8, 1.0, 1.0, 0, 0, 0 },
-	{ DT_FLOAT,   DELTA_D_DEF(premultiply), 1, 32, 4000.0, 1.0, 0, 0, 0 },
-	{ DT_FLOAT,   DELTA_D_DEF(postmultiply), 1, 32, 4000.0, 1.0, 0, 0, 0 }
+	{ DT_INTEGER, DELTA_D_DEF(fieldType), 1, 32, 1.0, 1.0, 0, {0, 0} },
+	{ DT_STRING,  DELTA_D_DEF(fieldName), 1, 1, 1.0, 1.0, 0, {0, 0} },
+	{ DT_INTEGER, DELTA_D_DEF(fieldOffset), 1, 16, 1.0, 1.0, 0, {0, 0} },
+	{ DT_INTEGER, DELTA_D_DEF(fieldSize), 1, 8, 1.0, 1.0, 0, {0, 0} },
+	{ DT_INTEGER, DELTA_D_DEF(significant_bits), 1, 8, 1.0, 1.0, 0, {0, 0} },
+	{ DT_FLOAT,   DELTA_D_DEF(premultiply), 1, 32, 4000.0, 1.0, 0, {0, 0} },
+	{ DT_FLOAT,   DELTA_D_DEF(postmultiply), 1, 32, 4000.0, 1.0, 0, {0, 0} }
 };
 
 namespace Delta {

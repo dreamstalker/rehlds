@@ -1208,11 +1208,12 @@ void World::ClearEntityCache()
 {
 	if (m_DeltaCache)
 	{
-		for (int i = 0; i < m_MaxCacheIndex; i++) {
+		for (int i = 0; i < m_MaxCacheIndex; i++)
+		{
+			m_DeltaCache[i].seqNr = 0;
+			m_DeltaCache[i].deltaNr = 0;
 			m_DeltaCache[i].buffer.Free();
 		}
-
-		Q_memset(m_DeltaCache, 0, sizeof(deltaCache_t) * m_MaxCacheIndex);
 	}
 
 	if (m_FrameCache) {

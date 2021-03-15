@@ -490,7 +490,7 @@ void NORETURN Sys_Error(const char *error, ...)
 #endif // SWDS
 
 	//Allahu akbar!
-	int *null = 0;
+	volatile int *null = 0;
 	*null = 0;
 	exit(-1);
 }

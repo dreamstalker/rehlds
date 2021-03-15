@@ -28,11 +28,6 @@
 
 #include "precompiled.h"
 
-typedef struct command_s
-{
-	char *command;
-} command_t;
-
 sv_adjusted_positions_t truepositions[MAX_CLIENTS];
 qboolean g_balreadymoved;
 
@@ -47,9 +42,9 @@ edict_t *sv_player;
 qboolean nofind;
 
 #if defined(SWDS) && defined(REHLDS_FIXES)
-command_t clcommands[] = { "status", "name", "kill", "pause", "spawn", "new", "sendres", "dropclient", "kick", "ping", "dlfile", "setinfo", "sendents", "fullupdate", "setpause", "unpause", NULL };
+const char *clcommands[] = { "status", "name", "kill", "pause", "spawn", "new", "sendres", "dropclient", "kick", "ping", "dlfile", "setinfo", "sendents", "fullupdate", "setpause", "unpause", NULL };
 #else
-command_t clcommands[23] = { "status", "god", "notarget", "fly", "name", "noclip", "kill", "pause", "spawn", "new", "sendres", "dropclient", "kick", "ping", "dlfile", "nextdl", "setinfo", "showinfo", "sendents", "fullupdate", "setpause", "unpause", NULL };
+const char *clcommands[23] = { "status", "god", "notarget", "fly", "name", "noclip", "kill", "pause", "spawn", "new", "sendres", "dropclient", "kick", "ping", "dlfile", "nextdl", "setinfo", "showinfo", "sendents", "fullupdate", "setpause", "unpause", NULL };
 #endif
 
 cvar_t sv_edgefriction = { "edgefriction", "2", FCVAR_SERVER, 0.0f, NULL };
@@ -560,7 +555,10 @@ void SV_AddLinksToPM_(areanode_t *node, float *pmove_mins, float *pmove_maxs)
 		if ((check->v.flags & FL_CLIENT) && check->v.health <= 0.0)
 			continue;
 
-		if (check->v.mins[2] == 0.0 && check->v.maxs[2] == 1.0 || Length(check->v.size) == 0.0)
+		if (check->v.mins[2] == 0.0 && check->v.maxs[2] == 1.0)
+			continue;
+
+		if (Length(check->v.size) == 0.0)
 			continue;
 
 		fmin = check->v.absmin;
@@ -1031,11 +1029,11 @@ void SV_RunCmd(usercmd_t *ucmd, int random_seed)
 
 int SV_ValidateClientCommand(char *pszCommand)
 {
-	char *p;
+	const char *p;
 	int i = 0;
 
 	COM_Parse(pszCommand);
-	while ((p = clcommands[i].command) != NULL)
+	while ((p = clcommands[i]) != NULL)
 	{
 		if (!Q_stricmp(com_token, p))
 		{
@@ -1742,7 +1740,7 @@ void SV_ParseCvarValue2(client_t *cl)
 	Con_DPrintf("Cvar query response: name:%s, request ID %d, cvar:%s, value:%s\n", cl->name, requestID, cvarName, value);
 }
 
-void EXT_FUNC SV_HandleClientMessage_api(IGameClient* client, int8 opcode) {
+void EXT_FUNC SV_HandleClientMessage_api(IGameClient* client, uint8 opcode) {
 	client_t* cl = client->GetClient();
 	if (opcode < clc_bad || opcode > clc_cvarvalue2)
 	{

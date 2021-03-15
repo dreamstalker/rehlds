@@ -210,7 +210,13 @@ bool Proxy::Init(IBaseSystem *system, int serial, char *name)
 	Q_memset(m_LastRconCommand, 0, sizeof(m_LastRconCommand));
 	Q_memset(m_OffLineText, 0, sizeof(m_OffLineText));
 	Q_memset(m_SignonCommands, 0, sizeof(m_SignonCommands));
-	Q_memset(m_Challenges, 0, sizeof(m_Challenges));
+
+	for (int i = 0; i < MAX_CHALLENGES; i++)
+	{
+		m_Challenges[i].adr.Clear();
+		m_Challenges[i].challenge = 0;
+		m_Challenges[i].time = 0.0f;
+	}
 
 	m_LoopCommands.Init();
 	m_BannList.Init();
@@ -836,10 +842,10 @@ void Proxy::Broadcast(byte *data, int length, int groupType, bool isReliable)
 	while (client)
 	{
 		if (client->IsActive()
-			&& ((groupType & GROUP_CLIENT) && client->GetClientType() == TYPE_CLIENT)
-			|| ((groupType & GROUP_PROXY) && client->GetClientType() == TYPE_PROXY)
-			|| ((groupType & GROUP_VOICE) && client->IsHearingVoices())
-			|| ((groupType & GROUP_CHAT) && client->HasChatEnabled()))
+			&& (((groupType & GROUP_CLIENT) && client->GetClientType() == TYPE_CLIENT)
+			||  ((groupType & GROUP_PROXY)  && client->GetClientType() == TYPE_PROXY)
+			||  ((groupType & GROUP_VOICE)  && client->IsHearingVoices())
+			||  ((groupType & GROUP_CHAT)   && client->HasChatEnabled())))
 		{
 			client->Send(data, length, isReliable);
 		}
@@ -966,7 +972,7 @@ void Proxy::CMD_Name(char *cmdLine)
 	}
 
 	char name[MAX_NAME];
-	int len = Q_strlen(params.GetToken(1));
+	unsigned int len = Q_strlen(params.GetToken(1));
 	if (len > sizeof(name) - 1) {
 		m_System->Printf("Invalid name length.\n");
 		return;

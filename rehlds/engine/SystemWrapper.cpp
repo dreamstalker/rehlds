@@ -54,7 +54,7 @@ BOOL SystemWrapper_LoadModule(char *interfacename, char *library, char *instance
 	return FALSE;
 }
 
-void SystemWrapper_ExecuteString(char *command)
+void SystemWrapper_ExecuteString(const char *command)
 {
 	gSystemWrapper.ExecuteString(command);
 }
@@ -234,7 +234,7 @@ void SystemWrapper::CMD_UnloadModule(char *cmdLine)
 
 SystemWrapper::library_t *SystemWrapper::GetLibrary(char *name)
 {
-	char fixedname[MAX_PATH];
+	char fixedname[MAX_PATH-4]; // reserve for extension so/dll
 	Q_strlcpy(fixedname, name);
 	COM_FixSlashes(fixedname);
 
@@ -550,49 +550,56 @@ bool SystemWrapper::RemoveModule(ISystemModule *module)
 	return false;
 }
 
-void SystemWrapper::ExecuteString(char *commands)
+void SystemWrapper::ExecuteString(const char *commands)
 {
 	if (!commands || !commands[0])
 		return;
 
-	int size = 0;
-	char singleCmd[256] = "";
-	bool quotes = false;
-	char *p = singleCmd;
-	char *c = commands;
+	// Remove format characters to block format string attacks
+	COM_RemoveEvilChars(const_cast<char *>(commands));
 
-	COM_RemoveEvilChars(c);
-	while (true)
+	bool bInQuote = false;
+
+	char *pszDest;
+	char singleCmd[256] = {0};
+
+	const char *pszSource = commands;
+	while (*pszSource)
 	{
-		*p = *c;
+		// Parse out single commands and execute them
+		pszDest = singleCmd;
 
-		if (++size >= sizeof(singleCmd))
+		unsigned int i;
+		for (i = 0; i < ARRAYSIZE(singleCmd); i++)
 		{
-			DPrintf("WARNING! System::ExecuteString: Command token too long.\n");
-			break;
+			char c = *pszSource++;
+
+			*pszDest++ = c;
+
+			if (c == '"')
+			{
+				bInQuote = !bInQuote;
+			}
+			else if (c == ';' && !bInQuote)
+			{
+				// End of command and not in a quoted string
+				break;
+			}
 		}
 
-		if (*c == '"')
-			quotes = !quotes;
-
-		if ((*c != ';' || quotes) && *c)
+		if (i >= ARRAYSIZE(singleCmd))
 		{
-			++p;
-		}
-		else
-		{
-			*p = '\0';
-
-			char *cmd = singleCmd;
-			while (*cmd == ' ') { cmd++; }
-
-			DispatchCommand(cmd);
-			p = singleCmd;
-			size = 0;
+			Printf("WARNING! System::ExecuteString: Command token too long.\n");
+			return;
 		}
 
-		if (!*c++)
-			break;
+		*pszDest = '\0';
+
+		char *pszCmd = singleCmd;
+		while (*pszCmd == ' ')
+			pszCmd++; // skip leading whitespaces
+
+		DispatchCommand(pszCmd);
 	}
 }
 
@@ -699,7 +706,7 @@ void EngineWrapper::DemoUpdateClientData(client_data_t *cdat)
 void EngineWrapper::CL_QueueEvent(int flags, int index, float delay, event_args_t *pargs)
 {
 #ifndef SWDS
-	CL_QueueEvent(flags, index, delay, pargs);
+	::CL_QueueEvent(flags, index, delay, pargs);
 #endif // SWDS
 }
 
@@ -713,14 +720,14 @@ void EngineWrapper::HudWeaponAnim(int iAnim, int body)
 void EngineWrapper::CL_DemoPlaySound(int channel, char *sample, float attenuation, float volume, int flags, int pitch)
 {
 #ifndef SWDS
-	CL_DemoPlaySound(channel, sample, attenuation, volume, flags, pitch);
+	::CL_DemoPlaySound(channel, sample, attenuation, volume, flags, pitch);
 #endif // SWDS
 }
 
 void EngineWrapper::ClientDLL_ReadDemoBuffer(int size, unsigned char *buffer)
 {
 #ifndef SWDS
-	ClientDLL_ReadDemoBuffer();
+	::ClientDLL_ReadDemoBuffer();
 #endif // SWDS
 }
 
@@ -741,7 +748,7 @@ char *EngineWrapper::GetStatusLine()
 
 void EngineWrapper::Cbuf_AddText(char *text)
 {
-	Cbuf_AddText(text);
+	::Cbuf_AddText(text);
 }
 
 #ifdef REHLDS_FIXES

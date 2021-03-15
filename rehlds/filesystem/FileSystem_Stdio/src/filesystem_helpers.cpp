@@ -172,7 +172,7 @@ void NORETURN FileSystem_SysError(const char *fmt, ...)
 	fprintf(fl, "%s\n", string);
 	fclose(fl);
 
-	int *null = 0;
+	volatile int *null = 0;
 	*null = 0;
 	exit(-1);
 }

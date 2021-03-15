@@ -57,7 +57,7 @@ public:
 	Panel *GetPanel();
 	bool RegisterCommand(char *name, ISystemModule *module, int commandID);
 	void GetCommandMatches(char *string, ObjectList *pMatchList);
-	void ExecuteString(char *commands);
+	void ExecuteString(const char *commands);
 	void ExecuteFile(char *filename);
 	void Errorf(char *fmt, ...);
 	char *CheckParam(char *param);
@@ -102,7 +102,7 @@ protected:
 	bool DispatchCommand(char *command);
 	void ExecuteCommandLine();
 	void UpdateTime();
-	char *GetInput();
+	const char *GetInput();
 	bool StartVGUI();
 	void StopVGUI();
 	void SetName(char *newName);
@@ -183,4 +183,4 @@ private:
 
 extern System gSystem;
 
-void Sys_Printf(char *fmt, ...);
+void Sys_Printf(const char *fmt, ...);

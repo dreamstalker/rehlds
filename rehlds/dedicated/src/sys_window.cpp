@@ -37,18 +37,18 @@ public:
 	bool GetExecutableName(char *out) override;
 	void ErrorMessage(int level, const char *msg) override;
 
-	void WriteStatusText(char *szText) override;
+	void WriteStatusText(const char *szText) override;
 	void UpdateStatus(int force) override;
 
-	long LoadLibrary(char *lib) override;
+	long LoadLibrary(const char *lib) override;
 	void FreeLibrary(long library) override;
 
 	bool CreateConsoleWindow() override;
 	void DestroyConsoleWindow() override;
 
-	void ConsoleOutput(char *string) override;
-	char *ConsoleInput() override;
-	void Printf(char *fmt, ...) override;
+	void ConsoleOutput(const char *string) override;
+	const char *ConsoleInput() override;
+	void Printf(const char *fmt, ...) override;
 };
 
 CSys g_Sys;
@@ -93,7 +93,7 @@ void CSys::ErrorMessage(int level, const char *msg)
 	PostQuitMessage(0);
 }
 
-void CSys::WriteStatusText(char *szText)
+void CSys::WriteStatusText(const char *szText)
 {
 	SetConsoleTitle(szText);
 }
@@ -125,7 +125,7 @@ void CSys::UpdateStatus(int force)
 	console.UpdateStatus();
 }
 
-long CSys::LoadLibrary(char *lib)
+long CSys::LoadLibrary(const char *lib)
 {
 	void *hDll = ::LoadLibrary(lib);
 	return (long)hDll;
@@ -160,7 +160,7 @@ void CSys::DestroyConsoleWindow()
 	DeinitConProc();
 }
 
-void CSys::ConsoleOutput(char *string)
+void CSys::ConsoleOutput(const char *string)
 {
 	if (g_bVGui)
 	{
@@ -172,12 +172,12 @@ void CSys::ConsoleOutput(char *string)
 	}
 }
 
-char *CSys::ConsoleInput()
+const char *CSys::ConsoleInput()
 {
 	return console.GetLine();
 }
 
-void CSys::Printf(char *fmt, ...)
+void CSys::Printf(const char *fmt, ...)
 {
 	// Dump text to debugging console.
 	va_list argptr;

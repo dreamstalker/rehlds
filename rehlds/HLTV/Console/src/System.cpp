@@ -48,7 +48,7 @@ char *System::GetBaseDir()
 	return COM_GetBaseDir();
 }
 
-void Sys_Printf(char *fmt, ...)
+void Sys_Printf(const char *fmt, ...)
 {
 	// Dump text to debugging console.
 	va_list argptr;
@@ -151,49 +151,56 @@ bool System::RegisterCommand(char *name, ISystemModule *module, int commandID)
 	return true;
 }
 
-void System::ExecuteString(char *commands)
+void System::ExecuteString(const char *commands)
 {
 	if (!commands || !commands[0])
 		return;
 
-	int size = 0;
-	char singleCmd[256] = "";
-	bool quotes = false;
-	char *p = singleCmd;
-	char *c = commands;
+	// Remove format characters to block format string attacks
+	COM_RemoveEvilChars(const_cast<char *>(commands));
 
-	COM_RemoveEvilChars(c);
-	while (true)
+	bool bInQuote = false;
+
+	char *pszDest;
+	char singleCmd[256] = {0};
+
+	const char *pszSource = commands;
+	while (*pszSource)
 	{
-		*p = *c;
+		// Parse out single commands and execute them
+		pszDest = singleCmd;
 
-		if (++size >= sizeof(singleCmd))
+		unsigned int i;
+		for (i = 0; i < ARRAYSIZE(singleCmd); i++)
 		{
-			DPrintf("WARNING! System::ExecuteString: Command token too long.\n");
-			break;
+			char c = *pszSource++;
+
+			*pszDest++ = c;
+
+			if (c == '"')
+			{
+				bInQuote = !bInQuote;
+			}
+			else if (c == ';' && !bInQuote)
+			{
+				// End of command and not in a quoted string
+				break;
+			}
 		}
 
-		if (*c == '"')
-			quotes = !quotes;
-
-		if ((*c != ';' || quotes) && *c)
+		if (i >= ARRAYSIZE(singleCmd))
 		{
-			++p;
-		}
-		else
-		{
-			*p = '\0';
-
-			char *cmd = singleCmd;
-			while (*cmd == ' ') { cmd++; }
-
-			DispatchCommand(cmd);
-			p = singleCmd;
-			size = 0;
+			Printf("WARNING! System::ExecuteString: Command token too long.\n");
+			return;
 		}
 
-		if (!*c++)
-			break;
+		*pszDest = '\0';
+
+		char *pszCmd = singleCmd;
+		while (*pszCmd == ' ')
+			pszCmd++; // skip leading whitespaces
+
+		DispatchCommand(pszCmd);
 	}
 }
 
@@ -887,7 +894,7 @@ void System::UpdateTime()
 	m_SystemTime = m_Counter.GetCurTime();
 }
 
-char *System::GetInput()
+const char *System::GetInput()
 {
 	return m_Console.GetLine();
 }
