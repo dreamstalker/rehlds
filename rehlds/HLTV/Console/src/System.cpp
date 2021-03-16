@@ -173,19 +173,19 @@ void System::ExecuteString(const char *commands)
 		unsigned int i;
 		for (i = 0; i < ARRAYSIZE(singleCmd); i++)
 		{
-			char c = *pszSource++;
-
-			*pszDest++ = c;
+			const char c = *pszSource++;
 
 			if (c == '"')
 			{
 				bInQuote = !bInQuote;
 			}
-			else if (c == ';' && !bInQuote)
+			else if ((c == ';' && !bInQuote) || !c)
 			{
 				// End of command and not in a quoted string
 				break;
 			}
+
+			*pszDest++ = c;
 		}
 
 		if (i >= ARRAYSIZE(singleCmd))
