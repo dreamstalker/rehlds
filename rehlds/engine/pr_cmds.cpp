@@ -313,7 +313,7 @@ void EXT_FUNC PF_ambientsound_I(edict_t *entity, float *pos, const char *samp, f
 void EXT_FUNC PF_sound_I(edict_t *entity, int channel, const char *sample, float volume, float attenuation, int fFlags, int pitch)
 {
 #ifdef REHLDS_FIXES
-	auto checkBounds = [&](double varValue, char const* varName, double min, double max) {
+	auto checkBounds = [&](double varValue, char const *varName, double min, double max) {
 		if (!(min <= varValue && varValue <= max)) {
 			Sys_Error("EMIT_SOUND: %s=%g out of bounds %g-%g\nEntity classname = %s, sound = %s\n", varName, varValue, min, max, entity->v.classname + pr_strings, sample);
 		}
