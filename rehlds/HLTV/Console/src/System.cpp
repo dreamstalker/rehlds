@@ -234,7 +234,7 @@ ISystemModule *System::FindModule(char *type, char *name)
 	while (module)
 	{
 		if (Q_stricmp(type, module->GetType()) == 0
-		&& (!name || Q_stricmp(name, module->GetType()) == 0)) {
+		&& (!name || Q_stricmp(name, module->GetName()) == 0)) {
 			return module;
 		}
 
