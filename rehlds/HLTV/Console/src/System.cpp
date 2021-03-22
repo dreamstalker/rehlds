@@ -173,7 +173,7 @@ void System::ExecuteString(const char *commands)
 		unsigned int i;
 		for (i = 0; i < ARRAYSIZE(singleCmd); i++)
 		{
-			const char c = *pszSource++;
+			const char c = *pszSource;
 
 			if (c == '"')
 			{
@@ -186,6 +186,7 @@ void System::ExecuteString(const char *commands)
 			}
 
 			*pszDest++ = c;
+			pszSource++;
 		}
 
 		if (i >= ARRAYSIZE(singleCmd))
