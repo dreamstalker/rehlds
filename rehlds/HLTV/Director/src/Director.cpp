@@ -32,6 +32,25 @@
 EXPOSE_SINGLE_INTERFACE(Director, IDirector, DIRECTOR_INTERFACE_VERSION);
 #endif // DIRECTOR_MODULE
 
+#if !defined(_WIN32) && __GNUC__ >= 8
+
+#define GLIBC_expf_VERSION "2.0"
+
+//
+// Building go on GCC 8.3 or greater that have newest expf GLIBC.2.27 than
+// available on the destination virtual machine, so we can downgrade GLIBC version
+// for this function.
+// Use for linker: -Wl,--wrap=expf
+
+extern int expf(int __fd, int __cmd, ...);
+__asm__(".symver expf,expf@GLIBC_" GLIBC_expf_VERSION);
+DLL_EXPORT float __wrap_expf(float x)
+{
+	return expf(x);
+}
+
+#endif // #if defined(_WIN32)
+
 bool Director::Init(IBaseSystem *system, int serial, char *name)
 {
 	BaseSystemModule::Init(system, serial, name);
@@ -49,7 +68,7 @@ bool Director::Init(IBaseSystem *system, int serial, char *name)
 	m_slowMotion = 0.5f;
 
 	for (int i = 0; i < MAX_WORLD_HISTORY; i++) {
-		m_gaussFilter[i] = 1.0f / exp((i * i) / 10000.0f);
+		m_gaussFilter[i] = 1.0f / expf((i * i) / 10000.0f);
 	}
 
 	m_World = nullptr;

@@ -41,6 +41,10 @@ else()
 		-Wno-write-strings -Wno-strict-aliasing")
 endif()
 
+if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 8.0)
+	set(CMAKE_EXE_LINKER_FLAGS	"${CMAKE_EXE_LINKER_FLAGS} -Wl,--wrap=expf")
+endif()
+
 set(PROJECT_SRC_DIR
 	"${PROJECT_SOURCE_DIR}/src"
 	"${PROJECT_SOURCE_DIR}/../"
