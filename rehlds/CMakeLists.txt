@@ -109,8 +109,6 @@ include_directories(
 	${PROJECT_PUBLIC_DIR}
 )
 
-link_directories(${PROJECT_SOURCE_DIR}/lib/linux32)
-
 add_definitions(
 	-DSWDS
 	-DREHLDS_JIT
@@ -132,6 +130,8 @@ add_definitions(
 	-D_vsnprintf=vsnprintf
 	-D_vsnwprintf=vswprintf
 )
+
+set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-rpath,'$ORIGIN/.' -L${PROJECT_SOURCE_DIR}/lib/linux32")
 
 if (NOT TARGET bzip2)
 	add_subdirectory(../dep/bzip2 lib)
