@@ -118,7 +118,7 @@ init()
 
 update_appversion()
 {
-	day=$(date +%m)
+	day=$(date +%d)
 	year=$(date +%Y)
 	hours=$(date +%H:%M:%S)
 	month=$(LANG=en_us_88591; date +"%b")
