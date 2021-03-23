@@ -42,7 +42,7 @@ else()
 		-Wno-unknown-pragmas -Wno-unused-result -Wno-unused-variable -Wno-unused-function\
 		-Wno-write-strings -Wno-sign-compare")
 
-	if (NOT USE_CLANG_COMPILER)
+	if (NOT USE_CLANG_COMPILER AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 8.0)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-stringop-truncation -Wno-class-memaccess")
 	endif()
 endif()

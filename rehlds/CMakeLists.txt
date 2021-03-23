@@ -47,7 +47,11 @@ else()
 		-Wno-sign-compare -Wno-strict-aliasing -Wno-ignored-attributes")
 
 	if (NOT USE_CLANG_COMPILER)
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-stringop-truncation -Wno-format-truncation -Wno-unused-but-set-variable -Wno-class-memaccess")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-but-set-variable")
+
+		if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 8.0)
+			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-stringop-truncation -Wno-format-truncation -Wno-class-memaccess")
+		endif()
 	endif()
 endif()
 
