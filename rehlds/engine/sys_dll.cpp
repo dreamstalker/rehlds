@@ -597,6 +597,20 @@ double EXT_FUNC Sys_FloatTime(void)
 
 #else // not _WIN32
 
+#if __GNUC__ >= 8
+
+#define GLIBC_clock_gettime_VERSION "2.2"
+
+//
+// Building go on GCC 8.3 or greater that have newest clock_gettime GLIBC.2.17 than
+// available on the destination virtual machine, so we can downgrade GLIBC version
+// for this function.
+// NOTE: This workaround seem not compatible with -flto compile GCC option.
+
+__asm__(".symver clock_gettime,clock_gettime@GLIBC_" GLIBC_clock_gettime_VERSION);
+
+#endif // #if __GNUC__ >= 8
+
 double Sys_FloatTime(void)
 {
 	static struct timespec start_time;

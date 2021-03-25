@@ -40,9 +40,17 @@ if (USE_INTEL_COMPILER)
 else()
 	# Produce code optimized for the most common IA32/AMD64/EM64T processors.
 	# As new processors are deployed in the marketplace, the behavior of this option will change.
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mtune=generic -msse3 -flto\
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mtune=generic -msse3\
 		-fpermissive -fno-sized-deallocation\
 		-Wno-unused-result")
+
+	if (NOT USE_CLANG_COMPILER AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 8.0)
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-stringop-truncation -Wno-format-truncation")
+	endif()
+endif()
+
+if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 8.0)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcf-protection=none")
 endif()
 
 set(PROJECT_SRC_DIR
@@ -87,6 +95,7 @@ add_definitions(
 	-D_LINUX
 	-DLINUX
 	-D_GLIBCXX_USE_CXX11_ABI=0
+	-U_FORTIFY_SOURCE
 	-D_stricmp=strcasecmp
 	-D_strnicmp=strncasecmp
 	-D_strdup=strdup

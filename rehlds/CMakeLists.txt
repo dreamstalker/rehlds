@@ -17,7 +17,7 @@ elseif (USE_CLANG_COMPILER)
 	set(CMAKE_CXX_COMPILER	"/usr/bin/clang++")
 endif()
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -fno-rtti -fno-exceptions")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -fno-rtti -fno-plt -fno-exceptions")
 
 # Remove noxref code and data
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ffunction-sections -fdata-sections")
@@ -34,7 +34,7 @@ if (USE_INTEL_COMPILER)
 
 	if (NOT DEBUG)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ipo")
-		set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_CXX_FLAGS} -ipo")
+		set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -ipo")
 	endif()
 else()
 	# Produce code optimized for the most common IA32/AMD64/EM64T processors.
@@ -53,6 +53,10 @@ else()
 			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-stringop-truncation -Wno-format-truncation -Wno-class-memaccess")
 		endif()
 	endif()
+endif()
+
+if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 8.0)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcf-protection=none")
 endif()
 
 if (NOT DEBUG AND USE_STATIC_LIBSTDC)
@@ -127,6 +131,7 @@ add_definitions(
 	-D_LINUX
 	-DLINUX
 	-D_GLIBCXX_USE_CXX11_ABI=0
+	-U_FORTIFY_SOURCE
 	-D_stricmp=strcasecmp
 	-D_strnicmp=strncasecmp
 	-D_strdup=strdup
@@ -147,6 +152,6 @@ endif()
 
 add_library(engine SHARED ${appversion.sh} ${ENGINE_SRCS} ${COMMON_SRCS} ${PUBLIC_SRCS})
 set_property(TARGET engine PROPERTY LIBRARY_OUTPUT_NAME engine_i486)
-set_target_properties(engine PROPERTIES PREFIX "" COMPILE_FLAGS "-m32" LINK_FLAGS "-m32" POSITION_INDEPENDENT_CODE ON)
+set_target_properties(engine PROPERTIES PREFIX "" COMPILE_FLAGS "-m32" LINK_FLAGS "-m32" POSITION_INDEPENDENT_CODE OFF)
 target_link_libraries(engine dl rt m aelf32 bzip2 steam_api)
 add_dependencies(engine appversion)

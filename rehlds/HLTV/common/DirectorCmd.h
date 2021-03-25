@@ -40,7 +40,7 @@ public:
 	void Copy(DirectorCmd *cmd);
 	void Resize(int size);
 	void FromString(char *string);
-	char *ToString();
+	const char *ToString();
 	void WriteToStream(BitBuffer *stream);
 	bool ReadFromStream(BitBuffer *stream);
 	int GetType();

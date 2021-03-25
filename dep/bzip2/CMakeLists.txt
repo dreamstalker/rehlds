@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.1)
 project(bzip2 C)
 
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g0 -O1 -fno-stack-protector")
+
 set(BZIP2_SRCS
 	"src/blocksort.c"
 	"src/bzlib.c"
@@ -18,4 +20,4 @@ include_directories(
 )
 
 add_library(bzip2 STATIC ${BZIP2_SRCS})
-set_target_properties(bzip2 PROPERTIES COMPILE_FLAGS "-m32" POSITION_INDEPENDENT_CODE ON)
+set_target_properties(bzip2 PROPERTIES COMPILE_FLAGS "-m32")

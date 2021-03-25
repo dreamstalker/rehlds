@@ -16,7 +16,7 @@ elseif (USE_CLANG_COMPILER)
 	set(CMAKE_CXX_COMPILER	"/usr/bin/clang++")
 endif()
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -fno-exceptions")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -fno-plt -fno-exceptions")
 
 if (DEBUG)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g3 -O3 -ggdb")
@@ -30,23 +30,27 @@ if (USE_INTEL_COMPILER)
 
 	if (NOT DEBUG)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ipo")
-		set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_CXX_FLAGS} -ipo")
+		set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -ipo")
 	endif()
 else()
 	# Produce code optimized for the most common IA32/AMD64/EM64T processors.
 	# As new processors are deployed in the marketplace, the behavior of this option will change.
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mtune=generic -msse3 -flto\
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mtune=generic -msse3\
 		-fpermissive -fno-sized-deallocation\
 		-Wno-unused-result -Wno-unknown-pragmas -Wno-unused-variable\
 		-Wno-write-strings -Wno-strict-aliasing")
 
 	if (USE_CLANG_COMPILER)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-private-field")
+	else()
+		if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 8.0)
+			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-stringop-truncation -Wno-format-truncation")
+		endif()
 	endif()
 endif()
 
 if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 8.0)
-	set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--wrap=expf")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcf-protection=none")
 endif()
 
 set(PROJECT_SRC_DIR
@@ -112,6 +116,7 @@ add_definitions(
 	-D_LINUX
 	-DLINUX
 	-D_GLIBCXX_USE_CXX11_ABI=0
+	-U_FORTIFY_SOURCE
 	-D_stricmp=strcasecmp
 	-D_strnicmp=strncasecmp
 	-D_strdup=strdup

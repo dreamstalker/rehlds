@@ -51,6 +51,10 @@ foreach(f ${WRAP_FUNCS_LIST})
 	set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-wrap,${f}")
 endforeach()
 
+if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 8.0)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcf-protection=none")
+endif()
+
 set(PROJECT_SRC_DIR
 	"${PROJECT_SOURCE_DIR}/src"
 	"${PROJECT_SOURCE_DIR}/../.."
@@ -80,6 +84,7 @@ add_definitions(
 	-D_LINUX
 	-DLINUX
 	-D_GLIBCXX_USE_CXX11_ABI=0
+	-U_FORTIFY_SOURCE
 	-D_strdup=strdup
 	-D_stricmp=strcasecmp
 	-D_strnicmp=strncasecmp

@@ -40,14 +40,9 @@ EXPOSE_SINGLE_INTERFACE(Director, IDirector, DIRECTOR_INTERFACE_VERSION);
 // Building go on GCC 8.3 or greater that have newest expf GLIBC.2.27 than
 // available on the destination virtual machine, so we can downgrade GLIBC version
 // for this function.
-// Use for linker: -Wl,--wrap=expf
+// NOTE: This workaround seem not compatible with -flto compile GCC option.
 
-extern int expf(int __fd, int __cmd, ...);
 __asm__(".symver expf,expf@GLIBC_" GLIBC_expf_VERSION);
-DLL_EXPORT float __wrap_expf(float x)
-{
-	return expf(x);
-}
 
 #endif // #if defined(_WIN32)
 
@@ -389,9 +384,9 @@ float Director::AddBestGenericCut()
 	int seqNrMod = m_nextCutSeqnr % m_historyLength;
 
 	float sumTarget2Rank[MAX_CLIENTS];
-	float bestTarget2Rank, bestRank = 0;
+	float bestTarget2Rank, bestRank = 0.0f;
 	float targetRankSum = 0;
-	int newTarget, newTarget2;
+	int newTarget = 0, newTarget2 = 0;
 	int bestTarget2;
 
 	for (int i = 0; i < MAX_CLIENTS; i++)

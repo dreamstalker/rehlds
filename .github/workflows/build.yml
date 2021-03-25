@@ -117,6 +117,23 @@ jobs:
           mv build/rehlds/HLTV/Director/director.so publish/bin/linux32/valve/dlls/director.so
           mv build/rehlds/filesystem/FileSystem_Stdio/filesystem_stdio.so publish/bin/linux32/filesystem_stdio.so
 
+      - name: Run GLIBC/ABI version compat test
+        run: |
+          binaries=(
+            "publish/bin/linux32/engine_i486.so"
+            "publish/bin/linux32/hlds_linux"
+            "publish/bin/linux32/hltv"
+            "publish/bin/linux32/core.so"
+            "publish/bin/linux32/proxy.so"
+            "publish/bin/linux32/demoplayer.so"
+            "publish/bin/linux32/valve/dlls/director.so"
+            "publish/bin/linux32/filesystem_stdio.so"
+          )
+          bash ./rehlds/version/glibc_test.sh ${binaries[@]}
+          if [[ $? -ne 0 ]]; then
+            exit 1 # Assertion failed
+          fi
+  
       - name: Deploy artifacts
         uses: actions/upload-artifact@v2
         id: upload-job
