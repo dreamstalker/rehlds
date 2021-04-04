@@ -7,7 +7,7 @@ main()
 	declare -A threshold_version
 	threshold_version[CXXABI]="1.3.5"
 	threshold_version[GLIBCXX]="3.4.15"
-	threshold_version[GLIBC]="2.7"
+	threshold_version[GLIBC]="2.11"
 
 	for k in "${!threshold_version[@]}"; do
 		for f in "${files[@]}"
