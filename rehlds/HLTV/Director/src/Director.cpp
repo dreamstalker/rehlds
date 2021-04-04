@@ -32,20 +32,6 @@
 EXPOSE_SINGLE_INTERFACE(Director, IDirector, DIRECTOR_INTERFACE_VERSION);
 #endif // DIRECTOR_MODULE
 
-#if !defined(_WIN32) && __GNUC__ >= 8
-
-#define GLIBC_expf_VERSION "2.0"
-
-//
-// Building go on GCC 8.3 or greater that have newest expf GLIBC.2.27 than
-// available on the destination virtual machine, so we can downgrade GLIBC version
-// for this function.
-// NOTE: This workaround seem not compatible with -flto compile GCC option.
-
-__asm__(".symver expf,expf@GLIBC_" GLIBC_expf_VERSION);
-
-#endif // #if defined(_WIN32)
-
 bool Director::Init(IBaseSystem *system, int serial, char *name)
 {
 	BaseSystemModule::Init(system, serial, name);

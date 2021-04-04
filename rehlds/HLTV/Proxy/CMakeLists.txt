@@ -35,7 +35,7 @@ if (USE_INTEL_COMPILER)
 else()
 	# Produce code optimized for the most common IA32/AMD64/EM64T processors.
 	# As new processors are deployed in the marketplace, the behavior of this option will change.
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mtune=generic -msse3\
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mtune=generic -msse3 -flto\
 		-fpermissive -fno-sized-deallocation\
 		-Wno-unused-result -Wno-unknown-pragmas -Wno-unused-variable\
 		-Wno-write-strings -Wno-strict-aliasing")
@@ -131,5 +131,5 @@ if (NOT TARGET bzip2)
 endif()
 
 add_library(proxy SHARED ${PROXY_SRCS} ${COMMON_SRCS})
-target_link_libraries(proxy dl bzip2 steam_api)
+target_link_libraries(proxy dl m bzip2 steam_api)
 set_target_properties(proxy PROPERTIES PREFIX "" COMPILE_FLAGS "-m32" LINK_FLAGS "-m32" POSITION_INDEPENDENT_CODE ON)
