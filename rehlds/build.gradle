@@ -177,7 +177,7 @@ void setupToolchain(NativeBinarySpec b) {
 		cfg.linkerOptions.args '-Wl,--version-script=../version_script.lds', '-Wl,--gc-sections'
 
 		cfg.projectLibpath(project, '/lib/linux32')
-		cfg.extraLibs 'rt', 'dl', 'm', 'steam_api', 'aelf32'
+		cfg.extraLibs 'rt', 'dl', 'm', 'steam_api', 'aelf32', 'pthread'
 	}
 
 	if (unitTestExecutable) {

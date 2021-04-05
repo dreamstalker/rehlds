@@ -81,6 +81,7 @@
 	#include <sys/types.h>
 	#include <sys/sysinfo.h>
 	#include <unistd.h>
+	#include <pthread.h>
 #endif // _WIN32
 
 #include <string>
