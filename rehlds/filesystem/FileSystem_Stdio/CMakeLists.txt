@@ -2,26 +2,10 @@ cmake_minimum_required(VERSION 3.1)
 project(filesystem_stdio CXX)
 
 option(DEBUG "Build with debug information." OFF)
-option(USE_INTEL_COMPILER "Use the Intel compiler." OFF)
-option(USE_CLANG_COMPILER "Use the Clang compiler." OFF)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-set(WRAP_FUNCS_LIST
-	"scandir" "opendir" "freopen" "fopen" "fopen64" "open" "open64" "creat"
-	"access" "stat" "lstat" "__xstat" "__lxstat" "__xstat64" "__lxstat64"
-	"chmod" "chown" "lchown" "unlink" "symlink" "link" "mknod" "mount"
-	"mkfifo" "rename" "utime" "utimes" "mkdir" "rmdir"
-)
-
-if (USE_INTEL_COMPILER)
-	set(CMAKE_C_COMPILER	"/opt/intel/bin/icc")
-	set(CMAKE_CXX_COMPILER	"/opt/intel/bin/icpc")
-elseif (USE_CLANG_COMPILER)
-	set(CMAKE_C_COMPILER	"/usr/bin/clang")
-	set(CMAKE_CXX_COMPILER	"/usr/bin/clang++")
-endif()
+set(CMAKE_SHARED_LIBRARY_CXX_FLAGS "")
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -fno-exceptions")
 
@@ -31,26 +15,38 @@ else()
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g0 -O3 -fno-stack-protector")
 endif()
 
-if (USE_INTEL_COMPILER)
+# Check Intel C++ compiler
+if ($ENV{CXX} MATCHES "icpc")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Qoption,cpp,--treat_func_as_string_literal_cpp")
 	set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -static-intel -no-intel-extensions")
 else()
 	# Produce code optimized for the most common IA32/AMD64/EM64T processors.
 	# As new processors are deployed in the marketplace, the behavior of this option will change.
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mtune=generic -msse3\
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} \
+		-mtune=generic -msse3\
 		-fpermissive -fno-sized-deallocation\
-		-Wno-unknown-pragmas -Wno-unused-result -Wno-unused-variable -Wno-unused-function\
+		-Wno-unknown-pragmas -Wno-unused-variable -Wno-unused-result -Wno-unused-function\
 		-Wno-write-strings -Wno-sign-compare")
 
-	if (NOT USE_CLANG_COMPILER AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 8.0)
+	# Check if not Clang compiler AND GCC >= 8.3
+	if (NOT $ENV{CXX} MATCHES "clang" AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 8.0)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-stringop-truncation -Wno-class-memaccess")
 	endif()
 endif()
+
+# NOTE: Don't use IPO or LTO with '--wrap' may make this feature ineffective
+set(WRAP_FUNCS_LIST
+	"scandir" "opendir" "freopen" "fopen" "fopen64" "open" "open64" "creat"
+	"access" "stat" "lstat" "__xstat" "__lxstat" "__xstat64" "__lxstat64"
+	"chmod" "chown" "lchown" "unlink" "symlink" "link" "mknod" "mount"
+	"mkfifo" "rename" "utime" "utimes" "mkdir" "rmdir"
+)
 
 foreach(f ${WRAP_FUNCS_LIST})
 	set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-wrap,${f}")
 endforeach()
 
+# GCC >= 8.3
 if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 8.0)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcf-protection=none")
 endif()
@@ -94,5 +90,13 @@ add_definitions(
 )
 
 add_library(filesystem_stdio SHARED ${FILESYSTEM_STDIO_SRCS})
-set_target_properties(filesystem_stdio PROPERTIES PREFIX "" COMPILE_FLAGS "-m32" LINK_FLAGS "-m32" POSITION_INDEPENDENT_CODE ON)
+
+set_target_properties(filesystem_stdio PROPERTIES
+	LIBRARY_OUTPUT_NAME filesystem_stdio
+	PREFIX ""
+	COMPILE_FLAGS "-m32"
+	LINK_FLAGS "-m32"
+	POSITION_INDEPENDENT_CODE OFF
+)
+
 target_link_libraries(filesystem_stdio dl)

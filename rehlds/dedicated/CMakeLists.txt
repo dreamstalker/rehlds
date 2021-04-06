@@ -2,19 +2,9 @@ cmake_minimum_required(VERSION 3.1)
 project(hlds CXX)
 
 option(DEBUG "Build with debug information." OFF)
-option(USE_INTEL_COMPILER "Use the Intel compiler." OFF)
-option(USE_CLANG_COMPILER "Use the Clang compiler." OFF)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-if (USE_INTEL_COMPILER)
-	set(CMAKE_C_COMPILER	"/opt/intel/bin/icc")
-	set(CMAKE_CXX_COMPILER	"/opt/intel/bin/icpc")
-elseif (USE_CLANG_COMPILER)
-	set(CMAKE_C_COMPILER	"/usr/bin/clang")
-	set(CMAKE_CXX_COMPILER	"/usr/bin/clang++")
-endif()
 
 set(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "")
 set(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "")
@@ -29,7 +19,8 @@ endif()
 
 set(CMAKE_EXE_LINKER_FLAGS "-no-pie -Wl,--no-export-dynamic")
 
-if (USE_INTEL_COMPILER)
+# Check Intel C++ compiler
+if ($ENV{CXX} MATCHES "icpc")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Qoption,cpp,--treat_func_as_string_literal_cpp")
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static-intel -no-intel-extensions")
 
@@ -40,15 +31,18 @@ if (USE_INTEL_COMPILER)
 else()
 	# Produce code optimized for the most common IA32/AMD64/EM64T processors.
 	# As new processors are deployed in the marketplace, the behavior of this option will change.
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mtune=generic -msse3\
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} \
+		-mtune=generic -msse3\
 		-fpermissive -fno-sized-deallocation\
 		-Wno-unused-result")
 
-	if (NOT USE_CLANG_COMPILER AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 8.0)
+	# Check if not Clang compiler AND GCC >= 8.3
+	if (NOT $ENV{CXX} MATCHES "clang" AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 8.0)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-stringop-truncation -Wno-format-truncation")
 	endif()
 endif()
 
+# GCC >= 8.3
 if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 8.0)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcf-protection=none")
 endif()
@@ -102,6 +96,18 @@ add_definitions(
 	-D_vsnprintf=vsnprintf
 )
 
+if (NOT TARGET appversion)
+	add_custom_target(appversion DEPENDS COMMAND "${PROJECT_SOURCE_DIR}/../../version/appversion.sh" "${PROJECT_SOURCE_DIR}/../..")
+endif()
+
 add_executable(hlds ${DEDICATED_SRCS} ${COMMON_SRCS})
+add_dependencies(hlds appversion)
+
 target_link_libraries(hlds dl)
-set_target_properties(hlds PROPERTIES OUTPUT_NAME hlds_linux PREFIX "" COMPILE_FLAGS "-m32" LINK_FLAGS "-m32")
+set_target_properties(hlds PROPERTIES
+	OUTPUT_NAME hlds_linux
+	PREFIX ""
+	COMPILE_FLAGS "-m32"
+	LINK_FLAGS "-m32"
+	POSITION_INDEPENDENT_CODE OFF
+)

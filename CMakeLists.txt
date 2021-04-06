@@ -5,6 +5,10 @@ if (WIN32)
 	message(FATAL_ERROR "CMakeLists.txt Windows platform isn't supported yet. Use msvc/ReHLDS.sln instead it!")
 endif()
 
+add_custom_target(appversion DEPENDS
+	COMMAND "${PROJECT_SOURCE_DIR}/rehlds/version/appversion.sh" "${PROJECT_SOURCE_DIR}"
+)
+
 add_subdirectory(rehlds)
 add_subdirectory(rehlds/dedicated)
 add_subdirectory(rehlds/filesystem)

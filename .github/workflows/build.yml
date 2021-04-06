@@ -72,6 +72,7 @@ jobs:
   linux:
     name: 'Linux'
     runs-on: ubuntu-latest
+    container: s1lentq/linux86buildtools:latest
 
     steps:
       - name: Checkout
@@ -79,21 +80,9 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Check dependencies
+      - name: Build using Intel C++ Compiler
         run: |
-          sudo dpkg --add-architecture i386
-          sudo apt-get update
-          sudo apt-get install -y gcc-multilib g++-multilib
-          sudo apt-get install -y build-essential
-          sudo apt-get install -y libc6-dev libc6-dev-i386
-          sudo apt-get install -y p7zip-full
-
-      - name: Build
-        run: |
-          mkdir build
-          cd build
-          cmake ../
-          make
+          rm -rf build && CC=icc CXX=icpc cmake -B build && cmake --build build -j8
 
       - name: Prepare HLSDK
         run: |
@@ -133,7 +122,8 @@ jobs:
           if [[ $? -ne 0 ]]; then
             exit 1 # Assertion failed
           fi
-  
+        shell: bash
+
       - name: Deploy artifacts
         uses: actions/upload-artifact@v2
         id: upload-job

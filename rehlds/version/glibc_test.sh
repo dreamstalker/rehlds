@@ -14,7 +14,15 @@ main()
 		do
 			:
 			version=$(readelf -sV $f | sed -n 's/.*@'$k'_//p' | sort -u -V | tail -1 | cut -d ' ' -f 1)
-			if [[ ! -z "$version" ]]; then
+
+			# version no present - skipped
+			if [[ -z "$version" ]]; then
+				version="UND"
+			# version is private - skipped
+			elif [ "$version" = "PRIVATE" ]; then
+				version="PRV"
+			# ensure numeric
+			elif [[ $version =~ ^[0-9]+$ ]]; then
 				check_version_greater $version ${threshold_version[$k]}
 				if [[ $? -eq 1 ]]; then
 					echo -e "\033[0;31mAssertion failed:\033[0m Binary \033[0;32m${f}\033[0m has ${k}_\033[0;33m$version\033[0m greater than max version ${k}_\033[0;33m${threshold_version[$k]}\033[0m"
@@ -23,7 +31,11 @@ main()
 			fi
 		done
 
-		echo -e "[\033[0;32mOK\033[0m] ${k}_\033[0;33m${threshold_version[$k]}\033[0m"
+		if [[ "$version" = "PRV" || "$version" = "UND" ]]; then
+			echo -e "[\033[0;90mSKIP\033[0m] \033[0;33m${version}\033[0m < ${k}_\033[0;33m${threshold_version[$k]}\033[0m"
+		else
+			echo -e "[\033[0;32mOK\033[0m] \033[0;33m${version}\033[0m < ${k}_\033[0;33m${threshold_version[$k]}\033[0m"
+		fi
 	done
 }
 

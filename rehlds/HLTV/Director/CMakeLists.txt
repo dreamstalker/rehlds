@@ -2,19 +2,10 @@ cmake_minimum_required(VERSION 3.1)
 project(director CXX)
 
 option(DEBUG "Build with debug information." OFF)
-option(USE_INTEL_COMPILER "Use the Intel compiler." OFF)
-option(USE_CLANG_COMPILER "Use the Clang compiler." OFF)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-if (USE_INTEL_COMPILER)
-	set(CMAKE_C_COMPILER	"/opt/intel/bin/icc")
-	set(CMAKE_CXX_COMPILER	"/opt/intel/bin/icpc")
-elseif (USE_CLANG_COMPILER)
-	set(CMAKE_C_COMPILER	"/usr/bin/clang")
-	set(CMAKE_CXX_COMPILER	"/usr/bin/clang++")
-endif()
+set(CMAKE_SHARED_LIBRARY_CXX_FLAGS "")
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -fno-exceptions")
 
@@ -24,7 +15,8 @@ else()
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g0 -O3 -fno-stack-protector")
 endif()
 
-if (USE_INTEL_COMPILER)
+# Check Intel C++ compiler
+if ($ENV{CXX} MATCHES "icpc")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Qoption,cpp,--treat_func_as_string_literal_cpp")
 	set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -static-intel -no-intel-extensions")
 
@@ -35,12 +27,14 @@ if (USE_INTEL_COMPILER)
 else()
 	# Produce code optimized for the most common IA32/AMD64/EM64T processors.
 	# As new processors are deployed in the marketplace, the behavior of this option will change.
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mtune=generic -msse3 -flto\
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} \
+		-mtune=generic -msse3 -flto\
 		-fpermissive -fno-sized-deallocation\
 		-Wno-unused-result -Wno-unknown-pragmas\
 		-Wno-write-strings -Wno-strict-aliasing")
 endif()
 
+# GCC >= 8.3
 if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 8.0)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcf-protection=none")
 endif()
@@ -98,8 +92,16 @@ add_definitions(
 	-D_snprintf=snprintf
 )
 
-set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-rpath,'$ORIGIN/.' -L${PROJECT_SOURCE_DIR}/../../lib/linux32")
+set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} \
+	-Wl,-rpath,'$ORIGIN/.' \
+	-L${PROJECT_SOURCE_DIR}/../../lib/linux32")
 
 add_library(director SHARED ${DIRECTOR_SRCS} ${COMMON_SRCS})
 target_link_libraries(director dl m)
-set_target_properties(director PROPERTIES PREFIX "" COMPILE_FLAGS "-m32" LINK_FLAGS "-m32" POSITION_INDEPENDENT_CODE ON)
+set_target_properties(director PROPERTIES
+	LIBRARY_OUTPUT_NAME director
+	PREFIX ""
+	COMPILE_FLAGS "-m32"
+	LINK_FLAGS "-m32"
+	POSITION_INDEPENDENT_CODE OFF
+)

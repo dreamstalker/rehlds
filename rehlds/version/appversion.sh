@@ -3,9 +3,9 @@
 init()
 {
 	SOURCE_DIR=$@
-	GIT_DIR=$SOURCE_DIR/..
-	VERSION_FILE=$GIT_DIR/gradle.properties
-	APPVERSION_FILE=$SOURCE_DIR/version/appversion.h
+	GIT_DIR=$SOURCE_DIR
+	VERSION_FILE=$SOURCE_DIR/gradle.properties
+	APPVERSION_FILE=$SOURCE_DIR/rehlds/version/appversion.h
 
 	if test -z "`git --version`"; then
 		echo "Please install git client"

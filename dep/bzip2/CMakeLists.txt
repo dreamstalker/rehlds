@@ -20,4 +20,6 @@ include_directories(
 )
 
 add_library(bzip2 STATIC ${BZIP2_SRCS})
-set_target_properties(bzip2 PROPERTIES COMPILE_FLAGS "-m32")
+set_target_properties(bzip2 PROPERTIES
+	COMPILE_FLAGS "-m32"
+)
