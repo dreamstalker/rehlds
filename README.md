@@ -32,6 +32,10 @@ Archive's bin directory contains 2 subdirectories, 'bugfixed' and 'pure'
 
 ## Configuring
 Bugfixed version of rehlds contains an additional cvars:
+
+<details>
+<summary>Click to expand</summary>
+
 <ul>
 <li>listipcfgfile <filename> // File for permanent ip bans. Default: listip.cfg
 <li>syserror_logfile <filename> // File for the system error log. Default: sys_error.log
@@ -57,64 +61,55 @@ Bugfixed version of rehlds contains an additional cvars:
 <li>sv_use_entity_file // Use custom entity file for a map. Path to an entity file will be "maps/[map name].ent". 0 - use original entities. 1 - use .ent files from maps directory. 2 - use .ent files from maps directory and create new .ent file if not exist.
 </ul>
 
+</details>
+
 ## Commands
-Bugfixed version of rehlds contains an additional commands:
+Bugfixed version of rehlds contains an additional commands
 <ul>
 <li>rescount // Prints the total count of precached resources in the server console
 <li>reslist &lt;sound | model | decal | generic | event&gt; // Separately prints the details of the precached resources for sounds, models, decals, generic and events in server console. Useful for managing resources and dealing with the goldsource precache limits.
 </ul>
 
 ## Build instructions
-There are several software requirements for building rehlds:
-<ol>
-<li>Java Development Kit (JDK) 7+ (http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)</li>
-<li>For Windows: Visual Studio 2013 and later</li>
-<li>For Linux: Intel C++ Compiler 13 and later or GCC 4.9.2 or later (some earlier versions might work too)</li>
-</ol>
-
 ### Checking requirements
-#### JDK version
-Windows<pre>&gt; %JAVA_HOME%\bin\javac -version
-javac 1.8.0_25
+There are several software requirements for building rehlds:
+
+#### Windows
+<pre>
+Visual Studio 2013 and later
 </pre>
 
-Linux
-<pre>$ javac -version
-javac 1.7.0_65
-</pre>
-
-#### Visual Studio
-Help -> About
-
-#### ICC
-<pre>$ icc --version
-icc (ICC) 15.0.1 20141023
-</pre>
-
-#### GCC
-<pre>$ gcc --version
-gcc (Debian 4.9.2-10) 4.9.2
+#### Linux
+<pre>
+cmake >= 3.10
+GCC >= 4.9.2 (Optional)
+ICC >= 15.0.1 20141023 (Optional)
+LLVM (Clang) >= 6.0 (Optional)
 </pre>
 
 ### Building
-On Windows:
-<pre>gradlew --max-workers=1 clean buildRelease</pre>
-* For faster building without unit tests use this:exclamation:
-<pre>gradlew --max-workers=1 clean buildFixes</pre>
-<b>NOTE:</b> You can also use `Visual Studio` to build, just select from the solution configurations list `Release Swds` or `Debug Swds`<br />
 
-On Linux (ICC):
-<pre>./gradlew --max-workers=1 clean buildRelease</pre>
-* For faster building without unit tests use this:exclamation:
-<pre>./gradlew --max-workers=1 clean buildFixes</pre>
+#### Windows
+Use `Visual Studio` to build, open `msvc/ReHLDS.sln` and just select from the solution configurations list `Release Swds` or `Debug Swds`
 
-On Linux (GCC):
-<pre>./gradlew --max-workers=1 -PuseGcc clean buildRelease</pre>
-* For faster building without unit tests use this:exclamation:
-<pre>./gradlew --max-workers=1 -PuseGcc clean buildFixes</pre>
+#### Linux
 
-Also there is a task `buildEngine`, it builds only engine, without other parts of the project.<br />
-Compiled binaries will be placed in the rehlds/build/binaries/ directory
+<ul>
+<li>
+ICC:
+<pre>./build.sh --compiler=intel</pre>
+</li>
+
+<li>
+LLVM (Clang):
+<pre>./build.sh --compiler=clang</pre>
+</li>
+
+<li>
+GCC:
+<pre>./build.sh --compiler=gcc</pre>
+</li>
+</ul>
 
 ## How can I help the project?
 Just install it on your game server and report problems you faced.

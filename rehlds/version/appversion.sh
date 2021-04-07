@@ -4,7 +4,7 @@ init()
 {
 	SOURCE_DIR=$@
 	GIT_DIR=$SOURCE_DIR
-	VERSION_FILE=$SOURCE_DIR/gradle.properties
+	VERSION_FILE=$SOURCE_DIR/rehlds/version/version.h
 	APPVERSION_FILE=$SOURCE_DIR/rehlds/version/appversion.h
 
 	if test -z "`git --version`"; then
@@ -25,17 +25,17 @@ init()
 	fi
 
 	# Get major, minor and maintenance information from gradle.properties
-	MAJOR=$(sed -nr -e '/majorVersion/ s/.*\= *//p' "$VERSION_FILE" | tr -d '\n\r')
+	MAJOR=$(cat $VERSION_FILE | grep -wi 'VERSION_MAJOR' | sed -e 's/.*VERSION_MAJOR.*[^0-9]\([0-9][0-9]*\).*/\1/i' -e 's/\r//g')
 	if [ $? -ne 0 -o "$MAJOR" = "" ]; then
 		MAJOR=0
 	fi
 
-	MINOR=$(sed -nr -e '/minorVersion/ s/.*\= *//p' "$VERSION_FILE" | tr -d '\n\r')
+	MINOR=$(cat $VERSION_FILE | grep -wi 'VERSION_MINOR' | sed -e 's/.*VERSION_MINOR.*[^0-9]\([0-9][0-9]*\).*/\1/i' -e 's/\r//g')
 	if [ $? -ne 0 -o "$MINOR" = "" ]; then
 		MINOR=0
 	fi
 
-	MAINTENANCE=$(sed -nr -e '/maintenanceVersion/ s/.*\= *//p' "$VERSION_FILE" | tr -d '\n\r')
+	MAINTENANCE=$(cat $VERSION_FILE | grep -i 'VERSION_MAINTENANCE' | sed -e 's/.*VERSION_MAINTENANCE.*[^0-9]\([0-9][0-9]*\).*/\1/i' -e 's/\r//g')
 	if [ $? -ne 0 -o "$MAINTENANCE" = "" ]; then
 		MAINTENANCE=0
 	fi

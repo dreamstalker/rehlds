@@ -77,14 +77,6 @@ IF EXIST "%srcdir%\version.h" (
 			IF %%j==VERSION_MAINTENANCE set version_maintenance=%%k
 		)
 	)
-) ELSE (
-	FOR /F "usebackq tokens=1,2,3,* delims==" %%i in ("%repodir%..\gradle.properties") do (
-		IF NOT [%%j] == [] (
-			IF %%i==majorVersion set version_major=%%j
-			IF %%i==minorVersion set version_minor=%%j
-			IF %%i==maintenanceVersion set version_maintenance=%%j
-		)
-	)
 )
 
 ::
