@@ -202,11 +202,5 @@ echo.>>"%srcdir%\appversion.h"
 echo #endif //__APPVERSION_H__>>"%srcdir%\appversion.h"
 echo.>>"%srcdir%\appversion.h"
 
-::
-:: Do update of version.cpp file last modify time to force it recompile
-::
-copy /b "%srcdir%\version.cpp"+,, "%srcdir%\version.cpp"
-endlocal
-
 :_exit
 exit /B 0

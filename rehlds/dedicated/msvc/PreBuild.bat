@@ -1,5 +1,5 @@
 @setlocal enableextensions enabledelayedexpansion
-@echo on
+@echo off
 ::
 :: Pre-build auto-versioning script
 ::

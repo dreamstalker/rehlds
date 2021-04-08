@@ -15,10 +15,13 @@ jobs:
   windows:
     name: 'Windows'
     runs-on: windows-latest
+
     env:
       solution: 'msvc/ReHLDS.sln'
       buildPlatform: 'Win32'
-      buildConfiguration: 'Release'
+      buildRelease: 'Release'
+      buildReleasePlay: 'Release Play'
+      buildTest: 'Test Fixes'
 
     steps:
       - name: Checkout
@@ -39,35 +42,120 @@ jobs:
           vs-version: '16.8'
 
       - name: Build ReHLDS
-        run:
-          msbuild ${{ env.solution }} /t:Clean,Build -p:Configuration="${{ env.buildConfiguration }}" /p:Platform=${{ env.buildPlatform }} /p:PlatformToolset=v140_xp /p:XPDeprecationWarning=false
+        run: |
+          msbuild ${{ env.solution }} -p:Configuration="${{ env.buildRelease }}" /t:Clean,Build /p:Platform=${{ env.buildPlatform }} /p:PlatformToolset=v140_xp /p:XPDeprecationWarning=false
+          msbuild ${{ env.solution }} -p:Configuration="${{ env.buildReleasePlay }}" /t:Clean,Build /p:Platform=${{ env.buildPlatform }} /p:PlatformToolset=v140_xp /p:XPDeprecationWarning=false
+
+      - name: Build and Testing
+        run: |
+          msbuild ${{ env.solution }} -p:Configuration="${{ env.buildTest }}" /t:Clean,Build /p:Platform=${{ env.buildPlatform }} /p:PlatformToolset=v140_xp /p:XPDeprecationWarning=false
+          .\"msvc\Test Fixes\swds.exe"
+          If ($LASTEXITCODE -ne 0 -And
+          $LASTEXITCODE -ne 3)
+          {[Environment]::Exit(1)}
+        shell: "pwsh"
 
       - name: Move files
         run: |
           mkdir publish\debug
+          mkdir publish\tests
           mkdir publish\bin\win32\valve\dlls
-          move msvc\${{ env.buildConfiguration }}\hlds.exe publish\bin\win32\hlds.exe
-          move msvc\${{ env.buildConfiguration }}\hltv.exe publish\bin\win32\hltv.exe
-          move msvc\${{ env.buildConfiguration }}\swds.dll publish\bin\win32\swds.dll
-          move msvc\${{ env.buildConfiguration }}\core.dll publish\bin\win32\core.dll
-          move msvc\${{ env.buildConfiguration }}\proxy.dll publish\bin\win32\proxy.dll
-          move msvc\${{ env.buildConfiguration }}\demoplayer.dll publish\bin\win32\demoplayer.dll
-          move msvc\${{ env.buildConfiguration }}\filesystem_stdio.dll publish\bin\win32\filesystem_stdio.dll
-          move msvc\${{ env.buildConfiguration }}\director.dll publish\bin\win32\valve\dlls\director.dll
-          move msvc\${{ env.buildConfiguration }}\hlds.pdb publish\debug\hlds.pdb
-          move msvc\${{ env.buildConfiguration }}\hltv.pdb publish\debug\hltv.pdb
-          move msvc\${{ env.buildConfiguration }}\swds.pdb publish\debug\swds.pdb
-          move msvc\${{ env.buildConfiguration }}\core.pdb publish\debug\core.pdb
-          move msvc\${{ env.buildConfiguration }}\proxy.pdb publish\debug\proxy.pdb
-          move msvc\${{ env.buildConfiguration }}\demoplayer.pdb publish\debug\demoplayer.pdb
-          move msvc\${{ env.buildConfiguration }}\filesystem_stdio.pdb publish\debug\filesystem_stdio.pdb
-          move msvc\${{ env.buildConfiguration }}\director.pdb publish\debug\director.pdb
+          move "msvc\${{ env.buildReleasePlay }}\swds.dll" publish\tests\swds.dll
+          move msvc\${{ env.buildRelease }}\hlds.exe publish\bin\win32\hlds.exe
+          move msvc\${{ env.buildRelease }}\hltv.exe publish\bin\win32\hltv.exe
+          move msvc\${{ env.buildRelease }}\swds.dll publish\bin\win32\swds.dll
+          move msvc\${{ env.buildRelease }}\core.dll publish\bin\win32\core.dll
+          move msvc\${{ env.buildRelease }}\proxy.dll publish\bin\win32\proxy.dll
+          move msvc\${{ env.buildRelease }}\demoplayer.dll publish\bin\win32\demoplayer.dll
+          move msvc\${{ env.buildRelease }}\filesystem_stdio.dll publish\bin\win32\filesystem_stdio.dll
+          move msvc\${{ env.buildRelease }}\director.dll publish\bin\win32\valve\dlls\director.dll
+          move msvc\${{ env.buildRelease }}\hlds.pdb publish\debug\hlds.pdb
+          move msvc\${{ env.buildRelease }}\hltv.pdb publish\debug\hltv.pdb
+          move msvc\${{ env.buildRelease }}\swds.pdb publish\debug\swds.pdb
+          move msvc\${{ env.buildRelease }}\core.pdb publish\debug\core.pdb
+          move msvc\${{ env.buildRelease }}\proxy.pdb publish\debug\proxy.pdb
+          move msvc\${{ env.buildRelease }}\demoplayer.pdb publish\debug\demoplayer.pdb
+          move msvc\${{ env.buildRelease }}\filesystem_stdio.pdb publish\debug\filesystem_stdio.pdb
+          move msvc\${{ env.buildRelease }}\director.pdb publish\debug\director.pdb
 
       - name: Deploy artifacts
         uses: actions/upload-artifact@v2
         with:
           name: win32
           path: publish/*
+
+  testdemos:
+    name: 'Test demos'
+    runs-on: ubuntu-latest
+    container: s1lentq/testdemos:latest
+    needs: [windows]
+
+    env:
+      WINEDEBUG: -all
+      WINEDLLOVERRIDES: mshtml=
+
+    defaults:
+      run:
+        shell: bash
+        working-directory: ../../../opt/HLDS
+
+    steps:
+      - name: Deploying windows artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: win32
+
+      - name: Play demos
+        run: |
+          chown root ~
+          cp -r deps/rehlds/* .
+          mv $GITHUB_WORKSPACE/tests/swds.dll .
+
+          descs=(
+            "Half-Life: Physics singleplayer"
+            "Half-Life: Multiplayer on crossfire map"
+            "Half-Life: Shooting with several weapons"
+            "CS: Multiplayer"
+          )
+
+          demos=(
+            "rehlds-phys-single1"
+            "crossfire-1-multiplayer-1"
+            "shooting-hl-1"
+            "cstrike-muliplayer-1"
+          )
+
+          retVal=0
+          for i in "${!demos[@]}"; do
+            params=$(cat "testdemos/${demos[i]}.params")
+
+            echo -e "\e[1m[$((i + 1))/${#demos[@]}] \e[1;36m${descs[i]} testing...\e[0m"
+            echo -e "    - \e[0;33mParameters $params\e[0m"
+
+            wine hlds.exe --rehlds-enable-all-hooks --rehlds-test-play "testdemos/${demos[i]}.bin" $params &> result.log || retVal=$?
+
+            if [ $retVal -ne 777 ] && [ $retVal -ne 9 ]; then
+              # Print with catchy messages
+              while read line; do
+                echo -e "      \e[0;33m$line"
+              done <<< $(cat result.log | sed '0,/demo failed/I!d;/wine:/d;/./,$!d')
+
+              echo "      🔸  🔸  🔸  🔸  🔸  🔸  🔸  🔸  🔸  🔸"
+              while read line; do
+                echo -e "      \e[1;31m$line";
+              done < rehlds_demo_error.txt
+              echo -e "      \e[30;41mExit code: $retVal\e[0m"
+              echo -e "\e[1m[$((i + 1))/${#demos[@]}] \e[1;36m${descs[i]} testing...\e[1;31m Failed ❌"
+              exit 6 # Test demo failed
+            else
+              # Print result HLDS console
+              while read line; do
+                echo -e "      \e[0;33m$line"
+              done <<< $(cat result.log | sed '/wine:/d;/./,$!d')
+              echo -e "      \e[30;43mExit code: $retVal\e[0m"
+              echo -e "\e[1m[$((i + 1))/${#demos[@]}] \e[1;36m${descs[i]} testing...\e[1;32m Succeed ✔"
+            fi
+          done
 
   linux:
     name: 'Linux'
@@ -138,9 +226,10 @@ jobs:
           rm -f appversion.h
 
   publish:
-    needs: [windows, linux]
     name: 'Publish'
     runs-on: ubuntu-latest
+    needs: [windows, testdemos, linux]
+
     steps:
       - name: Deploying linux artifacts
         uses: actions/download-artifact@v2
