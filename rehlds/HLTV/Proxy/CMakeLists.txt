@@ -133,6 +133,7 @@ endif()
 add_library(proxy SHARED ${PROXY_SRCS} ${COMMON_SRCS})
 target_link_libraries(proxy dl m bzip2 steam_api)
 set_target_properties(proxy PROPERTIES
+	LIBRARY_OUTPUT_NAME proxy
 	PREFIX ""
 	COMPILE_FLAGS "-m32"
 	LINK_FLAGS "-m32"

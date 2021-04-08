@@ -22,7 +22,7 @@ if ($ENV{CXX} MATCHES "icpc")
 
 	if (NOT DEBUG)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ipo")
-		set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_CXX_FLAGS} -ipo")
+		set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -ipo")
 	endif()
 else()
 	# Produce code optimized for the most common IA32/AMD64/EM64T processors.

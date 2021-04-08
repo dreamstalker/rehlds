@@ -22,7 +22,7 @@ if ($ENV{CXX} MATCHES "icpc")
 
 	if (NOT DEBUG)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ipo")
-		set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_CXX_FLAGS} -ipo")
+		set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -ipo")
 	endif()
 else()
 	# Produce code optimized for the most common IA32/AMD64/EM64T processors.
@@ -91,7 +91,7 @@ add_definitions(
 )
 
 add_library(demoplayer SHARED ${DEMOPLAYER_SRCS} ${COMMON_SRCS})
-target_link_libraries(demoplayer dl)
+target_link_libraries(demoplayer dl m)
 set_target_properties(demoplayer PROPERTIES
 	LIBRARY_OUTPUT_NAME demoplayer
 	PREFIX ""
