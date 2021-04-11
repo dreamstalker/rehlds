@@ -34,6 +34,7 @@ jobs:
         with:
           nuget-api-key: ${{ secrets.NuGetAPIKey }}
           nuget-version: '5.x'
+
       - run: nuget restore '${{ env.solution }}'
 
       - name: Setup MSBuild
@@ -41,12 +42,7 @@ jobs:
         with:
           vs-version: '16.8'
 
-      - name: Build ReHLDS
-        run: |
-          msbuild ${{ env.solution }} -p:Configuration="${{ env.buildRelease }}" /t:Clean,Build /p:Platform=${{ env.buildPlatform }} /p:PlatformToolset=v140_xp /p:XPDeprecationWarning=false
-          msbuild ${{ env.solution }} -p:Configuration="${{ env.buildReleasePlay }}" /t:Clean,Build /p:Platform=${{ env.buildPlatform }} /p:PlatformToolset=v140_xp /p:XPDeprecationWarning=false
-
-      - name: Build and Testing
+      - name: Build and Run unittests
         run: |
           msbuild ${{ env.solution }} -p:Configuration="${{ env.buildTest }}" /t:Clean,Build /p:Platform=${{ env.buildPlatform }} /p:PlatformToolset=v140_xp /p:XPDeprecationWarning=false
           .\"msvc\Test Fixes\swds.exe"
@@ -54,6 +50,11 @@ jobs:
           $LASTEXITCODE -ne 3)
           {[Environment]::Exit(1)}
         shell: "pwsh"
+
+      - name: Build
+        run: |
+          msbuild ${{ env.solution }} -p:Configuration="${{ env.buildRelease }}" /t:Clean,Build /p:Platform=${{ env.buildPlatform }} /p:PlatformToolset=v140_xp /p:XPDeprecationWarning=false
+          msbuild ${{ env.solution }} -p:Configuration="${{ env.buildReleasePlay }}" /t:Clean,Build /p:Platform=${{ env.buildPlatform }} /p:PlatformToolset=v140_xp /p:XPDeprecationWarning=false
 
       - name: Move files
         run: |
@@ -112,17 +113,17 @@ jobs:
           mv $GITHUB_WORKSPACE/tests/swds.dll .
 
           descs=(
+            "CS: Multiplayer"
             "Half-Life: Physics singleplayer"
             "Half-Life: Multiplayer on crossfire map"
             "Half-Life: Shooting with several weapons"
-            "CS: Multiplayer"
           )
 
           demos=(
+            "cstrike-muliplayer-1"
             "rehlds-phys-single1"
             "crossfire-1-multiplayer-1"
             "shooting-hl-1"
-            "cstrike-muliplayer-1"
           )
 
           retVal=0
@@ -168,6 +169,30 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Build and Run unittests
+        run: |
+          rm -rf build && CC=icc CXX=icpc cmake -DCMAKE_BUILD_TYPE=Unittests -B build && cmake --build build -j8
+          retVal=0
+          export LD_LIBRARY_PATH="rehlds/lib/linux32:$LD_LIBRARY_PATH"
+          ./build/rehlds/engine_i486 2> /dev/null > result.log || retVal=$?
+          while read line; do
+            if [[ ${line} == *"Warning in test"* ]] ; then
+              echo -e "\e[2;38m$line"
+            elif [[ ${line} == *"Failure in test"* ]] ; then
+              echo -e "\e[1;31m$line"
+            else
+              echo -e "\e[0;33m$line"
+            fi
+          done <<< $(cat result.log)
+
+          if [ $retVal -ne 0 ] && [ $retVal -ne 3 ]; then
+            echo -e "\e[30;41mExit code: $retVal\e[0m"
+            exit 1 # Unittest failed
+          else
+            echo -e "\e[30;43mExit code: $retVal\e[0m"
+          fi
+        shell: bash
+          
       - name: Build using Intel C++ Compiler
         run: |
           rm -rf build && CC=icc CXX=icpc cmake -B build && cmake --build build -j8
@@ -244,14 +269,14 @@ jobs:
       - name: Reading appversion.h
         run: |
           if [ -e appversion.h ]; then
-          	APP_VERSION=$(cat appversion.h | grep -wi '#define APP_VERSION_STRD' | sed -e 's/#define APP_VERSION_STRD[ \t\r\n\v\f]\+\(.*\)/\1/i' -e 's/\r//g')
-          	if [ $? -ne 0 ]; then
-          		APP_VERSION=""
-          	else
-          		# Remove quotes
-          		APP_VERSION=$(echo $APP_VERSION | xargs)
-          		echo "APP_VERSION=${APP_VERSION}" >> $GITHUB_ENV
-          	fi
+            APP_VERSION=$(cat appversion.h | grep -wi '#define APP_VERSION_STRD' | sed -e 's/#define APP_VERSION_STRD[ \t\r\n\v\f]\+\(.*\)/\1/i' -e 's/\r//g')
+            if [ $? -ne 0 ]; then
+              APP_VERSION=""
+            else
+              # Remove quotes
+              APP_VERSION=$(echo $APP_VERSION | xargs)
+              echo "APP_VERSION=${APP_VERSION}" >> $GITHUB_ENV
+            fi
           fi
           rm -f appversion.h
 

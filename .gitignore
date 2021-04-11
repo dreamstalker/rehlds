@@ -3,6 +3,7 @@
 *.bat
 *.log
 *.lnk
+*.aps
 **/msvc/Debug*
 **/msvc/Release*
 **/msvc/Tests

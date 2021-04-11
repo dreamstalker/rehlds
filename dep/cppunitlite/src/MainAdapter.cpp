@@ -2,11 +2,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "cppunitlite/GradleAdapter.h"
+#include "cppunitlite/MainAdapter.h"
 #include "cppunitlite/Test.h"
 #include "cppunitlite/TestRegistry.h"
 
-int GradleAdapter::writeAllTestsInfoToFile(const char* fname) {
+int MainAdapter::writeAllTestsInfoToFile(const char* fname) {
 	FILE* outFile = fopen(fname, "w");
 	if (outFile == NULL) {
 		return 1;
@@ -33,7 +33,7 @@ int GradleAdapter::writeAllTestsInfoToFile(const char* fname) {
 	return 0;
 }
 
-int GradleAdapter::runTest(const char* groupName, const char* testName) {
+int MainAdapter::runTest(const char* groupName, const char* testName) {
 	Test* curTest = TestRegistry::getFirstTest();
 	while (curTest != NULL) {
 		if (!strcmp(groupName, curTest->getGroup()) && !strcmp(testName, curTest->getName())) {
@@ -61,7 +61,7 @@ int GradleAdapter::runTest(const char* groupName, const char* testName) {
 	}
 }
 
-int GradleAdapter::runGroup(const char* groupName) {
+int MainAdapter::runGroup(const char* groupName) {
 	Test* curTest = TestRegistry::getFirstTest();
 	int ranTests = 0;
 	int warnTest = 0;
@@ -101,7 +101,7 @@ int GradleAdapter::runGroup(const char* groupName) {
 	return 0;
 }
 
-int GradleAdapter::runAllTests() {
+int MainAdapter::runAllTests() {
 	Test* curTest = TestRegistry::getFirstTest();
 	int ranTests = 0;
 	int warnTest = 0;
@@ -131,7 +131,7 @@ int GradleAdapter::runAllTests() {
 	return 0;
 }
 
-int GradleAdapter::testsEntryPoint(int argc, char* argv[]) {
+int MainAdapter::testsEntryPoint(int argc, char* argv[]) {
 	if (argc < 2 || !strcmp(argv[1], "-all")) {
 		return runAllTests();
 	}

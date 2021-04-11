@@ -5,47 +5,52 @@ option(DEBUG "Build with debug information." OFF)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# Avoid -fPIC option
 set(CMAKE_SHARED_LIBRARY_CXX_FLAGS "")
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -fno-exceptions")
+set(COMPILE_FLAGS "-m32 -U_FORTIFY_SOURCE")
+set(LINK_FLAGS "-m32")
+
+set(COMPILE_FLAGS "${COMPILE_FLAGS} -Wall -fno-exceptions")
 
 if (DEBUG)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g3 -O3 -ggdb")
+	set(COMPILE_FLAGS "${COMPILE_FLAGS} -g3 -O3 -ggdb")
 else()
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g0 -O3 -fno-stack-protector")
+	set(COMPILE_FLAGS "${COMPILE_FLAGS} -g0 -O3 -fno-stack-protector")
 endif()
 
 # Check Intel C++ compiler
-if ($ENV{CXX} MATCHES "icpc")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Qoption,cpp,--treat_func_as_string_literal_cpp")
-	set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -static-intel -no-intel-extensions")
+if ("$ENV{CXX}" MATCHES "icpc")
+	set(COMPILE_FLAGS "${COMPILE_FLAGS} -Qoption,cpp,--treat_func_as_string_literal_cpp")
+	set(LINK_FLAGS "${LINK_FLAGS} -static-intel -no-intel-extensions")
 
 	if (NOT DEBUG)
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ipo")
-		set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -ipo")
+		set(COMPILE_FLAGS "${COMPILE_FLAGS} -ipo")
+		set(LINK_FLAGS "${LINK_FLAGS} -ipo")
 	endif()
 else()
 	# Produce code optimized for the most common IA32/AMD64/EM64T processors.
 	# As new processors are deployed in the marketplace, the behavior of this option will change.
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mtune=generic -msse3 -flto\
+	set(COMPILE_FLAGS "${COMPILE_FLAGS} -mtune=generic -msse3 -flto\
 		-fpermissive -fno-sized-deallocation\
 		-Wno-unused-result -Wno-unknown-pragmas -Wno-unused-variable\
 		-Wno-sign-compare -Wno-write-strings -Wno-strict-aliasing")
 
 	# Check Clang compiler
-	if ($ENV{CXX} MATCHES "clang")
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-private-field")
+	if ("$ENV{CXX}" MATCHES "clang")
+		set(COMPILE_FLAGS "${COMPILE_FLAGS} -Wno-unused-private-field")
 	else()
 		# GCC >= 8.3
 		if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 8.0)
-			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-stringop-truncation -Wno-format-truncation")
+			set(COMPILE_FLAGS "${COMPILE_FLAGS} -Wno-stringop-truncation -Wno-format-truncation")
 		endif()
 	endif()
 endif()
 
 # GCC >= 8.3
 if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 8.0)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcf-protection=none")
+	set(COMPILE_FLAGS "${COMPILE_FLAGS} -fcf-protection=none")
 endif()
 
 set(PROJECT_SRC_DIR
@@ -96,36 +101,46 @@ set(COMMON_SRCS
 	"../../engine/mem.cpp"
 )
 
-include_directories(
+add_library(core SHARED)
+
+target_include_directories(core PRIVATE
 	${PROJECT_SRC_DIR}
 	${PROJECT_BZIP2_DIR}
 	${PROJECT_PUBLIC_DIR}
 )
 
-add_definitions(
-	-DHLTV
-	-DHLTV_FIXES
-	-D_LINUX
-	-DLINUX
-	-D_GLIBCXX_USE_CXX11_ABI=0
-	-U_FORTIFY_SOURCE
-	-D_stricmp=strcasecmp
-	-D_strnicmp=strncasecmp
-	-D_strdup=strdup
-	-D_vsnprintf=vsnprintf
-	-D_snprintf=snprintf
+target_compile_definitions(core PRIVATE
+	HLTV
+	HLTV_FIXES
+	_LINUX
+	LINUX
+	_GLIBCXX_USE_CXX11_ABI=0
+	_stricmp=strcasecmp
+	_strnicmp=strncasecmp
+	_strdup=strdup
+	_vsnprintf=vsnprintf
+	_snprintf=snprintf
+)
+
+target_sources(core PRIVATE
+	${CORE_SRCS}
+	${COMMON_SRCS}
+)
+
+target_link_libraries(core PRIVATE
+	dl
+	m
+	bzip2
 )
 
 if (NOT TARGET bzip2)
 	add_subdirectory(../../../dep/bzip2 lib)
 endif()
 
-add_library(core SHARED ${CORE_SRCS} ${COMMON_SRCS})
-target_link_libraries(core dl m bzip2)
 set_target_properties(core PROPERTIES
-	LIBRARY_OUTPUT_NAME core
+	OUTPUT_NAME core
 	PREFIX ""
-	COMPILE_FLAGS "-m32"
-	LINK_FLAGS "-m32"
+	COMPILE_FLAGS ${COMPILE_FLAGS}
+	LINK_FLAGS ${LINK_FLAGS}
 	POSITION_INDEPENDENT_CODE OFF
 )

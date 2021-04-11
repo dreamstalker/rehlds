@@ -1,6 +1,6 @@
 #pragma once
 
-class GradleAdapter {
+class MainAdapter {
 public:
 	int writeAllTestsInfoToFile(const char* fname);
 	int runTest(const char* groupName, const char* testName);

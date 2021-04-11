@@ -13,7 +13,7 @@
   <ItemGroup>
     <ClInclude Include="..\include\cppunitlite\Assertions.h" />
     <ClInclude Include="..\include\cppunitlite\Failure.h" />
-    <ClInclude Include="..\include\cppunitlite\GradleAdapter.h" />
+    <ClInclude Include="..\include\cppunitlite\MainAdapter.h" />
     <ClInclude Include="..\include\cppunitlite\Test.h" />
     <ClInclude Include="..\include\cppunitlite\TestHarness.h" />
     <ClInclude Include="..\include\cppunitlite\TestRegistry.h" />
@@ -21,7 +21,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\Assertions.cpp" />
-    <ClCompile Include="..\src\GradleAdapter.cpp" />
+    <ClCompile Include="..\src\MainAdapter.cpp" />
     <ClCompile Include="..\src\Test.cpp" />
     <ClCompile Include="..\src\TestRegistry.cpp" />
     <ClCompile Include="..\src\TestResult.cpp" />

@@ -10,6 +10,9 @@ add_custom_target(appversion DEPENDS
 )
 
 add_subdirectory(rehlds)
-add_subdirectory(rehlds/dedicated)
-add_subdirectory(rehlds/filesystem)
-add_subdirectory(rehlds/HLTV)
+
+if (NOT CMAKE_BUILD_TYPE MATCHES Unittests)
+	add_subdirectory(rehlds/dedicated)
+	add_subdirectory(rehlds/filesystem)
+	add_subdirectory(rehlds/HLTV)
+endif()

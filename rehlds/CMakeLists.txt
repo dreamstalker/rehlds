@@ -25,39 +25,45 @@ option(USE_STATIC_LIBSTDC "Enables static linking libstdc++." OFF)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_SHARED_LIBRARY_CXX_FLAGS "")
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -fno-rtti -fno-exceptions")
+# Avoid -rdynamic -fPIC options
+set(CMAKE_SHARED_LIBRARY_CXX_FLAGS "")
+set(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "")
+
+set(COMPILE_FLAGS "-m32 -U_FORTIFY_SOURCE")
+set(LINK_FLAGS "-m32")
+
+set(COMPILE_FLAGS "${COMPILE_FLAGS} -Wall -fno-rtti -fno-exceptions")
 
 # Remove noxref code and data
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ffunction-sections -fdata-sections")
+set(COMPILE_FLAGS "${COMPILE_FLAGS} -ffunction-sections -fdata-sections")
 
 if (DEBUG)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g3 -O3 -ggdb")
+	set(COMPILE_FLAGS "${COMPILE_FLAGS} -g3 -O3 -ggdb")
 else()
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g0 -O3 -fno-stack-protector")
+	set(COMPILE_FLAGS "${COMPILE_FLAGS} -g0 -O3 -fno-stack-protector")
 endif()
 
 # Check Intel C++ compiler
-if ($ENV{CXX} MATCHES "icpc")
+if ("$ENV{CXX}" MATCHES "icpc")
 	# -fp-model=precise
 	# ICC uses -fp-model fast=1 by default for more aggressive optimizations on floating-point calculations
 	# https://software.intel.com/content/www/us/en/develop/documentation/cpp-compiler-developer-guide-and-reference/top/compiler-reference/compiler-options/compiler-option-details/floating-point-options/fp-model-fp.html#fp-model-fp_GUID-99936BBA-1508-4E9F-AC09-FA98613CE2F5
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} \
+	set(COMPILE_FLAGS "${COMPILE_FLAGS} \
 		-fp-model=precise\
 		-fasm-blocks\
 		-Qoption,cpp,--treat_func_as_string_literal_cpp")
 
-	set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -static-intel -no-intel-extensions")
+	set(LINK_FLAGS "${LINK_FLAGS} -static-intel -no-intel-extensions")
 
 	if (NOT DEBUG)
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ipo")
-		set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -ipo")
+		set(COMPILE_FLAGS "${COMPILE_FLAGS} -ipo")
+		set(LINK_FLAGS "${LINK_FLAGS} -ipo")
 	endif()
 else()
 	# Produce code optimized for the most common IA32/AMD64/EM64T processors.
 	# As new processors are deployed in the marketplace, the behavior of this option will change.
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} \
+	set(COMPILE_FLAGS "${COMPILE_FLAGS} \
 		-mtune=generic -msse3\
 		-fpermissive -fno-sized-deallocation\
 		-Wno-unknown-pragmas -Wno-invalid-offsetof\
@@ -66,29 +72,24 @@ else()
 		-Wno-sign-compare -Wno-strict-aliasing -Wno-ignored-attributes")
 
 	# Check if not Clang compiler
-	if (NOT $ENV{CXX} MATCHES "clang")
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-plt -Wno-unused-but-set-variable")
+	if (NOT "$ENV{CXX}" MATCHES "clang")
+		set(COMPILE_FLAGS "${COMPILE_FLAGS} -fno-plt -Wno-unused-but-set-variable")
 
 		# GCC >= 8.3
 		if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 8.0)
-			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-stringop-truncation -Wno-format-truncation -Wno-class-memaccess")
+			set(COMPILE_FLAGS "${COMPILE_FLAGS} -Wno-stringop-truncation -Wno-format-truncation -Wno-class-memaccess")
 		endif()
 	endif()
 endif()
 
 # GCC >= 8.3
 if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 8.0)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcf-protection=none")
+	set(COMPILE_FLAGS "${COMPILE_FLAGS} -fcf-protection=none")
 endif()
 
 if (NOT DEBUG)
-	set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} \
+	set(LINK_FLAGS "${LINK_FLAGS} \
 		-Wl,-gc-sections -Wl,--version-script=\"${PROJECT_SOURCE_DIR}/../version_script.lds\"")
-endif()
-
-if (USE_STATIC_LIBSTDC)
-	add_definitions(-DBUILD_STATIC_LIBSTDC)
-	set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -static-libgcc -static-libstdc++")
 endif()
 
 set(PROJECT_SRC_DIR
@@ -98,10 +99,15 @@ set(PROJECT_SRC_DIR
 	"${PROJECT_SOURCE_DIR}/pm_shared"
 	"${PROJECT_SOURCE_DIR}/rehlds"
 	"${PROJECT_SOURCE_DIR}/testsuite"
+	"${PROJECT_SOURCE_DIR}/unittests"
 )
 
 set(PROJECT_BZIP2_DIR
 	"${PROJECT_SOURCE_DIR}/../dep/bzip2/include"
+)
+
+set(PROJECT_CPPUNITLITE_DIR
+	"${PROJECT_SOURCE_DIR}/../dep/cppunitlite/include"
 )
 
 set(PROJECT_PUBLIC_DIR
@@ -179,6 +185,21 @@ set(ENGINE_SRCS
 	rehlds/rehlds_security.cpp
 )
 
+set(UNITTESTS_SRCS
+	unittests/common_tests.cpp
+	unittests/crc32c_tests.cpp
+	unittests/delta_tests.cpp
+	unittests/info_tests.cpp
+	unittests/mathlib_tests.cpp
+	unittests/rehlds_tests_shared.cpp
+	unittests/rehlds_tests_shared.h
+	unittests/security_tests.cpp
+	unittests/struct_offsets_tests.cpp
+	unittests/TestRunner.cpp
+	unittests/tmessage_tests.cpp
+	unittests/unicode_tests.cpp
+)
+
 set(COMMON_SRCS
 	"common/BaseSystemModule.cpp"
 	"common/ObjectList.cpp"
@@ -192,56 +213,91 @@ set(PUBLIC_SRCS
 	"public/utlbuffer.cpp"
 )
 
-include_directories(
-	${PROJECT_SRC_DIR}
-	${PROJECT_BZIP2_DIR}
-	${PROJECT_PUBLIC_DIR}
-)
+if (CMAKE_BUILD_TYPE MATCHES Unittests)
+	if (NOT TARGET cppunitlite)
+		add_subdirectory(../dep/cppunitlite cppunitlite)
+	endif()
 
-add_definitions(
-	-DSWDS
-	-DREHLDS_JIT
-	-DREHLDS_SSE
-	-DREHLDS_FIXES
-	-DREHLDS_CHECKS
-	-DREHLDS_API
-	-DREHLDS_SELF
-	-DREHLDS_OPT_PEDANTIC
-	-DHAVE_OPT_STRTOOLS
-	-DUSE_BREAKPAD_HANDLER
-	-D_LINUX
-	-DLINUX
-	-D_GLIBCXX_USE_CXX11_ABI=0
-	-U_FORTIFY_SOURCE
-	-D_stricmp=strcasecmp
-	-D_strnicmp=strncasecmp
-	-D_strdup=strdup
-	-D_unlink=unlink
-	-D_vsnprintf=vsnprintf
-	-D_vsnwprintf=vswprintf
-)
-
-set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} \
-	-Wl,-rpath,'$ORIGIN/.' \
-	-L${PROJECT_SOURCE_DIR}/lib/linux32")
+	set(LINK_FLAGS "${LINK_FLAGS} -no-pie -Wl,--no-export-dynamic")
+	add_executable(engine ${appversion.sh})
+	target_link_libraries(engine PRIVATE cppunitlite)
+else()
+	add_library(engine SHARED ${appversion.sh})
+endif()
 
 if (NOT TARGET bzip2)
-	add_subdirectory(../dep/bzip2 lib)
+	add_subdirectory(../dep/bzip2 bzip2)
 endif()
 
 if (NOT TARGET appversion)
 	add_custom_target(appversion DEPENDS COMMAND "${PROJECT_SOURCE_DIR}/version/appversion.sh" "${PROJECT_SOURCE_DIR}/..")
 endif()
 
-add_library(engine SHARED ${appversion.sh} ${ENGINE_SRCS} ${COMMON_SRCS} ${PUBLIC_SRCS})
 add_dependencies(engine appversion)
 
-set_target_properties(engine PROPERTIES
-	LIBRARY_OUTPUT_NAME engine_i486
-	PREFIX ""
-	COMPILE_FLAGS "-m32"
-	LINK_FLAGS "-m32"
-	POSITION_INDEPENDENT_CODE OFF
+target_include_directories(engine PRIVATE
+	${PROJECT_SRC_DIR}
+	${PROJECT_BZIP2_DIR}
+	${PROJECT_CPPUNITLITE_DIR}
+	${PROJECT_PUBLIC_DIR}
 )
 
-target_link_libraries(engine dl rt m aelf32 bzip2 steam_api)
+target_compile_definitions(engine PRIVATE
+	SWDS
+	REHLDS_JIT
+	REHLDS_SSE
+	REHLDS_FIXES
+	REHLDS_CHECKS
+	REHLDS_API
+	REHLDS_SELF
+	REHLDS_OPT_PEDANTIC
+	HAVE_OPT_STRTOOLS
+	USE_BREAKPAD_HANDLER
+	_LINUX
+	LINUX
+	_GLIBCXX_USE_CXX11_ABI=0
+	_stricmp=strcasecmp
+	_strnicmp=strncasecmp
+	_strdup=strdup
+	_unlink=unlink
+	_vsnprintf=vsnprintf
+	_vsnwprintf=vswprintf
+
+	$<$<CONFIG:Unittests>:
+	REHLDS_UNIT_TESTS REHLDS_SSE REHLDS_JIT>
+)
+
+target_sources(engine PRIVATE
+	${ENGINE_SRCS}
+	${COMMON_SRCS}
+	${PUBLIC_SRCS}
+
+	$<$<CONFIG:Unittests>:
+	${UNITTESTS_SRCS}>
+)
+
+target_link_libraries(engine PRIVATE
+	dl
+	rt
+	m
+	aelf32
+	bzip2
+	steam_api
+)
+
+if (USE_STATIC_LIBSTDC)
+	target_compile_definitions(engine PRIVATE BUILD_STATIC_LIBSTDC)
+	set(LINK_FLAGS "${LINK_FLAGS} -static-libgcc -static-libstdc++")
+endif()
+
+set(LINK_FLAGS "${LINK_FLAGS} \
+	-Wl,-rpath,'$ORIGIN/.' \
+	-L${PROJECT_SOURCE_DIR}/lib/linux32")
+
+set_target_properties(engine PROPERTIES
+	OUTPUT_NAME engine_i486
+	PREFIX ""
+	COMPILE_FLAGS ${COMPILE_FLAGS}
+	LINK_FLAGS ${LINK_FLAGS}
+	POSITION_INDEPENDENT_CODE OFF
+)

@@ -67,13 +67,13 @@ TEST(SetValueForStarKey, Info, 1000) {
 			"\\cl_updaterate\\100\\topcolor\\60\\name\\abcdefghijklmnop\\*sid\\12332432525345\\_vgui_menus\\1\\model\\urban\\somelargeuselesskey\\12312321321323123123123213123123123123123123123123123123123123123dasdsad\\_cl_autowepswitch\\1",
 		},
 
-		{ 
+		{
 			"\\cl_updaterate\\100\\topcolor\\60\\name\\abcdefghijklmnop\\*sid\\12332432525345\\_vgui_menus\\1\\model\\urban\\somelargeuselesskey\\12312321321323123123123213123123123123123123123123123123123123123dasdsad\\_cl_autowepswitch\\1",
 			"*team",
 			"12345678901234567890123456789012345678",
 			"\\cl_updaterate\\100\\topcolor\\60\\name\\abcdefghijklmnop\\*sid\\12332432525345\\_vgui_menus\\1\\model\\urban\\_cl_autowepswitch\\1\\*team\\12345678901234567890123456789012345678",
 		},
-		
+
 		{
 			"\\cl_updaterate\\100\\topcolor\\60\\name\\abcdefghijklmnop\\*sid\\12332432525345\\_vgui_menus\\1\\model\\urban\\somelargeuselesskey\\12312321321323123123123213123123123123123123123123123123123123123dasdsad\\_cl_autowepswitch\\1",
 			"*team",
