@@ -192,7 +192,7 @@ jobs:
             echo -e "\e[30;43mExit code: $retVal\e[0m"
           fi
         shell: bash
-          
+
       - name: Build using Intel C++ Compiler
         run: |
           rm -rf build && CC=icc CXX=icpc cmake -B build && cmake --build build -j8

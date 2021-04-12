@@ -9,7 +9,7 @@ for i in "$@"
 do
 case $i in
 	-j=*|--jobs=*)
-		jobs="${i#*=}"
+		jobs="-j${i#*=}"
 		shift
 	;;
 	-c=*|--compiler=*)
@@ -33,7 +33,7 @@ esac
 
 rm -rf build
 mkdir build
-pushd build
+pushd build &> /dev/null
 CC=$CC CXX=$CXX cmake ${args[@]} ..
-make -j${jobs}
-popd
+make ${jobs}
+popd > /dev/null
