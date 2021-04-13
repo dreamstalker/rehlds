@@ -288,7 +288,7 @@ private:
 	void CMD_Protocol(char *cmdLine);
 	void CMD_Region(char *cmdLine);
 	void CMD_ChatDelay(char *cmdLine);
-
+	void AddNextWorld();
 	struct LocalCommandID_s {
 		char *name;
 		LocalCommandIDs id;
@@ -388,4 +388,5 @@ protected:
 	BitBuffer m_InfoDetails;
 	BitBuffer m_InfoInfo;
 	BitBuffer m_InfoString;
+	ObjectList m_Worlds;
 };

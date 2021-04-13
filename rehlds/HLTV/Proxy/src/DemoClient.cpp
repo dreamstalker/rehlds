@@ -157,6 +157,11 @@ void DemoClient::RunFrame(double time)
 
 void DemoClient::SendDatagram()
 {
+#ifndef HLTV_FIXES
+	/*
+	 * Delaying frames to demo is wrong.
+	 * Early stopping demo will lost server frames.
+	 */
 	if (m_Proxy->GetDelay() > 0)
 	{
 		double worldTime = m_Proxy->GetSpectatorTime();
@@ -173,7 +178,7 @@ void DemoClient::SendDatagram()
 
 		return;
 	}
-
+#endif
 	frame_t *frame = m_World->GetLastFrame();
 	if (frame) {
 		WriteDatagram(frame->time, frame);

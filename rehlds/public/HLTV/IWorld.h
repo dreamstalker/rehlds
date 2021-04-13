@@ -144,6 +144,7 @@ public:
 	virtual bool AddResource(resource_t *resource) = 0;
 	virtual void AddLightStyle(int index, char *style) = 0;
 	virtual bool AddSignonData(unsigned char type, unsigned char *data, int size) = 0;
+	virtual bool AddSignonData(unsigned char* data, int size) = 0;
 	virtual bool AddUserMessage(int msgNumber, int size, char *name) = 0;
 	virtual void AddBaselineEntity(int index, entity_state_t *ent) = 0;
 	virtual void AddInstancedBaselineEntity(int index, entity_state_t *ent) = 0;

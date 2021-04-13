@@ -86,7 +86,41 @@ Proxy::LocalCommandID_s Proxy::m_LocalCmdReg[] = {
 #ifndef HOOK_HLTV
 EXPOSE_SINGLE_INTERFACE(Proxy, IProxy, PROXY_INTERFACE_VERSION);
 #endif // HOOK_HLTV
+#ifdef HLTV_FIXES
+void Proxy::AddNextWorld()
+{
+	BitBuffer temp_buff;
+	temp_buff.Resize(0x8000);
+	static int num_alloc = 0;
+	static char instance[64];
+	snprintf(instance, sizeof(instance), "AddNextWorld_%d", num_alloc++);
+	IWorld* nextWorld = (IWorld*)m_System->GetModule(WORLD_INTERFACE_VERSION, "core", instance);
+	if (!nextWorld)
+	{
+		m_System->Errorf("Proxy::AddNextWorld: couldn't load world module.\n");
+		return;
+	}
 
+	m_World->WriteSigonData(&temp_buff);
+	nextWorld->AddSignonData(temp_buff.GetData(), temp_buff.CurrentSize());
+	
+	nextWorld->RegisterListener(this);
+	
+	m_Worlds.AddTail(nextWorld);
+
+	if (m_DemoClient.IsActive())
+	{
+		m_DemoClient.FinishDemo();
+	}
+	
+	m_Server->SetWorld(nextWorld);
+	m_DemoClient.SetWorld(nextWorld);
+	
+	if (m_Server->IsConnected()) {
+		m_Server->Reconnect();
+	}
+}
+#endif
 bool Proxy::Init(IBaseSystem *system, int serial, char *name)
 {
 	BaseSystemModule::Init(system, serial, name);
@@ -321,8 +355,27 @@ void Proxy::RunFrame(double time)
 			RunClocks();
 			if (m_IsFinishingBroadcast && m_ClientWorldTime > m_World->GetTime() && !m_IsReconnectRequested)
 			{
-				if (m_Server->IsConnected()) {
-					m_Server->Reconnect();
+#ifdef HLTV_FIXES
+				IWorld* head = (IWorld*)m_Worlds.GetFirst();
+
+				// If we just finished playback previous world record
+				if(head)
+				{
+					// We can't RemoveModule m_World right now because it will fire events to unload us.
+					// Store it in temp var to unload it after set new world
+					IWorld* oldWorld = m_World;
+					m_World = head;	
+					m_Worlds.RemoveHead();
+					NewGameStarted();
+					ReconnectClients();
+					m_System->RemoveModule((ISystemModule*)oldWorld);
+				}
+				else
+#endif
+				{
+					if (m_Server->IsConnected()) {
+						m_Server->Reconnect();
+					}
 				}
 				m_IsReconnectRequested = true;
 			}
@@ -1429,8 +1482,17 @@ void Proxy::ReceiveSignal(ISystemModule *module, unsigned int signal, void *data
 			break;
 		case 5:
 		case 6:
+		{
+#ifdef HLTV_FIXES
+			if (!m_IsFinishingBroadcast && m_ClientDelay > 0.f)
+			{				
+				//If we finished broadcast we need to get frames from next "World" (Next server map)				
+				AddNextWorld();
+			}
+#endif
 			m_IsFinishingBroadcast = true;
 			break;
+		}
 		case 7:
 			BroadcastRetryMessage();
 			break;
@@ -1447,15 +1509,26 @@ void Proxy::ReceiveSignal(ISystemModule *module, unsigned int signal, void *data
 		switch (signal)
 		{
 		case 2:
-			NewGameStarted();
-			ReconnectClients();
+
+#ifdef HLTV_FIXES
+			if(m_ClientDelay <= 0)
+#endif
+			{
+				NewGameStarted();
+				ReconnectClients();
+			}
 			break;
 		case 5:
 		case 6:
 			BroadcastPaused(signal == 5 ? true : false);
 			break;
 		case 8:
-			StopBroadcast("HLTV shutddown.");
+#ifdef HLTV_FIXES
+			if (m_ClientDelay <= 0)
+#endif
+			{
+				StopBroadcast("HLTV shutdown.");
+			}
 			break;
 		default:
 			break;
@@ -1847,11 +1920,20 @@ void Proxy::ReconnectClients()
 	IClient *client = (IClient *)m_Clients.GetFirst();
 	while (client)
 	{
+#ifdef HLTV_FIXES
+		client->SetWorld(m_World);
+#endif
 		client->Reconnect();
 		client = (IClient *)m_Clients.GetNext();
 	}
-
-	m_DemoClient.Reconnect();
+#ifdef HLTV_FIXES
+	// If delay set than m_DemoClient is already stopped demo in AddNextWorld
+	// Reconnect (Stoping demo) in this case will stop demo and write new one with lost frames
+	if (m_ClientDelay <= 0 && m_DemoClient.IsActive())
+#endif
+	{
+		m_DemoClient.Reconnect();		
+	}
 }
 
 void Proxy::CMD_OffLineText(char *cmdLine)
@@ -2485,11 +2567,17 @@ void Proxy::SetDelay(float seconds)
 	{
 		m_ClientDelay = 0;
 		m_World->SetBufferSize(10);
+#ifdef HLTV_FIXES
+		m_Server->SetDelayReconnect(false);
+#endif
 	}
 	else
 	{
 		m_World->SetBufferSize(seconds + seconds);
 		m_ClientWorldTime = m_World->GetTime() - m_ClientDelay;
+#ifdef HLTV_FIXES
+		m_Server->SetDelayReconnect(true);
+#endif
 	}
 
 	m_Server->SetUserInfo("hdelay", COM_VarArgs("%u", (int)m_ClientDelay));

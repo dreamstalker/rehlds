@@ -123,6 +123,7 @@ public:
 	EXT_FUNC char *GetHostName();
 	EXT_FUNC float GetPacketLoss();
 	EXT_FUNC int GetProtocol();
+	EXT_FUNC void SetWorld(IWorld* world);
 
 private:
 public:

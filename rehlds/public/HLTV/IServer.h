@@ -96,6 +96,7 @@ public:
 	virtual bool GetAutoRetry() = 0;
 	virtual float GetPacketLoss() = 0;
 	virtual int GetProtocol() = 0;
+	virtual void SetWorld(IWorld* world) = 0;
 };
 
 #define SERVER_INTERFACE_VERSION "server001"

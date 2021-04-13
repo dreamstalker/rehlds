@@ -1450,6 +1450,14 @@ bool World::AddSignonData(unsigned char type, unsigned char *data, int size)
 	return m_SignonData.IsOverflowed();
 }
 
+
+bool World::AddSignonData(unsigned char* data, int size)
+{
+	m_SignonData.WriteBuf(data, size);
+
+	return m_SignonData.IsOverflowed();
+}
+
 int World::FindUserMsgByName(char *name)
 {
 	for (UserMsg *pList = m_ClientUserMsgs; pList; pList = pList->next)
@@ -2377,6 +2385,5 @@ delta_t *World::GetEntityDelta() const {
 delta_t *World::GetWeaponDelta() const {
 	return Delta::m_WeaponDelta;
 }
-
 EXPOSE_INTERFACE_FN(CreateWorld, World, WORLD_INTERFACE_VERSION);
 #endif // HOOK_HLTV
