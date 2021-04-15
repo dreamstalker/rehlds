@@ -70,12 +70,6 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>ws2_32.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
-    <PreBuildEvent>
-      <Command>IF EXIST "$(ProjectDir)PreBuild.bat" (CALL "$(ProjectDir)PreBuild.bat" "$(ProjectDir)..\..\version\" "$(ProjectDir)..\..\")</Command>
-    </PreBuildEvent>
-    <PreBuildEvent>
-      <Message>Setup version from Git revision</Message>
-    </PreBuildEvent>
     <PostBuildEvent>
       <Command>IF EXIST "$(ProjectDir)PostBuild.bat" (CALL "$(ProjectDir)PostBuild.bat" "$(TargetDir)" "$(TargetName)" "$(TargetExt)" "$(ProjectDir)")</Command>
     </PostBuildEvent>
@@ -115,12 +109,6 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>ws2_32.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
-    <PreBuildEvent>
-      <Command>IF EXIST "$(ProjectDir)PreBuild.bat" (CALL "$(ProjectDir)PreBuild.bat" "$(ProjectDir)..\..\version\" "$(ProjectDir)..\..\")</Command>
-    </PreBuildEvent>
-    <PreBuildEvent>
-      <Message>Setup version from Git revision</Message>
-    </PreBuildEvent>
     <PostBuildEvent>
       <Command>IF EXIST "$(ProjectDir)PostBuild.bat" (CALL "$(ProjectDir)PostBuild.bat" "$(TargetDir)" "$(TargetName)" "$(TargetExt)" "$(ProjectDir)")</Command>
     </PostBuildEvent>
@@ -183,6 +171,11 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\version\msvc\version.vcxproj">
+      <Project>{6973dca5-253c-4d84-b51e-187e035eae06}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

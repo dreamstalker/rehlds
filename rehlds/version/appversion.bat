@@ -4,6 +4,8 @@
 :: Pre-build auto-versioning script
 ::
 
+chcp 65001
+
 set srcdir=%~1
 set repodir=%~2
 

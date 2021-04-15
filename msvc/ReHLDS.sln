@@ -7,6 +7,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ReHLDS", "..\rehlds\msvc\Re
 	ProjectSection(ProjectDependencies) = postProject
 		{792DF067-9904-4579-99B9-46C17277ADE3} = {792DF067-9904-4579-99B9-46C17277ADE3}
 		{CEB94F7C-E459-4673-AABB-36E2074396C0} = {CEB94F7C-E459-4673-AABB-36E2074396C0}
+		{6973DCA5-253C-4D84-B51E-187E035EAE06} = {6973DCA5-253C-4D84-B51E-187E035EAE06}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cppunitlite", "..\dep\cppunitlite\msvc\cppunitlite.vcxproj", "{CEB94F7C-E459-4673-AABB-36E2074396C0}"
@@ -14,6 +15,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bzip2", "..\dep\bzip2\msvc\bzip2.vcxproj", "{792DF067-9904-4579-99B9-46C17277ADE3}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dedicated", "..\rehlds\dedicated\msvc\dedicated.vcxproj", "{D49883F3-5C5C-4B9F-B9C7-B31518F228D4}"
+	ProjectSection(ProjectDependencies) = postProject
+		{6973DCA5-253C-4D84-B51E-187E035EAE06} = {6973DCA5-253C-4D84-B51E-187E035EAE06}
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{D2516ABB-21F2-4393-8CC9-2BD2D3316CD6}"
 	ProjectSection(SolutionItems) = preProject
@@ -21,6 +25,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Console", "..\rehlds\HLTV\Console\msvc\Console.vcxproj", "{D5CAB879-D54F-456F-8592-31D549CFD1D8}"
+	ProjectSection(ProjectDependencies) = postProject
+		{6973DCA5-253C-4D84-B51E-187E035EAE06} = {6973DCA5-253C-4D84-B51E-187E035EAE06}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Core", "..\rehlds\HLTV\Core\msvc\Core.vcxproj", "{52F752EA-73D1-422D-B805-17EF1FB20E09}"
 EndProject
@@ -31,6 +38,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Proxy", "..\rehlds\HLTV\Proxy\msvc\Proxy.vcxproj", "{ADDFF069-D39D-4A1B-87C9-85A62B980547}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "filesystem_stdio", "..\rehlds\filesystem\FileSystem_Stdio\msvc\filesystem_stdio.vcxproj", "{A428392F-52FB-489E-87D8-623528C7F4F9}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "version", "..\rehlds\version\msvc\version.vcxproj", "{6973DCA5-253C-4D84-B51E-187E035EAE06}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -134,8 +143,23 @@ Global
 		{A428392F-52FB-489E-87D8-623528C7F4F9}.Release|Win32.Build.0 = Release|Win32
 		{A428392F-52FB-489E-87D8-623528C7F4F9}.Test Fixes|Win32.ActiveCfg = Debug|Win32
 		{A428392F-52FB-489E-87D8-623528C7F4F9}.Tests|Win32.ActiveCfg = Debug|Win32
+		{6973DCA5-253C-4D84-B51E-187E035EAE06}.Debug Play|Win32.ActiveCfg = Release|Win32
+		{6973DCA5-253C-4D84-B51E-187E035EAE06}.Debug Play|Win32.Build.0 = Release|Win32
+		{6973DCA5-253C-4D84-B51E-187E035EAE06}.Debug|Win32.ActiveCfg = Release|Win32
+		{6973DCA5-253C-4D84-B51E-187E035EAE06}.Debug|Win32.Build.0 = Release|Win32
+		{6973DCA5-253C-4D84-B51E-187E035EAE06}.Release Play|Win32.ActiveCfg = Release|Win32
+		{6973DCA5-253C-4D84-B51E-187E035EAE06}.Release Play|Win32.Build.0 = Release|Win32
+		{6973DCA5-253C-4D84-B51E-187E035EAE06}.Release|Win32.ActiveCfg = Release|Win32
+		{6973DCA5-253C-4D84-B51E-187E035EAE06}.Release|Win32.Build.0 = Release|Win32
+		{6973DCA5-253C-4D84-B51E-187E035EAE06}.Test Fixes|Win32.ActiveCfg = Release|Win32
+		{6973DCA5-253C-4D84-B51E-187E035EAE06}.Test Fixes|Win32.Build.0 = Release|Win32
+		{6973DCA5-253C-4D84-B51E-187E035EAE06}.Tests|Win32.ActiveCfg = Release|Win32
+		{6973DCA5-253C-4D84-B51E-187E035EAE06}.Tests|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3225EDB9-2B71-42E4-99DB-ED6E6E2A2EC6}
 	EndGlobalSection
 EndGlobal

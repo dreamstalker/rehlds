@@ -83,6 +83,11 @@
   <ItemGroup>
     <ResourceCompile Include="hltv.rc" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\version\msvc\version.vcxproj">
+      <Project>{6973dca5-253c-4d84-b51e-187e035eae06}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{D5CAB879-D54F-456F-8592-31D549CFD1D8}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
@@ -157,10 +162,6 @@
       <Outputs>build.always.run</Outputs>
       <Inputs>build.always.run</Inputs>
     </CustomBuildStep>
-    <PreBuildEvent>
-      <Command>IF EXIST "$(ProjectDir)PreBuild.bat" (CALL "$(ProjectDir)PreBuild.bat" "$(ProjectDir)..\..\..\version\" "$(ProjectDir)..\..\..\")</Command>
-      <Message>Setup version from Git revision</Message>
-    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -193,10 +194,6 @@
       <Outputs>build.always.run</Outputs>
       <Inputs>build.always.run</Inputs>
     </CustomBuildStep>
-    <PreBuildEvent>
-      <Command>IF EXIST "$(ProjectDir)PreBuild.bat" (CALL "$(ProjectDir)PreBuild.bat" "$(ProjectDir)..\..\..\version\" "$(ProjectDir)..\..\..\")</Command>
-      <Message>Setup version from Git revision</Message>
-    </PreBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
