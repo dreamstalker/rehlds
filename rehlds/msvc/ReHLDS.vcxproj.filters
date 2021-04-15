@@ -338,8 +338,8 @@
     <ClCompile Include="..\rehlds\main.cpp">
       <Filter>rehlds</Filter>
     </ClCompile>
-    <ClCompile Include="..\hookers\memory.cpp">
-      <Filter>rehlds</Filter>
+    <ClCompile Include="..\testsuite\memory.cpp">
+      <Filter>testsuite</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1057,16 +1057,8 @@
     <ClInclude Include="..\engine\mathlib_sse.h">
       <Filter>engine</Filter>
     </ClInclude>
-    <ClInclude Include="..\hookers\memory.h">
-      <Filter>rehlds</Filter>
+    <ClInclude Include="..\testsuite\memory.h">
+      <Filter>testsuite</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\linux\appversion.sh">
-      <Filter>linux</Filter>
-    </None>
-    <None Include="..\linux\Makefile">
-      <Filter>linux</Filter>
-    </None>
   </ItemGroup>
 </Project>

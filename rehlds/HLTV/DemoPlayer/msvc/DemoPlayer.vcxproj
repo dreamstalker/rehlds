@@ -16,14 +16,6 @@
     <ClCompile Include="..\..\..\common\ObjectList.cpp" />
     <ClCompile Include="..\..\..\common\TokenLine.cpp" />
     <ClCompile Include="..\..\..\engine\mem.cpp" />
-    <ClCompile Include="..\..\..\hookers\HLTV\DemoPlayer\hooklist.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\hookers\HLTV\DemoPlayer\main.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="..\..\common\BitBuffer.cpp" />
     <ClCompile Include="..\..\common\byteorder.cpp" />
     <ClCompile Include="..\..\common\common.cpp" />
@@ -42,10 +34,6 @@
     <ClInclude Include="..\..\..\common\ObjectList.h" />
     <ClInclude Include="..\..\..\common\TokenLine.h" />
     <ClInclude Include="..\..\..\engine\mem.h" />
-    <ClInclude Include="..\..\..\hookers\HLTV\DemoPlayer\hooklist.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
     <ClInclude Include="..\..\common\BitBuffer.h" />
     <ClInclude Include="..\..\common\byteorder.h" />
     <ClInclude Include="..\..\common\common_hltv.h" />

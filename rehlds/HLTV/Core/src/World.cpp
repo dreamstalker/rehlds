@@ -2338,7 +2338,6 @@ IBaseInterface *CreateWorld()
 	return (IBaseInterface *)pWorld;
 }
 
-#ifndef HOOK_HLTV
 bool World::IsDeltaEncoder() const
 {
 	if (Delta::m_CustomentityDelta
@@ -2379,4 +2378,3 @@ delta_t *World::GetWeaponDelta() const {
 }
 
 EXPOSE_INTERFACE_FN(CreateWorld, World, WORLD_INTERFACE_VERSION);
-#endif // HOOK_HLTV

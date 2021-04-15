@@ -95,10 +95,6 @@ typedef struct delta_s
 	delta_description_t *pdd;
 } delta_t;
 
-#include "hookers/HLTV/Core/DeltaEx.h"
-
-#ifndef HOOK_HLTV
-
 class Delta {
 public:
 	void Init(IBaseSystem *system);
@@ -204,5 +200,3 @@ private:
 	double m_Time;
 	bool m_LargeTime_Buffers;
 };
-
-#endif // HOOK_HLTV

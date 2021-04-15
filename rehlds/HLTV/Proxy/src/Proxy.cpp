@@ -83,9 +83,7 @@ Proxy::LocalCommandID_s Proxy::m_LocalCmdReg[] = {
 	{ "chatdelay",         CMD_ID_CHATDELAY,          &Proxy::CMD_ChatDelay },
 };
 
-#ifndef HOOK_HLTV
 EXPOSE_SINGLE_INTERFACE(Proxy, IProxy, PROXY_INTERFACE_VERSION);
-#endif // HOOK_HLTV
 
 bool Proxy::Init(IBaseSystem *system, int serial, char *name)
 {

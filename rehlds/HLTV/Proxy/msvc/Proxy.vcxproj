@@ -36,14 +36,6 @@
       </ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\..\..\engine\mem.cpp" />
-    <ClCompile Include="..\..\..\hookers\HLTV\Proxy\hooklist.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\hookers\HLTV\Proxy\main.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="..\..\common\BaseClient.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
@@ -213,10 +205,6 @@
     <ClInclude Include="..\..\..\common\ObjectList.h" />
     <ClInclude Include="..\..\..\common\TokenLine.h" />
     <ClInclude Include="..\..\..\engine\mem.h" />
-    <ClInclude Include="..\..\..\hookers\HLTV\Proxy\hooklist.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
     <ClInclude Include="..\..\common\BaseClient.h" />
     <ClInclude Include="..\..\common\BitBuffer.h" />
     <ClInclude Include="..\..\common\byteorder.h" />

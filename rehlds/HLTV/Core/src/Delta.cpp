@@ -28,8 +28,6 @@
 
 #include "precompiled.h"
 
-#ifndef HOOK_HLTV
-
 delta_t *Delta::m_EntityDelta = nullptr;
 delta_t *Delta::m_PlayerDelta = nullptr;
 delta_t *Delta::m_ClientDelta = nullptr;
@@ -1510,5 +1508,3 @@ void Delta::SetLargeTimeBufferSize(bool bigBuffers)
 {
 	m_LargeTime_Buffers = bigBuffers;
 }
-
-#endif // HOOK_HLTV

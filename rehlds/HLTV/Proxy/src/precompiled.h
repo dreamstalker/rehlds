@@ -18,9 +18,6 @@
 #include "common/net_internal.h"
 #include "common/mathlib_internal.h"
 
-// Hooks stuff
-#include "hookers/HLTV/Proxy/hooklist.h"
-
 #include "common/DirectorCmd.h"
 #include "common/NetAddress.h"
 #include "common/NetChannel.h"

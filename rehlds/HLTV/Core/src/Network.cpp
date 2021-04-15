@@ -449,6 +449,4 @@ IBaseInterface *CreateNetwork()
 	return (IBaseInterface *)pNetwork;
 }
 
-#ifndef HOOK_HLTV
 EXPOSE_INTERFACE_FN(CreateNetwork, Network, NETWORK_INTERFACE_VERSION);
-#endif // HOOK_HLTV

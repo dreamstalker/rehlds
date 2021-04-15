@@ -88,7 +88,6 @@
     <ClCompile Include="..\engine\wad.cpp" />
     <ClCompile Include="..\engine\world.cpp" />
     <ClCompile Include="..\engine\zone.cpp" />
-    <ClCompile Include="..\hookers\memory.cpp" />
     <ClCompile Include="..\public\interface.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Play|Win32'">true</ExcludedFromBuild>
@@ -143,6 +142,7 @@
     <ClCompile Include="..\rehlds\structSizeCheck.cpp" />
     <ClCompile Include="..\testsuite\anonymizer.cpp" />
     <ClCompile Include="..\testsuite\funccalls.cpp" />
+    <ClCompile Include="..\testsuite\memory.cpp" />
     <ClCompile Include="..\testsuite\player.cpp" />
     <ClCompile Include="..\testsuite\recorder.cpp" />
     <ClCompile Include="..\testsuite\testsuite.cpp" />
@@ -366,7 +366,6 @@
     <ClInclude Include="..\engine\wad.h" />
     <ClInclude Include="..\engine\world.h" />
     <ClInclude Include="..\engine\zone.h" />
-    <ClInclude Include="..\hookers\memory.h" />
     <ClInclude Include="..\public\basetypes.h" />
     <ClInclude Include="..\public\commonmacros.h" />
     <ClInclude Include="..\public\engine_hlds_api.h" />
@@ -448,25 +447,12 @@
     <ClInclude Include="..\rehlds\rehlds_security.h" />
     <ClInclude Include="..\testsuite\anonymizer.h" />
     <ClInclude Include="..\testsuite\funccalls.h" />
+    <ClInclude Include="..\testsuite\memory.h" />
     <ClInclude Include="..\testsuite\player.h" />
     <ClInclude Include="..\testsuite\recorder.h" />
     <ClInclude Include="..\testsuite\testsuite.h" />
     <ClInclude Include="..\unittests\rehlds_tests_shared.h" />
     <ClInclude Include="..\version\version.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\linux\appversion.sh">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Play|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Tests|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test Fixes|Win32'">true</ExcludedFromBuild>
-    </None>
-    <None Include="..\linux\Makefile">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Play|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Tests|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test Fixes|Win32'">true</ExcludedFromBuild>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\dep\bzip2\msvc\bzip2.vcxproj">
@@ -589,7 +575,7 @@
       <Message>Setup version from Git revision</Message>
     </PreBuildEvent>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(ProjectDir)\..\;$(ProjectDir)\..\hookers\;$(ProjectDir)\..\metamod\include\;$(ProjectDir)\..\public\rehlds\;$(ProjectDir)\..\common;$(ProjectDir)\..\engine;$(ProjectDir)\..\public;$(ProjectDir)\..\pm_shared;$(ProjectDir)\..\rehlds\;$(ProjectDir)\..\testsuite\;$(VCInstallDir)UnitTest\include;$(SolutionDir)..\dep\bzip2\include\;$(SolutionDir)..\dep\cppunitlite\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\;$(ProjectDir)\..\metamod\include\;$(ProjectDir)\..\public\rehlds\;$(ProjectDir)\..\common;$(ProjectDir)\..\engine;$(ProjectDir)\..\public;$(ProjectDir)\..\pm_shared;$(ProjectDir)\..\rehlds\;$(ProjectDir)\..\testsuite\;$(VCInstallDir)UnitTest\include;$(SolutionDir)..\dep\bzip2\include\;$(SolutionDir)..\dep\cppunitlite\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
@@ -626,7 +612,7 @@
       <Message>Setup version from Git revision</Message>
     </PreBuildEvent>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(ProjectDir)\..\;$(ProjectDir)\..\hookers\;$(ProjectDir)\..\metamod\include\;$(ProjectDir)\..\public\rehlds\;$(ProjectDir)\..\common;$(ProjectDir)\..\engine;$(ProjectDir)\..\public;$(ProjectDir)\..\pm_shared;$(ProjectDir)\..\rehlds\;$(ProjectDir)\..\testsuite\;$(VCInstallDir)UnitTest\include;$(SolutionDir)..\dep\bzip2\include\;$(SolutionDir)..\dep\cppunitlite\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\;$(ProjectDir)\..\metamod\include\;$(ProjectDir)\..\public\rehlds\;$(ProjectDir)\..\common;$(ProjectDir)\..\engine;$(ProjectDir)\..\public;$(ProjectDir)\..\pm_shared;$(ProjectDir)\..\rehlds\;$(ProjectDir)\..\testsuite\;$(VCInstallDir)UnitTest\include;$(SolutionDir)..\dep\bzip2\include\;$(SolutionDir)..\dep\cppunitlite\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
@@ -665,7 +651,7 @@
       <Message>Setup version from Git revision</Message>
     </PreBuildEvent>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(ProjectDir)\..\;$(ProjectDir)\..\hookers\;$(ProjectDir)\..\metamod\include\;$(ProjectDir)\..\public\rehlds\;$(ProjectDir)\..\common;$(ProjectDir)\..\engine;$(ProjectDir)\..\public;$(ProjectDir)\..\pm_shared;$(ProjectDir)\..\rehlds\;$(ProjectDir)\..\testsuite\;$(VCInstallDir)UnitTest\include;$(SolutionDir)..\dep\bzip2\include\;$(SolutionDir)..\dep\cppunitlite\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\;$(ProjectDir)\..\metamod\include\;$(ProjectDir)\..\public\rehlds\;$(ProjectDir)\..\common;$(ProjectDir)\..\engine;$(ProjectDir)\..\public;$(ProjectDir)\..\pm_shared;$(ProjectDir)\..\rehlds\;$(ProjectDir)\..\testsuite\;$(VCInstallDir)UnitTest\include;$(SolutionDir)..\dep\bzip2\include\;$(SolutionDir)..\dep\cppunitlite\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
@@ -701,7 +687,7 @@
       <Message>Setup version from Git revision</Message>
     </PreBuildEvent>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(ProjectDir)\..\;$(ProjectDir)\..\hookers\;$(ProjectDir)\..\metamod\include\;$(ProjectDir)\..\public\rehlds\;$(ProjectDir)\..\common;$(ProjectDir)\..\engine;$(ProjectDir)\..\public;$(ProjectDir)\..\pm_shared;$(ProjectDir)\..\rehlds\;$(ProjectDir)\..\testsuite\;$(VCInstallDir)UnitTest\include;$(SolutionDir)..\dep\bzip2\include\;$(SolutionDir)..\dep\cppunitlite\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\;$(ProjectDir)\..\metamod\include\;$(ProjectDir)\..\public\rehlds\;$(ProjectDir)\..\common;$(ProjectDir)\..\engine;$(ProjectDir)\..\public;$(ProjectDir)\..\pm_shared;$(ProjectDir)\..\rehlds\;$(ProjectDir)\..\testsuite\;$(VCInstallDir)UnitTest\include;$(SolutionDir)..\dep\bzip2\include\;$(SolutionDir)..\dep\cppunitlite\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
@@ -736,7 +722,7 @@
       <Message>Setup version from Git revision</Message>
     </PreBuildEvent>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(ProjectDir)\..\;$(ProjectDir)\..\hookers\;$(ProjectDir)\..\metamod\include\;$(ProjectDir)\..\public\rehlds\;$(ProjectDir)\..\common;$(ProjectDir)\..\engine;$(ProjectDir)\..\public;$(ProjectDir)\..\pm_shared;$(ProjectDir)\..\rehlds\;$(ProjectDir)\..\testsuite\;$(VCInstallDir)UnitTest\include;$(SolutionDir)..\dep\bzip2\include\;$(SolutionDir)..\dep\cppunitlite\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\;$(ProjectDir)\..\metamod\include\;$(ProjectDir)\..\public\rehlds\;$(ProjectDir)\..\common;$(ProjectDir)\..\engine;$(ProjectDir)\..\public;$(ProjectDir)\..\pm_shared;$(ProjectDir)\..\rehlds\;$(ProjectDir)\..\testsuite\;$(VCInstallDir)UnitTest\include;$(SolutionDir)..\dep\bzip2\include\;$(SolutionDir)..\dep\cppunitlite\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -780,7 +766,7 @@
       <Message>Setup version from Git revision</Message>
     </PreBuildEvent>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(ProjectDir)\..\;$(ProjectDir)\..\hookers\;$(ProjectDir)\..\metamod\include\;$(ProjectDir)\..\public\rehlds\;$(ProjectDir)\..\common;$(ProjectDir)\..\engine;$(ProjectDir)\..\public;$(ProjectDir)\..\pm_shared;$(ProjectDir)\..\rehlds\;$(ProjectDir)\..\testsuite\;$(VCInstallDir)UnitTest\include;$(SolutionDir)..\dep\bzip2\include\;$(SolutionDir)..\dep\cppunitlite\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\;$(ProjectDir)\..\metamod\include\;$(ProjectDir)\..\public\rehlds\;$(ProjectDir)\..\common;$(ProjectDir)\..\engine;$(ProjectDir)\..\public;$(ProjectDir)\..\pm_shared;$(ProjectDir)\..\rehlds\;$(ProjectDir)\..\testsuite\;$(VCInstallDir)UnitTest\include;$(SolutionDir)..\dep\bzip2\include\;$(SolutionDir)..\dep\cppunitlite\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
