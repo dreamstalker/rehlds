@@ -15,27 +15,21 @@ You can try play on one of the servers that using rehlds: [Game Tracker](http://
 </ul>
 
 ## How can use it?
-Rehlds is fully compatible with latest official HLDS downloaded by steamcmd. All you have to do is to download rehlds binaries and replace original swds.dll/engine_i486.so. For windows you can also copy a swds.pdb file with a debug information.
-<br /><b>Warning!</b> Rehlds is not compatible with an old 5xxx or below platforms downloaded by hldsupdatetool.
+ReHLDS is fully compatible with latest official HLDS downloaded by steamcmd. All you have to do is to download rehlds binaries and replace original swds.dll/engine_i486.so. For windows you can also copy a swds.pdb file with a debug information.
+<br /><b>Warning!</b> ReHLDS is not compatible with an old 5xxx or below platforms downloaded by hldsupdatetool.
 
-Compiled binaries are available here: [Artifact releases](https://github.com/dreamstalker/rehlds/releases)
+## Downloads
+* [Release builds](https://github.com/dreamstalker/rehlds/releases)
+* [Dev builds](https://github.com/dreamstalker/rehlds/actions/workflows/build.yml)
 
-Rehlds binaries require SSE, SSE2 and SSE3 instruction sets to run and can benefit from SSE4.1 and SSE4.2.
+ReHLDS binaries require `SSE`, `SSE2` and `SSE3` instruction sets to run and can benefit from `SSE4.1` and `SSE4.2`
 
-Archive's bin directory contains 2 subdirectories, 'bugfixed' and 'pure'
-<ul>
-<li>'pure' version is designed to work exactly as official hlds engine</li>
-<li>'bugfixed' version contains some fixes and improvements</li>
-</ul>
-
-<b>Warning!</b> Rehlds is not binary compatible with original hlds since it's compiled with compilers other than ones used for original hlds. This means that plugins that do binary code analysis (Orpheu for example) probably will not work with rehlds.
+<b>Warning!</b> ReHLDS is not binary compatible with original hlds since it's compiled with compilers other than ones used for original hlds.
+This means that plugins that do binary code analysis (Orpheu for example) probably will not work with rehlds.
 
 ## Configuring
-Bugfixed version of rehlds contains an additional cvars:
-
 <details>
 <summary>Click to expand</summary>
-
 <ul>
 <li>listipcfgfile <filename> // File for permanent ip bans. Default: listip.cfg
 <li>syserror_logfile <filename> // File for the system error log. Default: sys_error.log
@@ -60,11 +54,9 @@ Bugfixed version of rehlds contains an additional cvars:
 <li>sv_rehlds_maxclients_from_single_ip // Limit number of connections from the single ip address. Default: 5
 <li>sv_use_entity_file // Use custom entity file for a map. Path to an entity file will be "maps/[map name].ent". 0 - use original entities. 1 - use .ent files from maps directory. 2 - use .ent files from maps directory and create new .ent file if not exist.
 </ul>
-
 </details>
 
 ## Commands
-Bugfixed version of rehlds contains an additional commands
 <ul>
 <li>rescount // Prints the total count of precached resources in the server console
 <li>reslist &lt;sound | model | decal | generic | event&gt; // Separately prints the details of the precached resources for sounds, models, decals, generic and events in server console. Useful for managing resources and dealing with the goldsource precache limits.
@@ -94,22 +86,47 @@ Use `Visual Studio` to build, open `msvc/ReHLDS.sln` and just select from the so
 
 #### Linux
 
+* Optional options using `build.sh --compiler=[gcc] --jobs=[N] -D[option]=[ON or OFF]` (without square brackets)
+
+<pre>
+-c=|--compiler=[icc|gcc|clang]  - Select preferred C/C++ compiler to build
+-j=|--jobs=[N]                  - Specifies the number of jobs (commands) to run simultaneously (For faster building)
+
+<sub>Definitions (-D)</sub>
+DEBUG                           - Enables debugging mode
+USE_STATIC_LIBSTDC              - Enables static linking library libstdc++
+</pre>
+
+* ICC          <pre>./build.sh --compiler=intel</pre>
+* LLVM (Clang) <pre>./build.sh --compiler=clang</pre>
+* GCC          <pre>./build.sh --compiler=gcc</pre>
+
+##### Checking build environment (Debian / Ubuntu)
+
+<details>
+<summary>Click to expand</summary>
+
 <ul>
 <li>
-ICC:
-<pre>./build.sh --compiler=intel</pre>
+Installing required packages
+<pre>
+sudo dpkg --add-architecture i386
+sudo apt-get update
+sudo apt-get install -y gcc-multilib g++-multilib
+sudo apt-get install -y build-essential
+sudo apt-get install -y libc6-dev libc6-dev-i386
+</pre>
 </li>
 
 <li>
-LLVM (Clang):
-<pre>./build.sh --compiler=clang</pre>
-</li>
-
-<li>
-GCC:
-<pre>./build.sh --compiler=gcc</pre>
+Select the preferred C/C++ Compiler installation
+<pre>
+1) sudo apt-get install -y gcc g++
+2) sudo apt-get install -y clang
+</pre>
 </li>
 </ul>
+</details>
 
 ## How can I help the project?
 Just install it on your game server and report problems you faced.
