@@ -68,7 +68,7 @@ There are several software requirements for building rehlds:
 
 #### Windows
 <pre>
-Visual Studio 2013 and later
+Visual Studio 2015 (C++14 standard) and later
 </pre>
 
 #### Linux
