@@ -29,18 +29,8 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup Nuget
-        uses: nuget/setup-nuget@v1
-        with:
-          nuget-api-key: ${{ secrets.NuGetAPIKey }}
-          nuget-version: '5.x'
-
-      - run: nuget restore '${{ env.solution }}'
-
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v1.0.2
-        with:
-          vs-version: '16.8'
 
       - name: Build and Run unittests
         run: |

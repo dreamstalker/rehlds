@@ -126,7 +126,7 @@ TEST(SetValueForStarKeyResult, Info, 1000) {
 		char localInfo[256];
 		strcpy(localInfo, d->initialInfo);
 		localInfo[255] = 0;
-		bool result = Info_SetValueForStarKey(localInfo, d->key, d->value, 256);
+		bool result = Info_SetValueForStarKey(localInfo, d->key, d->value, 256) ? true : false;
 		CHECK("Invalid info string", d->success == result);
 	}
 }
@@ -301,7 +301,7 @@ TEST(Info_IsKeyImportant, Info, 1000)
 	for (int i = 0; i < ARRAYSIZE(testdata); i++) {
 		testdata_t* d = &testdata[i];
 
-		bool result = Info_IsKeyImportant(d->key);
+		bool result = Info_IsKeyImportant(d->key) ? true : false;
 
 		CHECK("wrong result", d->result == result);
 	}
