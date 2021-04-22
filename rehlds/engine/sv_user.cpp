@@ -1803,6 +1803,12 @@ void SV_ExecuteClientMessage(client_t *cl)
 			return;
 
 		g_RehldsHookchains.m_HandleNetCommand.callChain(SV_HandleClientMessage_api, apiClient, c);
+
+#ifdef REHLDS_FIXES
+		// FIXED: Don't handle remaining packets if got dropclient above
+		if (!cl->connected && !cl->active && !cl->spawned)
+			break;
+#endif // REHLDS_FIXES
 	}
 }
 
