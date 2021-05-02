@@ -501,7 +501,7 @@ void Cmd_Alias_f(void)
 	// Gather arguments into one string
 	cmd[0] = 0;
 	c = Cmd_Argc();
-	for (i = 2; i <= c; i++)
+	for (i = 2; i < c; i++)
 	{
 		Q_strncat(cmd, Cmd_Argv(i), MAX_CMD_LINE - 2 - Q_strlen(cmd));	// always have a space for \n or ' ' and \0
 
