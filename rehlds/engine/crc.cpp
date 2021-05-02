@@ -227,7 +227,11 @@ int CRC_MapFile(CRC32_t *crcvalue, char *pszFileName)
 		return 0;
 	}
 	i = LittleLong(header.version);
-	if (i != HLBSP_VERSION)
+	if (
+#ifdef REHLDS_FIXES
+		i != Q1BSP_VERSION &&
+#endif
+		i != HLBSP_VERSION)
 	{
 		Con_Printf("Map [%s] has incorrect BSP version (%i should be %i).\n", pszFileName, i, HLBSP_VERSION);
 		FS_Close(fp);
