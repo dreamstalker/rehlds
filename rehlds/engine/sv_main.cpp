@@ -4057,10 +4057,12 @@ void SV_AddToFatPVS(vec_t *org, mnode_t *node)
 unsigned char* EXT_FUNC SV_FatPVS(float *org)
 {
 #ifdef REHLDS_FIXES
-	fatbytes = gPVSRowBytes;
-#else // REHLDS_FIXES
-	fatbytes = (g_psv.worldmodel->numleafs + 31) >> 3;
+	if (gPVS)
+		fatbytes = gPVSRowBytes;
+	else
 #endif // REHLDS_FIXES
+		fatbytes = (g_psv.worldmodel->numleafs + 31) >> 3;
+
 	Q_memset(fatpvs, 0, fatbytes);
 	SV_AddToFatPVS(org, g_psv.worldmodel->nodes);
 	return fatpvs;
@@ -4112,10 +4114,12 @@ void SV_AddToFatPAS(vec_t *org, mnode_t *node)
 unsigned char* EXT_FUNC SV_FatPAS(float *org)
 {
 #ifdef REHLDS_FIXES
-	fatpasbytes = gPVSRowBytes;
-#else // REHLDS_FIXES
-	fatpasbytes = (g_psv.worldmodel->numleafs + 31) >> 3;
+	if (gPAS)
+		fatpasbytes = gPVSRowBytes;
+	else
 #endif // REHLDS_FIXES
+		fatpasbytes = (g_psv.worldmodel->numleafs + 31) >> 3;
+
 	Q_memset(fatpas, 0, fatpasbytes);
 	SV_AddToFatPAS(org, g_psv.worldmodel->nodes);
 	return fatpas;
