@@ -515,7 +515,7 @@ RehldsFuncs_t g_RehldsApiFuncs =
 	&AddCvarListener_api,
 	&RemoveExtDll_api,
 	&RemoveCvarListener_api,
-	&GetEntityInit,
+	&GetEntityInit_api,
 	&MSG_ReadChar_api,
 	&MSG_ReadByte_api,
 	&MSG_ReadLong_api,
@@ -829,6 +829,10 @@ IRehldsHookRegistry_SV_Frame* CRehldsHookchains::SV_Frame() {
 
 IRehldsHookRegistry_SV_ShouldSendConsistencyList* CRehldsHookchains::SV_ShouldSendConsistencyList() {
 	return &m_SV_ShouldSendConsistencyList;
+}
+
+IRehldsHookRegistry_GetEntityInit* CRehldsHookchains::GetEntityInit() {
+	return &m_GetEntityInit;
 }
 
 int EXT_FUNC CRehldsApi::GetMajorVersion()

@@ -770,9 +770,19 @@ const char* EXT_FUNC NameForFunction(uint32 function)
 	return NULL;
 }
 
-ENTITYINIT EXT_FUNC GetEntityInit(char *pClassName)
+ENTITYINIT GetEntityInit_internal(char *pClassName)
 {
 	return (ENTITYINIT)GetDispatch(pClassName);
+}
+
+ENTITYINIT EXT_FUNC GetEntityInit_api(char *pClassName)
+{
+	return g_RehldsHookchains.m_GetEntityInit.callChain(GetEntityInit_internal, pClassName);
+}
+
+ENTITYINIT GetEntityInit(char *pClassName)
+{
+	return GetEntityInit_api(pClassName);
 }
 
 FIELDIOFUNCTION GetIOFunction(char *pName)
