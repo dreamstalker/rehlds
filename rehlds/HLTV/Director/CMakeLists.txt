@@ -77,7 +77,7 @@ set(COMMON_SRCS
 	"../../engine/mem.cpp"
 )
 
-add_library(director SHARED)
+add_library(director SHARED ${DIRECTOR_SRCS})
 
 target_include_directories(director PRIVATE
 	${PROJECT_SRC_DIR}
@@ -99,7 +99,6 @@ target_compile_definitions(director PRIVATE
 )
 
 target_sources(director PRIVATE
-	${DIRECTOR_SRCS}
 	${COMMON_SRCS}
 )
 

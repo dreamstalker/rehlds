@@ -31,7 +31,7 @@ else()
 		-mtune=generic -msse3\
 		-fpermissive -fno-sized-deallocation\
 		-Wno-unknown-pragmas -Wno-unused-variable -Wno-unused-result -Wno-unused-function\
-		-Wno-write-strings -Wno-sign-compare")
+		-Wno-write-strings -Wno-sign-compare -Wno-strict-aliasing")
 
 	# Check if not Clang compiler AND GCC >= 8.3
 	if (NOT "$ENV{CXX}" MATCHES "clang" AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 8.0)
@@ -93,10 +93,6 @@ target_compile_definitions(filesystem_stdio PRIVATE
 	_vsnprintf=vsnprintf
 	_snprintf=snprintf
 	_unlink=unlink
-)
-
-target_sources(filesystem_stdio PRIVATE
-	${FILESYSTEM_STDIO_SRCS}
 )
 
 target_link_libraries(filesystem_stdio PRIVATE

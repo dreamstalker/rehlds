@@ -219,10 +219,10 @@ if (CMAKE_BUILD_TYPE MATCHES Unittests)
 	endif()
 
 	set(LINK_FLAGS "${LINK_FLAGS} -no-pie -Wl,--no-export-dynamic")
-	add_executable(engine ${appversion.sh})
+	add_executable(engine ${appversion.sh} ${ENGINE_SRCS})
 	target_link_libraries(engine PRIVATE cppunitlite)
 else()
-	add_library(engine SHARED ${appversion.sh})
+	add_library(engine SHARED ${appversion.sh} ${ENGINE_SRCS})
 endif()
 
 if (NOT TARGET bzip2)
@@ -268,7 +268,6 @@ target_compile_definitions(engine PRIVATE
 )
 
 target_sources(engine PRIVATE
-	${ENGINE_SRCS}
 	${COMMON_SRCS}
 	${PUBLIC_SRCS}
 

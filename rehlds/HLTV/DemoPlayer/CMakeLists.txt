@@ -76,7 +76,7 @@ set(COMMON_SRCS
 	"../../engine/mem.cpp"
 )
 
-add_library(demoplayer SHARED)
+add_library(demoplayer SHARED ${DEMOPLAYER_SRCS})
 
 target_include_directories(demoplayer PRIVATE
 	${PROJECT_SRC_DIR}
@@ -97,7 +97,6 @@ target_compile_definitions(demoplayer PRIVATE
 )
 
 target_sources(demoplayer PRIVATE
-	${DEMOPLAYER_SRCS}
 	${COMMON_SRCS}
 )
 

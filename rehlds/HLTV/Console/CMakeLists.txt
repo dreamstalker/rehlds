@@ -84,7 +84,7 @@ if (NOT TARGET appversion)
 	add_custom_target(appversion DEPENDS COMMAND "${PROJECT_SOURCE_DIR}/../../version/appversion.sh" "${PROJECT_SOURCE_DIR}/../../..")
 endif()
 
-add_executable(hltv ${appversion.sh})
+add_executable(hltv ${appversion.sh} ${HLTV_SRCS})
 add_dependencies(hltv appversion)
 
 target_include_directories(hltv PRIVATE
@@ -106,7 +106,6 @@ target_compile_definitions(hltv PRIVATE
 )
 
 target_sources(hltv PRIVATE
-	${HLTV_SRCS}
 	${COMMON_SRCS}
 )
 

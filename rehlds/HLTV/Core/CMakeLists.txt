@@ -101,7 +101,7 @@ set(COMMON_SRCS
 	"../../engine/mem.cpp"
 )
 
-add_library(core SHARED)
+add_library(core SHARED ${CORE_SRCS})
 
 target_include_directories(core PRIVATE
 	${PROJECT_SRC_DIR}
@@ -123,7 +123,6 @@ target_compile_definitions(core PRIVATE
 )
 
 target_sources(core PRIVATE
-	${CORE_SRCS}
 	${COMMON_SRCS}
 )
 

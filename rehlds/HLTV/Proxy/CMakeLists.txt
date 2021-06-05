@@ -107,7 +107,7 @@ set(COMMON_SRCS
 	"../../engine/mem.cpp"
 )
 
-add_library(proxy SHARED)
+add_library(proxy SHARED ${PROXY_SRCS})
 
 target_include_directories(proxy PRIVATE
 	${PROJECT_SRC_DIR}
@@ -129,7 +129,6 @@ target_compile_definitions(proxy PRIVATE
 )
 
 target_sources(proxy PRIVATE
-	${PROXY_SRCS}
 	${COMMON_SRCS}
 )
 
