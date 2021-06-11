@@ -1164,6 +1164,22 @@ void SZ_Clear(sizebuf_t *buf)
 	buf->cursize = 0;
 }
 
+qboolean SZ_HasSpaceToRead(const sizebuf_t *buf, int length)
+{
+	if ((msg_readcount + length) > buf->maxsize)
+		return FALSE;
+
+	return TRUE;
+}
+
+qboolean SZ_HasSomethingToRead(const sizebuf_t *buf, int length)
+{
+	if ((msg_readcount + length) > buf->cursize)
+		return FALSE;
+
+	return TRUE;
+}
+
 void *EXT_FUNC SZ_GetSpace(sizebuf_t *buf, int length)
 {
 	void *data;

@@ -93,6 +93,15 @@ void SV_ParseConsistencyResponse(client_t *pSenderClient)
 	int c = 0;
 	Q_memset(nullbuffer, 0, sizeof(nullbuffer));
 	int value = MSG_ReadShort();
+
+	if (value <= 0 || !SZ_HasSomethingToRead(&net_message, value))
+	{
+		msg_badread = TRUE;
+		Con_DPrintf("%s:  %s:%s invalid length: %d\n", __func__, host_client->name, NET_AdrToString(host_client->netchan.remote_address), value);
+		SV_DropClient(host_client, FALSE, "Invalid length");
+		return;
+	}
+
 	COM_UnMunge(&net_message.data[msg_readcount], value, g_psvs.spawncount);
 	MSG_StartBitReading(&net_message);
 
@@ -1540,6 +1549,15 @@ void SV_ParseMove(client_t *pSenderClient)
 
 	placeholder = msg_readcount + 1;
 	mlen = MSG_ReadByte();
+
+	if (mlen <= 0 || !SZ_HasSpaceToRead(&net_message, mlen + 2))
+	{
+		msg_badread = TRUE;
+		Con_DPrintf("%s:  %s:%s invalid length: %d\n", __func__, host_client->name, NET_AdrToString(host_client->netchan.remote_address), mlen);
+		SV_DropClient(host_client, FALSE, "Invalid length");
+		return;
+	}
+
 	cbchecksum = MSG_ReadByte();
 	COM_UnMunge(&net_message.data[placeholder + 1], mlen, host_client->netchan.incoming_sequence);
 
