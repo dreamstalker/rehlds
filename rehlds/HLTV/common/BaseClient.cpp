@@ -266,6 +266,11 @@ bool BaseClient::ProcessStringCmd(char *string)
 		return false;
 	}
 
+	if (!cmdLine.CountToken()) {
+		m_System->DPrintf("WARNING! BaseClient::ProcessStringCmd: invalid command string.\n");
+		return false;
+	}
+
 	char *cmd = cmdLine.GetToken(0);
 	for (auto& local_cmd : m_LocalCmdReg)
 	{

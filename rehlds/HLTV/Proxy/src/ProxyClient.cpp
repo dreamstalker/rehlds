@@ -86,6 +86,11 @@ bool ProxyClient::ProcessStringCmd(char *string)
 		return true;
 	}
 
+	if (!cmdLine.CountToken()) {
+		m_System->DPrintf("WARNING! ProxyClient::ProcessStringCmd: invalid command string.\n");
+		return false;
+	}
+
 	char *cmd = cmdLine.GetToken(0);
 	for (auto& local_cmd : m_LocalCmdReg)
 	{
