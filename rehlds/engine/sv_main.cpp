@@ -209,6 +209,7 @@ cvar_t sv_rehlds_local_gametime = {"sv_rehlds_local_gametime", "0", 0, 0.0f, nul
 cvar_t sv_rehlds_send_mapcycle = { "sv_rehlds_send_mapcycle", "0", 0, 0.0f, nullptr };
 cvar_t sv_rehlds_maxclients_from_single_ip = { "sv_rehlds_maxclients_from_single_ip", "5", 0, 5.0f, nullptr };
 cvar_t sv_use_entity_file = { "sv_use_entity_file", "0", 0, 0.0f, nullptr };
+cvar_t sv_usercmd_custom_random_seed = { "sv_usercmd_custom_random_seed", "0", 0, 0.0f, nullptr };
 #endif
 
 delta_t *SV_LookupDelta(char *name)
@@ -8016,6 +8017,7 @@ void SV_Init(void)
 	Cvar_RegisterVariable(&sv_rollspeed);
 	Cvar_RegisterVariable(&sv_rollangle);
 	Cvar_RegisterVariable(&sv_use_entity_file);
+	Cvar_RegisterVariable(&sv_usercmd_custom_random_seed);
 #endif
 
 	for (int i = 0; i < MAX_MODELS; i++)
