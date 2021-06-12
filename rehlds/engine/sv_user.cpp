@@ -1549,8 +1549,9 @@ void SV_ParseMove(client_t *pSenderClient)
 
 	placeholder = msg_readcount + 1;
 	mlen = MSG_ReadByte();
+	cbchecksum = MSG_ReadByte();
 
-	if (mlen <= 0 || !SZ_HasSpaceToRead(&net_message, mlen + 2))
+	if (mlen <= 0 || !SZ_HasSpaceToRead(&net_message, mlen))
 	{
 		msg_badread = TRUE;
 		Con_DPrintf("%s:  %s:%s invalid length: %d\n", __func__, host_client->name, NET_AdrToString(host_client->netchan.remote_address), mlen);
@@ -1558,7 +1559,6 @@ void SV_ParseMove(client_t *pSenderClient)
 		return;
 	}
 
-	cbchecksum = MSG_ReadByte();
 	COM_UnMunge(&net_message.data[placeholder + 1], mlen, host_client->netchan.incoming_sequence);
 
 	packetLossByte = MSG_ReadByte();
