@@ -53,6 +53,7 @@ This means that plugins that do binary code analysis (Orpheu for example) probab
 <li>sv_rehlds_attachedentities_playeranimationspeed_fix // Fixes bug with gait animation speed increase when player has some attached entities (aiments). Can cause animation lags when cl_updaterate is low. Default: 0
 <li>sv_rehlds_maxclients_from_single_ip // Limit number of connections from the single ip address. Default: 5
 <li>sv_use_entity_file // Use custom entity file for a map. Path to an entity file will be "maps/[map name].ent". 0 - use original entities. 1 - use .ent files from maps directory. 2 - use .ent files from maps directory and create new .ent file if not exist.
+<li>sv_usercmd_custom_random_seed // When enabled server will populate an additional random seed independent of the client. Default: 0
 </ul>
 </details>
 

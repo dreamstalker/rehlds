@@ -782,6 +782,14 @@ void SV_RunCmd(usercmd_t *ucmd, int random_seed)
 	if (!host_client->fakeclient)
 		SV_SetupMove(host_client);
 
+#ifdef REHLDS_FIXES
+	if (sv_usercmd_custom_random_seed.value)
+	{
+		float fltTimeNow = float(Sys_FloatTime() * 1000.0);
+		random_seed = *reinterpret_cast<int *>((char *)&fltTimeNow);
+	}
+#endif
+
 	gEntityInterface.pfnCmdStart(sv_player, ucmd, random_seed);
 	frametime = float(ucmd->msec * 0.001);
 	host_client->svtimebase = frametime + host_client->svtimebase;
