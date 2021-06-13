@@ -120,6 +120,8 @@ uint32 FindNameInTable(extensiondll_t *pDll, const char *pName);
 NOBODY const char *ConvertNameToLocalPlatform(const char *pchInName);
 uint32 FunctionFromName(const char *pName);
 const char *NameForFunction(uint32 function);
+ENTITYINIT GetEntityInit_internal(char *pClassName);
+ENTITYINIT GetEntityInit_api(char *pClassName);
 ENTITYINIT GetEntityInit(char *pClassName);
 FIELDIOFUNCTION GetIOFunction(char *pName);
 NOBODY void DLL_SetModKey(modinfo_t *pinfo, char *pkey, char *pvalue);
