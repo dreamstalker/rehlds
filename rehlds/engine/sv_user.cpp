@@ -1779,6 +1779,12 @@ void EXT_FUNC SV_HandleClientMessage_api(IGameClient* client, uint8 opcode) {
 		return;
 	}
 
+#ifdef REHLDS_FIXES
+	// Save current name of the client before a possible kick
+	char name[32];
+	Q_strlcpy(name, host_client->name);
+#endif
+
 	void(*func)(client_t *) = sv_clcfuncs[opcode].pfnParse;
 	if (func)
 		func(cl);
@@ -1786,7 +1792,7 @@ void EXT_FUNC SV_HandleClientMessage_api(IGameClient* client, uint8 opcode) {
 #ifdef REHLDS_FIXES
 	if (msg_badread)
 	{
-		Con_Printf("SV_ReadClientMessage: badread on %s, opcode %s\n", host_client->name, sv_clcfuncs[opcode].pszname);
+		Con_Printf("SV_ReadClientMessage: badread on %s, opcode %s\n", name, sv_clcfuncs[opcode].pszname);
 	}
 #endif
 

@@ -1498,7 +1498,7 @@ void SV_New_f(void)
 		return;
 	}
 
-	if (!host_client->active && host_client->spawned)
+	if ((host_client->hasusrmsgs && host_client->m_bSentNewResponse) || (!host_client->active && host_client->spawned))
 	{
 		return;
 	}
@@ -1564,6 +1564,7 @@ void SV_New_f(void)
 	}
 	Netchan_CreateFragments(TRUE, &host_client->netchan, &msg);
 	Netchan_FragSend(&host_client->netchan);
+	host_client->m_bSentNewResponse = TRUE;
 }
 
 void SV_SendRes_f(void)
@@ -7371,6 +7372,8 @@ void SV_InactivateClients(void)
 			cl->connected = TRUE;
 			cl->spawned = FALSE;
 			cl->fully_connected = FALSE;
+			cl->hasusrmsgs = FALSE;
+			cl->m_bSentNewResponse = FALSE;
 
 			SZ_Clear(&cl->netchan.message);
 			SZ_Clear(&cl->datagram);
