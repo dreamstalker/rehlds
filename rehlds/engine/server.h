@@ -241,6 +241,7 @@ typedef struct client_s
 	uint32 m_VoiceStreams[2];
 	double m_lastvoicetime;
 	int m_sendrescount;
+	qboolean m_bSentNewResponse;
 } client_t;
 
 enum

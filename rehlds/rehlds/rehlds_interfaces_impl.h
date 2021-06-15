@@ -103,6 +103,143 @@ public:
 
 	virtual client_t* GetClient();
 
+	// This client is a fake player controlled by the game DLL
+	virtual bool IsFakeClient();
+	virtual void SetFakeClient(bool state);
+
+	// On server, getting data
+	virtual bool IsFullyConnected();
+	virtual void SetFullyConnected(bool state);
+
+	virtual bool IsUploading();
+	virtual void SetUploading(bool state);
+
+	virtual bool IsHasUserMsgs();
+	virtual void SetHasUserMsgs(bool value);
+
+	virtual bool HasForceUnmodified();
+	virtual void SetHasForceUnmodified(bool value);
+
+	// Number of packets choked at the server because the client - server network channel
+	// is backlogged with too much data
+	virtual int GetChokeCount();
+	virtual void SetChokeCount(int count);
+
+	// -1 = no compression. This is where the server is creating the compressed info from
+	virtual int GetDeltaSequence();
+	virtual void SetDeltaSequence(int value);
+
+	// For filling in big drops
+	virtual void SetLastCmd(struct usercmd_s *ucmd);
+
+	virtual double GetConnectTime();
+	virtual void SetConnectTime(double time);
+
+	virtual double GetCmdTime();
+	virtual void SetCmdTime(double time);
+
+	virtual double GetIgnoreCmdTime();
+	virtual void SetIgnoreCmdTime(double time);
+
+	virtual float GetLatency();
+	virtual void SetLatency(float latency);
+
+	virtual float GetPacketLoss();
+	virtual void SetPacketLoss(float packetLoss);
+
+	virtual double GetLocalTime();
+	virtual void SetLocalTime(double time);
+
+	virtual double GetSvTimeBase();
+	virtual void SetSvTimeBase(double time);
+
+	// Or time of disconnect for zombies
+	virtual double GetConnectionStartedTime();
+	virtual void SetConnectionStartedTime(double time);
+
+	// Time when we should send next world state update (datagram)
+	virtual double GetNextMessageTime();
+	virtual void SetNextMessageTime(double time);
+
+	// Default time to wait for next message
+	virtual double GetNextMessageIntervalTime();
+	virtual void SetNextMessageIntervalTime(double time_interval);
+
+	// false - only send messages if the client has sent one and the bandwidth is not choked
+	virtual bool GetSendMessageState();
+	virtual void SetSendMessageState(bool state);
+
+	virtual bool GetSkipMessageState();
+	virtual void SetSkipMessageState(bool state);
+
+	virtual bool GetSendInfoState();
+	virtual void SetSendInfoState(bool state);
+
+	virtual float GetSendInfoTime();
+	virtual void SetSendInfoTime(float time);
+
+	// updates can be deltad from here
+	virtual struct client_frame_s *GetFrames();
+
+	// Per edict events
+	virtual struct event_state_s *GetEvents();
+
+	// View Entity (camera or the client itself) svc_setview
+	virtual const edict_t *GetViewEntity();
+	virtual void SetViewEntity(const edict_t *entity);
+
+	// Identifying number on server
+	virtual int GetUserID();
+	virtual void SetUserID(int iUserID);
+
+	// name, etc (received from client)
+	virtual char *GetUserInfo();
+
+	// MD5 hash is 32 hex #'s, plus trailing 0
+	// Hashed CD Key (32 hex alphabetic chars + 0 terminator)
+	virtual char *GetHashedCDKey();
+
+	virtual int GetTopColor();
+	virtual void SetTopColor(int color);
+
+	virtual int GetBottomColor();
+	virtual void SetBottomColor(int color);
+
+	virtual resource_t *GetResourcesOnHand();
+	virtual resource_t *GetResourcesNeeded();
+
+	virtual FileHandle_t GetUploadFileHandle();
+	virtual void SetUploadFileHandle(FileHandle_t fhFile);
+
+	virtual bool IsUploadDoneRegistering();
+	virtual void SetUploadDoneRegistering(bool state);
+
+	virtual customization_t *GetCustomizationData();
+
+	virtual int GetCRC32MapValue();
+	virtual void SetCRC32MapValue(int crcMapValue);
+
+	// Perform client side prediction of weapon effects
+	// Determines that the client enabled prediction weapons and will be handled pfnGetWeaponData
+	virtual bool IsClientPredictingWeapons();
+	virtual void SetClientPredictingWeapons(bool state);
+
+	// Perform server side lag compensation of player movement
+	// Determines that the client is requesting lag compensation
+	virtual bool IsClientLagCompensation();
+	virtual void SetClientLagCompensation(bool state);
+
+	// Set on server (transmit to client)
+	virtual char *GetPhysInfo();
+
+	virtual void SetVoiceStream(int stream_id, int value);
+
+	virtual int GetSendResourceCount();
+	virtual void SetSendResourceCount(int count);
+
+	virtual bool IsSentNewResponse();
+	virtual void SetSentNewResponse(bool state);
+
 public:
 	bool GetSpawnedOnce() const { return m_bSpawnedOnce; }
 	void SetSpawnedOnce(bool spawned) { m_bSpawnedOnce = spawned; }
@@ -125,6 +262,12 @@ public:
 	virtual client_t* GetClient_t(int id);
 	virtual int GetIndexOfClient_t(client_t* client);
 	virtual int GetMaxClientsLimit();
+	virtual client_t *GetNextClient_t(client_t *client);
+	virtual int GetSpawnCount();
+	virtual void SetSpawnCount(int count);
+	virtual struct server_log_s *GetLog();
+	virtual bool IsSecure();
+	virtual void SetSecure(bool value);
 };
 
 class CRehldsServerData : public IRehldsServerData {
@@ -149,6 +292,42 @@ public:
 	virtual ISteamGameServer *GetSteamGameServer();
 	virtual netadr_t *GetNetFrom();
 	virtual double GetOldTime();
+
+	virtual void SetNetFrom(struct netadr_s *from);
+	virtual void SetWorldmapCrc(uint32 crcValue);
+	virtual void SetDecalNameNum(int num);
+
+	virtual bool IsActive();
+	virtual void SetActive(bool state);
+	virtual bool IsPaused();
+	virtual void SetPaused(bool state);
+	virtual int GetLastIndexCheckInPVS();
+	virtual void SetLastIndexCheckInPVS(int id);
+	virtual double GetLastIndexCheckTimeInPVS();
+	virtual void SetLastIndexCheckTimeInPVS(double time);
+	virtual const char *GetOldName();
+	virtual void SetOldName(const char *name);
+	virtual const char *GetStartSpotName();
+	virtual void SetStartSpotName(const char *startspot);
+	virtual struct model_s *GetWorldModel();
+	virtual void SetWorldModel(struct model_s *model);
+	virtual struct consistency_s *GetConsistency(int index);
+	virtual struct model_s *GetModel(int index);
+	virtual struct event_s *GetEventPrecache(int index);
+	virtual struct entity_state_s *GetEntityBaseline(int index);
+	virtual struct extra_baselines_s *GetEntityInstanceBaselines();
+	virtual int GetNumGenericNames();
+	virtual void SetNumGenericNames(int num);
+	virtual int GetNumEdicts();
+	virtual void SetNumEdicts(int num_edicts);
+	virtual int GetMaxEdicts();
+	virtual void SetMaxEdicts(int max_edicts);
+	virtual edict_t *GetEdict(int index);
+	virtual server_state_t GetState();
+	virtual void SetState(server_state_t st);
+	virtual sizebuf_t *GetMulticastBuf();
+	virtual sizebuf_t *GetSpectatorBuf();
+	virtual sizebuf_t *GetSignonBuf();
 };
 
 extern CGameClient** g_GameClients;
