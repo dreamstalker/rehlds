@@ -3379,14 +3379,17 @@ void SV_Rcon(netadr_t *net_from_)
 	Q_memcpy(remaining, &net_message.data[Q_strlen("rcon")], len);
 	remaining[len] = 0;
 
-	#ifdef REHLDS_FIXES
+#ifdef REHLDS_FIXES
 	if(!sv_rcon_allowexternal.value && !NET_CompareBaseAdr(*net_from_, net_local_adr))
 	{
-		Con_Printf("Rcon denied from %s\n", NET_AdrToString(*net_from_));
-		Log_Printf("Rcon denied from %s\n", NET_AdrToString(*net_from_));
+		if (sv_rcon_condebug.value > 0.0f)
+		{
+			Con_Printf("Rcon denied from %s\n", NET_AdrToString(*net_from_));
+			Log_Printf("Rcon denied from %s\n", NET_AdrToString(*net_from_));
+		}
 		return;
 	}
-	#endif
+#endif
 
 #ifdef REHLDS_FIXES
 	if (sv_rcon_condebug.value > 0.0f)
