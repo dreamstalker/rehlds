@@ -314,7 +314,7 @@ void EXT_FUNC PF_sound_I(edict_t *entity, int channel, const char *sample, float
 {
 #ifdef REHLDS_FIXES
 	auto checkBounds = [=](double varValue, char const *varName, double min, double max) {
-		if (!(min <= varValue && varValue <= max)) {
+		if (varValue < min || varValue > max) {
 			Sys_Error("EMIT_SOUND: %s=%g out of bounds %g-%g\nEntity classname = %s, sound = %s\n", varName, varValue, min, max, entity->v.classname + pr_strings, sample);
 		}
 	};
