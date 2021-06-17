@@ -312,10 +312,10 @@ void EXT_FUNC PF_ambientsound_I(edict_t *entity, float *pos, const char *samp, f
 
 void EXT_FUNC PF_sound_I(edict_t *entity, int channel, const char *sample, float volume, float attenuation, int fFlags, int pitch)
 {
-#ifdef REHLDS_FIXES
 	auto checkBounds = [=](double varValue, char const *varName, double min, double max) {
 		if (varValue < min || varValue > max) {
-			Sys_Error("EMIT_SOUND: %s=%g out of bounds %g-%g\nEntity classname = %s, sound = %s\n", varName, varValue, min, max, entity->v.classname + pr_strings, sample);
+			Sys_Error("EMIT_SOUND: %s=%g out of bounds %g-%g\nEntity classname = %s, sound = %s\n",
+				varName, varValue, min, max, entity->v.classname + pr_strings, sample);
 		}
 	};
 
@@ -323,16 +323,6 @@ void EXT_FUNC PF_sound_I(edict_t *entity, int channel, const char *sample, float
 	checkBounds(attenuation, nameof_variable(attenuation), 0.0, 4.0);
 	checkBounds(channel, nameof_variable(channel), 0, 7);
 	checkBounds(pitch, nameof_variable(pitch), 0, 255);
-#else
-	if (volume < 0.0 || volume > 255.0)
-		Sys_Error("%s: volume = %i", __func__, volume);
-	if (attenuation < 0.0 || attenuation > 4.0)
-		Sys_Error("%s: attenuation = %f", __func__, attenuation);
-	if (channel < 0 || channel > 7)
-		Sys_Error("%s: channel = %i", __func__, channel);
-	if (pitch < 0 || pitch > 255)
-		Sys_Error("%s: pitch = %i", __func__, pitch);
-#endif
 
 	SV_StartSound(0, entity, channel, sample, (int)(volume * 255), attenuation, fFlags, pitch);
 }
