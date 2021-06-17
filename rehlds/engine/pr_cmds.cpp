@@ -312,16 +312,18 @@ void EXT_FUNC PF_ambientsound_I(edict_t *entity, float *pos, const char *samp, f
 
 void EXT_FUNC PF_sound_I(edict_t *entity, int channel, const char *sample, float volume, float attenuation, int fFlags, int pitch)
 {
-	auto checkBounds = [=](double varValue, char const *varName, double min, double max) {
-		if (varValue < min || varValue > max) {
-			Sys_Error("EMIT_SOUND: %s=%g out of bounds %g-%g\nEntity classname = %s, sound = %s\n",
-				varName, varValue, min, max, entity->v.classname + pr_strings, sample);
+	auto checkBounds = [=, func = __func__]<typename T>(T value, char const *name, T min, T max)
+	{
+		if (value < min || value > max)
+		{
+			Sys_Error("%s: %s=%g out of bounds %g-%g\nEntity classname = %s, sound = %s\n",
+					  func, name, static_cast<float>(value), static_cast<float>(min), static_cast<float>(max), entity->v.classname + pr_strings, sample);
 		}
 	};
 
-	checkBounds(volume, nameof_variable(volume), 0.0, 1.0);
-	checkBounds(attenuation, nameof_variable(attenuation), 0.0, 4.0);
 	checkBounds(channel, nameof_variable(channel), 0, 7);
+	checkBounds(volume, nameof_variable(volume), 0.0f, 1.0f);
+	checkBounds(attenuation, nameof_variable(attenuation), 0.0f, 4.0f);
 	checkBounds(pitch, nameof_variable(pitch), 0, 255);
 
 	SV_StartSound(0, entity, channel, sample, (int)(volume * 255), attenuation, fFlags, pitch);
