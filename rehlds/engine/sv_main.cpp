@@ -670,9 +670,9 @@ qboolean SV_BuildSoundMsg(edict_t *entity, int channel, const char *sample, int 
 	int sound_num;
 	int field_mask;
 
-	auto clampBounds = [=, func = __func__]<typename T>(T value, char const *name, T min, T max)
+	auto clampBounds = [=, func = __func__](auto &value, char const *name, auto min, auto max)
 	{
-		if (varValue < min || varValue > max)
+		if (value < min || value > max)
 		{
 			Con_Printf("%s: %s=%g out of bounds %g-%g\nEntity classname = %s, sound = %s\n",
 					   func, name, static_cast<float>(value), static_cast<float>(min), static_cast<float>(max), entity->v.classname + pr_strings, sample);

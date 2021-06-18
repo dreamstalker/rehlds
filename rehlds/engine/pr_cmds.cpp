@@ -312,7 +312,7 @@ void EXT_FUNC PF_ambientsound_I(edict_t *entity, float *pos, const char *samp, f
 
 void EXT_FUNC PF_sound_I(edict_t *entity, int channel, const char *sample, float volume, float attenuation, int fFlags, int pitch)
 {
-	auto checkBounds = [=, func = __func__]<typename T>(T value, char const *name, T min, T max)
+	auto checkBounds = [=, func = __func__](auto value, char const *name, auto min, auto max)
 	{
 		if (value < min || value > max)
 		{
