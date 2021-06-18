@@ -4,9 +4,6 @@
     <Filter Include="src">
       <UniqueIdentifier>{3f7611e3-cf43-4956-a8a1-b6efbcf1a63d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="hookers">
-      <UniqueIdentifier>{cacc7b07-9ac2-42d5-bba3-14c061a19d11}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\BaseFileSystem.cpp">
@@ -30,12 +27,6 @@
     <ClCompile Include="..\src\filesystem_helpers.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\hookers\filesystem\hooklist.cpp">
-      <Filter>hookers</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\hookers\filesystem\main.cpp">
-      <Filter>hookers</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\BaseFileSystem.h">
@@ -49,9 +40,6 @@
     </ClInclude>
     <ClInclude Include="..\src\filesystem_helpers.h">
       <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hookers\filesystem\hooklist.h">
-      <Filter>hookers</Filter>
     </ClInclude>
     <ClInclude Include="..\src\FileSystem_Stdio.h">
       <Filter>src</Filter>

@@ -173,7 +173,10 @@ void SV_Customization(client_t *pPlayer, resource_t *pResource, qboolean bSkipPl
 	// Send resource to all other active players
 	for (i = 0, pHost = g_psvs.clients; i < g_psvs.maxclients; i++, pHost++)
 	{
-		if (!pHost->active && !pHost->spawned || pHost->fakeclient)
+		if (pHost->fakeclient)
+			continue;
+
+		if (!pHost->active && !pHost->spawned)
 			continue;
 
 		if (pHost == pPlayer && bSkipPlayer)

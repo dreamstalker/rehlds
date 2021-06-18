@@ -1132,8 +1132,8 @@ bool IsWildCardMatch(const char *wildcardString, const char *stringToCheck)
 		// we only want to advance the pointers if we successfully assigned
 		// both of our char variables, so we'll do it here rather than in the
 		// loop condition itself
-		*stringToCheck++;
-		*wildcardString++;
+		stringToCheck++;
+		wildcardString++;
 
 		// if this isn't a case-sensitive match, make both chars uppercase
 		wcChar = toupper(wcChar);
@@ -1148,7 +1148,7 @@ bool IsWildCardMatch(const char *wildcardString, const char *stringToCheck)
 			// until we've either found a match or the string has
 			// ended
 			if (starMatchesZero)
-				*stringToCheck--;
+				stringToCheck--;
 
 			while (*stringToCheck)
 			{
@@ -1501,7 +1501,7 @@ void CBaseFileSystem::Warning(FileWarningLevel_t level, const char *fmt, ...)
 #ifdef _WIN32
 		OutputDebugString(warningtext);
 #else
-		fprintf(stderr, warningtext);
+		fprintf(stderr, "%s", warningtext);
 #endif
 	}
 }
@@ -1654,15 +1654,15 @@ bool CBaseFileSystem::CSearchPath::PackFileLessFunc(CPackFileEntry const &src1, 
 }
 
 CBaseFileSystem::CSearchPath::CSearchPath() :
-	m_PackFiles(0, MAX_ENTRY_PATH, CSearchPath::PackFileLessFunc),
 	m_Path(CUtlSymbol("")),
 	m_bIsMapPath(false),
 	m_bIsPackFile(false),
-	m_bAllowWrite(true),
 	m_lPackFileTime(0),
+	m_hPackFile(nullptr),
 	m_nNumPackFiles(0),
 	m_iCurSearchFile(0),
-	m_hPackFile(nullptr)
+	m_bAllowWrite(true),
+	m_PackFiles(0, MAX_ENTRY_PATH, CSearchPath::PackFileLessFunc)
 {
 }
 

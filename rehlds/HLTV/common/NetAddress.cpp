@@ -28,9 +28,11 @@
 
 #include "precompiled.h"
 
-NetAddress::NetAddress() :
-	m_Port(0), m_IP(), m_String()
+NetAddress::NetAddress()
 {
+	m_Port = 0;
+	Q_memset(m_IP, 0, sizeof(m_IP));
+	Q_memset(m_String, 0, sizeof(m_String));
 }
 
 void NetAddress::SetPort(int16 port)

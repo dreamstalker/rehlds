@@ -44,9 +44,9 @@ public:
 
 	bool Init(IBaseSystem *system = nullptr);
 	void ShutDown();
-	void PrintRaw(char *pszMsg, int nChars = 0);
-	void Echo(char *pszMsg, int nChars = 0);
-	char *GetLine();
+	void PrintRaw(const char *pszMsg, int nChars = 0);
+	void Echo(const char *pszMsg, int nChars = 0);
+	const char *GetLine();
 	int GetWidth();
 
 private:

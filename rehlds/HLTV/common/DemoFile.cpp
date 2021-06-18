@@ -29,10 +29,10 @@
 #include "precompiled.h"
 
 DemoFile::DemoFile() :
-	m_FileSystem(nullptr),
 	m_FileHandle(FILESYSTEM_INVALID_HANDLE),
 	m_DemoChannel(nullptr),
-	m_Entries(nullptr)
+	m_Entries(nullptr),
+	m_FileSystem(nullptr)
 {
 	Reset();
 }
@@ -544,6 +544,8 @@ void DemoFile::ReadDemoPacket(BitBuffer *demoData, demo_info_t *demoInfo)
 				break;
 			case DemoCmd::PayLoad:
 				demoData->WriteLong(msglen);
+				break;
+			default:
 				break;
 			}
 

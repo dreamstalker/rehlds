@@ -102,7 +102,7 @@ int CSimplePlatform::setsockopt(SOCKET s, int level, int optname, const char* op
 #ifdef _WIN32
 	return setsockopt_v11(s, level, optname, optval, optlen);
 #else
-	return setsockopt(s, level, optname, optval, optlen);
+	return ::setsockopt(s, level, optname, optval, optlen);
 #endif
 }
 
@@ -213,6 +213,8 @@ void NORETURN rehlds_syserror(const char* fmt, ...) {
 	fclose(fl);
 
 	//TerminateProcess(GetCurrentProcess(), 1);
-	*((int*)NULL) = 0;
+	volatile int *null = 0;
+	*null = 0;
+
 	while (true);
 }

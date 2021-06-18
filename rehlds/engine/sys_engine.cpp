@@ -81,7 +81,7 @@ void ForceReloadProfile()
 	}
 }
 
-bool CEngine::Load(bool dedicated, char *basedir, char *cmdline)
+bool CEngine::Load(bool dedicated, const char *basedir, const char *cmdline)
 {
 	bool success = false;
 	SetState(DLL_ACTIVE);

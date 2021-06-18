@@ -67,15 +67,15 @@ const uint32 INVBITTABLE[] =
 	0xFFFFFFFF,
 };
 
-BitBuffer::BitBuffer() : m_Data(nullptr),
+BitBuffer::BitBuffer() :
+	m_Overflowed(false),
+	m_Data(nullptr),
 	m_CurByte(nullptr),
 	m_CurBit(0),
 	m_MaxSize(0),
-	m_Overflowed(false),
 	m_LittleEndian(false),
 	m_OwnData(false)
 {
-	;
 }
 
 BitBuffer::BitBuffer(void *newData, unsigned int size)
@@ -345,7 +345,8 @@ void BitBuffer::WriteBuf(BitBuffer *buf, int length)
 
 char *BitBuffer::ReadString()
 {
-	int c = 0, l = 0;
+	int c = 0;
+	unsigned int l = 0;
 	static char string[8192];
 
 	while ((c = ReadChar(), c) && c != -1 && l < sizeof(string) - 1) {
@@ -358,7 +359,8 @@ char *BitBuffer::ReadString()
 
 char *BitBuffer::ReadStringLine()
 {
-	int c = 0, l = 0;
+	int c = 0;
+	unsigned int l = 0;
 	static char string[2048];
 
 	while ((c = ReadChar(), c) && c != '\n' && c != -1 && l < sizeof(string) - 1) {

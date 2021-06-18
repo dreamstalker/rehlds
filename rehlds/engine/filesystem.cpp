@@ -241,7 +241,7 @@ void CheckLiblistForFallbackDir(const char *pGameDir, bool bLanguage, const char
 
 	if (bLanguage && pLanguage)
 	{
-		char baseDir[4096];
+		char baseDir[MAX_PATH];
 		char *tempPtr;
 
 		Q_snprintf(szTemp, 511, "%s/%s_%s", GetBaseDirectory(), szFallback, pLanguage);
@@ -283,7 +283,7 @@ void CheckLiblistForFallbackDir(const char *pGameDir, bool bLanguage, const char
 
 	if (Q_stricmp(szFallback, "valve"))
 	{
-		const int BufLen = 128;
+		const int BufLen = 256;
 		char *szFileName = new char[BufLen];
 
 		Q_snprintf(szFileName, BufLen - 1, "Resource/%s_%%language%%.txt", szFallback);
@@ -298,7 +298,7 @@ void CheckLiblistForFallbackDir(const char *pGameDir, bool bLanguage, const char
 int FileSystem_SetGameDirectory(const char *pDefaultDir, const char *pGameDir)
 {
 	char temp[512];
-	char language[256];
+	char language[128];
 	const char *pchLang;
 
 	g_pFileSystem->RemoveAllSearchPaths();
@@ -474,7 +474,7 @@ int FileSystem_AddFallbackGameDir(const char *pGameDir)
 	return 1;
 }
 
-int FileSystem_Init(char *basedir, void *voidfilesystemFactory)
+int FileSystem_Init(const char *basedir, void *voidfilesystemFactory)
 {
 #ifdef REHLDS_CHECKS
 	Q_strncpy(s_pBaseDir, basedir, ARRAYSIZE(s_pBaseDir));

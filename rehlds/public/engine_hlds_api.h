@@ -39,7 +39,7 @@
 class IDedicatedServerAPI : public IBaseInterface
 {
 public:
-	virtual bool Init(char *basedir, char *cmdline, CreateInterfaceFn launcherFactory, CreateInterfaceFn filesystemFactory) = 0;
+	virtual bool Init(const char *basedir, const char *cmdline, CreateInterfaceFn launcherFactory, CreateInterfaceFn filesystemFactory) = 0;
 	virtual int Shutdown() = 0;
 	virtual bool RunFrame() = 0;
 	virtual void AddConsoleText(char *text) = 0;

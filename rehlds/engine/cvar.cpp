@@ -430,11 +430,9 @@ NOXREF void Cvar_RemoveHudCvars(void)
 const char *Cvar_IsMultipleTokens(const char *varname)
 {
 	static char firstToken[516];
-	int tokens;
 	char *name;
 
 	firstToken[0] = 0;
-	tokens = 0;
 	name = (char *)varname;
 
 	name = COM_Parse(name);

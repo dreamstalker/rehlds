@@ -2,15 +2,3 @@
 
 ## What is this?
 Dedicated Server Launcher for Goldsrc based games
-
-### Building
-On Windows:
-<pre>gradlew --max-workers=1 clean rehlds/dedicated:build</pre>
-
-On Linux (ICC):
-<pre>./gradlew --max-workers=1 clean rehlds/dedicated:build</pre>
-
-On Linux (GCC):
-<pre>./gradlew --max-workers=1 -PuseGcc clean rehlds/dedicated:build</pre>
-
-Compiled binaries will be placed in the rehlds/dedicated/build/binaries/ directory

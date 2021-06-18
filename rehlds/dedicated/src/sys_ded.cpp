@@ -40,7 +40,7 @@ CSysModule *g_pFileSystemModule = nullptr;
 
 CreateInterfaceFn g_FilesystemFactoryFn;
 
-void Sys_Printf_Safe(char *text)
+void Sys_Printf_Safe(const char *text)
 {
 	if (sys)
 	{
@@ -48,7 +48,7 @@ void Sys_Printf_Safe(char *text)
 	}
 }
 
-void Sys_Printf(char *fmt, ...)
+void Sys_Printf(const char *fmt, ...)
 {
 	// Dump text to debugging console.
 	va_list argptr;
@@ -76,7 +76,7 @@ void ProcessConsoleInput()
 	if (!engineAPI)
 		return;
 
-	char *inputLine = console.GetLine();
+	const char *inputLine = console.GetLine();
 	if (inputLine)
 	{
 		char szBuf[256];
@@ -85,7 +85,7 @@ void ProcessConsoleInput()
 	}
 }
 
-char *UTIL_GetBaseDir()
+const char *UTIL_GetBaseDir()
 {
 	return ".";
 }

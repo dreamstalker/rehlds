@@ -1,0 +1,300 @@
+name: C/C++ CI
+
+on:
+  push:
+    branches: [master]
+    paths-ignore:
+      - '**.md'
+
+  pull_request:
+    types: [opened, reopened, synchronize]
+  release:
+    types: [published]
+
+jobs:
+  windows:
+    name: 'Windows'
+    runs-on: windows-latest
+
+    env:
+      solution: 'msvc/ReHLDS.sln'
+      buildPlatform: 'Win32'
+      buildRelease: 'Release'
+      buildReleasePlay: 'Release Play'
+      buildTest: 'Test Fixes'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v1.0.2
+
+      - name: Build and Run unittests
+        run: |
+          msbuild ${{ env.solution }} -p:Configuration="${{ env.buildTest }}" /t:Clean,Build /p:Platform=${{ env.buildPlatform }} /p:PlatformToolset=v140_xp /p:XPDeprecationWarning=false
+          .\"msvc\Test Fixes\swds.exe"
+          If ($LASTEXITCODE -ne 0 -And
+          $LASTEXITCODE -ne 3)
+          {[Environment]::Exit(1)}
+        shell: "pwsh"
+
+      - name: Build
+        run: |
+          msbuild ${{ env.solution }} -p:Configuration="${{ env.buildRelease }}" /t:Clean,Build /p:Platform=${{ env.buildPlatform }} /p:PlatformToolset=v140_xp /p:XPDeprecationWarning=false
+          msbuild ${{ env.solution }} -p:Configuration="${{ env.buildReleasePlay }}" /t:Clean,Build /p:Platform=${{ env.buildPlatform }} /p:PlatformToolset=v140_xp /p:XPDeprecationWarning=false
+
+      - name: Move files
+        run: |
+          mkdir publish\debug
+          mkdir publish\tests
+          mkdir publish\bin\win32\valve\dlls
+          move "msvc\${{ env.buildReleasePlay }}\swds.dll" publish\tests\swds.dll
+          move msvc\${{ env.buildRelease }}\hlds.exe publish\bin\win32\hlds.exe
+          move msvc\${{ env.buildRelease }}\hltv.exe publish\bin\win32\hltv.exe
+          move msvc\${{ env.buildRelease }}\swds.dll publish\bin\win32\swds.dll
+          move msvc\${{ env.buildRelease }}\core.dll publish\bin\win32\core.dll
+          move msvc\${{ env.buildRelease }}\proxy.dll publish\bin\win32\proxy.dll
+          move msvc\${{ env.buildRelease }}\demoplayer.dll publish\bin\win32\demoplayer.dll
+          move msvc\${{ env.buildRelease }}\filesystem_stdio.dll publish\bin\win32\filesystem_stdio.dll
+          move msvc\${{ env.buildRelease }}\director.dll publish\bin\win32\valve\dlls\director.dll
+          move msvc\${{ env.buildRelease }}\hlds.pdb publish\debug\hlds.pdb
+          move msvc\${{ env.buildRelease }}\hltv.pdb publish\debug\hltv.pdb
+          move msvc\${{ env.buildRelease }}\swds.pdb publish\debug\swds.pdb
+          move msvc\${{ env.buildRelease }}\core.pdb publish\debug\core.pdb
+          move msvc\${{ env.buildRelease }}\proxy.pdb publish\debug\proxy.pdb
+          move msvc\${{ env.buildRelease }}\demoplayer.pdb publish\debug\demoplayer.pdb
+          move msvc\${{ env.buildRelease }}\filesystem_stdio.pdb publish\debug\filesystem_stdio.pdb
+          move msvc\${{ env.buildRelease }}\director.pdb publish\debug\director.pdb
+
+      - name: Deploy artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: win32
+          path: publish/*
+
+  testdemos:
+    name: 'Test demos'
+    runs-on: ubuntu-latest
+    container: s1lentq/testdemos:latest
+    needs: [windows]
+
+    env:
+      WINEDEBUG: -all
+      WINEDLLOVERRIDES: mshtml=
+
+    defaults:
+      run:
+        shell: bash
+        working-directory: ../../../opt/HLDS
+
+    steps:
+      - name: Deploying windows artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: win32
+
+      - name: Play demos
+        run: |
+          chown root ~
+          rsync -a deps/rehlds/* .
+          mv $GITHUB_WORKSPACE/tests/swds.dll .
+
+          descs=(
+            "CS: Multiplayer"
+            "Half-Life: Physics singleplayer"
+            "Half-Life: Multiplayer on crossfire map"
+            "Half-Life: Shooting with several weapons"
+          )
+
+          demos=(
+            "cstrike-muliplayer-1"
+            "rehlds-phys-single1"
+            "crossfire-1-multiplayer-1"
+            "shooting-hl-1"
+          )
+
+          retVal=0
+          for i in "${!demos[@]}"; do
+            params=$(cat "testdemos/${demos[i]}.params")
+
+            echo -e "\e[1m[$((i + 1))/${#demos[@]}] \e[1;36m${descs[i]} testing...\e[0m"
+            echo -e "    - \e[0;33mParameters $params\e[0m"
+
+            wine hlds.exe --rehlds-enable-all-hooks --rehlds-test-play "testdemos/${demos[i]}.bin" $params &> result.log || retVal=$?
+
+            if [ $retVal -ne 777 ] && [ $retVal -ne 9 ]; then
+              # Print with catchy messages
+              while read line; do
+                echo -e "      \e[0;33m$line"
+              done <<< $(cat result.log | sed '0,/demo failed/I!d;/wine:/d;/./,$!d')
+
+              echo "      🔸  🔸  🔸  🔸  🔸  🔸  🔸  🔸  🔸  🔸"
+              while read line; do
+                echo -e "      \e[1;31m$line";
+              done < rehlds_demo_error.txt
+              echo -e "      \e[30;41mExit code: $retVal\e[0m"
+              echo -e "\e[1m[$((i + 1))/${#demos[@]}] \e[1;36m${descs[i]} testing...\e[1;31m Failed ❌"
+              exit 6 # Test demo failed
+            else
+              # Print result HLDS console
+              while read line; do
+                echo -e "      \e[0;33m$line"
+              done <<< $(cat result.log | sed '/wine:/d;/./,$!d')
+              echo -e "      \e[30;43mExit code: $retVal\e[0m"
+              echo -e "\e[1m[$((i + 1))/${#demos[@]}] \e[1;36m${descs[i]} testing...\e[1;32m Succeed ✔"
+            fi
+          done
+
+  linux:
+    name: 'Linux'
+    runs-on: ubuntu-latest
+    container: s1lentq/linux86buildtools:latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Build and Run unittests
+        run: |
+          rm -rf build && CC=icc CXX=icpc cmake -DCMAKE_BUILD_TYPE=Unittests -B build && cmake --build build -j8
+          retVal=0
+          export LD_LIBRARY_PATH="rehlds/lib/linux32:$LD_LIBRARY_PATH"
+          ./build/rehlds/engine_i486 2> /dev/null > result.log || retVal=$?
+          while read line; do
+            if [[ ${line} == *"Warning in test"* ]] ; then
+              echo -e "\e[2;38m$line"
+            elif [[ ${line} == *"Failure in test"* ]] ; then
+              echo -e "\e[1;31m$line"
+            else
+              echo -e "\e[0;33m$line"
+            fi
+          done <<< $(cat result.log)
+
+          if [ $retVal -ne 0 ] && [ $retVal -ne 3 ]; then
+            echo -e "\e[30;41mExit code: $retVal\e[0m"
+            exit 1 # Unittest failed
+          else
+            echo -e "\e[30;43mExit code: $retVal\e[0m"
+          fi
+        shell: bash
+
+      - name: Build using Intel C++ Compiler
+        run: |
+          rm -rf build && CC=icc CXX=icpc cmake -B build && cmake --build build -j8
+
+      - name: Prepare HLSDK
+        run: |
+          mkdir -p publish/hlsdk
+          rsync -a rehlds/common/ publish/hlsdk/common/
+          rsync -a rehlds/dlls/ publish/hlsdk/dlls/
+          rsync -a rehlds/pm_shared/ publish/hlsdk/pm_shared/
+          rsync -a rehlds/public/ publish/hlsdk/public/ --exclude rehlds/
+          rsync -a rehlds/public/rehlds/ publish/hlsdk/engine
+
+      - name: Move files
+        run: |
+          mkdir -p publish/bin/linux32/valve/dlls
+          mv build/rehlds/engine_i486.so publish/bin/linux32/engine_i486.so
+          mv rehlds/version/appversion.h publish/appversion.h
+          mv build/rehlds/dedicated/hlds_linux publish/bin/linux32/hlds_linux
+          mv build/rehlds/HLTV/Console/hltv publish/bin/linux32/hltv
+          mv build/rehlds/HLTV/Core/core.so publish/bin/linux32/core.so
+          mv build/rehlds/HLTV/Proxy/proxy.so publish/bin/linux32/proxy.so
+          mv build/rehlds/HLTV/DemoPlayer/demoplayer.so publish/bin/linux32/demoplayer.so
+          mv build/rehlds/HLTV/Director/director.so publish/bin/linux32/valve/dlls/director.so
+          mv build/rehlds/filesystem/FileSystem_Stdio/filesystem_stdio.so publish/bin/linux32/filesystem_stdio.so
+
+      - name: Run GLIBC/ABI version compat test
+        run: |
+          binaries=(
+            "publish/bin/linux32/engine_i486.so"
+            "publish/bin/linux32/hlds_linux"
+            "publish/bin/linux32/hltv"
+            "publish/bin/linux32/core.so"
+            "publish/bin/linux32/proxy.so"
+            "publish/bin/linux32/demoplayer.so"
+            "publish/bin/linux32/valve/dlls/director.so"
+            "publish/bin/linux32/filesystem_stdio.so"
+          )
+          bash ./rehlds/version/glibc_test.sh ${binaries[@]}
+          if [[ $? -ne 0 ]]; then
+            exit 1 # Assertion failed
+          fi
+        shell: bash
+
+      - name: Deploy artifacts
+        uses: actions/upload-artifact@v2
+        id: upload-job
+        with:
+          name: linux32
+          path: publish/*
+
+      - name: Cleanup temporary artifacts
+        if: success() && steps.upload-job.outcome == 'success'
+        run: |
+          rm -rf hlsdk
+          rm -f appversion.h
+
+  publish:
+    name: 'Publish'
+    runs-on: ubuntu-latest
+    needs: [windows, testdemos, linux]
+
+    steps:
+      - name: Deploying linux artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: linux32
+
+      - name: Deploying windows artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: win32
+
+      - name: Reading appversion.h
+        run: |
+          if [ -e appversion.h ]; then
+            APP_VERSION=$(cat appversion.h | grep -wi '#define APP_VERSION_STRD' | sed -e 's/#define APP_VERSION_STRD[ \t\r\n\v\f]\+\(.*\)/\1/i' -e 's/\r//g')
+            if [ $? -ne 0 ]; then
+              APP_VERSION=""
+            else
+              # Remove quotes
+              APP_VERSION=$(echo $APP_VERSION | xargs)
+              echo "APP_VERSION=${APP_VERSION}" >> $GITHUB_ENV
+            fi
+          fi
+          rm -f appversion.h
+
+      - name: Packaging bin/dbg
+        id: packaging-job
+        if: |
+          github.event_name == 'release' &&
+          github.event.action == 'published' &&
+          startsWith(github.ref, 'refs/tags/')
+        run: |
+          7z a -tzip rehlds-bin-${{ env.APP_VERSION }}.zip bin/ hlsdk/
+          7z a -t7z -m0=lzma2 -mx=9 -mfb=64 -aoa rehlds-dbg-${{ env.APP_VERSION }}.7z debug/
+
+      - name: Publish artifacts
+        uses: softprops/action-gh-release@v1
+        id: publish-job
+        if: |
+          startsWith(github.ref, 'refs/tags/') &&
+          steps.packaging-job.outcome == 'success'
+        with:
+          files: |
+            *.zip
+            *.7z
+        env:
+          GITHUB_TOKEN: ${{ secrets.API_TOKEN }}
+
+      - name: Cleanup temporary artifacts
+        if: success() && steps.publish-job.outcome == 'success'
+        run: |
+          rm -rf bin debug hlsdk
+          rm -f *.7z *.zip appversion.h

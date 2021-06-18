@@ -49,7 +49,7 @@ bool Director::Init(IBaseSystem *system, int serial, char *name)
 	m_slowMotion = 0.5f;
 
 	for (int i = 0; i < MAX_WORLD_HISTORY; i++) {
-		m_gaussFilter[i] = 1.0f / exp((i * i) / 10000.0f);
+		m_gaussFilter[i] = 1.0f / expf((i * i) / 10000.0f);
 	}
 
 	m_World = nullptr;
@@ -370,9 +370,9 @@ float Director::AddBestGenericCut()
 	int seqNrMod = m_nextCutSeqnr % m_historyLength;
 
 	float sumTarget2Rank[MAX_CLIENTS];
-	float bestTarget2Rank, bestRank = 0;
+	float bestTarget2Rank, bestRank = 0.0f;
 	float targetRankSum = 0;
-	int newTarget, newTarget2;
+	int newTarget = 0, newTarget2 = 0;
 	int bestTarget2;
 
 	for (int i = 0; i < MAX_CLIENTS; i++)

@@ -39,13 +39,13 @@ public:
 	bool Init(IBaseSystem *system = nullptr);
 	void ShutDown();
 
-	void SetTitle(char *pszTitle);
-	void SetStatusLine(char *pszStatus);
+	void SetTitle(const char *pszTitle);
+	void SetStatusLine(const char *pszStatus);
 	void UpdateStatus();
 
-	void PrintRaw(char * pszMsz, int nChars = 0);
-	void Echo(char * pszMsz, int nChars = 0);
-	char *GetLine();
+	void PrintRaw(const char *pszMsz, int nChars = 0);
+	void Echo(const char *pszMsz, int nChars = 0);
+	const char *GetLine();
 	int GetWidth();
 
 	void SetVisible(bool visible);

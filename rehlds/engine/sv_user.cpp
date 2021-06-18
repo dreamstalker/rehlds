@@ -28,11 +28,6 @@
 
 #include "precompiled.h"
 
-typedef struct command_s
-{
-	char *command;
-} command_t;
-
 sv_adjusted_positions_t truepositions[MAX_CLIENTS];
 qboolean g_balreadymoved;
 
@@ -47,9 +42,9 @@ edict_t *sv_player;
 qboolean nofind;
 
 #if defined(SWDS) && defined(REHLDS_FIXES)
-command_t clcommands[] = { "status", "name", "kill", "pause", "spawn", "new", "sendres", "dropclient", "kick", "ping", "dlfile", "setinfo", "sendents", "fullupdate", "setpause", "unpause", NULL };
+const char *clcommands[] = { "status", "name", "kill", "pause", "spawn", "new", "sendres", "dropclient", "kick", "ping", "dlfile", "setinfo", "sendents", "fullupdate", "setpause", "unpause", NULL };
 #else
-command_t clcommands[23] = { "status", "god", "notarget", "fly", "name", "noclip", "kill", "pause", "spawn", "new", "sendres", "dropclient", "kick", "ping", "dlfile", "nextdl", "setinfo", "showinfo", "sendents", "fullupdate", "setpause", "unpause", NULL };
+const char *clcommands[23] = { "status", "god", "notarget", "fly", "name", "noclip", "kill", "pause", "spawn", "new", "sendres", "dropclient", "kick", "ping", "dlfile", "nextdl", "setinfo", "showinfo", "sendents", "fullupdate", "setpause", "unpause", NULL };
 #endif
 
 cvar_t sv_edgefriction = { "edgefriction", "2", FCVAR_SERVER, 0.0f, NULL };
@@ -98,6 +93,15 @@ void SV_ParseConsistencyResponse(client_t *pSenderClient)
 	int c = 0;
 	Q_memset(nullbuffer, 0, sizeof(nullbuffer));
 	int value = MSG_ReadShort();
+
+	if (value <= 0 || !SZ_HasSomethingToRead(&net_message, value))
+	{
+		msg_badread = TRUE;
+		Con_DPrintf("%s:  %s:%s invalid length: %d\n", __func__, host_client->name, NET_AdrToString(host_client->netchan.remote_address), value);
+		SV_DropClient(host_client, FALSE, "Invalid length");
+		return;
+	}
+
 	COM_UnMunge(&net_message.data[msg_readcount], value, g_psvs.spawncount);
 	MSG_StartBitReading(&net_message);
 
@@ -560,7 +564,10 @@ void SV_AddLinksToPM_(areanode_t *node, float *pmove_mins, float *pmove_maxs)
 		if ((check->v.flags & FL_CLIENT) && check->v.health <= 0.0)
 			continue;
 
-		if (check->v.mins[2] == 0.0 && check->v.maxs[2] == 1.0 || Length(check->v.size) == 0.0)
+		if (check->v.mins[2] == 0.0 && check->v.maxs[2] == 1.0)
+			continue;
+
+		if (Length(check->v.size) == 0.0)
 			continue;
 
 		fmin = check->v.absmin;
@@ -774,6 +781,14 @@ void SV_RunCmd(usercmd_t *ucmd, int random_seed)
 
 	if (!host_client->fakeclient)
 		SV_SetupMove(host_client);
+
+#ifdef REHLDS_FIXES
+	if (sv_usercmd_custom_random_seed.value)
+	{
+		float fltTimeNow = float(Sys_FloatTime() * 1000.0);
+		random_seed = *reinterpret_cast<int *>((char *)&fltTimeNow);
+	}
+#endif
 
 	gEntityInterface.pfnCmdStart(sv_player, ucmd, random_seed);
 	frametime = float(ucmd->msec * 0.001);
@@ -1031,11 +1046,11 @@ void SV_RunCmd(usercmd_t *ucmd, int random_seed)
 
 int SV_ValidateClientCommand(char *pszCommand)
 {
-	char *p;
+	const char *p;
 	int i = 0;
 
 	COM_Parse(pszCommand);
-	while ((p = clcommands[i].command) != NULL)
+	while ((p = clcommands[i]) != NULL)
 	{
 		if (!Q_stricmp(com_token, p))
 		{
@@ -1543,6 +1558,15 @@ void SV_ParseMove(client_t *pSenderClient)
 	placeholder = msg_readcount + 1;
 	mlen = MSG_ReadByte();
 	cbchecksum = MSG_ReadByte();
+
+	if (mlen <= 0 || !SZ_HasSpaceToRead(&net_message, mlen))
+	{
+		msg_badread = TRUE;
+		Con_DPrintf("%s:  %s:%s invalid length: %d\n", __func__, host_client->name, NET_AdrToString(host_client->netchan.remote_address), mlen);
+		SV_DropClient(host_client, FALSE, "Invalid length");
+		return;
+	}
+
 	COM_UnMunge(&net_message.data[placeholder + 1], mlen, host_client->netchan.incoming_sequence);
 
 	packetLossByte = MSG_ReadByte();
@@ -1742,7 +1766,7 @@ void SV_ParseCvarValue2(client_t *cl)
 	Con_DPrintf("Cvar query response: name:%s, request ID %d, cvar:%s, value:%s\n", cl->name, requestID, cvarName, value);
 }
 
-void EXT_FUNC SV_HandleClientMessage_api(IGameClient* client, int8 opcode) {
+void EXT_FUNC SV_HandleClientMessage_api(IGameClient* client, uint8 opcode) {
 	client_t* cl = client->GetClient();
 	if (opcode < clc_bad || opcode > clc_cvarvalue2)
 	{
@@ -1755,6 +1779,12 @@ void EXT_FUNC SV_HandleClientMessage_api(IGameClient* client, int8 opcode) {
 		return;
 	}
 
+#ifdef REHLDS_FIXES
+	// Save current name of the client before a possible kick
+	char name[32];
+	Q_strlcpy(name, host_client->name);
+#endif
+
 	void(*func)(client_t *) = sv_clcfuncs[opcode].pfnParse;
 	if (func)
 		func(cl);
@@ -1762,7 +1792,7 @@ void EXT_FUNC SV_HandleClientMessage_api(IGameClient* client, int8 opcode) {
 #ifdef REHLDS_FIXES
 	if (msg_badread)
 	{
-		Con_Printf("SV_ReadClientMessage: badread on %s, opcode %s\n", host_client->name, sv_clcfuncs[opcode].pszname);
+		Con_Printf("SV_ReadClientMessage: badread on %s, opcode %s\n", name, sv_clcfuncs[opcode].pszname);
 	}
 #endif
 
@@ -1805,6 +1835,12 @@ void SV_ExecuteClientMessage(client_t *cl)
 			return;
 
 		g_RehldsHookchains.m_HandleNetCommand.callChain(SV_HandleClientMessage_api, apiClient, c);
+
+#ifdef REHLDS_FIXES
+		// FIXED: Don't handle remaining packets if got dropclient above
+		if (!cl->connected && !cl->active && !cl->spawned)
+			break;
+#endif // REHLDS_FIXES
 	}
 }
 

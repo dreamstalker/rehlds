@@ -1,5 +1,0 @@
-evaluationDependsOn(':rehlds/filesystem/FileSystem_Stdio');
-
-task build {
-	dependsOn project(':rehlds/filesystem/FileSystem_Stdio').tasks.build
-}

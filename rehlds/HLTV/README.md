@@ -1,15 +1,5 @@
 ## Half-Life TV for Goldsrc based games <img align="right" src="https://cloud.githubusercontent.com/assets/5860435/25316484/320cce9a-2892-11e7-8d12-3290baf4458c.png" alt="HLTV Launcher"/>
 
-### Building
-On Windows:
-<pre>gradlew --max-workers=1 clean rehlds/HLTV:build</pre>
-
-On Linux (ICC):
-<pre>./gradlew --max-workers=1 clean rehlds/HLTV:build</pre>
-
-On Linux (GCC):
-<pre>./gradlew --max-workers=1 -PuseGcc clean rehlds/HLTV:build</pre>
-
 Compiled binaries will be placed in each project rehlds/HLTV/**/binaries/ directory
 
 ### Overview

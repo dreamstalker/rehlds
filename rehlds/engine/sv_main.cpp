@@ -212,6 +212,7 @@ cvar_t sv_rehlds_local_gametime = {"sv_rehlds_local_gametime", "0", 0, 0.0f, nul
 cvar_t sv_rehlds_send_mapcycle = { "sv_rehlds_send_mapcycle", "0", 0, 0.0f, nullptr };
 cvar_t sv_rehlds_maxclients_from_single_ip = { "sv_rehlds_maxclients_from_single_ip", "5", 0, 5.0f, nullptr };
 cvar_t sv_use_entity_file = { "sv_use_entity_file", "0", 0, 0.0f, nullptr };
+cvar_t sv_usercmd_custom_random_seed = { "sv_usercmd_custom_random_seed", "0", 0, 0.0f, nullptr };
 #endif
 
 delta_t *SV_LookupDelta(char *name)
@@ -1500,7 +1501,7 @@ void SV_New_f(void)
 		return;
 	}
 
-	if (!host_client->active && host_client->spawned)
+	if ((host_client->hasusrmsgs && host_client->m_bSentNewResponse) || (!host_client->active && host_client->spawned))
 	{
 		return;
 	}
@@ -1566,6 +1567,7 @@ void SV_New_f(void)
 	}
 	Netchan_CreateFragments(TRUE, &host_client->netchan, &msg);
 	Netchan_FragSend(&host_client->netchan);
+	host_client->m_bSentNewResponse = TRUE;
 }
 
 void SV_SendRes_f(void)
@@ -1813,16 +1815,37 @@ challenge_t g_rg_sv_challenges[MAX_CHALLENGES];
 int g_oldest_challenge = 0;
 #endif
 
+typedef struct challenge_buf_s
+{
+	uint32_t ip;
+	uint32_t salt[15];
+} challenge_buf_t;
+
+challenge_buf_t g_raw_challenge_buf;
+
+void SV_ChallengesInit()
+{
+#ifdef REHLDS_FIXES
+	static_assert(sizeof(g_raw_challenge_buf) == 64u, "Invalid g_raw_challenge_buf size");
+	for (uint32_t& s : g_raw_challenge_buf.salt)
+		s = __rdtsc() * rand();
+#endif
+}
+
 bool EXT_FUNC SV_CheckChallenge_api(const netadr_t &adr, int nChallengeValue) {
 	if (NET_IsLocalAddress(adr))
 		return TRUE;
 
+#ifdef REHLDS_FIXES
+	return SV_GetChallenge(adr) == nChallengeValue;
+#else
 	for (int i = 0; i < MAX_CHALLENGES; i++) {
 		if (NET_CompareBaseAdr(adr, g_rg_sv_challenges[i].adr))
 			return nChallengeValue == g_rg_sv_challenges[i].challenge;
 	}
 
 	return FALSE;
+#endif
 }
 
 int SV_CheckChallenge(netadr_t *adr, int nChallengeValue)
@@ -1833,6 +1856,10 @@ int SV_CheckChallenge(netadr_t *adr, int nChallengeValue)
 	if (NET_IsLocalAddress(*adr))
 		return TRUE;
 
+#ifdef REHLDS_FIXES
+	if (SV_GetChallenge(*adr) == nChallengeValue)
+		return TRUE;
+#else
 	for (int i = 0; i < MAX_CHALLENGES; i++)
 	{
 		if (NET_CompareBaseAdr(net_from, g_rg_sv_challenges[i].adr))
@@ -1845,6 +1872,7 @@ int SV_CheckChallenge(netadr_t *adr, int nChallengeValue)
 			return TRUE;
 		}
 	}
+#endif
 	SV_RejectConnection(adr, "No challenge for your address.\n");
 	return FALSE;
 }
@@ -2036,7 +2064,9 @@ qboolean SV_CheckForDuplicateNames(char *userinfo, qboolean bIsReconnecting, int
 			return changed;
 
 		char newname[MAX_NAME];
-		Q_snprintf(newname, sizeof(newname), "(%d)%-0.*s", ++dupc, 28, rawname);
+		const int maxLenDupName = MAX_NAME - (sizeof("(d)") - 1);
+
+		Q_snprintf(newname, sizeof(newname), "(%d)%.*s", ++dupc, maxLenDupName - 1, rawname);
 
 #ifdef REHLDS_FIXES
 		// Fix possibly incorrectly cut UTF8 chars
@@ -2502,6 +2532,15 @@ void SVC_Ping(void)
 
 int EXT_FUNC SV_GetChallenge(const netadr_t& adr)
 {
+#ifdef REHLDS_FIXES
+	uint8_t digest[16];
+	g_raw_challenge_buf.ip = *(uint32_t*)adr.ip;
+	MD5Context_t ctx;
+	MD5Init(&ctx);
+	MD5Update(&ctx, (uint8_t *)&g_raw_challenge_buf, sizeof(g_raw_challenge_buf));
+	MD5Final(digest, &ctx);
+	return *(int *)digest & 0x7FFFFFFF;
+#else
 	int i;
 #ifndef REHLDS_OPT_PEDANTIC
 	int oldest = 0;
@@ -2543,6 +2582,7 @@ int EXT_FUNC SV_GetChallenge(const netadr_t& adr)
 	}
 
 	return g_rg_sv_challenges[i].challenge;
+#endif
 }
 
 void SVC_GetChallenge(void)
@@ -4034,10 +4074,12 @@ void SV_AddToFatPVS(vec_t *org, mnode_t *node)
 unsigned char* EXT_FUNC SV_FatPVS(float *org)
 {
 #ifdef REHLDS_FIXES
-	fatbytes = gPVSRowBytes;
-#else // REHLDS_FIXES
-	fatbytes = (g_psv.worldmodel->numleafs + 31) >> 3;
+	if (gPVS)
+		fatbytes = gPVSRowBytes;
+	else
 #endif // REHLDS_FIXES
+		fatbytes = (g_psv.worldmodel->numleafs + 31) >> 3;
+
 	Q_memset(fatpvs, 0, fatbytes);
 	SV_AddToFatPVS(org, g_psv.worldmodel->nodes);
 	return fatpvs;
@@ -4089,10 +4131,12 @@ void SV_AddToFatPAS(vec_t *org, mnode_t *node)
 unsigned char* EXT_FUNC SV_FatPAS(float *org)
 {
 #ifdef REHLDS_FIXES
-	fatpasbytes = gPVSRowBytes;
-#else // REHLDS_FIXES
-	fatpasbytes = (g_psv.worldmodel->numleafs + 31) >> 3;
+	if (gPAS)
+		fatpasbytes = gPVSRowBytes;
+	else
 #endif // REHLDS_FIXES
+		fatpasbytes = (g_psv.worldmodel->numleafs + 31) >> 3;
+
 	Q_memset(fatpas, 0, fatpasbytes);
 	SV_AddToFatPAS(org, g_psv.worldmodel->nodes);
 	return fatpas;
@@ -5440,7 +5484,10 @@ void SV_PropagateCustomizations(void)
 	// For each active player
 	for (i = 0, pHost = g_psvs.clients; i < g_psvs.maxclients; i++, pHost++)
 	{
-		if (!pHost->active && !pHost->spawned || pHost->fakeclient)
+		if (pHost->fakeclient)
+			continue;
+
+		if (!pHost->active && !pHost->spawned)
 			continue;
 
 		// Send each customization to current player
@@ -6569,7 +6616,10 @@ void SV_BanId_f(void)
 		for (int i = 0; i < g_psvs.maxclients; i++)
 		{
 			client_t *cl = &g_psvs.clients[i];
-			if (!cl->active && !cl->connected && !cl->spawned || cl->fakeclient)
+			if (cl->fakeclient)
+				continue;
+
+			if (!cl->active && !cl->connected && !cl->spawned)
 				continue;
 
 			if (!Q_stricmp(SV_GetClientIDString(cl), idstring))
@@ -6642,7 +6692,10 @@ void SV_BanId_f(void)
 	for (int i = 0; i < g_psvs.maxclients; i++)
 	{
 		client_t *cl = &g_psvs.clients[i];
-		if (!cl->active && !cl->connected && !cl->spawned || cl->fakeclient)
+		if (cl->fakeclient)
+			continue;
+
+		if (!cl->active && !cl->connected && !cl->spawned)
 			continue;
 
 		if (SV_CompareUserID(&cl->network_userid, id))
@@ -7304,7 +7357,10 @@ void SV_KickPlayer(int nPlayerSlot, int nReason)
 	Q_sprintf(rgchT, "%s was automatically disconnected\nfrom this secure server.\n", client->name);
 	for (int i = 0; i < g_psvs.maxclients; i++)
 	{
-		if (!g_psvs.clients[i].active && !g_psvs.clients[i].spawned || g_psvs.clients[i].fakeclient)
+		if (g_psvs.clients[i].fakeclient)
+			continue;
+
+		if (!g_psvs.clients[i].active && !g_psvs.clients[i].spawned)
 			continue;
 
 		MSG_WriteByte(&g_psvs.clients[i].netchan.message, svc_centerprint);
@@ -7331,6 +7387,8 @@ void SV_InactivateClients(void)
 			cl->connected = TRUE;
 			cl->spawned = FALSE;
 			cl->fully_connected = FALSE;
+			cl->hasusrmsgs = FALSE;
+			cl->m_bSentNewResponse = FALSE;
 
 			SZ_Clear(&cl->netchan.message);
 			SZ_Clear(&cl->datagram);
@@ -7501,7 +7559,7 @@ void SV_BeginFileDownload_f(void)
 	{
 		if (host_client->fully_connected ||
 			sv_send_resources.value == 0.0f ||
-			sv_downloadurl.string != NULL && sv_downloadurl.string[0] != 0 && Q_strlen(sv_downloadurl.string) <= 128 && sv_allow_dlfile.value == 0.0f ||
+			(sv_downloadurl.string != NULL && sv_downloadurl.string[0] != 0 && Q_strlen(sv_downloadurl.string) <= 128 && sv_allow_dlfile.value == 0.0f) ||
 			Netchan_CreateFileFragments(TRUE, &host_client->netchan, name) == 0)
 		{
 			SV_FailDownload(name);
@@ -7980,6 +8038,7 @@ void SV_Init(void)
 	Cvar_RegisterVariable(&sv_rollspeed);
 	Cvar_RegisterVariable(&sv_rollangle);
 	Cvar_RegisterVariable(&sv_use_entity_file);
+	Cvar_RegisterVariable(&sv_usercmd_custom_random_seed);
 #endif
 
 	for (int i = 0; i < MAX_MODELS; i++)
@@ -8003,6 +8062,7 @@ void SV_Init(void)
 	PM_Init(&g_svmove);
 	SV_AllocClientFrames();
 	SV_InitDeltas();
+	SV_ChallengesInit();
 }
 
 void SV_Shutdown(void)
@@ -8147,17 +8207,17 @@ typedef struct GameToAppIDMapItem_s
 } GameToAppIDMapItem_t;
 
 GameToAppIDMapItem_t g_GameToAppIDMap[11] = {
-	0x0A, "cstrike",
-	0x14, "tfc",
-	0x1E, "dod",
-	0x28, "dmc",
-	0x32, "gearbox",
-	0x3C, "ricochet",
-	0x46, "valve",
-	0x50, "czero",
-	0x64, "czeror",
-	0x82, "bshift",
-	0x96, "cstrike_beta",
+	{ 0x0A, "cstrike" },
+	{ 0x14, "tfc" },
+	{ 0x1E, "dod" },
+	{ 0x28, "dmc" },
+	{ 0x32, "gearbox" },
+	{ 0x3C, "ricochet" },
+	{ 0x46, "valve" },
+	{ 0x50, "czero" },
+	{ 0x64, "czeror" },
+	{ 0x82, "bshift" },
+	{ 0x96, "cstrike_beta" },
 };
 
 int GetGameAppID(void)

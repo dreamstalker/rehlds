@@ -220,7 +220,7 @@ char *COM_FileExtension(char *in)
 #else // #ifdef HLTV_FIXES
 	static char exten[MAX_PATH];
 	char *c, *d = nullptr;
-	int i;
+	unsigned int i;
 
 	// Search for the first dot after the last path separator
 	c = in;
@@ -537,7 +537,7 @@ void NORETURN HLTV_SysError(const char *fmt, ...)
 	fprintf(fl, "%s\n", string);
 	fclose(fl);
 
-	int *null = 0;
+	volatile int *null = 0;
 	*null = 0;
 	exit(-1);
 }

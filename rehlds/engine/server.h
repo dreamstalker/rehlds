@@ -241,6 +241,7 @@ typedef struct client_s
 	uint32 m_VoiceStreams[2];
 	double m_lastvoicetime;
 	int m_sendrescount;
+	qboolean m_bSentNewResponse;
 } client_t;
 
 enum
@@ -376,6 +377,7 @@ extern cvar_t sv_rehlds_userinfo_transmitted_fields;
 extern cvar_t sv_rehlds_attachedentities_playeranimationspeed_fix;
 extern cvar_t sv_rehlds_local_gametime;
 extern cvar_t sv_rehlds_send_mapcycle;
+extern cvar_t sv_usercmd_custom_random_seed;
 #endif
 extern int sv_playermodel;
 

@@ -140,7 +140,7 @@ SpewRetval_t  _SpewMessage(SpewType_t spewType, char const* pMsgFormat, va_list 
 
 	/* Printf the file and line for warning + assert only... */
 	int len = 0;
-	if ((spewType == SPEW_ASSERT))
+	if (spewType == SPEW_ASSERT)
 	{
 		len = sprintf(pTempBuffer, "%s (%d) : ", s_pFileName, s_Line);
 	}
@@ -149,7 +149,7 @@ SpewRetval_t  _SpewMessage(SpewType_t spewType, char const* pMsgFormat, va_list 
 	len += vsprintf(&pTempBuffer[len], pMsgFormat, args);
 
 	// Add \n for warning and assert
-	if ((spewType == SPEW_ASSERT))
+	if (spewType == SPEW_ASSERT)
 	{
 		len += sprintf(&pTempBuffer[len], "\n");
 	}

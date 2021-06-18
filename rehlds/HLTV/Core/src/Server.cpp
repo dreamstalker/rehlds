@@ -2411,6 +2411,4 @@ IBaseInterface *CreateServer()
 	return (IBaseInterface *)pServer;
 }
 
-#ifndef HOOK_HLTV
 EXPOSE_INTERFACE_FN(CreateServer, Server, SERVER_INTERFACE_VERSION);
-#endif // HOOK_HLTV

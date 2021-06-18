@@ -58,7 +58,7 @@ private:
 	char m_OrigCmd[1024];
 
 public:
-	EXT_FUNC virtual bool Init(char *basedir, char *cmdline, CreateInterfaceFn launcherFactory, CreateInterfaceFn filesystemFactory);
+	EXT_FUNC virtual bool Init(const char *basedir, const char *cmdline, CreateInterfaceFn launcherFactory, CreateInterfaceFn filesystemFactory);
 	EXT_FUNC virtual int Shutdown();
 	EXT_FUNC virtual bool RunFrame();
 	EXT_FUNC virtual void AddConsoleText(char *text);
@@ -93,7 +93,7 @@ NOXREF void Sys_ShutdownLauncherInterface();
 void Sys_InitAuthentication();
 NOXREF void Sys_ShutdownAuthentication();
 void Sys_ShowProgressTicks(char *specialProgressMsg);
-int Sys_InitGame(char *lpOrgCmdLine, char *pBaseDir, void *pwnd, int bIsDedicated);
+int Sys_InitGame(const char *lpOrgCmdLine, const char *pBaseDir, void *pwnd, int bIsDedicated);
 void Sys_ShutdownGame();
 void ClearIOStates();
 

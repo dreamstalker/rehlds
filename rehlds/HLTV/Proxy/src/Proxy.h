@@ -130,6 +130,8 @@ public:
 	EXT_FUNC int GetDispatchMode();
 	EXT_FUNC unsigned char GetRegion();
 	EXT_FUNC bool WriteSignonData(int type, BitBuffer *stream);
+	EXT_FUNC void SetChatDelay(int delay);
+	EXT_FUNC int GetChatDelay() const;
 
 	void ReconnectClients();
 	void ExecuteRcon(NetAddress *from, char *command);
@@ -229,7 +231,8 @@ private:
 		CMD_ID_CLEARBANNS,
 		CMD_ID_MAXLOSS,
 		CMD_ID_PROTOCOL,
-		CMD_ID_REGION
+		CMD_ID_REGION,
+		CMD_ID_CHATDELAY
 	};
 
 	void CMD_Rcon(char *cmdLine);
@@ -284,6 +287,7 @@ private:
 	void CMD_MaxLoss(char *cmdLine);
 	void CMD_Protocol(char *cmdLine);
 	void CMD_Region(char *cmdLine);
+	void CMD_ChatDelay(char *cmdLine);
 
 	struct LocalCommandID_s {
 		char *name;
@@ -373,6 +377,7 @@ protected:
 	float m_CurrentLoss;
 	ObjectList m_BannList;
 	unsigned char m_Region;
+	int m_ChatDelay;
 
 	textmessage_t m_LocalMessage;
 	textmessage_t m_CommentatorMessage;

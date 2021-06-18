@@ -63,13 +63,7 @@ typedef struct resourceinfo_s
 
 typedef struct resource_s
 {
-#ifdef HOOK_HLTV
-	// NOTE HLTV: array szFileName declared on 260 cell,
-	// this changes necessary for compatibility hookers.
-	char              szFileName[MAX_PATH];
-#else
 	char              szFileName[MAX_QPATH]; // File name to download/precache.
-#endif // HOOK_HLTV
 
 	resourcetype_t    type;                // t_sound, t_skin, t_model, t_decal.
 	int               nIndex;              // For t_decals

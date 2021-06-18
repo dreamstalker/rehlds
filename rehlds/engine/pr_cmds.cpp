@@ -384,7 +384,7 @@ void EXT_FUNC TraceSphere(const float *v1, const float *v2, int fNoMonsters, flo
 
 void EXT_FUNC TraceModel(const float *v1, const float *v2, int hullNumber, edict_t *pent, TraceResult *ptr)
 {
-	int oldMovetype, oldSolid;
+	int oldMovetype = MOVETYPE_NONE, oldSolid = SOLID_NOT;
 
 	if (hullNumber < 0 || hullNumber > 3)
 		hullNumber = 0;
@@ -1280,7 +1280,10 @@ void EXT_FUNC EV_Playback(int flags, const edict_t *pInvoker, unsigned short eve
 				continue;
 		}
 
-		if (cl == host_client && (flags & FEV_NOTHOST) && cl->lw || (flags & FEV_HOSTONLY) && cl->edict != pInvoker)
+		if ((flags & FEV_NOTHOST) && cl->lw && cl == host_client)
+			continue;
+
+		if ((flags & FEV_HOSTONLY) && cl->edict != pInvoker)
 			continue;
 
 		if (flags & FEV_RELIABLE)

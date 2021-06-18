@@ -455,7 +455,7 @@ void Sys_ShowProgressTicks(char *specialProgressMsg)
 	}
 }
 
-int Sys_InitGame(char *lpOrgCmdLine, char *pBaseDir, void *pwnd, int bIsDedicated)
+int Sys_InitGame(const char *lpOrgCmdLine, const char *pBaseDir, void *pwnd, int bIsDedicated)
 {
 	host_initialized = FALSE;
 
@@ -640,7 +640,7 @@ NOXREF int BuildMapCycleListHints(char **hints)
 }
 */
 
-bool CDedicatedServerAPI::Init(char *basedir, char *cmdline, CreateInterfaceFn launcherFactory, CreateInterfaceFn filesystemFactory)
+bool CDedicatedServerAPI::Init(const char *basedir, const char *cmdline, CreateInterfaceFn launcherFactory, CreateInterfaceFn filesystemFactory)
 {
 	dedicated_ = (IDedicatedExports *)launcherFactory(VENGINE_DEDICATEDEXPORTS_API_VERSION, NULL);
 	if (!dedicated_)
