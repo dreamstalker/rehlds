@@ -1537,8 +1537,8 @@ void SV_New_f(void)
 		gEntityInterface.pfnClientDisconnect(ent);
 	}
 
-	Q_snprintf(szName, sizeof(szName), host_client->name);
-	Q_snprintf(szAddress, sizeof(szAddress), NET_AdrToString(host_client->netchan.remote_address));
+	Q_snprintf(szName, sizeof(szName), "%s", host_client->name);
+	Q_snprintf(szAddress, sizeof(szAddress), "%s", NET_AdrToString(host_client->netchan.remote_address));
 	Q_snprintf(szRejectReason, sizeof(szRejectReason), "Connection rejected by game\n");
 
 	// Allow the game dll to reject this client.
