@@ -670,21 +670,26 @@ qboolean SV_BuildSoundMsg(edict_t *entity, int channel, const char *sample, int 
 	int sound_num;
 	int field_mask;
 
-	auto clampBounds = [=, func = __func__](auto &value, char const *name, auto min, auto max)
+	if (volume < 0 || volume > 255)
 	{
-		if (value < min || value > max)
-		{
-			Con_Printf("%s: %s=%g out of bounds %g-%g\nEntity classname = %s, sound = %s\n",
-					   func, name, static_cast<float>(value), static_cast<float>(min), static_cast<float>(max), entity->v.classname + pr_strings, sample);
-
-			value = Q_clamp(value, min, max);
-		}
-	};
-
-	clampBounds(channel, nameof_variable(channel), 0, 7);
-	clampBounds(volume, nameof_variable(volume), 0, 255);
-	clampBounds(attenuation, nameof_variable(attenuation), 0.0f, 4.0f);
-	clampBounds(pitch, nameof_variable(pitch), 0, 255);
+		Con_Printf("%s: volume = %i", __func__, volume);
+		volume = (volume < 0) ? 0 : 255;
+	}
+	if (attenuation < 0.0f || attenuation > 4.0f)
+	{
+		Con_Printf("%s: attenuation = %f", __func__, attenuation);
+		attenuation = (attenuation < 0.0f) ? 0.0f : 4.0f;
+	}
+	if (channel < 0 || channel > 7)
+	{
+		Con_Printf("%s: channel = %i", __func__, channel);
+		channel = (channel < 0) ? CHAN_AUTO : CHAN_NETWORKVOICE_BASE;
+	}
+	if (pitch < 0 || pitch > 255)
+	{
+		Con_Printf("%s: pitch = %i", __func__, pitch);
+		pitch = (pitch < 0) ? 0 : 255;
+	}
 
 	field_mask = fFlags;
 
