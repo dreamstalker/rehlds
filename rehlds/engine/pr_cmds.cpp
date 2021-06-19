@@ -317,7 +317,7 @@ void EXT_FUNC PF_sound_I(edict_t *entity, int channel, const char *sample, float
 #else
 	if (volume < 0.0 || volume > 255.0)
 #endif
-		Sys_Error("%s: volume = %i", __func__, volume);
+		Sys_Error("%s: volume = %f", __func__, volume);
 	if (attenuation < 0.0 || attenuation > 4.0)
 		Sys_Error("%s: attenuation = %f", __func__, attenuation);
 	if (channel < 0 || channel > 7)
