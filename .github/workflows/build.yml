@@ -277,7 +277,7 @@ jobs:
           github.event.action == 'published' &&
           startsWith(github.ref, 'refs/tags/')
         run: |
-          7z a -tzip rehlds-bin-${{ env.APP_VERSION }}.zip bin/ hlsdk/
+          7z a -tzip rehlds-bin-${{ env.APP_VERSION }}.zip bin/linux32/ hlsdk/
           7z a -t7z -m0=lzma2 -mx=9 -mfb=64 -aoa rehlds-dbg-${{ env.APP_VERSION }}.7z debug/
 
       - name: Publish artifacts
