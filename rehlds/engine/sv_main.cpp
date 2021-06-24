@@ -1657,6 +1657,9 @@ void EXT_FUNC SV_Spawn_f_internal(void)
 	}
 	else
 	{
+#ifdef REHLDS_FIXES
+		host_client->m_bSentNewResponse = FALSE;
+#endif
 		SV_New_f();
 	}
 }
@@ -2488,6 +2491,7 @@ void EXT_FUNC SV_ConnectClient_internal(void)
 	host_client->fully_connected = FALSE;
 
 #ifdef REHLDS_FIXES
+	host_client->m_bSentNewResponse = FALSE;
 	g_GameClients[host_client - g_psvs.clients]->SetSpawnedOnce(false);
 #endif // REHLDS_FIXES
 
