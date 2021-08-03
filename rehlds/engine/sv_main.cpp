@@ -3420,12 +3420,12 @@ void SV_Rcon(netadr_t *net_from_)
 	remaining[len] = 0;
 
 #ifdef REHLDS_FIXES
-	if(!sv_rcon_allowexternal.value && !NET_CompareBaseAdr(*net_from_, net_local_adr))
+	if (!sv_rcon_allowexternal.value && !NET_CompareBaseAdr(*net_from_, net_local_adr))
 	{
 		if (sv_rcon_condebug.value > 0.0f)
 		{
-			Con_Printf("Rcon denied from %s\n", NET_AdrToString(*net_from_));
-			Log_Printf("Rcon denied from %s\n", NET_AdrToString(*net_from_));
+			Con_Printf("External Rcon denied from %s\n", NET_AdrToString(*net_from_));
+			Log_Printf("External Rcon denied from %s\n", NET_AdrToString(*net_from_));
 		}
 		return;
 	}
