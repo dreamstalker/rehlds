@@ -211,6 +211,10 @@ typedef IHookChainRegistry<bool, IGameClient *, bool> IRehldsHookRegistry_SV_Sho
 typedef IHookChain<ENTITYINIT, char *> IRehldsHook_GetEntityInit;
 typedef IHookChainRegistry<ENTITYINIT, char *> IRehldsHookRegistry_GetEntityInit;
 
+//SV_EmitPings hook
+typedef IHookChain<void, IGameClient *, sizebuf_t *> IRehldsHook_SV_EmitPings;
+typedef IHookChainRegistry<void, IGameClient *, sizebuf_t *> IRehldsHookRegistry_SV_EmitPings;
+
 
 class IRehldsHookchains {
 public:
@@ -259,6 +263,7 @@ public:
 	virtual IRehldsHookRegistry_SV_Frame* SV_Frame() = 0;
 	virtual IRehldsHookRegistry_SV_ShouldSendConsistencyList* SV_ShouldSendConsistencyList() = 0;
 	virtual IRehldsHookRegistry_GetEntityInit* GetEntityInit() = 0;
+	virtual IRehldsHookRegistry_SV_EmitPings* SV_EmitPings() = 0;
 };
 
 struct RehldsFuncs_t {
