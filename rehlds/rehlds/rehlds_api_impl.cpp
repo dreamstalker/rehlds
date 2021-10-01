@@ -835,6 +835,10 @@ IRehldsHookRegistry_GetEntityInit* CRehldsHookchains::GetEntityInit() {
 	return &m_GetEntityInit;
 }
 
+IRehldsHookRegistry_Con_Printf* CRehldsHookchains::Con_Printf() {
+	return &m_Con_Printf;
+}
+
 int EXT_FUNC CRehldsApi::GetMajorVersion()
 {
 	return REHLDS_API_VERSION_MAJOR;
