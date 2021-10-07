@@ -93,7 +93,7 @@ public:
 	EXT_FUNC Panel *GetPanel();
 	EXT_FUNC bool RegisterCommand(char *name, ISystemModule *module, int commandID);
 	EXT_FUNC void GetCommandMatches(char *string, ObjectList *pMatchList);
-	EXT_FUNC void ExecuteString(char *commands);
+	EXT_FUNC void ExecuteString(const char *commands);
 	EXT_FUNC void ExecuteFile(char *filename);
 	EXT_FUNC void Errorf(char *fmt, ...);
 	EXT_FUNC char *CheckParam(char *param);
@@ -146,7 +146,7 @@ void SystemWrapper_Init();
 void SystemWrapper_ShutDown();
 void SystemWrapper_RunFrame(double time);
 BOOL SystemWrapper_LoadModule(char *interfacename, char *library, char *instancename = nullptr);
-void SystemWrapper_ExecuteString(char *command);
+void SystemWrapper_ExecuteString(const char *command);
 void SystemWrapper_CommandForwarder();
 
 int COM_BuildNumber();

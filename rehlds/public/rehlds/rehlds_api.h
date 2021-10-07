@@ -37,7 +37,7 @@
 #include "pr_dlls.h"
 
 #define REHLDS_API_VERSION_MAJOR 3
-#define REHLDS_API_VERSION_MINOR 7
+#define REHLDS_API_VERSION_MINOR 10
 
 //Steam_NotifyClientConnect hook
 typedef IHookChain<qboolean, IGameClient*, const void*, unsigned int> IRehldsHook_Steam_NotifyClientConnect;
@@ -108,8 +108,8 @@ typedef IVoidHookChain<IGameClient*> IRehldsHook_ClientConnected;
 typedef IVoidHookChainRegistry<IGameClient*> IRehldsHookRegistry_ClientConnected;
 
 //HandleNetCommand
-typedef IVoidHookChain<IGameClient*, int8> IRehldsHook_HandleNetCommand;
-typedef IVoidHookChainRegistry<IGameClient*, int8> IRehldsHookRegistry_HandleNetCommand;
+typedef IVoidHookChain<IGameClient*, uint8> IRehldsHook_HandleNetCommand;
+typedef IVoidHookChainRegistry<IGameClient*, uint8> IRehldsHookRegistry_HandleNetCommand;
 
 //Mod_LoadBrushModel
 typedef IVoidHookChain<model_t*, void*> IRehldsHook_Mod_LoadBrushModel;
@@ -203,6 +203,15 @@ typedef IHookChainRegistry<bool, netadr_t &, const uint8_t *, int> IRehldsHookRe
 typedef IVoidHookChain<> IRehldsHook_SV_Frame;
 typedef IVoidHookChainRegistry<> IRehldsHookRegistry_SV_Frame;
 
+//SV_ShouldSendConsistencyList hook
+typedef IHookChain<bool, IGameClient *, bool> IRehldsHook_SV_ShouldSendConsistencyList;
+typedef IHookChainRegistry<bool, IGameClient *, bool> IRehldsHookRegistry_SV_ShouldSendConsistencyList;
+
+//GetEntityInit hook
+typedef IHookChain<ENTITYINIT, char *> IRehldsHook_GetEntityInit;
+typedef IHookChainRegistry<ENTITYINIT, char *> IRehldsHookRegistry_GetEntityInit;
+
+
 class IRehldsHookchains {
 public:
 	virtual ~IRehldsHookchains() { }
@@ -248,6 +257,8 @@ public:
 	virtual IRehldsHookRegistry_CreateFakeClient* CreateFakeClient() = 0;
 	virtual IRehldsHookRegistry_SV_CheckConnectionLessRateLimits* SV_CheckConnectionLessRateLimits() = 0;
 	virtual IRehldsHookRegistry_SV_Frame* SV_Frame() = 0;
+	virtual IRehldsHookRegistry_SV_ShouldSendConsistencyList* SV_ShouldSendConsistencyList() = 0;
+	virtual IRehldsHookRegistry_GetEntityInit* GetEntityInit() = 0;
 };
 
 struct RehldsFuncs_t {
@@ -316,7 +327,7 @@ struct RehldsFuncs_t {
 	char*(*MSG_ReadStringLine)();
 	float(*MSG_ReadAngle)();
 	float(*MSG_ReadHiresAngle)();
-	void(*MSG_ReadUsercmd)(usercmd_t *to, usercmd_t *from);
+	void(*MSG_ReadUsercmd)(struct usercmd_s *to, struct usercmd_s *from);
 	float(*MSG_ReadCoord)();
 	void(*MSG_ReadVec3Coord)(sizebuf_t *sb, vec3_t fa);
 
@@ -340,7 +351,7 @@ struct RehldsFuncs_t {
 	void(*MSG_WriteFloat)(sizebuf_t *sb, float f);
 	void(*MSG_WriteAngle)(sizebuf_t *sb, float f);
 	void(*MSG_WriteHiresAngle)(sizebuf_t *sb, float f);
-	void(*MSG_WriteUsercmd)(sizebuf_t *sb, usercmd_t *to, usercmd_t *from);
+	void(*MSG_WriteUsercmd)(sizebuf_t *sb, struct usercmd_s *to, struct usercmd_s *from);
 	void(*MSG_WriteCoord)(sizebuf_t *sb, float f);
 	void(*MSG_WriteVec3Coord)(sizebuf_t *sb, const vec3_t fa);
 

@@ -538,15 +538,17 @@ void Decal_Init(void)
 	for (i = 0; i < ARRAYSIZE(pszPathID); i++)
 	{
 		hfile = FS_OpenPathID("decals.wad", "rb", pszPathID[i]);
-#ifdef REHLDS_FIXES
+
 		if (!hfile)
+		{
+#ifdef REHLDS_FIXES
 			if (found || i < ARRAYSIZE(pszPathID) - 1)
 				continue;
-			else
 #else
-		if (i == 0 && !hfile)
+			if (i == 0)
 #endif
-			Sys_Error("%s: Couldn't find '%s' in \"%s\" search path\n", __func__, "decals.wad", pszPathID[i]);
+				Sys_Error("%s: Couldn't find '%s' in \"%s\" search path\n", __func__, "decals.wad", pszPathID[i]);
+		}
 
 #ifdef REHLDS_FIXES
 		found = true;

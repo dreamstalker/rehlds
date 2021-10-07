@@ -252,7 +252,7 @@ protected:
 
 	int m_MaxInstanced_BaseLine;
 
-#if defined(HLTV_FIXES) && !defined(HOOK_HLTV)
+#if defined(HLTV_FIXES)
 	char m_Lightstyles[MAX_LIGHTSTYLES][64];
 #else
 	char m_Lightstyles[MAX_LIGHTSTYLES][65];
@@ -303,13 +303,7 @@ protected:
 	char m_HostName[255];
 
 	NetAddress m_GameServerAddress;
-
-#ifdef HOOK_HLTV
-	static DeltaWrapper m_Delta;
-#else
 	Delta m_Delta;
-#endif // HOOK_HLTV
-
 };
 
 extern char g_DownloadURL[128];

@@ -177,7 +177,7 @@ NOINLINE void _GetBitmaskAndBytecount(delta_t* delta, int* bits, int* bytecount,
 
 NOINLINE delta_t* _CreateTestDeltaDesc() {
 	static delta_description_t _fields[32];
-	delta_test_struct_t d; d; // "use" d variable
+	delta_test_struct_t d = {}; UNUSED(d);
 
 	_InitDeltaField(&_fields[0], 0x00, DT_BYTE, "b_00", offsetof(delta_test_struct_t, b_00), 1, 8, 1.0f, 1.0f);
 	_InitDeltaField(&_fields[1], 0x01, DT_BYTE, "b_01", offsetof(delta_test_struct_t, b_01), 1, 8, 1.0f, 1.0f);

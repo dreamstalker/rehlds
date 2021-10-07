@@ -86,6 +86,11 @@ bool ProxyClient::ProcessStringCmd(char *string)
 		return true;
 	}
 
+	if (!cmdLine.CountToken()) {
+		m_System->DPrintf("WARNING! ProxyClient::ProcessStringCmd: invalid command string.\n");
+		return false;
+	}
+
 	char *cmd = cmdLine.GetToken(0);
 	for (auto& local_cmd : m_LocalCmdReg)
 	{
@@ -126,7 +131,7 @@ void ProxyClient::CMD_Say(TokenLine *cmd)
 		return;
 	}
 
-	if (m_SystemTime >= m_LastChatTime + 6) {
+	if (m_SystemTime >= m_LastChatTime + m_Proxy->GetChatDelay()) {
 		m_Proxy->ChatSpectator(m_ClientName, chatText);
 		m_LastChatTime = float(m_SystemTime);
 		return;

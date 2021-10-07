@@ -130,14 +130,6 @@
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\hookers\filesystem\hooklist.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\hookers\filesystem\main.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="..\src\BaseFileSystem.cpp" />
     <ClCompile Include="..\src\filesystem_helpers.cpp" />
     <ClCompile Include="..\src\FileSystem_Stdio.cpp" />
@@ -156,10 +148,6 @@
     <ClCompile Include="..\src\public_amalgamation.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\hookers\filesystem\hooklist.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
     <ClInclude Include="..\src\BaseFileSystem.h" />
     <ClInclude Include="..\src\filesystem_helpers.h" />
     <ClInclude Include="..\src\FileSystem_Stdio.h" />

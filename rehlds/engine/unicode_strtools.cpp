@@ -565,22 +565,22 @@ int Q_UChar32ToUTF8(uchar32 uVal, char * pUTF8Out) {
 	else if (uVal <= 0x7FF)
 			{
 		*pUTF8Out = (uVal >> 6) | 0xC0;
-		pUTF8Out[1] = uVal & 0x3F | 0x80;
+		pUTF8Out[1] = (uVal & 0x3F) | 0x80;
 		return 2;
 	}
 	else if (uVal <= 0xFFFF)
 	{
-		*pUTF8Out = (uVal >> 12) | 0xE0;
-		pUTF8Out[2] = uVal & 0x3F | 0x80;
-		pUTF8Out[1] = (uVal >> 6) & 0x3F | 0x80;
+		*pUTF8Out = ((uVal >> 12)) | 0xE0;
+		pUTF8Out[2] = (uVal & 0x3F) | 0x80;
+		pUTF8Out[1] = (((uVal >> 6)) & 0x3F) | 0x80;
 		return 3;
 	}
 	else
 	{
-		*pUTF8Out = (uVal >> 18) & 7 | 0xF0;
-		pUTF8Out[1] = (uVal >> 12) & 0x3F | 0x80;
-		pUTF8Out[3] = uVal & 0x3F | 0x80;
-		pUTF8Out[2] = (uVal >> 6) & 0x3F | 0x80;
+		*pUTF8Out = ((uVal >> 18) & 7) | 0xF0;
+		pUTF8Out[1] = ((uVal >> 12) & 0x3F) | 0x80;
+		pUTF8Out[3] = (uVal & 0x3F) | 0x80;
+		pUTF8Out[2] = ((uVal >> 6) & 0x3F) | 0x80;
 		return 4;
 	}
 }
@@ -600,7 +600,7 @@ int __cdecl Q_UChar32ToUTF16(uchar32 uVal, uchar16 *pUTF16Out)
 	}
 	else
 	{
-		pUTF16Out[1] = uVal & 0x3FF | 0xDC00;
+		pUTF16Out[1] = (uVal & 0x3FF) | 0xDC00;
 		pUTF16Out[0] = ((uVal - 0x10000) >> 10) | 0xD800;
 		return 2;
 	}

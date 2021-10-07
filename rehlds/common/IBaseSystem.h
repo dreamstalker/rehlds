@@ -74,7 +74,7 @@ public:
 
 	virtual bool RegisterCommand(char *name, ISystemModule *module, int commandID) = 0;
 	virtual void GetCommandMatches(char *string, ObjectList *pMatchList) = 0;
-	virtual void ExecuteString(char *commands) = 0;
+	virtual void ExecuteString(const char *commands) = 0;
 	virtual void ExecuteFile(char *filename) = 0;
 	virtual void Errorf(char *fmt, ...) = 0;
 

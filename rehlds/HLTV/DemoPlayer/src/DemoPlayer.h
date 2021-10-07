@@ -172,7 +172,6 @@ private:
 	unsigned int m_Outgoing_sequence;
 };
 
-#ifndef HOOK_HLTV
 // Use this to expose a singleton interface. This creates the global variable for you automatically.
 #define EXPOSE_SINGLE_INTERFACE2(className, interfaceName, versionName) \
 	static className __g_##className##_singleton;\
@@ -180,4 +179,3 @@ private:
 	static InterfaceReg __g_Create##className##interfaceName##_reg(__Create##className##interfaceName##_interface, versionName);
 
 EXPOSE_SINGLE_INTERFACE2(DemoPlayer, IDemoPlayer, DEMOPLAYER_INTERFACE_VERSION);
-#endif // HOOK_HLTV

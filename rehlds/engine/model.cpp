@@ -152,7 +152,7 @@ model_t *Mod_FindName(qboolean trackCRC, const char *name)
 
 		if (mod->needload == NL_UNREFERENCED)
 		{
-			if (!avail || mod->type != mod_alias && mod->type != mod_studio)
+			if (!avail || (mod->type != mod_alias && mod->type != mod_studio))
 				avail = mod;
 		}
 	}
@@ -866,10 +866,12 @@ void CalcSurfaceExtents(msurface_t *s)
 
 		for (j = 0; j < 2; j++)
 		{
-			val = v->position[0] * tex->vecs[j][0] +
-				v->position[1] * tex->vecs[j][1] +
-				v->position[2] * tex->vecs[j][2] +
-				tex->vecs[j][3];
+			// FIXED: loss of floating point
+			val = v->position[0] * (double)tex->vecs[j][0] +
+				v->position[1] * (double)tex->vecs[j][1] +
+				v->position[2] * (double)tex->vecs[j][2] +
+				(double)tex->vecs[j][3];
+
 			if (val < mins[j])
 				mins[j] = val;
 			if (val > maxs[j])
@@ -1329,7 +1331,7 @@ void EXT_FUNC Mod_LoadBrushModel_internal(model_t *mod, void *buffer)
 
 		if (i < mod->numsubmodels - 1)
 		{
-			char name[10];
+			char name[12];
 			Q_snprintf(name, ARRAYSIZE(name), "*%i", i + 1);
 
 			loadmodel = Mod_FindName(0, name);

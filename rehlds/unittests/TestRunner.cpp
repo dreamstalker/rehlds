@@ -1,16 +1,10 @@
 #include "precompiled.h"
 #include "rehlds_tests_shared.h"
-#include "cppunitlite/GradleAdapter.h"
+#include "cppunitlite/MainAdapter.h"
 
 int main(int argc, char* argv[]) {
 	printf("TestRunner: main()\n");
 
-	GradleAdapter a;
-	int res = a.testsEntryPoint(argc, argv);
-
-#ifdef _BUILD_FROM_IDE
-	system("PAUSE");
-#endif
-
-	return res;
+	MainAdapter a;
+	return a.testsEntryPoint(argc, argv);
 }

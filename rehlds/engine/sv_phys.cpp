@@ -1255,7 +1255,7 @@ void PF_WaterMove(edict_t *pSelf)
 
 	if (!(flags & (FL_IMMUNE_WATER | FL_GODMODE)))
 	{
-		if ((flags & FL_SWIM) && (waterlevel < drownlevel) || (waterlevel >= drownlevel))
+		if (((flags & FL_SWIM) && waterlevel < drownlevel) || (waterlevel >= drownlevel))
 		{
 			if (pSelf->v.air_finished < g_psv.time && pSelf->v.pain_finished < g_psv.time)
 			{

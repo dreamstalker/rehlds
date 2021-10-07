@@ -35,8 +35,6 @@
 
 const int CMD_MAXBACKUP = 64;
 
-typedef struct command_s command_t;
-
 typedef struct sv_adjusted_positions_s
 {
 	int active;
@@ -59,7 +57,6 @@ typedef struct clc_func_s
 } clc_func_t;
 
 extern edict_t *sv_player;
-extern command_t clcommands[23];
 extern sv_adjusted_positions_t truepositions[MAX_CLIENTS];
 extern qboolean g_balreadymoved;
 

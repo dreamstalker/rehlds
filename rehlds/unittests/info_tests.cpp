@@ -67,13 +67,13 @@ TEST(SetValueForStarKey, Info, 1000) {
 			"\\cl_updaterate\\100\\topcolor\\60\\name\\abcdefghijklmnop\\*sid\\12332432525345\\_vgui_menus\\1\\model\\urban\\somelargeuselesskey\\12312321321323123123123213123123123123123123123123123123123123123dasdsad\\_cl_autowepswitch\\1",
 		},
 
-		{ 
+		{
 			"\\cl_updaterate\\100\\topcolor\\60\\name\\abcdefghijklmnop\\*sid\\12332432525345\\_vgui_menus\\1\\model\\urban\\somelargeuselesskey\\12312321321323123123123213123123123123123123123123123123123123123dasdsad\\_cl_autowepswitch\\1",
 			"*team",
 			"12345678901234567890123456789012345678",
 			"\\cl_updaterate\\100\\topcolor\\60\\name\\abcdefghijklmnop\\*sid\\12332432525345\\_vgui_menus\\1\\model\\urban\\_cl_autowepswitch\\1\\*team\\12345678901234567890123456789012345678",
 		},
-		
+
 		{
 			"\\cl_updaterate\\100\\topcolor\\60\\name\\abcdefghijklmnop\\*sid\\12332432525345\\_vgui_menus\\1\\model\\urban\\somelargeuselesskey\\12312321321323123123123213123123123123123123123123123123123123123dasdsad\\_cl_autowepswitch\\1",
 			"*team",
@@ -126,7 +126,7 @@ TEST(SetValueForStarKeyResult, Info, 1000) {
 		char localInfo[256];
 		strcpy(localInfo, d->initialInfo);
 		localInfo[255] = 0;
-		bool result = Info_SetValueForStarKey(localInfo, d->key, d->value, 256);
+		bool result = Info_SetValueForStarKey(localInfo, d->key, d->value, 256) ? true : false;
 		CHECK("Invalid info string", d->success == result);
 	}
 }
@@ -301,7 +301,7 @@ TEST(Info_IsKeyImportant, Info, 1000)
 	for (int i = 0; i < ARRAYSIZE(testdata); i++) {
 		testdata_t* d = &testdata[i];
 
-		bool result = Info_IsKeyImportant(d->key);
+		bool result = Info_IsKeyImportant(d->key) ? true : false;
 
 		CHECK("wrong result", d->result == result);
 	}

@@ -80,11 +80,10 @@ Proxy::LocalCommandID_s Proxy::m_LocalCmdReg[] = {
 	{ "maxloss",           CMD_ID_MAXLOSS,            &Proxy::CMD_MaxLoss },
 	{ "protocol",          CMD_ID_PROTOCOL,           &Proxy::CMD_Protocol },
 	{ "region",            CMD_ID_REGION,             &Proxy::CMD_Region },
+	{ "chatdelay",         CMD_ID_CHATDELAY,          &Proxy::CMD_ChatDelay },
 };
 
-#ifndef HOOK_HLTV
 EXPOSE_SINGLE_INTERFACE(Proxy, IProxy, PROXY_INTERFACE_VERSION);
-#endif // HOOK_HLTV
 
 bool Proxy::Init(IBaseSystem *system, int serial, char *name)
 {
@@ -188,6 +187,7 @@ bool Proxy::Init(IBaseSystem *system, int serial, char *name)
 	m_MaxClients = 128;
 	m_MaxQueries = 100;
 	m_Region = 255;
+	m_ChatDelay = 6;
 
 	const int maxRouteAblePacketSize = 1400;
 	m_InfoInfo.Resize(maxRouteAblePacketSize);
@@ -208,7 +208,13 @@ bool Proxy::Init(IBaseSystem *system, int serial, char *name)
 	Q_memset(m_LastRconCommand, 0, sizeof(m_LastRconCommand));
 	Q_memset(m_OffLineText, 0, sizeof(m_OffLineText));
 	Q_memset(m_SignonCommands, 0, sizeof(m_SignonCommands));
-	Q_memset(m_Challenges, 0, sizeof(m_Challenges));
+
+	for (int i = 0; i < MAX_CHALLENGES; i++)
+	{
+		m_Challenges[i].adr.Clear();
+		m_Challenges[i].challenge = 0;
+		m_Challenges[i].time = 0.0f;
+	}
 
 	m_LoopCommands.Init();
 	m_BannList.Init();
@@ -834,10 +840,10 @@ void Proxy::Broadcast(byte *data, int length, int groupType, bool isReliable)
 	while (client)
 	{
 		if (client->IsActive()
-			&& ((groupType & GROUP_CLIENT) && client->GetClientType() == TYPE_CLIENT)
-			|| ((groupType & GROUP_PROXY) && client->GetClientType() == TYPE_PROXY)
-			|| ((groupType & GROUP_VOICE) && client->IsHearingVoices())
-			|| ((groupType & GROUP_CHAT) && client->HasChatEnabled()))
+			&& (((groupType & GROUP_CLIENT) && client->GetClientType() == TYPE_CLIENT)
+			||  ((groupType & GROUP_PROXY)  && client->GetClientType() == TYPE_PROXY)
+			||  ((groupType & GROUP_VOICE)  && client->IsHearingVoices())
+			||  ((groupType & GROUP_CHAT)   && client->HasChatEnabled())))
 		{
 			client->Send(data, length, isReliable);
 		}
@@ -964,7 +970,7 @@ void Proxy::CMD_Name(char *cmdLine)
 	}
 
 	char name[MAX_NAME];
-	int len = Q_strlen(params.GetToken(1));
+	unsigned int len = Q_strlen(params.GetToken(1));
 	if (len > sizeof(name) - 1) {
 		m_System->Printf("Invalid name length.\n");
 		return;
@@ -2773,4 +2779,29 @@ const char *Proxy::GetDescription()
 	}
 
 	return "Private Server";
+}
+
+void Proxy::CMD_ChatDelay(char *cmdLine)
+{
+	enum { param_ChatDelay = 1 };
+
+	TokenLine params(cmdLine);
+	if (params.CountToken() != 2)
+	{
+		m_System->Printf("Syntax: chatdelay <number>\n");
+		m_System->Printf("Current clients chat delay is %i.\n", GetChatDelay());
+		return;
+	}
+
+	SetChatDelay(Q_atoi(params.GetToken(param_ChatDelay)));
+}
+
+void Proxy::SetChatDelay(int delay)
+{
+	m_ChatDelay = delay;
+}
+
+int Proxy::GetChatDelay() const
+{
+	return m_ChatDelay;
 }

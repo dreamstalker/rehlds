@@ -10,9 +10,6 @@
     <Filter Include="HLTV\common">
       <UniqueIdentifier>{feda00f0-7c09-4c63-b5a1-e4fbcdfc6b69}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\hookers">
-      <UniqueIdentifier>{199d99ef-8924-48fc-8c8a-2859f8d40c82}</UniqueIdentifier>
-    </Filter>
     <Filter Include="engine">
       <UniqueIdentifier>{1777708a-8593-40c0-8caa-9154180854dc}</UniqueIdentifier>
     </Filter>
@@ -83,12 +80,6 @@
     </ClCompile>
     <ClCompile Include="..\..\common\byteorder.cpp">
       <Filter>HLTV\common</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\hookers\HLTV\Proxy\hooklist.cpp">
-      <Filter>src\hookers</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\hookers\HLTV\Proxy\main.cpp">
-      <Filter>src\hookers</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Director\src\Director.cpp">
       <Filter>src</Filter>
@@ -172,9 +163,6 @@
     </ClInclude>
     <ClInclude Include="..\..\common\NetAddress.h">
       <Filter>HLTV\common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hookers\HLTV\Proxy\hooklist.h">
-      <Filter>src\hookers</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\common\BaseSystemModule.h">
       <Filter>common</Filter>

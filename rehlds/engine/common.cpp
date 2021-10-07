@@ -1033,10 +1033,24 @@ float MSG_ReadFloat(void)
 {
 	float f;
 
+	union
+	{
+		unsigned char    b[4];
+		float   f;
+		int     l;
+	} dat;
+
 	if (msg_readcount + 4 <= net_message.cursize)
 	{
-		f = *((float*)LittleLong(*(int *)&net_message.data[msg_readcount]));
+		dat.b[0] = net_message.data[msg_readcount];
+		dat.b[1] = net_message.data[msg_readcount + 1];
+		dat.b[2] = net_message.data[msg_readcount + 2];
+		dat.b[3] = net_message.data[msg_readcount + 3];
 		msg_readcount += 4;
+
+		dat.l = LittleLong(dat.l);
+
+		return dat.f;
 	}
 	else
 	{
@@ -1148,6 +1162,22 @@ void SZ_Clear(sizebuf_t *buf)
 {
 	buf->flags &= ~SIZEBUF_OVERFLOWED;
 	buf->cursize = 0;
+}
+
+qboolean SZ_HasSpaceToRead(const sizebuf_t *buf, int length)
+{
+	if ((msg_readcount + length) > buf->maxsize)
+		return FALSE;
+
+	return TRUE;
+}
+
+qboolean SZ_HasSomethingToRead(const sizebuf_t *buf, int length)
+{
+	if ((msg_readcount + length) > buf->cursize)
+		return FALSE;
+
+	return TRUE;
 }
 
 void *EXT_FUNC SZ_GetSpace(sizebuf_t *buf, int length)
@@ -2266,23 +2296,35 @@ void COM_ListMaps(char *pszSubString)
 
 		while (findfn != NULL)
 		{
-			Q_snprintf(curDir, ARRAYSIZE(curDir), "maps/%s", findfn);
-			FS_GetLocalPath(curDir, curDir, ARRAYSIZE(curDir));
-
-			if (strstr(curDir, com_gamedir) && (!nSubStringLen || !Q_strnicmp(findfn, pszSubString, nSubStringLen)))
+			if (Q_snprintf(curDir, ARRAYSIZE(curDir), "maps/%s", findfn) < ARRAYSIZE(curDir))
 			{
-				Q_memset(&header, 0, sizeof(dheader_t));
-				Q_sprintf(pFileName, "maps/%s", findfn);
+				FS_GetLocalPath(curDir, curDir, ARRAYSIZE(curDir));
 
-				fp = FS_Open(pFileName, "rb");
-
-				if (fp)
+				if (Q_strstr(curDir, com_gamedir) && (!nSubStringLen || !Q_strnicmp(findfn, pszSubString, nSubStringLen)))
 				{
-					FS_Read(&header, sizeof(dheader_t), 1, fp);
-					FS_Close(fp);
-				}
+					if (Q_snprintf(pFileName, ARRAYSIZE(pFileName), "maps/%s", findfn) < ARRAYSIZE(pFileName))
+					{
+						Q_memset(&header, 0, sizeof(dheader_t));
 
-				COM_CheckPrintMap(&header, findfn, bShowOutdated != 0);
+						fp = FS_Open(pFileName, "rb");
+
+						if (fp)
+						{
+							FS_Read(&header, sizeof(dheader_t), 1, fp);
+							FS_Close(fp);
+						}
+
+						COM_CheckPrintMap(&header, findfn, bShowOutdated != 0);
+					}
+					else
+					{
+						Con_Printf("Map name too long: %s\n", findfn);
+					}
+				}
+			}
+			else
+			{
+				Con_Printf("Map name too long: %s\n", findfn);
 			}
 
 			findfn = Sys_FindNext(NULL);
@@ -2367,7 +2409,7 @@ void EXT_FUNC COM_GetGameDir(char *szGameDir)
 {
 	if (szGameDir)
 	{
-		Q_snprintf(szGameDir, MAX_PATH - 1 , "%s", com_gamedir);
+		Q_snprintf(szGameDir, MAX_PATH, "%s", com_gamedir);
 	}
 }
 

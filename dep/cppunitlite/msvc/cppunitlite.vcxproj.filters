@@ -27,7 +27,7 @@
     <ClInclude Include="..\include\cppunitlite\TestResult.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\cppunitlite\GradleAdapter.h">
+    <ClInclude Include="..\include\cppunitlite\MainAdapter.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>
@@ -44,7 +44,7 @@
     <ClCompile Include="..\src\TestResult.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\GradleAdapter.cpp">
+    <ClCompile Include="..\src\MainAdapter.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>

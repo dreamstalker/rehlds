@@ -56,7 +56,7 @@ public:
 	CEngine();
 	virtual ~CEngine();
 
-	virtual bool Load(bool dedicated, char *rootDir, char *cmdLine);
+	virtual bool Load(bool dedicated, const char *rootDir, const char *cmdLine);
 	virtual void Unload();
 	virtual void SetState(int iState);
 	virtual int GetState();

@@ -10,9 +10,6 @@
     <Filter Include="HLTV\common">
       <UniqueIdentifier>{664fe3c6-46ae-4fa5-bf0c-f70873228f5e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\hookers">
-      <UniqueIdentifier>{fb482bcd-a131-4e66-be87-c7b0ffe6a4cf}</UniqueIdentifier>
-    </Filter>
     <Filter Include="engine">
       <UniqueIdentifier>{0997bc0d-a67f-47eb-abc1-3c7ebb128beb}</UniqueIdentifier>
     </Filter>
@@ -78,12 +75,6 @@
     <ClCompile Include="..\src\public_amalgamation.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\hookers\HLTV\Core\hooklist.cpp">
-      <Filter>src\hookers</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\hookers\HLTV\Core\main.cpp">
-      <Filter>src\hookers</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\common\BaseSystemModule.cpp">
       <Filter>common</Filter>
     </ClCompile>
@@ -98,9 +89,6 @@
     </ClCompile>
     <ClCompile Include="..\..\common\md5.cpp">
       <Filter>HLTV\common</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\hookers\HLTV\Core\DeltaEx.cpp">
-      <Filter>src\hookers</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\engine\mem.cpp">
       <Filter>engine</Filter>
@@ -164,9 +152,6 @@
     <ClInclude Include="..\src\Delta.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\hookers\HLTV\Core\hooklist.h">
-      <Filter>src\hookers</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\common\BaseSystemModule.h">
       <Filter>common</Filter>
     </ClInclude>
@@ -181,9 +166,6 @@
     </ClInclude>
     <ClInclude Include="..\..\common\md5.h">
       <Filter>HLTV\common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hookers\HLTV\Core\DeltaEx.h">
-      <Filter>src\hookers</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\engine\mem.h">
       <Filter>engine</Filter>

@@ -377,7 +377,7 @@ void Host_UpdateStats(void)
 		fscanf(pFile, "%d %s %c %d %d %d %d %d %lu %lu \t\t\t%lu %lu %lu %ld %ld %ld %ld %ld %ld %lu \t\t\t%lu %ld %lu %lu %lu %lu %lu %lu %lu %lu \t\t\t%lu %lu %lu %lu %lu %lu",
 			&dummy,
 			statFile,
-			&dummy, &dummy, &dummy, &dummy, &dummy, &dummy, &dummy, &dummy, &dummy, &dummy, &dummy,
+			(char *)&dummy, &dummy, &dummy, &dummy, &dummy, &dummy, &dummy, &dummy, &dummy, &dummy, &dummy,
 			&ctime,
 			&stime,
 			&dummy, &dummy, &dummy, &dummy, &dummy,
@@ -423,7 +423,12 @@ void GetStatsString(char *buf, int bufSize)
 	for (int i = 0; i < g_psvs.maxclients; i++)
 	{
 		host_client = &g_psvs.clients[i];
-		if (!host_client->active && !host_client->connected && !host_client->spawned || host_client->fakeclient)
+
+		// Fake clients are ignored
+		if (host_client->fakeclient)
+			continue;
+
+		if (!host_client->active && !host_client->connected && !host_client->spawned)
 			continue;
 
 		players++;

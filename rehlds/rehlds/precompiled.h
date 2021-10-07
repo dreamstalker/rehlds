@@ -14,8 +14,6 @@
 #include "static_map.h"
 
 #include "ed_strpool.h"
-
-#include "memory.h"
 #include "strtools.h"
 
 // Valve libs stuff

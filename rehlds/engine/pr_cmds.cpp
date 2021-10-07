@@ -312,8 +312,12 @@ void EXT_FUNC PF_ambientsound_I(edict_t *entity, float *pos, const char *samp, f
 
 void EXT_FUNC PF_sound_I(edict_t *entity, int channel, const char *sample, float volume, float attenuation, int fFlags, int pitch)
 {
+#ifdef REHLDS_FIXES
+	if (volume < 0.0f || volume > 1.0f)
+#else
 	if (volume < 0.0 || volume > 255.0)
-		Sys_Error("%s: volume = %i", __func__, volume);
+#endif
+		Sys_Error("%s: volume = %f", __func__, volume);
 	if (attenuation < 0.0 || attenuation > 4.0)
 		Sys_Error("%s: attenuation = %f", __func__, attenuation);
 	if (channel < 0 || channel > 7)
@@ -384,7 +388,7 @@ void EXT_FUNC TraceSphere(const float *v1, const float *v2, int fNoMonsters, flo
 
 void EXT_FUNC TraceModel(const float *v1, const float *v2, int hullNumber, edict_t *pent, TraceResult *ptr)
 {
-	int oldMovetype, oldSolid;
+	int oldMovetype = MOVETYPE_NONE, oldSolid = SOLID_NOT;
 
 	if (hullNumber < 0 || hullNumber > 3)
 		hullNumber = 0;
@@ -1280,7 +1284,10 @@ void EXT_FUNC EV_Playback(int flags, const edict_t *pInvoker, unsigned short eve
 				continue;
 		}
 
-		if (cl == host_client && (flags & FEV_NOTHOST) && cl->lw || (flags & FEV_HOSTONLY) && cl->edict != pInvoker)
+		if ((flags & FEV_NOTHOST) && cl->lw && cl == host_client)
+			continue;
+
+		if ((flags & FEV_HOSTONLY) && cl->edict != pInvoker)
 			continue;
 
 		if (flags & FEV_RELIABLE)

@@ -1,10 +1,9 @@
 **/build
-**/.gradle
-.idea
 *.iml
 *.bat
 *.log
 *.lnk
+*.aps
 **/msvc/Debug*
 **/msvc/Release*
 **/msvc/Tests
@@ -21,6 +20,3 @@
 **/msvc/ipch
 
 rehlds/version/appversion.h
-rehlds/_rehldsTestImg
-rehlds/_dev
-publish

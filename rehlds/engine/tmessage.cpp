@@ -44,17 +44,19 @@ const char *gNetworkMessageNames[MAX_NETMESSAGE] =
 
 client_textmessage_t gNetworkTextMessage[MAX_NETMESSAGE] =
 {
-	0, // effect
-	255, 255, 255, 255,
-	255, 255, 255, 255,
-	-1.0f, // x
-	-1.0f, // y
-	0.0f, // fadein
-	0.0f, // fadeout
-	0.0f, // holdtime
-	0.0f, // fxTime,
-	NETWORK_MESSAGE1,// pName message name.
-	gNetworkTextMessageBuffer[0] // pMessage
+	{
+		0, // effect
+		255, 255, 255, 255,
+		255, 255, 255, 255,
+		-1.0f, // x
+		-1.0f, // y
+		0.0f, // fadein
+		0.0f, // fadeout
+		0.0f, // holdtime
+		0.0f, // fxTime,
+		NETWORK_MESSAGE1,// pName message name.
+		gNetworkTextMessageBuffer[0] // pMessage
+	}
 };
 
 char* EXT_FUNC memfgets(unsigned char *pMemFile, int fileSize, int *pFilePos, char *pBuffer, int bufferSize)

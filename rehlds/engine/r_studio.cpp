@@ -187,9 +187,9 @@ void QuaternionSlerp(vec_t *p, vec_t *q, float t, vec_t *qt)
 
 	cosom = p[0] * q[0] + p[1] * q[1] + p[2] * q[2] + p[3] * q[3];
 
-	if ((1.0 + cosom) > 0.00000001)
+	if ((1.0 + cosom) > 0.000001)
 	{
-		if ((1.0 - cosom) > 0.00000001)
+		if ((1.0 - cosom) > 0.000001)
 		{
 			omega = acos(cosom);
 			sinom = sin(omega);
@@ -785,7 +785,7 @@ hull_t *SV_HullForStudioModel(const edict_t *pEdict, const vec_t *mins, const ve
 			int iBlend;
 			R_StudioPlayerBlend(pseqdesc, &iBlend, angles);
 
-			unsigned char blending = (unsigned char)iBlend;
+			unsigned char blending[2] = { (unsigned char)iBlend, 0 };
 			unsigned char controller[4] = { 0x7F, 0x7F, 0x7F, 0x7F };
 			return R_StudioHull(
 				g_psv.models[pEdict->v.modelindex],
@@ -795,7 +795,7 @@ hull_t *SV_HullForStudioModel(const edict_t *pEdict, const vec_t *mins, const ve
 				pEdict->v.origin,
 				size,
 				controller,
-				&blending,
+				blending,
 				pNumHulls,
 				pEdict,
 				bSkipShield);

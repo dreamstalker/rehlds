@@ -724,7 +724,12 @@ bool BSPModel::LoadFromBuffer(unsigned int *buffer, int length, const char *name
 	header = (dheader_t *)buffer;
 
 	i = _LittleLong(header->version);
-	if (i != HLBSP_VERSION) {
+	if (
+#ifdef HLTV_FIXES
+		i != Q1BSP_VERSION &&
+#endif
+		i != HLBSP_VERSION)
+	{
 		m_System->Errorf("BSPModel::LoadFromBuffer: %s has wrong version number (%i should be %i)\n", m_model.name, i, HLBSP_VERSION);
 	}
 

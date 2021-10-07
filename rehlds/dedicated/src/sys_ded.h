@@ -38,5 +38,5 @@ extern CreateInterfaceFn g_FilesystemFactoryFn;
 int RunEngine();
 int StartServer(char* cmdline);
 
-void Sys_Printf_Safe(char *text);
-void Sys_Printf(char *fmt, ...);
+void Sys_Printf_Safe(const char *text);
+void Sys_Printf(const char *fmt, ...);

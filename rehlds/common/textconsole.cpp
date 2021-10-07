@@ -74,7 +74,7 @@ void CTextConsole::ShutDown()
 	;
 }
 
-void CTextConsole::Print(char *pszMsg)
+void CTextConsole::Print(const char *pszMsg)
 {
 	if (m_nConsoleTextLen)
 	{
@@ -264,7 +264,7 @@ void CTextConsole::ReceiveStandardChar(const char ch)
 	int nCount;
 
 	// If the line buffer is maxed out, ignore this char
-	if (m_nConsoleTextLen >= (sizeof(m_szConsoleText) - 2))
+	if ((unsigned)m_nConsoleTextLen >= (sizeof(m_szConsoleText) - 2))
 	{
 		return;
 	}

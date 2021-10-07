@@ -102,6 +102,7 @@ public:
 	virtual unsigned char GetRegion() = 0;
 	virtual IObjectContainer *GetClients() = 0;
 	virtual bool WriteSignonData(int type, BitBuffer *stream) = 0;
+	virtual int GetChatDelay() const = 0;
 };
 
 #define PROXY_INTERFACE_VERSION "proxy001"

@@ -46,7 +46,7 @@ const avec4_t deg2rad =
 	(float)M_PI / 180.f
 };
 
-const aivec4_t negmask[4] =
+const aivec4_t negmask =
 {
 	0x80000000,
 	0x80000000,

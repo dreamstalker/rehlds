@@ -82,13 +82,13 @@ static delta_definition_t g_DeltaDataDefinition[] =
 
 static delta_description_t g_MetaDescription[] =
 {
-	{ DT_INTEGER, DELTA_D_DEF(fieldType), 1, 32, 1.0, 1.0, 0, 0, 0 },
-	{ DT_STRING, DELTA_D_DEF(fieldName), 1, 1, 1.0, 1.0, 0, 0, 0 },
-	{ DT_INTEGER, DELTA_D_DEF(fieldOffset), 1, 16, 1.0, 1.0, 0, 0, 0 },
-	{ DT_INTEGER, DELTA_D_DEF(fieldSize), 1, 8, 1.0, 1.0, 0, 0, 0 },
-	{ DT_INTEGER, DELTA_D_DEF(significant_bits), 1, 8, 1.0, 1.0, 0, 0, 0 },
-	{ DT_FLOAT, DELTA_D_DEF(premultiply), 1, 32, 4000.0, 1.0, 0, 0, 0 },
-	{ DT_FLOAT, DELTA_D_DEF(postmultiply), 1, 32, 4000.0, 1.0, 0, 0, 0 },
+	{ DT_INTEGER, DELTA_D_DEF(fieldType), 1, 32, 1.0, 1.0, 0, {0, 0} },
+	{ DT_STRING, DELTA_D_DEF(fieldName), 1, 1, 1.0, 1.0, 0, {0, 0} },
+	{ DT_INTEGER, DELTA_D_DEF(fieldOffset), 1, 16, 1.0, 1.0, 0, {0, 0} },
+	{ DT_INTEGER, DELTA_D_DEF(fieldSize), 1, 8, 1.0, 1.0, 0, {0, 0} },
+	{ DT_INTEGER, DELTA_D_DEF(significant_bits), 1, 8, 1.0, 1.0, 0, {0, 0} },
+	{ DT_FLOAT, DELTA_D_DEF(premultiply), 1, 32, 4000.0, 1.0, 0, {0, 0} },
+	{ DT_FLOAT, DELTA_D_DEF(postmultiply), 1, 32, 4000.0, 1.0, 0, {0, 0} },
 };
 
 delta_t g_MetaDelta[] =
@@ -463,7 +463,7 @@ int DELTA_TestDelta(unsigned char *from, unsigned char *to, delta_t *pFields)
 		case DT_STRING:
 			st1 = (char*)&from[pTest->fieldOffset];
 			st2 = (char*)&to[pTest->fieldOffset];
-			if (!(!*st1 && !*st2 || *st1 && *st2 && !Q_stricmp(st1, st2)))	// Not sure why it is case insensitive, but it looks so
+			if (!((!*st1 && !*st2) || (*st1 && *st2 && !Q_stricmp(st1, st2))))	// Not sure why it is case insensitive, but it looks so
 			{
 #ifndef REHLDS_FIXES
 				pTest->flags |= FDT_MARK;
@@ -558,7 +558,7 @@ void DELTA_MarkSendFields(unsigned char *from, unsigned char *to, delta_t *pFiel
 		case DT_STRING:
 			st1 = (char*)&from[pTest->fieldOffset];
 			st2 = (char*)&to[pTest->fieldOffset];
-			if (!(!*st1 && !*st2 || *st1 && *st2 && !Q_stricmp(st1, st2)))	// Not sure why it is case insensitive, but it looks so
+			if (!((!*st1 && !*st2) || (*st1 && *st2 && !Q_stricmp(st1, st2))))	// Not sure why it is case insensitive, but it looks so
 				pTest->flags |= FDT_MARK;
 			break;
 		default:
@@ -1239,7 +1239,7 @@ qboolean DELTA_ParseField(int count, delta_definition_t *pdefinition, delta_link
 		Sys_Error("%s:  Expecting fieldname\n", __func__);
 	}
 
-	Q_strncpy(pField->delta->fieldName, com_token, 31);
+	Q_strlcpy(pField->delta->fieldName, com_token);
 	pField->delta->fieldName[31] = 0;
 	pField->delta->fieldOffset = DELTA_FindOffset(count, pdefinition, com_token);
 
@@ -1454,8 +1454,7 @@ qboolean DELTA_ParseDescription(char *name, delta_t **ppdesc, char *pstream)
 			}
 			if (Q_stricmp(com_token, "none"))
 			{
-				Q_strncpy(source, com_token, sizeof(source)-1);
-				source[sizeof(source)-1] = 0;
+				Q_strlcpy(source, com_token);
 
 				// Parse custom encoder function name
 				pstream = COM_Parse(pstream);
@@ -1464,8 +1463,7 @@ qboolean DELTA_ParseDescription(char *name, delta_t **ppdesc, char *pstream)
 					Sys_Error("%s:  Expecting encoder\n", __func__);
 				}
 
-				Q_strncpy(encoder, com_token, sizeof(encoder)-1);
-				encoder[sizeof(encoder)-1] = 0;
+				Q_strlcpy(encoder, com_token);
 			}
 
 			// Parse fields
@@ -1496,7 +1494,7 @@ qboolean DELTA_ParseDescription(char *name, delta_t **ppdesc, char *pstream)
 
 	if (encoder[0] != 0)
 	{
-		Q_strncpy((*ppdesc)->conditionalencodename, encoder, sizeof((*ppdesc)->conditionalencodename) - 1);
+		Q_strlcpy((*ppdesc)->conditionalencodename, encoder);
 		(*ppdesc)->conditionalencodename[sizeof((*ppdesc)->conditionalencodename) - 1] = 0;
 		(*ppdesc)->conditionalencode = 0;
 	}

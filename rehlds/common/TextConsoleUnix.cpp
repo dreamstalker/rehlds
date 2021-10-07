@@ -133,7 +133,7 @@ int CTextConsoleUnix::kbhit()
 	return select(STDIN_FILENO + 1, &rfds, NULL, NULL, &tv) != -1 && FD_ISSET(STDIN_FILENO, &rfds);
 }
 
-char *CTextConsoleUnix::GetLine()
+const char *CTextConsoleUnix::GetLine()
 {
 	// early return for 99.999% case :)
 	if (!kbhit())
@@ -273,7 +273,7 @@ char *CTextConsoleUnix::GetLine()
 	return NULL;
 }
 
-void CTextConsoleUnix::PrintRaw(char *pszMsg, int nChars)
+void CTextConsoleUnix::PrintRaw(const char *pszMsg, int nChars)
 {
 	if (nChars == 0)
 	{
@@ -288,7 +288,7 @@ void CTextConsoleUnix::PrintRaw(char *pszMsg, int nChars)
 	}
 }
 
-void CTextConsoleUnix::Echo(char *pszMsg, int nChars)
+void CTextConsoleUnix::Echo(const char *pszMsg, int nChars)
 {
 	if (nChars == 0)
 	{
