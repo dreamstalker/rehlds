@@ -38,6 +38,11 @@ void ED_ClearEdict(edict_t *e)
 
 edict_t *ED_Alloc(void)
 {
+	g_RehldsHookchains.m_ED_Alloc.callChain(ED_Alloc_internal);
+}
+
+edict_t *EXT_FUNC ED_Alloc_internal(void)
+{
 	int i;
 	edict_t *e;
 
