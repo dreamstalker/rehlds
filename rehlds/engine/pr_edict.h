@@ -36,6 +36,7 @@
 void ED_ClearEdict(edict_t *e);
 edict_t *ED_Alloc(void);
 void ED_Free(edict_t *ed);
+void ED_Free_internal(edict_t *ed);
 NOXREF void ED_Count(void);
 char *ED_NewString(const char *string);
 char *ED_ParseEdict(char *data, edict_t *ent);
