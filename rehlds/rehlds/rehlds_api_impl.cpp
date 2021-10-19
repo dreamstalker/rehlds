@@ -835,6 +835,10 @@ IRehldsHookRegistry_GetEntityInit* CRehldsHookchains::GetEntityInit() {
 	return &m_GetEntityInit;
 }
 
+IRehldsHookRegistry_ED_Alloc* CRehldsHookchains::ED_Alloc() {
+	return &m_ED_Alloc;
+}
+
 IRehldsHookRegistry_ED_Free* CRehldsHookchains::ED_Free() {
 	return &m_ED_Free;
 }
