@@ -4566,7 +4566,16 @@ int EXT_FUNC SV_CheckVisibility(edict_t *entity, unsigned char *pset)
 	}
 }
 
-void SV_EmitPings(client_t *client, sizebuf_t *msg)
+void EXT_FUNC SV_EmitPings_hook(IGameClient *cl, sizebuf_t *msg)
+{
+	SV_EmitPings_internal(cl->GetClient(), msg);
+}
+
+void SV_EmitPings(client_t* client, sizebuf_t* msg) {
+	g_RehldsHookchains.m_SV_EmitPings.callChain(SV_EmitPings_hook, GetRehldsApiClient(client), msg);
+}
+
+void EXT_FUNC SV_EmitPings_internal(client_t* client, sizebuf_t* msg)
 {
 	int ping;
 	int packet_loss;
