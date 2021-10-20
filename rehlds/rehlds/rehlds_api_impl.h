@@ -210,6 +210,14 @@ typedef IHookChainRegistryImpl<ENTITYINIT, char *> CRehldsHookRegistry_GetEntity
 typedef IHookChainImpl<void, IGameClient *, sizebuf_t *> CRehldsHook_SV_EmitPings;
 typedef IHookChainRegistryImpl<void, IGameClient *, sizebuf_t *> CRehldsHookRegistry_SV_EmitPings;
 
+//ED_Alloc hook
+typedef IHookChainImpl<edict_t *> CRehldsHook_ED_Alloc;
+typedef IHookChainRegistryImpl<edict_t *> CRehldsHookRegistry_ED_Alloc;
+
+//ED_Free hook
+typedef IVoidHookChainImpl<edict_t *> CRehldsHook_ED_Free;
+typedef IVoidHookChainRegistryImpl<edict_t *> CRehldsHookRegistry_ED_Free;
+
 class CRehldsHookchains : public IRehldsHookchains {
 public:
 	CRehldsHookRegistry_Steam_NotifyClientConnect m_Steam_NotifyClientConnect;
@@ -256,6 +264,8 @@ public:
 	CRehldsHookRegistry_SV_ShouldSendConsistencyList m_SV_ShouldSendConsistencyList;
 	CRehldsHookRegistry_GetEntityInit m_GetEntityInit;
 	CRehldsHookRegistry_SV_EmitPings m_SV_EmitPings;
+	CRehldsHookRegistry_ED_Alloc m_ED_Alloc;
+	CRehldsHookRegistry_ED_Free m_ED_Free;
 
 public:
 	EXT_FUNC virtual IRehldsHookRegistry_Steam_NotifyClientConnect* Steam_NotifyClientConnect();
@@ -302,6 +312,8 @@ public:
 	EXT_FUNC virtual IRehldsHookRegistry_SV_ShouldSendConsistencyList* SV_ShouldSendConsistencyList();
 	EXT_FUNC virtual IRehldsHookRegistry_GetEntityInit* GetEntityInit();
 	EXT_FUNC virtual IRehldsHookRegistry_SV_EmitPings* SV_EmitPings();
+	EXT_FUNC virtual IRehldsHookRegistry_ED_Alloc* ED_Alloc();
+	EXT_FUNC virtual IRehldsHookRegistry_ED_Free* ED_Free();
 };
 
 extern CRehldsHookchains g_RehldsHookchains;
