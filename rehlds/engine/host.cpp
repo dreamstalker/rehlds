@@ -142,6 +142,7 @@ void Host_InitLocal(void)
 {
 	Host_InitCommands();
 	Cvar_RegisterVariable(&host_killtime);
+	Cvar_RegisterVariable(&sys_timescale);
 	Cvar_RegisterVariable(&sys_ticrate);
 	Cvar_RegisterVariable(&fps_max);
 	Cvar_RegisterVariable(&fps_override);
