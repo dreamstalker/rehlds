@@ -238,7 +238,8 @@ hull_t *SV_HullForEntity(edict_t *ent, const vec_t *mins, const vec_t *maxs, vec
 		// explicit hulls in the BSP model
 		if (ent->v.movetype != MOVETYPE_PUSH && ent->v.movetype != MOVETYPE_PUSHSTEP)
 		{
-			Sys_Error("%s: SOLID_BSP without MOVETYPE_PUSH", __func__);
+			Sys_Error("%s: SOLID_BSP without MOVETYPE_PUSH\nEntity classname = %s, model = %s",
+				__func__, STRING(ent->v.classname), STRING(ent->v.model));
 		}
 
 		return SV_HullForBsp(ent, mins, maxs, offset);
