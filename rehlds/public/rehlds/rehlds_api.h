@@ -211,10 +211,6 @@ typedef IHookChainRegistry<bool, IGameClient *, bool> IRehldsHookRegistry_SV_Sho
 typedef IHookChain<ENTITYINIT, char *> IRehldsHook_GetEntityInit;
 typedef IHookChainRegistry<ENTITYINIT, char*> IRehldsHookRegistry_GetEntityInit;
 
-//Con_Printf hook
-typedef IHookChain<void, const char *> IRehldsHook_Con_Printf;
-typedef IHookChainRegistry<void, const char *> IRehldsHookRegistry_Con_Printf;
-
 //SV_EmitPings hook
 typedef IHookChain<void, IGameClient *, sizebuf_t *> IRehldsHook_SV_EmitPings;
 typedef IHookChainRegistry<void, IGameClient *, sizebuf_t *> IRehldsHookRegistry_SV_EmitPings;
@@ -226,6 +222,10 @@ typedef IHookChainRegistry<edict_t *> IRehldsHookRegistry_ED_Alloc;
 //ED_Free hook
 typedef IVoidHookChain<edict_t *> IRehldsHook_ED_Free;
 typedef IVoidHookChainRegistry<edict_t *> IRehldsHookRegistry_ED_Free;
+
+//Con_Printf hook
+typedef IHookChain<void, const char *> IRehldsHook_Con_Printf;
+typedef IHookChainRegistry<void, const char *> IRehldsHookRegistry_Con_Printf;
 
 
 class IRehldsHookchains {
