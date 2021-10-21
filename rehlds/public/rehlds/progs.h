@@ -68,6 +68,10 @@ struct event_state_s
 extern	char			*pr_strings;
 extern	globalvars_t	gGlobalVariables;
 
+#if !defined(STRING) && defined(SWDS)
+#define STRING(offset) ((const char *)(pr_strings + (unsigned int)(offset)))
+#endif
+
 //============================================================================
 
 edict_t		*ED_Alloc (void);

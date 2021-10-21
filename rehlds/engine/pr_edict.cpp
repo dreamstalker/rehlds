@@ -38,6 +38,11 @@ void ED_ClearEdict(edict_t *e)
 
 edict_t *ED_Alloc(void)
 {
+	return g_RehldsHookchains.m_ED_Alloc.callChain(ED_Alloc_internal);
+}
+
+edict_t *EXT_FUNC ED_Alloc_internal(void)
+{
 	int i;
 	edict_t *e;
 
@@ -71,6 +76,11 @@ edict_t *ED_Alloc(void)
 }
 
 void ED_Free(edict_t *ed)
+{
+	g_RehldsHookchains.m_ED_Free.callChain(ED_Free_internal, ed);	
+}
+
+void EXT_FUNC ED_Free_internal(edict_t *ed)
 {
 	if (!ed->free)
 	{
