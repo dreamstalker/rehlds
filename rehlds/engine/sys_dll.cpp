@@ -1318,7 +1318,7 @@ void Con_DebugLog(const char *file, const char *fmt, ...)
 #endif // _WIN32
 }
 
-void Con_Printf(const char* fmt, ...)
+void Con_Printf(const char *fmt, ...)
 {
 	char Dest[4096];
 	va_list va;

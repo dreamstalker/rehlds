@@ -209,7 +209,7 @@ typedef IHookChainRegistry<bool, IGameClient *, bool> IRehldsHookRegistry_SV_Sho
 
 //GetEntityInit hook
 typedef IHookChain<ENTITYINIT, char *> IRehldsHook_GetEntityInit;
-typedef IHookChainRegistry<ENTITYINIT, char*> IRehldsHookRegistry_GetEntityInit;
+typedef IHookChainRegistry<ENTITYINIT, char *> IRehldsHookRegistry_GetEntityInit;
 
 //SV_EmitPings hook
 typedef IHookChain<void, IGameClient *, sizebuf_t *> IRehldsHook_SV_EmitPings;
