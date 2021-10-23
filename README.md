@@ -6,7 +6,7 @@ ReHLDS is a result of reverse engineering of original HLDS (build 6152/6153) usi
 
 Along with reverse engineering, a lot of defects and (potential) bugs were found and fixed
 
-You can try play on one of the servers that using rehlds: [Game Tracker](http://www.gametracker.com/search/?search_by=server_variable&search_by2=sv_version)
+You can try playing on one of many servers that are using ReHLDS: [Game Tracker](http://www.gametracker.com/search/?search_by=server_variable&search_by2=sv_version)
 
 ## Goals of the project
 <ul>
