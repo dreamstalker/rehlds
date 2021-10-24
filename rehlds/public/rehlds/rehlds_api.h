@@ -223,6 +223,10 @@ typedef IHookChainRegistry<edict_t *> IRehldsHookRegistry_ED_Alloc;
 typedef IVoidHookChain<edict_t *> IRehldsHook_ED_Free;
 typedef IVoidHookChainRegistry<edict_t *> IRehldsHookRegistry_ED_Free;
 
+//Con_Printf hook
+typedef IHookChain<void, const char *> IRehldsHook_Con_Printf;
+typedef IHookChainRegistry<void, const char *> IRehldsHookRegistry_Con_Printf;
+
 
 class IRehldsHookchains {
 public:
@@ -274,6 +278,7 @@ public:
 	virtual IRehldsHookRegistry_SV_EmitPings* SV_EmitPings() = 0;
 	virtual IRehldsHookRegistry_ED_Alloc* ED_Alloc() = 0;
 	virtual IRehldsHookRegistry_ED_Free* ED_Free() = 0;
+	virtual IRehldsHookRegistry_Con_Printf* Con_Printf() = 0;
 };
 
 struct RehldsFuncs_t {

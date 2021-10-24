@@ -218,6 +218,10 @@ typedef IHookChainRegistryImpl<edict_t *> CRehldsHookRegistry_ED_Alloc;
 typedef IVoidHookChainImpl<edict_t *> CRehldsHook_ED_Free;
 typedef IVoidHookChainRegistryImpl<edict_t *> CRehldsHookRegistry_ED_Free;
 
+//Con_Printf hook
+typedef IHookChainImpl<void, const char *> CRehldsHook_Con_Printf;
+typedef IHookChainRegistryImpl<void, const char *> CRehldsHookRegistry_Con_Printf;
+
 class CRehldsHookchains : public IRehldsHookchains {
 public:
 	CRehldsHookRegistry_Steam_NotifyClientConnect m_Steam_NotifyClientConnect;
@@ -266,6 +270,7 @@ public:
 	CRehldsHookRegistry_SV_EmitPings m_SV_EmitPings;
 	CRehldsHookRegistry_ED_Alloc m_ED_Alloc;
 	CRehldsHookRegistry_ED_Free m_ED_Free;
+	CRehldsHookRegistry_Con_Printf m_Con_Printf;
 
 public:
 	EXT_FUNC virtual IRehldsHookRegistry_Steam_NotifyClientConnect* Steam_NotifyClientConnect();
@@ -314,6 +319,7 @@ public:
 	EXT_FUNC virtual IRehldsHookRegistry_SV_EmitPings* SV_EmitPings();
 	EXT_FUNC virtual IRehldsHookRegistry_ED_Alloc* ED_Alloc();
 	EXT_FUNC virtual IRehldsHookRegistry_ED_Free* ED_Free();
+	EXT_FUNC virtual IRehldsHookRegistry_Con_Printf* Con_Printf();
 };
 
 extern CRehldsHookchains g_RehldsHookchains;
