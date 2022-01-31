@@ -1901,7 +1901,7 @@ int SV_CheckIPConnectionReuse(netadr_t *adr)
 	client_t *cl = g_psvs.clients;
 	for (int i = 0; i < g_psvs.maxclients; i++, cl++)
 	{
-		if (cl->connected && !cl->fully_connected && NET_CompareBaseAdr(cl->netchan.remote_address, *adr))
+		if (cl->connected && NET_CompareBaseAdr(cl->netchan.remote_address, *adr))
 		{
 			count++;
 		}
