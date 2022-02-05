@@ -1390,7 +1390,7 @@ void Netchan_FlushIncoming(netchan_t *chan, int stream)
 	fragbuf_t *p, *n;
 
 #ifdef REHLDS_FIXES
-	if (chan->player_slot == host_client - g_psvs.clients)
+	if ((chan->player_slot - 1) == host_client - g_psvs.clients)
 #endif
 	{
 		SZ_Clear(&net_message);
