@@ -1389,10 +1389,13 @@ void Netchan_FlushIncoming(netchan_t *chan, int stream)
 {
 	fragbuf_t *p, *n;
 
-#ifndef REHLDS_FIXES
-	SZ_Clear(&net_message);
-	msg_readcount = 0;
+#ifdef REHLDS_FIXES
+	if (chan->player_slot == host_client - g_psvs.clients)
 #endif
+	{
+		SZ_Clear(&net_message);
+		msg_readcount = 0;
+	}
 
 	p = chan->incomingbufs[stream];
 	while (p)
