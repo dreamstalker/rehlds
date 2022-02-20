@@ -684,6 +684,11 @@ IRehldsHookRegistry_SV_CheckKeyInfo* CRehldsHookchains::SV_CheckKeyInfo()
 	return &m_SV_CheckKeyInfo;
 }
 
+IRehldsHookRegistry_SV_CheckUserInfo* CRehldsHookchains::SV_CheckUserInfo()
+{
+	return &m_SV_CheckUserInfo;
+}
+
 IRehldsHookRegistry_SV_CheckIPRestrictions* CRehldsHookchains::SV_CheckIPRestrictions()
 {
 	return &m_SV_CheckIPRestrictions;
