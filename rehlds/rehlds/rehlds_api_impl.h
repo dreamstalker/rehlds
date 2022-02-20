@@ -63,8 +63,8 @@ typedef IHookChainImpl<int, netadr_t*, char*, uint16*, int*, char*, char*> CRehl
 typedef IHookChainRegistryImpl<int, netadr_t*, char*, uint16*, int*, char*, char*> CRehldsHookRegistry_SV_CheckKeyInfo;
 
 //SV_CheckUserInfo hook
-typedef IHookChainImpl<int, netadr_t*, char*, qboolean*, int, char*> CRehldsHook_SV_CheckUserInfo;
-typedef IHookChainRegistryImpl<int, netadr_t*, char*, qboolean*, int, char*> CRehldsHookRegistry_SV_CheckUserInfo;
+typedef IHookChainImpl<int, netadr_t*, char*, qboolean, int, char*> CRehldsHook_SV_CheckUserInfo;
+typedef IHookChainRegistryImpl<int, netadr_t*, char*, qboolean, int, char*> CRehldsHookRegistry_SV_CheckUserInfo;
 
 //SV_CheckIPRestrictions hook
 typedef IHookChainImpl<int, netadr_t*, int> CRehldsHook_SV_CheckIPRestrictions;
