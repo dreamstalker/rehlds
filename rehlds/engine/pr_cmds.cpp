@@ -1381,7 +1381,7 @@ int SV_LookupModelIndex(const char *name)
 	return 0;
 }
 
-int EXT_FUNC PF_precache_model_I(char *s)
+int PF_precache_model_I(char *s)
 {
 	return g_RehldsHookchains.m_PF_precache_model_I.callChain(PF_precache_model_I_internal, s);
 }
