@@ -851,6 +851,22 @@ IRehldsHookRegistry_Con_Printf* CRehldsHookchains::Con_Printf() {
 	return &m_Con_Printf;
 }
 
+IRehldsHookRegistry_SV_CheckUserInfo* CRehldsHookchains::SV_CheckUserInfo() {
+	return &m_SV_CheckUserInfo;
+}
+
+IRehldsHookRegistry_PF_precache_generic_I* CRehldsHookchains::PF_precache_generic_I() {
+	return &m_PF_precache_generic_I;
+}
+
+IRehldsHookRegistry_PF_precache_model_I* CRehldsHookchains::PF_precache_model_I() {
+	return &m_PF_precache_model_I;
+}
+
+IRehldsHookRegistry_PF_precache_sound_I* CRehldsHookchains::PF_precache_sound_I() {
+	return &m_PF_precache_sound_I;
+}
+
 int EXT_FUNC CRehldsApi::GetMajorVersion()
 {
 	return REHLDS_API_VERSION_MAJOR;
