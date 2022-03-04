@@ -1010,7 +1010,7 @@ qboolean EXT_FUNC PR_IsEmptyString(const char *s)
 	return s[0] < ' ';
 }
 
-int PF_precache_sound_I(const char *s)
+int EXT_FUNC PF_precache_sound_I(const char *s)
 {
 	return g_RehldsHookchains.m_PF_precache_sound_I.callChain(PF_precache_sound_I_internal, s);
 }
@@ -1381,7 +1381,7 @@ int SV_LookupModelIndex(const char *name)
 	return 0;
 }
 
-int PF_precache_model_I(const char *s)
+int EXT_FUNC PF_precache_model_I(const char *s)
 {
 	return g_RehldsHookchains.m_PF_precache_model_I.callChain(PF_precache_model_I_internal, s);
 }
@@ -1455,7 +1455,7 @@ int EXT_FUNC PF_precache_model_I_internal(const char *s)
 	}
 }
 
-int PF_precache_generic_I(const char *s)
+int EXT_FUNC PF_precache_generic_I(const char *s)
 {
 	return g_RehldsHookchains.m_PF_precache_generic_I.callChain(PF_precache_generic_I_internal, s);
 }
