@@ -1389,7 +1389,7 @@ int PF_precache_model_I(char *s)
 int EXT_FUNC PF_precache_model_I_internal(char *s)
 {
 	int iOptional = 0;
-	Con_Printf("Model: %s", s);
+	Con_Printf("Model: %s", char);
 	if (!s)
 		Host_Error("%s: NULL pointer", __func__);
 
