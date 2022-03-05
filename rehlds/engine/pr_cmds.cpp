@@ -1064,6 +1064,11 @@ int EXT_FUNC PF_precache_sound_I_internal(const char *s)
 
 unsigned short EXT_FUNC EV_Precache(int type, const char *psz)
 {
+	return g_RehldsHookchains.m_EV_Precache.callChain(EV_Precache_internal, type, psz);
+}
+
+unsigned short EXT_FUNC EV_Precache_internal(int type, const char *psz)
+{
 	if (!psz)
 		Host_Error("%s: NULL pointer", __func__);
 

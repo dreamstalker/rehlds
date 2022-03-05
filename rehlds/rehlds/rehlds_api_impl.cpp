@@ -867,6 +867,14 @@ IRehldsHookRegistry_PF_precache_sound_I* CRehldsHookchains::PF_precache_sound_I(
 	return &m_PF_precache_sound_I;
 }
 
+IRehldsHookRegistry_EV_Precache* CRehldsHookchains::EV_Precache() {
+	return &m_EV_Precache;
+}
+
+IRehldsHookRegistry_SV_AddResource* CRehldsHookchains::SV_AddResource(){
+	return &m_SV_AddResource;
+}
+
 int EXT_FUNC CRehldsApi::GetMajorVersion()
 {
 	return REHLDS_API_VERSION_MAJOR;

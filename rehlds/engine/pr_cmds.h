@@ -122,6 +122,7 @@ qboolean PR_IsEmptyString(const char *s);
 int PF_precache_sound_I(const char *s);
 int PF_precache_sound_I_internal(const char *s);
 unsigned short EV_Precache(int type, const char *psz);
+unsigned short EV_Precache_internal(int type, const char *psz);
 void EV_PlayReliableEvent_api(IGameClient *cl, int entindex, unsigned short eventindex, float delay, event_args_t *pargs);
 void EV_PlayReliableEvent(client_t *cl, int entindex, unsigned short eventindex, float delay, event_args_t *pargs);
 void EV_PlayReliableEvent_internal(client_t *cl, int entindex, unsigned short eventindex, float delay, event_args_t *pargs);
