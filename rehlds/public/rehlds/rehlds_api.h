@@ -228,28 +228,28 @@ typedef IHookChain<void, const char *> IRehldsHook_Con_Printf;
 typedef IHookChainRegistry<void, const char *> IRehldsHookRegistry_Con_Printf;
 
 //SV_CheckUserInfo hook
-typedef IHookChain<int, netadr_t*, char*, qboolean, int, char*> IRehldsHook_SV_CheckUserInfo;
-typedef IHookChainRegistry<int, netadr_t*, char*, qboolean, int, char*> IRehldsHookRegistry_SV_CheckUserInfo;
+typedef IHookChain<int, netadr_t *, char *, qboolean, int, char *> IRehldsHook_SV_CheckUserInfo;
+typedef IHookChainRegistry<int, netadr_t *, char *, qboolean, int, char *> IRehldsHookRegistry_SV_CheckUserInfo;
 
 //PF_precache_generic_I hook
-typedef IHookChain<int, const char*> IRehldsHook_PF_precache_generic_I;
-typedef IHookChainRegistry<int, const char*> IRehldsHookRegistry_PF_precache_generic_I;
+typedef IHookChain<int, const char *> IRehldsHook_PF_precache_generic_I;
+typedef IHookChainRegistry<int, const char *> IRehldsHookRegistry_PF_precache_generic_I;
 
 //PF_precache_model_I hook
-typedef IHookChain<int, const char*> IRehldsHook_PF_precache_model_I;
-typedef IHookChainRegistry<int, const char*> IRehldsHookRegistry_PF_precache_model_I;
+typedef IHookChain<int, const char *> IRehldsHook_PF_precache_model_I;
+typedef IHookChainRegistry<int, const char *> IRehldsHookRegistry_PF_precache_model_I;
 
 //PF_precache_sound_I hook
-typedef IHookChain<int, const char*> IRehldsHook_PF_precache_sound_I;
-typedef IHookChainRegistry<int, const char*> IRehldsHookRegistry_PF_precache_sound_I;
+typedef IHookChain<int, const char *> IRehldsHook_PF_precache_sound_I;
+typedef IHookChainRegistry<int, const char *> IRehldsHookRegistry_PF_precache_sound_I;
 
 //EV_Precache hook
-typedef IHookChain<int, int, const char*> IRehldsHook_EV_Precache;
-typedef IHookChainRegistry<int, int, const char*> IRehldsHookRegistry_EV_Precache;
+typedef IHookChain<int, int, const char *> IRehldsHook_EV_Precache;
+typedef IHookChainRegistry<int, int, const char *> IRehldsHookRegistry_EV_Precache;
 
 //SV_AddResource hook
-typedef IVoidHookChain<void, resourcetype_t, const char*, int, unsigned char, int> IRehldsHook_SV_AddResource;
-typedef IVoidHookChainRegistry<void, resourcetype_t, const char*, int, unsigned char, int> IRehldsHookRegistry_SV_AddResource;
+typedef IVoidHookChain<void, resourcetype_t, const char *, int, unsigned char, int> IRehldsHook_SV_AddResource;
+typedef IVoidHookChainRegistry<void, resourcetype_t, const char *, int, unsigned char, int> IRehldsHookRegistry_SV_AddResource;
 
 class IRehldsHookchains {
 public:

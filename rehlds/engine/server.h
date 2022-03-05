@@ -570,6 +570,7 @@ void SV_SendClientMessages(void);
 void SV_ExtractFromUserinfo(client_t *cl);
 int SV_ModelIndex(const char *name);
 void SV_AddResource(resourcetype_t type, const char *name, int size, unsigned char flags, int index);
+void SV_AddResource_internal(resourcetype_t type, const char *name, int size, unsigned char flags, int index);
 size_t SV_CountResourceByType(resourcetype_t type, resource_t **pResourceList = nullptr, size_t nListMax = 0, size_t *nWidthFileNameMax = nullptr);
 void SV_CreateGenericResources(void);
 void SV_CreateResourceList(void);
