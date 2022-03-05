@@ -127,8 +127,8 @@ void EV_PlayReliableEvent(client_t *cl, int entindex, unsigned short eventindex,
 void EV_PlayReliableEvent_internal(client_t *cl, int entindex, unsigned short eventindex, float delay, event_args_t *pargs);
 void EV_Playback(int flags, const edict_t *pInvoker, unsigned short eventindex, float delay, float *origin, float *angles, float fparam1, float fparam2, int iparam1, int iparam2, int bparam1, int bparam2);
 void EV_SV_Playback(int flags, int clientindex, unsigned short eventindex, float delay, float *origin, float *angles, float fparam1, float fparam2, int iparam1, int iparam2, int bparam1, int bparam2);
-int PF_precache_model_I(char *s);
-int PF_precache_model_I_internal(char *s);
+int PF_precache_model_I(const char *s);
+int PF_precache_model_I_internal(const char *s);
 int PF_precache_generic_I(const char *s);
 int PF_precache_generic_I_internal(const char *s);
 int PF_IsMapValid_I(const char *mapname);

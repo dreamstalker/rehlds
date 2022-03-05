@@ -236,8 +236,8 @@ typedef IHookChain<int, const char*> IRehldsHook_PF_precache_generic_I;
 typedef IHookChainRegistry<int, const char*> IRehldsHookRegistry_PF_precache_generic_I;
 
 //PF_precache_model_I hook
-typedef IHookChain<int, char*> IRehldsHook_PF_precache_model_I;
-typedef IHookChainRegistry<int, char*> IRehldsHookRegistry_PF_precache_model_I;
+typedef IHookChain<int, const char*> IRehldsHook_PF_precache_model_I;
+typedef IHookChainRegistry<int, const char*> IRehldsHookRegistry_PF_precache_model_I;
 
 //PF_precache_sound_I hook
 typedef IHookChain<int, const char*> IRehldsHook_PF_precache_sound_I;
