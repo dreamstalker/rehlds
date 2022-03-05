@@ -239,8 +239,8 @@ typedef IHookChainImpl<int, const char*> CRehldsHook_PF_precache_sound_I;
 typedef IHookChainRegistryImpl<int, const char*> CRehldsHookRegistry_PF_precache_sound_I;
 
 //EV_Precache hook
-typedef IHookChainImpl<int, int, const char*> CRehldsHook_EV_Precache;
-typedef IHookChainRegistryImpl<int, int, const char*> CRehldsHookRegistry_EV_Precache;
+typedef IHookChainImpl<unsigned short, int, const char*> CRehldsHook_EV_Precache;
+typedef IHookChainRegistryImpl<unsigned short, int, const char*> CRehldsHookRegistry_EV_Precache;
 
 //SV_AddResource hook
 typedef IHookChainImpl<void, resourcetype_t, const char*, int, unsigned char, int> CRehldsHook_SV_AddResource;
