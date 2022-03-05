@@ -243,8 +243,8 @@ typedef IHookChainImpl<unsigned short, int, const char*> CRehldsHook_EV_Precache
 typedef IHookChainRegistryImpl<unsigned short, int, const char*> CRehldsHookRegistry_EV_Precache;
 
 //SV_AddResource hook
-typedef IVoidHookChainImpl<void, resourcetype_t, const char*, int, unsigned char, int> CRehldsHook_SV_AddResource;
-typedef IVoidHookChainRegistryImpl<void, resourcetype_t, const char*, int, unsigned char, int> CRehldsHookRegistry_SV_AddResource;
+typedef IHookChainImpl<void, resourcetype_t, const char*, int, unsigned char, int> CRehldsHook_SV_AddResource;
+typedef IHookChainRegistryImpl<void, resourcetype_t, const char*, int, unsigned char, int> CRehldsHookRegistry_SV_AddResource;
 
 class CRehldsHookchains : public IRehldsHookchains {
 public:
