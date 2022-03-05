@@ -343,7 +343,7 @@ struct RehldsFuncs_t {
 	void*(*SZ_GetSpace)(sizebuf_t *buf, int length);
 	cvar_t*(*GetCvarVars)();
 	int (*SV_GetChallenge)(const netadr_t& adr);
-	void (*SV_AddResource)(resourcetype_t type, const char *name, int size, unsigned char flags, int index);
+	void (*AddResource)(resourcetype_t type, const char *name, int size, unsigned char flags, int index);
 	int(*MSG_ReadShort)();
 	int(*MSG_ReadBuf)(int iSize, void *pbuf);
 	void(*MSG_WriteBuf)(sizebuf_t *sb, int iSize, void *buf);

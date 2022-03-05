@@ -5127,8 +5127,12 @@ int SV_ModelIndex(const char *name)
 
 void EXT_FUNC SV_AddResource_hook(resourcetype_t type, const char *name, int size, unsigned char flags, int index)
 {
-	SV_AddResource_internal(type, name, size, flags, index)
+	SV_AddResource_internal(type, name, size, flags, index);
 }
+
+void EXT_FUNC SV_AddResource_api(resourcetype_t type, const char *name, int size, unsigned char flags, int index)
+{
+	g_RehldsHookchains.m_SV_AddResource.callChain(SV_AddResource_hook, type, name, size, flags, index);
 
 void EXT_FUNC SV_AddResource(resourcetype_t type, const char *name, int size, unsigned char flags, int index)
 {

@@ -493,7 +493,7 @@ RehldsFuncs_t g_RehldsApiFuncs =
 	&SZ_GetSpace,
 	&GetCvarVars_api,
 	&SV_GetChallenge,
-	&SV_AddResource,
+	&SV_AddResource_api,
 	&MSG_ReadShort_api,
 	&MSG_ReadBuf_api,
 	&MSG_WriteBuf_api,
