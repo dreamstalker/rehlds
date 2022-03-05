@@ -245,7 +245,7 @@ typedef IHookChainRegistry<int, const char*> IRehldsHookRegistry_PF_precache_sou
 
 //EV_Precache hook
 typedef IHookChain<int, int, const char*> IRehldsHook_EV_Precache;
-typedef IHookChainRegistry<int, int const char*> IRehldsHookRegistry_EV_Precache;
+typedef IHookChainRegistry<int, int, const char*> IRehldsHookRegistry_EV_Precache;
 
 //SV_AddResource hook
 typedef IVoidHookChain<void, resourcetype_t, const char*, int, unsigned char, int> IRehldsHook_SV_AddResource;
