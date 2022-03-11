@@ -251,6 +251,10 @@ typedef IHookChainRegistry<unsigned short, int, const char *> IRehldsHookRegistr
 typedef IVoidHookChain<resourcetype_t, const char *, int, unsigned char, int> IRehldsHook_SV_AddResource;
 typedef IVoidHookChainRegistry<resourcetype_t, const char *, int, unsigned char, int> IRehldsHookRegistry_SV_AddResource;
 
+//SV_ClientPrintf hook
+typedef IHookChain<void, const char *> IRehldsHook_SV_ClientPrintf;
+typedef IHookChainRegistry<void, const char *> IRehldsHookRegistry_SV_ClientPrintf;
+
 class IRehldsHookchains {
 public:
 	virtual ~IRehldsHookchains() { }
@@ -308,6 +312,7 @@ public:
 	virtual IRehldsHookRegistry_PF_precache_sound_I* PF_precache_sound_I() = 0;
 	virtual IRehldsHookRegistry_EV_Precache* EV_Precache() = 0;
 	virtual IRehldsHookRegistry_SV_AddResource* SV_AddResource() = 0;
+	virtual IRehldsHookRegistry_SV_ClientPrintf* SV_ClientPrintf() = 0;
 };
 
 struct RehldsFuncs_t {

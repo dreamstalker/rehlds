@@ -351,19 +351,22 @@ void Host_WriteCustomConfig(void)
 
 void SV_ClientPrintf(const char *fmt, ...)
 {
+	char Dest[4096];
 	va_list va;
-	char string[1024];
 
+	va_start(va, fmt);
+	Q_vsnprintf(Dest, sizeof(Dest), fmt, va);
+	va_end(va);
+	
+	g_RehldsHookchains.m_SV_ClientPrintf.callChain(SV_ClientPrintf_internal, Dest);
+}
+
+void SV_ClientPrintf_internal(const char *Dest)
+{
 	if (!host_client->fakeclient)
 	{
-		va_start(va, fmt);
-		Q_vsnprintf(string, ARRAYSIZE(string) - 1, fmt, va);
-		va_end(va);
-
-		string[ARRAYSIZE(string) - 1] = 0;
-
 		MSG_WriteByte(&host_client->netchan.message, svc_print);
-		MSG_WriteString(&host_client->netchan.message, string);
+		MSG_WriteString(&host_client->netchan.message, Dest);
 	}
 }
 

@@ -246,6 +246,10 @@ typedef IHookChainRegistryImpl<unsigned short, int, const char*> CRehldsHookRegi
 typedef IVoidHookChainImpl<resourcetype_t, const char*, int, unsigned char, int> CRehldsHook_SV_AddResource;
 typedef IVoidHookChainRegistryImpl<resourcetype_t, const char*, int, unsigned char, int> CRehldsHookRegistry_SV_AddResource;
 
+//SV_ClientPrintf hook
+typedef IHookChainImpl<void, const char*> CRehldsHook_SV_ClientPrintf;
+typedef IHookChainRegistryImpl<void, const char*> CRehldsHookRegistry_SV_ClientPrintf;
+
 class CRehldsHookchains : public IRehldsHookchains {
 public:
 	CRehldsHookRegistry_Steam_NotifyClientConnect m_Steam_NotifyClientConnect;
@@ -301,6 +305,7 @@ public:
 	CRehldsHookRegistry_PF_precache_sound_I m_PF_precache_sound_I;
 	CRehldsHookRegistry_EV_Precache m_EV_Precache;
 	CRehldsHookRegistry_SV_AddResource m_SV_AddResource;
+	CRehldsHookRegistry_SV_ClientPrintf m_SV_ClientPrintf;
 
 public:
 	EXT_FUNC virtual IRehldsHookRegistry_Steam_NotifyClientConnect* Steam_NotifyClientConnect();
@@ -356,6 +361,7 @@ public:
 	EXT_FUNC virtual IRehldsHookRegistry_PF_precache_sound_I* PF_precache_sound_I();
 	EXT_FUNC virtual IRehldsHookRegistry_EV_Precache* EV_Precache();
 	EXT_FUNC virtual IRehldsHookRegistry_SV_AddResource* SV_AddResource();
+	EXT_FUNC virtual IRehldsHookRegistry_SV_ClientPrintf* SV_ClientPrintf();
 };
 
 extern CRehldsHookchains g_RehldsHookchains;

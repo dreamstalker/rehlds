@@ -875,6 +875,10 @@ IRehldsHookRegistry_SV_AddResource* CRehldsHookchains::SV_AddResource(){
 	return &m_SV_AddResource;
 }
 
+IRehldsHookRegistry_SV_ClientPrintf* CRehldsHookchains::SV_ClientPrintf(){
+	return &m_SV_ClientPrintf;
+}
+
 int EXT_FUNC CRehldsApi::GetMajorVersion()
 {
 	return REHLDS_API_VERSION_MAJOR;
