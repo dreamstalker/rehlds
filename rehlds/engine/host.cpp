@@ -368,7 +368,7 @@ void EXT_FUNC SV_ClientPrintf_internal(const char *Dest)
 {
 	char string[4096];
 	
-	Q_memcpy(Dest, string, ARRAYSIZE(string) - 1)
+	Q_memcpy(string, Dest, ARRAYSIZE(string) - 1)
 	// This should be here because of hookchain. The real value could be changed.
 	string[ARRAYSIZE(string) - 1] = 0;
 	
