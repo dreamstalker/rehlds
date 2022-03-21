@@ -354,20 +354,20 @@ void SV_ClientPrintf(const char *fmt, ...)
 	char Dest[4096];
 	va_list va;
 
-	va_start(va, fmt);
-	Q_vsnprintf(Dest, sizeof(Dest), fmt, va);
-	va_end(va);
-	
-	g_RehldsHookchains.m_SV_ClientPrintf.callChain(SV_ClientPrintf_internal, Dest);
-}
-
-void SV_ClientPrintf_internal(const char *Dest)
-{
 	if (!host_client->fakeclient)
 	{
-		MSG_WriteByte(&host_client->netchan.message, svc_print);
-		MSG_WriteString(&host_client->netchan.message, Dest);
+		va_start(va, fmt);
+		Q_vsnprintf(Dest, sizeof(Dest), fmt, va);
+		va_end(va);
+
+		g_RehldsHookchains.m_SV_ClientPrintf.callChain(SV_ClientPrintf_internal, Dest);
 	}
+}
+
+void EXT_FUNC SV_ClientPrintf_internal(const char *Dest)
+{
+	MSG_WriteByte(&host_client->netchan.message, svc_print);
+	MSG_WriteString(&host_client->netchan.message, Dest);
 }
 
 void SV_BroadcastPrintf(const char *fmt, ...)
