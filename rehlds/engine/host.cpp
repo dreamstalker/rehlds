@@ -352,7 +352,7 @@ void Host_WriteCustomConfig(void)
 void SV_ClientPrintf(const char *fmt, ...)
 {
 	va_list va;
-	char string[4096];
+	char string[1024];
 
 	if (!host_client->fakeclient)
 	{
@@ -366,7 +366,7 @@ void SV_ClientPrintf(const char *fmt, ...)
 
 void EXT_FUNC SV_ClientPrintf_internal(const char *Dest)
 {
-	char string[4096];
+	char string[1024];
 	
 	Q_memcpy(string, Dest, ARRAYSIZE(string) - 1);
 	// This should be here because of hookchain. The real value could be changed.
