@@ -364,10 +364,13 @@ void SV_ClientPrintf(const char *fmt, ...)
 	}
 }
 
-void EXT_FUNC SV_ClientPrintf_internal(char *Dest)
+void EXT_FUNC SV_ClientPrintf_internal(const char *Dest)
 {
+	char string[4096];
+	
+	Q_memcpy(Dest, string, ARRAYSIZE(string) - 1)
 	// This should be here because of hookchain. The real value could be changed.
-	Dest[ARRAYSIZE(Dest) - 1] = 0;
+	string[ARRAYSIZE(string) - 1] = 0;
 	
 	MSG_WriteByte(&host_client->netchan.message, svc_print);
 	MSG_WriteString(&host_client->netchan.message, Dest);
