@@ -247,8 +247,8 @@ typedef IVoidHookChainImpl<resourcetype_t, const char*, int, unsigned char, int>
 typedef IVoidHookChainRegistryImpl<resourcetype_t, const char*, int, unsigned char, int> CRehldsHookRegistry_SV_AddResource;
 
 //SV_ClientPrintf hook
-typedef IVoidHookChainImpl<const char*> CRehldsHook_SV_ClientPrintf;
-typedef IVoidHookChainRegistryImpl<const char*> CRehldsHookRegistry_SV_ClientPrintf;
+typedef IVoidHookChainImpl<char*> CRehldsHook_SV_ClientPrintf;
+typedef IVoidHookChainRegistryImpl<char*> CRehldsHookRegistry_SV_ClientPrintf;
 
 class CRehldsHookchains : public IRehldsHookchains {
 public:
