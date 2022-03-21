@@ -368,12 +368,12 @@ void EXT_FUNC SV_ClientPrintf_internal(const char *Dest)
 {
 	char string[4096];
 	
-	Q_memcpy(string, Dest, ARRAYSIZE(string) - 1)
+	Q_memcpy(string, Dest, ARRAYSIZE(string) - 1);
 	// This should be here because of hookchain. The real value could be changed.
 	string[ARRAYSIZE(string) - 1] = 0;
 	
 	MSG_WriteByte(&host_client->netchan.message, svc_print);
-	MSG_WriteString(&host_client->netchan.message, Dest);
+	MSG_WriteString(&host_client->netchan.message, string);
 }
 
 void SV_BroadcastPrintf(const char *fmt, ...)
