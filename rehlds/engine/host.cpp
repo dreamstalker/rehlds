@@ -364,7 +364,7 @@ void SV_ClientPrintf(const char *fmt, ...)
 	}
 }
 
-void EXT_FUNC SV_ClientPrintf_internal(const char *Dest)
+void EXT_FUNC SV_ClientPrintf_internal(char *Dest)
 {
 	// This should be here because of hookchain. The real value could be changed.
 	Dest[ARRAYSIZE(Dest) - 1] = 0;
