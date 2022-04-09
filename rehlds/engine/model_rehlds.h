@@ -46,7 +46,7 @@
 #include "crc.h"
 
 extern model_t* loadmodel;
-extern char loadname[32];
+extern char loadname[MAX_MODEL_NAME];
 extern model_t mod_known[MAX_KNOWN_MODELS];
 extern int mod_numknown;
 extern unsigned char* mod_base;
