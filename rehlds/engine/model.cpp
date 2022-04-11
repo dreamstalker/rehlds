@@ -29,7 +29,7 @@
 #include "precompiled.h"
 
 model_t *loadmodel;
-char loadname[32];
+char loadname[MAX_MODEL_NAME];
 model_t mod_known[MAX_KNOWN_MODELS];
 int mod_numknown;
 unsigned char* mod_base;
@@ -330,7 +330,12 @@ model_t *Mod_LoadModel(model_t *mod, qboolean crash, qboolean trackCRC)
 		Con_DPrintf("loading %s\n", mod->name);
 
 	// allocate a new model
-	COM_FileBase(mod->name, loadname);
+	if (!COM_FileBase_s(mod->name, loadname, sizeof(loadname)))
+	{
+		Sys_Error("%s: Bad model name length: %s", __func__, mod->name);
+		return NULL;
+	}
+
 	loadmodel = mod;
 
 	mod->needload = NL_PRESENT;
