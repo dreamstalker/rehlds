@@ -351,16 +351,16 @@ void Host_WriteCustomConfig(void)
 
 void SV_ClientPrintf(const char *fmt, ...)
 {
-	va_list va;
-	char string[1024];
-
 	if (!host_client->fakeclient)
 	{
+		va_list va;
+		char Dest[1024];
+	
 		va_start(va, fmt);
-		Q_vsnprintf(string, ARRAYSIZE(string) - 1, fmt, va);
+		Q_vsnprintf(Dest, ARRAYSIZE(Dest) - 1, fmt, va);
 		va_end(va);
 
-		g_RehldsHookchains.m_SV_ClientPrintf.callChain(SV_ClientPrintf_internal, string);
+		g_RehldsHookchains.m_SV_ClientPrintf.callChain(SV_ClientPrintf_internal, Dest);
 	}
 }
 
