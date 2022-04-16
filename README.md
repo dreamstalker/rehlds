@@ -55,6 +55,17 @@ This means that plugins that do binary code analysis (Orpheu for example) probab
 <li>sv_rehlds_local_gametime <1|0> // A feature of local gametime which decrease "lags" if you run same map for a long time. Default: 0
 <li>sv_use_entity_file // Use custom entity file for a map. Path to an entity file will be "maps/[map name].ent". 0 - use original entities. 1 - use .ent files from maps directory. 2 - use .ent files from maps directory and create new .ent file if not exist.
 <li>sv_usercmd_custom_random_seed // When enabled server will populate an additional random seed independent of the client. Default: 0
+<li>sv_rehlds_hitboxes_draw  // When enabled, the value will be used for the refresh rate of the hitbox display. 0 to disable. >=0.1 to set redraw delay.
+<li>sv_rehlds_hitboxes_groups // Hitgroups that should be drawn (<code>abcdefg</code> flags)
+	<ul>
+		<li> <code>a</code> - head
+		<li> <code>b</code> - chest
+		<li> <code>c</code> - stomach
+		<li> <code>d</code> - leftarm	
+		<li> <code>e</code> - rightarm
+		<li> <code>f</code> - leftleg
+		<li> <code>g</code> - rightleg
+	</ul>
 </ul>
 </details>
 
