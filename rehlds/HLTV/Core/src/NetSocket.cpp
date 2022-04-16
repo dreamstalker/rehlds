@@ -297,6 +297,14 @@ int NetSocket::GetLong(unsigned char *pData, int size)
 	{
 		m_NetSplitPacket.currentSequence = sequenceNumber;
 		m_NetSplitPacket.splitCount = packetCount;
+
+#ifdef HLTV_FIXES
+		m_NetSplitPacket.totalSize = 0;
+
+		// clear part's sequence
+		for (int i = 0; i < MAX_SPLIT_FRAGMENTS; i++)
+			netSplitFlags[i] = -1;
+#endif
 	}
 
 	unsigned int packetPayloadSize = size - sizeof(SPLITPACKET);
@@ -310,15 +318,46 @@ int NetSocket::GetLong(unsigned char *pData, int size)
 			m_NetSplitPacket.totalSize = packetPayloadSize + SPLIT_SIZE * (packetCount - 1);
 		}
 
-		--m_NetSplitPacket.splitCount;
+		m_NetSplitPacket.splitCount--;
 		netSplitFlags[packetNumber] = sequenceNumber;
+
+#ifdef HLTV_FIXES
+		if (SPLIT_SIZE * packetNumber + packetPayloadSize > MAX_UDP_PACKET)
+		{
+			m_System->DPrintf("WARNING! NetSocket::GetLong: Malformed packet size (%i, %i)\n", SPLIT_SIZE * packetNumber, packetPayloadSize);
+			m_NetSplitPacket.currentSequence = -1;
+			return -1;
+		}
+
+		Q_memcpy(&m_NetSplitPacket.buffer[SPLIT_SIZE * packetNumber], pHeader + 1, packetPayloadSize);
+#endif
+
 	}
 
+#ifndef HLTV_FIXES
 	Q_memcpy(&m_NetSplitPacket.buffer[SPLIT_SIZE * packetNumber], pHeader + 1, packetPayloadSize);
+#endif
 
 	if (m_NetSplitPacket.splitCount > 0) {
 		return 0;
 	}
+
+#ifdef HLTV_FIXES
+	for (unsigned int i = 0; i < packetCount; i++)
+	{
+		if (netSplitFlags[i] != m_NetSplitPacket.currentSequence)
+		{
+			m_System->DPrintf("WARNING! NetSocket::GetLong: Split packet without all %i parts, part %i had wrong sequence %i/%i\n",
+				packetCount,
+				i + 1,
+				netSplitFlags[i],
+				m_NetSplitPacket.currentSequence);
+
+			m_NetSplitPacket.currentSequence = -1;
+			return -1;
+		}
+	}
+#endif
 
 	m_NetSplitPacket.currentSequence = -1;
 	if (m_NetSplitPacket.totalSize > MAX_UDP_PACKET)

@@ -29,10 +29,10 @@
 #include "precompiled.h"
 
 DemoFile::DemoFile() :
-	m_FileSystem(nullptr),
 	m_FileHandle(FILESYSTEM_INVALID_HANDLE),
 	m_DemoChannel(nullptr),
-	m_Entries(nullptr)
+	m_Entries(nullptr),
+	m_FileSystem(nullptr)
 {
 	Reset();
 }
@@ -252,6 +252,24 @@ bool DemoFile::StartRecording(char *newName)
 	}
 
 	Q_strlcpy(m_FileName, newName);
+
+	COM_DefaultExtension(m_FileName, ".dem");
+
+	if (m_FileName[0] == '/'
+		|| Q_strstr(m_FileName, ":")
+		|| Q_strstr(m_FileName, "..")
+		|| Q_strstr(m_FileName, "\\"))
+	{
+		m_System->Printf("WARNING! DemoFile::StartRecording: unable to open %s (contains illegal characters).\n", m_FileName);
+		return false;
+	}
+
+	const char *pszFileExt = COM_FileExtension(m_FileName);
+	if (Q_stricmp(pszFileExt, "dem") != 0)
+	{
+		m_System->Printf("WARNING! DemoFile::StartRecording: unable to open %s (wrong file extension, must be .dem).\n", m_FileName);
+		return false;
+	}
 
 	m_FileHandle = m_FileSystem->Open(m_FileName, "wb");
 	if (!m_FileHandle) {
@@ -526,6 +544,8 @@ void DemoFile::ReadDemoPacket(BitBuffer *demoData, demo_info_t *demoInfo)
 				break;
 			case DemoCmd::PayLoad:
 				demoData->WriteLong(msglen);
+				break;
+			default:
 				break;
 			}
 

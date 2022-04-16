@@ -28,8 +28,9 @@
 
 #include "precompiled.h"
 
-InfoString::InfoString(char *string, unsigned int maxSize)
-	: m_String(nullptr), m_MaxSize(0)
+InfoString::InfoString(char *string, unsigned int maxSize) :
+	m_MaxSize(0),
+	m_String(nullptr)
 {
 	unsigned int len = Q_strlen(string) + 1;
 	if (len < maxSize) {
@@ -40,19 +41,22 @@ InfoString::InfoString(char *string, unsigned int maxSize)
 	SetString(string);
 }
 
-InfoString::InfoString()
-	: m_String(nullptr), m_MaxSize(0)
+InfoString::InfoString() :
+	m_MaxSize(0),
+	m_String(nullptr)
 {
 }
 
-InfoString::InfoString(unsigned int maxSize)
-	: m_String(nullptr), m_MaxSize(0)
+InfoString::InfoString(unsigned int maxSize) :
+	m_MaxSize(0),
+	m_String(nullptr)
 {
 	SetMaxSize(maxSize);
 }
 
-InfoString::InfoString(char *string)
-	: m_String(nullptr), m_MaxSize(0)
+InfoString::InfoString(char *string) :
+	m_MaxSize(0),
+	m_String(nullptr)
 {
 	unsigned int len = Q_strlen(string) + 1;
 	if (len < MAX_INFO_LEN) {
@@ -81,7 +85,7 @@ bool InfoString::SetString(char *string)
 		return false;
 	}
 
-	Q_strnlcpy(m_String, string, m_MaxSize);
+	Q_strlcpy(m_String, string, m_MaxSize);
 	return true;
 }
 
@@ -95,7 +99,7 @@ void InfoString::SetMaxSize(unsigned int maxSize)
 	if (m_String)
 	{
 		if (maxSize > Q_strlen(m_String)) {
-			Q_strnlcpy(newBuffer, m_String, maxSize);
+			Q_strlcpy(newBuffer, m_String, maxSize);
 		}
 
 		Mem_Free(m_String);

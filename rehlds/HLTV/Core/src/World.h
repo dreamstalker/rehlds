@@ -252,11 +252,11 @@ protected:
 
 	int m_MaxInstanced_BaseLine;
 
-#ifdef HOOK_HLTV
-	char m_Lightstyles[MAX_LIGHTSTYLES][65];
-#else
+#if defined(HLTV_FIXES)
 	char m_Lightstyles[MAX_LIGHTSTYLES][64];
-#endif // HOOK_HLTV
+#else
+	char m_Lightstyles[MAX_LIGHTSTYLES][65];
+#endif
 
 	movevars_t m_MoveVars;
 	BSPModel m_WorldModel;
@@ -303,13 +303,7 @@ protected:
 	char m_HostName[255];
 
 	NetAddress m_GameServerAddress;
-
-#ifdef HOOK_HLTV
-	static DeltaWrapper m_Delta;
-#else
 	Delta m_Delta;
-#endif // HOOK_HLTV
-
 };
 
 extern char g_DownloadURL[128];

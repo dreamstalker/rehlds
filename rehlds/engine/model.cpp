@@ -29,7 +29,7 @@
 #include "precompiled.h"
 
 model_t *loadmodel;
-char loadname[32];
+char loadname[MAX_MODEL_NAME];
 model_t mod_known[MAX_KNOWN_MODELS];
 int mod_numknown;
 unsigned char* mod_base;
@@ -152,7 +152,7 @@ model_t *Mod_FindName(qboolean trackCRC, const char *name)
 
 		if (mod->needload == NL_UNREFERENCED)
 		{
-			if (!avail || mod->type != mod_alias && mod->type != mod_studio)
+			if (!avail || (mod->type != mod_alias && mod->type != mod_studio))
 				avail = mod;
 		}
 	}
@@ -330,7 +330,12 @@ model_t *Mod_LoadModel(model_t *mod, qboolean crash, qboolean trackCRC)
 		Con_DPrintf("loading %s\n", mod->name);
 
 	// allocate a new model
-	COM_FileBase(mod->name, loadname);
+	if (!COM_FileBase_s(mod->name, loadname, sizeof(loadname)))
+	{
+		Sys_Error("%s: Bad model name length: %s", __func__, mod->name);
+		return NULL;
+	}
+
 	loadmodel = mod;
 
 	mod->needload = NL_PRESENT;
@@ -866,10 +871,12 @@ void CalcSurfaceExtents(msurface_t *s)
 
 		for (j = 0; j < 2; j++)
 		{
-			val = v->position[0] * tex->vecs[j][0] +
-				v->position[1] * tex->vecs[j][1] +
-				v->position[2] * tex->vecs[j][2] +
-				tex->vecs[j][3];
+			// FIXED: loss of floating point
+			val = v->position[0] * (double)tex->vecs[j][0] +
+				v->position[1] * (double)tex->vecs[j][1] +
+				v->position[2] * (double)tex->vecs[j][2] +
+				(double)tex->vecs[j][3];
+
 			if (val < mins[j])
 				mins[j] = val;
 			if (val > maxs[j])
@@ -1036,18 +1043,7 @@ void Mod_LoadLeafs(lump_t *l)
 
 	loadmodel->leafs = out;
 	loadmodel->numleafs = count;
-#ifdef REHLDS_FIXES
-	// Originally check was called only in singleplayer mode, that is why this "if" here (see Mod_LeafPVS, gPVS is not NULL for multiplayer)
-	if (g_psvs.maxclients <= 1)
-	{
-		int row = (loadmodel->numleafs + 7) / 8;
 
-		if (row < 0 || row > MODEL_MAX_PVS)
-		{
-			Sys_Error("%s: oversized loadmodel->numleafs: %i", __func__, loadmodel->numleafs);
-		}
-	}
-#endif
 	for (i = 0; i < count; i++, in++, out++)
 	{
 		for (j = 0; j < 3; j++)
@@ -1340,7 +1336,7 @@ void EXT_FUNC Mod_LoadBrushModel_internal(model_t *mod, void *buffer)
 
 		if (i < mod->numsubmodels - 1)
 		{
-			char name[10];
+			char name[12];
 			Q_snprintf(name, ARRAYSIZE(name), "*%i", i + 1);
 
 			loadmodel = Mod_FindName(0, name);

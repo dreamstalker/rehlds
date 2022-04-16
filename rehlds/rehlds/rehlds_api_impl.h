@@ -103,8 +103,8 @@ typedef IVoidHookChainImpl<IGameClient*> CRehldsHook_ClientConnected;
 typedef IVoidHookChainRegistryImpl<IGameClient*> CRehldsHookRegistry_ClientConnected;
 
 //HandleNetCommand
-typedef IVoidHookChainImpl<IGameClient*, int8> CRehldsHook_HandleNetCommand;
-typedef IVoidHookChainRegistryImpl<IGameClient*, int8> CRehldsHookRegistry_HandleNetCommand;
+typedef IVoidHookChainImpl<IGameClient*, uint8> CRehldsHook_HandleNetCommand;
+typedef IVoidHookChainRegistryImpl<IGameClient*, uint8> CRehldsHookRegistry_HandleNetCommand;
 
 //Mod_LoadBrushModel
 typedef IVoidHookChainImpl<model_t*, void*> CRehldsHook_Mod_LoadBrushModel;
@@ -190,6 +190,38 @@ typedef IHookChainRegistryImpl<bool, edict_t *, IGameClient *, int, const char*,
 typedef IHookChainImpl<edict_t *, const char *> CRehldsHook_CreateFakeClient;
 typedef IHookChainRegistryImpl<edict_t *, const char *> CRehldsHookRegistry_CreateFakeClient;
 
+//SV_CheckConnectionLessRateLimits hook
+typedef IHookChainImpl<bool, netadr_t &, const uint8_t *, int> CRehldsHook_SV_CheckConnectionLessRateLimits;
+typedef IHookChainRegistryImpl<bool, netadr_t &, const uint8_t *, int> CRehldsHookRegistry_SV_CheckConnectionLessRateLimits;
+
+//SV_Frame hook
+typedef IVoidHookChainImpl<> CRehldsHook_SV_Frame;
+typedef IVoidHookChainRegistryImpl<> CRehldsHookRegistry_SV_Frame;
+
+//SV_ShouldSendConsistencyList hook
+typedef IHookChainImpl<bool, IGameClient *, bool> CRehldsHook_SV_ShouldSendConsistencyList;
+typedef IHookChainRegistryImpl<bool, IGameClient *, bool> CRehldsHookRegistry_SV_ShouldSendConsistencyList;
+
+//GetEntityInit hook
+typedef IHookChainImpl<ENTITYINIT, char *> CRehldsHook_GetEntityInit;
+typedef IHookChainRegistryImpl<ENTITYINIT, char *> CRehldsHookRegistry_GetEntityInit;
+
+//SV_EmitPings hook
+typedef IHookChainImpl<void, IGameClient *, sizebuf_t *> CRehldsHook_SV_EmitPings;
+typedef IHookChainRegistryImpl<void, IGameClient *, sizebuf_t *> CRehldsHookRegistry_SV_EmitPings;
+
+//ED_Alloc hook
+typedef IHookChainImpl<edict_t *> CRehldsHook_ED_Alloc;
+typedef IHookChainRegistryImpl<edict_t *> CRehldsHookRegistry_ED_Alloc;
+
+//ED_Free hook
+typedef IVoidHookChainImpl<edict_t *> CRehldsHook_ED_Free;
+typedef IVoidHookChainRegistryImpl<edict_t *> CRehldsHookRegistry_ED_Free;
+
+//Con_Printf hook
+typedef IHookChainImpl<void, const char *> CRehldsHook_Con_Printf;
+typedef IHookChainRegistryImpl<void, const char *> CRehldsHookRegistry_Con_Printf;
+
 class CRehldsHookchains : public IRehldsHookchains {
 public:
 	CRehldsHookRegistry_Steam_NotifyClientConnect m_Steam_NotifyClientConnect;
@@ -231,6 +263,14 @@ public:
 	CRehldsHookRegistry_SV_CreatePacketEntities m_SV_CreatePacketEntities;
 	CRehldsHookRegistry_SV_EmitSound2 m_SV_EmitSound2;
 	CRehldsHookRegistry_CreateFakeClient m_CreateFakeClient;
+	CRehldsHookRegistry_SV_CheckConnectionLessRateLimits m_SV_CheckConnectionLessRateLimits;
+	CRehldsHookRegistry_SV_Frame m_SV_Frame;
+	CRehldsHookRegistry_SV_ShouldSendConsistencyList m_SV_ShouldSendConsistencyList;
+	CRehldsHookRegistry_GetEntityInit m_GetEntityInit;
+	CRehldsHookRegistry_SV_EmitPings m_SV_EmitPings;
+	CRehldsHookRegistry_ED_Alloc m_ED_Alloc;
+	CRehldsHookRegistry_ED_Free m_ED_Free;
+	CRehldsHookRegistry_Con_Printf m_Con_Printf;
 
 public:
 	EXT_FUNC virtual IRehldsHookRegistry_Steam_NotifyClientConnect* Steam_NotifyClientConnect();
@@ -260,18 +300,26 @@ public:
 	EXT_FUNC virtual IRehldsHookRegistry_PF_BuildSoundMsg_I* PF_BuildSoundMsg_I();
 	EXT_FUNC virtual IRehldsHookRegistry_SV_WriteFullClientUpdate* SV_WriteFullClientUpdate();
 	EXT_FUNC virtual IRehldsHookRegistry_SV_CheckConsistencyResponse* SV_CheckConsistencyResponse();
-	EXT_FUNC virtual	IRehldsHookRegistry_SV_DropClient* SV_DropClient();
-	EXT_FUNC virtual	IRehldsHookRegistry_SV_ActivateServer* SV_ActivateServer();
-	EXT_FUNC virtual	IRehldsHookRegistry_SV_WriteVoiceCodec* SV_WriteVoiceCodec();
+	EXT_FUNC virtual IRehldsHookRegistry_SV_DropClient* SV_DropClient();
+	EXT_FUNC virtual IRehldsHookRegistry_SV_ActivateServer* SV_ActivateServer();
+	EXT_FUNC virtual IRehldsHookRegistry_SV_WriteVoiceCodec* SV_WriteVoiceCodec();
 	EXT_FUNC virtual IRehldsHookRegistry_Steam_GSGetSteamID* Steam_GSGetSteamID();
 	EXT_FUNC virtual IRehldsHookRegistry_SV_TransferConsistencyInfo* SV_TransferConsistencyInfo();
 	EXT_FUNC virtual IRehldsHookRegistry_Steam_GSBUpdateUserData* Steam_GSBUpdateUserData();
 	EXT_FUNC virtual IRehldsHookRegistry_Cvar_DirectSet* Cvar_DirectSet();
 	EXT_FUNC virtual IRehldsHookRegistry_SV_EstablishTimeBase* SV_EstablishTimeBase();
-	EXT_FUNC virtual	IRehldsHookRegistry_SV_Spawn_f* SV_Spawn_f();
-	EXT_FUNC virtual	IRehldsHookRegistry_SV_CreatePacketEntities* SV_CreatePacketEntities();
-	EXT_FUNC virtual	IRehldsHookRegistry_SV_EmitSound2* SV_EmitSound2();
-	EXT_FUNC virtual	IRehldsHookRegistry_CreateFakeClient* CreateFakeClient();
+	EXT_FUNC virtual IRehldsHookRegistry_SV_Spawn_f* SV_Spawn_f();
+	EXT_FUNC virtual IRehldsHookRegistry_SV_CreatePacketEntities* SV_CreatePacketEntities();
+	EXT_FUNC virtual IRehldsHookRegistry_SV_EmitSound2* SV_EmitSound2();
+	EXT_FUNC virtual IRehldsHookRegistry_CreateFakeClient* CreateFakeClient();
+	EXT_FUNC virtual IRehldsHookRegistry_SV_CheckConnectionLessRateLimits* SV_CheckConnectionLessRateLimits();
+	EXT_FUNC virtual IRehldsHookRegistry_SV_Frame* SV_Frame();
+	EXT_FUNC virtual IRehldsHookRegistry_SV_ShouldSendConsistencyList* SV_ShouldSendConsistencyList();
+	EXT_FUNC virtual IRehldsHookRegistry_GetEntityInit* GetEntityInit();
+	EXT_FUNC virtual IRehldsHookRegistry_SV_EmitPings* SV_EmitPings();
+	EXT_FUNC virtual IRehldsHookRegistry_ED_Alloc* ED_Alloc();
+	EXT_FUNC virtual IRehldsHookRegistry_ED_Free* ED_Free();
+	EXT_FUNC virtual IRehldsHookRegistry_Con_Printf* Con_Printf();
 };
 
 extern CRehldsHookchains g_RehldsHookchains;

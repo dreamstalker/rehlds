@@ -52,5 +52,5 @@ int Host_GetVideoLevel(void);
 void CheckLiblistForFallbackDir(const char *pGameDir, bool bLanguage, const char *pLanguage, bool bLowViolenceBuild_);
 int FileSystem_SetGameDirectory(const char *pDefaultDir, const char *pGameDir);
 int FileSystem_AddFallbackGameDir(const char *pGameDir);
-int FileSystem_Init(char *basedir, void *voidfilesystemFactory);
+int FileSystem_Init(const char *basedir, void *voidfilesystemFactory);
 void FileSystem_Shutdown(void);

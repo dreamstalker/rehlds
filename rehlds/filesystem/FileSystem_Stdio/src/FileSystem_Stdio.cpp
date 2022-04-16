@@ -227,6 +227,4 @@ bool CFileSystem_Stdio::IsAppReadyForOfflinePlay(int appID)
 	return true;
 }
 
-#ifndef HOOK_FILESYSTEM
 EXPOSE_SINGLE_INTERFACE(CFileSystem_Stdio, IFileSystem, FILESYSTEM_INTERFACE_VERSION);
-#endif // HOOK_FILESYSTEM

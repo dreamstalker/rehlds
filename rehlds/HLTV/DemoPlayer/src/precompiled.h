@@ -18,6 +18,3 @@
 #include "common/DemoFile.h"
 
 #include "DemoPlayer.h"
-
-// Hooks stuff
-#include "hookers/HLTV/DemoPlayer/hooklist.h"

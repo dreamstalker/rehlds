@@ -61,7 +61,6 @@ char *CopyString(const char *src)
 void CCommandLine::CreateCmdLine(int argc, const char *argv[])
 {
 	char cmdline[4096] = "";
-	const int MAX_CHARS = sizeof(cmdline) - 1;
 
 	for (int i = 0; i < argc; ++i)
 	{
@@ -88,7 +87,10 @@ void CCommandLine::LoadParametersFromFile(const char *&pSrc, char *&pDst, int ma
 	// Suck out the file name
 	char szFileName[ MAX_PATH ];
 	char *pOut;
+
+#if 0
 	char *pDestStart = pDst;
+#endif
 
 	// Skip the @ sign
 	pSrc++;
@@ -342,7 +344,7 @@ const char *CCommandLine::CheckParm(const char *psz, char **ppszValue) const
 
 		sz[i] = p2[i];
 		i++;
-	} while (i < sizeof(sz));
+	} while ((unsigned)i < sizeof(sz));
 
 	sz[i] = '\0';
 	*ppszValue = sz;

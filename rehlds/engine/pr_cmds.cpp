@@ -312,8 +312,12 @@ void EXT_FUNC PF_ambientsound_I(edict_t *entity, float *pos, const char *samp, f
 
 void EXT_FUNC PF_sound_I(edict_t *entity, int channel, const char *sample, float volume, float attenuation, int fFlags, int pitch)
 {
+#ifdef REHLDS_FIXES
+	if (volume < 0.0f || volume > 1.0f)
+#else
 	if (volume < 0.0 || volume > 255.0)
-		Sys_Error("%s: volume = %i", __func__, volume);
+#endif
+		Sys_Error("%s: volume = %f", __func__, volume);
 	if (attenuation < 0.0 || attenuation > 4.0)
 		Sys_Error("%s: attenuation = %f", __func__, attenuation);
 	if (channel < 0 || channel > 7)
@@ -356,7 +360,6 @@ void EXT_FUNC PF_traceline_DLL(const float *v1, const float *v2, int fNoMonsters
 
 void EXT_FUNC TraceHull(const float *v1, const float *v2, int fNoMonsters, int hullNumber, edict_t *pentToSkip, TraceResult *ptr)
 {
-	hullNumber = hullNumber;
 	if (hullNumber < 0 || hullNumber > 3)
 		hullNumber = 0;
 
@@ -385,7 +388,7 @@ void EXT_FUNC TraceSphere(const float *v1, const float *v2, int fNoMonsters, flo
 
 void EXT_FUNC TraceModel(const float *v1, const float *v2, int hullNumber, edict_t *pent, TraceResult *ptr)
 {
-	int oldMovetype, oldSolid;
+	int oldMovetype = MOVETYPE_NONE, oldSolid = SOLID_NOT;
 
 	if (hullNumber < 0 || hullNumber > 3)
 		hullNumber = 0;
@@ -1281,7 +1284,10 @@ void EXT_FUNC EV_Playback(int flags, const edict_t *pInvoker, unsigned short eve
 				continue;
 		}
 
-		if (cl == host_client && (flags & FEV_NOTHOST) && cl->lw || (flags & FEV_HOSTONLY) && cl->edict != pInvoker)
+		if ((flags & FEV_NOTHOST) && cl->lw && cl == host_client)
+			continue;
+
+		if ((flags & FEV_HOSTONLY) && cl->edict != pInvoker)
 			continue;
 
 		if (flags & FEV_RELIABLE)
@@ -1346,7 +1352,6 @@ void EXT_FUNC EV_SV_Playback(int flags, int clientindex, unsigned short eventind
 	EV_Playback(flags,pEdict, eventindex, delay, origin, angles, fparam1, fparam2, iparam1, iparam2, bparam1, bparam2);
 }
 
-#ifdef REHLDS_FIXES
 int SV_LookupModelIndex(const char *name)
 {
 	if (!name || !name[0])
@@ -1370,7 +1375,6 @@ int SV_LookupModelIndex(const char *name)
 
 	return 0;
 }
-#endif // REHLDS_FIXES
 
 int EXT_FUNC PF_precache_model_I(const char *s)
 {
@@ -2125,8 +2129,12 @@ void EXT_FUNC PF_MessageEnd_I(void)
 	if (gMsgBuffer.flags & SIZEBUF_OVERFLOWED)
 		Sys_Error("%s: called, but message buffer from .dll had overflowed\n", __func__);
 
-
+// With `REHLDS_FIXES` enabled meaning of `svc_startofusermessages` changed a bit: now it is an id of the first user message
+#ifdef REHLDS_FIXES
+	if (gMsgType >= svc_startofusermessages)
+#else // REHLDS_FIXES
 	if (gMsgType > svc_startofusermessages)
+#endif // REHLDS_FIXES
 	{
 		UserMsg* pUserMsg = sv_gpUserMsgs;
 		while (pUserMsg && pUserMsg->iMsg != gMsgType)
@@ -2167,7 +2175,12 @@ void EXT_FUNC PF_MessageEnd_I(void)
 		if ((gMsgDest == MSG_BROADCAST && gMsgBuffer.cursize + pBuffer->cursize > pBuffer->maxsize) || !pBuffer->data)
 			return;
 
+// With `REHLDS_FIXES` enabled meaning of `svc_startofusermessages` changed a bit: now it is an id of the first user message
+#ifdef REHLDS_FIXES
+		if (gMsgType >= svc_startofusermessages && (gMsgDest == MSG_ONE || gMsgDest == MSG_ONE_UNRELIABLE))
+#else // REHLDS_FIXES
 		if (gMsgType > svc_startofusermessages && (gMsgDest == MSG_ONE || gMsgDest == MSG_ONE_UNRELIABLE))
+#endif // REHLDS_FIXES
 		{
 			int entnum = NUM_FOR_EDICT((const edict_t *)gMsgEntity);
 			if (entnum < 1 || entnum > g_psvs.maxclients)
@@ -2630,7 +2643,7 @@ void EXT_FUNC PF_SetGroupMask(int mask, int op)
 int EXT_FUNC PF_CreateInstancedBaseline(int classname, struct entity_state_s *baseline)
 {
 	extra_baselines_t *bls = g_psv.instance_baselines;
-	if (bls->number >= NUM_BASELINES)
+	if (bls->number >= NUM_BASELINES - 1)
 		return 0;
 
 	bls->classname[bls->number] = classname;

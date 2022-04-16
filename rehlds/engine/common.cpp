@@ -531,10 +531,8 @@ void MSG_WriteBits(uint32 data, int numbits)
 
 #endif //defined(REHLDS_FIXES)
 
-NOXREF qboolean MSG_IsBitWriting(void)
+qboolean MSG_IsBitWriting(void)
 {
-	NOXREFCHECK;
-
 	return bfwrite.pbuf != 0;
 }
 
@@ -622,10 +620,8 @@ int MSG_CurrentBit(void)
 	return nbits;
 }
 
-NOXREF qboolean MSG_IsBitReading(void)
+qboolean MSG_IsBitReading(void)
 {
-	NOXREFCHECK;
-
 	return bfread.pbuf != 0;
 }
 
@@ -758,10 +754,8 @@ uint32 MSG_ReadBits(int numbits)
 	return result;
 }
 
-NOXREF uint32 MSG_PeekBits(int numbits)
+uint32 MSG_PeekBits(int numbits)
 {
-	NOXREFCHECK;
-
 	bf_read_t savebf = bfread;
 	uint32 r = MSG_ReadBits(numbits);
 	bfread = savebf;
@@ -782,10 +776,8 @@ int MSG_ReadSBits(int numbits)
 	return result;
 }
 
-NOXREF char *MSG_ReadBitString(void)
+char *MSG_ReadBitString(void)
 {
-	NOXREFCHECK;
-
 	static char buf[8192];
 
 	char *p = &buf[0];
@@ -825,10 +817,8 @@ int MSG_ReadBitData(void *dest, int length)
 	return length;
 }
 
-NOXREF float MSG_ReadBitCoord(void)
+float MSG_ReadBitCoord(void)
 {
-	NOXREFCHECK;
-
 	float value = 0;
 
 	int intval = MSG_ReadOneBit();
@@ -878,10 +868,8 @@ void MSG_WriteBitCoord(const float f)
 	}
 }
 
-NOXREF void MSG_ReadBitVec3Coord(vec3_t fa)
+void MSG_ReadBitVec3Coord(vec3_t fa)
 {
-	NOXREFCHECK;
-
 	int xflag = MSG_ReadOneBit();
 	int yflag = MSG_ReadOneBit();
 	int zflag = MSG_ReadOneBit();
@@ -912,10 +900,8 @@ void MSG_WriteBitVec3Coord(const vec3_t fa)
 		MSG_WriteBitCoord(fa[2]);
 }
 
-NOXREF float MSG_ReadCoord(void)
+float MSG_ReadCoord(void)
 {
-	NOXREFCHECK;
-
 	return (float)(MSG_ReadShort() * (1.0 / 8));
 }
 
@@ -924,10 +910,8 @@ void MSG_WriteCoord(sizebuf_t *sb, const float f)
 	MSG_WriteShort(sb, (int)(f * 8.0));
 }
 
-NOXREF void MSG_ReadVec3Coord(sizebuf_t *sb, vec3_t fa)
+void MSG_ReadVec3Coord(sizebuf_t *sb, vec3_t fa)
 {
-	NOXREFCHECK;
-
 	if (MSG_IsBitReading())
 	{
 		MSG_ReadBitVec3Coord(fa);
@@ -940,10 +924,8 @@ NOXREF void MSG_ReadVec3Coord(sizebuf_t *sb, vec3_t fa)
 	}
 }
 
-NOXREF void MSG_WriteVec3Coord(sizebuf_t *sb, const vec3_t fa)
+void MSG_WriteVec3Coord(sizebuf_t *sb, const vec3_t fa)
 {
-	NOXREFCHECK;
-
 	MSG_StartBitWriting(sb);
 	MSG_WriteBitVec3Coord(fa);
 	MSG_EndBitWriting(sb);
@@ -1047,16 +1029,28 @@ int MSG_ReadLong(void)
 	return c;
 }
 
-NOXREF float MSG_ReadFloat(void)
+float MSG_ReadFloat(void)
 {
-	NOXREFCHECK;
-
 	float f;
+
+	union
+	{
+		unsigned char    b[4];
+		float   f;
+		int     l;
+	} dat;
 
 	if (msg_readcount + 4 <= net_message.cursize)
 	{
-		f = *((float*)LittleLong(*(int *)&net_message.data[msg_readcount]));
+		dat.b[0] = net_message.data[msg_readcount];
+		dat.b[1] = net_message.data[msg_readcount + 1];
+		dat.b[2] = net_message.data[msg_readcount + 2];
+		dat.b[3] = net_message.data[msg_readcount + 3];
 		msg_readcount += 4;
+
+		dat.l = LittleLong(dat.l);
+
+		return dat.f;
 	}
 	else
 	{
@@ -1109,10 +1103,8 @@ char *MSG_ReadStringLine(void)
 	return string;
 }
 
-NOXREF float MSG_ReadAngle(void)
+float MSG_ReadAngle(void)
 {
-	NOXREFCHECK;
-
 	int c = MSG_ReadChar();
 #ifdef REHLDS_FIXES
 	if (c == -1)	// FIXED: Added check for wrong value, but just return 0 instead of -1 * (360.0 / 256)
@@ -1123,10 +1115,8 @@ NOXREF float MSG_ReadAngle(void)
 	return (float)(c * (360.0 / 256));
 }
 
-NOXREF float MSG_ReadHiresAngle(void)
+float MSG_ReadHiresAngle(void)
 {
-	NOXREFCHECK;
-
 	int c = MSG_ReadShort();
 #ifdef REHLDS_FIXES
 	if (c == -1)	// FIXED: Added check for wrong value, but just return 0 instead of -1 * (360.0 / 65536)
@@ -1172,6 +1162,22 @@ void SZ_Clear(sizebuf_t *buf)
 {
 	buf->flags &= ~SIZEBUF_OVERFLOWED;
 	buf->cursize = 0;
+}
+
+qboolean SZ_HasSpaceToRead(const sizebuf_t *buf, int length)
+{
+	if ((msg_readcount + length) > buf->maxsize)
+		return FALSE;
+
+	return TRUE;
+}
+
+qboolean SZ_HasSomethingToRead(const sizebuf_t *buf, int length)
+{
+	if ((msg_readcount + length) > buf->cursize)
+		return FALSE;
+
+	return TRUE;
 }
 
 void *EXT_FUNC SZ_GetSpace(sizebuf_t *buf, int length)
@@ -1378,6 +1384,33 @@ void COM_StripExtension(char *in, char *out)
 
 char *COM_FileExtension(char *in)
 {
+#ifdef REHLDS_FIXES
+	int len = Q_strlen(in);
+	if (len <= 0)
+		return "";  // no extension
+
+	char *src = in + len - 1;
+
+	// back up until a . or the start
+	while (src >= in && !PATHSEPARATOR(*src))
+	{
+		if (*src == '.')
+		{
+			src++; // skip dot
+
+			if (*src != '\0')
+			{
+				return src;
+			}
+
+			break;
+		}
+
+		src--;
+	}
+
+	return "";  // no extension
+#else // #ifdef REHLDS_FIXES
 	static char exten[MAX_PATH];
 	char *c, *d = NULL;
 	int i;
@@ -1409,35 +1442,68 @@ char *COM_FileExtension(char *in)
 		exten[i] = *d;
 	}
 	exten[i] = 0;
-
 	return exten;
+#endif // #ifdef REHLDS_FIXES
 }
 
-// Fills "out" with the file name without path and extension.
+// Fills "out" with the file name without path and extension
 void COM_FileBase(const char *in, char *out)
 {
-	const char *start, *end;
-	int len;
+	COM_FileBase_s(in, out, -1);
+}
 
-	*out = 0;
-
-	len = Q_strlen(in);
-	if (len <= 0)
-		return;
-
-	start = in + len - 1;
-	end = in + len;
-	while (start >= in && *start != '/' && *start != '\\')
+// Extracts the base name of a file (no path, no extension, assumes '/' as path separator)
+const char *COM_FileBase_s(const char *in, char *out, int size)
+{
+	if (!in || !in[0])
 	{
-		if (*start == '.')
-			end = start;
-		start--;
+		*out = '\0';
+		return NULL;
 	}
-	start++;
 
-	len = end - start;
-	Q_strncpy(out, start, len);
-	out[len] = 0;
+	int len = Q_strlen(in);
+	if (len <= 0)
+		return NULL;
+
+	// scan backward for '.'
+	int end = len - 1;
+	while (end && in[end] != '.' && !PATHSEPARATOR(in[end]))
+		end--;
+
+	// no '.', copy to end
+	if (in[end] != '.')
+	{
+		end = len - 1;
+	}
+	else
+	{
+		// Found ',', copy to left of '.'
+		end--;
+	}
+
+	// Scan backward for '/'
+	int start = len - 1;
+	while (start >= 0 && !PATHSEPARATOR(in[start]))
+		start--;
+
+	if (start < 0 || !PATHSEPARATOR(in[start]))
+	{
+		start = 0;
+	}
+	else
+	{
+		start++;
+	}
+
+	// Length of new sting
+	int maxcopy = end - start + 1;
+	if (size >= 0 && maxcopy >= size)
+		return NULL;
+
+	// Copy partial string
+	Q_strncpy(out, &in[start], maxcopy);
+	out[maxcopy] = '\0';
+	return out;
 }
 
 void COM_DefaultExtension(char *path, char *extension)
@@ -1568,7 +1634,7 @@ inquotes:
 
 char *COM_ParseLine(char *data)
 {
-#ifndef REHLDS_FIXES
+#ifdef REHLDS_FIXES
 	unsigned int c;
 #else
 	int c;
@@ -1592,7 +1658,7 @@ char *COM_ParseLine(char *data)
 	c = *data;
 
 	// parse a line out of the data
-#ifndef REHLDS_FIXES
+#ifdef REHLDS_FIXES
 	while ((c >= ' ' || c == '\t') && (len < COM_TOKEN_LEN - 1))
 	{
 		com_token[len] = c;
@@ -1617,7 +1683,7 @@ char *COM_ParseLine(char *data)
 		return NULL;
 	}
 
-	// eat whitespace (LF,CR,etc.) at the end of this line
+	// skip end of the line (CR, LF, etc.., but not TAB)
 	while ((c = *data) < ' ' && c != '\t')
 	{
 		if (c == 0)
@@ -1929,7 +1995,7 @@ int EXT_FUNC COM_FileSize(const char *filename)
 
 unsigned char* EXT_FUNC COM_LoadFile(const char *path, int usehunk, int *pLength)
 {
-	char base[33];
+	char base[MAX_PATH];
 	unsigned char *buf = NULL;
 
 #ifndef SWDS
@@ -1949,8 +2015,10 @@ unsigned char* EXT_FUNC COM_LoadFile(const char *path, int usehunk, int *pLength
 	}
 
 	int len = FS_Size(hFile);
-	COM_FileBase(path, base);
-	base[32] = 0;
+	if (!COM_FileBase_s(path, base, sizeof(base)))
+		Sys_Error("%s: Bad path length: %s", __func__, path);
+
+	base[32] = '\0';
 
 	switch (usehunk)
 	{
@@ -2263,23 +2331,35 @@ void COM_ListMaps(char *pszSubString)
 
 		while (findfn != NULL)
 		{
-			Q_snprintf(curDir, ARRAYSIZE(curDir), "maps/%s", findfn);
-			FS_GetLocalPath(curDir, curDir, ARRAYSIZE(curDir));
-
-			if (strstr(curDir, com_gamedir) && (!nSubStringLen || !Q_strnicmp(findfn, pszSubString, nSubStringLen)))
+			if (Q_snprintf(curDir, ARRAYSIZE(curDir), "maps/%s", findfn) < ARRAYSIZE(curDir))
 			{
-				Q_memset(&header, 0, sizeof(dheader_t));
-				Q_sprintf(pFileName, "maps/%s", findfn);
+				FS_GetLocalPath(curDir, curDir, ARRAYSIZE(curDir));
 
-				fp = FS_Open(pFileName, "rb");
-
-				if (fp)
+				if (Q_strstr(curDir, com_gamedir) && (!nSubStringLen || !Q_strnicmp(findfn, pszSubString, nSubStringLen)))
 				{
-					FS_Read(&header, sizeof(dheader_t), 1, fp);
-					FS_Close(fp);
-				}
+					if (Q_snprintf(pFileName, ARRAYSIZE(pFileName), "maps/%s", findfn) < ARRAYSIZE(pFileName))
+					{
+						Q_memset(&header, 0, sizeof(dheader_t));
 
-				COM_CheckPrintMap(&header, findfn, bShowOutdated != 0);
+						fp = FS_Open(pFileName, "rb");
+
+						if (fp)
+						{
+							FS_Read(&header, sizeof(dheader_t), 1, fp);
+							FS_Close(fp);
+						}
+
+						COM_CheckPrintMap(&header, findfn, bShowOutdated != 0);
+					}
+					else
+					{
+						Con_Printf("Map name too long: %s\n", findfn);
+					}
+				}
+			}
+			else
+			{
+				Con_Printf("Map name too long: %s\n", findfn);
 			}
 
 			findfn = Sys_FindNext(NULL);
@@ -2364,7 +2444,7 @@ void EXT_FUNC COM_GetGameDir(char *szGameDir)
 {
 	if (szGameDir)
 	{
-		Q_snprintf(szGameDir, MAX_PATH - 1 , "%s", com_gamedir);
+		Q_snprintf(szGameDir, MAX_PATH, "%s", com_gamedir);
 	}
 }
 

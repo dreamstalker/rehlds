@@ -175,12 +175,7 @@ byte *BSPModel::DecompressVis(unsigned char *in)
 		return m_novis;
 	}
 
-	int row = (m_model.numleafs + 7) / 8;
-	if (row < 0 || row > MODEL_MAX_PVS) {
-		m_System->Errorf("BSPModel::DecompressVis: oversized m_model.numleafs: %i\n", m_model.numleafs);
-	}
-
-	DecompressPVS(in, decompressed, row);
+	DecompressPVS(in, decompressed, (m_model.numleafs + 7) / 8);
 	return decompressed;
 }
 
@@ -729,7 +724,12 @@ bool BSPModel::LoadFromBuffer(unsigned int *buffer, int length, const char *name
 	header = (dheader_t *)buffer;
 
 	i = _LittleLong(header->version);
-	if (i != HLBSP_VERSION) {
+	if (
+#ifdef HLTV_FIXES
+		i != Q1BSP_VERSION &&
+#endif
+		i != HLBSP_VERSION)
+	{
 		m_System->Errorf("BSPModel::LoadFromBuffer: %s has wrong version number (%i should be %i)\n", m_model.name, i, HLBSP_VERSION);
 	}
 

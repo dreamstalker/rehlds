@@ -60,6 +60,8 @@ public:
 	void FinishDemo();
 	void SendDatagram();
 	void WriteDatagram(double time, frame_t *frame);
+	void SetUpdateRate(int updaterate);
+	void SetRate(int rate);
 
 protected:
 	IProxy *m_Proxy;

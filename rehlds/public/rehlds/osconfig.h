@@ -71,6 +71,7 @@
 	#include <link.h>
 	#include <netdb.h>
 	#include <netinet/in.h>
+	#include <netinet/ip.h>
 	#include <pthread.h>
 	#include <sys/ioctl.h>
 	#include <sys/mman.h>
@@ -135,6 +136,8 @@
 		VirtualFree(ptr, 0, MEM_RELEASE);
 	}
 #else // _WIN32
+	#include <x86intrin.h>
+
 	#ifndef PAGESIZE
 		#define PAGESIZE 4096
 	#endif

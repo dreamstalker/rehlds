@@ -58,6 +58,9 @@
     <ClInclude Include="..\..\..\engine\mem.h">
       <Filter>engine</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\common\minidump.h">
+      <Filter>common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\precompiled.cpp">
@@ -95,6 +98,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\engine\mem.cpp">
       <Filter>engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\common\minidump.cpp">
+      <Filter>common</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

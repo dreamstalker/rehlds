@@ -119,7 +119,7 @@ void Log_Open(void)
 	time_t ltime;
 	struct tm *today;
 	char szFileBase[MAX_PATH];
-	char szTestFile[MAX_PATH];
+	char szTestFile[MAX_PATH+8]; // room for extra string
 	int i;
 	FileHandle_t fp;
 	char *temp;

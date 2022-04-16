@@ -109,7 +109,7 @@ const float MAX_RATE		= 100000.0f;
 const float MIN_RATE		= 1000.0f;
 
 // Default data rate
-const float DEFAULT_RATE	= 9999.0f;
+const float DEFAULT_RATE	= 30000.0f;
 
 // NETWORKING INFO
 
@@ -208,9 +208,24 @@ typedef enum svc_commands_e
 	svc_resourcelocation,
 	svc_sendcvarvalue,
 	svc_sendcvarvalue2,
-	svc_startofusermessages = svc_sendcvarvalue2,
+	svc_exec,
+	svc_reserve60,
+	svc_reserve61,
+	svc_reserve62,
+	svc_reserve63,
+// Let's just use an id of the first user message instead of the last svc_*
+// This change makes code in `PF_MessageEnd_I` forward-compatible with future svc_* additions
+#ifdef REHLDS_FIXES
+	svc_startofusermessages = svc_reserve63 + 1,
+#else // REHLDS_FIXES
+	svc_startofusermessages = svc_exec,
+#endif // REHLDS_FIXES
 	svc_endoflist = 255,
 } svc_commands_t;
+
+#ifdef REHLDS_FIXES
+static_assert(svc_startofusermessages == 64, "svc_startofusermessages should be equal to 64 for backward and forward compatibility");
+#endif // REHLDS_FIXES
 
 typedef enum clc_commands_e
 {

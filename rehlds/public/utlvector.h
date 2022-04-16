@@ -43,10 +43,10 @@ public:
 
 	// features C++11 ranged based for
 	T *begin() { return &m_Memory[0]; }
-	T *end()   { return &m_Memory[m_Size - 1]; }
+	T *end()   { return &m_Memory[m_Size]; }
 
 	T const *begin() const { return &m_Memory[0]; }
-	T const *end()   const { return &m_Memory[m_Size - 1]; }
+	T const *end()   const { return &m_Memory[m_Size]; }
 
 	// Copy the array.
 	CUtlVector<T> &operator=(const CUtlVector<T> &other);

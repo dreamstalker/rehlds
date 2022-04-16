@@ -38,6 +38,11 @@ void ED_ClearEdict(edict_t *e)
 
 edict_t *ED_Alloc(void)
 {
+	return g_RehldsHookchains.m_ED_Alloc.callChain(ED_Alloc_internal);
+}
+
+edict_t *EXT_FUNC ED_Alloc_internal(void)
+{
 	int i;
 	edict_t *e;
 
@@ -71,6 +76,11 @@ edict_t *ED_Alloc(void)
 }
 
 void ED_Free(edict_t *ed)
+{
+	g_RehldsHookchains.m_ED_Free.callChain(ED_Free_internal, ed);	
+}
+
+void EXT_FUNC ED_Free_internal(edict_t *ed)
 {
 	if (!ed->free)
 	{
@@ -265,6 +275,42 @@ char *ED_ParseEdict(char *data, edict_t *ent)
 
 				Q_strcpy(keyname, "angles");
 			}
+#ifdef REHLDS_FIXES
+			else if (!Q_strcmp(keyname, "model"))
+			{
+				// local model?
+				if (com_token[0] == '*')
+				{
+					// make sure that local model not pre-cached yet
+					if (!SV_LookupModelIndex(com_token))
+					{
+						// find empty slot
+						int i;
+						for (i = 0; i < MAX_MODELS; i++)
+						{
+							if (!g_psv.model_precache[i])
+								break;
+						}
+
+						int index = Q_atoi(com_token + 1);
+						if (i == MAX_MODELS)
+						{
+							Host_Error("%s: Model '%s' failed to precache because the item count is over the %d limit.\n"
+								"Reduce the number of brush models and/or regular models in the map to correct this.", __func__,
+								localmodels[index], MAX_MODELS);
+						}
+
+						g_psv.model_precache[i] = localmodels[index];
+						g_psv.models[i] = Mod_ForName(localmodels[index], FALSE, FALSE);
+						g_psv.model_precache_flags[i] |= RES_FATALIFMISSING;
+
+#ifdef REHLDS_OPT_PEDANTIC
+						g_rehlds_sv.modelsMap.put(g_psv.model_precache[i], i);
+#endif
+					}
+				}
+			}
+#endif
 
 			kvd.szClassName = className;
 			kvd.szKeyName = keyname;

@@ -181,6 +181,80 @@ void COM_FileBase(char *in, char *out)
 	out[len] = '\0';
 }
 
+void COM_DefaultExtension(char *path, char *extension)
+{
+	char *src;
+	src = path + Q_strlen(path) - 1;
+
+	while (*src != '/' && *src != '\\' && src != path)
+	{
+		if (*src == '.')
+		{
+			return;
+		}
+
+		src--;
+	}
+
+	Q_strcat(path, extension);
+}
+
+char *COM_FileExtension(char *in)
+{
+#ifdef HLTV_FIXES
+	char *src = in + Q_strlen(in) - 1;
+
+	// back up until a . or the start
+	while (src != in && *(src - 1) != '.')
+	{
+		src--;
+	}
+
+	// check to see if the '.' is part of a input buffer
+	if (src == in || PATHSEPARATOR(*src))
+	{
+		return "";  // no extension
+	}
+
+	return src;
+#else // #ifdef HLTV_FIXES
+	static char exten[MAX_PATH];
+	char *c, *d = nullptr;
+	unsigned int i;
+
+	// Search for the first dot after the last path separator
+	c = in;
+	while (*c)
+	{
+		if (*c == '/' || *c == '\\')
+		{
+			d = nullptr;	// reset dot location on path separator
+		}
+		else if (d == nullptr && *c == '.')
+		{
+			d = c;		// store first dot location in the file name
+		}
+		c++;
+	}
+
+	if (d == nullptr)
+	{
+		return "";
+	}
+
+	d++;	// skip dot
+
+	// Copy extension
+	for (i = 0; i < (ARRAYSIZE(exten) - 1) && *d; i++, d++)
+	{
+		exten[i] = *d;
+	}
+
+	exten[i] = '\0';
+	return exten;
+#endif // #ifdef HLTV_FIXES
+}
+
 char com_token[COM_TOKEN_LEN];
 qboolean s_com_token_unget = FALSE;
 
@@ -463,7 +537,7 @@ void NORETURN HLTV_SysError(const char *fmt, ...)
 	fprintf(fl, "%s\n", string);
 	fclose(fl);
 
-	int *null = 0;
+	volatile int *null = 0;
 	*null = 0;
 	exit(-1);
 }

@@ -1041,7 +1041,7 @@ void Host_Version(void)
 					gpszVersionString[sizeof(gpszVersionString) - 1] = 0;
 					if (COM_CheckParm("-steam"))
 					{
-						char szSteamVersionId[32];
+						char szSteamVersionId[16];
 						FS_GetInterfaceVersion(szSteamVersionId, sizeof(szSteamVersionId) - 1);
 						Q_snprintf(gpszVersionString, sizeof(gpszVersionString), "%s/%s", &com_token[Q_strlen("PatchVersion=")], szSteamVersionId);
 						gpszVersionString[sizeof(gpszVersionString) - 1] = 0;
@@ -1212,7 +1212,12 @@ void Host_Shutdown(void)
 	if (host_initialized) // Client-side
 		Host_WriteConfiguration();
 
+#ifdef REHLDS_FIXES
+	Host_ShutdownServer(FALSE);
+#else
 	SV_ServerShutdown();
+#endif
+
 	Voice_Deinit();
 	host_initialized = FALSE;
 

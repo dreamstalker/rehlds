@@ -241,6 +241,7 @@ typedef struct client_s
 	uint32 m_VoiceStreams[2];
 	double m_lastvoicetime;
 	int m_sendrescount;
+	qboolean m_bSentNewResponse;
 } client_t;
 
 enum
@@ -378,6 +379,7 @@ extern cvar_t sv_rehlds_hitboxes_draw;
 extern cvar_t sv_rehlds_hitboxes_draw_groups;
 extern cvar_t sv_rehlds_local_gametime;
 extern cvar_t sv_rehlds_send_mapcycle;
+extern cvar_t sv_usercmd_custom_random_seed;
 #endif
 extern int sv_playermodel;
 
@@ -496,7 +498,7 @@ int SV_FinishCertificateCheck_internal(netadr_t *adr, int nAuthProtocol, char *s
 int SV_CheckKeyInfo(netadr_t *adr, char *protinfo, unsigned short *port, int *pAuthProtocol, char *pszRaw, char *cdkey);
 int SV_CheckKeyInfo_internal(netadr_t *adr, char *protinfo, unsigned short *port, int *pAuthProtocol, char *pszRaw, char *cdkey);
 int SV_CheckForDuplicateSteamID(client_t *client);
-int SV_CheckForDuplicateNames(char *userinfo, qboolean bIsReconnecting, int nExcludeSlot);
+qboolean SV_CheckForDuplicateNames(char *userinfo, qboolean bIsReconnecting, int nExcludeSlot);
 int SV_CheckUserInfo(netadr_t *adr, char *userinfo, qboolean bIsReconnecting, int nReconnectSlot, char *name);
 int SV_FindEmptySlot(netadr_t *adr, int *pslot, client_t ** ppClient);
 void SV_ConnectClient(void);
@@ -558,6 +560,7 @@ NOXREF qboolean SV_HasEventsInQueue(client_t *client);
 void SV_GetNetInfo(client_t *client, int *ping, int *packet_loss);
 int SV_CheckVisibility(edict_t *entity, unsigned char *pset);
 void SV_EmitPings(client_t *client, sizebuf_t *msg);
+void SV_EmitPings_internal(client_t *client, sizebuf_t *msg);
 void SV_WriteEntitiesToClient(client_t *client, sizebuf_t *msg);
 void SV_CleanupEnts(void);
 qboolean SV_SendClientDatagram(client_t *client);
@@ -610,7 +613,8 @@ void SV_CheckCmdTimes(void);
 void SV_CheckForRcon(void);
 qboolean SV_IsSimulating(void);
 void SV_CheckMapDifferences(void);
-void SV_Frame(void);
+void SV_Frame();
+void SV_Frame_Internal();
 void SV_Drop_f(void);
 void SV_RegisterDelta(char *name, char *loadfile);
 void SV_InitDeltas(void);

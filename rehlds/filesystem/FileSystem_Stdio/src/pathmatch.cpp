@@ -769,9 +769,9 @@ extern "C" {
 		return __wrap_open(pathname, O_CREAT | O_WRONLY | O_TRUNC, mode);
 	}
 
-	int __wrap_access(const char *pathname, int mode)
+	WRAP(access, int, const char *pathname, int mode)
 	{
-		return __real_access(CWrap(pathname, false), mode);
+		return CALL(access)(CWrap(pathname, false), mode);
 	}
 
 	WRAP(stat, int, const char *path, struct stat *buf)

@@ -37,18 +37,18 @@ public:
 	bool GetExecutableName(char *out) override;
 	NORETURN void ErrorMessage(int level, const char *msg) override;
 
-	void WriteStatusText(char *szText) override;
+	void WriteStatusText(const char *szText) override;
 	void UpdateStatus(int force) override;
 
-	long LoadLibrary(char *lib) override;
+	long LoadLibrary(const char *lib) override;
 	void FreeLibrary(long library) override;
 
 	bool CreateConsoleWindow() override;
 	void DestroyConsoleWindow() override;
 
-	void ConsoleOutput(char *string) override;
-	char *ConsoleInput() override;
-	void Printf(char *fmt, ...) override;
+	void ConsoleOutput(const char *string) override;
+	const char *ConsoleInput() override;
+	void Printf(const char *fmt, ...) override;
 };
 
 CSys g_Sys;
@@ -206,7 +206,7 @@ void CSys::ErrorMessage(int level, const char *msg)
 	exit(-1);
 }
 
-void CSys::WriteStatusText(char *szText)
+void CSys::WriteStatusText(const char *szText)
 {
 }
 
@@ -214,7 +214,7 @@ void CSys::UpdateStatus(int force)
 {
 }
 
-long CSys::LoadLibrary(char *lib)
+long CSys::LoadLibrary(const char *lib)
 {
 	char cwd[1024];
 	char absolute_lib[1024];
@@ -258,18 +258,18 @@ void CSys::DestroyConsoleWindow()
 }
 
 // Print text to the dedicated console
-void CSys::ConsoleOutput(char *string)
+void CSys::ConsoleOutput(const char *string)
 {
 	printf("%s", string);
 	fflush(stdout);
 }
 
-char *CSys::ConsoleInput()
+const char *CSys::ConsoleInput()
 {
 	return console.GetLine();
 }
 
-void CSys::Printf(char *fmt, ...)
+void CSys::Printf(const char *fmt, ...)
 {
 	// Dump text to debugging console.
 	va_list argptr;
@@ -314,8 +314,21 @@ char* BuildCmdLine(int argc, char **argv)
 	return linuxCmdline;
 }
 
+static void ConsoleCtrlHandler(int signal)
+{
+	if (signal == SIGINT || signal == SIGTERM)
+	{
+		g_bAppHasBeenTerminated = true;
+	}
+}
+
 bool Sys_SetupConsole()
 {
+	struct sigaction action;
+	action.sa_handler = ConsoleCtrlHandler;
+	sigaction(SIGINT, &action, NULL);
+	sigaction(SIGTERM, &action, NULL);
+
 	return true;
 }
 
@@ -327,7 +340,6 @@ int main(int argc, char *argv[])
 {
 	Q_snprintf(g_szEXEName, sizeof(g_szEXEName), "%s", argv[0]);
 	char* cmdline = BuildCmdLine(argc, argv);
-	StartServer(cmdline);
 
-	return 0;
+	return StartServer(cmdline) == LAUNCHER_OK ? EXIT_SUCCESS : EXIT_FAILURE;
 }

@@ -583,7 +583,7 @@ void DirectorCmd::WriteToStream(BitBuffer *stream)
 	}
 }
 
-char *DirectorCmd::ToString()
+const char *DirectorCmd::ToString()
 {
 	int i1, i2, i3;
 	float f1, f2, f3, f4;
@@ -592,7 +592,7 @@ char *DirectorCmd::ToString()
 	char *t1 = m_CMD_Name[m_Type];
 	char t2[1024];
 
-	static char s[1024];
+	static char s[2048];
 	Q_memset(s, 0, sizeof(s));
 
 	switch (m_Type)

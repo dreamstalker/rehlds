@@ -56,7 +56,7 @@ int* EXT_FUNC GetAllowCheats_api() {
 }
 
 bool EXT_FUNC GSBSecure_api() {
-	return Steam_GSBSecure() != 0;
+	return Steam_GSBSecure() != FALSE;
 }
 
 int EXT_FUNC GetBuildNumber_api() {
@@ -65,6 +65,14 @@ int EXT_FUNC GetBuildNumber_api() {
 
 double EXT_FUNC GetRealTime_api() {
 	return realtime;
+}
+
+double EXT_FUNC GetHostFrameTime_api() {
+	return host_frametime;
+}
+
+cmd_function_t* EXT_FUNC GetFirstCmdFunctionHandle_api() {
+	return Cmd_GetFirstCmd();
 }
 
 int* EXT_FUNC GetMsgBadRead_api() {
@@ -85,24 +93,126 @@ DLL_FUNCTIONS* EXT_FUNC GetEntityInterface_api() {
 	return &gEntityInterface;
 }
 
-void EXT_FUNC MSG_StartBitWriting_api(sizebuf_t *buf) {
-	MSG_StartBitWriting(buf);
+
+//
+// Read functions API
+//
+
+int EXT_FUNC MSG_ReadChar_api() {
+	return MSG_ReadChar();
 }
 
-void EXT_FUNC MSG_WriteBits_api(uint32 data, int numbits) {
-	MSG_WriteBits(data, numbits);
+int EXT_FUNC MSG_ReadByte_api() {
+	return MSG_ReadByte();
 }
 
 int EXT_FUNC MSG_ReadShort_api() {
 	return MSG_ReadShort();
 }
 
+int EXT_FUNC MSG_ReadLong_api() {
+	return MSG_ReadLong();
+}
+
+float EXT_FUNC MSG_ReadFloat_api() {
+	return MSG_ReadFloat();
+}
+
+char* EXT_FUNC MSG_ReadString_api() {
+	return MSG_ReadString();
+}
+
+char* EXT_FUNC MSG_ReadStringLine_api() {
+	return MSG_ReadStringLine();
+}
+
 int EXT_FUNC MSG_ReadBuf_api(int iSize, void *pbuf) {
 	return MSG_ReadBuf(iSize, pbuf);
 }
 
-void EXT_FUNC MSG_WriteBuf_api(sizebuf_t *sb, int iSize, void *buf) {
-	MSG_WriteBuf(sb, iSize, buf);
+float EXT_FUNC MSG_ReadAngle_api() {
+	return MSG_ReadAngle();
+}
+
+float EXT_FUNC MSG_ReadHiresAngle_api() {
+	return MSG_ReadHiresAngle();
+}
+
+void EXT_FUNC MSG_ReadUsercmd_api(usercmd_t *to, usercmd_t *from) {
+	MSG_ReadUsercmd(to, from);
+}
+
+float EXT_FUNC MSG_ReadCoord_api() {
+	return MSG_ReadCoord();
+}
+
+void EXT_FUNC MSG_ReadVec3Coord_api(sizebuf_t *sb, vec3_t fa) {
+	MSG_ReadVec3Coord(sb, fa);
+}
+
+
+//
+// Read bit functions API
+//
+
+bool EXT_FUNC MSG_IsBitReading_api() {
+	return MSG_IsBitReading() ? true : false;
+}
+
+void EXT_FUNC MSG_StartBitReading_api(sizebuf_t *buf) {
+	MSG_StartBitReading(buf);
+}
+
+void EXT_FUNC MSG_EndBitReading_api(sizebuf_t *buf) {
+	MSG_EndBitReading(buf);
+}
+
+uint32 EXT_FUNC MSG_PeekBits_api(int numbits) {
+	return MSG_PeekBits(numbits);
+}
+
+int EXT_FUNC MSG_ReadOneBit_api() {
+	return MSG_ReadOneBit();
+}
+
+uint32 EXT_FUNC MSG_ReadBits_api(int numbits) {
+	return MSG_ReadBits(numbits);
+}
+
+int EXT_FUNC MSG_ReadSBits_api(int numbits) {
+	return MSG_ReadSBits(numbits);
+}
+
+float EXT_FUNC MSG_ReadBitCoord_api() {
+	return MSG_ReadBitCoord();
+}
+
+void EXT_FUNC MSG_ReadBitVec3Coord_api(vec_t *fa) {
+	MSG_ReadBitVec3Coord(fa);
+}
+
+float EXT_FUNC MSG_ReadBitAngle_api(int numbits) {
+	return MSG_ReadBitAngle(numbits);
+}
+
+int EXT_FUNC MSG_ReadBitData_api(void *dest, int length) {
+	return MSG_ReadBitData(dest, length);
+}
+
+char* EXT_FUNC MSG_ReadBitString_api() {
+	return MSG_ReadBitString();
+}
+
+int EXT_FUNC MSG_CurrentBit_api() {
+	return MSG_CurrentBit();
+}
+
+//
+// Write functions API
+//
+
+void EXT_FUNC MSG_WriteChar_api(sizebuf_t *sb, int c) {
+	MSG_WriteChar(sb, c);
 }
 
 void EXT_FUNC MSG_WriteByte_api(sizebuf_t *sb, int c) {
@@ -113,16 +223,105 @@ void EXT_FUNC MSG_WriteShort_api(sizebuf_t *sb, int c) {
 	MSG_WriteShort(sb, c);
 }
 
+void EXT_FUNC MSG_WriteLong_api(sizebuf_t *sb, int c) {
+	MSG_WriteLong(sb, c);
+}
+
+void EXT_FUNC MSG_WriteFloat_api(sizebuf_t *sb, float f) {
+	MSG_WriteFloat(sb, f);
+}
+
 void EXT_FUNC MSG_WriteString_api(sizebuf_t *sb, const char *s) {
 	MSG_WriteString(sb, s);
+}
+
+void EXT_FUNC MSG_WriteBuf_api(sizebuf_t *sb, int iSize, void *buf) {
+	MSG_WriteBuf(sb, iSize, buf);
+}
+
+void EXT_FUNC MSG_WriteAngle_api(sizebuf_t *sb, float f) {
+	MSG_WriteAngle(sb, f);
+}
+
+void EXT_FUNC MSG_WriteHiresAngle_api(sizebuf_t *sb, float f) {
+	MSG_WriteHiresAngle(sb, f);
+}
+
+void EXT_FUNC MSG_WriteUsercmd_api(sizebuf_t *sb, usercmd_t *to, usercmd_t *from) {
+	MSG_WriteUsercmd(sb, to, from);
+}
+
+void EXT_FUNC MSG_WriteCoord_api(sizebuf_t *sb, float f) {
+	MSG_WriteCoord(sb, f);
+}
+
+void EXT_FUNC MSG_WriteVec3Coord_api(sizebuf_t *sb, const vec3_t fa) {
+	MSG_WriteVec3Coord(sb, fa);
+}
+
+
+//
+// Write bit functions API
+//
+
+bool EXT_FUNC MSG_IsBitWriting_api() {
+	return MSG_IsBitWriting() ? true : false;
+}
+
+void EXT_FUNC MSG_StartBitWriting_api(sizebuf_t *buf) {
+	MSG_StartBitWriting(buf);
+}
+
+void EXT_FUNC MSG_EndBitWriting_api(sizebuf_t *buf) {
+	MSG_EndBitWriting(buf);
+}
+
+void EXT_FUNC MSG_WriteOneBit_api(int nValue) {
+	MSG_WriteOneBit(nValue);
+}
+
+void EXT_FUNC MSG_WriteBits_api(uint32 data, int numbits) {
+	MSG_WriteBits(data, numbits);
+}
+
+void EXT_FUNC MSG_WriteSBits_api(uint32 data, int numbits) {
+	MSG_WriteSBits(data, numbits);
+}
+
+void EXT_FUNC MSG_WriteBitCoord_api(float f) {
+	MSG_WriteBitCoord(f);
 }
 
 void EXT_FUNC MSG_WriteBitVec3Coord_api(const vec3_t fa) {
 	MSG_WriteBitVec3Coord(fa);
 }
 
-void EXT_FUNC MSG_EndBitWriting_api(sizebuf_t *buf) {
-	MSG_EndBitWriting(buf);
+void EXT_FUNC MSG_WriteBitAngle_api(float fAngle, int numbits) {
+	MSG_WriteBitAngle(fAngle, numbits);
+}
+
+void EXT_FUNC MSG_WriteBitData_api(void *src, int length) {
+	MSG_WriteBitData(src, length);
+}
+
+void EXT_FUNC MSG_WriteBitString_api(const char *p) {
+	MSG_WriteBitString(p);
+}
+
+void EXT_FUNC SZ_Write_api(sizebuf_t *buf, const void *data, int length) {
+	SZ_Write(buf, data, length);
+}
+
+void EXT_FUNC SZ_Print_api(sizebuf_t *buf, const char *data) {
+	SZ_Print(buf, data);
+}
+
+void EXT_FUNC SZ_Clear_api(sizebuf_t *buf) {
+	SZ_Clear(buf);
+}
+
+void EXT_FUNC MSG_BeginReading_api() {
+	MSG_BeginReading();
 }
 
 cvar_t* EXT_FUNC GetCvarVars_api() {
@@ -316,7 +515,51 @@ RehldsFuncs_t g_RehldsApiFuncs =
 	&AddCvarListener_api,
 	&RemoveExtDll_api,
 	&RemoveCvarListener_api,
-	&GetEntityInit
+	&GetEntityInit_api,
+	&MSG_ReadChar_api,
+	&MSG_ReadByte_api,
+	&MSG_ReadLong_api,
+	&MSG_ReadFloat_api,
+	&MSG_ReadString_api,
+	&MSG_ReadStringLine_api,
+	&MSG_ReadAngle_api,
+	&MSG_ReadHiresAngle_api,
+	&MSG_ReadUsercmd_api,
+	&MSG_ReadCoord_api,
+	&MSG_ReadVec3Coord_api,
+	&MSG_IsBitReading_api,
+	&MSG_StartBitReading_api,
+	&MSG_EndBitReading_api,
+	&MSG_PeekBits_api,
+	&MSG_ReadOneBit_api,
+	&MSG_ReadBits_api,
+	&MSG_ReadSBits_api,
+	&MSG_ReadBitCoord_api,
+	&MSG_ReadBitVec3Coord_api,
+	&MSG_ReadBitAngle_api,
+	&MSG_ReadBitData_api,
+	&MSG_ReadBitString_api,
+	&MSG_CurrentBit_api,
+	&MSG_WriteLong_api,
+	&MSG_WriteFloat_api,
+	&MSG_WriteAngle_api,
+	&MSG_WriteHiresAngle_api,
+	&MSG_WriteUsercmd_api,
+	&MSG_WriteCoord_api,
+	&MSG_WriteVec3Coord_api,
+	&MSG_IsBitWriting_api,
+	&MSG_WriteOneBit_api,
+	&MSG_WriteSBits_api,
+	&MSG_WriteBitCoord_api,
+	&MSG_WriteBitAngle_api,
+	&MSG_WriteBitData_api,
+	&MSG_WriteBitString_api,
+	&SZ_Write_api,
+	&SZ_Print_api,
+	&SZ_Clear_api,
+	&MSG_BeginReading_api,
+	&GetHostFrameTime_api,
+	&GetFirstCmdFunctionHandle_api
 };
 
 bool EXT_FUNC SV_EmitSound2_internal(edict_t *entity, IGameClient *pReceiver, int channel, const char *sample, float volume, float attenuation, int flags, int pitch, int emitFlags, const float *pOrigin)
@@ -355,11 +598,15 @@ bool EXT_FUNC SV_EmitSound2_internal(edict_t *entity, IGameClient *pReceiver, in
 		{
 			SV_Multicast(entity, origin, msg_destination | MSG_FL_BROADCAST, TRUE);
 		}
+
 		return true;
 	}
 
 	sizebuf_t *pBuffer;
 	client_t *receiver = pReceiver->GetClient();
+
+	if (receiver->fakeclient || (!receiver->connected && !receiver->active && !receiver->spawned))
+		return false;
 
 	if (bSendPAS && receiver->edict != entity) // if the sound for myself, then do not check PAS.
 	{
@@ -569,6 +816,39 @@ IRehldsHookRegistry_SV_EmitSound2* CRehldsHookchains::SV_EmitSound2() {
 
 IRehldsHookRegistry_CreateFakeClient* CRehldsHookchains::CreateFakeClient() {
 	return &m_CreateFakeClient;
+}
+
+IRehldsHookRegistry_SV_CheckConnectionLessRateLimits* CRehldsHookchains::SV_CheckConnectionLessRateLimits()
+{
+	return &m_SV_CheckConnectionLessRateLimits;
+}
+
+IRehldsHookRegistry_SV_Frame* CRehldsHookchains::SV_Frame() {
+	return &m_SV_Frame;
+}
+
+IRehldsHookRegistry_SV_ShouldSendConsistencyList* CRehldsHookchains::SV_ShouldSendConsistencyList() {
+	return &m_SV_ShouldSendConsistencyList;
+}
+
+IRehldsHookRegistry_GetEntityInit* CRehldsHookchains::GetEntityInit() {
+	return &m_GetEntityInit;
+}
+
+IRehldsHookRegistry_SV_EmitPings* CRehldsHookchains::SV_EmitPings() {
+	return &m_SV_EmitPings;
+}
+
+IRehldsHookRegistry_ED_Alloc* CRehldsHookchains::ED_Alloc() {
+	return &m_ED_Alloc;
+}
+
+IRehldsHookRegistry_ED_Free* CRehldsHookchains::ED_Free() {
+	return &m_ED_Free;
+}
+
+IRehldsHookRegistry_Con_Printf* CRehldsHookchains::Con_Printf() {
+	return &m_Con_Printf;
 }
 
 int EXT_FUNC CRehldsApi::GetMajorVersion()

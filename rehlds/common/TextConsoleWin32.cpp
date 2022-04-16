@@ -111,7 +111,7 @@ void CTextConsoleWin32::SetVisible(bool visible)
 	m_ConsoleVisible = visible;
 }
 
-char *CTextConsoleWin32::GetLine()
+const char *CTextConsoleWin32::GetLine()
 {
 	while (true)
 	{
@@ -203,7 +203,7 @@ char *CTextConsoleWin32::GetLine()
 	return nullptr;
 }
 
-void CTextConsoleWin32::PrintRaw(char *pszMsg, int nChars)
+void CTextConsoleWin32::PrintRaw(const char *pszMsg, int nChars)
 {
 #ifdef LAUNCHER_FIXES
 	char outputStr[2048];
@@ -225,7 +225,7 @@ void CTextConsoleWin32::PrintRaw(char *pszMsg, int nChars)
 #endif
 }
 
-void CTextConsoleWin32::Echo(char *pszMsg, int nChars)
+void CTextConsoleWin32::Echo(const char *pszMsg, int nChars)
 {
 	PrintRaw(pszMsg, nChars);
 }
@@ -245,7 +245,7 @@ int CTextConsoleWin32::GetWidth()
 	return nWidth;
 }
 
-void CTextConsoleWin32::SetStatusLine(char *pszStatus)
+void CTextConsoleWin32::SetStatusLine(const char *pszStatus)
 {
 	Q_strncpy(statusline, pszStatus, sizeof(statusline) - 1);
 	statusline[sizeof(statusline) - 2] = '\0';
@@ -269,7 +269,7 @@ void CTextConsoleWin32::UpdateStatus()
 	WriteConsoleOutputCharacter(houtput, statusline, 80, coord, &dwWritten);
 }
 
-void CTextConsoleWin32::SetTitle(char *pszTitle)
+void CTextConsoleWin32::SetTitle(const char *pszTitle)
 {
 	SetConsoleTitle(pszTitle);
 }

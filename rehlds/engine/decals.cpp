@@ -538,15 +538,17 @@ void Decal_Init(void)
 	for (i = 0; i < ARRAYSIZE(pszPathID); i++)
 	{
 		hfile = FS_OpenPathID("decals.wad", "rb", pszPathID[i]);
-#ifdef REHLDS_FIXES
+
 		if (!hfile)
+		{
+#ifdef REHLDS_FIXES
 			if (found || i < ARRAYSIZE(pszPathID) - 1)
 				continue;
-			else
 #else
-		if (i == 0 && !hfile)
+			if (i == 0)
 #endif
-			Sys_Error("%s: Couldn't find '%s' in \"%s\" search path\n", __func__, "decals.wad", pszPathID[i]);
+				Sys_Error("%s: Couldn't find '%s' in \"%s\" search path\n", __func__, "decals.wad", pszPathID[i]);
+		}
 
 #ifdef REHLDS_FIXES
 		found = true;
@@ -742,23 +744,40 @@ qboolean Draw_ValidateCustomLogo(cachewad_t *wad, unsigned char *data, lumpinfo_
 	tex.alternate_anims = NULL;
 	tex.anim_next = NULL;
 
+	if (!tex.width || tex.width > 256 || tex.height > 256)
+	{
+		Con_Printf("%s: Bad wad dimensions %s\n", __func__, wad->name);
+		return FALSE;
+	}
+
 	for (int i = 0; i < MIPLEVELS; i++)
 		tex.offsets[i] = wad->cacheExtra + LittleLong(tmp.offsets[i]);
 
 	pix = tex.width * tex.height;
 	pixoffset = pix + (pix >> 2) + (pix >> 4) + (pix >> 6);
+
+#ifdef REHLDS_FIXES
+	// Ensure that pixoffset won't be exceed the pre allocated buffer
+	// This can happen when there are no color palettes in payload
+	if ((pixoffset + sizeof(texture_t)) >= (unsigned)(wad->cacheExtra + lump->size))
+	{
+		Con_Printf("%s: Bad wad payload size %s\n", __func__, wad->name);
+		return FALSE;
+	}
+#endif
+
 	paloffset = (pix >> 2) + tmp.offsets[0] + pix;
 	palettesize = (pix >> 4) + paloffset;
-	nPalleteCount = *(u_short *)(data + pixoffset + sizeof(texture_t));
 
-	if (!tex.width || tex.width > 256 || tex.height > 256
-		|| (tmp.offsets[0] + pix != tmp.offsets[1])
-		|| paloffset != tmp.offsets[2] || palettesize != tmp.offsets[3])
+	if ((tmp.offsets[0] + pix != tmp.offsets[1])
+		|| paloffset != tmp.offsets[2]
+		|| palettesize != tmp.offsets[3])
 	{
 		Con_Printf("%s: Bad cached wad %s\n", __func__, wad->name);
 		return FALSE;
 	}
 
+	nPalleteCount = *(u_short *)(data + pixoffset + sizeof(texture_t));
 	if (nPalleteCount > 256)
 	{
 		Con_Printf("%s: Bad cached wad palette size %i on %s\n", __func__, nPalleteCount, wad->name);

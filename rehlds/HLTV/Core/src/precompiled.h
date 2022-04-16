@@ -10,9 +10,6 @@
 #include "mem.h"
 #include "common.h"
 
-// Hooks stuff
-#include "hookers/HLTV/Core/hooklist.h"
-
 #include "common/md5.h"
 #include "common/random.h"
 #include "common/byteorder.h"

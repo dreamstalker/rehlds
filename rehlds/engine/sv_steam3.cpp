@@ -439,6 +439,11 @@ void CSteam3Server::RunFrame()
 		bool iHasPW = (sv_password.string[0] && Q_stricmp(sv_password.string, "none"));
 		CRehldsPlatformHolder::get()->SteamGameServer()->SetPasswordProtected(iHasPW);
 
+#ifdef REHLDS_FIXES
+		// Let's get it an up-to-date description of the game
+		CRehldsPlatformHolder::get()->SteamGameServer()->SetGameDescription(gEntityInterface.pfnGetGameDescription());
+#endif
+
 		for (int i = 0; i < g_psvs.maxclients; i++)
 		{
 			client_t* cl = &g_psvs.clients[i];

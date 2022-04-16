@@ -5,10 +5,11 @@
 #include "cppunitlite/Failure.h"
 
 #include <exception>
+#include <iostream>
 #include <sstream>
 
 
-Test::Test (const char* testName, const char* testGroup, int timeout) 
+Test::Test (const char* testName, const char* testGroup, int timeout)
 	: name_ (testName), group_ (testGroup), timeout_(timeout)
 {
 	next_ = NULL;
@@ -23,13 +24,14 @@ Test *Test::getNext() const
 
 
 void Test::setNext(Test *test)
-{	
+{
 	next_ = test;
 }
 
 void Test::run(TestResult &result) {
 	try {
 		runInternal();
+		std::cout << "Test::run() > " << group_ << "::" << name_ << " Passed" << std::endl;
 	} catch (TestFailException &e) {
 		result.addFailure(Failure(e, name_));
 	} catch (std::exception &e) {

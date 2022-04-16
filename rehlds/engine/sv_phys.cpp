@@ -289,6 +289,9 @@ void SV_FlyMove(edict_t *ent, float time, float bounce)
 			if ((ent->v.flags & FL_ONGROUND) && ent->v.movetype == MOVETYPE_TOSS)
 			{
 				VectorClear(ent->v.velocity);
+
+				// run the impact function
+				SV_Impact(ent, trace.ent, &trace);
 				return;
 			}
 #endif
@@ -1252,7 +1255,7 @@ void PF_WaterMove(edict_t *pSelf)
 
 	if (!(flags & (FL_IMMUNE_WATER | FL_GODMODE)))
 	{
-		if ((flags & FL_SWIM) && (waterlevel < drownlevel) || (waterlevel >= drownlevel))
+		if (((flags & FL_SWIM) && waterlevel < drownlevel) || (waterlevel >= drownlevel))
 		{
 			if (pSelf->v.air_finished < g_psv.time && pSelf->v.pain_finished < g_psv.time)
 			{

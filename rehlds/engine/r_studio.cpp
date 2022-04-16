@@ -187,9 +187,9 @@ void QuaternionSlerp(vec_t *p, vec_t *q, float t, vec_t *qt)
 
 	cosom = p[0] * q[0] + p[1] * q[1] + p[2] * q[2] + p[3] * q[3];
 
-	if ((1.0 + cosom) > 0.00000001)
+	if ((1.0 + cosom) > 0.000001)
 	{
-		if ((1.0 - cosom) > 0.00000001)
+		if ((1.0 - cosom) > 0.000001)
 		{
 			omega = acos(cosom);
 			sinom = sin(omega);
@@ -753,7 +753,14 @@ hull_t *R_StudioHull(model_t *pModel, float frame, int sequence, const vec_t *an
 
 	vec_t angles2[3] = { -angles[0], angles[1], angles[2] };
 	g_pSvBlendingAPI->SV_StudioSetupBones(pModel, frame, sequence, angles2, origin, pcontroller, pblending, -1, pEdict);
-  
+
+#ifdef REHLDS_FIXES
+	const int hitboxShieldIndex = 20;
+#else
+	// NOTE: numhitboxes range [0,21], so index 21 it's unreachable code for loop
+	const int hitboxShieldIndex = 21;
+#endif
+
 	mstudiobbox_t *pbbox = (mstudiobbox_t *)((char *)pstudiohdr + pstudiohdr->hitboxindex);
 
 #ifdef REHLDS_FIXES
@@ -767,7 +774,7 @@ hull_t *R_StudioHull(model_t *pModel, float frame, int sequence, const vec_t *an
 
 	for (int i = 0; i < pstudiohdr->numhitboxes; i++)
 	{
-		if (bSkipShield && i == 21) continue;
+		if (bSkipShield && i == hitboxShieldIndex) continue;
 
 		studio_hull_hitgroup[i] = pbbox[i].group;
 
@@ -925,7 +932,7 @@ hull_t *SV_HullForStudioModel(edict_t *pEdict, const vec_t *mins, const vec_t *m
 			int iBlend;
 			R_StudioPlayerBlend(pseqdesc, &iBlend, angles);
 
-			unsigned char blending = (unsigned char)iBlend;
+			unsigned char blending[2] = { (unsigned char)iBlend, 0 };
 			unsigned char controller[4] = { 0x7F, 0x7F, 0x7F, 0x7F };
 			return R_StudioHull(
 				g_psv.models[pEdict->v.modelindex],
@@ -935,7 +942,7 @@ hull_t *SV_HullForStudioModel(edict_t *pEdict, const vec_t *mins, const vec_t *m
 				pEdict->v.origin,
 				size,
 				controller,
-				&blending,
+				blending,
 				pNumHulls,
 				pEdict,
 				bSkipShield);

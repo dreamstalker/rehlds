@@ -33,8 +33,5 @@
 #include "interface.h"
 #include "strtools.h"
 
-// Hooks stuff
-#include "hookers/filesystem/hooklist.h"
-
 // FileSystem stuff
 #include "FileSystem_Stdio.h"

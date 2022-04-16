@@ -412,7 +412,7 @@ void Netchan_Transmit(netchan_t *chan, int length, byte *data)
 
 				// If it's not in-memory, then we'll need to copy it in frame the file handle.
 				if (pbuf->isfile && !pbuf->isbuffer)	{
-					char compressedfilename[MAX_PATH];
+					char compressedfilename[MAX_PATH+5]; // room for extension string
 					FileHandle_t hfile;
 					if (pbuf->iscompressed)
 					{
@@ -1389,8 +1389,13 @@ void Netchan_FlushIncoming(netchan_t *chan, int stream)
 {
 	fragbuf_t *p, *n;
 
-	SZ_Clear(&net_message);
-	msg_readcount = 0;
+#ifdef REHLDS_FIXES
+	if ((chan->player_slot - 1) == host_client - g_psvs.clients)
+#endif
+	{
+		SZ_Clear(&net_message);
+		msg_readcount = 0;
+	}
 
 	p = chan->incomingbufs[stream];
 	while (p)
@@ -1525,7 +1530,7 @@ qboolean Netchan_CopyFileFragments(netchan_t *chan)
 	// TODO: add client name to message
 	if (uncompressedSize > 1024 * 64) {
 		Con_Printf("Received too large file (size=%u)\nFlushing input queue\n", uncompressedSize);
-		Netchan_FlushIncoming(chan, 1);
+		Netchan_FlushIncoming(chan, FRAG_FILE_STREAM);
 		return FALSE;
 	}
 #endif
@@ -1533,28 +1538,28 @@ qboolean Netchan_CopyFileFragments(netchan_t *chan)
 	if (Q_strlen(filename) <= 0)
 	{
 		Con_Printf("File fragment received with no filename\nFlushing input queue\n");
-		Netchan_FlushIncoming(chan, 1);
+		Netchan_FlushIncoming(chan, FRAG_FILE_STREAM);
 		return FALSE;
 	}
 
 	if (Q_strstr(filename, ".."))
 	{
 		Con_Printf("File fragment received with relative path, ignoring\n");
-		Netchan_FlushIncoming(chan, 1);
+		Netchan_FlushIncoming(chan, FRAG_FILE_STREAM);
 		return FALSE;
 	}
 
 	if (filename[0] != '!' && !IsSafeFileToDownload(filename))
 	{
 		Con_Printf("File fragment received with bad path, ignoring\n");
-		Netchan_FlushIncoming(chan, 1);
+		Netchan_FlushIncoming(chan, FRAG_FILE_STREAM);
 		return FALSE;
 	}
 	// This prohibits to write files to FS on server
 	if (g_pcls.state == ca_dedicated && filename[0] != '!')
 	{
 		Con_Printf("File fragment received with bad path, ignoring (2)\n");
-		Netchan_FlushIncoming(chan, 1);
+		Netchan_FlushIncoming(chan, FRAG_FILE_STREAM);
 		return FALSE;
 	}
 
@@ -1564,7 +1569,7 @@ qboolean Netchan_CopyFileFragments(netchan_t *chan)
 	if (filename[0] != '!' && FS_FileExists(filename))
 	{
 		Con_Printf("Can't download %s, already exists\n", filename);
-		Netchan_FlushIncoming(chan, 1);
+		Netchan_FlushIncoming(chan, FRAG_FILE_STREAM);
 		return TRUE;
 	}
 
@@ -1581,7 +1586,7 @@ qboolean Netchan_CopyFileFragments(netchan_t *chan)
 	if (!buffer)
 	{
 		Con_Printf("Buffer allocation failed on %i bytes\n", nsize + 1);
-		Netchan_FlushIncoming(chan, 1);
+		Netchan_FlushIncoming(chan, FRAG_FILE_STREAM);
 		return FALSE;
 	}
 
@@ -1609,6 +1614,13 @@ qboolean Netchan_CopyFileFragments(netchan_t *chan)
 		p = n;
 
 	}
+
+	// FIXED: We have concat fragment buffer above, make sure that the fisrt fragment is null
+	// otherwise we will get memory access violation at next call Netchan_FlushIncoming
+#ifdef REHLDS_FIXES
+	chan->incomingbufs[FRAG_FILE_STREAM] = nullptr;
+	chan->incomingready[FRAG_FILE_STREAM] = FALSE;
+#endif
 
 	if (bCompressed)
 	{
@@ -1660,7 +1672,7 @@ qboolean Netchan_CopyFileFragments(netchan_t *chan)
 		if (!handle)
 		{
 			Con_Printf("File open failed %s\n", filename);
-			Netchan_FlushIncoming(chan, 1);
+			Netchan_FlushIncoming(chan, FRAG_FILE_STREAM);
 
 #ifdef REHLDS_FIXES
 			Mem_Free(buffer);
@@ -1675,8 +1687,13 @@ qboolean Netchan_CopyFileFragments(netchan_t *chan)
 		Mem_Free(buffer);
 	}
 	SZ_Clear(&net_message);
+
+// Moved above
+#ifndef REHLDS_FIXES
 	chan->incomingbufs[FRAG_FILE_STREAM] = nullptr;
 	chan->incomingready[FRAG_FILE_STREAM] = FALSE;
+#endif
+
 	msg_readcount = 0;
 	return TRUE;
 }

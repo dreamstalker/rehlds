@@ -71,7 +71,7 @@ qboolean SV_CheckBottom(edict_t *ent)
 realcheck:
 
 	// check it for real...
-	start[2] = mins[2];
+	start[2] = mins[2] + sv_stepsize.value;
 
 	// the midpoint must be within 16 of the bottom
 	start[0] = stop[0] = (mins[0] + maxs[0]) * 0.5f;
