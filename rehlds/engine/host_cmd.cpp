@@ -606,7 +606,7 @@ void Host_Status_f(void)
 	client = g_psvs.clients;
 	for (j = 0; j < g_psvs.maxclients; j++, client++)
 	{
-		if (!client->active)
+		if (!client->active || client->userid != j)
 		{
 			continue;
 		}
