@@ -1995,6 +1995,9 @@ int EXT_FUNC COM_FileSize(const char *filename)
 
 unsigned char* EXT_FUNC COM_LoadFile(const char *path, int usehunk, int *pLength)
 {
+	if (!path || !path[0])
+		return NULL;
+
 	char base[MAX_PATH];
 	unsigned char *buf = NULL;
 
