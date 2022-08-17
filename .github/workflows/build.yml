@@ -185,7 +185,7 @@ jobs:
 
       - name: Build using Intel C++ Compiler
         run: |
-          rm -rf build && CC=icc CXX=icpc cmake -B build && cmake --build build -j8
+          rm -rf build && CC=gcc CXX=g++ cmake -B build && cmake --build build -j8
 
       - name: Prepare HLSDK
         run: |
