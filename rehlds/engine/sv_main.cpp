@@ -211,8 +211,8 @@ cvar_t sv_rehlds_maxclients_from_single_ip = { "sv_rehlds_maxclients_from_single
 cvar_t sv_use_entity_file = { "sv_use_entity_file", "0", 0, 0.0f, nullptr };
 cvar_t sv_usercmd_custom_random_seed = { "sv_usercmd_custom_random_seed", "0", 0, 0.0f, nullptr };
 
-cvar_t sv_invalid_length = { "sv_invalid_length", "0", 0, 0.0f, NULL };
-cvar_t sv_msg_badread = { "sv_msg_badread", "0", 0, 0.0f, NULL };
+cvar_t sv_invalid_length = { "sv_invalid_length", "0", 0, 0.0f, nullptr };
+cvar_t sv_msg_badread = { "sv_msg_badread", "0", 0, 0.0f, nullptr };
 #endif
 
 delta_t *SV_LookupDelta(char *name)
