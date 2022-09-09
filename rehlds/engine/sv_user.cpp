@@ -94,7 +94,7 @@ void SV_ParseConsistencyResponse(client_t *pSenderClient)
 	Q_memset(nullbuffer, 0, sizeof(nullbuffer));
 	int value = MSG_ReadShort();
 
-	if (sv_invalid_length.value || value <= 0 || !SZ_HasSomethingToRead(&net_message, value))
+	if (sv_invalid_length.value && value <= 0 || !SZ_HasSomethingToRead(&net_message, value))
 	{
 		msg_badread = TRUE;
 		Con_DPrintf("%s:  %s:%s invalid length: %d\n", __func__, host_client->name, NET_AdrToString(host_client->netchan.remote_address), value);
@@ -1572,7 +1572,7 @@ void SV_ParseMove(client_t *pSenderClient)
 	mlen = MSG_ReadByte();
 	cbchecksum = MSG_ReadByte();
 
-	if (sv_invalid_length.value || mlen <= 0 || !SZ_HasSpaceToRead(&net_message, mlen))
+	if (sv_invalid_length.value && mlen <= 0 || !SZ_HasSpaceToRead(&net_message, mlen))
 	{
 		msg_badread = TRUE;
 		Con_DPrintf("%s:  %s:%s invalid length: %d\n", __func__, host_client->name, NET_AdrToString(host_client->netchan.remote_address), mlen);
@@ -1807,7 +1807,7 @@ void EXT_FUNC SV_HandleClientMessage_api(IGameClient* client, uint8 opcode) {
 		func(cl);
 
 #ifdef REHLDS_FIXES
-	if (msg_badread || sv_msg_badread.value)
+	if (msg_badread && sv_msg_badread.value)
 	{
 		Con_Printf("SV_ReadClientMessage: badread on %s, opcode %s\n", name, sv_clcfuncs[opcode].pszname);
 	}
@@ -1835,7 +1835,7 @@ void SV_ExecuteClientMessage(client_t *cl)
 
 	while (1)
 	{
-		if (msg_badread || sv_msg_badread.value)
+		if (msg_badread && sv_msg_badread.value)
 		{
 #ifdef REHLDS_FIXES
 			Con_Printf("SV_ReadClientMessage: badread on %s\n", host_client->name);
