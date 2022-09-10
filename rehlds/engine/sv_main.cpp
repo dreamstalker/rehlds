@@ -8037,10 +8037,10 @@ void SV_Init(void)
 	Cvar_RegisterVariable(&sv_rollangle);
 	Cvar_RegisterVariable(&sv_use_entity_file);
 	Cvar_RegisterVariable(&sv_usercmd_custom_random_seed);
+#endif
 
 	Cvar_RegisterVariable(&sv_invalid_length);
 	Cvar_RegisterVariable(&sv_msg_badread);
-#endif
 
 	for (int i = 0; i < MAX_MODELS; i++)
 	{
