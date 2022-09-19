@@ -222,6 +222,34 @@ typedef IVoidHookChainRegistryImpl<edict_t *> CRehldsHookRegistry_ED_Free;
 typedef IHookChainImpl<void, const char *> CRehldsHook_Con_Printf;
 typedef IHookChainRegistryImpl<void, const char *> CRehldsHookRegistry_Con_Printf;
 
+//SV_CheckUserInfo hook
+typedef IHookChainImpl<int, netadr_t*, char*, qboolean, int, char*> CRehldsHook_SV_CheckUserInfo;
+typedef IHookChainRegistryImpl<int, netadr_t*, char*, qboolean, int, char*> CRehldsHookRegistry_SV_CheckUserInfo;
+
+//PF_precache_generic_I hook
+typedef IHookChainImpl<int, const char*> CRehldsHook_PF_precache_generic_I;
+typedef IHookChainRegistryImpl<int, const char*> CRehldsHookRegistry_PF_precache_generic_I;
+
+//PF_precache_model_I hook
+typedef IHookChainImpl<int, const char*> CRehldsHook_PF_precache_model_I;
+typedef IHookChainRegistryImpl<int, const char*> CRehldsHookRegistry_PF_precache_model_I;
+
+//PF_precache_sound_I hook
+typedef IHookChainImpl<int, const char*> CRehldsHook_PF_precache_sound_I;
+typedef IHookChainRegistryImpl<int, const char*> CRehldsHookRegistry_PF_precache_sound_I;
+
+//EV_Precache hook
+typedef IHookChainImpl<unsigned short, int, const char*> CRehldsHook_EV_Precache;
+typedef IHookChainRegistryImpl<unsigned short, int, const char*> CRehldsHookRegistry_EV_Precache;
+
+//SV_AddResource hook
+typedef IVoidHookChainImpl<resourcetype_t, const char*, int, unsigned char, int> CRehldsHook_SV_AddResource;
+typedef IVoidHookChainRegistryImpl<resourcetype_t, const char*, int, unsigned char, int> CRehldsHookRegistry_SV_AddResource;
+
+//SV_ClientPrintf hook
+typedef IVoidHookChainImpl<const char*> CRehldsHook_SV_ClientPrintf;
+typedef IVoidHookChainRegistryImpl<const char*> CRehldsHookRegistry_SV_ClientPrintf;
+
 class CRehldsHookchains : public IRehldsHookchains {
 public:
 	CRehldsHookRegistry_Steam_NotifyClientConnect m_Steam_NotifyClientConnect;
@@ -271,6 +299,13 @@ public:
 	CRehldsHookRegistry_ED_Alloc m_ED_Alloc;
 	CRehldsHookRegistry_ED_Free m_ED_Free;
 	CRehldsHookRegistry_Con_Printf m_Con_Printf;
+	CRehldsHookRegistry_SV_CheckUserInfo m_SV_CheckUserInfo;
+	CRehldsHookRegistry_PF_precache_generic_I m_PF_precache_generic_I;
+	CRehldsHookRegistry_PF_precache_model_I m_PF_precache_model_I;
+	CRehldsHookRegistry_PF_precache_sound_I m_PF_precache_sound_I;
+	CRehldsHookRegistry_EV_Precache m_EV_Precache;
+	CRehldsHookRegistry_SV_AddResource m_SV_AddResource;
+	CRehldsHookRegistry_SV_ClientPrintf m_SV_ClientPrintf;
 
 public:
 	EXT_FUNC virtual IRehldsHookRegistry_Steam_NotifyClientConnect* Steam_NotifyClientConnect();
@@ -320,6 +355,13 @@ public:
 	EXT_FUNC virtual IRehldsHookRegistry_ED_Alloc* ED_Alloc();
 	EXT_FUNC virtual IRehldsHookRegistry_ED_Free* ED_Free();
 	EXT_FUNC virtual IRehldsHookRegistry_Con_Printf* Con_Printf();
+	EXT_FUNC virtual IRehldsHookRegistry_SV_CheckUserInfo* SV_CheckUserInfo();
+	EXT_FUNC virtual IRehldsHookRegistry_PF_precache_generic_I* PF_precache_generic_I();
+	EXT_FUNC virtual IRehldsHookRegistry_PF_precache_model_I* PF_precache_model_I();
+	EXT_FUNC virtual IRehldsHookRegistry_PF_precache_sound_I* PF_precache_sound_I();
+	EXT_FUNC virtual IRehldsHookRegistry_EV_Precache* EV_Precache();
+	EXT_FUNC virtual IRehldsHookRegistry_SV_AddResource* SV_AddResource();
+	EXT_FUNC virtual IRehldsHookRegistry_SV_ClientPrintf* SV_ClientPrintf();
 };
 
 extern CRehldsHookchains g_RehldsHookchains;

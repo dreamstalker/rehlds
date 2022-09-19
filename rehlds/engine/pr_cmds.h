@@ -120,14 +120,18 @@ edict_t *FindEntityByString(edict_t *pEdictStartSearchAfter, const char *pszFiel
 int GetEntityIllum(edict_t *pEnt);
 qboolean PR_IsEmptyString(const char *s);
 int PF_precache_sound_I(const char *s);
+int PF_precache_sound_I_internal(const char *s);
 unsigned short EV_Precache(int type, const char *psz);
+unsigned short EV_Precache_internal(int type, const char *psz);
 void EV_PlayReliableEvent_api(IGameClient *cl, int entindex, unsigned short eventindex, float delay, event_args_t *pargs);
 void EV_PlayReliableEvent(client_t *cl, int entindex, unsigned short eventindex, float delay, event_args_t *pargs);
 void EV_PlayReliableEvent_internal(client_t *cl, int entindex, unsigned short eventindex, float delay, event_args_t *pargs);
 void EV_Playback(int flags, const edict_t *pInvoker, unsigned short eventindex, float delay, float *origin, float *angles, float fparam1, float fparam2, int iparam1, int iparam2, int bparam1, int bparam2);
 void EV_SV_Playback(int flags, int clientindex, unsigned short eventindex, float delay, float *origin, float *angles, float fparam1, float fparam2, int iparam1, int iparam2, int bparam1, int bparam2);
 int PF_precache_model_I(const char *s);
+int PF_precache_model_I_internal(const char *s);
 int PF_precache_generic_I(const char *s);
+int PF_precache_generic_I_internal(const char *s);
 int PF_IsMapValid_I(const char *mapname);
 int PF_NumberOfEntities_I(void);
 char *PF_GetInfoKeyBuffer_I(edict_t *e);
