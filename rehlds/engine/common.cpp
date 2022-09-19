@@ -1446,31 +1446,64 @@ char *COM_FileExtension(char *in)
 #endif // #ifdef REHLDS_FIXES
 }
 
-// Fills "out" with the file name without path and extension.
+// Fills "out" with the file name without path and extension
 void COM_FileBase(const char *in, char *out)
 {
-	const char *start, *end;
-	int len;
+	COM_FileBase_s(in, out, -1);
+}
 
-	*out = 0;
-
-	len = Q_strlen(in);
-	if (len <= 0)
-		return;
-
-	start = in + len - 1;
-	end = in + len;
-	while (start >= in && *start != '/' && *start != '\\')
+// Extracts the base name of a file (no path, no extension, assumes '/' as path separator)
+const char *COM_FileBase_s(const char *in, char *out, int size)
+{
+	if (!in || !in[0])
 	{
-		if (*start == '.')
-			end = start;
-		start--;
+		*out = '\0';
+		return NULL;
 	}
-	start++;
 
-	len = end - start;
-	Q_strncpy(out, start, len);
-	out[len] = 0;
+	int len = Q_strlen(in);
+	if (len <= 0)
+		return NULL;
+
+	// scan backward for '.'
+	int end = len - 1;
+	while (end && in[end] != '.' && !PATHSEPARATOR(in[end]))
+		end--;
+
+	// no '.', copy to end
+	if (in[end] != '.')
+	{
+		end = len - 1;
+	}
+	else
+	{
+		// Found ',', copy to left of '.'
+		end--;
+	}
+
+	// Scan backward for '/'
+	int start = len - 1;
+	while (start >= 0 && !PATHSEPARATOR(in[start]))
+		start--;
+
+	if (start < 0 || !PATHSEPARATOR(in[start]))
+	{
+		start = 0;
+	}
+	else
+	{
+		start++;
+	}
+
+	// Length of new sting
+	int maxcopy = end - start + 1;
+	if (size >= 0 && maxcopy >= size)
+		return NULL;
+
+	// Copy partial string
+	Q_strncpy(out, &in[start], maxcopy);
+	out[maxcopy] = '\0';
+	return out;
 }
 
 void COM_DefaultExtension(char *path, char *extension)
@@ -1962,7 +1995,10 @@ int EXT_FUNC COM_FileSize(const char *filename)
 
 unsigned char* EXT_FUNC COM_LoadFile(const char *path, int usehunk, int *pLength)
 {
-	char base[33];
+	if (!path || !path[0])
+		return NULL;
+
+	char base[MAX_PATH];
 	unsigned char *buf = NULL;
 
 #ifndef SWDS
@@ -1982,8 +2018,10 @@ unsigned char* EXT_FUNC COM_LoadFile(const char *path, int usehunk, int *pLength
 	}
 
 	int len = FS_Size(hFile);
-	COM_FileBase(path, base);
-	base[32] = 0;
+	if (!COM_FileBase_s(path, base, sizeof(base)))
+		Sys_Error("%s: Bad path length: %s", __func__, path);
+
+	base[32] = '\0';
 
 	switch (usehunk)
 	{

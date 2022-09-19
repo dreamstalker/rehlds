@@ -461,7 +461,7 @@ static uchar16 *StripWhitespaceWorker(uchar16 *pwch, int cchLength, bool *pbStri
 	// walk backwards from the end of the string, killing any whitespace
 	*pbStrippedWhitespace = false;
 
-	uchar16 *pwchEnd = pwch + cchLength;
+	uchar16 *pwchEnd = pwch + cchLength - 1;
 	while (--pwchEnd >= pwch)
 	{
 		if (!iswspace(*pwchEnd) && !Q_IsMeanSpaceW(*pwchEnd))
@@ -505,7 +505,7 @@ uchar16 *__cdecl StripUnprintableWorker(uchar16 *pwch, int *pLength, bool *pStri
 	*pStripped = rPos != wPos;
 
 	if (*pStripped)
-		*pLength = wPos - pwch;
+		*pLength = (wPos - pwch) + 1; // null termination
 
 	return pwch;
 }

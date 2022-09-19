@@ -1158,7 +1158,10 @@ void Netchan_CreateFileFragmentsFromBuffer(qboolean server, netchan_t *chan, con
 			MSG_WriteString(&buf->frag_message, filename);
 			MSG_WriteString(&buf->frag_message, bCompressed ? "bz2" : "uncompressed");
 			MSG_WriteLong(&buf->frag_message, uncompressed_size);
-			send -= buf->frag_message.cursize;
+
+			// Check if we aren't send more than we should
+			if ((chunksize - send) < buf->frag_message.cursize)
+				send -= buf->frag_message.cursize;
 		}
 
 		buf->isbuffer = TRUE;
@@ -1321,7 +1324,7 @@ int Netchan_CreateFileFragments_(qboolean server, netchan_t *chan, const char *f
 	remaining = filesize;
 	pos = 0;
 
-	while (remaining)
+	while (remaining > 0)
 	{
 		send = min(chunksize, remaining);
 		buf = Netchan_AllocFragbuf();
@@ -1353,7 +1356,10 @@ int Netchan_CreateFileFragments_(qboolean server, netchan_t *chan, const char *f
 			MSG_WriteString(&buf->frag_message, filename);
 			MSG_WriteString(&buf->frag_message, bCompressed ? "bz2" : "uncompressed");
 			MSG_WriteLong(&buf->frag_message, uncompressed_size);
-			send -= buf->frag_message.cursize;
+
+			// Check if we aren't send more than we should
+			if ((chunksize - send) < buf->frag_message.cursize)
+				send -= buf->frag_message.cursize;
 		}
 		buf->isfile = TRUE;
 		buf->iscompressed = bCompressed;
