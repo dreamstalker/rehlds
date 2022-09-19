@@ -354,13 +354,13 @@ void SV_ClientPrintf(const char *fmt, ...)
 	if (!host_client->fakeclient)
 	{
 		va_list va;
-		char Dest[1024];
+		char string[1024];
 	
 		va_start(va, fmt);
-		Q_vsnprintf(Dest, ARRAYSIZE(Dest) - 1, fmt, va);
+		Q_vsnprintf(string, ARRAYSIZE(string) - 1, fmt, va);
 		va_end(va);
 
-		g_RehldsHookchains.m_SV_ClientPrintf.callChain(SV_ClientPrintf_internal, Dest);
+		g_RehldsHookchains.m_SV_ClientPrintf.callChain(SV_ClientPrintf_internal, string);
 	}
 }
 
