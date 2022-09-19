@@ -1012,6 +1012,11 @@ qboolean EXT_FUNC PR_IsEmptyString(const char *s)
 
 int EXT_FUNC PF_precache_sound_I(const char *s)
 {
+	return g_RehldsHookchains.m_PF_precache_sound_I.callChain(PF_precache_sound_I_internal, s);
+}
+
+int EXT_FUNC PF_precache_sound_I_internal(const char *s)
+{
 	if (!s)
 		Host_Error("%s: NULL pointer", __func__);
 
@@ -1058,6 +1063,11 @@ int EXT_FUNC PF_precache_sound_I(const char *s)
 }
 
 unsigned short EXT_FUNC EV_Precache(int type, const char *psz)
+{
+	return g_RehldsHookchains.m_EV_Precache.callChain(EV_Precache_internal, type, psz);
+}
+
+unsigned short EXT_FUNC EV_Precache_internal(int type, const char *psz)
 {
 	if (!psz)
 		Host_Error("%s: NULL pointer", __func__);
@@ -1378,6 +1388,11 @@ int SV_LookupModelIndex(const char *name)
 
 int EXT_FUNC PF_precache_model_I(const char *s)
 {
+	return g_RehldsHookchains.m_PF_precache_model_I.callChain(PF_precache_model_I_internal, s);
+}
+
+int EXT_FUNC PF_precache_model_I_internal(const char *s)
+{
 	int iOptional = 0;
 	if (!s)
 		Host_Error("%s: NULL pointer", __func__);
@@ -1445,8 +1460,13 @@ int EXT_FUNC PF_precache_model_I(const char *s)
 	}
 }
 
-#ifdef REHLDS_FIXES
 int EXT_FUNC PF_precache_generic_I(const char *s)
+{
+	return g_RehldsHookchains.m_PF_precache_generic_I.callChain(PF_precache_generic_I_internal, s);
+}
+
+#ifdef REHLDS_FIXES
+int EXT_FUNC PF_precache_generic_I_internal(const char *s)
 {
 	if (!s)
 		Host_Error("%s: NULL pointer", __func__);
@@ -1493,7 +1513,7 @@ int EXT_FUNC PF_precache_generic_I(const char *s)
 	return g_rehlds_sv.precachedGenericResourceCount++;
 }
 #else // REHLDS_FIXES
-int EXT_FUNC PF_precache_generic_I(const char *s)
+int EXT_FUNC PF_precache_generic_I_internal(const char *s)
 {
 	if (!s)
 		Host_Error("%s: NULL pointer", __func__);

@@ -85,6 +85,7 @@ NOXREF void Info_WriteVars(FileHandle_t fp);
 void Host_WriteConfiguration(void);
 void Host_WriteCustomConfig(void);
 void SV_ClientPrintf(const char *fmt, ...);
+void SV_ClientPrintf_internal(const char *Dest);
 void SV_BroadcastPrintf(const char *fmt, ...);
 void Host_ClientCommands(const char *fmt, ...);
 void SV_DropClient_api(IGameClient* cl, bool crash, const char* fmt, ...);
