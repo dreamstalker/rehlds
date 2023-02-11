@@ -502,7 +502,7 @@ void System::RunFrame(double time)
 		UpdateTime();
 		double timeDiff = m_SystemTime - m_LastTime;
 		if (m_LastTime > 0 && timeDiff <= 0) {
-			Printf("WARNING! System::RunFrame: system time difference <= 0.\n");
+			DPrintf("WARNING! System::RunFrame: system time difference <= 0.\n");
 			timeDiff = 0.001;
 		}
 
