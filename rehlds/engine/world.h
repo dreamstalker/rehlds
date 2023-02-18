@@ -65,6 +65,7 @@ typedef struct moveclip_s	// TODO: Move it to world.cpp someday
 #define MOVE_NORMAL         0 // normal trace
 #define MOVE_NOMONSTERS     1 // ignore monsters (edicts with flags (FL_MONSTER|FL_FAKECLIENT|FL_CLIENT) set)
 #define MOVE_MISSILE        2 // extra size for monsters
+#define MOVE_NOCOLLIDE		3 // we do not intend to physically collide with something
 
 #define FMOVE_IGNORE_GLASS  0x100
 #define FMOVE_SIMPLEBOX     0x200
