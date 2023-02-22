@@ -113,4 +113,5 @@ trace_t SV_Move(const vec_t *start, const vec_t *mins, const vec_t *maxs, const 
 
 #ifdef REHLDS_OPT_PEDANTIC
 trace_t SV_Move_Point(const vec_t *start, const vec_t *end, int type, edict_t *passedict);
+void SV_ClipToLinks_Point(areanode_t* node, moveclip_t* clip);
 #endif // REHLDS_OPT_PEDANTIC

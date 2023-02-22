@@ -1533,13 +1533,117 @@ trace_t SV_Move_Point(const vec_t *start, const vec_t *end, int type, edict_t *p
 		}
 
 		SV_MoveBounds_Point(start, trace_endpos, clip.boxmins, clip.boxmaxs);
-		SV_ClipToLinks(sv_areanodes, &clip);
+		SV_ClipToLinks_Point(sv_areanodes, &clip);
 
 		clip.trace.fraction *= trace_fraction;
 		gGlobalVariables.trace_ent = clip.trace.ent;
 	}
 
 	return clip.trace;
+}
+
+// A lighter version of SV_ClipToLinks without redundant checks
+void SV_ClipToLinks_Point(areanode_t* node, moveclip_t* clip)
+{
+	link_t* next, * l;
+	edict_t* touch;
+
+	// touch linked edicts
+	for (l = node->solid_edicts.next; l != &node->solid_edicts; l = next)
+	{
+		next = l->next;
+		touch = EDICT_FROM_AREA(l);
+
+		if (touch->v.groupinfo && clip->passedict && clip->passedict->v.groupinfo)
+		{
+			if (g_groupop)
+			{
+				if (g_groupop == GROUP_OP_NAND && (clip->passedict->v.groupinfo & touch->v.groupinfo))
+					continue;
+			}
+			else
+			{
+				if (!(clip->passedict->v.groupinfo & touch->v.groupinfo))
+					continue;
+			}
+		}
+
+		if (touch->v.solid == SOLID_NOT || touch == clip->passedict)
+			continue;
+
+		if (touch->v.solid == SOLID_TRIGGER)
+			Sys_Error("%s: Trigger in clipping list", __func__);
+
+		if (gNewDLLFunctions.pfnShouldCollide && !gNewDLLFunctions.pfnShouldCollide(touch, clip->passedict))
+#ifdef REHLDS_FIXES
+			// https://github.com/dreamstalker/rehlds/issues/46
+			continue;
+#else
+			return;
+#endif
+
+		// monsterclip filter
+		if (touch->v.solid == SOLID_BSP)
+		{
+			if ((touch->v.flags & FL_MONSTERCLIP) && !clip->monsterClipBrush)
+				continue;
+		}
+		else
+		{
+			// ignore all monsters but pushables
+			if (clip->type == MOVE_NOMONSTERS && touch->v.movetype != MOVETYPE_PUSHSTEP)
+				continue;
+		}
+
+		if (clip->ignoretrans && touch->v.rendermode != kRenderNormal && !(touch->v.flags & FL_WORLDBRUSH))
+			continue;
+
+		if (clip->passedict && clip->passedict->v.size[0] && !touch->v.size[0])
+			continue; // points never interact
+
+		// might intersect, so do an exact clip
+		if (clip->trace.allsolid)
+			return;
+
+		if (clip->passedict)
+		{
+			if (touch->v.owner == clip->passedict)
+				continue; // don't clip against own missiles
+
+			if (clip->passedict->v.owner == touch)
+				continue; // don't clip against owner
+		}
+
+		trace_t trace;
+		if (touch->v.flags & FL_MONSTER)
+			trace = SV_ClipMoveToEntity(touch, clip->start, clip->mins2, clip->maxs2, clip->end);
+		else
+			trace = SV_ClipMoveToEntity(touch, clip->start, clip->mins, clip->maxs, clip->end);
+
+		if (trace.allsolid || trace.startsolid || trace.fraction < clip->trace.fraction)
+		{
+			trace.ent = touch;
+			if (clip->trace.startsolid)
+			{
+				clip->trace = trace;
+				clip->trace.startsolid = TRUE;
+			}
+			else
+			{
+				clip->trace = trace;
+			}
+		}
+	}
+
+	// recurse down both sides
+	if (node->axis == -1)
+		return;
+
+	if (clip->boxmaxs[node->axis] > node->dist)
+		SV_ClipToLinks_Point(node->children[0], clip);
+
+	if (node->dist > clip->boxmins[node->axis])
+		SV_ClipToLinks_Point(node->children[1], clip);
 }
 
 #endif // REHLDS_OPT_PEDANTIC
