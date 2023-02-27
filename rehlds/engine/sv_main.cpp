@@ -4030,9 +4030,10 @@ void SV_EmitEvents_internal(client_t *cl, packet_entities_t *pack, sizebuf_t *ms
 }
 
 int fatbytes;
-unsigned char fatpvs[1024];
+unsigned char fatpvs[MAX_MAP_LEAFS / 8];
+
 int fatpasbytes;
-unsigned char fatpas[1024];
+unsigned char fatpas[MAX_MAP_LEAFS / 8];
 
 void SV_AddToFatPVS(vec_t *org, mnode_t *node)
 {
@@ -4073,6 +4074,9 @@ unsigned char* EXT_FUNC SV_FatPVS(float *org)
 	else
 #endif // REHLDS_FIXES
 		fatbytes = (g_psv.worldmodel->numleafs + 31) >> 3;
+
+	if (fatbytes >= (MAX_MAP_LEAFS / 8))
+		Sys_Error("%s: MAX_MAP_LEAFS limit exceeded\n", __func__);
 
 	Q_memset(fatpvs, 0, fatbytes);
 	SV_AddToFatPVS(org, g_psv.worldmodel->nodes);
@@ -4130,6 +4134,9 @@ unsigned char* EXT_FUNC SV_FatPAS(float *org)
 	else
 #endif // REHLDS_FIXES
 		fatpasbytes = (g_psv.worldmodel->numleafs + 31) >> 3;
+
+	if (fatpasbytes >= (MAX_MAP_LEAFS / 8))
+		Sys_Error("%s: MAX_MAP_LEAFS limit exceeded\n", __func__);
 
 	Q_memset(fatpas, 0, fatpasbytes);
 	SV_AddToFatPAS(org, g_psv.worldmodel->nodes);
@@ -6155,7 +6162,7 @@ int SV_SpawnServer(qboolean bIsDemo, char *server, char *startspot)
 	if (g_psvs.maxclients <= 1)
 	{
 		int row = (g_psv.worldmodel->numleafs + 7) / 8;
-		if (row < 0 || row > MODEL_MAX_PVS)
+		if (row < 0 || row > (MAX_MAP_LEAFS / 8))
 		{
 			Sys_Error("%s: oversized g_psv.worldmodel->numleafs: %i", __func__, g_psv.worldmodel->numleafs);
 		}
