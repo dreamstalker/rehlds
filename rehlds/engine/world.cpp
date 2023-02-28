@@ -1598,6 +1598,14 @@ void SV_ClipToLinks_Point(areanode_t* node, moveclip_t* clip)
 		if (clip->ignoretrans && touch->v.rendermode != kRenderNormal && !(touch->v.flags & FL_WORLDBRUSH))
 			continue;
 
+		if (clip->boxmins[0] > touch->v.absmax[0]
+			|| clip->boxmins[1] > touch->v.absmax[1]
+			|| clip->boxmins[2] > touch->v.absmax[2]
+			|| clip->boxmaxs[0] < touch->v.absmin[0]
+			|| clip->boxmaxs[1] < touch->v.absmin[1]
+			|| clip->boxmaxs[2] < touch->v.absmin[2])
+			continue;
+
 		if (clip->passedict && clip->passedict->v.size[0] && !touch->v.size[0])
 			continue; // points never interact
 
