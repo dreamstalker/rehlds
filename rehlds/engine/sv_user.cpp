@@ -54,6 +54,9 @@ cvar_t sv_footsteps = { "mp_footsteps", "1", FCVAR_SERVER, 0.0f, NULL };
 cvar_t sv_rollspeed = { "sv_rollspeed", "0.0", 0, 0.0f, NULL };
 cvar_t sv_rollangle = { "sv_rollangle", "0.0", 0, 0.0f, NULL };
 cvar_t sv_unlag = { "sv_unlag", "1", 0, 0.0f, NULL };
+#ifdef REHLDS_FIXES
+cvar_t sv_bone_unlag = { "sv_bone_unlag", "0", 0, 0.0f, NULL };
+#endif // REHLDS_FIXES
 cvar_t sv_maxunlag = { "sv_maxunlag", "0.5", 0, 0.0f, NULL };
 cvar_t sv_unlagpush = { "sv_unlagpush", "0.0", 0, 0.0f, NULL };
 cvar_t sv_unlagsamples = { "sv_unlagsamples", "1", 0, 0.0f, NULL };
@@ -1052,9 +1055,13 @@ void SV_RunCmd(usercmd_t *ucmd, int random_seed)
 	gGlobalVariables.frametime = frametime;
 	gEntityInterface.pfnPlayerPostThink(sv_player);
 	gEntityInterface.pfnCmdEnd(sv_player);
-
+	
 	if (!host_client->fakeclient)
 		SV_RestoreMove(host_client);
+	
+#ifdef REHLDS_FIXES
+	SV_SaveBoneState( host_client, sv_player );
+#endif
 }
 
 int SV_ValidateClientCommand(char *pszCommand)
@@ -1195,6 +1202,90 @@ entity_state_t *SV_FindEntInPack(int index, packet_entities_t *pack)
 
 	return NULL;
 }
+
+
+void VectorsAngles( const vec3_t forward, const vec3_t right, const vec3_t up, vec3_t angles )
+{
+	float	pitch, cpitch, yaw, roll;
+
+	pitch = -asin( forward[2] );
+	cpitch = cos( pitch );
+
+	if( fabs( cpitch ) > 0.001f )	// gimball lock?
+	{
+		cpitch = 1.0f / cpitch;
+		pitch = RAD2DEG( pitch );
+		yaw = RAD2DEG( atan2( forward[1] * cpitch, forward[0] * cpitch ));
+		roll = RAD2DEG( atan2( -right[2] * cpitch, up[2] * cpitch ));
+	}
+	else
+	{
+		pitch = forward[2] > 0 ? -90.0f : 90.0f;
+		yaw = RAD2DEG( atan2( right[0], -right[1] ));
+		roll = 180.0f;
+	}
+
+	angles[0] = pitch;
+	angles[1] = yaw;
+	angles[2] = roll;
+}
+
+static void LerpRotationMatrix(const float from[3][4], const float to[3][4], float s, float out[3][4])
+{
+	vec3_t f1, r1, u1, pos1, ang1;
+	vec3_t f2, r2, u2, pos2, ang2;
+	vec4_t q1, q2, q3;
+	float s1 = 1.0f - s; // backlerp
+	
+	for( int j = 0; j < 3; j++ )
+	{
+		f1[j]   = from[j][0];
+		r1[j]   = from[j][1];
+		u2[j]   = from[j][2];
+		pos1[j] = from[j][3];
+		
+		f1[j]   = to[j][0];
+		r1[j]   = to[j][1];
+		u1[j]   = to[j][2];
+		pos2[j] = to[j][3];
+	}
+		
+	VectorsAngles( f1, r1, u1, ang1 );
+	VectorsAngles( f2, r2, u2, ang2 );
+	
+	AngleQuaternion( ang1, q1 );
+	AngleQuaternion( ang2, q2 );
+	
+	QuaternionSlerp(q1, q2, s, q3);
+	pos1[0] = pos1[0] * s1 + pos2[0] * s;
+	pos1[1] = pos1[1] * s1 + pos2[1] * s;
+	pos1[2] = pos1[2] * s1 + pos2[2] * s;
+	
+	// result
+	QuaternionMatrix(q3, out);
+	out[0][3] = pos1[0];
+	out[1][3] = pos1[1];
+	out[2][3] = pos1[2];
+}
+
+#ifdef REHLDS_FIXES
+static client_bone_state_t SV_StudioUnlagSlerpBones(const client_bone_state_t *from, const client_bone_state_t *to, float s)
+{
+	client_bone_state_t ret;
+	
+	ret.valid = true;
+	ret.numbones = from->numbones;
+	
+	for (int i = 0; i < from->numbones; i++)
+	{
+		LerpRotationMatrix(from->bonetransform[i], to->bonetransform[i], s, ret.bonetransform[i]);
+	}
+	
+	LerpRotationMatrix(from->rotationmatrix, to->rotationmatrix, s, ret.rotationmatrix);
+	
+	return ret;
+}
+#endif // REHLDS_FIXES
 
 void SV_SetupMove(client_t *_host_client)
 {
@@ -1364,7 +1455,7 @@ void SV_SetupMove(client_t *_host_client)
 		frame = nextFrame;
 		frac = 0.0;
 	}
-
+	
 	for (i = 0; i < nextFrame->entities.num_entities; i++)
 	{
 		state = &nextFrame->entities.entities[i];
@@ -1386,6 +1477,24 @@ void SV_SetupMove(client_t *_host_client)
 		}
 
 		pnextstate = SV_FindEntInPack(state->number, &frame->entities);
+		
+#ifdef REHLDS_FIXES
+		if( nextFrame->bonestate.valid )
+		{
+			if( frame->bonestate.valid )
+			{
+				pos->bonestate = SV_StudioUnlagSlerpBones(&frame->bonestate, &nextFrame->bonestate, frac);
+			}
+			else
+			{
+				pos->bonestate = nextFrame->bonestate;
+			}
+		}
+		else
+		{
+			pos->bonestate.valid = false;
+		}
+#endif // REHLDS_FIXES
 
 		if (pnextstate)
 		{
@@ -1453,7 +1562,11 @@ void SV_RestoreMove(client_t *_host_client)
 			Con_DPrintf("SV_RestoreMove:  Tried to restore 'inactive' player %i/%s\n", i, &cli->name[4]);
 			continue;
 		}
-
+		
+#ifdef REHLDS_FIXES
+		pos->bonestate.valid = false;
+#endif // REHLDS_FIXES
+		
 		if (VectorCompare(pos->initial_correction_org, cli->edict->v.origin))
 		{
 			cli->edict->v.origin[0] = pos->oldorg[0];
@@ -1993,3 +2106,80 @@ void SV_FullUpdate_f(void)
 	gEntityInterface.pfnClientCommand(sv_player);
 #endif // REHLDS_FIXES
 }
+
+#ifdef REHLDS_FIXES
+void SV_SaveBoneState(client_t *_host_client, const edict_t *edict)
+{
+	int num = NUM_FOR_EDICT( edict );
+	client_frame_t *frame;
+	extern bonetransform_t bonetransform; // in r_studio.cpp
+	extern float rotationmatrix[3][4]; // in r_studio.cpp
+
+	if( !SV_IsPlayerIndex( num )) // just in case
+		return;
+	
+	// get last outgoing frame
+	frame = &_host_client->frames[SV_UPDATE_MASK & (_host_client->netchan.outgoing_sequence)];
+	
+	// not a studio model
+	if( g_psv.models[edict->v.modelindex]->type != mod_studio )
+	{
+		frame->bonestate.valid = false;
+		return;
+	}
+	
+	studiohdr_t *hdr = (studiohdr_t*)Mod_Extradata(g_psv.models[edict->v.modelindex]);
+	
+	// shouldn't really happen
+	if( !hdr )
+	{
+		frame->bonestate.valid = false;
+		return;
+	}
+	
+	// set up bones
+	g_pSvBlendingAPI->SV_StudioSetupBones(
+		g_psv.models[edict->v.modelindex],
+		edict->v.frame, edict->v.sequence, edict->v.angles, edict->v.origin,
+		edict->v.controller, edict->v.blending, -1, edict
+	);
+	
+	// copy bones
+	frame->bonestate.valid = true;
+	frame->bonestate.numbones = hdr->numbones;
+	Q_memcpy( frame->bonestate.bonetransform, bonetransform, sizeof( bonetransform ));
+	Q_memcpy( frame->bonestate.rotationmatrix, rotationmatrix, sizeof( rotationmatrix ));
+
+}
+
+void SV_StudioSetupUnlagBones( model_t *pModel, float frame, int sequence, const vec_t *angles, const vec_t *origin, const unsigned char *pcontroller, const unsigned char *pblending, int iBone, const edict_t *edict )
+{
+	// a1ba: carefully check everything, otherwise we may get broken bones!
+	if( edict && sv_bone_unlag.value ) // check is this a server or disabled
+	{
+		if( !nofind ) // unlag is enabled
+		{			
+			if( edict->v.flags & FL_CLIENT ) 
+			{
+				int num = NUM_FOR_EDICT( edict );	
+
+				if( truepositions[num].active &&
+					!truepositions[num].needrelink && // TODO: will this work for moving clients?
+					truepositions[num].bonestate.valid ) // bones are correct
+				{
+					// in r_studio.cpp
+					extern bonetransform_t bonetransform;
+					extern float rotationmatrix[3][4];
+					
+					Q_memcpy( bonetransform, truepositions[num].bonestate.bonetransform, sizeof( bonetransform ));
+					Q_memcpy( rotationmatrix, truepositions[num].bonestate.rotationmatrix, sizeof( rotationmatrix ));
+					return;
+				}
+			}
+		}
+	}
+	
+	// fallback to original SV_StudioSetupBones
+	g_pSvBlendingAPI->SV_StudioSetupBones(pModel, frame, sequence, angles, origin, pcontroller, pblending, iBone, edict);
+}
+#endif // REHLDS_FIXES
