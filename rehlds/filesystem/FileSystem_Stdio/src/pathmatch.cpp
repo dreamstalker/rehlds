@@ -523,147 +523,108 @@ static resultCache_t resultCache;
 static const int k_cMaxCacheLifetimeSeconds = 2;
 #endif // DO_PATHMATCH_CACHE
 
-PathMod_t pathmatch(const char *pszIn, char **ppszOut, bool bAllowBasenameMismatch, char *pszOutBuf, size_t OutBufLen)
-{
-	static const char *s_pszDbgPathMatch = getenv("DBG_PATHMATCH");
+PathMod_t pathmatch(const char* pszIn, char** ppszOut, bool bAllowBasenameMismatch, char* pszOutBuf, size_t OutBufLen) {
+    // ORIGINAL COMMENT:
+    // Path matching can be very expensive, and the cost is unpredictable because it
+    // depends on how many files are in directories on a user's machine. Therefore
+    // it should be disabled whenever possible, and only enabled in environments (such
+    // as running with loose files such as out of Perforce) where it is needed.
+    //
+    // 10669836's comment:
+    // In HL1, the paths are incorrect, so we *have* to use pathmatching!
+    // Hence, this check has been flipped/inverted.
+    static const char* s_pszPathMatchDisabled = getenv("DISABLE_PATHMATCH");
+    if (s_pszPathMatchDisabled)
+        return kPathUnchanged;
 
-	s_bShowDiag = (s_pszDbgPathMatch != nullptr);
+    static const char* s_pszDbgPathMatch = getenv("DBG_PATHMATCH");
+    s_bShowDiag = s_pszDbgPathMatch != nullptr;
 
-	*ppszOut = nullptr;
+    *ppszOut = nullptr;
 
-	if (__real_access(pszIn, F_OK) == 0)
-		return kPathUnchanged;
+    if (__real_access(pszIn, F_OK) == 0)
+        return kPathUnchanged;
 
-#ifdef DO_PATHMATCH_CACHE
-	resultCacheItr_t cachedResult = resultCache.find(pszIn);
-	if (cachedResult != resultCache.end())
-	{
-		unsigned int age = time(nullptr) - cachedResult->second.second;
-		const char *pszResult = cachedResult->second.first.c_str();
-		if (pszResult[0] != '\0' || age <= k_cMaxCacheLifetimeSeconds)
-		{
-			if (pszResult[0] != '\0')
-			{
-				*ppszOut = Q_strdup(pszResult);
-				DEBUG_MSG("Cached '%s' -> '%s'\n", pszIn, *ppszOut);
-				return kPathChanged;
-			}
-			else
-			{
-				DEBUG_MSG("Cached '%s' -> kPathFailed\n", pszIn);
-				return kPathFailed;
-			}
-		}
-		else if (age <= k_cMaxCacheLifetimeSeconds)
-		{
-			DEBUG_MSG("Rechecking '%s' - cache is %u seconds old\n", pszIn, age);
-		}
-	}
-#endif // DO_PATHMATCH_CACHE
+    char* pPath;
+    if (Q_strlen(pszIn) >= OutBufLen) {
+        pPath = Q_strdup(pszIn);
+    } else {
+        Q_strncpy(pszOutBuf, pszIn, OutBufLen);
+        pPath = pszOutBuf;
+    }
 
-	char *pPath;
-	if (Q_strlen(pszIn) >= OutBufLen)
-	{
-		pPath = Q_strdup(pszIn);
-	}
-	else
-	{
-		Q_strncpy(pszOutBuf, pszIn, OutBufLen);
-		pPath = pszOutBuf;
-	}
+    if (pPath) {
+        // I believe this code is broken. I'm guessing someone wanted to avoid lowercasing
+        //	the path before the steam directory - but it's actually skipping lowercasing
+        //	whenever steam is found anywhere - including the filename. For example,
+        //	  /home/mikesart/valvesrc/console/l4d2/game/left4dead2_dlc1/particles/steam_fx.pcf
+        //	winds up only having the "steam_fx.pcf" portion lowercased.
+#ifdef NEVER
+        // optimization, if the path contained steam somewhere
+        // assume the path up through the component with 'steam' in
+        // is valid (because we almost certainly obtained it
+        // progamatically
+        char *p = strcasestr(pPath, "steam");
+        if (p)
+        {
+            while (p > pPath)
+            {
+                if (p[-1] == '/')
+                    break;
+                p--;
+            }
 
-	if (pPath)
-	{
-		// optimization, if the path contained steam somewhere
-		// assume the path up through the component with 'steam' in
-		// is valid (because we almost certainly obtained it
-		// progamatically
-		size_t nStartIdx = 0;
-		static char *pszSteamPath = nullptr;
-		static size_t nSteamPathLen = 0;
-		if (!pszSteamPath)
-		{
-			pszSteamPath = GetSteamContentPath();
-			nSteamPathLen = Q_strlen(pszSteamPath);
-		}
-
-		// optimization, if the path contained steam somewhere
-		// assume the path up through the component with 'steam' in
-		// is valid (because we almost certainly obtained it
-		// progamatically
-		if (strncasecmp(pPath, pszSteamPath, nSteamPathLen) == 0)
-		{
-			nStartIdx = nSteamPathLen - 1;
-			Q_memcpy(pPath, pszSteamPath, nStartIdx);
-		}
-
-		char *p = pPath;
-
-		// Try the lower casing of the remaining path
-		char *pBasename = p + nStartIdx;
-		while (*p)
-		{
-			if (*p == '/') {
-				pBasename = p + 1;
-			}
-
-			*p = tolower(*p);
-			p++;
-		}
-
-		if (__real_access(pPath, F_OK) == 0)
-		{
-			*ppszOut = pPath;
-			DEBUG_MSG("Lowered '%s' -> '%s'\n", pszIn, pPath);
-			return kPathLowered;
-		}
-
-		// path didn't match lowered successfully, restore the basename
-		// if bAllowBasenameMismatch was true
-		if (bAllowBasenameMismatch && *pBasename)
-		{
-			const char *pSrc = pszIn + (pBasename - pPath);
-			while (*pBasename)
-			{
-				*pBasename++ = *pSrc++;
-			}
-		}
-
-		if (s_pszDbgPathMatch && strcasestr(s_pszDbgPathMatch, pszIn))
-		{
-			DEBUG_MSG("Breaking '%s' in '%s'\n", pszIn, s_pszDbgPathMatch);
-			DEBUG_BREAK();
-		}
-
-		bool bSuccess = Descend(pPath, nStartIdx, bAllowBasenameMismatch);
-		if (bSuccess)
-		{
-			*ppszOut = pPath;
-			DEBUG_MSG("Matched '%s' -> '%s'\n", pszIn, pPath);
-		}
-		else
-		{
-			DEBUG_MSG("Unmatched %s\n", pszIn);
-		}
-
-#ifndef DO_PATHMATCH_CACHE
-		return bSuccess ? kPathChanged : kPathFailed;
+            if ((p == pPath+1) && (*pPath != '/'))
+                p = pPath;
+        }
+        else
+        {
+            p = pPath;
+        }
 #else
-		time_t now = time(nullptr);
-		if (bSuccess)
-		{
-			resultCache[pszIn] = std::make_pair(*ppszOut, now);
-			return kPathChanged;
-		}
-		else
-		{
-			resultCache[pszIn] = std::make_pair("", now);
-			return kPathFailed;
-		}
-#endif // DO_PATHMATCH_CACHE
-	}
+        char* p = pPath;
+#endif
 
-	return kPathFailed;
+        // Try the lower casing of the remaining path
+        char* pBasename = p;
+        while (*p) {
+            if (*p == '/')
+                pBasename = p + 1;
+
+            *p = tolower(*p);
+            p++;
+        }
+        if (__real_access(pPath, F_OK) == 0) {
+            *ppszOut = pPath;
+            DEBUG_MSG("Lowered '%s' -> '%s'\n", pszIn, pPath);
+            return kPathLowered;
+        }
+
+        // path didn't match lowered successfully, restore the basename
+        // if bAllowBasenameMismatch was true
+        if (bAllowBasenameMismatch) {
+            const char* pSrc = pszIn + (pBasename - pPath);
+            while (*pBasename) {
+                *pBasename++ = *pSrc++;
+            }
+        }
+
+        if (s_pszDbgPathMatch && strcasestr(s_pszDbgPathMatch, pszIn)) {
+            DEBUG_MSG("Breaking '%s' in '%s'\n", pszIn, s_pszDbgPathMatch);
+            DEBUG_BREAK();
+        }
+
+        bool bSuccess = Descend(pPath, 0, bAllowBasenameMismatch);
+        if (bSuccess) {
+            *ppszOut = pPath;
+            DEBUG_MSG("Matched '%s' -> '%s'\n", pszIn, pPath);
+        } else {
+            DEBUG_MSG("Unmatched %s\n", pszIn);
+        }
+
+        return bSuccess ? kPathChanged : kPathFailed;
+    }
+    return kPathFailed;
 }
 
 // Wrapper object that manages the 'typical' usage cases of pathmatch()
