@@ -1112,8 +1112,18 @@ void SV_SendServerinfo_internal(sizebuf_t *msg, client_t *client)
 	else
 		MSG_WriteByte(msg, 0);
 
-	COM_FileBase(com_gamedir, message);
-	MSG_WriteString(msg, message);
+	const char *pszGameDir = message;
+
+#ifdef REHLDS_FIXES
+	// Give the client a chance to connect in to the server with different game
+	const char *gd = Info_ValueForKey(client->userinfo, "_gd");
+	if (gd[0])
+		pszGameDir = gd;
+	else
+#endif
+		COM_FileBase(com_gamedir, message);
+
+	MSG_WriteString(msg, pszGameDir);
 	MSG_WriteString(msg, Cvar_VariableString("hostname"));
 	MSG_WriteString(msg, g_psv.modelname);
 
