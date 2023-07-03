@@ -881,6 +881,15 @@ void EXT_FUNC AnimationAutomove(const edict_t *pEdict, float flTime)
 void EXT_FUNC GetBonePosition(const edict_t *pEdict, int iBone, float *rgflOrigin, float *rgflAngles)
 {
 	pstudiohdr = (studiohdr_t *)Mod_Extradata(g_psv.models[pEdict->v.modelindex]);
+
+#ifdef REHLDS_FIXES
+	if (!pstudiohdr)
+		return;
+
+	if (iBone < 0 || iBone >= pstudiohdr->numbones)
+		return; // invalid bone
+#endif
+
 	g_pSvBlendingAPI->SV_StudioSetupBones(
 		g_psv.models[pEdict->v.modelindex],
 		pEdict->v.frame,
