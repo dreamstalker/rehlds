@@ -680,22 +680,22 @@ qboolean SV_BuildSoundMsg(edict_t *entity, int channel, const char *sample, int 
 
 	if (volume < 0 || volume > 255)
 	{
-		Con_Printf("%s: volume = %i", __func__, volume);
+		Con_Printf("%s: volume = %i\n", __func__, volume);
 		volume = (volume < 0) ? 0 : 255;
 	}
 	if (attenuation < 0.0f || attenuation > 4.0f)
 	{
-		Con_Printf("%s: attenuation = %f", __func__, attenuation);
+		Con_Printf("%s: attenuation = %f\n", __func__, attenuation);
 		attenuation = (attenuation < 0.0f) ? 0.0f : 4.0f;
 	}
 	if (channel < 0 || channel > 7)
 	{
-		Con_Printf("%s: channel = %i", __func__, channel);
+		Con_Printf("%s: channel = %i\n", __func__, channel);
 		channel = (channel < 0) ? CHAN_AUTO : CHAN_NETWORKVOICE_BASE;
 	}
 	if (pitch < 0 || pitch > 255)
 	{
-		Con_Printf("%s: pitch = %i", __func__, pitch);
+		Con_Printf("%s: pitch = %i\n", __func__, pitch);
 		pitch = (pitch < 0) ? 0 : 255;
 	}
 
@@ -707,7 +707,7 @@ qboolean SV_BuildSoundMsg(edict_t *entity, int channel, const char *sample, int 
 		sound_num = Q_atoi(sample + 1);
 		if (sound_num >= CVOXFILESENTENCEMAX)
 		{
-			Con_Printf("%s: invalid sentence number: %s", __func__, sample + 1);
+			Con_Printf("%s: invalid sentence number: %s\n", __func__, sample + 1);
 			return FALSE;
 		}
 	}
@@ -1112,8 +1112,18 @@ void SV_SendServerinfo_internal(sizebuf_t *msg, client_t *client)
 	else
 		MSG_WriteByte(msg, 0);
 
-	COM_FileBase(com_gamedir, message);
-	MSG_WriteString(msg, message);
+	const char *pszGameDir = message;
+
+#ifdef REHLDS_FIXES
+	// Give the client a chance to connect in to the server with different game
+	const char *gd = Info_ValueForKey(client->userinfo, "_gd");
+	if (gd[0])
+		pszGameDir = gd;
+	else
+#endif
+		COM_FileBase(com_gamedir, message);
+
+	MSG_WriteString(msg, pszGameDir);
 	MSG_WriteString(msg, Cvar_VariableString("hostname"));
 	MSG_WriteString(msg, g_psv.modelname);
 
