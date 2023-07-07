@@ -170,7 +170,7 @@ byte *BSPModel::LeafPVS(mleaf_t *leaf)
 
 byte *BSPModel::DecompressVis(unsigned char *in)
 {
-	static unsigned char decompressed[MODEL_MAX_PVS];
+	static unsigned char decompressed[MAX_MAP_LEAFS / 8];
 	if (in == nullptr) {
 		return m_novis;
 	}

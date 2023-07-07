@@ -511,6 +511,14 @@ void SV_CopyEdictToPhysent(physent_t *pe, int e, edict_t *check)
 	pe->vuser4[2] = check->v.vuser4[2];
 }
 
+bool EXT_FUNC SV_AllowPhysent_mod(edict_t* check, edict_t* sv_player) {
+	return true;
+}
+
+bool SV_AllowPhysent(edict_t* check, edict_t* sv_player) {
+	return g_RehldsHookchains.m_SV_AllowPhysent.callChain(SV_AllowPhysent_mod, check, sv_player);
+}
+
 void SV_AddLinksToPM_(areanode_t *node, float *pmove_mins, float *pmove_maxs)
 {
 	struct link_s *l;
@@ -546,6 +554,11 @@ void SV_AddLinksToPM_(areanode_t *node, float *pmove_mins, float *pmove_maxs)
 
 		if (check->v.solid != SOLID_BSP && check->v.solid != SOLID_BBOX && check->v.solid != SOLID_SLIDEBOX && check->v.solid != SOLID_NOT)
 			continue;
+
+		// Apply our own custom checks
+		if (!SV_AllowPhysent(check, sv_player)) {
+			continue;
+		}
 
 		e = NUM_FOR_EDICT(check);
 		ve = &pmove->visents[pmove->numvisent];

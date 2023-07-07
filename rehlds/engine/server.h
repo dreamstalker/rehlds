@@ -408,7 +408,6 @@ enum GameType_e
 
 extern GameType_e g_eGameType;
 
-extern int fatbytes;
 extern int giNextUserMsg;
 extern int hashstrings_collisions;
 
@@ -420,10 +419,6 @@ extern delta_t *g_pweapondelta;
 #ifdef REHLDS_OPT_PEDANTIC
 extern delta_t *g_pusercmddelta;
 #endif
-
-extern unsigned char fatpvs[1024];
-extern int fatpasbytes;
-extern unsigned char fatpas[1024];
 
 extern int gPacketSuppressed;
 

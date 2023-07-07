@@ -683,22 +683,22 @@ qboolean SV_BuildSoundMsg(edict_t *entity, int channel, const char *sample, int 
 
 	if (volume < 0 || volume > 255)
 	{
-		Con_Printf("%s: volume = %i", __func__, volume);
+		Con_Printf("%s: volume = %i\n", __func__, volume);
 		volume = (volume < 0) ? 0 : 255;
 	}
 	if (attenuation < 0.0f || attenuation > 4.0f)
 	{
-		Con_Printf("%s: attenuation = %f", __func__, attenuation);
+		Con_Printf("%s: attenuation = %f\n", __func__, attenuation);
 		attenuation = (attenuation < 0.0f) ? 0.0f : 4.0f;
 	}
 	if (channel < 0 || channel > 7)
 	{
-		Con_Printf("%s: channel = %i", __func__, channel);
+		Con_Printf("%s: channel = %i\n", __func__, channel);
 		channel = (channel < 0) ? CHAN_AUTO : CHAN_NETWORKVOICE_BASE;
 	}
 	if (pitch < 0 || pitch > 255)
 	{
-		Con_Printf("%s: pitch = %i", __func__, pitch);
+		Con_Printf("%s: pitch = %i\n", __func__, pitch);
 		pitch = (pitch < 0) ? 0 : 255;
 	}
 
@@ -710,7 +710,7 @@ qboolean SV_BuildSoundMsg(edict_t *entity, int channel, const char *sample, int 
 		sound_num = Q_atoi(sample + 1);
 		if (sound_num >= CVOXFILESENTENCEMAX)
 		{
-			Con_Printf("%s: invalid sentence number: %s", __func__, sample + 1);
+			Con_Printf("%s: invalid sentence number: %s\n", __func__, sample + 1);
 			return FALSE;
 		}
 	}
@@ -1115,8 +1115,18 @@ void SV_SendServerinfo_internal(sizebuf_t *msg, client_t *client)
 	else
 		MSG_WriteByte(msg, 0);
 
-	COM_FileBase(com_gamedir, message);
-	MSG_WriteString(msg, message);
+	const char *pszGameDir = message;
+
+#ifdef REHLDS_FIXES
+	// Give the client a chance to connect in to the server with different game
+	const char *gd = Info_ValueForKey(client->userinfo, "_gd");
+	if (gd[0])
+		pszGameDir = gd;
+	else
+#endif
+		COM_FileBase(com_gamedir, message);
+
+	MSG_WriteString(msg, pszGameDir);
 	MSG_WriteString(msg, Cvar_VariableString("hostname"));
 	MSG_WriteString(msg, g_psv.modelname);
 
@@ -4033,9 +4043,10 @@ void SV_EmitEvents_internal(client_t *cl, packet_entities_t *pack, sizebuf_t *ms
 }
 
 int fatbytes;
-unsigned char fatpvs[1024];
+unsigned char fatpvs[MAX_MAP_LEAFS / 8];
+
 int fatpasbytes;
-unsigned char fatpas[1024];
+unsigned char fatpas[MAX_MAP_LEAFS / 8];
 
 void SV_AddToFatPVS(vec_t *org, mnode_t *node)
 {
@@ -4076,6 +4087,9 @@ unsigned char* EXT_FUNC SV_FatPVS(float *org)
 	else
 #endif // REHLDS_FIXES
 		fatbytes = (g_psv.worldmodel->numleafs + 31) >> 3;
+
+	if (fatbytes >= (MAX_MAP_LEAFS / 8))
+		Sys_Error("%s: MAX_MAP_LEAFS limit exceeded\n", __func__);
 
 	Q_memset(fatpvs, 0, fatbytes);
 	SV_AddToFatPVS(org, g_psv.worldmodel->nodes);
@@ -4133,6 +4147,9 @@ unsigned char* EXT_FUNC SV_FatPAS(float *org)
 	else
 #endif // REHLDS_FIXES
 		fatpasbytes = (g_psv.worldmodel->numleafs + 31) >> 3;
+
+	if (fatpasbytes >= (MAX_MAP_LEAFS / 8))
+		Sys_Error("%s: MAX_MAP_LEAFS limit exceeded\n", __func__);
 
 	Q_memset(fatpas, 0, fatpasbytes);
 	SV_AddToFatPAS(org, g_psv.worldmodel->nodes);
@@ -6158,7 +6175,7 @@ int SV_SpawnServer(qboolean bIsDemo, char *server, char *startspot)
 	if (g_psvs.maxclients <= 1)
 	{
 		int row = (g_psv.worldmodel->numleafs + 7) / 8;
-		if (row < 0 || row > MODEL_MAX_PVS)
+		if (row < 0 || row > (MAX_MAP_LEAFS / 8))
 		{
 			Sys_Error("%s: oversized g_psv.worldmodel->numleafs: %i", __func__, g_psv.worldmodel->numleafs);
 		}

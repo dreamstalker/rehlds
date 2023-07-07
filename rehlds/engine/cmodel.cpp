@@ -31,17 +31,17 @@
 unsigned char *gPAS;
 unsigned char *gPVS;
 int gPVSRowBytes;
-unsigned char mod_novis[MODEL_MAX_PVS];
+unsigned char mod_novis[MAX_MAP_LEAFS / 8];
 
 void Mod_Init(void)
 {
 	SW_Mod_Init();
-	Q_memset(mod_novis, 255, MODEL_MAX_PVS);
+	Q_memset(mod_novis, 0xFF, MAX_MAP_LEAFS / 8);
 }
 
 unsigned char *Mod_DecompressVis(unsigned char *in, model_t *model)
 {
-	static unsigned char decompressed[MODEL_MAX_PVS];
+	static unsigned char decompressed[MAX_MAP_LEAFS / 8];
 
 	if (in == NULL)
 	{

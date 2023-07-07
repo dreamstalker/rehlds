@@ -32,6 +32,7 @@
 
 #include "l_studio.h"
 #include "edict.h"
+#include "bspfile.h"
 
 // values for model_t's needload
 #define NL_PRESENT      0
@@ -87,9 +88,7 @@ private:
 
 protected:
 	model_t m_model;
-
-	enum { MODEL_MAX_PVS = 1024 };
-	byte m_novis[MODEL_MAX_PVS];
+	byte m_novis[MAX_MAP_LEAFS / 8];
 	byte *m_base;
 
 	int m_visframecount;
