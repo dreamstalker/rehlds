@@ -115,6 +115,7 @@ NOBODY void GameSetBackground(qboolean bNewSetting);
 qboolean Voice_GetClientListening(int iReceiver, int iSender);
 qboolean Voice_SetClientListening(int iReceiver, int iSender, qboolean bListen);
 DISPATCHFUNCTION GetDispatch(char *pname);
+DISPATCHFUNCTION GetDispatch_Internal(char* pname);
 const char *FindAddressInTable(extensiondll_t *pDll, uint32 function);
 uint32 FindNameInTable(extensiondll_t *pDll, const char *pName);
 NOBODY const char *ConvertNameToLocalPlatform(const char *pchInName);

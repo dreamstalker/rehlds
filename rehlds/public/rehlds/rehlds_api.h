@@ -259,6 +259,10 @@ typedef IVoidHookChainRegistry<const char *> IRehldsHookRegistry_SV_ClientPrintf
 typedef IHookChain<bool, edict_t*, edict_t*> IRehldsHook_SV_AllowPhysent;
 typedef IHookChainRegistry<bool, edict_t*, edict_t*> IRehldsHookRegistry_SV_AllowPhysent;
 
+//GetDispatch hook
+typedef IHookChain<DISPATCHFUNCTION, char*> IRehldsHook_GetDispatch;
+typedef IHookChainRegistry<DISPATCHFUNCTION, char*> IRehldsHookRegistry_GetDispatch;
+
 class IRehldsHookchains {
 public:
 	virtual ~IRehldsHookchains() { }
@@ -318,6 +322,7 @@ public:
 	virtual IRehldsHookRegistry_SV_AddResource* SV_AddResource() = 0;
 	virtual IRehldsHookRegistry_SV_ClientPrintf* SV_ClientPrintf() = 0;
 	virtual IRehldsHookRegistry_SV_AllowPhysent* SV_AllowPhysent() = 0;
+	virtual IRehldsHookRegistry_GetDispatch* GetDispatch() = 0;
 };
 
 struct RehldsFuncs_t {
