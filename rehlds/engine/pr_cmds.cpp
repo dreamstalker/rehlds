@@ -1447,6 +1447,9 @@ int EXT_FUNC PF_precache_model_I_internal(const char *s)
 	{
 		for (int i = 0; i < MAX_MODELS; i++)
 		{
+			if (!g_psv.model_precache[i])
+				continue;
+
 			// use case-sensitive names to increase performance
 #ifdef REHLDS_FIXES
 			if (!Q_strcmp(g_psv.model_precache[i], s))
@@ -1545,7 +1548,7 @@ int EXT_FUNC PF_precache_generic_I_internal(const char *s)
 	{
 		for (int i = 0; i < MAX_GENERIC; i++)
 		{
-			if (!Q_stricmp(g_psv.generic_precache[i], s))
+			if (g_psv.generic_precache[i] && !Q_stricmp(g_psv.generic_precache[i], s))
 				return i;
 		}
 		Host_Error("%s: '%s' Precache can only be done in spawn functions", __func__, s);
