@@ -1190,13 +1190,15 @@ void SV_ClipToLinks(areanode_t *node, moveclip_t *clip)
 		if (touch->v.solid == SOLID_TRIGGER)
 			Sys_Error("%s: Trigger in clipping list", __func__);
 
+#ifndef REHLDS_OPT_PEDANTIC
 		if (gNewDLLFunctions.pfnShouldCollide && !gNewDLLFunctions.pfnShouldCollide(touch, clip->passedict))
 #ifdef REHLDS_FIXES
 			// https://github.com/dreamstalker/rehlds/issues/46
 			continue;
 #else
 			return;
-#endif
+#endif // REHLDS_FIXES
+#endif // REHLDS_OPT_PEDANTIC
 
 		// monsterclip filter
 		if (touch->v.solid == SOLID_BSP)
@@ -1247,6 +1249,16 @@ void SV_ClipToLinks(areanode_t *node, moveclip_t *clip)
 			if (clip->passedict->v.owner == touch)
 				continue; // don't clip against owner
 		}
+
+#ifdef REHLDS_OPT_PEDANTIC
+		if (gNewDLLFunctions.pfnShouldCollide && !gNewDLLFunctions.pfnShouldCollide(touch, clip->passedict))
+#ifdef REHLDS_FIXES
+			// https://github.com/dreamstalker/rehlds/issues/46
+			continue;
+#else
+			return;
+#endif // REHLDS_FIXES
+#endif // REHLDS_OPT_PEDANTIC
 
 		trace_t trace;
 		if (touch->v.flags & FL_MONSTER)
