@@ -651,7 +651,7 @@ void NET_AdjustLag()
 	}
 	lasttime = realtime;
 
-	if (allow_cheats || fakelag.value == 0.0)
+	if (sv_cheats.value || fakelag.value == 0.0)
 	{
 		if (fakelag.value != gFakeLag)
 		{
@@ -689,7 +689,7 @@ qboolean NET_LagPacket(qboolean newdata, netsrc_t sock, netadr_t *from, sizebuf_
 	{
 		if (fakeloss.value != 0.0)
 		{
-			if (allow_cheats)
+			if (sv_cheats.value)
 			{
 				static int losscount[NS_MAX] = {};
 				++losscount[sock];

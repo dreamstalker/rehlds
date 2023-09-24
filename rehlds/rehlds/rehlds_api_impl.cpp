@@ -52,7 +52,9 @@ char* EXT_FUNC GetClientFallback_api() {
 }
 
 int* EXT_FUNC GetAllowCheats_api() {
-	return &allow_cheats;
+	static int sv_cheats_stub = 0;
+	Con_Printf("WARNING! allow_cheats marked as deprecated! Use sv_cheats cvar directly!\n");
+	return &sv_cheats_stub;
 }
 
 bool EXT_FUNC GSBSecure_api() {

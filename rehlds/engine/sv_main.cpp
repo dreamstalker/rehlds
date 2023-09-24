@@ -100,7 +100,6 @@ redirect_t sv_redirected;
 netadr_t sv_redirectto;
 
 GameType_e g_eGameType = GT_Unitialized;
-qboolean allow_cheats;
 
 char *gNullString = "";
 int SV_UPDATE_BACKUP = SINGLEPLAYER_BACKUP;
@@ -129,6 +128,12 @@ cvar_t sv_wateraccelerate = { "sv_wateraccelerate", "10", FCVAR_SERVER, 0.0f, NU
 cvar_t sv_waterfriction = { "sv_waterfriction", "1", FCVAR_SERVER, 0.0f, NULL };
 cvar_t sv_zmax = { "sv_zmax", "4096", FCVAR_SPONLY, 0.0f, NULL };
 cvar_t sv_wateramp = { "sv_wateramp", "0", 0, 0.0f, NULL };
+
+void sv_cheats_hook_callback(cvar_t *cvar);
+void mapcyclefile_hook_callback(cvar_t *cvar);
+
+cvarhook_t sv_cheats_hook = { sv_cheats_hook_callback, NULL, NULL };
+cvarhook_t mapcyclefile_hook = { mapcyclefile_hook_callback, NULL, NULL };
 
 cvar_t sv_skyname = { "sv_skyname", "desert", 0, 0.0f, NULL };
 cvar_t mapcyclefile = { "mapcyclefile", "mapcycle.txt", 0, 0.0f, NULL };
@@ -1173,7 +1178,7 @@ void SV_SendServerinfo_internal(sizebuf_t *msg, client_t *client)
 
 	MSG_WriteByte(msg, svc_sendextrainfo);
 	MSG_WriteString(msg, com_clientfallback);
-	MSG_WriteByte(msg, allow_cheats);
+	MSG_WriteByte(msg, sv_cheats.value != 0);
 
 	SV_WriteDeltaDescriptionsToClient(msg);
 	SV_SetMoveVars();
@@ -6257,7 +6262,6 @@ int SV_SpawnServer(qboolean bIsDemo, char *server, char *startspot)
 	gGlobalVariables.serverflags = g_psvs.serverflags;
 	gGlobalVariables.mapname = (size_t)g_psv.name - (size_t)pr_strings;
 	gGlobalVariables.startspot = (size_t)g_psv.startspot - (size_t)pr_strings;
-	allow_cheats = sv_cheats.value;
 	SV_SetMoveVars();
 
 	return 1;
@@ -6574,6 +6578,42 @@ USERID_t *SV_StringToUserID(const char *str)
 void EXT_FUNC SV_SerializeSteamid(USERID_t* id, USERID_t* serialized)
 {
 	*serialized = *id;
+}
+
+void sv_cheats_hook_callback(cvar_t *cvar)
+{
+	int i;
+	client_t *client = NULL;
+
+	if (!Host_IsServerActive())
+		return;
+
+	for (i = 0; i < g_psvs.maxclients; i++)
+	{
+		client = &g_psvs.clients[i];
+
+		if (!client->fakeclient && (client->active || client->spawned || client->connected))
+		{
+			MSG_WriteByte(&client->netchan.message, svc_sendextrainfo);
+			MSG_WriteString(&client->netchan.message, "");
+			MSG_WriteByte(&client->netchan.message, sv_cheats.value != 0);
+		}
+	}
+}
+
+void mapcyclefile_hook_callback(cvar_t *cvar)
+{
+	char buf[MAX_PATH + 4];
+
+	if (!Q_strcmp(COM_FileExtension(cvar->string), "txt"))
+		return;
+
+	Q_snprintf(buf, sizeof(buf) - 3, "%s.txt", cvar->string);
+
+	if (!Q_strcmp(COM_FileExtension(buf), "txt"))
+		Cvar_DirectSet(cvar, buf);
+	else
+		Cvar_DirectSet(cvar, "mapcycle.txt");
 }
 
 void SV_BanId_f(void)
@@ -8014,6 +8054,7 @@ void SV_Init(void)
 	Cvar_RegisterVariable(&sv_skyname);
 	Cvar_RegisterVariable(&sv_maxvelocity);
 	Cvar_RegisterVariable(&sv_cheats);
+	Cvar_HookVariable(sv_cheats.name, &sv_cheats_hook);
 	if (COM_CheckParm("-dev"))
 		Cvar_SetValue("sv_cheats", 1.0);
 	Cvar_RegisterVariable(&sv_spectatormaxspeed);
@@ -8025,6 +8066,7 @@ void SV_Init(void)
 	Cvar_RegisterVariable(&sv_logbans);
 	Cvar_RegisterVariable(&hpk_maxsize);
 	Cvar_RegisterVariable(&mapcyclefile);
+	Cvar_HookVariable(mapcyclefile.name, &mapcyclefile_hook);
 	Cvar_RegisterVariable(&motdfile);
 	Cvar_RegisterVariable(&servercfgfile);
 	Cvar_RegisterVariable(&mapchangecfgfile);
