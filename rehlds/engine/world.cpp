@@ -319,6 +319,15 @@ void SV_UnlinkEdict(edict_t *ent)
 	ent->area.prev = ent->area.next = nullptr;
 }
 
+qboolean SV_BoundsIntersect(const vec3_t mins1, const vec3_t maxs1, const vec3_t mins2, const vec3_t maxs2)
+{
+	if (mins1[0] > maxs2[0] || mins1[1] > maxs2[1] || mins1[2] > maxs2[2])
+		return false;
+	if (maxs1[0] < mins2[0] || maxs1[1] < mins2[1] || maxs1[2] < mins2[2])
+		return false;
+	return true;
+}
+
 void SV_TouchLinks(edict_t *ent, areanode_t *node)
 {
 	vec3_t localPosition, offset;
@@ -359,12 +368,7 @@ void SV_TouchLinks(edict_t *ent, areanode_t *node)
 		if (touch->v.solid != SOLID_TRIGGER)
 			continue;
 
-		if (ent->v.absmin[0] > touch->v.absmax[0]
-		|| ent->v.absmin[1] > touch->v.absmax[1]
-		|| ent->v.absmin[2] > touch->v.absmax[2]
-		|| ent->v.absmax[0] < touch->v.absmin[0]
-		|| ent->v.absmax[1] < touch->v.absmin[1]
-		|| ent->v.absmax[2] < touch->v.absmin[2])
+		if (!SV_BoundsIntersect(ent->v.absmin, ent->v.absmax, touch->v.absmin, touch->v.absmax))
 			continue;
 
 		// check brush triggers accuracy
@@ -647,12 +651,7 @@ int SV_LinkContents(areanode_t *node, const vec_t *pos)
 			if (Mod_GetType(touch->v.modelindex) != mod_brush)
 				continue;
 
-			if (pos[0] > touch->v.absmax[0]
-			|| pos[1] > touch->v.absmax[1]
-			|| pos[2] > touch->v.absmax[2]
-			|| pos[0] < touch->v.absmin[0]
-			|| pos[1] < touch->v.absmin[1]
-			|| pos[2] < touch->v.absmin[2])
+			if (!SV_BoundsIntersect(pos, pos, touch->v.absmin, touch->v.absmax))
 				continue;
 
 			int contents = touch->v.skin;
@@ -1216,12 +1215,7 @@ void SV_ClipToLinks(areanode_t *node, moveclip_t *clip)
 		if (clip->ignoretrans && touch->v.rendermode != kRenderNormal && !(touch->v.flags & FL_WORLDBRUSH))
 			continue;
 
-		if (clip->boxmins[0] > touch->v.absmax[0]
-		|| clip->boxmins[1] > touch->v.absmax[1]
-		|| clip->boxmins[2] > touch->v.absmax[2]
-		|| clip->boxmaxs[0] < touch->v.absmin[0]
-		|| clip->boxmaxs[1] < touch->v.absmin[1]
-		|| clip->boxmaxs[2] < touch->v.absmin[2])
+		if (!SV_BoundsIntersect(clip->boxmins, clip->boxmaxs, touch->v.absmin, touch->v.absmax))
 			continue;
 
 		if (touch->v.solid != SOLID_SLIDEBOX
@@ -1310,12 +1304,7 @@ void SV_ClipToWorldbrush(areanode_t *node, moveclip_t *clip)
 		if (!(touch->v.flags & FL_WORLDBRUSH))
 			continue;
 
-		if (clip->boxmins[0] > touch->v.absmax[0]
-		|| clip->boxmins[1] > touch->v.absmax[1]
-		|| clip->boxmins[2] > touch->v.absmax[2]
-		|| clip->boxmaxs[0] < touch->v.absmin[0]
-		|| clip->boxmaxs[1] < touch->v.absmin[1]
-		|| clip->boxmaxs[2] < touch->v.absmin[2])
+		if (!SV_BoundsIntersect(clip->boxmins, clip->boxmaxs, touch->v.absmin, touch->v.absmax))
 			continue;
 
 		if (clip->trace.allsolid)
