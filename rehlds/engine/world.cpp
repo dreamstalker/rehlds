@@ -322,10 +322,10 @@ void SV_UnlinkEdict(edict_t *ent)
 qboolean SV_BoundsIntersect(const vec3_t mins1, const vec3_t maxs1, const vec3_t mins2, const vec3_t maxs2)
 {
 	if (mins1[0] > maxs2[0] || mins1[1] > maxs2[1] || mins1[2] > maxs2[2])
-		return false;
+		return FALSE;
 	if (maxs1[0] < mins2[0] || maxs1[1] < mins2[1] || maxs1[2] < mins2[2])
-		return false;
-	return true;
+		return FALSE;
+	return TRUE;
 }
 
 void SV_TouchLinks(edict_t *ent, areanode_t *node)
