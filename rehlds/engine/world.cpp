@@ -318,6 +318,7 @@ void SV_UnlinkEdict(edict_t *ent)
 	RemoveLink(&ent->area);
 	ent->area.prev = ent->area.next = nullptr;
 }
+
 void SV_TouchLinks(edict_t *ent, areanode_t *node)
 {
 	vec3_t localPosition, offset;
