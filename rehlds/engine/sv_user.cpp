@@ -525,7 +525,6 @@ void SV_AddLinksToPM_(areanode_t *node, float *pmove_mins, float *pmove_maxs)
 	edict_t *check;
 	int e;
 	physent_t *ve;
-	int i;
 	link_t *next;
 	float *fmax;
 	float *fmin;
@@ -588,13 +587,7 @@ void SV_AddLinksToPM_(areanode_t *node, float *pmove_mins, float *pmove_maxs)
 		if (check->v.flags & FL_CLIENT)
 			SV_GetTrueMinMax(e - 1, &fmin, &fmax);
 
-		for (i = 0; i < 3; i++)
-		{
-			if (fmin[i] > pmove_maxs[i] || fmax[i] < pmove_mins[i])
-				break;
-		}
-
-		if (i != 3)
+		if (!BoundsIntersect(pmove_mins, pmove_maxs, fmin, fmax))
 			continue;
 
 		if (check->v.solid || check->v.skin != -16)
