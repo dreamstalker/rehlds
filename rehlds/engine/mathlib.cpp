@@ -418,3 +418,12 @@ qboolean VectorCompare(const vec_t *v1, const vec_t *v2)
 }
 
 #endif // #if !defined(REHLDS_SSE)
+
+qboolean BoundsIntersect(const vec3_t mins1, const vec3_t maxs1, const vec3_t mins2, const vec3_t maxs2)
+{
+	if (mins1[0] > maxs2[0] || mins1[1] > maxs2[1] || mins1[2] > maxs2[2])
+		return FALSE;
+	if (maxs1[0] < mins2[0] || maxs1[1] < mins2[1] || maxs1[2] < mins2[2])
+		return FALSE;
+	return TRUE;
+}
