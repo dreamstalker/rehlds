@@ -307,7 +307,7 @@ void SV_ClearWorld()
 // call before removing an entity, and before trying to move one,
 // so it doesn't clip against itself
 // flags ent->v.modified
-void SV_UnlinkEdict(edict_t* ent)
+void SV_UnlinkEdict(edict_t *ent)
 {
 	if (!ent->area.prev)
 	{
