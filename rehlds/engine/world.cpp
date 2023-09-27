@@ -307,7 +307,7 @@ void SV_ClearWorld()
 // call before removing an entity, and before trying to move one,
 // so it doesn't clip against itself
 // flags ent->v.modified
-void SV_UnlinkEdict(edict_t *ent)
+void SV_UnlinkEdict(edict_t* ent)
 {
 	if (!ent->area.prev)
 	{
@@ -318,19 +318,6 @@ void SV_UnlinkEdict(edict_t *ent)
 	RemoveLink(&ent->area);
 	ent->area.prev = ent->area.next = nullptr;
 }
-
-<<<<<<< HEAD
-=======
-qboolean SV_BoundsIntersect(const vec3_t mins1, const vec3_t maxs1, const vec3_t mins2, const vec3_t maxs2)
-{
-	if (mins1[0] > maxs2[0] || mins1[1] > maxs2[1] || mins1[2] > maxs2[2])
-		return FALSE;
-	if (maxs1[0] < mins2[0] || maxs1[1] < mins2[1] || maxs1[2] < mins2[2])
-		return FALSE;
-	return TRUE;
-}
-
->>>>>>> 64a6c87b7c2c3b8ad964030efc08049cc4275796
 void SV_TouchLinks(edict_t *ent, areanode_t *node)
 {
 	vec3_t localPosition, offset;
