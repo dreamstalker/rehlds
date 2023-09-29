@@ -30,7 +30,7 @@
 
 #include "maintypes.h"
 
-#define ZONE_DYNAMIC_SIZE 0x20000
+#define ZONE_DYNAMIC_SIZE 0x200000
 
 typedef struct memblock_s memblock_t;
 typedef struct memzone_s memzone_t;

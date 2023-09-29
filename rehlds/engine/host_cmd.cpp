@@ -205,11 +205,19 @@ void Host_Motd_f(void)
 	char *next;
 
 	pFileList = motdfile.string;
-	if (*pFileList == '/' || Q_strstr(pFileList, ":") || Q_strstr(pFileList, "..") || Q_strstr(pFileList, "\\"))
+	if (!COM_IsValidPath(pFileList) || COM_IsAbsolutePath(pFileList))
 	{
 		Con_Printf("Unable to open %s (contains illegal characters)\n", pFileList);
 		return;
 	}
+
+	const char *pchExtension = COM_FileExtension(pFileList);
+	if (Q_stricmp(pchExtension, "txt") != 0)
+	{
+		Con_Printf("Invalid motdfile name %s (wrong file extension, must be .txt)\n", pFileList);
+		return;
+	}
+
 	pFile = FS_Open(pFileList, "rb");
 	if (!pFile)
 	{

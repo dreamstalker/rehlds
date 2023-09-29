@@ -57,7 +57,11 @@ cvar_t deathmatch = { "deathmatch", "0", FCVAR_SERVER, 0.0f, NULL };
 cvar_t coop = { "coop", "0", FCVAR_SERVER, 0.0f, NULL };
 
 cvar_t sys_ticrate = { "sys_ticrate", "100.0", 0, 0.0f, NULL };
+
+void sys_timescale_hook_callback(cvar_t *cvar);
+cvarhook_t sys_timescale_hook = { sys_timescale_hook_callback, NULL, NULL };
 cvar_t sys_timescale = { "sys_timescale", "1.0", 0, 0.0f, NULL };
+
 cvar_t fps_max = { "fps_max", "100.0", FCVAR_ARCHIVE, 0.0f, NULL };
 cvar_t host_killtime = { "host_killtime", "0.0", 0, 0.0f, NULL };
 cvar_t sv_stats = { "sv_stats", "1", 0, 0.0f, NULL };
@@ -143,6 +147,9 @@ void Host_InitLocal(void)
 	Host_InitCommands();
 	Cvar_RegisterVariable(&host_killtime);
 	Cvar_RegisterVariable(&sys_ticrate);
+	Cvar_RegisterVariable(&sys_timescale);
+	Cvar_HookVariable(sys_timescale.name, &sys_timescale_hook);
+
 	Cvar_RegisterVariable(&fps_max);
 	Cvar_RegisterVariable(&fps_override);
 	Cvar_RegisterVariable(&host_name);
@@ -351,20 +358,26 @@ void Host_WriteCustomConfig(void)
 
 void SV_ClientPrintf(const char *fmt, ...)
 {
-	va_list va;
-	char string[1024];
-
 	if (!host_client->fakeclient)
 	{
+		va_list va;
+		char string[1024];
+
 		va_start(va, fmt);
 		Q_vsnprintf(string, ARRAYSIZE(string) - 1, fmt, va);
 		va_end(va);
 
-		string[ARRAYSIZE(string) - 1] = 0;
-
-		MSG_WriteByte(&host_client->netchan.message, svc_print);
-		MSG_WriteString(&host_client->netchan.message, string);
+		g_RehldsHookchains.m_SV_ClientPrintf.callChain(SV_ClientPrintf_internal, string);
 	}
+}
+
+void EXT_FUNC SV_ClientPrintf_internal(const char *Dest)
+{
+	char string[1024];
+
+	Q_strlcpy(string, Dest, min(strlen(Dest) + 1, sizeof(string)));
+	MSG_WriteByte(&host_client->netchan.message, svc_print);
+	MSG_WriteString(&host_client->netchan.message, string);
 }
 
 void SV_BroadcastPrintf(const char *fmt, ...)
@@ -1268,4 +1281,24 @@ void Host_Shutdown(void)
 	realtime = 0.0f;
 	g_psv.time = 0.0f;
 	g_pcl.time = 0.0f;
+}
+
+void sys_timescale_hook_callback(cvar_t *cvar)
+{
+	int i;
+	client_t *client = NULL;
+
+	if (!Host_IsServerActive())
+		return;
+
+	for (i = 0; i < g_psvs.maxclients; i++)
+	{
+		client = &g_psvs.clients[i];
+
+		if (!client->fakeclient && (client->active || client->spawned || client->connected))
+		{
+			MSG_WriteByte(&client->netchan.message, svc_timescale);
+			MSG_WriteFloat(&client->netchan.message, max(0.1f, sys_timescale.value));
+		}
+	}
 }

@@ -511,13 +511,20 @@ void SV_CopyEdictToPhysent(physent_t *pe, int e, edict_t *check)
 	pe->vuser4[2] = check->v.vuser4[2];
 }
 
+bool EXT_FUNC SV_AllowPhysent_mod(edict_t* check, edict_t* sv_player) {
+	return true;
+}
+
+bool SV_AllowPhysent(edict_t* check, edict_t* sv_player) {
+	return g_RehldsHookchains.m_SV_AllowPhysent.callChain(SV_AllowPhysent_mod, check, sv_player);
+}
+
 void SV_AddLinksToPM_(areanode_t *node, float *pmove_mins, float *pmove_maxs)
 {
 	struct link_s *l;
 	edict_t *check;
 	int e;
 	physent_t *ve;
-	int i;
 	link_t *next;
 	float *fmax;
 	float *fmin;
@@ -547,6 +554,11 @@ void SV_AddLinksToPM_(areanode_t *node, float *pmove_mins, float *pmove_maxs)
 		if (check->v.solid != SOLID_BSP && check->v.solid != SOLID_BBOX && check->v.solid != SOLID_SLIDEBOX && check->v.solid != SOLID_NOT)
 			continue;
 
+		// Apply our own custom checks
+		if (!SV_AllowPhysent(check, sv_player)) {
+			continue;
+		}
+
 		e = NUM_FOR_EDICT(check);
 		ve = &pmove->visents[pmove->numvisent];
 		pmove->numvisent = pmove->numvisent + 1;
@@ -575,13 +587,7 @@ void SV_AddLinksToPM_(areanode_t *node, float *pmove_mins, float *pmove_maxs)
 		if (check->v.flags & FL_CLIENT)
 			SV_GetTrueMinMax(e - 1, &fmin, &fmax);
 
-		for (i = 0; i < 3; i++)
-		{
-			if (fmin[i] > pmove_maxs[i] || fmax[i] < pmove_mins[i])
-				break;
-		}
-
-		if (i != 3)
+		if (!BoundsIntersect(pmove_mins, pmove_maxs, fmin, fmax))
 			continue;
 
 		if (check->v.solid || check->v.skin != -16)

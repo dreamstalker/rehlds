@@ -285,7 +285,7 @@ static const uint32_t g_isPrintTable[2048] = {
 	0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
 	0xFFFFFFFF, 0xFFFFFFFF, 0xFFFF0000, 0xFFFFFFFF, 0xFFFCFFFF, 0xFFFFFFFF, 0x000000FF, 0x0FFF0000,
 	0x03FF0000, 0xFFFF0000, 0xFFF7FFFF, 0xFFDF0D0B, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0x9FFFFFFF,
-	0x8FFFF7EE, 0xBFFFFFFF, 0xAFFFFFFE, 0xFFFFFFFF, 0xFFFFFFFF, 0x7FFFFFFF, 0x1CFCFCFC, 0x00000000
+	0x8FFFF7EE, 0xBFFFFFFF, 0xAFFFFFFE, 0xFFFFFFFF, 0xFFFFFFFF, 0x7FFFFFFE, 0x1CFCFCFC, 0x00000000
 };
 
 //-----------------------------------------------------------------------------
@@ -461,7 +461,7 @@ static uchar16 *StripWhitespaceWorker(uchar16 *pwch, int cchLength, bool *pbStri
 	// walk backwards from the end of the string, killing any whitespace
 	*pbStrippedWhitespace = false;
 
-	uchar16 *pwchEnd = pwch + cchLength;
+	uchar16 *pwchEnd = pwch + cchLength - 1;
 	while (--pwchEnd >= pwch)
 	{
 		if (!iswspace(*pwchEnd) && !Q_IsMeanSpaceW(*pwchEnd))
@@ -474,7 +474,7 @@ static uchar16 *StripWhitespaceWorker(uchar16 *pwch, int cchLength, bool *pbStri
 	// walk forward in the string
 	while (pwch < pwchEnd)
 	{
-		if (!iswspace(*pwch))
+		if (!iswspace(*pwch) && !Q_IsMeanSpaceW(*pwch))
 			break;
 
 		*pbStrippedWhitespace = true;
@@ -484,7 +484,7 @@ static uchar16 *StripWhitespaceWorker(uchar16 *pwch, int cchLength, bool *pbStri
 	return pwch;
 }
 
-uchar16 *__cdecl StripUnprintableWorker(uchar16 *pwch, bool *pStripped)
+uchar16 *__cdecl StripUnprintableWorker(uchar16 *pwch, int *pLength, bool *pStripped)
 {
 	uchar16* rPos = pwch;
 	uchar16* wPos = pwch;
@@ -503,6 +503,10 @@ uchar16 *__cdecl StripUnprintableWorker(uchar16 *pwch, bool *pStripped)
 
 	*wPos = 0;
 	*pStripped = rPos != wPos;
+
+	if (*pStripped)
+		*pLength = (wPos - pwch) + 1; // null termination
+
 	return pwch;
 }
 
@@ -736,8 +740,8 @@ qboolean Q_StripUnprintableAndSpace(char *pch)
 	bStrippedAny = false;
 	bStrippedWhitespace = false;
 	int cwch = (unsigned int)Q_UTF8ToUTF16(pch, (uchar16 *)pwch_alloced, cubDest, _STRINGCONVERTFLAG_ASSERT) >> 1;
-	uchar16 * pwch = StripUnprintableWorker(pwch_alloced, &bStrippedAny);
-	pwch = StripWhitespaceWorker(pwch, cwch - 1, &bStrippedWhitespace);
+	uchar16 * pwch = StripUnprintableWorker(pwch_alloced, &cwch, &bStrippedAny);
+	pwch = StripWhitespaceWorker(pwch, cwch, &bStrippedWhitespace);
 	if (bStrippedWhitespace || bStrippedAny)
 		Q_UTF16ToUTF8(pwch, pch, cch, STRINGCONVERT_ASSERT_REPLACE);
 

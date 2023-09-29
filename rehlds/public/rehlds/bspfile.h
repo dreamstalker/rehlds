@@ -32,6 +32,7 @@
 #define HLBSP_VERSION		30		// half-life regular version
 
 #define MAX_MAP_HULLS		4
+#define MAX_MAP_LEAFS		32767	// signed short limit
 
 #define CONTENTS_ORIGIN		-7		// removed at csg time
 #define CONTENTS_CLIP		-8		// changed to contents_solid

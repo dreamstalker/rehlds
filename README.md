@@ -6,7 +6,7 @@ ReHLDS is a result of reverse engineering of original HLDS (build 6152/6153) usi
 
 Along with reverse engineering, a lot of defects and (potential) bugs were found and fixed
 
-You can try play on one of the servers that using rehlds: [Game Tracker](http://www.gametracker.com/search/?search_by=server_variable&search_by2=sv_version)
+You can try playing on one of many servers that are using ReHLDS: [Game Tracker](http://www.gametracker.com/search/?search_by=server_variable&search_by2=sv_version)
 
 ## Goals of the project
 <ul>
@@ -51,7 +51,8 @@ This means that plugins that do binary code analysis (Orpheu for example) probab
 <li>sv_rehlds_stringcmdrate_burst_punish // Time in minutes for which the player will be banned (0 - Permanent, use a negative number for a kick). Default: 5
 <li>sv_rehlds_userinfo_transmitted_fields // Userinfo fields only with these keys will be transmitted to clients via network. If not set then all fields will be transmitted (except prefixed with underscore). Each key must be prefixed by backslash, for example "\name\model\*sid\*hltv\bottomcolor\topcolor". See [wiki](https://github.com/dreamstalker/rehlds/wiki/Userinfo-keys) to collect sufficient set of keys for your server. Default: ""
 <li>sv_rehlds_attachedentities_playeranimationspeed_fix // Fixes bug with gait animation speed increase when player has some attached entities (aiments). Can cause animation lags when cl_updaterate is low. Default: 0
-<li>sv_rehlds_maxclients_from_single_ip // Limit number of connections from the single ip address. Default: 5
+<li>sv_rehlds_maxclients_from_single_ip // Limit number of connections at the same time from single IP address, not confuse to already connected players. Default: 5
+<li>sv_rehlds_local_gametime <1|0> // A feature of local gametime which decrease "lags" if you run same map for a long time. Default: 0
 <li>sv_use_entity_file // Use custom entity file for a map. Path to an entity file will be "maps/[map name].ent". 0 - use original entities. 1 - use .ent files from maps directory. 2 - use .ent files from maps directory and create new .ent file if not exist.
 <li>sv_usercmd_custom_random_seed // When enabled server will populate an additional random seed independent of the client. Default: 0
 </ul>

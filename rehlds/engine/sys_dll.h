@@ -135,5 +135,6 @@ void Con_Debug_f(void);
 void Con_Init(void);
 void Con_DebugLog(const char *file, const char *fmt, ...);
 void Con_Printf(const char *fmt, ...);
+void Con_Printf_internal(const char *Dest);
 void Con_SafePrintf(const char *fmt, ...);
 void Con_DPrintf(const char *fmt, ...);

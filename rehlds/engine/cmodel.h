@@ -29,15 +29,10 @@
 #pragma once
 
 #include "maintypes.h"
-#include "model.h"
-
-// Looks like no more than 8096 visibility leafs per world model
-const int MODEL_MAX_PVS = 1024;
 
 extern unsigned char *gPAS;
 extern unsigned char *gPVS;
 extern int gPVSRowBytes;
-extern unsigned char mod_novis[MODEL_MAX_PVS];
 
 void Mod_Init(void);
 unsigned char *Mod_DecompressVis(unsigned char *in, model_t *model);
