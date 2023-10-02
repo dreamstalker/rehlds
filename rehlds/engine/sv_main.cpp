@@ -4514,6 +4514,12 @@ qboolean SV_ShouldUpdatePing(client_t *client)
 	//useless call
 	//SV_CalcPing(client);
 
+#ifdef REHLDS_FIXES
+	// Ping is recalculated every two seconds so it's redundant to update them every frame
+	if (realtime < client->nextping)
+		return FALSE;
+#endif // REHLDS_FIXES
+
 	return client->lastcmd.buttons & IN_SCORE;
 }
 
