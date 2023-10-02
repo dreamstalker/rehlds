@@ -4507,9 +4507,8 @@ qboolean SV_ShouldUpdatePing(client_t *client)
 	if (realtime < client->nextping)
 		return FALSE;
 
-
-	// Non-proxy client already does this in SV_GetNetInfo
 	if (client->proxy) {
+		// Non-proxy client already does this in SV_GetNetInfo
 		client->nextping = realtime + 2.0;
 		return TRUE;
 	}
