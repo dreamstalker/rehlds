@@ -4502,6 +4502,17 @@ void SV_EmitPacketEntities(client_t *client, packet_entities_t *to, sizebuf_t *m
 
 qboolean SV_ShouldUpdatePing(client_t *client)
 {
+#ifdef REHLDS_FIXES
+	// Ping is recalculated every two seconds so it's redundant to update them every frame
+	if (realtime < client->nextping)
+		return FALSE;
+
+
+	if (client->proxy) {
+		client->nextping = realtime + 2.0;
+		return TRUE;
+	}
+#else // REHLDS_FIXES
 	if (client->proxy)
 	{
 		if (realtime < client->nextping)
@@ -4510,15 +4521,10 @@ qboolean SV_ShouldUpdatePing(client_t *client)
 		client->nextping = realtime + 2.0;
 		return TRUE;
 	}
+#endif // REHLDS_FIXES
 
 	//useless call
 	//SV_CalcPing(client);
-
-#ifdef REHLDS_FIXES
-	// Ping is recalculated every two seconds so it's redundant to update them every frame
-	if (realtime < client->nextping)
-		return FALSE;
-#endif // REHLDS_FIXES
 
 	return client->lastcmd.buttons & IN_SCORE;
 }
