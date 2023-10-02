@@ -4507,12 +4507,13 @@ qboolean SV_ShouldUpdatePing(client_t *client)
 	if (realtime < client->nextping)
 		return FALSE;
 
-	if (client->proxy) 
+	if (client->proxy || client->lastcmd.buttons & IN_SCORE)
 	{
-		// Non-proxy client already does this in SV_GetNetInfo
 		client->nextping = realtime + 2.0;
 		return TRUE;
 	}
+
+	return FALSE;
 #else // REHLDS_FIXES
 	if (client->proxy)
 	{
@@ -4522,12 +4523,12 @@ qboolean SV_ShouldUpdatePing(client_t *client)
 		client->nextping = realtime + 2.0;
 		return TRUE;
 	}
-#endif // REHLDS_FIXES
 
 	//useless call
 	//SV_CalcPing(client);
 
 	return client->lastcmd.buttons & IN_SCORE;
+#endif // REHLDS_FIXES
 }
 
 NOXREF qboolean SV_HasEventsInQueue(client_t *client)
@@ -4549,6 +4550,7 @@ NOXREF qboolean SV_HasEventsInQueue(client_t *client)
 	return FALSE;
 }
 
+#ifndef REHLDS_FIXES
 void SV_GetNetInfo(client_t *client, int *ping, int *packet_loss)
 {
 	static uint16 lastping[32];
@@ -4565,6 +4567,7 @@ void SV_GetNetInfo(client_t *client, int *ping, int *packet_loss)
 	*ping = lastping[i];
 	*packet_loss = lastloss[i];
 }
+#endif // !REHLDS_FIXES
 
 int EXT_FUNC SV_CheckVisibility(edict_t *entity, unsigned char *pset)
 {
@@ -4617,8 +4620,10 @@ void SV_EmitPings(client_t *client, sizebuf_t *msg) {
 
 void EXT_FUNC SV_EmitPings_internal(client_t *client, sizebuf_t *msg)
 {
+#ifndef REHLDS_FIXES
 	int ping;
 	int packet_loss;
+#endif // !REHLDS_FIXES
 
 	MSG_WriteByte(msg, svc_pings);
 	MSG_StartBitWriting(msg);
@@ -4627,12 +4632,17 @@ void EXT_FUNC SV_EmitPings_internal(client_t *client, sizebuf_t *msg)
 		client_t *cl = &g_psvs.clients[i];
 		if (!cl->active)
 			continue;
-
-		SV_GetNetInfo(cl, &ping, &packet_loss);
+		
 		MSG_WriteBits(1, 1);
 		MSG_WriteBits(i, 5);
+#ifndef REHLDS_FIXES
+		SV_GetNetInfo(cl, &ping, &packet_loss);
 		MSG_WriteBits(ping, 12);
 		MSG_WriteBits(packet_loss, 7);
+#else
+		MSG_WriteBits(SV_CalcPing(cl), 12);
+		MSG_WriteBits((int)cl->packet_loss, 7);
+#endif
 	}
 
 	MSG_WriteBits(0, 1);
