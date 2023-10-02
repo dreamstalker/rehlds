@@ -554,11 +554,6 @@ void SV_AddLinksToPM_(areanode_t *node, float *pmove_mins, float *pmove_maxs)
 		if (check->v.solid != SOLID_BSP && check->v.solid != SOLID_BBOX && check->v.solid != SOLID_SLIDEBOX && check->v.solid != SOLID_NOT)
 			continue;
 
-		// Apply our own custom checks
-		if (!SV_AllowPhysent(check, sv_player)) {
-			continue;
-		}
-
 		e = NUM_FOR_EDICT(check);
 		ve = &pmove->visents[pmove->numvisent];
 		pmove->numvisent = pmove->numvisent + 1;
@@ -589,6 +584,12 @@ void SV_AddLinksToPM_(areanode_t *node, float *pmove_mins, float *pmove_maxs)
 
 		if (!BoundsIntersect(pmove_mins, pmove_maxs, fmin, fmax))
 			continue;
+
+
+		// Apply our own custom checks
+		if (!SV_AllowPhysent(check, sv_player)) {
+			continue;
+		}
 
 		if (check->v.solid || check->v.skin != -16)
 		{
