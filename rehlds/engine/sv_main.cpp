@@ -4503,26 +4503,22 @@ void SV_EmitPacketEntities(client_t *client, packet_entities_t *to, sizebuf_t *m
 qboolean SV_ShouldUpdatePing(client_t *client)
 {
 #ifdef REHLDS_FIXES
-	// Ping is recalculated every two seconds so it's redundant to update them every frame
+	// Every client ping is recalculated with a delay of two seconds so it's redundant to update them every frame
 	if (realtime < client->nextping)
 		return FALSE;
+#endif // REHLDS_FIXES
 
-	if (client->proxy) 
-	{
-		// Non-proxy client already does this in SV_GetNetInfo
-		client->nextping = realtime + 2.0;
-		return TRUE;
-	}
-#else // REHLDS_FIXES
 	if (client->proxy)
 	{
+#ifndef REHLDS_FIXES
 		if (realtime < client->nextping)
 			return FALSE;
+#endif // !REHLDS_FIXES
 
 		client->nextping = realtime + 2.0;
 		return TRUE;
 	}
-#endif // REHLDS_FIXES
+
 
 	//useless call
 	//SV_CalcPing(client);
