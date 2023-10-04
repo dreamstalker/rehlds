@@ -4547,8 +4547,8 @@ NOXREF qboolean SV_HasEventsInQueue(client_t *client)
 
 void SV_GetNetInfo(client_t *client, int *ping, int *packet_loss)
 {
-	static uint16 lastping[32];
-	static uint8 lastloss[32];
+	static uint16 lastping[MAX_CLIENTS];
+	static uint8 lastloss[MAX_CLIENTS];
 
 	int i = client - g_psvs.clients;
 	if (realtime >= client->nextping)
