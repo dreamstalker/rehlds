@@ -4506,6 +4506,8 @@ qboolean SV_ShouldUpdatePing(client_t *client)
 	// Every client ping is recalculated with a delay of two seconds so it's redundant to update them every frame
 	if (realtime < client->nextping)
 		return FALSE;
+
+	client->nextping = realtime + 2.0;
 #endif // REHLDS_FIXES
 
 	if (client->proxy)
@@ -4513,9 +4515,9 @@ qboolean SV_ShouldUpdatePing(client_t *client)
 #ifndef REHLDS_FIXES
 		if (realtime < client->nextping)
 			return FALSE;
-#endif // !REHLDS_FIXES
 
 		client->nextping = realtime + 2.0;
+#endif // !REHLDS_FIXES
 		return TRUE;
 	}
 
@@ -4550,13 +4552,27 @@ void SV_GetNetInfo(client_t *client, int *ping, int *packet_loss)
 	static uint16 lastping[MAX_CLIENTS];
 	static uint8 lastloss[MAX_CLIENTS];
 
+#ifdef REHLDS_FIXES
+	static double nextping_calculation;
+#endif // REHLDS_FIXES
+
+
 	int i = client - g_psvs.clients;
+#ifdef REHLDS_FIXES
+	if (realtime >= nextping_calculation)
+	{
+		nextping_calculation = realtime + 2.0;
+		lastping[i] = SV_CalcPing(client);
+		lastloss[i] = client->packet_loss;
+	}
+#else
 	if (realtime >= client->nextping)
 	{
 		client->nextping = realtime + 2.0;
 		lastping[i] = SV_CalcPing(client);
 		lastloss[i] = client->packet_loss;
 	}
+#endif // REHLDS_FIXES
 
 	*ping = lastping[i];
 	*packet_loss = lastloss[i];
