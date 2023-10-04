@@ -4553,16 +4553,16 @@ void SV_GetNetInfo(client_t *client, int *ping, int *packet_loss)
 	static uint8 lastloss[MAX_CLIENTS];
 
 #ifdef REHLDS_FIXES
-	static double nextping_calculation;
+	static double nextping_calculation[MAX_CLIENTS];
 #endif // REHLDS_FIXES
 
 
 	int i = client - g_psvs.clients;
 #ifdef REHLDS_FIXES
-	// Instead of being client dependent we can let the server decide, this way all clients receive the same ping values
-	if (realtime >= nextping_calculation)
+	// keep client's ping up to date
+	if (realtime >= nextping_calculation[i])
 	{
-		nextping_calculation = realtime + 2.0;
+		nextping_calculation[i] = realtime + 2.0;
 		lastping[i] = SV_CalcPing(client);
 		lastloss[i] = client->packet_loss;
 	}
