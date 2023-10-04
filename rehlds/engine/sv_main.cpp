@@ -4503,7 +4503,7 @@ void SV_EmitPacketEntities(client_t *client, packet_entities_t *to, sizebuf_t *m
 qboolean SV_ShouldUpdatePing(client_t *client)
 {
 #ifdef REHLDS_FIXES
-	// Every client ping is recalculated with a delay of two seconds so it's redundant to update them every frame
+	// Only send ping updates to clients once every two seconds
 	if (realtime < client->nextping)
 		return FALSE;
 
@@ -4559,6 +4559,7 @@ void SV_GetNetInfo(client_t *client, int *ping, int *packet_loss)
 
 	int i = client - g_psvs.clients;
 #ifdef REHLDS_FIXES
+	// Instead of being client dependent we can let the server decide, this way all clients receive the same ping values
 	if (realtime >= nextping_calculation)
 	{
 		nextping_calculation = realtime + 2.0;
