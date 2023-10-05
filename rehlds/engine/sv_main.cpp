@@ -4507,25 +4507,27 @@ qboolean SV_ShouldUpdatePing(client_t *client)
 	if (realtime < client->nextping)
 		return FALSE;
 
-	client->nextping = realtime + 2.0;
-#endif // REHLDS_FIXES
+	if (client->proxy || client->lastcmd.buttons & IN_SCORE) {
+		client->nextping = realtime + 2.0;
+		return TRUE;
+	}
 
+	return FALSE;
+#else
 	if (client->proxy)
 	{
-#ifndef REHLDS_FIXES
 		if (realtime < client->nextping)
 			return FALSE;
 
 		client->nextping = realtime + 2.0;
-#endif // !REHLDS_FIXES
 		return TRUE;
 	}
-
 
 	//useless call
 	//SV_CalcPing(client);
 
 	return client->lastcmd.buttons & IN_SCORE;
+#endif // REHLDS_FIXES
 }
 
 NOXREF qboolean SV_HasEventsInQueue(client_t *client)
