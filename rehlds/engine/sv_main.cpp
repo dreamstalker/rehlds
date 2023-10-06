@@ -4502,18 +4502,6 @@ void SV_EmitPacketEntities(client_t *client, packet_entities_t *to, sizebuf_t *m
 
 qboolean SV_ShouldUpdatePing(client_t *client)
 {
-#ifdef REHLDS_FIXES
-	// Only send ping updates to clients once every two seconds
-	if (realtime < client->nextping)
-		return FALSE;
-
-	if (client->proxy || client->lastcmd.buttons & IN_SCORE) {
-		client->nextping = realtime + 2.0;
-		return TRUE;
-	}
-
-	return FALSE;
-#else
 	if (client->proxy)
 	{
 		if (realtime < client->nextping)
@@ -4526,8 +4514,25 @@ qboolean SV_ShouldUpdatePing(client_t *client)
 	//useless call
 	//SV_CalcPing(client);
 
+#ifdef REHLDS_FIXES
+	static double nextping_update[MAX_CLIENTS];
+
+	int i = client - g_psvs.clients;
+
+	// Let's avoid sending updates every frame under any condition, clients' ping get updated every two seconds so it's redundant
+	if (realtime < nextping_update[i])
+		return FALSE;
+
+	if (client->lastcmd.buttons & IN_SCORE) {
+		// One second seems fair, two seconds can be a bit noticeable
+		nextping_update[i] = realtime + 1.0;
+		return TRUE;
+	}
+
+	return FALSE;
+#else
 	return client->lastcmd.buttons & IN_SCORE;
-#endif // REHLDS_FIXES
+#endif
 }
 
 NOXREF qboolean SV_HasEventsInQueue(client_t *client)
@@ -4554,28 +4559,14 @@ void SV_GetNetInfo(client_t *client, int *ping, int *packet_loss)
 	static uint16 lastping[MAX_CLIENTS];
 	static uint8 lastloss[MAX_CLIENTS];
 
-#ifdef REHLDS_FIXES
-	static double nextping_calculation[MAX_CLIENTS];
-#endif // REHLDS_FIXES
-
 
 	int i = client - g_psvs.clients;
-#ifdef REHLDS_FIXES
-	// keep client's ping up to date
-	if (realtime >= nextping_calculation[i])
-	{
-		nextping_calculation[i] = realtime + 2.0;
-		lastping[i] = SV_CalcPing(client);
-		lastloss[i] = client->packet_loss;
-	}
-#else
 	if (realtime >= client->nextping)
 	{
 		client->nextping = realtime + 2.0;
 		lastping[i] = SV_CalcPing(client);
 		lastloss[i] = client->packet_loss;
 	}
-#endif // REHLDS_FIXES
 
 	*ping = lastping[i];
 	*packet_loss = lastloss[i];
