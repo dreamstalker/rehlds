@@ -47,4 +47,16 @@ struct cvar_listener_t
 	const char      *name;
 };
 
+typedef void (*pfnCvar_HookVariable_t) (cvar_t *pCvar);
+
+struct cvarhook_t
+{
+	pfnCvar_HookVariable_t hook;
+
+	cvar_t *cvar;
+	cvarhook_t *next;
+};
+
+qboolean Cvar_HookVariable(const char *var_name, cvarhook_t *pHook);
+
 #endif // CVARDEF_H

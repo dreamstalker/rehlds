@@ -359,12 +359,7 @@ void SV_TouchLinks(edict_t *ent, areanode_t *node)
 		if (touch->v.solid != SOLID_TRIGGER)
 			continue;
 
-		if (ent->v.absmin[0] > touch->v.absmax[0]
-		|| ent->v.absmin[1] > touch->v.absmax[1]
-		|| ent->v.absmin[2] > touch->v.absmax[2]
-		|| ent->v.absmax[0] < touch->v.absmin[0]
-		|| ent->v.absmax[1] < touch->v.absmin[1]
-		|| ent->v.absmax[2] < touch->v.absmin[2])
+		if (!BoundsIntersect(ent->v.absmin, ent->v.absmax, touch->v.absmin, touch->v.absmax))
 			continue;
 
 		// check brush triggers accuracy
@@ -647,12 +642,7 @@ int SV_LinkContents(areanode_t *node, const vec_t *pos)
 			if (Mod_GetType(touch->v.modelindex) != mod_brush)
 				continue;
 
-			if (pos[0] > touch->v.absmax[0]
-			|| pos[1] > touch->v.absmax[1]
-			|| pos[2] > touch->v.absmax[2]
-			|| pos[0] < touch->v.absmin[0]
-			|| pos[1] < touch->v.absmin[1]
-			|| pos[2] < touch->v.absmin[2])
+			if (!BoundsIntersect(pos, pos, touch->v.absmin, touch->v.absmax))
 				continue;
 
 			int contents = touch->v.skin;
@@ -1190,13 +1180,15 @@ void SV_ClipToLinks(areanode_t *node, moveclip_t *clip)
 		if (touch->v.solid == SOLID_TRIGGER)
 			Sys_Error("%s: Trigger in clipping list", __func__);
 
+#ifndef REHLDS_OPT_PEDANTIC
 		if (gNewDLLFunctions.pfnShouldCollide && !gNewDLLFunctions.pfnShouldCollide(touch, clip->passedict))
 #ifdef REHLDS_FIXES
 			// https://github.com/dreamstalker/rehlds/issues/46
 			continue;
 #else
 			return;
-#endif
+#endif // REHLDS_FIXES
+#endif // REHLDS_OPT_PEDANTIC
 
 		// monsterclip filter
 		if (touch->v.solid == SOLID_BSP)
@@ -1214,12 +1206,7 @@ void SV_ClipToLinks(areanode_t *node, moveclip_t *clip)
 		if (clip->ignoretrans && touch->v.rendermode != kRenderNormal && !(touch->v.flags & FL_WORLDBRUSH))
 			continue;
 
-		if (clip->boxmins[0] > touch->v.absmax[0]
-		|| clip->boxmins[1] > touch->v.absmax[1]
-		|| clip->boxmins[2] > touch->v.absmax[2]
-		|| clip->boxmaxs[0] < touch->v.absmin[0]
-		|| clip->boxmaxs[1] < touch->v.absmin[1]
-		|| clip->boxmaxs[2] < touch->v.absmin[2])
+		if (!BoundsIntersect(clip->boxmins, clip->boxmaxs, touch->v.absmin, touch->v.absmax))
 			continue;
 
 		if (touch->v.solid != SOLID_SLIDEBOX
@@ -1247,6 +1234,16 @@ void SV_ClipToLinks(areanode_t *node, moveclip_t *clip)
 			if (clip->passedict->v.owner == touch)
 				continue; // don't clip against owner
 		}
+
+#ifdef REHLDS_OPT_PEDANTIC
+		if (gNewDLLFunctions.pfnShouldCollide && !gNewDLLFunctions.pfnShouldCollide(touch, clip->passedict))
+#ifdef REHLDS_FIXES
+			// https://github.com/dreamstalker/rehlds/issues/46
+			continue;
+#else
+			return;
+#endif // REHLDS_FIXES
+#endif // REHLDS_OPT_PEDANTIC
 
 		trace_t trace;
 		if (touch->v.flags & FL_MONSTER)
@@ -1298,12 +1295,7 @@ void SV_ClipToWorldbrush(areanode_t *node, moveclip_t *clip)
 		if (!(touch->v.flags & FL_WORLDBRUSH))
 			continue;
 
-		if (clip->boxmins[0] > touch->v.absmax[0]
-		|| clip->boxmins[1] > touch->v.absmax[1]
-		|| clip->boxmins[2] > touch->v.absmax[2]
-		|| clip->boxmaxs[0] < touch->v.absmin[0]
-		|| clip->boxmaxs[1] < touch->v.absmin[1]
-		|| clip->boxmaxs[2] < touch->v.absmin[2])
+		if (!BoundsIntersect(clip->boxmins, clip->boxmaxs, touch->v.absmin, touch->v.absmax))
 			continue;
 
 		if (clip->trace.allsolid)

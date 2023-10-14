@@ -679,7 +679,7 @@ void Cache_Force_Flush()
 
 void Cache_Flush()
 {
-	if (g_pcl.maxclients <= 1 || allow_cheats)
+	if (g_pcl.maxclients <= 1 || sv_cheats.value)
 	{
 		Cache_Force_Flush();
 	}

@@ -32,7 +32,8 @@
 	All cvar names are case insensitive! Values not.
 */
 
-cvar_t *cvar_vars;
+cvar_t *cvar_vars = NULL;
+cvarhook_t *cvar_hooks = NULL;
 char cvar_null_string[] = "";
 
 void Cvar_Init(void)
@@ -319,8 +320,10 @@ void Cvar_DirectSet(struct cvar_s *var, const char *value)
 
 void Cvar_Set(const char *var_name, const char *value)
 {
-	cvar_t *var = Cvar_FindVar(var_name);
+	cvar_t *var;
+	cvarhook_t *pHook;
 
+	var = Cvar_FindVar(var_name);
 	if (!var)
 	{
 		Con_DPrintf("%s: variable \"%s\" not found\n", __func__, var_name);
@@ -328,6 +331,15 @@ void Cvar_Set(const char *var_name, const char *value)
 	}
 
 	Cvar_DirectSet(var, value);
+
+	for (pHook = cvar_hooks; pHook; pHook = pHook->next)
+	{
+		if (pHook->cvar == var)
+		{
+			pHook->hook(var);
+			break;
+		}
+	}
 }
 
 void Cvar_SetValue(const char *var_name, float value)
@@ -729,4 +741,37 @@ void Cvar_UnlinkExternals(void)
 void Cvar_CmdInit(void)
 {
 	Cmd_AddCommand("cvarlist", Cmd_CvarList_f);
+}
+
+qboolean Cvar_HookVariable(const char *var_name, cvarhook_t *pHook)
+{
+	cvar_t *cvar;
+
+	if (!pHook || !pHook->hook)
+		return FALSE;
+
+	if (pHook->cvar || pHook->next)
+		return FALSE;
+
+	cvar = Cvar_FindVar(var_name);
+	if (!cvar)
+		return FALSE;
+
+	cvarhook_t *pCur = cvar_hooks;
+	pHook->cvar = cvar;
+
+	if (pCur)
+	{
+		while (pCur->next)
+			pCur = pCur->next;
+
+		pCur->next = pHook;
+	}
+	else
+	{
+		// First in chain is null, assign pHook to it
+		cvar_hooks = pHook;
+	}
+
+	return TRUE;
 }

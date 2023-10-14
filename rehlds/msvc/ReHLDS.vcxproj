@@ -463,6 +463,7 @@
     </ProjectReference>
     <ProjectReference Include="..\version\msvc\version.vcxproj">
       <Project>{6973dca5-253c-4d84-b51e-187e035eae06}</Project>
+      <Private>false</Private>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup Label="Globals">

@@ -187,6 +187,8 @@ void COM_CreatePath(char *path);
 NOXREF void COM_CopyFile(char *netpath, char *cachepath);
 NOXREF int COM_ExpandFilename(char *filename);
 int COM_FileSize(const char *filename);
+qboolean COM_IsAbsolutePath(const char *pStr);
+qboolean COM_IsValidPath(const char *pszFilename);
 unsigned char *COM_LoadFile(const char *path, int usehunk, int *pLength);
 void COM_FreeFile(void *buffer);
 void COM_CopyFileChunk(FileHandle_t dst, FileHandle_t src, int nSize);
