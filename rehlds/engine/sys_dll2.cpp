@@ -665,6 +665,13 @@ bool CDedicatedServerAPI::Init(const char *basedir, const char *cmdline, CreateI
 	TraceInit("FileSystem_Init(basedir, (void *)filesystemFactory)", "FileSystem_Shutdown()", 0);
 	if (FileSystem_Init(basedir, (void *)filesystemFactory) && game->Init(0) && eng->Load(true, basedir, cmdline))
 	{
+		int numParam = COM_CheckParm("-map");
+		if (numParam)
+		{
+			char mapstring[64];
+			Q_snprintf(mapstring, ARRAYSIZE(mapstring), "map %s\n", com_argv[numParam + 1]);
+			Cbuf_InsertText(mapstring);
+		}
 		char text[256];
 		Q_snprintf(text, ARRAYSIZE(text), "exec %s\n", servercfgfile.string);
 		text[255] = 0;
