@@ -55,6 +55,9 @@ This means that plugins that do binary code analysis (Orpheu for example) probab
 <li>sv_rehlds_local_gametime <1|0> // A feature of local gametime which decrease "lags" if you run same map for a long time. Default: 0
 <li>sv_use_entity_file // Use custom entity file for a map. Path to an entity file will be "maps/[map name].ent". 0 - use original entities. 1 - use .ent files from maps directory. 2 - use .ent files from maps directory and create new .ent file if not exist.
 <li>sv_usercmd_custom_random_seed // When enabled server will populate an additional random seed independent of the client. Default: 0
+<li>sv_net_incoming_decompression <1|0> // When enabled server will decompress of incoming compressed file transfer payloads. Default: 1
+<li>sv_net_incoming_decompression_max_ratio <0|100> // Sets the max allowed ratio between compressed and uncompressed data for file transfer. (A ratio close to 90 indicates large uncompressed data with low entropy) Default: 80.0
+<li>sv_net_incoming_decompression_max_size <16|65536> // Sets the max allowed size for decompressed file transfer data. Default: 65536 bytes
 </ul>
 </details>
 
