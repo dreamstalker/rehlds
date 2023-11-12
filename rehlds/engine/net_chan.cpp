@@ -40,6 +40,7 @@ cvar_t net_chokeloopback = { "net_chokeloop", "0", 0, 0.0f, nullptr};
 cvar_t sv_net_incoming_decompression = { "sv_net_incoming_decompression", "1", 0, 1.0f, nullptr };
 cvar_t sv_net_incoming_decompression_max_ratio = { "sv_net_incoming_decompression_max_ratio", "75.0", 0, 75.0f, nullptr };
 cvar_t sv_net_incoming_decompression_max_size = { "sv_net_incoming_decompression_max_size", "65536", 0, 65536.0f, nullptr };
+cvar_t sv_net_incoming_decompression_punish = { "sv_net_incoming_decompression_punish", "-1", 0, -1.0f, NULL };
 
 cvar_t sv_filetransfercompression = { "sv_filetransfercompression", "1", 0, 0.0f, nullptr};
 cvar_t sv_filetransfermaxsize = { "sv_filetransfermaxsize", "10485760", 0, 0.0f, nullptr};
@@ -1486,12 +1487,19 @@ qboolean Netchan_CopyNormalFragments(netchan_t *chan)
 	{
 		// Determine whether decompression of compressed data is allowed
 #ifdef REHLDS_FIXES
-		if (!sv_net_incoming_decompression.value && ((chan->player_slot - 1) == host_client - g_psvs.clients) &&
-			// compressed data is expected only after requesting resource list
-			!host_client->m_sendrescount)
+		if (!sv_net_incoming_decompression.value)
 		{
-			success = FALSE;
-			Con_Printf("%s: Incoming compressed data disallowed from %s\n", __func__, host_client->name);
+			if (chan->player_slot == 0)
+			{
+				Con_DPrintf("Incoming compressed data disallowed from\n");
+				return FALSE;
+			}
+			// compressed data is expected only after requesting resource list
+			else if (host_client->m_sendrescount)
+			{
+				Con_DPrintf("%s:Incoming compressed data disallowed from %s\n", NET_AdrToString(chan->remote_address), host_client->name);
+				return FALSE;
+			}
 		}
 #endif
 
@@ -1510,9 +1518,9 @@ qboolean Netchan_CopyNormalFragments(netchan_t *chan)
 				if (ratio >= sv_net_incoming_decompression_max_ratio.value)
 				{
 					if (chan->player_slot == 0)
-						Con_Printf("%s: Incoming abnormal uncompressed size with ratio %.2f\n", __func__, ratio);
+						Con_DPrintf("Incoming abnormal uncompressed size with ratio %.2f\n", ratio);
 					else
-						Con_Printf("%s: Incoming abnormal uncompressed size with ratio %.2f from %s\n", __func__, ratio, g_psvs.clients[chan->player_slot - 1].name);
+						Con_DPrintf("%s:Incoming abnormal uncompressed size with ratio %.2f from %s\n", NET_AdrToString(chan->remote_address), ratio, host_client->name);
 
 					success = FALSE;
 				}
@@ -1530,9 +1538,21 @@ qboolean Netchan_CopyNormalFragments(netchan_t *chan)
 		}
 
 		// Drop client if decompression was unsuccessful
-		if (!success && ((chan->player_slot - 1) == host_client - g_psvs.clients))
+		if (!success)
 		{
-			SV_DropClient(host_client, FALSE, "Malformed/abnormal compressed data");
+			if ((chan->player_slot - 1) == host_client - g_psvs.clients)
+			{
+#ifdef REHLDS_FIXES
+				if (sv_net_incoming_decompression_punish.value >= 0)
+				{
+					Con_DPrintf("%s:Banned for malformed/abnormal bzip2 fragments from %s\n", NET_AdrToString(chan->remote_address), host_client->name);
+					Cbuf_AddText(va("addip %.1f %s\n", sv_net_incoming_decompression_punish.value, NET_BaseAdrToString(chan->remote_address)));
+				}
+#endif
+
+				SV_DropClient(host_client, FALSE, "Malformed/abnormal compressed data");
+			}
+
 			SZ_Clear(&net_message);
 		}
 	}

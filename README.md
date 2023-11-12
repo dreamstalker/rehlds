@@ -58,6 +58,7 @@ This means that plugins that do binary code analysis (Orpheu for example) probab
 <li>sv_net_incoming_decompression <1|0> // When enabled server will decompress of incoming compressed file transfer payloads. Default: 1
 <li>sv_net_incoming_decompression_max_ratio <0|100> // Sets the max allowed ratio between compressed and uncompressed data for file transfer. (A ratio close to 90 indicates large uncompressed data with low entropy) Default: 80.0
 <li>sv_net_incoming_decompression_max_size <16|65536> // Sets the max allowed size for decompressed file transfer data. Default: 65536 bytes
+<li>sv_net_incoming_decompression_punish // Time in minutes for which the player will be banned for malformed/abnormal bzip2 fragments (0 - Permanent, use a negative number for a kick). Default: -1
 </ul>
 </details>
 
