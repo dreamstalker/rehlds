@@ -1897,6 +1897,7 @@ void Netchan_Init(void)
 	Cvar_RegisterVariable(&sv_net_incoming_decompression);
 	Cvar_RegisterVariable(&sv_net_incoming_decompression_max_ratio);
 	Cvar_RegisterVariable(&sv_net_incoming_decompression_max_size);
+	Cvar_RegisterVariable(&sv_net_incoming_decompression_punish);
 #endif
 	Cvar_RegisterVariable(&sv_filetransfermaxsize);
 }
