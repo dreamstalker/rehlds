@@ -1495,7 +1495,7 @@ qboolean Netchan_CopyNormalFragments(netchan_t *chan)
 				return FALSE;
 			}
 			// compressed data is expected only after requesting resource list
-			else if (host_client->m_sendrescount)
+			else if (host_client->m_sendrescount == 0)
 			{
 				Con_DPrintf("%s:Incoming compressed data disallowed from %s\n", NET_AdrToString(chan->remote_address), host_client->name);
 				return FALSE;
