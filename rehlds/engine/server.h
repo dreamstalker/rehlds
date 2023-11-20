@@ -283,6 +283,7 @@ extern rehlds_server_t g_rehlds_sv;
 extern cvar_t sv_lan;
 extern cvar_t sv_lan_rate;
 extern cvar_t sv_aim;
+extern cvar_t sv_allow_autoaim;
 
 extern cvar_t sv_skycolor_r;
 extern cvar_t sv_skycolor_g;
