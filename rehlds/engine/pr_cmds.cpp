@@ -1802,7 +1802,14 @@ void EXT_FUNC PF_aim_I(edict_t *ent, float speed, float *rgflReturn)
 	bestdir[1] = dir[1];
 	bestdir[2] = dir[2];
 	bestdir[0] = dir[0];
-	bestdist = sv_aim.value;
+	if (sv_allow_autoaim.value)
+	{
+		bestdist = sv_aim.value;
+	}
+	else
+	{
+		bestdist = 0.0f;
+	}
 
 	for (int i = 1; i < g_psv.num_edicts; i++)
 	{

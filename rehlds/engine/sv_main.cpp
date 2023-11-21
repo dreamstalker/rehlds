@@ -114,6 +114,7 @@ int giNextUserMsg = 64;
 cvar_t sv_lan = { "sv_lan", "0", 0, 0.0f, NULL };
 cvar_t sv_lan_rate = { "sv_lan_rate", "20000.0", 0, 0.0f, NULL };
 cvar_t sv_aim = { "sv_aim", "1", FCVAR_SERVER | FCVAR_ARCHIVE , 0.0f, NULL };
+cvar_t sv_allow_autoaim = { "sv_allow_autoaim", "1", FCVAR_SERVER | FCVAR_ARCHIVE, 0.0f, NULL };
 
 cvar_t sv_skycolor_r = { "sv_skycolor_r", "0", 0, 0.0f, NULL };
 cvar_t sv_skycolor_g = { "sv_skycolor_g", "0", 0, 0.0f, NULL };
@@ -8024,6 +8025,9 @@ void SV_Init(void)
 	Cvar_RegisterVariable(&sv_visiblemaxplayers);
 	Cvar_RegisterVariable(&sv_password);
 	Cvar_RegisterVariable(&sv_aim);
+#ifdef REHLDS_FIXES
+	Cvar_RegisterVariable(&sv_allow_autoaim);
+#endif
 	Cvar_RegisterVariable(&violence_hblood);
 	Cvar_RegisterVariable(&violence_ablood);
 	Cvar_RegisterVariable(&violence_hgibs);
