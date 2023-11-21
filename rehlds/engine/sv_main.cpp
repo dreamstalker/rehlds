@@ -8025,7 +8025,9 @@ void SV_Init(void)
 	Cvar_RegisterVariable(&sv_visiblemaxplayers);
 	Cvar_RegisterVariable(&sv_password);
 	Cvar_RegisterVariable(&sv_aim);
+#ifdef REHLDS_FIXES
 	Cvar_RegisterVariable(&sv_allow_autoaim);
+#endif
 	Cvar_RegisterVariable(&violence_hblood);
 	Cvar_RegisterVariable(&violence_ablood);
 	Cvar_RegisterVariable(&violence_hgibs);
