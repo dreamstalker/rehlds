@@ -55,6 +55,8 @@ This means that plugins that do binary code analysis (Orpheu for example) probab
 <li>sv_rehlds_local_gametime <1|0> // A feature of local gametime which decrease "lags" if you run same map for a long time. Default: 0
 <li>sv_use_entity_file // Use custom entity file for a map. Path to an entity file will be "maps/[map name].ent". 0 - use original entities. 1 - use .ent files from maps directory. 2 - use .ent files from maps directory and create new .ent file if not exist.
 <li>sv_usercmd_custom_random_seed // When enabled server will populate an additional random seed independent of the client. Default: 0
+<li>sv_invalid_length // Fix bug to fake players. Default: 0
+<li>sv_msg_badread // Disable message flooding in console. Default: 0
 </ul>
 </details>
 

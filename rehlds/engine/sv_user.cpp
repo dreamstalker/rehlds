@@ -92,17 +92,17 @@ void SV_ParseConsistencyResponse(client_t *pSenderClient)
 	int length = 0;
 	int c = 0;
 	Q_memset(nullbuffer, 0, sizeof(nullbuffer));
-	int value = MSG_ReadShort();
+	int mlen = MSG_ReadShort();
 
-	if (value <= 0 || !SZ_HasSomethingToRead(&net_message, value))
+	if (sv_invalid_length.value != 0.0f && mlen <= 0 || !SZ_HasSomethingToRead(&net_message, mlen))
 	{
 		msg_badread = TRUE;
-		Con_DPrintf("%s:  %s:%s invalid length: %d\n", __func__, host_client->name, NET_AdrToString(host_client->netchan.remote_address), value);
+		Con_DPrintf("%s:  %s:%s invalid length: %d\n", __func__, host_client->name, NET_AdrToString(host_client->netchan.remote_address), mlen);
 		SV_DropClient(host_client, FALSE, "Invalid length");
 		return;
 	}
 
-	COM_UnMunge(&net_message.data[msg_readcount], value, g_psvs.spawncount);
+	COM_UnMunge(&net_message.data[msg_readcount], mlen, g_psvs.spawncount);
 	MSG_StartBitReading(&net_message);
 
 	while (MSG_ReadBits(1))
@@ -1578,14 +1578,14 @@ void SV_ParseMove(client_t *pSenderClient)
 	mlen = MSG_ReadByte();
 	cbchecksum = MSG_ReadByte();
 
-	if (mlen <= 0 || !SZ_HasSpaceToRead(&net_message, mlen))
+	if (sv_invalid_length.value != 0.0f && mlen <= 0 || !SZ_HasSpaceToRead(&net_message, mlen))
 	{
 		msg_badread = TRUE;
 		Con_DPrintf("%s:  %s:%s invalid length: %d\n", __func__, host_client->name, NET_AdrToString(host_client->netchan.remote_address), mlen);
 		SV_DropClient(host_client, FALSE, "Invalid length");
 		return;
 	}
-
+	
 	COM_UnMunge(&net_message.data[placeholder + 1], mlen, host_client->netchan.incoming_sequence);
 
 	packetLossByte = MSG_ReadByte();
@@ -1793,7 +1793,11 @@ void EXT_FUNC SV_HandleClientMessage_api(IGameClient* client, uint8 opcode) {
 		static_assert(REHLDS_API_VERSION_MAJOR <= 3, "Bump major API DETECTED!! You shall rework the hookchain, make function returnable");
 		msg_badread = 1;
 
-		Con_Printf("SV_ReadClientMessage: unknown command char (%d)\n", opcode);
+		if (sv_msg_badread.value != 0.0f)
+		{
+			Con_Printf("SV_ReadClientMessage: unknown command char (%d)\n", opcode);
+		}
+
 		SV_DropClient(cl, FALSE, "Bad command character in client command");
 		return;
 	}
@@ -1809,7 +1813,7 @@ void EXT_FUNC SV_HandleClientMessage_api(IGameClient* client, uint8 opcode) {
 		func(cl);
 
 #ifdef REHLDS_FIXES
-	if (msg_badread)
+	if (msg_badread && sv_msg_badread.value != 0.0f)
 	{
 		Con_Printf("SV_ReadClientMessage: badread on %s, opcode %s\n", name, sv_clcfuncs[opcode].pszname);
 	}
@@ -1837,10 +1841,11 @@ void SV_ExecuteClientMessage(client_t *cl)
 
 	while (1)
 	{
-		if (msg_badread)
+		if (msg_badread && sv_msg_badread.value != 0.0f)
 		{
 #ifdef REHLDS_FIXES
 			Con_Printf("SV_ReadClientMessage: badread on %s\n", host_client->name);
+
 			if (host_client->active)
 				SV_ClientPrintf("Badread\n");
 #else // REHLDS_FIXES

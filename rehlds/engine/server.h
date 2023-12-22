@@ -379,6 +379,9 @@ extern cvar_t sv_rehlds_local_gametime;
 extern cvar_t sv_rehlds_send_mapcycle;
 extern cvar_t sv_usercmd_custom_random_seed;
 #endif
+extern cvar_t sv_invalid_length;
+extern cvar_t sv_msg_badread;
+
 extern int sv_playermodel;
 
 extern char outputbuf[MAX_ROUTEABLE_PACKET];

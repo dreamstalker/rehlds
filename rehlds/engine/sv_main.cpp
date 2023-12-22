@@ -218,6 +218,9 @@ cvar_t sv_use_entity_file = { "sv_use_entity_file", "0", 0, 0.0f, nullptr };
 cvar_t sv_usercmd_custom_random_seed = { "sv_usercmd_custom_random_seed", "0", 0, 0.0f, nullptr };
 #endif
 
+cvar_t sv_invalid_length = { "sv_invalid_length", "0", 0, 0.0f, nullptr };
+cvar_t sv_msg_badread = { "sv_msg_badread", "0", 0, 0.0f, nullptr };
+
 delta_t *SV_LookupDelta(char *name)
 {
 	delta_info_t *p = g_sv_delta;
@@ -8113,6 +8116,9 @@ void SV_Init(void)
 	Cvar_RegisterVariable(&sv_use_entity_file);
 	Cvar_RegisterVariable(&sv_usercmd_custom_random_seed);
 #endif
+
+	Cvar_RegisterVariable(&sv_invalid_length);
+	Cvar_RegisterVariable(&sv_msg_badread);
 
 	for (int i = 0; i < MAX_MODELS; i++)
 	{
