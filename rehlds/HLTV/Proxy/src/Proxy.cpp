@@ -956,6 +956,8 @@ void Proxy::CMD_Connect(char *cmdLine)
 		address.SetPort(Q_atoi("27015"));
 	}
 
+	m_System->Printf("Connecting...\n");
+
 	Reset();
 	m_Server->Connect(m_World, &address, m_Socket);
 }
