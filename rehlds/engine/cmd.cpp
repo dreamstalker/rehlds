@@ -235,7 +235,7 @@ void Cbuf_Execute(void)
 		}
 
 		// execute the command line
-		if (len > 0)
+		if (line[0])
 			Cmd_ExecuteString(line, src_command);
 
 		if (cmd_wait)
