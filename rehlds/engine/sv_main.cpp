@@ -6553,7 +6553,6 @@ int EXT_FUNC RegUserMsg(const char *pszName, int iSize)
 	return pNewMsg->iMsg;
 }
 
-#ifdef REHLDS_FIXES
 uint32_t CIDRToMask(int cidr)
 {
 	return htonl(0xFFFFFFFFull << (32 - cidr));
@@ -6703,44 +6702,6 @@ qboolean StringToFilter(const char *s, ipfilter_t *f)
 
 	return true;
 }
-#else // REHLDS_FIXES
-qboolean StringToFilter(const char *s, ipfilter_t *f)
-{
-	char num[128];
-	unsigned char b[4] = { 0, 0, 0, 0 };
-	unsigned char m[4] = { 0, 0, 0, 0 };
-
-	const char* cc = s;
-	int i = 0;
-	while (1)
-	{
-		if (*cc < '0' || *cc > '9')
-			break;
-
-		int j = 0;
-		while (*cc >= '0' && *cc <= '9')
-			num[j++] = *(cc++);
-
-		num[j] = 0;
-		b[i] = Q_atoi(num);
-		if (b[i])
-			m[i] = -1;
-
-		if (*cc)
-		{
-			++cc;
-			++i;
-			if (i < 4)
-				continue;
-		}
-		f->mask = *(uint32 *)m;
-		f->compare.u32 = *(uint32 *)b;
-		return TRUE;
-	}
-	Con_Printf("Bad filter address: %s\n", cc);
-	return FALSE;
-}
-#endif // REHLDS_FIXES
 
 USERID_t *SV_StringToUserID(const char *str)
 {
