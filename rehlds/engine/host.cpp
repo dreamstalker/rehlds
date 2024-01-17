@@ -1197,7 +1197,11 @@ int Host_Init(quakeparms_t *parms)
 	else
 	{
 		Cvar_RegisterVariable(&suitvolume);
+#ifdef REHLDS_FIXES
+		Cvar_RegisterVariable(&r_cachestudio);
+#endif
 	}
+
 	Cbuf_InsertText("exec valve.rc\n");
 	Hunk_AllocName(0, "-HOST_HUNKLEVEL-");
 	host_hunklevel = Hunk_LowMark();
