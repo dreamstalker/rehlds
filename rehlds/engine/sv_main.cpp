@@ -3274,6 +3274,159 @@ void SV_ResetRcon_f(void)
 	Q_memset(g_rgRconFailures, 0, sizeof(g_rgRconFailures));
 }
 
+const int MAX_RCON_USERS = 128;
+ipfilter_t rconusers[MAX_RCON_USERS];
+int numrconusers = 0;
+
+qboolean SV_CheckRconAllowed(const netadr_t *adr)
+{
+	if (numrconusers <= 0)
+		return TRUE; // Rcon user list empty so assume allowed it for all
+
+	for (int i = numrconusers - 1; i >= 0; i--)
+	{
+		ipfilter_t *curFilter = &rconusers[i];
+		if (curFilter->compare.u32 == 0xFFFFFFFF || (*(uint32*)adr->ip & curFilter->mask) == curFilter->compare.u32)
+			return TRUE;
+	}
+
+	return FALSE;
+}
+
+void SV_RconAddUser_f(void)
+{
+	if (Cmd_Argc() != 2)
+	{
+		Con_Printf("Usage: rcon_adduser <ipaddress/CIDR>\n"
+			"ipaddress A.B.C.D/24 is equivalent to A.B.C.0 and A.B.C\n");
+		return;
+	}
+
+	ipfilter_t tempFilter;
+	if (!StringToFilter(Cmd_Argv(1), &tempFilter))
+	{
+		Con_Printf("Invalid IP address!\nUsage: rcon_adduser <ipaddress>\n");
+		return;
+	}
+
+	int i = 0;
+	for (; i < numrconusers; i++)
+	{
+		if (rconusers[i].mask == tempFilter.mask && rconusers[i].compare.u32 == tempFilter.compare.u32)
+		{
+			rconusers[i].cidr = tempFilter.cidr;
+			return;
+		}
+	}
+
+	if (numrconusers >= MAX_RCON_USERS)
+	{
+		Con_Printf("IP rcon users is full\n");
+		return;
+	}
+
+	numrconusers++;
+	rconusers[i].compare = tempFilter.compare;
+	rconusers[i].mask = tempFilter.mask;
+	rconusers[i].cidr = tempFilter.cidr;
+}
+
+void SV_RconDelUser_f(void)
+{
+	int argCount = Cmd_Argc();
+	if (argCount != 2 && argCount != 3)
+	{
+		Con_Printf("Usage: rcon_deluser <ipaddress> {removeAll}\n"
+				   "removeip <ipaddress/CIDR> {removeAll}\n"
+				   "Use removeAll to delete all Rcon ip users which ipaddress or ipaddress/CIDR includes\n");
+
+		return;
+	}
+
+	ipfilter_t f;
+
+	if (!StringToFilter(Cmd_Argv(1), &f))
+	{
+		Con_Printf("Invalid IP address\n"
+				   "Usage: rcon_deluser <ipaddress> {removeAll}\n"
+				   "       rcon_deluser <ipaddress/CIDR> {removeAll}\n"
+				   "Use removeAll to delete all Rcon ip users which ipaddress or ipaddress/CIDR includes\n");
+		return;
+	}
+
+	bool found = false;
+	for (int i = 0; i < numrconusers; i++)
+	{
+		if ((argCount == 2 && rconusers[i].mask == f.mask && rconusers[i].compare.u32 == f.compare.u32) ||
+			(argCount == 3 && IsFilterIncludesAnotherFilter(f, rconusers[i])))
+		{
+			if (i + 1 < numrconusers)
+				Q_memmove(&rconusers[i], &rconusers[i + 1], (numrconusers - (i + 1)) * sizeof(ipfilter_t));
+			numrconusers--;
+			rconusers[numrconusers].banTime = 0.0f;
+			rconusers[numrconusers].banEndTime = 0.0f;
+			rconusers[numrconusers].compare.u32 = 0;
+			rconusers[numrconusers].mask = 0;
+			found = true;
+			--i;
+
+			if (argCount == 2)
+				break;
+		}
+	}
+
+	if (found)
+		Con_Printf("Rcon user IP removed.\n");
+
+	else
+	{
+		Con_Printf("rcon_deluser: couldn't find %s.\n", Cmd_Argv(1));
+	}
+}
+
+void SV_RconUsers_f(void)
+{
+	if (numrconusers <= 0)
+	{
+		Con_Printf("Rcon user IP list: empty\n");
+		return;
+	}
+
+	bool isNew = Cmd_Argc() == 2;
+	bool searchByFilter = isNew && isdigit(Cmd_Argv(1)[0]);
+	ipfilter_t filter;
+
+	if (searchByFilter)
+	{
+		if (!StringToFilter(Cmd_Argv(1), &filter))
+			return;
+
+		Con_Printf("Rcon user IP list for %s:\n", Cmd_Argv(1));
+	}
+	else
+	{
+		Con_Printf("Rcon user IP list:\n");
+	}
+
+	for (int i = 0; i < numrconusers; i++)
+	{
+		uint8 *b = rconusers[i].compare.octets;
+		if (isNew)
+		{
+			if (!searchByFilter || IsFilterIncludesAnotherFilter(filter, rconusers[i]))
+			{
+				char strFilter[32];
+				FilterToString(rconusers[i], strFilter);
+				Con_Printf("%-18s\n", strFilter);
+			}
+		}
+		else if (CanBeWrittenWithoutCIDR(rconusers[i]))
+		{
+			Con_Printf("%3i.%3i.%3i.%3i\n", b[0], b[1], b[2], b[3]);
+		}
+	}
+}
+
 void SV_AddFailedRcon(netadr_t *adr)
 {
 	int i;
@@ -3402,10 +3555,21 @@ qboolean SV_CheckRconFailure(netadr_t *adr)
 	return FALSE;
 }
 
+#define RCON_RESULT_SUCCESS       0 // allow the rcon
+#define RCON_RESULT_BADPASSWORD   1 // reject it, bad password
+#define RCON_RESULT_BADCHALLENGE  2 // bad challenge
+#define RCON_RESULT_BANNING       3 // decline it, banning for rcon hacking attempts
+#define RCON_RESULT_NOSETPASSWORD 4 // rcon password is not set
+#define RCON_RESULT_NOPRIVILEGE   5 // user attempt with valid password but is not privileged
+
 int SV_Rcon_Validate(void)
 {
-	if (Cmd_Argc() < 3 || Q_strlen(rcon_password.string) == 0)
-		return 1;
+	if (Cmd_Argc() < 3)
+		return RCON_RESULT_BADPASSWORD;
+
+	// Must have a password set to allow any rconning
+	if (Q_strlen(rcon_password.string) == 0)
+		return RCON_RESULT_NOSETPASSWORD;
 
 	if (sv_rcon_banpenalty.value < 0.0f)
 		Cvar_SetValue("sv_rcon_banpenalty", 0.0);
@@ -3414,18 +3578,27 @@ int SV_Rcon_Validate(void)
 	{
 		Con_Printf("Banning %s for rcon hacking attempts\n", NET_AdrToString(net_from));
 		Cbuf_AddText(va("addip %i %s\n", (int)sv_rcon_banpenalty.value, NET_BaseAdrToString(net_from)));
-		return 3;
+		return RCON_RESULT_BANNING;
 	}
 
 	if (!SV_CheckChallenge(&net_from, Q_atoi(Cmd_Argv(1))))
-		return 2;
+		return RCON_RESULT_BADCHALLENGE;
 
 	if (Q_strcmp(Cmd_Argv(2), rcon_password.string))
 	{
 		SV_AddFailedRcon(&net_from);
-		return 1;
+		return RCON_RESULT_BADPASSWORD;
 	}
-	return 0;
+
+	if (!SV_CheckRconAllowed(&net_from))
+	{
+		Con_Printf("Banning %s for rcon attempts without privileged\n", NET_AdrToString(net_from));
+		Cbuf_AddText(va("addip %i %s\n", (int)sv_rcon_banpenalty.value, NET_BaseAdrToString(net_from)));
+		return RCON_RESULT_NOPRIVILEGE;
+	}
+
+	// Otherwise it's ok
+	return RCON_RESULT_SUCCESS;
 }
 
 void SV_Rcon(netadr_t *net_from_)
@@ -3445,7 +3618,7 @@ void SV_Rcon(netadr_t *net_from_)
 	if (sv_rcon_condebug.value > 0.0f)
 #endif
 	{
-		if (invalid)
+		if (invalid != RCON_RESULT_SUCCESS)
 		{
 			Con_Printf("Bad Rcon from %s:\n%s\n", NET_AdrToString(*net_from_), remaining);
 			Log_Printf("Bad Rcon: \"%s\" from \"%s\"\n", remaining, NET_AdrToString(*net_from_));
@@ -3459,18 +3632,28 @@ void SV_Rcon(netadr_t *net_from_)
 
 	SV_BeginRedirect(RD_PACKET, net_from_);
 
-	if (invalid)
+	switch (invalid)
 	{
-		if (invalid == 2)
-			Con_Printf("Bad rcon_password.\n");
-		else if (Q_strlen(rcon_password.string) == 0)
-			Con_Printf("Bad rcon_password.\nNo password set for this server.\n");
-		else
-			Con_Printf("Bad rcon_password.\n");
-
+	case RCON_RESULT_SUCCESS:
+		break;
+	case RCON_RESULT_BANNING:
+	case RCON_RESULT_BADPASSWORD:
+		Con_Printf("Bad rcon_password.\n");
+		// fall through
+	case RCON_RESULT_NOPRIVILEGE:
+		Con_Printf("Bad rcon_password.\nNo privilege.\n");
+		// fall through
+	case RCON_RESULT_NOSETPASSWORD:
+		Con_Printf("Bad rcon_password.\nNo password set for this server.\n");
+		// fall through
+	case RCON_RESULT_BADCHALLENGE:
+		Con_Printf("Bad rcon_password.\nBad challenge.\n");
+		// fall through
+	default:
 		SV_EndRedirect();
 		return;
 	}
+
 	char *data = COM_Parse(COM_Parse(COM_Parse(remaining)));
 	if (!data)
 	{
@@ -7995,6 +8178,11 @@ void SV_Init(void)
 	Cmd_AddCommand("listid", SV_ListId_f);
 	Cmd_AddCommand("writeid", SV_WriteId_f);
 	Cmd_AddCommand("resetrcon", SV_ResetRcon_f);
+#ifdef REHLDS_FIXES
+	Cmd_AddCommand("rcon_adduser", SV_RconAddUser_f);
+	Cmd_AddCommand("rcon_deluser", SV_RconDelUser_f);
+	Cmd_AddCommand("rcon_users", SV_RconUsers_f);
+#endif
 	Cmd_AddCommand("logaddress", SV_SetLogAddress_f);
 	Cmd_AddCommand("logaddress_add", SV_AddLogAddress_f);
 	Cmd_AddCommand("logaddress_del", SV_DelLogAddress_f);
