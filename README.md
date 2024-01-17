@@ -62,8 +62,8 @@ This means that plugins that do binary code analysis (Orpheu for example) probab
 <ul>
 <li>rescount // Prints the total count of precached resources in the server console
 <li>reslist &lt;sound | model | decal | generic | event&gt; // Separately prints the details of the precached resources for sounds, models, decals, generic and events in server console. Useful for managing resources and dealing with the goldsource precache limits.
-<li>rcon_adduser <ipaddress/CIDR> // Add a new IP address or CIDR range to RCON user list (This command adds a new IP address to the RCON user list. The specified IP or CIDR range is granted privileged access to server console. Without any Rcon users, access is allowed to anyone with a valid password)</li>
-<li>rcon_deluser <ipaddress> {removeAll} // Remove an IP address or CIDR range from RCON user list </li>
+<li>rcon_adduser &lt;ipaddress/CIDR&gt; // Add a new IP address or CIDR range to RCON user list (This command adds a new IP address to the RCON user list. The specified IP or CIDR range is granted privileged access to server console. Without any Rcon users, access is allowed to anyone with a valid password)</li>
+<li>rcon_deluser &lt;ipaddress&gt; {removeAll} // Remove an IP address or CIDR range from RCON user list</li>
 <li>rcon_users // List all IP addresses and CIDR ranges in RCON user list</li>
 </ul>
 
