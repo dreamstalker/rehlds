@@ -506,7 +506,7 @@ void CSteam3Server::RunFrame()
 void CSteam3Server::UpdateGameTags()
 {
 #ifdef REHLDS_FIXES
-	if (!sv_tags.string[0])
+	if (!m_GameTagsData[0] && !sv_tags.string[0])
 		return;
 
 	if (m_GameTagsData[0] && !Q_stricmp(m_GameTagsData, sv_tags.string))
