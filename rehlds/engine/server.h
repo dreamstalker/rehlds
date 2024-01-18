@@ -366,6 +366,7 @@ extern cvar_t sv_visiblemaxplayers;
 extern cvar_t sv_downloadurl;
 extern cvar_t sv_allow_dlfile;
 extern cvar_t sv_version;
+extern cvar_t sv_tags;
 #ifdef REHLDS_FIXES
 extern cvar_t sv_echo_unknown_cmd;
 extern cvar_t sv_auto_precache_sounds_in_models;

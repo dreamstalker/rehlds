@@ -193,6 +193,8 @@ cvar_t sv_version = { "sv_version", "", FCVAR_SERVER, 0.0f, NULL };
 cvar_t sv_version = {"sv_version", "", 0, 0.0f, NULL};
 #endif
 
+cvar_t sv_tags = { "sv_tags", "", 0, 0.0f, NULL };
+
 cvar_t sv_rcon_minfailures = { "sv_rcon_minfailures", "5", 0, 0.0f, NULL };
 cvar_t sv_rcon_maxfailures = { "sv_rcon_maxfailures", "10", 0, 0.0f, NULL };
 cvar_t sv_rcon_minfailuretime = { "sv_rcon_minfailuretime", "30", 0, 0.0f, NULL };
@@ -8258,6 +8260,7 @@ void SV_Init(void)
 	Cvar_RegisterVariable(&sv_version);
 	Cvar_RegisterVariable(&sv_allow_dlfile);
 #ifdef REHLDS_FIXES
+	Cvar_RegisterVariable(&sv_tags);
 	Cvar_RegisterVariable(&sv_force_ent_intersection);
 	Cvar_RegisterVariable(&sv_echo_unknown_cmd);
 	Cvar_RegisterVariable(&sv_auto_precache_sounds_in_models);
