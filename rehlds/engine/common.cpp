@@ -1182,72 +1182,45 @@ qboolean SZ_HasSomethingToRead(const sizebuf_t *buf, int length)
 
 void *EXT_FUNC SZ_GetSpace(sizebuf_t *buf, int length)
 {
-	void *data;
+	unsigned char *data;
 	const char *buffername = buf->buffername ? buf->buffername : "???";
+	int cursize = buf->cursize;
 
-
-	if (length < 0)
+	if (cursize + length <= buf->maxsize)
 	{
-		Sys_Error("%s: %i negative length on %s", __func__, length, buffername);
+		data = buf->data;
+		buf->cursize += length;
+		return &data[cursize];
 	}
 
-	if (buf->cursize + length > buf->maxsize)
+	if (!(buf->flags & SIZEBUF_ALLOW_OVERFLOW))
 	{
-#ifdef REHLDS_FIXES
+		if (!buf->maxsize)
+		{
+			Sys_Error("%s: tried to write to an uninitialized sizebuf_t: %s", __func__, buffername);
+		}
+		else
+		{
+			Sys_Error("%s: overflow without FSB_ALLOWOVERFLOW set on %s", __func__, buffername);
+		}
+	}
+
+	if (length > buf->maxsize)
+	{
 		if (!(buf->flags & SIZEBUF_ALLOW_OVERFLOW))
 		{
-			if (!buf->maxsize)
-			{
-				Sys_Error("%s: tried to write to an uninitialized sizebuf_t: %s", __func__, buffername);
-			}
-			else if (length > buf->maxsize)
-			{
-				Sys_Error("%s: %i is > full buffer size on %s", __func__, length, buffername);
-			}
-			else
-			{
-				Sys_Error("%s: overflow without FSB_ALLOWOVERFLOW set on %s", __func__, buffername);
-			}
+			Sys_Error("%s: %i is > full buffer size on %s", __func__, length, buffername);
 		}
-
-		if (length > buf->maxsize)
+		else
 		{
 			Con_DPrintf("%s: %i is > full buffer size on %s, ignoring", __func__, length, buffername);
 		}
-#else // REHLDS_FIXES
-		if (!(buf->flags & SIZEBUF_ALLOW_OVERFLOW))
-		{
-			if (!buf->maxsize)
-			{
-				Sys_Error("%s: Tried to write to an uninitialized sizebuf_t: %s", __func__, buffername);
-			}
-			else
-			{
-				Sys_Error("%s: overflow without FSB_ALLOWOVERFLOW set on %s", __func__, buffername);
-			}
-		}
-
-		if (length > buf->maxsize)
-		{
-			if (!(buf->flags & SIZEBUF_ALLOW_OVERFLOW))
-			{
-				Sys_Error("%s: %i is > full buffer size on %s", __func__, length, buffername);
-			}
-
-			Con_DPrintf("%s: %i is > full buffer size on %s, ignoring", __func__, length, buffername);
-		}
-#endif // REHLDS_FIXES
-
-		Con_Printf("%s: overflow on %s\n", __func__, buffername);
-
-		SZ_Clear(buf);
-		buf->flags |= SIZEBUF_OVERFLOWED;
 	}
 
-	data = &buf->data[buf->cursize];
-	buf->cursize = length + buf->cursize;
-
-	return data;
+	Con_Printf("%s: overflow on %s\n", __func__, buffername);
+	buf->cursize = length;
+	buf->flags |= SIZEBUF_OVERFLOWED;
+	return buf->data;
 }
 
 void SZ_Write(sizebuf_t *buf, const void *data, int length)
