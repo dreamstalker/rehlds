@@ -3584,8 +3584,9 @@ int SV_Rcon_Validate(void)
 	}
 
 	if (!SV_CheckChallenge(&net_from, Q_atoi(Cmd_Argv(1))))
-		return RCON_RESULT_BADCHALLENGE;
+		return RCON_RESULT_BADCHALLENGE; // The client is spoofing...
 
+	// If the pw does not match, then disallow command
 	if (Q_strcmp(Cmd_Argv(2), rcon_password.string))
 	{
 		SV_AddFailedRcon(&net_from);
@@ -3603,18 +3604,24 @@ int SV_Rcon_Validate(void)
 	return RCON_RESULT_SUCCESS;
 }
 
+// A client issued an rcom command
+// Shift down the remaining args and redirect all Con_Printf
 void SV_Rcon(netadr_t *net_from_)
 {
-	char remaining[512];
-	char rcon_buff[1024];
+	int		invalid;
+	char	remaining[1024];
+	char	rcon_buff[512];
+	int		len;
 
-	int invalid = SV_Rcon_Validate();
-	int len = net_message.cursize - Q_strlen("rcon");
-	if (len <= 0 || len >= sizeof(remaining))
+	// Verify this user has access rights
+	invalid = SV_Rcon_Validate();
+
+	len = net_message.cursize - Q_strlen("rcon");
+	if (len <= 0 || len >= sizeof(rcon_buff))
 		return;
 
-	Q_memcpy(remaining, &net_message.data[Q_strlen("rcon")], len);
-	remaining[len] = 0;
+	Q_memcpy(rcon_buff, &net_message.data[Q_strlen("rcon")], len);
+	rcon_buff[len] = 0;
 
 #ifdef REHLDS_FIXES
 	if (sv_rcon_condebug.value > 0.0f)
@@ -3622,13 +3629,13 @@ void SV_Rcon(netadr_t *net_from_)
 	{
 		if (invalid != RCON_RESULT_SUCCESS)
 		{
-			Con_Printf("Bad Rcon from %s:\n%s\n", NET_AdrToString(*net_from_), remaining);
-			Log_Printf("Bad Rcon: \"%s\" from \"%s\"\n", remaining, NET_AdrToString(*net_from_));
+			Con_Printf("Bad Rcon from %s:\n%s\n", NET_AdrToString(*net_from_), rcon_buff);
+			Log_Printf("Bad Rcon: \"%s\" from \"%s\"\n", rcon_buff, NET_AdrToString(*net_from_));
 		}
 		else
 		{
-			Con_Printf("Rcon from %s:\n%s\n", NET_AdrToString(*net_from_), remaining);
-			Log_Printf("Rcon: \"%s\" from \"%s\"\n", remaining, NET_AdrToString(*net_from_));
+			Con_Printf("Rcon from %s:\n%s\n", NET_AdrToString(*net_from_), rcon_buff);
+			Log_Printf("Rcon: \"%s\" from \"%s\"\n", rcon_buff, NET_AdrToString(*net_from_));
 		}
 	}
 
@@ -3637,40 +3644,41 @@ void SV_Rcon(netadr_t *net_from_)
 	switch (invalid)
 	{
 	case RCON_RESULT_SUCCESS:
+	{
+		char *data;
+		data = COM_Parse(rcon_buff);
+		data = COM_Parse(data);
+		data = COM_Parse(data);
+
+		if (data)
+		{
+			Q_strncpy(remaining, data, sizeof(remaining) - 1);
+			remaining[sizeof(remaining) - 1] = 0;
+
+			Cmd_ExecuteString(remaining, src_command);
+		}
+		else
+		{
+			Con_Printf("Empty rcon\n");
+		}
+
 		break;
+	}
 	case RCON_RESULT_BANNING:
 	case RCON_RESULT_BADPASSWORD:
 		Con_Printf("Bad rcon_password.\n");
-		// fall through
+		break;
 	case RCON_RESULT_NOPRIVILEGE:
 		Con_Printf("Bad rcon_password.\nNo privilege.\n");
-		// fall through
+		break;
 	case RCON_RESULT_NOSETPASSWORD:
 		Con_Printf("Bad rcon_password.\nNo password set for this server.\n");
-		// fall through
+		break;
 	case RCON_RESULT_BADCHALLENGE:
 		Con_Printf("Bad rcon_password.\nBad challenge.\n");
-		// fall through
-	default:
-		SV_EndRedirect();
-		return;
+		break;
 	}
 
-	char *data = COM_Parse(COM_Parse(COM_Parse(remaining)));
-	if (!data)
-	{
-		Con_Printf("Empty rcon\n");
-
-#ifdef REHLDS_FIXES
-		//missing SV_EndRedirect()
-		SV_EndRedirect();
-#endif // REHLDS_FIXES
-		return;
-	}
-
-	Q_strncpy(rcon_buff, data, sizeof(rcon_buff) - 1);
-	rcon_buff[sizeof(rcon_buff) - 1] = 0;
-	Cmd_ExecuteString(rcon_buff, src_command);
 	SV_EndRedirect();
 }
 
