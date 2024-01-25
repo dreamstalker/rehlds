@@ -586,9 +586,9 @@ void MSG_WriteBitData(void *src, int length)
 
 void MSG_WriteBitAngle(float fAngle, int numbits)
 {
-	if (numbits >= 32)
+	if (numbits > 22)
 	{
-		Sys_Error("%s: Can't write bit angle with 32 bits precision\n", __func__);
+		Sys_Error("%s: Can't write bit angle with more than 22 bits precision\n", __func__);
 	}
 
 	uint32 shift = (1 << numbits);
