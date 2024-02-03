@@ -366,6 +366,7 @@ extern cvar_t sv_visiblemaxplayers;
 extern cvar_t sv_downloadurl;
 extern cvar_t sv_allow_dlfile;
 extern cvar_t sv_version;
+extern cvar_t sv_tags;
 #ifdef REHLDS_FIXES
 extern cvar_t sv_echo_unknown_cmd;
 extern cvar_t sv_auto_precache_sounds_in_models;
@@ -587,6 +588,9 @@ void SV_ClearEntities(void);
 int RegUserMsg(const char *pszName, int iSize);
 qboolean StringToFilter(const char *s, ipfilter_t *f);
 USERID_t *SV_StringToUserID(const char *str);
+bool CanBeWrittenWithoutCIDR(const ipfilter_t &f);
+void FilterToString(const ipfilter_t &f, char *s);
+bool IsFilterIncludesAnotherFilter(const ipfilter_t &f, const ipfilter_t &f2);
 void SV_BanId_f(void);
 void Host_Kick_f(void);
 void SV_RemoveId_f(void);
