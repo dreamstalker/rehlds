@@ -1110,9 +1110,11 @@ int Host_Init(quakeparms_t *parms)
 	if (COM_CheckParm("-dev"))
 		Cvar_SetValue("developer", 1.0);
 
+#ifdef _WIN32
 	char consoleTitle[64];
 	COM_ParseDirectoryFromCmd("-contitle", consoleTitle, "Console");
 	SetConsoleTitle(consoleTitle);
+#endif
 
 	//Engine string pooling
 #ifdef REHLDS_FIXES
