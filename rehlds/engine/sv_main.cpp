@@ -4904,8 +4904,9 @@ void SV_WriteEntitiesToClient(client_t *client, sizebuf_t *msg)
 				if (entityState.aiment < g_psv.num_edicts)
 				{
 					edict_t *ent = &g_psv.edicts[entityState.aiment];
-					if ((ent->v.modelindex >= 0 && ent->v.modelindex < MAX_MODELS)
-						&& g_psv.models[ent->v.modelindex]->type != mod_studio)
+					if (ent->v.modelindex >= 0 && ent->v.modelindex < MAX_MODELS
+						&& (!g_psv.models[ent->v.modelindex]
+						|| g_psv.models[ent->v.modelindex]->type != mod_studio))
 					{
 						entityState.aiment = 0;
 					}
@@ -4915,6 +4916,7 @@ void SV_WriteEntitiesToClient(client_t *client, sizebuf_t *msg)
 			// Prevent spam "Non-sprite set to glow!" in console on client-side
 			if (entityState.rendermode == kRenderGlow
 				&& (entityState.modelindex >= 0 && entityState.modelindex < MAX_MODELS)
+				&& g_psv.models[entityState.modelindex]
 				&& g_psv.models[entityState.modelindex]->type != mod_sprite)
 			{
 				entityState.rendermode = kRenderNormal;
