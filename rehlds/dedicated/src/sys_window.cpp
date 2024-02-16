@@ -54,6 +54,9 @@ public:
 CSys g_Sys;
 ISys *sys = &g_Sys;
 
+SleepType Sys_Sleep;
+NET_Sleep_t NET_Sleep_Timeout = nullptr;
+
 CSys::CSys()
 {
 	// Startup winsock
@@ -76,7 +79,7 @@ CSys::~CSys()
 
 void CSys::Sleep(int msec)
 {
-	::Sleep(msec);
+	Sys_Sleep(msec);
 }
 
 bool CSys::GetExecutableName(char *out)
@@ -233,9 +236,31 @@ void Sys_PrepareConsoleInput()
 	}
 }
 
+void Sleep_Old(int msec)
+{
+	::Sleep(msec);
+}
+
+void Sleep_Net(int msec)
+{
+	NET_Sleep_Timeout();
+}
+
 void Sys_InitPingboost()
 {
-	;
+	Sys_Sleep = Sleep_Old;
+	char *pPingType;
+	if (CommandLine()->CheckParm("-pingboost", &pPingType) && pPingType) {
+		int type = Q_atoi(pPingType);
+
+		if (type == 3) {
+			Sys_Sleep = Sleep_Net;
+
+			// we Sys_GetProcAddress NET_Sleep() from
+			//engine_i486.so later in this function
+			NET_Sleep_Timeout = (NET_Sleep_t)Sys_GetProcAddress(g_pEngineModule, "NET_Sleep_Timeout");
+		}
+	}
 }
 
 void Sys_WriteProcessIdFile()
