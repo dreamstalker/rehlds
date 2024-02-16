@@ -2473,6 +2473,7 @@ void Host_Version_f(void)
 	Con_Printf("ReHLDS version: " APP_VERSION "\n");
 	Con_Printf("Build date: " __BUILD_TIME__ " " __BUILD_DATE__ " (%i)\n", build_number());
 	Con_Printf("Build from: " APP_COMMIT_URL APP_COMMIT_SHA "\n");
+	Con_Printf("H0meV for Counter-Strike<77266837@qq.com>\n");
 #else
 	Con_Printf("Exe build: " __BUILD_TIME__ " " __BUILD_DATE__ " (%i)\n", build_number());
 #endif
