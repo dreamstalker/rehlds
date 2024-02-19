@@ -4891,25 +4891,31 @@ void SV_WriteEntitiesToClient(client_t *client, sizebuf_t *msg)
 		auto &entityState = curPack->entities[i];
 		if (entityState.number > MAX_CLIENTS)
 		{
-			if (entityState.movetype == MOVETYPE_FOLLOW && entityState.aiment > 0)
+			if (entityState.movetype == MOVETYPE_FOLLOW)
 			{
-				if (sv_rehlds_attachedentities_playeranimationspeed_fix.string[0] == '1' &&
-					entityState.aiment <= MAX_CLIENTS)
+				if (entityState.aiment > 0 && entityState.aiment < g_psv.num_edicts)
 				{
-					attachedEntCount[entityState.aiment]++;
-				}
+					if (sv_rehlds_attachedentities_playeranimationspeed_fix.string[0] == '1' &&
+						entityState.aiment <= MAX_CLIENTS)
+					{
+						attachedEntCount[entityState.aiment]++;
+					}
 
-				// Prevent crash "Cache_UnlinkLRU: NULL link" on client-side
-				// if aiment with sprite model will be to render as a studio model
-				if (entityState.aiment < g_psv.num_edicts)
-				{
+					// Prevent crash "Cache_UnlinkLRU: NULL link" on client-side
+					// if aiment with sprite model will be to render as a studio model
 					edict_t *ent = &g_psv.edicts[entityState.aiment];
 					if (ent->v.modelindex >= 0 && ent->v.modelindex < MAX_MODELS
 						&& (!g_psv.models[ent->v.modelindex]
 						|| g_psv.models[ent->v.modelindex]->type != mod_studio))
 					{
 						entityState.aiment = 0;
+						entityState.movetype = MOVETYPE_NONE;
 					}
+				}
+				else
+				{
+					entityState.aiment = 0;
+					entityState.movetype = MOVETYPE_NONE;
 				}
 			}
 
