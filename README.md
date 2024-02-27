@@ -15,8 +15,16 @@ You can try playing on one of many servers that are using ReHLDS: [Game Tracker]
 </ul>
 
 ## How can use it?
-ReHLDS is fully compatible with latest official HLDS downloaded by steamcmd. All you have to do is to download rehlds binaries and replace original swds.dll/engine_i486.so. For windows you can also copy a swds.pdb file with a debug information.
-<br /><b>Warning!</b> ReHLDS is not compatible with an old 5xxx or below platforms downloaded by hldsupdatetool.
+ReHLDS is fully compatible with the official pre-anniversary edition of HLDS (engine version <= 8684) downloaded by steamcmd. All you have to do is to download rehlds binaries and replace original swds.dll/engine_i486.so. For windows you can also copy a swds.pdb file with a debug information.
+
+<b>Warning!</b> ReHLDS is not compatible with an old 5xxx or below platforms downloaded by hldsupdatetool.
+
+#### Downloading HLDS via steamcmd
+
+```
+app_set_config 90 mod cstrike
+app_update 90 -beta steam_legacy validate
+```
 
 ## Downloads
 * [Release builds](https://github.com/dreamstalker/rehlds/releases)
