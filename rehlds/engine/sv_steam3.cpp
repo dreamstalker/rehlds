@@ -628,6 +628,34 @@ void CSteam3Client::OnGameOverlayActivated(GameOverlayActivated_t *pGameOverlayA
 #endif
 }
 
+void CSteam3Client::OnGameRichPresenceJoinRequested(GameRichPresenceJoinRequested_t *pGameRichPresenceJoinRequested)
+{
+	Con_Printf("OnGameRichPresenceJoinRequested\n");
+	
+	client_t* cl = CSteam3Client::ClientFindFromSteamID(pGameRichPresenceJoinRequested->m_steamIDFriend);
+	
+	if(cl)
+		UnsafeCmdLineProcessor(pGameRichPresenceJoinRequested->m_rgchConnect, k_cchMaxRichPresenceValueLength);
+}
+
+client_t *CSteam3Client::ClientFindFromSteamID(CSteamID &steamIDFind)
+{
+	for (int i = 0; i < g_psvs.maxclients; i++)
+	{
+		auto cl = &g_psvs.clients[i];
+		if (!cl->connected && !cl->active && !cl->spawned)
+			continue;
+
+		if (cl->network_userid.idtype != AUTH_IDTYPE_STEAM)
+			continue;
+
+		if (steamIDFind == cl->network_userid.m_SteamID)
+			return cl;
+	}
+
+	return NULL;
+}
+
 void CSteam3Client::RunFrame()
 {
 	CRehldsPlatformHolder::get()->SteamAPI_RunCallbacks();

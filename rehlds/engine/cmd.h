@@ -110,3 +110,4 @@ void Cmd_ForwardToServer(void);
 qboolean Cmd_ForwardToServerUnreliable(void);
 NOXREF int Cmd_CheckParm(const char *parm);
 void Cmd_CmdList_f(void);
+void UnsafeCmdLineProcessor(const char *pchUnsafeCmdLine, int cubSize);
