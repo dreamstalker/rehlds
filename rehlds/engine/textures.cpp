@@ -109,10 +109,10 @@ qboolean TEX_InitFromWad(char *path)
 #endif // REHLDS_FIXES
 
 		texfile = FS_Open(wadPath, "rb");
-		texfiles[nTexFiles++] = texfile;
 		if (!texfile)
 			Sys_Error("%s: couldn't open %s\n", __func__, wadPath);
 
+		texfiles[nTexFiles++] = texfile;
 		Con_DPrintf("Using WAD File: %s\n", wadPath);
 		SafeRead(texfile, &header, 12);
 		if (Q_strncmp(header.identification, "WAD2", 4) && Q_strncmp(header.identification, "WAD3", 4))
@@ -147,8 +147,9 @@ void TEX_CleanupWadInfo(void)
 
 	for (int i = 0; i < nTexFiles; i++)
 	{
-		FS_Close(texfiles[i]);
-		texfiles[i] = 0;
+		if (texfiles[i])
+			FS_Close(texfiles[i]);
+		texfiles[i] = NULL;
 	}
 
 	nTexLumps = 0;

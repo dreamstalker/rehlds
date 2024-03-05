@@ -232,6 +232,10 @@ CSteam3Server::CSteam3Server() :
 	m_CallbackLogonFailure(this, &CSteam3Server::OnLogonFailure),
 	m_SteamIDGS(1, 0, k_EUniverseInvalid, k_EAccountTypeInvalid)
 {
+#ifdef REHLDS_FIXES
+	m_GameTagsData[0] = '\0';
+#endif
+
 	m_bHasActivePlayers = false;
 	m_bWantToBeSecure = false;
 	m_bLanOnly = false;
@@ -499,6 +503,21 @@ void CSteam3Server::RunFrame()
 	}
 }
 
+void CSteam3Server::UpdateGameTags()
+{
+#ifdef REHLDS_FIXES
+	if (!m_GameTagsData[0] && !sv_tags.string[0])
+		return;
+
+	if (m_GameTagsData[0] && !Q_stricmp(m_GameTagsData, sv_tags.string))
+		return;
+
+	Q_strlcpy(m_GameTagsData, sv_tags.string);
+	Q_strlwr(m_GameTagsData);
+	CRehldsPlatformHolder::get()->SteamGameServer()->SetGameTags(m_GameTagsData);
+#endif
+}
+
 void CSteam3Server::SendUpdatedServerDetails()
 {
 	int botCount = 0;
@@ -521,6 +540,8 @@ void CSteam3Server::SendUpdatedServerDetails()
 	CRehldsPlatformHolder::get()->SteamGameServer()->SetBotPlayerCount(botCount);
 	CRehldsPlatformHolder::get()->SteamGameServer()->SetServerName(Cvar_VariableString("hostname"));
 	CRehldsPlatformHolder::get()->SteamGameServer()->SetMapName(g_psv.name);
+
+	UpdateGameTags();
 }
 
 void CSteam3Client::Shutdown()
