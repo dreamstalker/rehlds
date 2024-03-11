@@ -610,7 +610,6 @@ void Host_Status_f(void)
 	Host_Status_Printf(conprint, log, "players :  %i active (%i max)\n\n", nClients, g_psvs.maxclients);
 	Host_Status_Printf(conprint, log, "#      name userid uniqueid frag time ping loss adr\n");
 
-	int count = 1;
 	client = g_psvs.clients;
 	for (j = 0; j < g_psvs.maxclients; j++, client++)
 	{
@@ -634,7 +633,7 @@ void Host_Status_f(void)
 			val = SV_GetClientIDString(client);
 		else val = "BOT";
 
-		Host_Status_Printf(conprint, log, "#%2i %8s %i %s", count++, va("\"%s\"", client->name), client->userid, val);
+		Host_Status_Printf(conprint, log, "#%2i %8s %i %s", j + 1, va("\"%s\"", client->name), client->userid, val);
 		if (client->proxy)
 		{
 			const char *userInfo = Info_ValueForKey(client->userinfo, "hspecs");
@@ -724,7 +723,6 @@ void Host_Status_Formatted_f(void)
 	Host_Status_Printf(conprint, log, "players :  %i active (%i max)\n\n", nClients, g_psvs.maxclients);
 	Host_Status_Printf(conprint, log, "%-2.2s\t%-9.9s\t%-7.7s\t%-20.20s\t%-4.4s\t%-8.8s\t%-4.4s\t%-4.4s\t%-21.21s\n","# ","name","userid   ","uniqueid ","frag","time    ","ping","loss","adr");
 
-	int count = 1;
 	char *szRemoteAddr;
 	client = g_psvs.clients;
 	for (j = 0; j < g_psvs.maxclients; j++, client++)
@@ -755,7 +753,7 @@ void Host_Status_Formatted_f(void)
 #endif // REHLDS_FIXES
 		szIDString = SV_GetClientIDString(client);
 		Host_Status_Printf(conprint, log, "%-2.2s\t%-9.9s\t%-7.7s\t%-20.20s\t%-4.4s\t%-8.8s\t%-4.4s\t%-4.4s\t%-21.21s\n",
-			va("%-2i", count++),va("\"%s\"", client->name),va("%-7i", client->userid),szIDString,
+			va("%-2i", j + 1),va("\"%s\"", client->name),va("%-7i", client->userid),szIDString,
 			va("%-4i", (int)client->edict->v.frags),sz,va("%-4i", SV_CalcPing(client)),va("%-4i", (int)client->packet_loss),szRemoteAddr);
 	}
 	Host_Status_Printf(conprint, log, "%i users\n", nClients);

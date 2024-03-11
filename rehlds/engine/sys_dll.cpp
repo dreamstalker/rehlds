@@ -1150,46 +1150,47 @@ void EXT_FUNC EngineFprintf(void *pfile, const char *szFmt, ...)
 
 void EXT_FUNC AlertMessage(ALERT_TYPE atype, const char *szFmt, ...)
 {
+	char szOut[2048];
 	va_list argptr;
-	static char szOut[1024];
 
-	va_start(argptr, szFmt);
 	if (atype == at_logged && g_psvs.maxclients > 1)
 	{
+		va_start(argptr, szFmt);
 		Q_vsnprintf(szOut, sizeof(szOut), szFmt, argptr);
+		va_end(argptr);
+
 		Log_Printf("%s", szOut);
+		return;
 	}
-	else if (developer.value != 0.0f)
-	{
-		switch (atype)
-		{
-		case at_notice:
-			Q_strcpy(szOut, "NOTE:  ");
-			break;
-		case at_console:
-			szOut[0] = 0;
-			break;
-		case at_aiconsole:
-			if (developer.value < 2.0f)
-				return;
-			szOut[0] = 0;
-			break;
-		case at_warning:
-			Q_strcpy(szOut, "WARNING:  ");
-			break;
-		case at_error:
-			Q_strcpy(szOut, "ERROR:  ");
-			break;
-		case at_logged:
-			break;
-		default:
-			break;
-		}
-		int iLen = Q_strlen(szOut);
-		Q_vsnprintf(&szOut[iLen], sizeof(szOut) - iLen, szFmt, argptr);
-		Con_Printf("%s", szOut);
-	}
+
+	if (!developer.value)
+		return;
+
+	if (atype == at_aiconsole && developer.value < 2)
+		return;
+
+	va_start(argptr, szFmt);
+	Q_vsnprintf(szOut, sizeof(szOut), szFmt, argptr);
 	va_end(argptr);
+
+	switch (atype)
+	{
+	case at_notice:
+		Con_Printf("NOTE:  %s", szOut);
+		break;
+	case at_console:
+	case at_aiconsole:
+		Con_Printf("%s", szOut);
+		break;
+	case at_warning:
+		Con_Printf("WARNING:  %s", szOut);
+		break;
+	case at_error:
+		Con_Printf("ERROR:  %s", szOut);
+		break;
+	default:
+		break;
+	}
 }
 
 NOXREF void Sys_SplitPath(const char *path, char *drive, char *dir, char *fname, char *ext)
@@ -1326,7 +1327,7 @@ void Con_Printf(const char *fmt, ...)
 	va_start(va, fmt);
 	Q_vsnprintf(Dest, sizeof(Dest), fmt, va);
 	va_end(va);
-	
+
 	g_RehldsHookchains.m_Con_Printf.callChain(Con_Printf_internal, Dest);
 }
 
