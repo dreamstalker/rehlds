@@ -138,6 +138,9 @@ void SV_CreateCustomizationList(client_t *pHost)
 			{
 				pCust->nUserData2 = nLumps;
 				gEntityInterface.pfnPlayerCustomization(pHost->edict, pCust);
+#ifdef REHLDS_FIXES
+				SV_Customization(pHost, pResource, TRUE);
+#endif
 			}
 			else
 			{
@@ -205,10 +208,6 @@ void SV_RegisterResources(void)
 	pHost->uploading = FALSE;
 #ifdef REHLDS_FIXES
 	SV_CreateCustomizationList(pHost);		// FIXED: Call this function only once. It was crazy to call it for each resource available.
-	for (pResource = pHost->resourcesonhand.pNext; pResource != &pHost->resourcesonhand; pResource = pResource->pNext)
-	{
-		SV_Customization(pHost, pResource, TRUE);
-	}
 #else // REHLDS_FIXES
 	for (pResource = pHost->resourcesonhand.pNext; pResource != &pHost->resourcesonhand; pResource = pResource->pNext)
 	{
