@@ -145,9 +145,9 @@ void SV_CreateCustomizationList(client_t *pHost)
 			else
 			{
 				if (sv_allow_upload.value == 0.0f)
-					Con_Printf("Ignoring custom decal from %s\n", pHost->name);
+					Con_DPrintf("Ignoring custom decal from %s\n", pHost->name);
 				else
-					Con_Printf("Ignoring invalid custom decal from %s\n", pHost->name);
+					Con_DPrintf("Ignoring invalid custom decal from %s\n", pHost->name);
 			}
 		}
 	}
