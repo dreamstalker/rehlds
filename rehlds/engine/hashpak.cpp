@@ -620,7 +620,9 @@ qboolean HPAK_ResourceForHash(char *pakname, unsigned char *hash, struct resourc
 	fp = FS_Open(name, "rb");
 	if (!fp)
 	{
+#ifndef REHLDS_FIXES
 		Con_Printf("ERROR: couldn't open %s.\n", name);
+#endif
 		return FALSE;
 	}
 	FS_Read(&header, sizeof(hash_pack_header_t), 1, fp);
