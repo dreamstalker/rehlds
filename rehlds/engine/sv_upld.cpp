@@ -509,8 +509,13 @@ void SV_ParseResourceList(client_t *pSenderClient)
 		}
 	}
 
-	host_client->uploading = TRUE;
-	host_client->uploaddoneregistering = FALSE;
+#ifdef REHLDS_FIXES
+	if (sv_allow_upload.value != 0.0f)
+#endif //REHLDS_FIXES
+	{
+		host_client->uploading = TRUE;
+		host_client->uploaddoneregistering = FALSE;
 
-	SV_BatchUploadRequest(host_client);
+		SV_BatchUploadRequest(host_client);
+	}
 }
