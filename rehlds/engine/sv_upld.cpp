@@ -160,6 +160,11 @@ void SV_Customization(client_t *pPlayer, resource_t *pResource, qboolean bSkipPl
 	int nPlayerNumber;
 	client_t *pHost;
 
+#ifdef REHLDS_FIXES
+	if ((pResource->ucFlags & RES_CUSTOM) && !sv_send_logos.value)
+		return;
+#endif
+
 	// Get originating player id
 	for (i = 0, pHost = g_psvs.clients; i < g_psvs.maxclients; i++, pHost++)
 	{

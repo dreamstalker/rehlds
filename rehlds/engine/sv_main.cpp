@@ -5748,6 +5748,12 @@ void SV_PropagateCustomizations(void)
 			if (pCust->bInUse)
 			{
 				pResource = &pCust->resource;
+
+#ifdef REHLDS_FIXES
+				if ((pResource->ucFlags & RES_CUSTOM) && !sv_send_logos.value)
+					continue;
+#endif
+
 				MSG_WriteByte(&host_client->netchan.message, svc_customization);
 				MSG_WriteByte(&host_client->netchan.message, i);
 				MSG_WriteByte(&host_client->netchan.message, pResource->type);
