@@ -678,6 +678,11 @@ qboolean EXT_FUNC Voice_SetClientListening(int iReceiver, int iSender, qboolean 
 
 DISPATCHFUNCTION GetDispatch(char *pname)
 {
+	return g_RehldsHookchains.m_GetDispatch.callChain(GetDispatch_Internal, pname);
+}
+
+DISPATCHFUNCTION GetDispatch_Internal(char* pname)
+{
 	int i;
 	DISPATCHFUNCTION pDispatch;
 
