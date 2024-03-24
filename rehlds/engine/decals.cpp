@@ -717,14 +717,9 @@ NOXREF qboolean Draw_CacheReload(cachewad_t *wad, int i, lumpinfo_t *pLump, cach
 qboolean Draw_ValidateCustomLogo(cachewad_t *wad, unsigned char *data, lumpinfo_t *lump)
 {
 	texture_t tex;
-	miptex_t *mip;
-	miptex_t tmp;
-	int pix;
-	int pixoffset;
-	int paloffset;
-	int palettesize;
-	int nPalleteCount;
-	int nSize;
+	miptex_t *mip, tmp;
+	int i, pix, paloffset, palettesize;
+	int size;
 
 	if (wad->cacheExtra != DECAL_EXTRASIZE)
 	{
@@ -734,58 +729,54 @@ qboolean Draw_ValidateCustomLogo(cachewad_t *wad, unsigned char *data, lumpinfo_
 
 	tex = *(texture_t *)data;
 	mip = (miptex_t *)(data + wad->cacheExtra);
-	tmp = *mip;
 
+	// Copy mip texture data
+	tmp = *mip;
 	tex.width = LittleLong(tmp.width);
 	tex.height = LittleLong(tmp.height);
-	tex.anim_max = 0;
-	tex.anim_min = 0;
-	tex.anim_total = 0;
-	tex.alternate_anims = NULL;
-	tex.anim_next = NULL;
+	tex.anim_total = tex.anim_min = tex.anim_max = 0;
+	tex.alternate_anims = tex.anim_next = NULL;
 
-	if (!tex.width || tex.width > 256 || tex.height > 256)
-	{
-		Con_Printf("%s: Bad wad dimensions %s\n", __func__, wad->name);
-		return FALSE;
-	}
-
-	for (int i = 0; i < MIPLEVELS; i++)
+	for (i = 0; i < MIPLEVELS; i++)
 		tex.offsets[i] = wad->cacheExtra + LittleLong(tmp.offsets[i]);
 
+	if (tex.width <= 0  || tex.height <= 0 ||
+		// Check if texture dimensions exceed limits
+		tex.width > 256 || tex.height > 256)
+	{
+		Con_Printf("%s: Bad cached wad tex size  %ux%u on %s\n", __func__, tex.width, tex.height, wad->name);
+		return FALSE;
+	}
+
 	pix = tex.width * tex.height;
-	pixoffset = pix + (pix >> 2) + (pix >> 4) + (pix >> 6);
+	size = pix + (pix >> 2) + (pix >> 4) + (pix >> 6);
 
-#ifdef REHLDS_FIXES
-	// Ensure that pixoffset won't be exceed the pre allocated buffer
-	// This can happen when there are no color palettes in payload
-	if ((pixoffset + sizeof(texture_t)) >= (unsigned)(wad->cacheExtra + lump->size))
+	if ((unsigned)(size + sizeof(miptex_t)) >= (unsigned)(lump->size + wad->cacheExtra))
 	{
-		Con_Printf("%s: Bad wad payload size %s\n", __func__, wad->name);
-		return FALSE;
-	}
-#endif
-
-	paloffset = (pix >> 2) + tmp.offsets[0] + pix;
-	palettesize = (pix >> 4) + paloffset;
-
-	if ((tmp.offsets[0] + pix != tmp.offsets[1])
-		|| paloffset != tmp.offsets[2]
-		|| palettesize != tmp.offsets[3])
-	{
-		Con_Printf("%s: Bad cached wad %s\n", __func__, wad->name);
-		return FALSE;
+		Con_Printf("%s: Bad cached wad size %i/%i on %s\n", __func__, size + sizeof(miptex_t), lump->size + wad->cacheExtra, wad->name);
 	}
 
-	nPalleteCount = *(u_short *)(data + pixoffset + sizeof(texture_t));
-	if (nPalleteCount > 256)
+	paloffset = size + sizeof(lumpinfo_t) + sizeof(miptex_t);
+	palettesize = *(u_short *)(data + paloffset); // Get palette size
+
+	for (i = 0; i < 3; i++)
 	{
-		Con_Printf("%s: Bad cached wad palette size %i on %s\n", __func__, nPalleteCount, wad->name);
+		// Check if offsets are valid for mip levels
+		if (pix + tmp.offsets[i] != tmp.offsets[i + 1])
+		{
+			Con_Printf("%s: Bad cached wad %s\n", __func__, wad->name);
+			return FALSE;
+		}
+		pix >>= 2;
+	}
+
+	if (palettesize > 256)
+	{
+		Con_Printf("%s: Bad cached wad palette size %i on %s\n", __func__, palettesize, wad->name);
 		return FALSE;
 	}
 
-	nSize = pixoffset + LittleLong(tmp.offsets[0]) + 3 * nPalleteCount + 2;
-	if (nSize > lump->disksize)
+	if ((palettesize + 2 * (palettesize + 1) + size + LittleLong(tmp.offsets[0])) > lump->disksize)
 	{
 		Con_Printf("%s: Bad cached wad %s\n", __func__, wad->name);
 		return FALSE;

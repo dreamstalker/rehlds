@@ -138,13 +138,16 @@ void SV_CreateCustomizationList(client_t *pHost)
 			{
 				pCust->nUserData2 = nLumps;
 				gEntityInterface.pfnPlayerCustomization(pHost->edict, pCust);
+#ifdef REHLDS_FIXES
+				SV_Customization(pHost, pResource, TRUE);
+#endif
 			}
 			else
 			{
 				if (sv_allow_upload.value == 0.0f)
-					Con_Printf("Ignoring custom decal from %s\n", pHost->name);
+					Con_DPrintf("Ignoring custom decal from %s\n", pHost->name);
 				else
-					Con_Printf("Ignoring invalid custom decal from %s\n", pHost->name);
+					Con_DPrintf("Ignoring invalid custom decal from %s\n", pHost->name);
 			}
 		}
 	}
@@ -156,6 +159,11 @@ void SV_Customization(client_t *pPlayer, resource_t *pResource, qboolean bSkipPl
 	int i;
 	int nPlayerNumber;
 	client_t *pHost;
+
+#ifdef REHLDS_FIXES
+	if ((pResource->ucFlags & RES_CUSTOM) && !sv_send_logos.value)
+		return;
+#endif
 
 	// Get originating player id
 	for (i = 0, pHost = g_psvs.clients; i < g_psvs.maxclients; i++, pHost++)
@@ -205,10 +213,6 @@ void SV_RegisterResources(void)
 	pHost->uploading = FALSE;
 #ifdef REHLDS_FIXES
 	SV_CreateCustomizationList(pHost);		// FIXED: Call this function only once. It was crazy to call it for each resource available.
-	for (pResource = pHost->resourcesonhand.pNext; pResource != &pHost->resourcesonhand; pResource = pResource->pNext)
-	{
-		SV_Customization(pHost, pResource, TRUE);
-	}
 #else // REHLDS_FIXES
 	for (pResource = pHost->resourcesonhand.pNext; pResource != &pHost->resourcesonhand; pResource = pResource->pNext)
 	{
@@ -509,8 +513,13 @@ void SV_ParseResourceList(client_t *pSenderClient)
 		}
 	}
 
-	host_client->uploading = TRUE;
-	host_client->uploaddoneregistering = FALSE;
+#ifdef REHLDS_FIXES
+	if (sv_allow_upload.value != 0.0f)
+#endif //REHLDS_FIXES
+	{
+		host_client->uploading = TRUE;
+		host_client->uploaddoneregistering = FALSE;
 
-	SV_BatchUploadRequest(host_client);
+		SV_BatchUploadRequest(host_client);
+	}
 }

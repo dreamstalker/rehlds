@@ -54,6 +54,8 @@ protected:
 	bool InitModule();
 };
 
+#define MAX_STEAM_TAGS_LENGTH 128 // Steam doesn't send tags string more than 128 bytes
+
 class CSteam3Server: public CSteam3
 {
 public:
@@ -70,6 +72,10 @@ protected:
 	bool m_bWantToBeSecure;
 	bool m_bLanOnly;
 	CSteamID m_SteamIDGS;
+
+#ifdef REHLDS_FIXES
+	char m_GameTagsData[MAX_STEAM_TAGS_LENGTH];
+#endif
 
 public:
 
@@ -96,6 +102,7 @@ public:
 	void NotifyOfLevelChange(bool bForce);
 	void RunFrame();
 	void SendUpdatedServerDetails();
+	void UpdateGameTags();
 };
 
 class CSteam3Client: public CSteam3

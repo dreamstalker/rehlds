@@ -235,7 +235,8 @@ void Cbuf_Execute(void)
 		}
 
 		// execute the command line
-		Cmd_ExecuteString(line, src_command);
+		if (line[0])
+			Cmd_ExecuteString(line, src_command);
 
 		if (cmd_wait)
 		{
@@ -406,17 +407,12 @@ void Cmd_Exec_f(void)
 	else
 	{
 		char *pszDataPtr = configContents;
-		while (true)
+		while (pszDataPtr && *pszDataPtr)
 		{
 			Cbuf_Execute();	// TODO: This doesn't obey the rule to first execute commands from the file, and then the others in the buffer
 			pszDataPtr = COM_ParseLine(pszDataPtr); // TODO: COM_ParseLine can be const char*
-
-			if (com_token[0] == 0)
-			{
-				break;
-			}
-
-			Cbuf_InsertTextLines(com_token);
+			if (com_token[0])
+				Cbuf_InsertTextLines(com_token);
 		}
 	}
 

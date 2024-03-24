@@ -610,7 +610,6 @@ void Host_Status_f(void)
 	Host_Status_Printf(conprint, log, "players :  %i active (%i max)\n\n", nClients, g_psvs.maxclients);
 	Host_Status_Printf(conprint, log, "#      name userid uniqueid frag time ping loss adr\n");
 
-	int count = 1;
 	client = g_psvs.clients;
 	for (j = 0; j < g_psvs.maxclients; j++, client++)
 	{
@@ -634,7 +633,7 @@ void Host_Status_f(void)
 			val = SV_GetClientIDString(client);
 		else val = "BOT";
 
-		Host_Status_Printf(conprint, log, "#%2i %8s %i %s", count++, va("\"%s\"", client->name), client->userid, val);
+		Host_Status_Printf(conprint, log, "#%2i %8s %i %s", j + 1, va("\"%s\"", client->name), client->userid, val);
 		if (client->proxy)
 		{
 			const char *userInfo = Info_ValueForKey(client->userinfo, "hspecs");
@@ -724,7 +723,6 @@ void Host_Status_Formatted_f(void)
 	Host_Status_Printf(conprint, log, "players :  %i active (%i max)\n\n", nClients, g_psvs.maxclients);
 	Host_Status_Printf(conprint, log, "%-2.2s\t%-9.9s\t%-7.7s\t%-20.20s\t%-4.4s\t%-8.8s\t%-4.4s\t%-4.4s\t%-21.21s\n","# ","name","userid   ","uniqueid ","frag","time    ","ping","loss","adr");
 
-	int count = 1;
 	char *szRemoteAddr;
 	client = g_psvs.clients;
 	for (j = 0; j < g_psvs.maxclients; j++, client++)
@@ -755,10 +753,115 @@ void Host_Status_Formatted_f(void)
 #endif // REHLDS_FIXES
 		szIDString = SV_GetClientIDString(client);
 		Host_Status_Printf(conprint, log, "%-2.2s\t%-9.9s\t%-7.7s\t%-20.20s\t%-4.4s\t%-8.8s\t%-4.4s\t%-4.4s\t%-21.21s\n",
-			va("%-2i", count++),va("\"%s\"", client->name),va("%-7i", client->userid),szIDString,
+			va("%-2i", j + 1),va("\"%s\"", client->name),va("%-7i", client->userid),szIDString,
 			va("%-4i", (int)client->edict->v.frags),sz,va("%-4i", SV_CalcPing(client)),va("%-4i", (int)client->packet_loss),szRemoteAddr);
 	}
 	Host_Status_Printf(conprint, log, "%i users\n", nClients);
+}
+
+// Sets client to godmode
+void Host_God_f(void)
+{
+	if (cmd_source == src_command)
+	{
+		Cmd_ForwardToServer();
+		return;
+	}
+
+	if (!sv_cheats.value)
+		return;
+
+	sv_player->v.flags = (int)sv_player->v.flags ^ FL_GODMODE;
+	if (!((int)sv_player->v.flags & FL_GODMODE))
+		SV_ClientPrintf("godmode OFF\n");
+	else
+		SV_ClientPrintf("godmode ON\n");
+}
+
+// Sets client to notarget mode
+void Host_Notarget_f(void)
+{
+	if (cmd_source == src_command)
+	{
+		Cmd_ForwardToServer();
+		return;
+	}
+
+	if (!sv_cheats.value)
+		return;
+
+	sv_player->v.flags = (int)sv_player->v.flags ^ FL_NOTARGET;
+	if (!((int)sv_player->v.flags & FL_NOTARGET))
+		SV_ClientPrintf("notarget OFF\n");
+	else
+		SV_ClientPrintf("notarget ON\n");
+}
+
+// Searches along the direction ray in steps of "step" to see if
+// the entity position is passible
+// Used for putting the player in valid space when toggling off noclip mode
+int FindPassableSpace(edict_t *pEdict, vec_t *direction, float step)
+{
+	int		i;
+
+	for (i = 0; i < 100; i++)
+	{
+		VectorMA(pEdict->v.origin, step, direction, pEdict->v.origin);
+
+		if (!SV_TestEntityPosition(pEdict))
+		{
+			// Store old origin
+			VectorCopy(pEdict->v.origin, pEdict->v.oldorigin);
+			return TRUE;
+		}
+	}
+
+	return FALSE;
+}
+
+void Host_Noclip_f(void)
+{
+	if (cmd_source == src_command)
+	{
+		Cmd_ForwardToServer();
+		return;
+	}
+
+	if (!sv_cheats.value)
+		return;
+
+	if (sv_player->v.movetype != MOVETYPE_NOCLIP)
+	{
+		sv_player->v.movetype = MOVETYPE_NOCLIP;
+		SV_ClientPrintf("noclip ON\n");
+	}
+	else
+	{
+		sv_player->v.movetype = MOVETYPE_WALK;
+
+		// Store old origin
+		VectorCopy(sv_player->v.origin, sv_player->v.oldorigin);
+
+		SV_ClientPrintf("noclip OFF\n");
+
+		if (SV_TestEntityPosition(sv_player))
+		{
+			vec3_t forward, right, up;
+			AngleVectors(sv_player->v.v_angle, forward, right, up);
+
+			if (!FindPassableSpace(sv_player, forward, 1.0)
+				&& !FindPassableSpace(sv_player, right, 1.0)
+				&& !FindPassableSpace(sv_player, right, -1.0)		// left
+				&& !FindPassableSpace(sv_player, up, 1.0)			// up
+				&& !FindPassableSpace(sv_player, up, -1.0)			// down
+				&& !FindPassableSpace(sv_player, forward, -1.0))	// back
+			{
+				Con_DPrintf("Can't find the world\n");
+			}
+
+			VectorCopy(sv_player->v.oldorigin, sv_player->v.origin);
+		}
+	}
 }
 
 void Host_Ping_f(void)
@@ -3146,11 +3249,12 @@ void Host_InitCommands(void)
 	Cmd_AddCommand("setinfo", Host_SetInfo_f);
 	Cmd_AddCommand("fullinfo", Host_FullInfo_f);
 
-#ifndef SWDS
 	Cmd_AddCommand("god", Host_God_f);
 	Cmd_AddCommand("notarget", Host_Notarget_f);
-	Cmd_AddCommand("fly", Host_Fly_f);
 	Cmd_AddCommand("noclip", Host_Noclip_f);
+
+#ifndef SWDS
+	Cmd_AddCommand("fly", Host_Fly_f);
 	Cmd_AddCommand("viewmodel", Host_Viewmodel_f);
 	Cmd_AddCommand("viewframe", Host_Viewframe_f);
 	Cmd_AddCommand("viewnext", Host_Viewnext_f);

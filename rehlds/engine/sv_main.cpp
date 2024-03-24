@@ -114,6 +114,7 @@ int giNextUserMsg = 64;
 cvar_t sv_lan = { "sv_lan", "0", 0, 0.0f, NULL };
 cvar_t sv_lan_rate = { "sv_lan_rate", "20000.0", 0, 0.0f, NULL };
 cvar_t sv_aim = { "sv_aim", "1", FCVAR_SERVER | FCVAR_ARCHIVE , 0.0f, NULL };
+cvar_t sv_allow_autoaim = { "sv_allow_autoaim", "1", FCVAR_SERVER | FCVAR_ARCHIVE, 0.0f, NULL };
 
 cvar_t sv_skycolor_r = { "sv_skycolor_r", "0", 0, 0.0f, NULL };
 cvar_t sv_skycolor_g = { "sv_skycolor_g", "0", 0, 0.0f, NULL };
@@ -191,6 +192,8 @@ cvar_t sv_version = { "sv_version", "", FCVAR_SERVER, 0.0f, NULL };
 #else
 cvar_t sv_version = {"sv_version", "", 0, 0.0f, NULL};
 #endif
+
+cvar_t sv_tags = { "sv_tags", "", 0, 0.0f, NULL };
 
 cvar_t sv_rcon_minfailures = { "sv_rcon_minfailures", "5", 0, 0.0f, NULL };
 cvar_t sv_rcon_maxfailures = { "sv_rcon_maxfailures", "10", 0, 0.0f, NULL };
@@ -3275,6 +3278,159 @@ void SV_ResetRcon_f(void)
 	Q_memset(g_rgRconFailures, 0, sizeof(g_rgRconFailures));
 }
 
+const int MAX_RCON_USERS = 128;
+ipfilter_t rconusers[MAX_RCON_USERS];
+int numrconusers = 0;
+
+qboolean SV_CheckRconAllowed(const netadr_t *adr)
+{
+	if (numrconusers <= 0)
+		return TRUE; // Rcon user list empty so assume allowed it for all
+
+	for (int i = numrconusers - 1; i >= 0; i--)
+	{
+		ipfilter_t *curFilter = &rconusers[i];
+		if (curFilter->compare.u32 == 0xFFFFFFFF || (*(uint32*)adr->ip & curFilter->mask) == curFilter->compare.u32)
+			return TRUE;
+	}
+
+	return FALSE;
+}
+
+void SV_RconAddUser_f(void)
+{
+	if (Cmd_Argc() != 2)
+	{
+		Con_Printf("Usage: rcon_adduser <ipaddress/CIDR>\n"
+			"ipaddress A.B.C.D/24 is equivalent to A.B.C.0 and A.B.C\n");
+		return;
+	}
+
+	ipfilter_t tempFilter;
+	if (!StringToFilter(Cmd_Argv(1), &tempFilter))
+	{
+		Con_Printf("Invalid IP address!\nUsage: rcon_adduser <ipaddress>\n");
+		return;
+	}
+
+	int i = 0;
+	for (; i < numrconusers; i++)
+	{
+		if (rconusers[i].mask == tempFilter.mask && rconusers[i].compare.u32 == tempFilter.compare.u32)
+		{
+			rconusers[i].cidr = tempFilter.cidr;
+			return;
+		}
+	}
+
+	if (numrconusers >= MAX_RCON_USERS)
+	{
+		Con_Printf("IP rcon users is full\n");
+		return;
+	}
+
+	numrconusers++;
+	rconusers[i].compare = tempFilter.compare;
+	rconusers[i].mask = tempFilter.mask;
+	rconusers[i].cidr = tempFilter.cidr;
+}
+
+void SV_RconDelUser_f(void)
+{
+	int argCount = Cmd_Argc();
+	if (argCount != 2 && argCount != 3)
+	{
+		Con_Printf("Usage: rcon_deluser <ipaddress> {removeAll}\n"
+				   "removeip <ipaddress/CIDR> {removeAll}\n"
+				   "Use removeAll to delete all Rcon ip users which ipaddress or ipaddress/CIDR includes\n");
+
+		return;
+	}
+
+	ipfilter_t f;
+
+	if (!StringToFilter(Cmd_Argv(1), &f))
+	{
+		Con_Printf("Invalid IP address\n"
+				   "Usage: rcon_deluser <ipaddress> {removeAll}\n"
+				   "       rcon_deluser <ipaddress/CIDR> {removeAll}\n"
+				   "Use removeAll to delete all Rcon ip users which ipaddress or ipaddress/CIDR includes\n");
+		return;
+	}
+
+	bool found = false;
+	for (int i = 0; i < numrconusers; i++)
+	{
+		if ((argCount == 2 && rconusers[i].mask == f.mask && rconusers[i].compare.u32 == f.compare.u32) ||
+			(argCount == 3 && IsFilterIncludesAnotherFilter(f, rconusers[i])))
+		{
+			if (i + 1 < numrconusers)
+				Q_memmove(&rconusers[i], &rconusers[i + 1], (numrconusers - (i + 1)) * sizeof(ipfilter_t));
+			numrconusers--;
+			rconusers[numrconusers].banTime = 0.0f;
+			rconusers[numrconusers].banEndTime = 0.0f;
+			rconusers[numrconusers].compare.u32 = 0;
+			rconusers[numrconusers].mask = 0;
+			found = true;
+			--i;
+
+			if (argCount == 2)
+				break;
+		}
+	}
+
+	if (found)
+		Con_Printf("Rcon user IP removed.\n");
+
+	else
+	{
+		Con_Printf("rcon_deluser: couldn't find %s.\n", Cmd_Argv(1));
+	}
+}
+
+void SV_RconUsers_f(void)
+{
+	if (numrconusers <= 0)
+	{
+		Con_Printf("Rcon user IP list: empty\n");
+		return;
+	}
+
+	bool isNew = Cmd_Argc() == 2;
+	bool searchByFilter = isNew && isdigit(Cmd_Argv(1)[0]);
+	ipfilter_t filter;
+
+	if (searchByFilter)
+	{
+		if (!StringToFilter(Cmd_Argv(1), &filter))
+			return;
+
+		Con_Printf("Rcon user IP list for %s:\n", Cmd_Argv(1));
+	}
+	else
+	{
+		Con_Printf("Rcon user IP list:\n");
+	}
+
+	for (int i = 0; i < numrconusers; i++)
+	{
+		uint8 *b = rconusers[i].compare.octets;
+		if (isNew)
+		{
+			if (!searchByFilter || IsFilterIncludesAnotherFilter(filter, rconusers[i]))
+			{
+				char strFilter[32];
+				FilterToString(rconusers[i], strFilter);
+				Con_Printf("%-18s\n", strFilter);
+			}
+		}
+		else if (CanBeWrittenWithoutCIDR(rconusers[i]))
+		{
+			Con_Printf("%3i.%3i.%3i.%3i\n", b[0], b[1], b[2], b[3]);
+		}
+	}
+}
+
 void SV_AddFailedRcon(netadr_t *adr)
 {
 	int i;
@@ -3403,10 +3559,21 @@ qboolean SV_CheckRconFailure(netadr_t *adr)
 	return FALSE;
 }
 
+#define RCON_RESULT_SUCCESS       0 // allow the rcon
+#define RCON_RESULT_BADPASSWORD   1 // reject it, bad password
+#define RCON_RESULT_BADCHALLENGE  2 // bad challenge
+#define RCON_RESULT_BANNING       3 // decline it, banning for rcon hacking attempts
+#define RCON_RESULT_NOSETPASSWORD 4 // rcon password is not set
+#define RCON_RESULT_NOPRIVILEGE   5 // user attempt with valid password but is not privileged
+
 int SV_Rcon_Validate(void)
 {
-	if (Cmd_Argc() < 3 || Q_strlen(rcon_password.string) == 0)
-		return 1;
+	if (Cmd_Argc() < 3)
+		return RCON_RESULT_BADPASSWORD;
+
+	// Must have a password set to allow any rconning
+	if (Q_strlen(rcon_password.string) == 0)
+		return RCON_RESULT_NOSETPASSWORD;
 
 	if (sv_rcon_banpenalty.value < 0.0f)
 		Cvar_SetValue("sv_rcon_banpenalty", 0.0);
@@ -3415,78 +3582,105 @@ int SV_Rcon_Validate(void)
 	{
 		Con_Printf("Banning %s for rcon hacking attempts\n", NET_AdrToString(net_from));
 		Cbuf_AddText(va("addip %i %s\n", (int)sv_rcon_banpenalty.value, NET_BaseAdrToString(net_from)));
-		return 3;
+		return RCON_RESULT_BANNING;
 	}
 
 	if (!SV_CheckChallenge(&net_from, Q_atoi(Cmd_Argv(1))))
-		return 2;
+		return RCON_RESULT_BADCHALLENGE; // The client is spoofing...
 
+	// If the pw does not match, then disallow command
 	if (Q_strcmp(Cmd_Argv(2), rcon_password.string))
 	{
 		SV_AddFailedRcon(&net_from);
-		return 1;
+		return RCON_RESULT_BADPASSWORD;
 	}
-	return 0;
+
+	if (!SV_CheckRconAllowed(&net_from))
+	{
+		Con_Printf("Banning %s for rcon attempts without privileged\n", NET_AdrToString(net_from));
+		Cbuf_AddText(va("addip %i %s\n", (int)sv_rcon_banpenalty.value, NET_BaseAdrToString(net_from)));
+		return RCON_RESULT_NOPRIVILEGE;
+	}
+
+	// Otherwise it's ok
+	return RCON_RESULT_SUCCESS;
 }
 
+// A client issued an rcom command
+// Shift down the remaining args and redirect all Con_Printf
 void SV_Rcon(netadr_t *net_from_)
 {
-	char remaining[512];
-	char rcon_buff[1024];
+	int		invalid;
+	char	remaining[1024];
+	char	rcon_buff[512];
+	int		len;
 
-	int invalid = SV_Rcon_Validate();
-	int len = net_message.cursize - Q_strlen("rcon");
-	if (len <= 0 || len >= sizeof(remaining))
+	// Verify this user has access rights
+	invalid = SV_Rcon_Validate();
+
+	len = net_message.cursize - Q_strlen("rcon");
+	if (len <= 0 || len >= sizeof(rcon_buff))
 		return;
 
-	Q_memcpy(remaining, &net_message.data[Q_strlen("rcon")], len);
-	remaining[len] = 0;
+	Q_memcpy(rcon_buff, &net_message.data[Q_strlen("rcon")], len);
+	rcon_buff[len] = 0;
 
 #ifdef REHLDS_FIXES
 	if (sv_rcon_condebug.value > 0.0f)
 #endif
 	{
-		if (invalid)
+		if (invalid != RCON_RESULT_SUCCESS)
 		{
-			Con_Printf("Bad Rcon from %s:\n%s\n", NET_AdrToString(*net_from_), remaining);
-			Log_Printf("Bad Rcon: \"%s\" from \"%s\"\n", remaining, NET_AdrToString(*net_from_));
+			Con_Printf("Bad Rcon from %s:\n%s\n", NET_AdrToString(*net_from_), rcon_buff);
+			Log_Printf("Bad Rcon: \"%s\" from \"%s\"\n", rcon_buff, NET_AdrToString(*net_from_));
 		}
 		else
 		{
-			Con_Printf("Rcon from %s:\n%s\n", NET_AdrToString(*net_from_), remaining);
-			Log_Printf("Rcon: \"%s\" from \"%s\"\n", remaining, NET_AdrToString(*net_from_));
+			Con_Printf("Rcon from %s:\n%s\n", NET_AdrToString(*net_from_), rcon_buff);
+			Log_Printf("Rcon: \"%s\" from \"%s\"\n", rcon_buff, NET_AdrToString(*net_from_));
 		}
 	}
 
 	SV_BeginRedirect(RD_PACKET, net_from_);
 
-	if (invalid)
+	switch (invalid)
 	{
-		if (invalid == 2)
-			Con_Printf("Bad rcon_password.\n");
-		else if (Q_strlen(rcon_password.string) == 0)
-			Con_Printf("Bad rcon_password.\nNo password set for this server.\n");
+	case RCON_RESULT_SUCCESS:
+	{
+		char *data;
+		data = COM_Parse(rcon_buff);
+		data = COM_Parse(data);
+		data = COM_Parse(data);
+
+		if (data)
+		{
+			Q_strncpy(remaining, data, sizeof(remaining) - 1);
+			remaining[sizeof(remaining) - 1] = 0;
+
+			Cmd_ExecuteString(remaining, src_command);
+		}
 		else
-			Con_Printf("Bad rcon_password.\n");
+		{
+			Con_Printf("Empty rcon\n");
+		}
 
-		SV_EndRedirect();
-		return;
+		break;
 	}
-	char *data = COM_Parse(COM_Parse(COM_Parse(remaining)));
-	if (!data)
-	{
-		Con_Printf("Empty rcon\n");
-
-#ifdef REHLDS_FIXES
-		//missing SV_EndRedirect()
-		SV_EndRedirect();
-#endif // REHLDS_FIXES
-		return;
+	case RCON_RESULT_BANNING:
+	case RCON_RESULT_BADPASSWORD:
+		Con_Printf("Bad rcon_password.\n");
+		break;
+	case RCON_RESULT_NOPRIVILEGE:
+		Con_Printf("Bad rcon_password.\nNo privilege.\n");
+		break;
+	case RCON_RESULT_NOSETPASSWORD:
+		Con_Printf("Bad rcon_password.\nNo password set for this server.\n");
+		break;
+	case RCON_RESULT_BADCHALLENGE:
+		Con_Printf("Bad rcon_password.\nBad challenge.\n");
+		break;
 	}
 
-	Q_strncpy(rcon_buff, data, sizeof(rcon_buff) - 1);
-	rcon_buff[sizeof(rcon_buff) - 1] = 0;
-	Cmd_ExecuteString(rcon_buff, src_command);
 	SV_EndRedirect();
 }
 
@@ -4699,16 +4893,38 @@ void SV_WriteEntitiesToClient(client_t *client, sizebuf_t *msg)
 		auto &entityState = curPack->entities[i];
 		if (entityState.number > MAX_CLIENTS)
 		{
-			if (sv_rehlds_attachedentities_playeranimationspeed_fix.string[0] == '1'
-				&& entityState.movetype == MOVETYPE_FOLLOW
-				&& 1 <= entityState.aiment && entityState.aiment <= MAX_CLIENTS)
+			if (entityState.movetype == MOVETYPE_FOLLOW)
 			{
-				attachedEntCount[entityState.aiment]++;
+				if (entityState.aiment > 0 && entityState.aiment < g_psv.num_edicts)
+				{
+					if (sv_rehlds_attachedentities_playeranimationspeed_fix.string[0] == '1' &&
+						entityState.aiment <= MAX_CLIENTS)
+					{
+						attachedEntCount[entityState.aiment]++;
+					}
+
+					// Prevent crash "Cache_UnlinkLRU: NULL link" on client-side
+					// if aiment with sprite model will be to render as a studio model
+					edict_t *ent = &g_psv.edicts[entityState.aiment];
+					if (ent->v.modelindex >= 0 && ent->v.modelindex < MAX_MODELS
+						&& (!g_psv.models[ent->v.modelindex]
+						|| g_psv.models[ent->v.modelindex]->type != mod_studio))
+					{
+						entityState.aiment = 0;
+						entityState.movetype = MOVETYPE_NONE;
+					}
+				}
+				else
+				{
+					entityState.aiment = 0;
+					entityState.movetype = MOVETYPE_NONE;
+				}
 			}
 
 			// Prevent spam "Non-sprite set to glow!" in console on client-side
 			if (entityState.rendermode == kRenderGlow
 				&& (entityState.modelindex >= 0 && entityState.modelindex < MAX_MODELS)
+				&& g_psv.models[entityState.modelindex]
 				&& g_psv.models[entityState.modelindex]->type != mod_sprite)
 			{
 				entityState.rendermode = kRenderNormal;
@@ -5534,6 +5750,12 @@ void SV_PropagateCustomizations(void)
 			if (pCust->bInUse)
 			{
 				pResource = &pCust->resource;
+
+#ifdef REHLDS_FIXES
+				if ((pResource->ucFlags & RES_CUSTOM) && !sv_send_logos.value)
+					continue;
+#endif
+
 				MSG_WriteByte(&host_client->netchan.message, svc_customization);
 				MSG_WriteByte(&host_client->netchan.message, i);
 				MSG_WriteByte(&host_client->netchan.message, pResource->type);
@@ -6357,7 +6579,6 @@ int EXT_FUNC RegUserMsg(const char *pszName, int iSize)
 	return pNewMsg->iMsg;
 }
 
-#ifdef REHLDS_FIXES
 uint32_t CIDRToMask(int cidr)
 {
 	return htonl(0xFFFFFFFFull << (32 - cidr));
@@ -6507,44 +6728,6 @@ qboolean StringToFilter(const char *s, ipfilter_t *f)
 
 	return true;
 }
-#else // REHLDS_FIXES
-qboolean StringToFilter(const char *s, ipfilter_t *f)
-{
-	char num[128];
-	unsigned char b[4] = { 0, 0, 0, 0 };
-	unsigned char m[4] = { 0, 0, 0, 0 };
-
-	const char* cc = s;
-	int i = 0;
-	while (1)
-	{
-		if (*cc < '0' || *cc > '9')
-			break;
-
-		int j = 0;
-		while (*cc >= '0' && *cc <= '9')
-			num[j++] = *(cc++);
-
-		num[j] = 0;
-		b[i] = Q_atoi(num);
-		if (b[i])
-			m[i] = -1;
-
-		if (*cc)
-		{
-			++cc;
-			++i;
-			if (i < 4)
-				continue;
-		}
-		f->mask = *(uint32 *)m;
-		f->compare.u32 = *(uint32 *)b;
-		return TRUE;
-	}
-	Con_Printf("Bad filter address: %s\n", cc);
-	return FALSE;
-}
-#endif // REHLDS_FIXES
 
 USERID_t *SV_StringToUserID(const char *str)
 {
@@ -7982,6 +8165,11 @@ void SV_Init(void)
 	Cmd_AddCommand("listid", SV_ListId_f);
 	Cmd_AddCommand("writeid", SV_WriteId_f);
 	Cmd_AddCommand("resetrcon", SV_ResetRcon_f);
+#ifdef REHLDS_FIXES
+	Cmd_AddCommand("rcon_adduser", SV_RconAddUser_f);
+	Cmd_AddCommand("rcon_deluser", SV_RconDelUser_f);
+	Cmd_AddCommand("rcon_users", SV_RconUsers_f);
+#endif
 	Cmd_AddCommand("logaddress", SV_SetLogAddress_f);
 	Cmd_AddCommand("logaddress_add", SV_AddLogAddress_f);
 	Cmd_AddCommand("logaddress_del", SV_DelLogAddress_f);
@@ -8026,6 +8214,9 @@ void SV_Init(void)
 	Cvar_RegisterVariable(&sv_visiblemaxplayers);
 	Cvar_RegisterVariable(&sv_password);
 	Cvar_RegisterVariable(&sv_aim);
+#ifdef REHLDS_FIXES
+	Cvar_RegisterVariable(&sv_allow_autoaim);
+#endif
 	Cvar_RegisterVariable(&violence_hblood);
 	Cvar_RegisterVariable(&violence_ablood);
 	Cvar_RegisterVariable(&violence_hgibs);
@@ -8093,6 +8284,7 @@ void SV_Init(void)
 	Cvar_RegisterVariable(&sv_version);
 	Cvar_RegisterVariable(&sv_allow_dlfile);
 #ifdef REHLDS_FIXES
+	Cvar_RegisterVariable(&sv_tags);
 	Cvar_RegisterVariable(&sv_force_ent_intersection);
 	Cvar_RegisterVariable(&sv_echo_unknown_cmd);
 	Cvar_RegisterVariable(&sv_auto_precache_sounds_in_models);

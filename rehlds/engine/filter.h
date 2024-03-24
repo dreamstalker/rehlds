@@ -42,9 +42,7 @@ typedef struct ipfilter_s
 	} compare;
 	float banEndTime;
 	float banTime;
-#ifdef REHLDS_FIXES
 	int cidr;
-#endif // REHLDS_FIXES
 } ipfilter_t;
 
 typedef struct userfilter_s
