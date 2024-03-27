@@ -1200,6 +1200,11 @@ void SV_SendServerinfo_internal(sizebuf_t *msg, client_t *client)
 
 void SV_SendResources(sizebuf_t *msg)
 {
+	g_RehldsHookchains.m_SV_SendResources.callChain(SV_SendResources_internal, msg);
+}
+
+void EXT_FUNC SV_SendResources_internal(sizebuf_t *msg)
+{
 	unsigned char nullbuffer[32];
 	Q_memset(nullbuffer, 0, sizeof(nullbuffer));
 
