@@ -254,6 +254,46 @@ typedef IVoidHookChainRegistryImpl<const char*> CRehldsHookRegistry_SV_ClientPri
 typedef IHookChainImpl<bool, edict_t*, edict_t*> CRehldsHook_SV_AllowPhysent;
 typedef IHookChainRegistryImpl<bool, edict_t*, edict_t*> CRehldsHookRegistry_SV_AllowPhysent;
 
+//PF_MessageBegin_I hook
+typedef IVoidHookChain<int, int, const float *, edict_t *> CRehldsHook_PF_MessageBegin_I;
+typedef IVoidHookChainRegistryImpl<int, int, const float *, edict_t *> CRehldsHookRegistry_PF_MessageBegin_I;
+
+//PF_MessageEnd_I hook
+typedef IVoidHookChain<> CRehldsHook_PF_MessageEnd_I;
+typedef IVoidHookChainRegistryImpl<> CRehldsHookRegistry_PF_MessageEnd_I;
+
+//PF_WriteByte_I hook
+typedef IVoidHookChain<int> CRehldsHook_PF_WriteByte_I;
+typedef IVoidHookChainRegistryImpl<int> CRehldsHookRegistry_PF_WriteByte_I;
+
+//PF_WriteChar_I hook
+typedef IVoidHookChain<int> CRehldsHook_PF_WriteChar_I;
+typedef IVoidHookChainRegistryImpl<int> CRehldsHookRegistry_PF_WriteChar_I;
+
+//PF_WriteShort_I hook
+typedef IVoidHookChain<int> CRehldsHook_PF_WriteShort_I;
+typedef IVoidHookChainRegistryImpl<int> CRehldsHookRegistry_PF_WriteShort_I;
+
+//PF_WriteLong_I hook
+typedef IVoidHookChain<int> CRehldsHook_PF_WriteLong_I;
+typedef IVoidHookChainRegistryImpl<int> CRehldsHookRegistry_PF_WriteLong_I;
+
+//PF_WriteAngle_I hook
+typedef IVoidHookChain<float> CRehldsHook_PF_WriteAngle_I;
+typedef IVoidHookChainRegistryImpl<float> CRehldsHookRegistry_PF_WriteAngle_I;
+
+//PF_WriteCoord_I hook
+typedef IVoidHookChain<float> CRehldsHook_PF_WriteCoord_I;
+typedef IVoidHookChainRegistryImpl<float> CRehldsHookRegistry_PF_WriteCoord_I;
+
+//PF_WriteString_I hook
+typedef IVoidHookChain<const char *> CRehldsHook_PF_WriteString_I;
+typedef IVoidHookChainRegistryImpl<const char *> CRehldsHookRegistry_PF_WriteString_I;
+
+//PF_WriteEntity_I hook
+typedef IVoidHookChain<int> CRehldsHook_PF_WriteEntity_I;
+typedef IVoidHookChainRegistryImpl<int> CRehldsHookRegistry_PF_WriteEntity_I;
+
 class CRehldsHookchains : public IRehldsHookchains {
 public:
 	CRehldsHookRegistry_Steam_NotifyClientConnect m_Steam_NotifyClientConnect;
@@ -311,6 +351,16 @@ public:
 	CRehldsHookRegistry_SV_AddResource m_SV_AddResource;
 	CRehldsHookRegistry_SV_ClientPrintf m_SV_ClientPrintf;
 	CRehldsHookRegistry_SV_AllowPhysent m_SV_AllowPhysent;
+	CRehldsHookRegistry_PF_MessageBegin_I m_PF_MessageBegin_I;
+	CRehldsHookRegistry_PF_MessageEnd_I m_PF_MessageEnd_I;
+	CRehldsHookRegistry_PF_WriteByte_I m_PF_WriteByte_I;
+	CRehldsHookRegistry_PF_WriteChar_I m_PF_WriteChar_I;
+	CRehldsHookRegistry_PF_WriteShort_I m_PF_WriteShort_I;
+	CRehldsHookRegistry_PF_WriteLong_I m_PF_WriteLong_I;
+	CRehldsHookRegistry_PF_WriteAngle_I m_PF_WriteAngle_I;
+	CRehldsHookRegistry_PF_WriteCoord_I m_PF_WriteCoord_I;
+	CRehldsHookRegistry_PF_WriteString_I m_PF_WriteString_I;
+	CRehldsHookRegistry_PF_WriteEntity_I m_PF_WriteEntity_I;
 
 public:
 	EXT_FUNC virtual IRehldsHookRegistry_Steam_NotifyClientConnect* Steam_NotifyClientConnect();
@@ -368,6 +418,16 @@ public:
 	EXT_FUNC virtual IRehldsHookRegistry_SV_AddResource* SV_AddResource();
 	EXT_FUNC virtual IRehldsHookRegistry_SV_ClientPrintf* SV_ClientPrintf();
 	EXT_FUNC virtual IRehldsHookRegistry_SV_AllowPhysent* SV_AllowPhysent();
+	EXT_FUNC virtual IRehldsHookRegistry_PF_MessageBegin_I* PF_MessageBegin_I();
+	EXT_FUNC virtual IRehldsHookRegistry_PF_MessageEnd_I* PF_MessageEnd_I();
+	EXT_FUNC virtual IRehldsHookRegistry_PF_WriteByte_I* PF_WriteByte_I();
+	EXT_FUNC virtual IRehldsHookRegistry_PF_WriteChar_I* PF_WriteChar_I();
+	EXT_FUNC virtual IRehldsHookRegistry_PF_WriteShort_I* PF_WriteShort_I();
+	EXT_FUNC virtual IRehldsHookRegistry_PF_WriteLong_I* PF_WriteLong_I();
+	EXT_FUNC virtual IRehldsHookRegistry_PF_WriteAngle_I* PF_WriteAngle_I();
+	EXT_FUNC virtual IRehldsHookRegistry_PF_WriteCoord_I* PF_WriteCoord_I();
+	EXT_FUNC virtual IRehldsHookRegistry_PF_WriteString_I* PF_WriteString_I();
+	EXT_FUNC virtual IRehldsHookRegistry_PF_WriteEntity_I* PF_WriteEntity_I();
 };
 
 extern CRehldsHookchains g_RehldsHookchains;

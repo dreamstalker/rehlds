@@ -2107,6 +2107,11 @@ sizebuf_t* EXT_FUNC WriteDest_Parm(int dest)
 
 void EXT_FUNC PF_MessageBegin_I(int msg_dest, int msg_type, const float *pOrigin, edict_t *ed)
 {
+	g_RehldsHookchains.m_PF_MessageBegin_I.callChain(PF_MessageBegin_I_internal, msg_dest, msg_type, pOrigin, ed);
+}
+
+void EXT_FUNC PF_MessageBegin_I_internal(int msg_dest, int msg_type, const float *pOrigin, edict_t *ed)
+{
 	if (msg_dest == MSG_ONE || msg_dest == MSG_ONE_UNRELIABLE)
 	{
 		if (!ed)
@@ -2147,6 +2152,11 @@ void EXT_FUNC PF_MessageBegin_I(int msg_dest, int msg_type, const float *pOrigin
 }
 
 void EXT_FUNC PF_MessageEnd_I(void)
+{
+	g_RehldsHookchains.m_PF_MessageEnd_I.callChain(PF_MessageEnd_I_internal);
+}
+
+void EXT_FUNC PF_MessageEnd_I_internal(void)
 {
 	qboolean MsgIsVarLength = 0;
 	if (!gMsgStarted)
@@ -2273,12 +2283,22 @@ void EXT_FUNC PF_MessageEnd_I(void)
 
 void EXT_FUNC PF_WriteByte_I(int iValue)
 {
+	g_RehldsHookchains.m_PF_WriteByte_I.callChain(PF_WriteByte_I_internal, iValue);
+}
+
+void EXT_FUNC PF_WriteByte_I_internal(int iValue)
+{	
 	if (!gMsgStarted)
 		Sys_Error("%s: called with no active message\n", __func__);
 	MSG_WriteByte(&gMsgBuffer, iValue);
 }
 
 void EXT_FUNC PF_WriteChar_I(int iValue)
+{
+	g_RehldsHookchains.m_PF_WriteChar_I.callChain(PF_WriteChar_I_internal, iValue);
+}
+
+void EXT_FUNC PF_WriteChar_I_internal(int iValue)
 {
 	if (!gMsgStarted)
 		Sys_Error("%s: called with no active message\n", __func__);
@@ -2287,12 +2307,22 @@ void EXT_FUNC PF_WriteChar_I(int iValue)
 
 void EXT_FUNC PF_WriteShort_I(int iValue)
 {
+	g_RehldsHookchains.m_PF_WriteShort_I.callChain(PF_WriteShort_I_internal, iValue);
+}
+
+void EXT_FUNC PF_WriteShort_I_internal(int iValue)
+{
 	if (!gMsgStarted)
 		Sys_Error("%s: called with no active message\n", __func__);
 	MSG_WriteShort(&gMsgBuffer, iValue);
 }
 
 void EXT_FUNC PF_WriteLong_I(int iValue)
+{
+	g_RehldsHookchains.m_PF_WriteLong_I.callChain(PF_WriteLong_I_internal, iValue);
+}
+
+void EXT_FUNC PF_WriteLong_I_internal(int iValue)
 {
 	if (!gMsgStarted)
 		Sys_Error("%s: called with no active message\n", __func__);
@@ -2301,12 +2331,22 @@ void EXT_FUNC PF_WriteLong_I(int iValue)
 
 void EXT_FUNC PF_WriteAngle_I(float flValue)
 {
+	g_RehldsHookchains.m_PF_WriteAngle_I.callChain(PF_WriteAngle_I_internal, flValue);
+}
+
+void EXT_FUNC PF_WriteAngle_I_internal(float flValue)
+{
 	if (!gMsgStarted)
 		Sys_Error("%s: called with no active message\n", __func__);
 	MSG_WriteAngle(&gMsgBuffer, flValue);
 }
 
 void EXT_FUNC PF_WriteCoord_I(float flValue)
+{
+	g_RehldsHookchains.m_PF_WriteCoord_I.callChain(PF_WriteCoord_I_internal, flValue);
+}
+
+void EXT_FUNC PF_WriteCoord_I_internal(float flValue)
 {
 	if (!gMsgStarted)
 		Sys_Error("%s: called with no active message\n", __func__);
@@ -2315,12 +2355,22 @@ void EXT_FUNC PF_WriteCoord_I(float flValue)
 
 void EXT_FUNC PF_WriteString_I(const char *sz)
 {
+	g_RehldsHookchains.m_PF_WriteString_I.callChain(PF_WriteString_I_internal, sz);
+}
+
+void EXT_FUNC PF_WriteString_I_internal(const char *sz)
+{
 	if (!gMsgStarted)
 		Sys_Error("%s: called with no active message\n", __func__);
 	MSG_WriteString(&gMsgBuffer, sz);
 }
 
 void EXT_FUNC PF_WriteEntity_I(int iValue)
+{
+	g_RehldsHookchains.m_PF_WriteEntity_I.callChain(PF_WriteEntity_I_internal, iValue);
+}
+
+void EXT_FUNC PF_WriteEntity_I_internal(int iValue)
 {
 	if (!gMsgStarted)
 		Sys_Error("%s: called with no active message\n", __func__);

@@ -885,6 +885,46 @@ IRehldsHookRegistry_SV_AllowPhysent* CRehldsHookchains::SV_AllowPhysent() {
 	return &m_SV_AllowPhysent;
 }
 
+IRehldsHookRegistry_PF_MessageBegin_I* CRehldsHookchains::PF_MessageBegin_I() {
+	return &m_PF_MessageBegin_I;
+}
+
+IRehldsHookRegistry_PF_MessageEnd_I* CRehldsHookchains::PF_MessageEnd_I() {
+	return &m_PF_MessageEnd_I;
+}
+
+IRehldsHookRegistry_PF_WriteByte_I* CRehldsHookchains::PF_WriteByte_I() {
+	return &m_PF_WriteByte_I;
+}
+
+IRehldsHookRegistry_PF_WriteChar_I* CRehldsHookchains::PF_WriteChar_I() {
+	return &m_PF_WriteChar_I;
+}
+
+IRehldsHookRegistry_PF_WriteShort_I* CRehldsHookchains::PF_WriteShort_I() {
+	return &m_PF_WriteShort_I;
+}
+
+IRehldsHookRegistry_PF_WriteLong_I* CRehldsHookchains::PF_WriteLong_I() {
+	return &m_PF_WriteLong_I;
+}
+
+IRehldsHookRegistry_PF_WriteAngle_I* CRehldsHookchains::PF_WriteAngle_I() {
+	return &m_PF_WriteAngle_I;
+}
+
+IRehldsHookRegistry_PF_WriteCoord_I* CRehldsHookchains::PF_WriteCoord_I() {
+	return &m_PF_WriteCoord_I;
+}
+
+IRehldsHookRegistry_PF_WriteString_I* CRehldsHookchains::PF_WriteString_I() {
+	return &m_PF_WriteString_I;
+}
+
+IRehldsHookRegistry_PF_WriteEntity_I* CRehldsHookchains::PF_WriteEntity_I() {
+	return &m_PF_WriteEntity_I;
+}
+
 int EXT_FUNC CRehldsApi::GetMajorVersion()
 {
 	return REHLDS_API_VERSION_MAJOR;
