@@ -1203,7 +1203,9 @@ int Netchan_CreateFileFragments(qboolean server, netchan_t *chan, const char *fi
 
 	if (!FS_FileExists(filename))
 		return FALSE;
-	if (FS_FileSize(filename) > sv_filetransfermaxsize.value)
+
+	unsigned int nSize = FS_FileSize(filename);
+	if (nSize == 0 || nSize > sv_filetransfermaxsize.value)
 		return FALSE;
 
 	auto wait = (fragbufwaiting_t *)Mem_ZeroMalloc(sizeof(fragbufwaiting_t));
