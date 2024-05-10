@@ -38,7 +38,7 @@ cvar_t net_drawslider = { "net_drawslider", "0", 0, 0.0f, nullptr};
 cvar_t net_chokeloopback = { "net_chokeloop", "0", 0, 0.0f, nullptr};
 
 cvar_t sv_net_incoming_decompression = { "sv_net_incoming_decompression", "1", 0, 1.0f, nullptr };
-cvar_t sv_net_incoming_decompression_max_ratio = { "sv_net_incoming_decompression_max_ratio", "75.0", 0, 75.0f, nullptr };
+cvar_t sv_net_incoming_decompression_max_ratio = { "sv_net_incoming_decompression_max_ratio", "80.0", 0, 80.0f, nullptr };
 cvar_t sv_net_incoming_decompression_max_size = { "sv_net_incoming_decompression_max_size", "65536", 0, 65536.0f, nullptr };
 cvar_t sv_net_incoming_decompression_punish = { "sv_net_incoming_decompression_punish", "-1", 0, -1.0f, NULL };
 
