@@ -95,13 +95,6 @@ typedef enum redirect_e
 	RD_PACKET = 2,
 } redirect_t;
 
-typedef enum server_state_e
-{
-	ss_dead = 0,
-	ss_loading = 1,
-	ss_active = 2,
-} server_state_t;
-
 typedef struct server_s
 {
 	qboolean active;

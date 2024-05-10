@@ -67,4 +67,12 @@ typedef enum sv_delta_s
 	sv_packet_delta,
 } sv_delta_t;
 
+// From engine/server.h
+typedef enum server_state_e
+{
+	ss_dead = 0,
+	ss_loading = 1,
+	ss_active = 2,
+} server_state_t;
+
 #endif // MAINTYPES_H
