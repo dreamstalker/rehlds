@@ -207,14 +207,13 @@ void SV_Customization(client_t *pPlayer, resource_t *pResource, qboolean bSkipPl
 // Creates customizations list for the current player and sends resources to other players.
 void SV_RegisterResources(void)
 {
-	resource_t *pResource;
 	client_t *pHost = host_client;
 
 	pHost->uploading = FALSE;
 #ifdef REHLDS_FIXES
 	SV_CreateCustomizationList(pHost);		// FIXED: Call this function only once. It was crazy to call it for each resource available.
 #else // REHLDS_FIXES
-	for (pResource = pHost->resourcesonhand.pNext; pResource != &pHost->resourcesonhand; pResource = pResource->pNext)
+	for (resource_t *pResource = pHost->resourcesonhand.pNext; pResource != &pHost->resourcesonhand; pResource = pResource->pNext)
 	{
 		SV_CreateCustomizationList(pHost);
 		SV_Customization(pHost, pResource, TRUE);
