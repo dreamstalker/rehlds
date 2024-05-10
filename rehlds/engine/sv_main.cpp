@@ -3836,13 +3836,20 @@ void SV_ProcessFile(client_t *cl, char *filename)
 
 qboolean SV_FilterPacket(void)
 {
+	// sv_filterban filtering IP mode
+	// -1: all players will be rejected without any exceptions
+	//  0: no checks will happen
+	//  1: all incoming players will be checked if they're IP banned (if they have an IP filter entry), if they are, they will be kicked
+
+	qboolean bNegativeFilter = (sv_filterban.value == 1) ? TRUE : FALSE;
+
 	for (int i = numipfilters - 1; i >= 0; i--)
 	{
 		ipfilter_t* curFilter = &ipfilters[i];
 		if (curFilter->compare.u32 == 0xFFFFFFFF || curFilter->banEndTime == 0.0f || curFilter->banEndTime > realtime)
 		{
 			if ((*(uint32*)net_from.ip & curFilter->mask) == curFilter->compare.u32)
-				return (int)sv_filterban.value;
+				return bNegativeFilter;
 		}
 		else
 		{
@@ -3852,7 +3859,8 @@ qboolean SV_FilterPacket(void)
 			--numipfilters;
 		}
 	}
-	return sv_filterban.value == 0.0f;
+
+	return !bNegativeFilter;
 }
 
 void SV_SendBan(void)
