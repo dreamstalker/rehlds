@@ -109,10 +109,11 @@ protected:
 
 protected:
 	void addHook(void* hookFunc, int priority);
-	bool findHook(void* hookFunc) const;
 	void removeHook(void* hookFunc);
 
 public:
+	int  getCount() const;
+	bool findHook(void* hookFunc) const;
 	AbstractHookChainRegistry();
 };
 
@@ -132,8 +133,13 @@ public:
 	EXT_FUNC virtual void registerHook(hookfunc_t hook, int priority) {
 		addHook((void*)hook, priority);
 	}
+
 	EXT_FUNC virtual void unregisterHook(hookfunc_t hook) {
 		removeHook((void*)hook);
+	}
+
+	bool isEmpty() const {
+		return getCount() == 0;
 	}
 };
 
@@ -156,5 +162,9 @@ public:
 
 	EXT_FUNC virtual void unregisterHook(hookfunc_t hook) {
 		removeHook((void*)hook);
+	}
+
+	bool isEmpty() const {
+		return getCount() == 0;
 	}
 };

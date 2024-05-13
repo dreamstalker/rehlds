@@ -1083,6 +1083,10 @@ void LoadThisDll(const char *szDllFilename)
 		goto IgnoreThisDLL;
 	}
 
+#ifdef REHLDS_API
+	MessageManager().Init();
+#endif
+
 	pfnGiveFnptrsToDll(&g_engfuncsExportedToDlls, &gGlobalVariables);
 	if (g_iextdllMac == MAX_EXTENSION_DLL)
 	{

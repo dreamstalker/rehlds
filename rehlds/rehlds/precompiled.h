@@ -49,6 +49,7 @@
 #include "rehlds_api_impl.h"
 #include "FlightRecorderImpl.h"
 #include "flight_recorder.h"
+#include "rehlds_messagemngr_impl.h"
 #include "rehlds_security.h"
 
 #include "dlls/cdll_dll.h"

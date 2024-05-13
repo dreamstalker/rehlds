@@ -31,6 +31,7 @@
 #include "rehlds_interfaces.h"
 #include "hookchains.h"
 #include "FlightRecorder.h"
+#include "IMessageManager.h"
 #include "interface.h"
 #include "model.h"
 #include "ObjectList.h"
@@ -446,6 +447,7 @@ public:
 	virtual IRehldsServerStatic* GetServerStatic() = 0;
 	virtual IRehldsServerData* GetServerData() = 0;
 	virtual IRehldsFlightRecorder* GetFlightRecorder() = 0;
+	virtual IMessageManager *GetMessageManager() = 0;
 };
 
 #define VREHLDS_HLDS_API_VERSION "VREHLDS_HLDS_API_VERSION001"

@@ -917,6 +917,10 @@ IRehldsServerData* EXT_FUNC CRehldsApi::GetServerData() {
 	return &g_RehldsServerData;
 }
 
+IMessageManager* EXT_FUNC CRehldsApi::GetMessageManager() {
+	return &MessageManager();
+}
+
 IRehldsFlightRecorder* EXT_FUNC CRehldsApi::GetFlightRecorder() {
 	return g_FlightRecorder;
 }

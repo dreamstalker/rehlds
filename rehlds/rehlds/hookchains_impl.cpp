@@ -90,3 +90,7 @@ void AbstractHookChainRegistry::removeHook(void* hookFunc) {
 		}
 	}
 }
+
+int AbstractHookChainRegistry::getCount() const {
+	return m_NumHooks;
+}

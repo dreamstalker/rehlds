@@ -182,6 +182,7 @@ set(ENGINE_SRCS
 	rehlds/public_amalgamation.cpp
 	rehlds/rehlds_api_impl.cpp
 	rehlds/rehlds_interfaces_impl.cpp
+	rehlds/rehlds_messagemngr_impl.cpp
 	rehlds/rehlds_security.cpp
 )
 

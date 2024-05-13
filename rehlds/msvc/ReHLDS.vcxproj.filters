@@ -341,6 +341,9 @@
     <ClCompile Include="..\testsuite\memory.cpp">
       <Filter>testsuite</Filter>
     </ClCompile>
+    <ClCompile Include="..\rehlds\rehlds_messagemngr_impl.cpp">
+      <Filter>rehlds</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\version\version.h">
@@ -1059,6 +1062,12 @@
     </ClInclude>
     <ClInclude Include="..\testsuite\memory.h">
       <Filter>testsuite</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rehlds\rehlds_messagemngr_impl.h">
+      <Filter>rehlds</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\rehlds\IMessageManager.h">
+      <Filter>public\rehlds</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

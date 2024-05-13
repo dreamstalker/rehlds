@@ -391,6 +391,7 @@ public:
 	virtual IRehldsServerStatic* GetServerStatic();
 	virtual IRehldsServerData* GetServerData();
 	virtual IRehldsFlightRecorder* GetFlightRecorder();
+	virtual IMessageManager* GetMessageManager();
 };
 
 extern sizebuf_t* GetNetMessage_api();
