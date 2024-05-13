@@ -2539,7 +2539,7 @@ void EXT_FUNC SV_ConnectClient_internal(void)
 	host_client->userinfo[MAX_INFO_STRING - 1] = 0;
 
 	SV_ExtractFromUserinfo(host_client);
-	Info_SetValueForStarKey(host_client->userinfo, "*sid", va("%lld", host_client->network_userid.m_SteamID), MAX_INFO_STRING);
+	Info_SetValueForStarKey(host_client->userinfo, "*sid", va("%lld", host_client->network_userid.m_SteamIDValidated), MAX_INFO_STRING);
 
 	host_client->datagram.flags = SIZEBUF_ALLOW_OVERFLOW;
 	host_client->datagram.data = (byte *)host_client->datagram_buf;
