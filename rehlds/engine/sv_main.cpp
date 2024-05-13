@@ -6568,7 +6568,13 @@ void SV_ClearEntities(void)
 }
 int EXT_FUNC RegUserMsg(const char *pszName, int iSize)
 {
-	if (giNextUserMsg > 255 || !pszName || Q_strlen(pszName) > 11 || iSize > 192)
+	if (giNextUserMsg >= MAX_USERMESSAGES)
+		return 0;
+
+	if (iSize > MAX_USER_MSG_DATA)
+		return 0;
+
+	if (!pszName || Q_strlen(pszName) >= MAX_USERMESSAGES_LENGTH - 1)
 		return 0;
 
 	UserMsg *pUserMsgs = sv_gpUserMsgs;

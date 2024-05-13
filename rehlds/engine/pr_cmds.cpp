@@ -2124,7 +2124,7 @@ void EXT_FUNC PF_MessageBegin_I(int msg_dest, int msg_type, const float *pOrigin
 	if (msg_type == 0)
 		Sys_Error("%s: Tried to create a message with a bogus message type ( 0 )", __func__);
 
-	gMsgStarted = 1;
+	gMsgStarted = TRUE;
 	gMsgType = msg_type;
 	gMsgEntity = ed;
 	gMsgDest = msg_dest;
@@ -2151,7 +2151,7 @@ void EXT_FUNC PF_MessageEnd_I(void)
 	qboolean MsgIsVarLength = 0;
 	if (!gMsgStarted)
 		Sys_Error("%s: called with no active message\n", __func__);
-	gMsgStarted = 0;
+	gMsgStarted = FALSE;
 
 	if (gMsgEntity && (gMsgEntity->v.flags & FL_FAKECLIENT))
 		return;
@@ -2275,6 +2275,7 @@ void EXT_FUNC PF_WriteByte_I(int iValue)
 {
 	if (!gMsgStarted)
 		Sys_Error("%s: called with no active message\n", __func__);
+
 	MSG_WriteByte(&gMsgBuffer, iValue);
 }
 

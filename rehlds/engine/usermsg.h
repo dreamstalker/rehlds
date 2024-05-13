@@ -31,11 +31,14 @@
 #include "maintypes.h"
 #include "quakedef.h"
 
+// The maximum length of a usermessage name in a network transmission
+#define MAX_USERMESSAGES_LENGTH 16
+
 typedef struct _UserMsg
 {
 	int iMsg;
 	int iSize;
-	char szName[16];
+	char szName[MAX_USERMESSAGES_LENGTH];
 	struct _UserMsg *next;
 	pfnUserMsgHook pfn;
 } UserMsg;

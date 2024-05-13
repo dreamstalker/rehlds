@@ -29,6 +29,9 @@
 
 typedef int BOOL;
 
+// The maximum user messages
+#define MAX_USERMESSAGES 256
+
 // user message
 #define MAX_USER_MSG_DATA 192
 
