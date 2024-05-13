@@ -174,6 +174,12 @@ void CSteam3Server::OnGSClientApprove(GSClientApprove_t *pGSClientSteam2Accept)
 	if (!cl)
 		return;
 
+	cl->network_userid.m_SteamIDValidated = pGSClientSteam2Accept->m_SteamID.ConvertToUint64();
+	host_client->network_userid.m_SteamIDValidated = pGSClientSteam2Accept->m_SteamID.ConvertToUint64();
+
+	Info_SetValueForStarKey(cl->userinfo, "*sid", va("%lld", cl->network_userid.m_SteamIDValidated), MAX_INFO_STRING);
+	Info_SetValueForStarKey(host_client->userinfo, "*sid", va("%lld", host_client->network_userid.m_SteamIDValidated), MAX_INFO_STRING);
+
 	if (SV_FilterUser(&cl->network_userid))
 	{
 		char msg[256];
