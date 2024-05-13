@@ -156,7 +156,9 @@ void CSteam3Server::OnGSClientDenyHelper(client_t *cl, EDenyReason eDenyReason, 
 		break;
 
 	case k_EDenySteamValidationStalled:
-		if (m_bLanOnly)
+		if (!m_bLanOnly)
+			SV_DropClient(cl, 0, "STEAM verification failed");
+		else
 			cl->network_userid.m_SteamID = 1;
 		break;
 
