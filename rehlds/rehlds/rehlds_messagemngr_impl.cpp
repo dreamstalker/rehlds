@@ -562,7 +562,7 @@ void MessageManagerImpl::registerHook(int msg_id, hookfunc_t handler, int priori
 	if (!m_hooks[msg_id])
 		m_hooks[msg_id] = new HookRegistry_t;
 
-	if (m_hooks[msg_id]->findHook(handler))
+	if (m_hooks[msg_id]->findHook((void *)handler))
 		return; // already registered
 
 	m_hooks[msg_id]->registerHook(handler, priority);
