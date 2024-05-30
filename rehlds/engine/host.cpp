@@ -375,7 +375,8 @@ void EXT_FUNC SV_ClientPrintf_internal(const char *Dest)
 {
 	char string[1024];
 
-	Q_strlcpy(string, Dest, min(strlen(Dest) + 1, sizeof(string)));
+	Q_strlcpy(string, Dest);
+
 	MSG_WriteByte(&host_client->netchan.message, svc_print);
 	MSG_WriteString(&host_client->netchan.message, string);
 }

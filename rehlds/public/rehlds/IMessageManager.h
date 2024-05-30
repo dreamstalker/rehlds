@@ -69,7 +69,7 @@ public:
 	/**
 	 * @brief Data types for message data
 	 */
-	enum class DataType : uint8_t
+	enum class DataType : uint8
 	{
 		Any,    // Any part of the message
 		Dest,   // Destination of the message
