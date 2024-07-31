@@ -195,7 +195,7 @@ bool ObjectDictionary::RemoveIndex(int index, bool freeObjectMemory)
 	CheckSize();
 	ClearCache();
 
-	return false;
+	return true;
 }
 
 bool ObjectDictionary::RemoveIndexRange(int minIndex, int maxIndex)
