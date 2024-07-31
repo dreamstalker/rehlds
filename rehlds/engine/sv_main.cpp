@@ -4529,15 +4529,20 @@ int SV_CreatePacketEntities(sv_delta_t type, client_t *client, packet_entities_t
 	return g_RehldsHookchains.m_SV_CreatePacketEntities.callChain(SV_CreatePacketEntities_api, type, GetRehldsApiClient(client), to, msg);
 }
 
+// Computes either a compressed, or uncompressed delta buffer for the client
+// Returns the size IN BITS of the message buffer created
 int SV_CreatePacketEntities_internal(sv_delta_t type, client_t *client, packet_entities_t *to, sizebuf_t *msg)
 {
-	packet_entities_t *from;
-	int oldindex;
-	int newindex;
-	int oldnum;
-	int newnum;
-	int oldmax;
-	int numbase;
+	edict_t *ent;
+	client_frame_t *fromframe;
+	packet_entities_t *from;		// Entity packet for that frame
+	delta_t	*delta;
+	int		oldindex, newindex;
+	int		oldnum, newnum;
+	int		oldmax;
+	qboolean custom = FALSE;
+	int		offset;
+	int		numbase = 0;
 
 	// fix for https://github.com/dreamstalker/rehlds/issues/24
 #ifdef REHLDS_FIXES
@@ -4545,159 +4550,163 @@ int SV_CreatePacketEntities_internal(sv_delta_t type, client_t *client, packet_e
 	uint64 toBaselinesForceMask[MAX_PACKET_ENTITIES];
 #endif
 
-	numbase = 0;
+	// See if this is a full update
 	if (type == sv_packet_delta)
 	{
-		client_frame_t *fromframe = &client->frames[SV_UPDATE_MASK & client->delta_sequence];
+		// This is the frame that we are going to delta update from
+		fromframe = &client->frames[SV_UPDATE_MASK & client->delta_sequence];
 		from = &fromframe->entities;
 		_mm_prefetch((const char*)&from->entities[0], _MM_HINT_T0);
 		_mm_prefetch(((const char*)&from->entities[0]) + 64, _MM_HINT_T0);
-		oldmax = from->num_entities;
-		MSG_WriteByte(msg, svc_deltapacketentities);
-		MSG_WriteShort(msg, to->num_entities);
-		MSG_WriteByte(msg, client->delta_sequence);
+		oldmax = fromframe->entities.num_entities;
+
+		MSG_WriteByte(msg, svc_deltapacketentities);    // This is a delta
+		MSG_WriteShort(msg, to->num_entities);          // This is how many ents are in the new packet
+		MSG_WriteByte(msg, client->delta_sequence);     // This is the sequence # that we are updating from
 	}
 	else
 	{
-		oldmax = 0;
+		oldmax = 0;	// no delta update
 		from = NULL;
-		MSG_WriteByte(msg, svc_packetentities);
-		MSG_WriteShort(msg, to->num_entities);
+
+		MSG_WriteByte(msg, svc_packetentities);         // Just a packet update.
+		MSG_WriteShort(msg, to->num_entities);          // This is the # of entities we are sending.
 	}
 
-	newnum = 0; //index in to->entities
-	oldnum = 0; //index in from->entities
+	newindex = 0; // index in to->entities
+	oldindex = 0; // index in from->entities
+
 	MSG_StartBitWriting(msg);
-	while (1)
+
+	while (newindex < to->num_entities || oldindex < oldmax)
 	{
-		if (newnum < to->num_entities)
-		{
-			newindex = to->entities[newnum].number;
-		}
-		else
-		{
-			if (oldnum >= oldmax)
-				break;
+		newnum = (newindex >= to->num_entities) ? ENTITY_SENTINEL : to->entities[newindex].number;
+		oldnum = (!from || oldindex >= oldmax)  ? ENTITY_SENTINEL : from->entities[oldindex].number; // FIXED: from can be null
 
-			if (newnum < to->num_entities)
-				newindex = to->entities[newnum].number;
+		// this is a delta update of the entity from old position
+		if (newnum == oldnum)
+		{
+			// delta update from old position
+			// because the force parm is false, this will not result
+			// in any bytes being emitted if the entity has not changed at all
+			// note that players are always 'newentities', this updates their oldorigin always
+			// and prevents warping
+
+			entity_state_t *baseline = &to->entities[newindex];
+			custom = (baseline->entityType == ENTITY_BEAM) ? TRUE : FALSE;
+			SV_SetCallback(newnum, FALSE, custom, &numbase, FALSE, 0);
+			DELTA_WriteDelta((uint8 *)&from->entities[oldindex], (uint8 *)baseline, FALSE, custom ? g_pcustomentitydelta : (SV_IsPlayerIndex(newnum) ? g_pplayerdelta : g_pentitydelta), &SV_InvokeCallback);
+			oldindex++;
+			_mm_prefetch((const char*)&from->entities[oldindex], _MM_HINT_T0);
+			_mm_prefetch(((const char*)&from->entities[oldindex]) + 64, _MM_HINT_T0);
+			newindex++;
+			continue;
+		}
+
+		// Figure out how we want to update the entity
+		// This is a new entity, send it from the baseline
+		if (newnum < oldnum)
+		{
+			//
+			// If the entity was not in the old packet (oldnum == 9999),
+			// then delta from the baseline since this is a new entity
+
+			ent = EDICT_NUM(newnum);
+			custom = (to->entities[newindex].entityType == ENTITY_BEAM) ? TRUE : FALSE;
+
+			if (from == NULL)
+				SV_SetCallback(newnum, FALSE, custom, &numbase, TRUE, 0);
 			else
-				newindex = 9999;
-		}
+				SV_SetCallback(newnum, FALSE, custom, &numbase, FALSE, 0);
 
-#ifdef REHLDS_FIXES
-		if (oldnum < oldmax && from)
-#else
-		if (oldnum < oldmax)
-#endif
-			oldindex = from->entities[oldnum].number;
-		else
-			oldindex = 9999;
+			// this is a new entity, send it from the baseline
+			entity_state_t *baseline = &g_psv.baselines[newnum];
 
-		if (newindex == oldindex)
-		{
-			entity_state_t *baseline_ = &to->entities[newnum];
-			qboolean custom = baseline_->entityType & 0x2 ? TRUE : FALSE;
-			SV_SetCallback(newindex, FALSE, custom, &numbase, FALSE, 0);
-			DELTA_WriteDelta((uint8 *)&from->entities[oldnum], (uint8 *)baseline_, FALSE, custom ? g_pcustomentitydelta : (SV_IsPlayerIndex(newindex) ? g_pplayerdelta : g_pentitydelta), &SV_InvokeCallback);
-			++oldnum;
-			_mm_prefetch((const char*)&from->entities[oldnum], _MM_HINT_T0);
-			_mm_prefetch(((const char*)&from->entities[oldnum]) + 64, _MM_HINT_T0);
-			++newnum;
-			continue;
-		}
-
-		if (newindex >= oldindex)
-		{
-			if (newindex > oldindex)
+			if (sv_instancedbaseline.value && g_psv.instance_baselines->number != 0 && newnum > sv_lastnum)
 			{
-				SV_WriteDeltaHeader(oldindex, TRUE, FALSE, &numbase, FALSE, 0, FALSE, 0);
-				++oldnum;
-				_mm_prefetch((const char*)&from->entities[oldnum], _MM_HINT_T0);
-				_mm_prefetch(((const char*)&from->entities[oldnum]) + 64, _MM_HINT_T0);
-			}
-			continue;
-		}
-
-		edict_t *ent = EDICT_NUM(newindex);
-		qboolean custom = to->entities[newnum].entityType & 0x2 ? TRUE : FALSE;
-		SV_SetCallback(
-			newindex,
-			FALSE,
-			custom,
-			&numbase,
-			from == NULL,
-			0);
-
-		entity_state_t *baseline_ = &g_psv.baselines[newindex];
-		if (sv_instancedbaseline.value != 0.0f && g_psv.instance_baselines->number != 0 && newindex > sv_lastnum)
-		{
-			for (int i = 0; i < g_psv.instance_baselines->number; i++)
-			{
-				if (g_psv.instance_baselines->classname[i] == ent->v.classname)
+				for (int i = 0; i < g_psv.instance_baselines->number; i++)
 				{
-					SV_SetNewInfo(i);
-					baseline_ = &g_psv.instance_baselines->baseline[i];
-					break;
+					if (g_psv.instance_baselines->classname[i] == ent->v.classname)
+					{
+						SV_SetNewInfo(i);
+						baseline = &g_psv.instance_baselines->baseline[i];
+						break;
+					}
 				}
 			}
-		}
-		else
-		{
-			if (!from)
+			else
 			{
-				int offset = SV_FindBestBaseline(newnum, &baseline_, to->entities, newindex, custom);
-				_mm_prefetch((const char*)baseline_, _MM_HINT_T0);
-				_mm_prefetch(((const char*)baseline_) + 64, _MM_HINT_T0);
-				if (offset)
-					SV_SetCallback(newindex, FALSE, custom, &numbase, TRUE, offset);
+				// If this is full update
+				if (!from)
+				{
+					offset = SV_FindBestBaseline(newindex, &baseline, to->entities, newnum, custom);
+					_mm_prefetch((const char*)baseline, _MM_HINT_T0);
+					_mm_prefetch(((const char*)baseline) + 64, _MM_HINT_T0);
+					if (offset)
+						SV_SetCallback(newnum, FALSE, custom, &numbase, TRUE, offset);
 
-				// fix for https://github.com/dreamstalker/rehlds/issues/24
+					// fix for https://github.com/dreamstalker/rehlds/issues/24
 #ifdef REHLDS_FIXES
-				if (offset)
-					baselineToIdx = newnum - offset;
+					if (offset)
+						baselineToIdx = newindex - offset;
 #endif
+				}
 			}
+
+			delta = custom ? g_pcustomentitydelta : (SV_IsPlayerIndex(newnum) ? g_pplayerdelta : g_pentitydelta);
+
+			// fix for https://github.com/dreamstalker/rehlds/issues/24
+#ifdef REHLDS_FIXES
+			DELTA_WriteDeltaForceMask(
+				(uint8 *)baseline,
+				(uint8 *)&to->entities[newindex],
+				TRUE,
+				delta,
+				&SV_InvokeCallback,
+				baselineToIdx != -1 ? &toBaselinesForceMask[baselineToIdx] : NULL
+			);
+			baselineToIdx = -1;
+
+			uint64 origMask = DELTA_GetOriginalMask(delta);
+			uint64 usedMask = DELTA_GetMaskU64(delta);
+			uint64 diffMask = origMask ^ usedMask;
+
+			// Remember changed fields that was marked in original mask, but unmarked by the conditional encoder
+			toBaselinesForceMask[newindex] = diffMask & origMask;
+
+#else // REHLDS_FIXES
+			DELTA_WriteDelta(
+				(uint8 *)baseline,
+				(uint8 *)&to->entities[newindex],
+				TRUE,
+				delta,
+				&SV_InvokeCallback
+				);
+#endif // REHLDS_FIXES
+
+			newindex++;
+			continue;
 		}
 
+		// the old entity isn't present in the new message
+		if (newnum > oldnum)
+		{
+			//
+			// If the entity was in the old list, but is not in the new list (newnum == 9999),
+			// then construct a special remove message
 
-		delta_t* delta = custom ? g_pcustomentitydelta : (SV_IsPlayerIndex(newindex) ? g_pplayerdelta : g_pentitydelta);
-
-		// fix for https://github.com/dreamstalker/rehlds/issues/24
-#ifdef REHLDS_FIXES
-		DELTA_WriteDeltaForceMask(
-			(uint8 *)baseline_,
-			(uint8 *)&to->entities[newnum],
-			TRUE,
-			delta,
-			&SV_InvokeCallback,
-			baselineToIdx != -1 ? &toBaselinesForceMask[baselineToIdx] : NULL
-		);
-		baselineToIdx = -1;
-
-		uint64 origMask = DELTA_GetOriginalMask(delta);
-		uint64 usedMask = DELTA_GetMaskU64(delta);
-		uint64 diffMask = origMask ^ usedMask;
-
-		//Remember changed fields that was marked in original mask, but unmarked by the conditional encoder
-		toBaselinesForceMask[newnum] = diffMask & origMask;
-
-
-#else //REHLDS_FIXES
-		DELTA_WriteDelta(
-			(uint8 *)baseline_,
-			(uint8 *)&to->entities[newnum],
-			TRUE,
-			delta,
-			&SV_InvokeCallback
-			);
-#endif //REHLDS_FIXES
-
-		++newnum;
-
+			// remove = TRUE, tell the client that entity was removed from server
+			SV_WriteDeltaHeader(oldnum, TRUE, FALSE, &numbase, FALSE, 0, FALSE, 0);
+			oldindex++;
+			_mm_prefetch((const char*)&from->entities[oldindex], _MM_HINT_T0);
+			_mm_prefetch(((const char*)&from->entities[oldindex]) + 64, _MM_HINT_T0);
+			continue;
+		}
 	}
 
+	// No more entities.. (end of packet entities)
 	MSG_WriteBits(0, 16);
+
 	MSG_EndBitWriting(msg);
 	return msg->cursize;
 }

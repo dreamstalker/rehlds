@@ -1060,15 +1060,18 @@ void World::ParseClientData(BitBuffer *stream, unsigned int deltaSeqNr, BitBuffe
 	}
 }
 
+// When a delta command is received from the server
+// We need to grab the entity # out of it any the bit settings, too
 int World::ParseDeltaHeader(BitBuffer *stream, bool &remove, bool &custom, int &numbase, bool &newbl, int &newblindex, bool full, int &offset)
 {
 	int num;
-	bool isdelta, isnext;
+	bool isdelta;
 
 	offset = 0;
 	custom = false;
-	newbl = false;
+	newbl  = false;
 
+	// This full update (non-delta)
 	if (full)
 	{
 		isdelta = stream->ReadBit() ? true : false;
@@ -1077,6 +1080,8 @@ int World::ParseDeltaHeader(BitBuffer *stream, bool &remove, bool &custom, int &
 	else
 	{
 		isdelta = false;
+
+		// the entity was removed from server or not
 		remove = stream->ReadBit() ? true : false;
 	}
 
@@ -1088,11 +1093,11 @@ int World::ParseDeltaHeader(BitBuffer *stream, bool &remove, bool &custom, int &
 	{
 		if (stream->ReadBit())
 		{
-			num = stream->ReadBits(11);
+			num = stream->ReadBits(MAX_EDICT_BITS);
 		}
 		else
 		{
-			int delta = stream->ReadBits(6);
+			int delta = stream->ReadBits(DELTA_OFFSET_BITS);
 			num = delta + numbase;
 		}
 	}
@@ -1105,20 +1110,19 @@ int World::ParseDeltaHeader(BitBuffer *stream, bool &remove, bool &custom, int &
 
 		if (m_MaxInstanced_BaseLine)
 		{
-			isnext = stream->ReadBit() ? true : false;
-			if (isnext)
+			newbl = stream->ReadBit() ? true : false;
+
+			if (newbl)
 			{
-				newbl = true;
-				newblindex = stream->ReadBits(6);
+				newblindex = stream->ReadBits(MAX_BASELINE_BITS);
 			}
 		}
 
 		if (full && !newbl)
 		{
-			isnext = stream->ReadBit() ? true : false;
-			if (isnext)
+			if (stream->ReadBit() != 0)
 			{
-				offset = stream->ReadBits(6);
+				offset = stream->ReadBits(MAX_BASELINE_BITS);
 			}
 		}
 	}
@@ -1152,10 +1156,10 @@ int World::CompressFrame(frame_t *from, BitBuffer *stream)
 	unsigned char *start = stream->CurrentByte();
 	for (auto entnum = 0u; entnum < from->entitynum; entnum++)
 	{
-		header.num = entities[entnum].number;
-		header.custom = (entities[entnum].entityType & ENTITY_BEAM) == ENTITY_BEAM;
+		header.num        = entities[entnum].number;
+		header.custom     = (entities[entnum].entityType & ENTITY_BEAM) == ENTITY_BEAM;
 		header.newblindex = 0;
-		header.newbl = false;
+		header.newbl      = false;
 
 		entity_state_t *baseline = &m_BaseLines[header.num];
 		header.offset = FindBestBaseline(entnum, &baseline, entities, header.num, header.custom);
@@ -1273,26 +1277,25 @@ bool World::GetDeltaFromCache(unsigned int seqNr, unsigned int deltaNr, BitBuffe
 	return 0;
 }
 
+// marker an entity index that not in an old packet (for svc_packetentities)
+#define ENTITY_SENTINEL 9999
+
 void World::WritePacketEntities(BitBuffer *stream, frame_t *frame, frame_t *deltaframe)
 {
-	int oldmax;
-	int oldindex;
-	int newindex;
-	int newnum;
-	int oldnum;
-	entity_state_t *frameEntities;
-	entity_state_t *deltaEntities;
+	unsigned int	oldmax, oldindex, newindex;
+	int				newnum, oldnum;
+	entity_state_t		*frameEntities, *deltaEntities;
 
 	deltacallback_t header;
 	header.instanced_baseline = (m_MaxInstanced_BaseLine > 0) ? true : false;
-	header.num = 0;
-	header.offset = 0;
-	header.numbase = 0;
+	header.num        = 0;
+	header.offset     = 0;
+	header.numbase    = 0;
 	header.newblindex = 0;
-	header.full = false;
-	header.newbl = false;
-	header.remove = false;
-	header.custom = false;
+	header.newbl      = false;
+	header.remove     = false;
+	header.full       = false;
+	header.custom     = false;
 
 	if (frame->delta || deltaframe->delta) {
 		m_System->Errorf("World::WritePacketEntities: frame and delta frame must be uncompressed.\n");
@@ -1302,79 +1305,82 @@ void World::WritePacketEntities(BitBuffer *stream, frame_t *frame, frame_t *delt
 	m_Delta.SetTime(frame->time);
 
 	oldmax = deltaframe->entitynum;
-	newnum = 0; // index in frame->entities
-	oldnum = 0; // index in deltaframe->entities
+	newindex = 0; // index in frame->entities
+	oldindex = 0; // index in deltaframe->entities
 
 	frameEntities = (entity_state_t *)frame->entities;
 	deltaEntities = (entity_state_t *)deltaframe->entities;
 
 	stream->StartBitMode();
-	while (true)
+
+	while (newindex < frame->entitynum || oldindex < oldmax)
 	{
-		if ((unsigned)newnum < frame->entitynum)
-		{
-			newindex = frameEntities[newnum].number;
-		}
-		else
-		{
-			if (oldnum >= oldmax)
-				break;
+		newnum = (newindex >= frame->entitynum) ? ENTITY_SENTINEL : frameEntities[newindex].number;
+		oldnum = (oldindex >= oldmax)           ? ENTITY_SENTINEL : deltaEntities[oldindex].number;
 
-			// TODO: Unreachable code
-			if ((unsigned)newnum < frame->entitynum)
-				newindex = frameEntities[newnum].number;
-			else
-				newindex = 9999;
-		}
-
-		if (oldnum < oldmax)
-			oldindex = deltaEntities[oldnum].number;
-		else
-			oldindex = 9999;
-
-		if (newindex == oldindex)
+		// this is a delta update of the entity from previous position
+		if (newnum == oldnum)
 		{
-			header.custom = (frameEntities[newnum].entityType & ENTITY_BEAM) == ENTITY_BEAM;
-			header.num = newindex;
+			// delta update from old position
+			// because the force parm is false, this will not result
+			// in any bytes being emitted if the entity has not changed at all
+			// note that players are always 'newentities', this updates their oldorigin always
+			// and prevents warping
+
+			header.custom     = (frameEntities[newindex].entityType & ENTITY_BEAM) == ENTITY_BEAM;
+			header.num        = newnum;
 			header.newblindex = 0;
-			header.newbl = false;
-			header.remove = false;
+			header.newbl      = false;
+			header.remove     = false;
 
-			delta_t *delta = GetDeltaEncoder(newindex, header.custom);
-			m_Delta.WriteDelta(stream, (byte *)&deltaEntities[newindex], (byte *)&frameEntities[newnum], false, delta, &header);
+			delta_t *delta = GetDeltaEncoder(newnum, header.custom);
+			m_Delta.WriteDelta(stream, (byte *)&deltaEntities[oldindex], (byte *)&frameEntities[newindex], false, delta, &header);
 
-			oldnum++;
-			newnum++;
+			oldindex++;
+			newindex++;
 			continue;
 		}
 
-		if (newindex >= oldindex)
+		// Figure out how we want to update the entity
+		// This is a new entity, send it from the baseline
+		if (newnum < oldnum)
 		{
-			if (newindex > oldindex)
-			{
-				header.num = oldindex;
-				header.remove = true;
-				header.newbl = false;
-				header.newblindex = 0;
+			//
+			// If the entity was not in the old packet (oldnum == 9999),
+			// then delta from the baseline since this is a new entity
+			header.custom     = (frameEntities[newindex].entityType & ENTITY_BEAM) == ENTITY_BEAM;
+			header.num        = newnum;
+			header.newblindex = 0;
+			header.newbl      = false;
+			header.remove     = false;
 
-				m_Delta.WriteHeader(stream, &header);
-				++oldnum;
-			}
+			delta_t *delta = GetDeltaEncoder(newnum, header.custom);
+			m_Delta.WriteDelta(stream, (byte *)&m_BaseLines[newnum], (byte *)&frameEntities[newindex], true, delta, &header);
+			newindex++;
 			continue;
 		}
 
-		header.custom = (frameEntities[newnum].entityType & ENTITY_BEAM) == ENTITY_BEAM;
-		header.newblindex = 0;
-		header.num = newindex;
-		header.remove = false;
-		header.newbl = false;
+		// the old entity isn't present in the new message
+		if (newnum > oldnum)
+		{
+			//
+			// If the entity was in the old list, but is not in the new list (newindex == 9999),
+			// then construct a special remove message
 
-		delta_t *delta = GetDeltaEncoder(newindex, header.custom);
-		m_Delta.WriteDelta(stream, (byte *)&m_BaseLines[oldnum], (byte *)&frameEntities[newnum], true, delta, &header);
-		newnum++;
+			header.num        = oldnum;
+			header.newblindex = 0;
+			header.newbl      = false;
+			header.remove     = true; // tell the client that entity was removed from server
+
+			m_Delta.WriteHeader(stream, &header);
+			oldindex++;
+			continue;
+		}
 	}
 
+	// No more entities.. (end of packet entities)
 	stream->WriteBits(0, 16);
+
 	stream->EndBitMode();
 }
 
@@ -1467,13 +1473,14 @@ double World::GetTime()
 	return m_WorldTime;
 }
 
+// An svc_packetentities has just been parsed, deal with the rest of the data stream
 bool World::UncompressEntitiesFromStream(frame_t *frame, BitBuffer *stream, unsigned int from)
 {
-	int newnum, oldnum;
-	int oldindex, newindex;
+	int				newnum, oldnum;
+	unsigned int	oldindex, newindex;
 
-	bool remove, custom, newbl;
-	int newblindex, numbase, offset;
+	bool	remove, custom, newbl;
+	int		newblindex, numbase, offset;
 
 	frame_t deltaFrame;
 	if (!GetUncompressedFrame(from, &deltaFrame)) {
@@ -1485,11 +1492,15 @@ bool World::UncompressEntitiesFromStream(frame_t *frame, BitBuffer *stream, unsi
 	oldindex = 0;
 	newindex = 0;
 
-	remove = false;
-	custom = false;
-	newbl = false;
+	numbase    = 0;
 	newblindex = 0;
-	numbase = 0;
+	newbl      = false;
+	remove     = false;
+	custom     = false;
+
+	//
+	// Parse uncompress entities
+	//
 
 	m_Delta.SetTime(frame->time);
 	stream->StartBitMode();
@@ -1500,59 +1511,74 @@ bool World::UncompressEntitiesFromStream(frame_t *frame, BitBuffer *stream, unsi
 	while (stream->PeekBits(16))
 	{
 		newnum = ParseDeltaHeader(stream, remove, custom, numbase, newbl, newblindex, false, offset);
+		oldnum = (oldindex >= deltaFrame.entitynum) ? ENTITY_SENTINEL : deltaEntity[oldindex].number;
 
-		if ((unsigned)oldindex < deltaFrame.entitynum)
-			oldnum = deltaEntity[oldindex].number;
-		else
-			oldnum = 9999;
-
-		while (newnum > oldnum)
+		while (oldnum < newnum)
 		{
+			//
+			// one or more entities from the old packet are unchanged
+
 			if (newindex >= MAX_PACKET_ENTITIES)
 			{
 				m_System->DPrintf("WARNING!World::UncompressEntitiesFromStream: newindex >= MAX_PACKET_ENTITIES.\n");
 				stream->m_Overflowed = true;
 			}
 
+			// copy one of the old entities over to the new packet unchanged
 			Q_memcpy(&entity[newindex], &deltaEntity[oldindex], sizeof(entity[newindex]));
 
 			newindex++;
 			oldindex++;
 
-			if ((unsigned)oldindex < deltaFrame.entitynum)
-				oldnum = deltaEntity[oldindex].number;
-			else
-				oldnum = 9999;
+			// lookup next index
+			oldnum = (oldindex >= deltaFrame.entitynum) ? ENTITY_SENTINEL : deltaEntity[oldindex].number;
 		}
 
-		if (newnum >= oldnum)
+		// delta from previous state
+		if (newnum == oldnum)
 		{
-			if (newnum == oldnum)
+			if (remove)
 			{
-				if (remove)
-				{
-					++oldindex;
-				}
-				else
-				{
-					entity[newindex].entityType = custom ? ENTITY_BEAM : ENTITY_NORMAL;
-
-					delta_t *delta = GetDeltaEncoder(newnum, custom);
-					m_Delta.ParseDelta(stream, (byte *)&deltaEntity[oldindex], (byte *)&entity[newindex], delta);
-
-					entity[newindex].number = newnum;
-					++newindex;
-					++oldindex;
-				}
+				oldindex++;
+				continue;
 			}
+
+			//
+			// Insert new the entity to frame
+
+			entity[newindex].entityType = custom ? ENTITY_BEAM : ENTITY_NORMAL;
+
+			delta_t *delta = GetDeltaEncoder(newnum, custom);
+			m_Delta.ParseDelta(stream, (byte *)&deltaEntity[oldindex], (byte *)&entity[newindex], delta);
+
+			entity[newindex].number = newnum;
+			newindex++;
+			oldindex++;
+
+			continue;
 		}
-		else if (!remove)
+
+		// Figure out how we want to update the entity
+		// This is a new entity, sent it from the baseline
+		if (newnum < oldnum)
 		{
+			//
+			// If the entity was not in the old packet (oldnum == 9999),
+			// then delta from the baseline since this is a new entity
+
+			if (remove)
+			{
+				continue;
+			}
+
 			if (newindex >= MAX_PACKET_ENTITIES)
 			{
 				m_System->DPrintf("World::UncompressEntitiesFromStream: newindex >= MAX_PACKET_ENTITIES.\n");
 				stream->m_Overflowed = true;
 			}
+
+			//
+			// Insert new the entity to frame
 
 			entity_state_t *baseline;
 			if (newbl)
@@ -1574,9 +1600,12 @@ bool World::UncompressEntitiesFromStream(frame_t *frame, BitBuffer *stream, unsi
 			m_Delta.ParseDelta(stream, (byte *)baseline, (byte *)&entity[newindex], delta);
 			entity[newindex].number = newnum;
 			newindex++;
+
+			continue;
 		}
 	}
 
+	// peek bit == 0 end of packet entities
 	if (stream->ReadShort())
 	{
 		m_System->DPrintf("WARNING! World::UncompressEntitiesFromStream: missing end tag.\n");
@@ -1585,7 +1614,10 @@ bool World::UncompressEntitiesFromStream(frame_t *frame, BitBuffer *stream, unsi
 
 	stream->EndBitMode();
 
-	while ((unsigned)oldindex < deltaFrame.entitynum)
+	// Copy all the rest of the entities from the old packet
+	//
+
+	while (oldindex != ENTITY_SENTINEL && oldindex < deltaFrame.entitynum)
 	{
 		if (newindex >= MAX_PACKET_ENTITIES)
 		{
@@ -1593,13 +1625,10 @@ bool World::UncompressEntitiesFromStream(frame_t *frame, BitBuffer *stream, unsi
 			stream->m_Overflowed = true;
 		}
 
+		// copy everything to the new state we are delta'ing
 		Q_memcpy(&entity[newindex], &deltaEntity[oldindex], sizeof(entity[newindex]));
 		newindex++;
 		oldindex++;
-	}
-
-	if (newindex != frame->entitynum) {
-		m_System->DPrintf("WARNING! World::UncompressEntitiesFromStream: newindex != frame->entitynum.\n");
 	}
 
 	return true;
@@ -1607,19 +1636,11 @@ bool World::UncompressEntitiesFromStream(frame_t *frame, BitBuffer *stream, unsi
 
 bool World::UncompressEntitiesFromStream(frame_t *frame, BitBuffer *stream)
 {
-	int num;
-	int newindex = 0;
-	int entnum = frame->entitynum;
+	int		num, newindex = 0;
+	int		entnum = frame->entitynum;
 	entity_state_t *baseline;
-	bool remove, custom, newbl;
-	int newblindex, numbase, offset;
-
-	newblindex = 0;
-	numbase = 0;
-
-	remove = false;
-	custom = false;
-	newbl = false;
+	bool		remove = false, custom = false, newbl = false;
+	int		newblindex = 0, numbase = 0, offset;
 
 	entity_state_t *entities = (entity_state_t *)frame->entities;
 	m_Delta.SetTime(frame->time);
@@ -2240,8 +2261,8 @@ void World::RearrangeFrame(frame_t *frame, int seqNrOffset, float timeOffset)
 		BitBuffer tempStream(frame->entities, frame->entitiesSize);
 		Q_memset(frame->entities, 0, frame->entitiesSize);
 
-		int newsize = CompressFrame(&fullFrame, &tempStream);
-		if ((unsigned)newsize > frame->entitiesSize || tempStream.IsOverflowed()) {
+		unsigned int newsize = CompressFrame(&fullFrame, &tempStream);
+		if (newsize > frame->entitiesSize || tempStream.IsOverflowed()) {
 			m_System->Printf("WARNING! World::RearrangeFrame: wrong entities size (%i != %i).\n", frame->entitiesSize, newsize);
 			return;
 		}

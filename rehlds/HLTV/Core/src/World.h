@@ -39,6 +39,9 @@
 #define RESOURCE_INDEX_BITS	12
 #define RESOURCE_MAX_COUNT	(1 << RESOURCE_INDEX_BITS)
 
+#define MAX_BASELINE_BITS	6
+#define MAX_BASELINES		(1 << MAX_BASELINE_BITS)
+
 class World: public IWorld, public BaseSystemModule {
 public:
 	World() {}

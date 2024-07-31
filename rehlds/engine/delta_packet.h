@@ -30,6 +30,9 @@
 
 #include "entity_state.h"
 
+// marker an entity index that not in an old packet (for svc_packetentities)
+#define ENTITY_SENTINEL 9999
+
 typedef struct packet_entities_s
 {
 	int num_entities;

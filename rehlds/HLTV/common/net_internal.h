@@ -98,6 +98,9 @@
 // Max size of udp packet payload
 #define	MAX_UDP_PACKET	4010		// 9 bytes SPLITHEADER + 4000 payload?
 
+#define	DELTA_OFFSET_BITS 6
+#define	DELTA_OFFSET_MAX  ((1 << DELTA_OFFSET_BITS) - 1)
+
 enum svc_commands_e
 {
 	svc_bad,
