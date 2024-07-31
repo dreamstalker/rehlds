@@ -1341,7 +1341,7 @@ void World::WritePacketEntities(BitBuffer *stream, frame_t *frame, frame_t *delt
 			header.remove = false;
 
 			delta_t *delta = GetDeltaEncoder(newindex, header.custom);
-			m_Delta.WriteDelta(stream, (byte *)&deltaEntities[oldnum], (byte *)&frameEntities[newnum], true, delta, &header);
+			m_Delta.WriteDelta(stream, (byte *)&deltaEntities[newindex], (byte *)&frameEntities[newnum], false, delta, &header);
 
 			oldnum++;
 			newnum++;
