@@ -884,7 +884,11 @@ void SV_RunCmd(usercmd_t *ucmd, int random_seed)
 	pmove->spectator = 0;
 	pmove->waterjumptime = sv_player->v.teleport_time;
 
+#ifdef REHLDS_FIXES
+	Q_memcpy(&pmove->cmd, ucmd, sizeof(pmove->cmd));
+#else
 	Q_memcpy(&pmove->cmd, &cmd, sizeof(pmove->cmd));
+#endif
 
 	pmove->dead = sv_player->v.health <= 0.0;
 	pmove->movetype = sv_player->v.movetype;
