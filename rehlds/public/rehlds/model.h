@@ -144,6 +144,13 @@ struct msurface_s
 	// surface generation data
 	struct surfcache_s *cachespots[MIPLEVELS];
 
+	// Maximum s/t texture size on the surface
+#if defined(GLQUAKE) || defined(SWDS)
+	#define MAX_SURFACE_TEXTURE_SIZE 512
+#else
+	#define MAX_SURFACE_TEXTURE_SIZE 256 // Software rendering is limited to 256
+#endif
+
 	short			texturemins[2]; // smallest s/t position on the surface.
 	short			extents[2];		// ?? s/t texture size, 1..256 for all non-sky surfaces
 

@@ -891,7 +891,7 @@ void CalcSurfaceExtents(msurface_t *s)
 
 		s->texturemins[i] = bmins[i] * 16;
 		s->extents[i] = (bmaxs[i] - bmins[i]) * 16;
-		if (!(tex->flags & TEX_SPECIAL) && s->extents[i] > 256)
+		if (!(tex->flags & TEX_SPECIAL) && s->extents[i] > MAX_SURFACE_TEXTURE_SIZE)
 			Sys_Error("%s: Bad surface extents", __func__);
 	}
 }
