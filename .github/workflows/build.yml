@@ -116,7 +116,7 @@ jobs:
   linux:
     name: 'Linux'
     runs-on: ubuntu-latest
-    container: s1lentq/linux86buildtools:latest
+    container: debian:oldstable-slim
 
     steps:
       - name: Checkout
@@ -124,9 +124,20 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Install dependencies
+        run: |
+          dpkg --add-architecture i386
+          apt-get update
+          apt-get install -y \
+            gcc-multilib g++-multilib \
+            build-essential \
+            libc6-dev libc6-dev-i386 \
+            git cmake rsync \
+            g++ gcc
+
       - name: Build and Run unittests
         run: |
-          rm -rf build && CC=icc CXX=icpc cmake -DCMAKE_BUILD_TYPE=Unittests -B build && cmake --build build -j8
+          rm -rf build && cmake -DCMAKE_BUILD_TYPE=Unittests -B build && cmake --build build -j8
           retVal=0
           export LD_LIBRARY_PATH="rehlds/lib/linux32:$LD_LIBRARY_PATH"
           ./build/rehlds/engine_i486 2> /dev/null > result.log || retVal=$?
@@ -148,9 +159,9 @@ jobs:
           fi
         shell: bash
 
-      - name: Build using Intel C++ Compiler
+      - name: Build using GCC Compiler
         run: |
-          rm -rf build && CC=icc CXX=icpc cmake -B build && cmake --build build -j8
+          rm -rf build && cmake -B build && cmake --build build -j8
 
       - name: Prepare HLSDK
         run: |
