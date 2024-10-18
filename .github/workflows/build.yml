@@ -11,9 +11,6 @@ on:
   release:
     types: [published]
 
-env:
-  ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
-
 jobs:
   windows:
     name: 'Windows'
@@ -28,12 +25,12 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Setup MSBuild
-        uses: microsoft/setup-msbuild@v1.1.3
+        uses: microsoft/setup-msbuild@v2
 
       - name: Build and Run unittests
         run: |
@@ -73,7 +70,7 @@ jobs:
           move msvc\${{ env.buildRelease }}\director.pdb publish\debug\director.pdb
 
       - name: Deploy artifacts
-        uses: actions/upload-artifact@v3.1.1
+        uses: actions/upload-artifact@v4
         with:
           name: win32
           path: publish/*
@@ -81,90 +78,66 @@ jobs:
   testdemos:
     name: 'Test demos'
     runs-on: ubuntu-latest
-    container: s1lentq/testdemos:latest
+    container: rehldsorg/testdemos:latest
     needs: [windows]
-
-    env:
-      WINEDEBUG: -all
-      WINEDLLOVERRIDES: mshtml=
-
     defaults:
       run:
         shell: bash
-        working-directory: ../../../opt/HLDS
+        working-directory: /opt/HLDS
+
+    strategy:
+      fail-fast: false
+      matrix:
+        test: [
+          { file: 'cstrike-muliplayer-1',       desc: 'CS: Multiplayer' },
+          { file: 'rehlds-phys-single1',        desc: 'Half-Life: Physics singleplayer' },
+          { file: 'crossfire-1-multiplayer-1',  desc: 'Half-Life: Multiplayer on crossfire map' },
+          { file: 'shooting-hl-1',              desc: 'Half-Life: Shooting with several weapons' },
+        ]
 
     steps:
       - name: Deploying windows artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: win32
 
-      - name: Play demos
+      - name: Setup dependencies
         run: |
           chown root ~
           rsync -a deps/rehlds/* .
           mv $GITHUB_WORKSPACE/tests/swds.dll .
 
-          descs=(
-            "CS: Multiplayer"
-            "Half-Life: Physics singleplayer"
-            "Half-Life: Multiplayer on crossfire map"
-            "Half-Life: Shooting with several weapons"
-          )
-
-          demos=(
-            "cstrike-muliplayer-1"
-            "rehlds-phys-single1"
-            "crossfire-1-multiplayer-1"
-            "shooting-hl-1"
-          )
-
-          retVal=0
-          for i in "${!demos[@]}"; do
-            params=$(cat "testdemos/${demos[i]}.params")
-
-            echo -e "\e[1m[$((i + 1))/${#demos[@]}] \e[1;36m${descs[i]} testing...\e[0m"
-            echo -e "    - \e[0;33mParameters $params\e[0m"
-
-            wine hlds.exe --rehlds-enable-all-hooks --rehlds-test-play "testdemos/${demos[i]}.bin" $params &> result.log || retVal=$?
-
-            if [ $retVal -ne 777 ] && [ $retVal -ne 9 ]; then
-              # Print with catchy messages
-              while read line; do
-                echo -e "      \e[0;33m$line"
-              done <<< $(cat result.log | sed '0,/demo failed/I!d;/wine:/d;/./,$!d')
-
-              echo "      🔸  🔸  🔸  🔸  🔸  🔸  🔸  🔸  🔸  🔸"
-              while read line; do
-                echo -e "      \e[1;31m$line";
-              done < rehlds_demo_error.txt
-              echo -e "      \e[30;41mExit code: $retVal\e[0m"
-              echo -e "\e[1m[$((i + 1))/${#demos[@]}] \e[1;36m${descs[i]} testing...\e[1;31m Failed ❌"
-              exit 6 # Test demo failed
-            else
-              # Print result HLDS console
-              while read line; do
-                echo -e "      \e[0;33m$line"
-              done <<< $(cat result.log | sed '/wine:/d;/./,$!d')
-              echo -e "      \e[30;43mExit code: $retVal\e[0m"
-              echo -e "\e[1m[$((i + 1))/${#demos[@]}] \e[1;36m${descs[i]} testing...\e[1;32m Succeed ✔"
-            fi
-          done
+      - name: Play test
+        env:
+          demo: ${{ matrix.test.file }}
+          desc: ${{ matrix.test.desc }}
+        run: ./runTest.sh
 
   linux:
     name: 'Linux'
     runs-on: ubuntu-latest
-    container: s1lentq/linux86buildtools:latest
+    container: debian:oldstable-slim
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
+      - name: Install dependencies
+        run: |
+          dpkg --add-architecture i386
+          apt-get update
+          apt-get install -y \
+            gcc-multilib g++-multilib \
+            build-essential \
+            libc6-dev libc6-dev-i386 \
+            git cmake rsync \
+            g++ gcc
+
       - name: Build and Run unittests
         run: |
-          rm -rf build && CC=icc CXX=icpc cmake -DCMAKE_BUILD_TYPE=Unittests -B build && cmake --build build -j8
+          rm -rf build && cmake -DCMAKE_BUILD_TYPE=Unittests -B build && cmake --build build -j8
           retVal=0
           export LD_LIBRARY_PATH="rehlds/lib/linux32:$LD_LIBRARY_PATH"
           ./build/rehlds/engine_i486 2> /dev/null > result.log || retVal=$?
@@ -186,9 +159,9 @@ jobs:
           fi
         shell: bash
 
-      - name: Build using Intel C++ Compiler
+      - name: Build using GCC Compiler
         run: |
-          rm -rf build && CC=icc CXX=icpc cmake -B build && cmake --build build -j8
+          rm -rf build && cmake -B build && cmake --build build -j8
 
       - name: Prepare HLSDK
         run: |
@@ -231,17 +204,11 @@ jobs:
         shell: bash
 
       - name: Deploy artifacts
-        uses: actions/upload-artifact@v3.1.1
+        uses: actions/upload-artifact@v4
         id: upload-job
         with:
           name: linux32
           path: publish/*
-
-      - name: Cleanup temporary artifacts
-        if: success() && steps.upload-job.outcome == 'success'
-        run: |
-          rm -rf hlsdk
-          rm -f appversion.h
 
   publish:
     name: 'Publish'
@@ -250,12 +217,12 @@ jobs:
 
     steps:
       - name: Deploying linux artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: linux32
 
       - name: Deploying windows artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: win32
 
@@ -284,7 +251,7 @@ jobs:
           7z a -t7z -m0=lzma2 -mx=9 -mfb=64 -aoa rehlds-dbg-${{ env.APP_VERSION }}.7z debug/
 
       - name: Publish artifacts
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         id: publish-job
         if: |
           startsWith(github.ref, 'refs/tags/') &&
@@ -295,9 +262,3 @@ jobs:
             *.7z
         env:
           GITHUB_TOKEN: ${{ secrets.API_TOKEN }}
-
-      - name: Cleanup temporary artifacts
-        if: success() && steps.publish-job.outcome == 'success'
-        run: |
-          rm -rf bin debug hlsdk
-          rm -f *.7z *.zip appversion.h
