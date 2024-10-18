@@ -199,12 +199,6 @@ jobs:
           name: linux32
           path: publish/*
 
-      - name: Cleanup temporary artifacts
-        if: success() && steps.upload-job.outcome == 'success'
-        run: |
-          rm -rf hlsdk
-          rm -f appversion.h
-
   publish:
     name: 'Publish'
     runs-on: ubuntu-latest
@@ -257,9 +251,3 @@ jobs:
             *.7z
         env:
           GITHUB_TOKEN: ${{ secrets.API_TOKEN }}
-
-      - name: Cleanup temporary artifacts
-        if: success() && steps.publish-job.outcome == 'success'
-        run: |
-          rm -rf bin debug hlsdk
-          rm -f *.7z *.zip appversion.h
